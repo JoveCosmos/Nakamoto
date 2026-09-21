@@ -135,7 +135,7 @@ function lum(u){ u=Math.max(0,Math.min(1,u));
 })();
 
 var maxT = VALS[0][1], MODE = "color";
-var LIVE_H = D.height || 0, LIVE_AT = 0;
+var LIVE_H = D.height || 0, LIVE_AT = 0, LIVE_MOVED = true;   /* did the last tick move a stake? (a redraw costs 300 rows) */
 
 /* ── concentration as a model input ────────────────────────────────────────
    eta and the bonded share are single numbers; concentration is a property of
@@ -608,7 +608,7 @@ function applyLive(d){
      waits for the next full rebuild rather than inventing a row. */
   if(VALS.length !== d.n) moved = true;
   if(!moved && d.h === LIVE_H) return false;
-  LIVE_H = d.h || LIVE_H; LIVE_AT = Date.now();
+  LIVE_H = d.h || LIVE_H; LIVE_AT = Date.now(); LIVE_MOVED = moved;
   /* rank is stake order, and stake just moved */
   VALS.sort(function(a, b){ return b[1] - a[1]; });
   S = d.s; N = d.n; R = d.r || R;
@@ -620,6 +620,7 @@ function applyLive(d){
 }
 
 window.__applyLive = applyLive;
+window.__liveMoved = function(){ return LIVE_MOVED; };
 /* the whole set again, from data.json: monikers, commissions, jailings, the lifetime
    record, and every detail the cards and the dashboard read - what the refresh button
    is for. The live tokens (the 6-second vector) are kept; a validator new to the set
@@ -1496,7 +1497,9 @@ rememberGridH();
       back = 0;
       try{
         if(x.status === 200 && window.__applyLive(JSON.parse(x.responseText))){
-          window.__redraw();
+          /* a block with no stake moving is a height tick: the clock and the height
+             follow it, the map and the lists do not rebuild for nothing */
+          if(window.__liveMoved()) window.__redraw();
           window.dispatchEvent(new Event("thermo:live"));
           /* the plan is not advice that was true once - it re-solves on the same
              vector everyone else is seeing, so a reader watches their own answer
@@ -1665,7 +1668,7 @@ rememberGridH();
   var amt = E("amt"), out = E("dstrat");
   if(!amt || !out) return;
   /* the picker is rebuilt on every draw; a live tick redraws the plan too */
-  window.addEventListener("thermo:live", function(){ if(document.documentElement.getAttribute("data-tab") === "dele") draw(); });
+  window.addEventListener("thermo:live", function(){ if(document.documentElement.getAttribute("data-tab") === "dele" && (!window.__liveMoved || window.__liveMoved())) draw(); });
   /* the counter: seconds since the numbers were last read - the live tick or a
      refresh, whichever is later - ticking on its own while the wallet is open */
   var ago = E("dago");
@@ -1818,7 +1821,7 @@ rememberGridH();
     h += '<table><colgroup><col style="width:30px"><col><col style="width:80px"><col style="width:50px"><col style="width:56px"></colgroup><thead><tr><th class=c>rank</th><th class=l>validator</th><th>ATONE</th><th>APR</th><th>rewards</th></tr></thead><tbody>';
     for(k = 0; k < slice.length; k++){
       var rw = slice[k], rk = rankOf(V, rw.id);
-      h += '<tr data-v="' + att(rw.id) + '" tabindex=0 title="Open this validator"><td class="c rk">' + rk + '</td><td class="l nm">' + logo(rw.id, rw.m) + '<span>' + att(rw.m) + '</span></td>' +
+      h += '<tr' + (rw.inactive ? ' class=inactive title="Not in the active set: this stake earns nothing until it is moved or unstaked"' : ' data-v="' + att(rw.id) + '" tabindex=0 title="Open this validator"') + '><td class="c rk">' + (rk || '\u2014') + '</td><td class="l nm">' + logo(rw.id, rw.m) + '<span>' + att(rw.m) + '</span></td>' +
            '<td class=amt><span title="' + (rw.locked > 0 ? 'held until ' + window.__day(rw.until) : 'free to move') + '">' + fmt(rw.x) + (rw.locked > 0 ? LOCK : '') + '</span></td>' +
            '<td>' + pct(rw.rate) + '</td><td class=rw>' + (RB[rw.id] != null ? fmt(RB[rw.id]) : '\u2014') + '</td></tr>';
     }
@@ -2036,10 +2039,11 @@ rememberGridH();
   window.__txMsgs = function(){ return txMsgs(); };   /* the probes read what would be signed */
   function txMsgs(){
     var addr = window.__ADDR, VD = window.__VDBY || {};
+    var pos = window.__POS, own = {}; if(pos) pos.rows.forEach(function(r){ if(r.op) own[r.id] = r.op; });
     return MSGS.map(function(m){
-      var s = VD[m.from], d = VD[m.to];
-      if(!s || !d || !s.op || !d.op) return null;
-      return { type: "cosmos-sdk/MsgBeginRedelegate", value: { delegator_address: addr, validator_src_address: s.op,
+      var s = VD[m.from], d = VD[m.to], src = (s && s.op) || own[m.from];
+      if(!src || !d || !d.op) return null;
+      return { type: "cosmos-sdk/MsgBeginRedelegate", value: { delegator_address: addr, validator_src_address: src,
                validator_dst_address: d.op, amount: { denom: "uatone", amount: String(m.amt) } } };
     }).filter(Boolean);
   }
@@ -2141,13 +2145,13 @@ rememberGridH();
          amount is covered - the whole stake when the field holds the total */
       var need = u, out = [];
       pos.rows.slice().sort(function(a, b){ return b.x - a.x; }).forEach(function(row){
-        if(need <= 0) return; var d = VD[row.id]; if(!d || !d.op) return;
+        if(need <= 0) return; var d = VD[row.id], op = (d && d.op) || row.op; if(!op) return;
         var t = Math.min(row.x, need); need -= t;
-        out.push({ type: "cosmos-sdk/MsgUndelegate", value: { delegator_address: window.__ADDR, validator_address: d.op, amount: { denom: "uatone", amount: String(Math.floor(t)) } } }); });
+        out.push({ type: "cosmos-sdk/MsgUndelegate", value: { delegator_address: window.__ADDR, validator_address: op, amount: { denom: "uatone", amount: String(Math.floor(t)) } } }); });
       return out;
     }
-    var d = VD[UNSEL]; if(!d || !d.op) return [];
-    return [{ type: "cosmos-sdk/MsgUndelegate", value: { delegator_address: window.__ADDR, validator_address: d.op, amount: { denom: "uatone", amount: String(u) } } }];
+    var d = VD[UNSEL], op = (d && d.op) || r.op; if(!op) return [];
+    return [{ type: "cosmos-sdk/MsgUndelegate", value: { delegator_address: window.__ADDR, validator_address: op, amount: { denom: "uatone", amount: String(u) } } }];
   }
   window.__unMsgs = unMsgs;
   var unbtn = E("unbtn");
@@ -2562,16 +2566,18 @@ rememberGridH();
     for(i = 0; i < dels.length; i++){
       var d = dels[i];
       var amt = parseInt(d.balance.amount, 10);
-      var v = by[d.delegation.validator_address.slice(-6)];
-      if(!v || !(amt > 0)) continue;
+      var op = d.delegation.validator_address, id6 = op.slice(-6), v = by[id6];
+      if(!(amt > 0)) continue;
       /* the chain refuses ANY redelegation out of a validator that still holds an
          unmatured redelegation in for this delegator (ErrTransitiveRedelegation),
          not just the amount that arrived - so the whole row is held */
-      var L = lock[v[3]], held = L ? amt : 0;
-      var rate = window.__rateAfter(v[1], v[2], 0);  /* already in, no dilution */
+      var L = lock[id6], held = L ? amt : 0;
+      /* a validator outside the active set (unbonded, jailed out, gone) earns nothing:
+         that stake is still the reader's, shown as such, and the first to move */
+      var rate = v ? window.__rateAfter(v[1], v[2], 0) : 0;   /* already in, no dilution */
       total += amt; free += (amt - held); weighted += amt * rate;
       if(L && L.until > until) until = L.until;
-      rows.push({ id: v[3], m: v[0], x: amt, rate: rate, locked: held, until: L ? L.until : 0 });
+      rows.push({ id: id6, op: op, m: v ? v[0] : "Inactive validator", x: amt, rate: rate, locked: held, until: L ? L.until : 0, inactive: !v });
     }
     return { total: total, free: free, locked: total - free, until: until,
              rate: total ? weighted / total : 0, rows: rows };

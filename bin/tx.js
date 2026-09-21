@@ -123,6 +123,16 @@ function feeFor(gasUsed, n){
   return { gas: gas, amount: [{ denom: FEE_DENOM, amount: String(Math.ceil(gas * GAS_PRICE)) }] };
 }
 
+/* A simulation that the node REFUSES is the chain saying the transaction would fail in the
+   block - and a failed transaction still pays its fee. So the refusal is surfaced with the
+   node's own words, before anything is signed; only an unreachable node falls back to a
+   flat gas estimate. */
+function gasFallback(e){
+  var m = (e && e.message) || "";
+  if(m === "node unreachable" || m === "bad reply") return 0;
+  throw new Error("The chain refused this transaction: " + m.replace(/^rpc error: code = \w+ desc = /, "").slice(0, 300));
+}
+
 /* the sign doc the wallet shows the reader: legacy amino JSON, keys sorted */
 function signDoc(acc, fee, msgs, memo){
   return { account_number: acc.number, chain_id: CHAIN,
@@ -134,7 +144,7 @@ function sendRedelegations(wallet, msgs, memo, onStep){
   var step = onStep || function(){};
   var acc, fee;
   return account(wallet.address).then(function(a){ acc = a; step("simulating");
-    return simulate(msgs, memo, wallet.pubKey, acc.sequence).catch(function(){ return 0; });
+    return simulate(msgs, memo, wallet.pubKey, acc.sequence).catch(gasFallback);
   }).then(function(gasUsed){
     fee = feeFor(gasUsed, msgs.length);
     return balances(wallet.address).then(function(b){
@@ -167,7 +177,7 @@ function sendDirect(wallet, msgs, memo, onStep){
   if(!wallet.signDirect) return sendRedelegations(wallet, msgs, memo, onStep);
   var acc, fee, bodyB;
   return account(wallet.address).then(function(a){ acc = a; step("simulating");
-    return simulate(msgs, memo, wallet.pubKey, acc.sequence).catch(function(){ return 0; });
+    return simulate(msgs, memo, wallet.pubKey, acc.sequence).catch(gasFallback);
   }).then(function(gasUsed){
     fee = feeFor(gasUsed, msgs.length);
     return balances(wallet.address).then(function(b){

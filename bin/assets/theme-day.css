@@ -127,7 +127,6 @@
   html[data-theme=light]:not([data-mono]) .pdate{color:var(--faint)}
   html[data-theme=light]:not([data-mono]) .haltn{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .vsubn{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .chiprow .chip.static{border-color:var(--danger-bg);background:var(--danger-bg)}
   html[data-theme=light]:not([data-mono]) .bul{border-top:1px solid var(--line)}
   html[data-theme=light]:not([data-mono]) .bul b.hov::after{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .vstat.vrow{background:var(--surface-2)}
@@ -152,9 +151,6 @@
   html[data-theme=light]:not([data-mono]) .etabox.conc.low:hover{border-color:var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .etabox.conc.low:focus-visible{outline-color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .etabox.conc.low .disc.dc{color:var(--accent);border-color:var(--accent);box-shadow:0 0 0 1.5px var(--surface)}
-  html[data-theme=light]:not([data-mono]) .chiprow.narrow.cchips.low .chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .chiprow.narrow.cchips.low .chip[aria-pressed=true] span{color:#FFFFFF}
-  html[data-theme=light]:not([data-mono]) .chiprow.narrow.cchips.low .chip[aria-pressed=true] b{color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .etabox.cool{border-color:var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .etabox.cool b,html[data-theme=light]:not([data-mono]) .etabox.cool::after{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .etabox.cool:hover{border-color:var(--accent);background:var(--accent-soft)}
@@ -168,17 +164,6 @@
   html[data-theme=light]:not([data-mono]) .frow .etabox.conc.low{background-color:var(--surface)}
   html[data-theme=light]:not([data-mono]) .frow .etabox.cool{background-color:var(--surface)}
   html[data-theme=light]:not([data-mono]) .etabox:hover{background:var(--warn-bg)}
-  html[data-theme=light]:not([data-mono]) .chiprow .chip span{color:var(--muted)}
-  html[data-theme=light]:not([data-mono]) .chiprow .chip[aria-pressed=true] span{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .chiprow .chip[aria-pressed=true] b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .chiprow.narrow .chip[aria-pressed=true] span{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .chiprow.narrow .chip[aria-pressed=true] b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .chiprow.narrow.cchips .chip[aria-pressed=true]{background:var(--danger-bar);border-color:var(--danger-bar)}
-  html[data-theme=light]:not([data-mono]) .chiprow.narrow.cchips .chip[aria-pressed=true] span{color:#FFFFFF}
-  html[data-theme=light]:not([data-mono]) .chiprow.narrow.cchips .chip[aria-pressed=true] b{color:#FFFFFF}
-  html[data-theme=light]:not([data-mono]) .chiprow.narrow.echips.rise .chip[aria-pressed=true] span{color:#FFFFFF}
-  html[data-theme=light]:not([data-mono]) .chiprow.narrow.echips.rise .chip[aria-pressed=true] b{color:#FFFFFF}
-  html[data-theme=light]:not([data-mono]) .chiprow.narrow .chip span{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .pop{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .pop .card{border:1px solid var(--line-strong);background:var(--surface-2);box-shadow:0 0 0 1px var(--bg)}
   html[data-theme=light]:not([data-mono]) .vhead{background:var(--surface-2);border-bottom:1px solid var(--line)}
@@ -190,9 +175,6 @@
   html[data-theme=light]:not([data-mono]) .vstat:hover{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .vk{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .vnote{color:var(--faint)}
-  @media(max-width:620px){
-    html[data-theme=light]:not([data-mono]) .chiprow.narrow .chip span{color:var(--accent)}
-  }
   html[data-theme=light]:not([data-mono]) #cpop .vgrid{border-top:none}
   html[data-theme=light]:not([data-mono]) .vrk{border-color:var(--amber-bar);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) .tabb{background:transparent}
@@ -267,36 +249,19 @@
   html[data-theme=light]:not([data-mono]) .wk-btn:disabled{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-primary{color:var(--accent);background:var(--accent);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-go{color:#FFFFFF;background:var(--accent);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-txh .wchain i{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wopt:hover{border-color:var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .wopt b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .wk-state s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .wk-state b,html[data-theme=light]:not([data-mono]) .wk-state u{text-decoration:none}
-  html[data-theme=light]:not([data-mono]) .wk-card{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-live i{box-shadow:0 0 0 0 var(--accent)}
   html[data-theme=light]:not([data-mono]) .wk-pre button{background:transparent}
   html[data-theme=light]:not([data-mono]) .wk-pre button[aria-pressed=true]{background:var(--accent-soft);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-ico{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--a) 30%,transparent)}
-  html[data-theme=light]:not([data-mono]) #p-dele .wk-ico svg,html[data-theme=light]:not([data-mono]) #txpop .wk-ico svg,html[data-theme=light]:not([data-mono]) #wpick .wk-ico svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .wk-pl{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-pl.dim{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-hb i{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .wk-hb.hld i{background:transparent}
   html[data-theme=light]:not([data-mono]) .wk-hb.mv i{background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .wk-tbl tbody tr:hover td{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .wk-lg{box-shadow:0 0 0 1px var(--wbd2)}
   html[data-theme=light]:not([data-mono]) .wk-lgx{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .wk-tbl td.nm .j{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-tbl td.amt .lk svg{fill:none;stroke:currentColor}
-  html[data-theme=light]:not([data-mono]) .wk-c.aft b{text-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-cb u{background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .wk-cb.up u{background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .wk-amt:focus-within{box-shadow:0 0 0 3px var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .wk-amt input{background:none;outline:none}
-  html[data-theme=light]:not([data-mono]) .wk-pk:hover{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .wk-pk.head:hover{background:transparent}
-  html[data-theme=light]:not([data-mono]) .wk-pk input:checked{background:var(--accent);border-color:transparent;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-pk input:checked::after{border:solid var(--surface)}
   html[data-theme=light]:not([data-mono]) .wk-soon{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .pop .card.txcard{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard,html[data-theme=light]:not([data-mono]) #wpick .txcard{--wsolid:var(--ink)}
@@ -311,28 +276,12 @@
   html[data-theme=light]:not([data-mono]) .wk-tab.on::after{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-tab i{background:transparent;border-color:var(--amber-bar)}
   html[data-theme=light]:not([data-mono]) .wk-ib{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-card{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .fig b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .wk-tbl tbody tr:hover td{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .wk-tbl td.nm{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .wk-tbl td.amt{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .wk-lg{box-shadow:0 0 0 1px var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .wk-hb{background:var(--line-soft)}
   html[data-theme=light]:not([data-mono]) .wk-hb i{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .wk-hb.mv i{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .wk-pl{box-shadow:none;background:transparent}
-  html[data-theme=light]:not([data-mono]) .wk-amt input{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .wk-pre button[aria-pressed=true]{color:#FFFFFF;background:var(--accent);border-color:var(--accent);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-pk.head{background:transparent}
-  html[data-theme=light]:not([data-mono]) .wk-pk .n b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .wk-pk .x{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .wk-pk input:checked{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-pk input:checked::after{border-color:var(--surface)}
-  html[data-theme=light]:not([data-mono]) .wk-c b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .wk-c.aft b{text-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-cb{background:var(--line-soft)}
-  html[data-theme=light]:not([data-mono]) .wk-cb u{background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .wk-mv .f .dest b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .wk-mv .a{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .wk-btn.wk-go,html[data-theme=light]:not([data-mono]) .wk-btn.wk-primary{background:var(--accent-soft);border:1px solid var(--accent-soft);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-btn.wk-primary{background:var(--warn-bg);border-color:var(--amber-bar)}
@@ -361,7 +310,6 @@
   html[data-theme=light]:not([data-mono]) .ptab tr.vrow:hover td{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .ptab .tlg{box-shadow:0 0 0 1px var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .wk-tab i{border:1px solid var(--amber-bar);background:transparent}
-  html[data-theme=light]:not([data-mono]) .wk-pk .r s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .wk-mv .side .who b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .wk-mv .mid b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .wk-mv .mid u{text-decoration:none}
@@ -370,45 +318,15 @@
   html[data-theme=light]:not([data-mono]) .tabs .tabb.on[style*="2bc8bd"]{color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .tabs .tabb.on[style*="2ee06a"]{color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .w#calc>.brandbar,html[data-theme=light]:not([data-mono]) #p-gov>.w>.brandbar{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .wk-head{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .wk-card::before{background:transparent}
   html[data-theme=light]:not([data-mono]) #wk-mine{--a:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-plan{--a:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-moves{--a:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .fig{background:var(--wi)}
-  html[data-theme=light]:not([data-mono]) .fig::before{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .fig b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .fig.f-bal{--a:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .fig.f-stk{--a:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .fig.f-rew{--a:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .fig.f-pho{--a:var(--warn)}
-  html[data-theme=light]:not([data-mono]) .fig.f-stk b{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .fig.f-rew b{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .fig.f-pho b{color:var(--warn)}
-  html[data-theme=light]:not([data-mono]) .fig b.warn{color:var(--danger)}
-  html[data-theme=light]:not([data-mono]) .wk-stack i{border-right:1px solid var(--bg)}
-  html[data-theme=light]:not([data-mono]) .wk-stack i.hld{background-image:transparent}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-c.aft{border-color:var(--accent-soft);background:var(--wi)}
-  html[data-theme=light]:not([data-mono]) .wk-pk.on{border-color:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .wk-mv{background:var(--wchip)}
   html[data-theme=light]:not([data-mono]) .wk-btn.wk-go{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-btn.wk-go:disabled{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-plan{--a:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .wk-cap b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .wk-pk.on{background:var(--wchip);border-color:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .wk-ml .f.to b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .wk-ml .a{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .ftab.acct{background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--edge2)}
   html[data-theme=light]:not([data-mono]) .ftab.acct:hover{box-shadow:inset 0 0 0 1px var(--hot)}
-  html[data-theme=light]:not([data-mono]) .fig .two b.pho{color:var(--warn)}
-  html[data-theme=light]:not([data-mono]) .fig.f-bal{--a:var(--warn)}
-  html[data-theme=light]:not([data-mono]) .wk-news{border:1px solid var(--accent-soft);background:var(--bg);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-news b{text-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-news span{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .wk-news.none{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-news.none b{text-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-flt{background:transparent}
-  html[data-theme=light]:not([data-mono]) .wk-flt[aria-pressed=true]{border-color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .wk-gate{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .wk-gatecard{background:var(--surface);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .introby{text-decoration:none}
@@ -417,12 +335,6 @@
   html[data-theme=light]:not([data-mono]) .wk-gatecard .wopt:hover{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-disc{background:var(--wh);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-disc:hover{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-strip{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .kv b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .kv b.pho{color:var(--warn)}
-  html[data-theme=light]:not([data-mono]) .kv b.stk{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .kv b.rew{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .kv b.warn{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .wk-pane::before{background:transparent}
   html[data-theme=light]:not([data-mono]) #wk-mine{--a:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-plan{--a:var(--accent)}
@@ -438,25 +350,6 @@
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td.ck input:checked::after{border:solid var(--surface)}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 tr.pad td{border-bottom-color:transparent;background:transparent}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td.r2 s{text-decoration:none}
-  html[data-theme=light]:not([data-mono]) .wk-ph .wk-news{background:none;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-ph .wk-news b{text-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-ph .wk-news.none b{text-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-res .strip .p b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .wk-ml{border-bottom-color:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .kv{--k:var(--muted)}
-  html[data-theme=light]:not([data-mono]) .kv i{color:color-mix(in srgb,var(--k) 70%,var(--faint))}
-  html[data-theme=light]:not([data-mono]) .kv.k-bal{--k:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .kv.k-pho{--k:var(--warn)}
-  html[data-theme=light]:not([data-mono]) .kv.k-stk{--k:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .kv.k-rew{--k:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .kv.k-apr{--k:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .kv b.warn{color:var(--danger)}
-  html[data-theme=light]:not([data-mono]) .wk-who b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .wk-ph .wk-news .l1{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-news{border:1px solid var(--accent-soft);background:transparent;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-news .l1{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-news .l1 b{text-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-news.none b{text-shadow:none}
   html[data-theme=light]:not([data-mono]) #p-home .tapnote svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .wk-ph .wk-ib,html[data-theme=light]:not([data-mono]) #wk-plan .wk-ph .wk-ib{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-ph .wk-ib:hover{border-color:var(--accent);background:var(--accent-soft);box-shadow:none}
@@ -471,22 +364,15 @@
     html[data-theme=light]:not([data-mono]) .w#calc,html[data-theme=light]:not([data-mono]) .panes>.w{background:transparent;box-shadow:none}
   }
   html[data-theme=light]:not([data-mono]) .wk-max{background:transparent}
-  html[data-theme=light]:not([data-mono]) .wk-strip{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .wk-pane{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td{border-bottom-color:var(--line-soft)}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 tr:hover td{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 tr.on td{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 th{color:var(--muted)}
-  html[data-theme=light]:not([data-mono]) .kv i,html[data-theme=light]:not([data-mono]) .kv em{color:var(--muted)}
-  html[data-theme=light]:not([data-mono]) .wk-ml{border-bottom-color:var(--line-soft)}
-  html[data-theme=light]:not([data-mono]) .wk-ml .f b{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td.ck input{border-color:var(--line-strong);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) #p-dele .wk-disc svg.wk-out{fill:none;stroke:currentColor}
-  html[data-theme=light]:not([data-mono]) .wk-bal b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .wk-bal b.pho{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) .ftab.acct,html[data-theme=light]:not([data-mono]) .ftab.acct:hover,html[data-theme=light]:not([data-mono]) .ftab.acct.on{background:transparent;box-shadow:none}
   html[data-theme=light]:not([data-mono]) .ftab.acct.on::after{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .wk-balpane{--a:var(--warn)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh h3{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 b.pho{color:var(--accent)}
@@ -545,23 +431,13 @@
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td.nm .nmw>span.wk-lgx,html[data-theme=light]:not([data-mono]) #dpicks td.nm .nmw>span.wk-lgx{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td.amt{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves tr:hover td{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-news{border:1px solid var(--accent-soft);background:transparent}
-  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-news .l1{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-news .l1 b{text-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-news.none b{text-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.lock{--c:var(--warn)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.lock b{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) #p-dele #wk-mv .wk-ans .p.lock svg{fill:none;stroke:var(--warn)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-news{border:1px solid var(--accent-soft);background:transparent}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-news .l1{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-news .l1 b{text-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-news.none b{text-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-lockn{border:1px solid var(--amber-bar);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-lockn b{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) #wk-plan .wk-field .wk-max:disabled{background:transparent}
   html[data-theme=light]:not([data-mono]) #wk-plan .wk-field .wk-max:disabled:hover{background:transparent}
-  html[data-theme=light]:not([data-mono]) #wk-mv .wk-mvh .wk-tag{border:1px solid var(--accent-soft);background:transparent}
-  html[data-theme=light]:not([data-mono]) #wk-mv .wk-mvh .wk-tag i{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb{border:1px solid var(--amber-bar);background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb:hover{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .uncard .unrow{background:var(--surface-2)}
@@ -589,19 +465,11 @@
   html[data-theme=light]:not([data-mono]) .pop .card.uncard{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .pop .card.stcard::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .uncard .wk-txh b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .uncard .unstrip .p{background:var(--surface-2);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .uncard .unstrip .p::before{background:transparent}
-  html[data-theme=light]:not([data-mono]) .uncard .unstrip .p b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .uncard .unstrip .p.out{--c:var(--warn)}
-  html[data-theme=light]:not([data-mono]) .uncard .unstrip .p.left{--c:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .uncard .unstrip .p.back{--c:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .uncard .unstrip .p.back b{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .stcard .txlock{border:1px solid var(--warn-bg);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) #p-dele .stcard .txlock svg,html[data-theme=light]:not([data-mono]) .stcard .txlock svg{fill:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb.wk-stb{border-color:var(--accent);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb.wk-stb:hover{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .pop .card.stcard::before{background:transparent}
-  html[data-theme=light]:not([data-mono]) .stcard .unstrip .p.out{--c:var(--accent)}
   html[data-theme=light]:not([data-mono]) .stcard .stlist thead th{color:var(--muted);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .stcard .stlist td{border-bottom:1px solid var(--line-soft)}
   html[data-theme=light]:not([data-mono]) .stcard .stlist tr:hover td{background:var(--surface-2)}
@@ -629,9 +497,6 @@
   html[data-theme=light]:not([data-mono]) #dpicks tbody tr.on td:first-child{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #dmy tbody tr[data-v]:hover td:first-child{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #dmy tbody tr[data-v]:hover td.nm span{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-btn.wk-go{background:var(--accent);border:1px solid var(--accent);color:#FFFFFF;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-btn.wk-go:hover{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-btn.wk-go:disabled{background:var(--surface-2);border-color:var(--line);color:var(--faint);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-copy{background:transparent}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-copy:hover{color:var(--ink);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) #p-dele #wk-mine .wk-bh .wk-copy svg{fill:none;stroke:currentColor}
@@ -649,13 +514,6 @@
   html[data-theme=light]:not([data-mono]) .fnav .ftab.acct{background:transparent;box-shadow:none}
   html[data-theme=light]:not([data-mono]) .fnav .ftab.acct b{color:inherit}
   html[data-theme=light]:not([data-mono]) .fnav .ftab.acct:hover,html[data-theme=light]:not([data-mono]) .fnav .ftab.acct.on{background:transparent;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-tag{border:1px solid var(--accent-soft);background:transparent}
-  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-tag i{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-addrrow .wk-addrw{background:var(--surface-2);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-addrrow .wk-addr em{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-addrrow .wk-copy{background:transparent}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-addrrow .wk-copy:hover{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #p-dele #wk-mine .wk-addrrow .wk-copy svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5{background:transparent;box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 b::after{background:var(--c,var(--accent))}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(1){--c:var(--accent)}
@@ -663,37 +521,11 @@
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(3){--c:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(4){--c:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(5){--c:var(--warn)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-news,html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-tag{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-news{border:1px solid var(--accent-soft);background:transparent}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-tag{border:1px solid var(--accent-soft);background:transparent}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-news .l1{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-news .l1 b{text-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-news .l2{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-tag b{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-tag i{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-ans .p,html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-ans .p.rate,html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-ans .p.gain,html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-ans .p.lock{background:var(--surface-2);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-ans .p::before{background:transparent}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-ans .p b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-ans .p.rate{--c:var(--accent)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-ans .p.gain{--c:var(--accent)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-ans .p.lock{--c:var(--warn)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-ans .p.lock b{color:var(--warn)}
-  html[data-theme=light]:not([data-mono]) #p-dele #wk-plan .wk-bar2 .wk-ans .p.lock svg{fill:none;stroke:var(--warn)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-mvh .wk-btn.wk-go{background:var(--accent);border:1px solid var(--accent);color:#FFFFFF;box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-mvh .wk-btn.wk-go:disabled{background:var(--surface-2);border-color:var(--line);color:var(--faint);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #dpicks thead th{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) #wk-mv .wk-mvh .wk-tag{border:1px solid var(--accent-soft);background:transparent;color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #wk-mv .wk-mvh .wk-tag b{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) #wk-mv .wk-mvh .wk-tag i{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-acctblk{background:var(--surface-2);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-acctblk .wk-disc{background:transparent;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-acctblk .wk-disc:hover{background:var(--danger-bg);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-acctblk .wk-addrrow .wk-addrw{background:transparent;box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5::before{background:transparent}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-addrrow .wk-copy{background:var(--surface-2);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-addrrow .wk-copy:hover{color:var(--ink);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-addrrow .wk-copy.done{border-color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addrw{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addr em{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-copy{background:var(--surface-2);box-shadow:none}
@@ -704,38 +536,23 @@
   html[data-theme=light]:not([data-mono]) #wk-mine #wk-acct .wk-disc:hover{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #dpicks tbody tr.lt td,html[data-theme=light]:not([data-mono]) #dpicks tbody tr.lt td.nm .nmw>span,html[data-theme=light]:not([data-mono]) #dpicks tbody tr.lt.on td{color:inherit}
   html[data-theme=light]:not([data-mono]) #dpicks tbody tr.lt td.nm .nmw>span{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-field{border:1px solid var(--accent);background:var(--surface-2);box-shadow:0 0 0 1px var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-field:hover{border-color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-field:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-field .wk-flab{border-right:1px solid var(--accent-soft);color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-plan .wk-field .wk-max b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-mvh .wk-btn.wk-go{color:#FFFFFF;background:var(--accent);border:1px solid var(--accent);box-shadow:0 0 0 1px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-mvh .wk-btn.wk-go:hover{box-shadow:0 0 0 1px var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-mvh .wk-btn.wk-go:disabled{background:var(--surface-2);border-color:var(--line-strong);color:var(--faint);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb.wk-stb{color:var(--accent);border-color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb:not(.wk-stb){color:var(--warn);border-color:var(--amber-bar)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-field{border:1px solid var(--accent);background:var(--surface-2);box-shadow:0 0 0 1px var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-bar2 .wk-field:focus-within{border-color:var(--line-strong);box-shadow:0 0 0 3px var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-field .wk-flab{border-right:1px solid var(--accent-soft);color:var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #wk-plan input.wk-amt2{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-plan .wk-field .wk-max{border-color:var(--accent);background:var(--accent-soft);color:var(--muted)}
   html[data-theme=light]:not([data-mono]) #wk-plan .wk-field .wk-max b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-plan .wk-field .wk-max:hover{background:var(--accent-soft);border-color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-plan .wk-field.need{border-color:var(--amber-bar);box-shadow:0 0 0 3px var(--warn-bg)}
-  html[data-theme=light]:not([data-mono]) #wk-plan .wk-field.need .wk-flab{color:var(--warn);border-right-color:var(--amber-bar);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-btn.wk-go{color:#FFFFFF;background:var(--accent);border:1px solid var(--accent);box-shadow:0 0 0 1px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-btn.wk-go:disabled{background:var(--surface-2);border-color:var(--line-strong);color:var(--faint);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-auto{border:1px solid var(--accent);background:var(--surface-2);color:var(--muted);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-auto:hover{border-color:var(--accent);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-auto.on{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .pop .card.atcard::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .atcard .txsum{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .atcard .atstate{border:1px solid var(--accent-soft);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .atcard .atstate b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .atcard .atopt{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .atcard .atopt b{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .atcard .atopt input:checked{border-color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .atcard .atopt input:checked::after{background:var(--accent);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .atcard .atfield:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .atcard .atseg button{background:transparent}
   html[data-theme=light]:not([data-mono]) .atcard .atseg button[aria-pressed=true]{background:var(--accent);color:#FFFFFF}

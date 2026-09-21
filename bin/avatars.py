@@ -80,6 +80,9 @@ def download(idx):
     got = 0
     for key, url in idx.items():
         if not url or not SAFE_ID.fullmatch(key): continue
+        # the picture URL is Keybase's own (their S3 bucket): anything else is not fetched, so
+        # a profile can never point this collector at an address of its choosing
+        if not re.match(r"^https://(s3\.amazonaws\.com/keybase_processed_uploads/|keybase\.io/)", url): continue
         dst = os.path.join(CACHE, key + ".jpg")
         if os.path.exists(dst) and os.path.getsize(dst) > 0: continue
         try:

@@ -26,7 +26,6 @@ html:not([data-tab=dele]) #calc,.pop .card:not(.txcard){--void:var(--cv);--edge:
 .w{max-width:1120px;margin:0 auto;padding:0 44px;position:relative;z-index:1}
 @media(max-width:760px){.w{padding:0 20px}}
 
-
 /* ── above the fold ── */
 .fold{min-height:100svh;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:12px 0 14px}
 /* the mark sits against the whole lockup - title AND slogan - rather than inside
@@ -163,21 +162,10 @@ border-top:1.2px solid #8d8ab8;border-right:1.2px solid #8d8ab8}
 
 .ramp{height:10px;border-radius:2px;width:100%}
 
-
-
-
-
-
 /* the step rate sits directly over the track it steps along */
 
 /* flex:1 from the base rule grows along the CONTAINER axis - in this column
    that is height, which fattened the track. Pin it back. */
-
-
-
-
-
-
 
 input[type=range]{-webkit-appearance:none;appearance:none;height:4px;flex:1;min-width:150px;max-width:340px;
 background:linear-gradient(90deg,#2b1a5e,#c9331f,#ffc843,#fff8dc);outline:none;border-radius:2px}
@@ -206,13 +194,6 @@ background:var(--edge);border:1px solid var(--edge2);margin-bottom:26px}
 .sbox .k{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);margin-top:8px}
 .sbox .s{font-size:12px;color:var(--ink2);margin-top:5px}
 
-
-
-
-
-
-
-
 table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13.5px;font-variant-numeric:tabular-nums}
 th{text-align:right;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);
 font-weight:400;padding:0 14px 12px 0;border-bottom:1px solid var(--edge2)}
@@ -227,20 +208,9 @@ tr.wk{cursor:pointer}tr.wk:hover td{background:#ff4d1f10;color:var(--ink)}
 .nm{font-family:var(--sans);font-weight:600;font-size:14.5px;color:var(--ink)}
 .up{color:var(--hot)}.dn{color:var(--cold)}
 
-
-
-
-
-
-
-
 .note{font-size:13px;color:var(--ink3);margin-top:20px;max-width:64ch;line-height:1.6}
 
-
 footer{padding:42px 0 64px;font-family:var(--mono);font-size:11px;color:var(--ink3);border-top:1px solid var(--edge)}
-
-
-
 
 /* ── popups ── */
 .pop{position:fixed;inset:0;background:#06060cdd;display:none;align-items:center;justify-content:center;
@@ -257,7 +227,6 @@ max-height:92vh;max-height:92svh;overflow-y:auto;scrollbar-color:var(--edge2) #0
 .vcard:not(.gcard)::after{content:"";display:block;height:16px;
 border-top:1px solid #2b2b4a;background:linear-gradient(0deg,#191930 0,#0d0d18 100%)}
 @media(max-width:620px){.vcard:not(.gcard)::after{height:13px}}
-
 
 .pop .scroll{background:#0b0b16;scrollbar-color:var(--edge2) #0b0b16;scrollbar-width:thin}
 .pop .scroll::-webkit-scrollbar{width:10px}
@@ -442,7 +411,6 @@ fill:none;stroke:#9ed6f7;stroke-width:1.2;stroke-dasharray:5 4;animation:march .
 /* the alert chooser */
 .acard{max-width:430px}
 
-
 .alist{display:flex;flex-direction:column;gap:1px;background:var(--edge);
 border-top:1px solid var(--edge);border-bottom:1px solid var(--edge);margin-top:16px}
 .aopt{display:flex;align-items:flex-start;gap:11px;background:#0b0b16;padding:11px 24px;cursor:pointer}
@@ -487,19 +455,7 @@ min-width:11ch;text-align:right;flex:0 0 auto}
 .upbars b.n{background:#20203c;box-shadow:none}
 .upbars b.tip{box-shadow:0 0 6px #2ee06acc}
 
-
-
-
-
-
-
 /* reads as a button, not as another outline chip in the selector row */
-
-
-
-
-
-
 
 /* ── phone ─────────────────────────────────────────────────────────────────
    The fold stops forcing a full viewport here. Two 100-cell grids plus the
@@ -795,8 +751,7 @@ letter-spacing:.06em}
 .vv .pc{display:block;margin-top:3px;font-style:normal;font-size:11px;
 color:var(--ink3);letter-spacing:.08em}
 /* a reading in the button row, deliberately inert - it opens nothing */
-.chiprow .chip.static{cursor:default;border-color:#ff4d1f44;background:#ff4d1f0a}
-.chiprow .chip.static b{color:var(--burn)}
+
 /* bullets: the three things worth knowing before any of the numbers */
 /* three short facts, set quieter and tighter than body copy: they are reference
    lines to scan, not a paragraph to read */
@@ -821,7 +776,6 @@ transition:opacity .15s,transform .15s}
 .sc{font-variant:small-caps}
 b.hotc{color:var(--burn);font-weight:inherit}
 /* the concentration block, folded into this card rather than a panel of its own */
-
 
 @media(max-width:620px){
   .bul{padding:11px 16px 12px;font-size:10.5px;gap:6px}
@@ -865,9 +819,7 @@ color:var(--burn);opacity:.8;font-family:var(--mono)}
 .etabox.conc.low:focus-visible{outline-color:#5cf08f}
 .etabox.conc.low .disc.dc{color:#7cf0a4;border-color:#7cf0a4;
 box-shadow:0 0 0 1.5px #0b0b16,0 0 9px #2ee06a88}
-.chiprow.narrow.cchips.low .chip[aria-pressed=true]{background:#2ee06a;border-color:#2ee06a}
-.chiprow.narrow.cchips.low .chip[aria-pressed=true] span{color:#04170b}
-.chiprow.narrow.cchips.low .chip[aria-pressed=true] b{color:#04170b}
+
 .etabox.cool{border-color:#57d9d055;background:#57d9d00f}
 .etabox.cool b,.etabox.cool::after{color:#7fe5de}
 .etabox.cool:hover{border-color:#7fe5de;background:#57d9d01f}
@@ -888,12 +840,10 @@ pointer-events:none;box-shadow:0 0 0 1px #ffffff55,0 1px 2px #0008;z-index:2}
 /* label and figure sit together over the buttons they belong to, and the figure
    is amber because it MOVES with those buttons the way the coefficient does */
 
-
 /* the same tag the coefficient wears over the grid, so the two readings on this
    panel read as the same kind of thing */
 /* No box and no tint: a border plus a fill is a button, and this is a reading.
    Brightness comes from the figure itself rather than from a frame around it. */
-
 
 /* the coefficient the map is drawn at, sized like the mode buttons opposite */
 /* Same family as the mode buttons opposite, but this one opens a panel rather
@@ -924,35 +874,9 @@ line-height:1;color:var(--hot);opacity:.75}
 font-variant-numeric:tabular-nums}
 
 /* one row of equal buttons, centred under the track */
-.chiprow{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
-.chiprow .chip{display:flex;flex-direction:column;align-items:center;gap:4px;
-flex:1 1 0;min-width:0;max-width:160px;padding:5px 7px;border-radius:4px}
-.chiprow .chip span{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:#9a97c4}
-.chiprow .chip b{font-size:12px;font-weight:400;color:var(--lit);letter-spacing:-.02em;
-font-variant-numeric:tabular-nums}
-.chiprow .chip[aria-pressed=true] span{color:#ffffffcc}
-.chiprow .chip[aria-pressed=true] b{color:#fff}
-.chiprow.narrow .chip[aria-pressed=true] span{color:#ffffffd9}
-.chiprow.narrow .chip[aria-pressed=true] b{color:#fff}
-.chiprow.narrow.cchips .chip[aria-pressed=true]{background:#ff6a3d;border-color:#ff6a3d}
-.chiprow.narrow.cchips .chip[aria-pressed=true] span{color:#2a0c03}
-.chiprow.narrow.cchips .chip[aria-pressed=true] b{color:#1b0701}
 
-
-
-.chiprow.narrow.echips.rise .chip[aria-pressed=true] span{color:#04170b}
-.chiprow.narrow.echips.rise .chip[aria-pressed=true] b{color:#04170b}
-.chiprow .chip:hover b{color:var(--lit)}
 /* the range row spans the full width, so its buttons stretched to twice the
    size of the paired sections' - cap them instead of letting flex fill */
-.chiprow.narrow .chip{max-width:82px;padding:3px 5px;gap:0}
-.chiprow.narrow .chip span{font-size:8px;letter-spacing:.12em;color:#a49fd6}
-.chiprow.narrow .chip b{font-size:10.5px}
-
-
-
-
-
 
 .apx{font-family:var(--mono);font-size:8px;letter-spacing:.14em;color:var(--ink2);
 text-transform:uppercase;white-space:nowrap}
@@ -981,9 +905,9 @@ color:var(--ink2);margin-top:-2px}
   
   .bt .tag{flex:0 0 auto}
   .sec{padding:13px 13px 12px;gap:9px}
-    .chiprow .chip{min-width:0;padding:7px 4px}
-  .chiprow .chip span{font-size:7px;letter-spacing:.06em}
-  .chiprow .chip b{font-size:12px}
+    
+  
+  
   .apx{font-size:8px;white-space:normal;text-align:center}
   .apx b{font-size:12px}
   }
@@ -1011,7 +935,6 @@ background:linear-gradient(180deg,#191930 0,#0d0d18 100%);
 border-bottom:1px solid #2b2b4a}
 .vname{font-size:21px;letter-spacing:-.025em}
 
-
 .vlogo,.vmono{box-shadow:0 0 0 1px #ffffff1a,0 6px 18px -8px #000}
 
 /* the figure grid: hairlines instead of slabs, and room to breathe */
@@ -1023,7 +946,6 @@ border-bottom:1px solid #2b2b4a}
 .vgrid.gbelow{margin-top:14px;border-bottom:1px solid var(--edge)}
 /* the formula sits right above the figures now, so it needs its own breathing
    room rather than a margin on the grid */
-
 
 #qpop .vgrid{margin-top:0}
 /* the coefficient and concentration cards must fit a laptop viewport without a
@@ -1040,9 +962,6 @@ border-bottom:1px solid #2b2b4a}
 .vk{font-size:8.5px;letter-spacing:.2em;color:#7a78a3}
 .vv{font-size:15.5px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vstat.hot .vv{color:var(--hot)}
-
-
-
 
 .vnote{font-size:11.5px;line-height:1.6;color:#6f6d94;padding:12px 24px 15px;
 border-top:1px solid var(--edge);margin-top:0;text-align:center}
@@ -1093,20 +1012,20 @@ border-top:1px solid var(--edge);margin-top:0;text-align:center}
 @media(max-width:620px) and (max-height:700px){#p-home{overflow-y:auto;overscroll-behavior:contain}}
 @media(max-width:620px) and (max-height:640px){
   #gwrap{height:var(--maph,197px)}
-  .chiprow .chip{padding:2px 5px}
+  
 }
 @media(max-width:620px){
-  .chiprow .chip{padding:3px 6px}
+  
   .grid{gap:3px}
   .duo{gap:7px}
   .sec.tight{padding:8px 12px;gap:6px}
   .frow{margin-bottom:3px}
   .trackwrap{height:22px}
   .knob{width:15px;height:15px}
-  .chiprow{gap:4px}
-  .chiprow.narrow .chip{padding:2px 4px}
-  .chiprow.narrow .chip span{font-size:7.5px;letter-spacing:.08em;color:#a49fd6}
-  .chiprow.narrow .chip b{font-size:9.5px}
+  
+  
+  
+  
   .aprbar{gap:8px}
   .apnum{font-size:16px}
   
@@ -1294,10 +1213,6 @@ margin-bottom:4px;line-height:1.2}
 
 .panel .sbox.mv{margin-top:8px}
 
-
-
-
-
 @media(max-width:620px){
   /* A grid row's automatic minimum is min-content, so "auto 1fr" rows refused to
      shrink and .panel's overflow:hidden ate the boxes at the bottom. */
@@ -1406,8 +1321,6 @@ background:#1b1b33;border:1px solid #ffffff14}
 background:#0b0b16;border-top:1px solid var(--edge);border-bottom:1px solid var(--edge)}
 .gcard .vnote{padding:11px 22px 16px}
 
-
-
 .ptab .ok{color:#5cf08f}
 .ptab .warn{color:var(--burn)}
 .duotab{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:stretch;
@@ -1450,7 +1363,6 @@ margin:16px 0 -6px}
 .pane .note{font-size:clamp(10.5px,.92vw,12.5px);margin-top:8px;max-width:88ch}
 .pane .sbox{margin-top:12px}
 .pane .sbox .v{font-size:clamp(22px,2.4vw,30px)}
-
 
 /* the page stacks these two at 760px, but they only mean anything side by side:
    the whole point is before against after, read in one glance */
@@ -1712,11 +1624,6 @@ html[data-mono] .mbtn[aria-pressed=true]{background:#fff;color:#000;box-shadow:n
 #calc{transition:opacity .34s .04s ease,transform .5s cubic-bezier(.22,.7,.26,1)}
 @media(prefers-reduced-motion:reduce){#calc{transition:none}}
 
-
-
-
-
-
 /* ── My wallet ─────────────────────────────────────────────────────────────
    The reader's own screen, in the hub's language rather than the calculator's:
    GATA's cards (16px, an accent bloom in the corner, a hairline of light on the
@@ -1736,15 +1643,13 @@ html[data-mono] .mbtn[aria-pressed=true]{background:#fff;color:#000;box-shadow:n
 #p-dele b{font-weight:700}
 
 /* the head: who is connected, the two tabs, two icon buttons */
-.wk-head{display:flex;align-items:center;gap:14px;padding:0;flex:0 0 auto;height:48px;border-bottom:1px solid var(--wbd);margin-bottom:2px}
-.wk-id{display:flex;align-items:center;gap:12px;min-width:0}
+
 .wk-mark{width:40px;height:40px;border-radius:11px;overflow:hidden;flex:0 0 auto;border:1px solid var(--wbd2);background:var(--wi);box-shadow:0 8px 20px -12px #000}
 .wk-mark img{width:100%;height:100%;display:block;object-fit:cover}
-.wk-ttl{display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:0;height:40px}
-.wk-ttl b{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1;color:var(--wt);white-space:nowrap}
+
 .wk-addr{display:inline-flex;align-items:center;gap:6px;font-family:var(--wmono);font-size:11px;font-weight:600;color:var(--wcyan);letter-spacing:.01em}
 .wk-addr::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--wgreen);box-shadow:0 0 8px var(--wgreen)}
-.wk-tabs{margin-left:auto;display:flex;gap:24px;padding:0;height:48px;align-self:stretch}
+
 .wk-tab{position:relative;border:0;background:transparent;color:var(--ws);font-size:15px;font-weight:700;padding:0 2px;height:48px;line-height:1;cursor:pointer;
 display:inline-flex;align-items:center;gap:8px;transition:color .18s;white-space:nowrap}
 .wk-tab:hover{color:var(--wt)}
@@ -1753,7 +1658,7 @@ display:inline-flex;align-items:center;gap:8px;transition:color .18s;white-space
 .wk-tab i{font-style:normal;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--wgold);
 background:rgba(245,198,107,.08);border:1px solid rgba(245,198,107,.25);border-radius:99px;padding:1px 7px}
 .wk-tab:focus-visible,.wk-ib:focus-visible,.wk-btn:focus-visible{outline:2px solid var(--wcyan);outline-offset:2px}
-.wk-acts{display:flex;gap:8px;flex:0 0 auto;margin-left:10px}
+
 .wk-ib{width:38px;height:38px;border-radius:50%;border:1px solid var(--wbd2);background:rgba(255,255,255,.03);color:var(--ws);
 display:grid;place-items:center;cursor:pointer;padding:0;transition:color .16s,border-color .16s,box-shadow .16s,transform .16s,background .16s;
 box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
@@ -1777,12 +1682,9 @@ transition:filter .12s,transform .12s,box-shadow .2s,opacity .2s}
 
 /* disconnected: one button in the middle of the room, the chooser under it */
 .wk-gate{flex:1 1 auto;min-height:0;display:grid;place-items:center;position:relative}
-.pop .card.wkpick{max-width:440px}
-.wk-txh .wchain{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-family:var(--wmono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
-.wk-txh .wchain i{width:6px;height:6px;border-radius:50%;background:var(--wgreen);box-shadow:0 0 8px var(--wgreen)}
+
 .wopts{display:grid;grid-template-columns:1fr;gap:8px;padding:14px 22px 0}
-.wkpick .wk-txh span{text-transform:none;letter-spacing:.04em}
-.wnote{margin:12px 22px 18px;font-family:var(--wmono);font-size:8.5px;letter-spacing:.04em;line-height:1.6;color:var(--wf)}
+
 .wopt{display:grid;grid-template-columns:40px minmax(0,1fr) auto;grid-template-areas:"lg nm ar" "lg st ar";align-items:center;gap:2px 12px;padding:12px 12px 12px 12px;border:1px solid var(--wbd);border-radius:7px;background:var(--wchip);color:var(--wt);text-align:left;
 font-size:13.5px;font-weight:600;cursor:pointer;transition:border-color .15s,background .15s;text-align:left}
 .wopt:hover{border-color:rgba(98,217,255,.4);background:rgba(98,217,255,.08)}
@@ -1801,138 +1703,49 @@ font-size:13.5px;font-weight:600;cursor:pointer;transition:border-color .15s,bac
 
 /* connected: the four figures, then the ledger beside the plan and the moves */
 .wk-body{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:12px}
-.wk-grid{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:12px}
-.wk-col{display:flex;flex-direction:column;gap:12px;min-height:0}
-.wk-card{position:relative;display:flex;flex-direction:column;min-height:0;border-radius:16px;padding:13px 16px 12px;
-background:var(--wc);border:1px solid var(--wbd);box-shadow:0 18px 50px -28px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.03)}
+
 #wk-mine{flex:1 1 auto;min-height:0}
-#wk-mine .wk-scroll{min-height:120px}
+
 #wk-plan{flex:0 0 auto}
-#wk-plan .wk-picks{flex:0 0 auto;overflow:visible}
+
 #wk-moves{min-height:0}
-#wk-moves .wk-scroll{flex:1 1 auto}
-.wk-ch{display:flex;align-items:center;gap:9px;margin-bottom:9px;flex:0 0 auto;min-height:26px}
-.wk-ch>.wk-row{margin-left:auto;flex-wrap:nowrap;gap:6px}
+
 /* the chain's height, live: the plan is solved on this block */
-.wk-live{display:inline-flex;align-items:center;gap:7px;margin-left:4px;font-family:var(--wmono);font-size:11px;font-weight:600;color:var(--ws);font-variant-numeric:tabular-nums;white-space:nowrap}
-.wk-live i{width:7px;height:7px;border-radius:50%;background:var(--wgreen);box-shadow:0 0 0 0 rgba(54,211,153,.6);animation:wklive 2.4s ease-out infinite}
-.wk-live b{font-weight:600;color:var(--ws)}
+
 @keyframes wklive{0%{box-shadow:0 0 0 0 rgba(54,211,153,.6)}70%{box-shadow:0 0 0 6px rgba(54,211,153,0)}100%{box-shadow:0 0 0 0 rgba(54,211,153,0)}}
-@media(prefers-reduced-motion:reduce){.wk-live i{animation:none}}
-.wk-ch h3{margin:0;font-size:13.5px;font-weight:700;letter-spacing:-.01em;color:var(--wt);line-height:1}
-.wk-k{font-size:9.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ws)}
+
 /* the reader's four figures, in the head of the ledger they describe */
-.wk-figs{margin-left:auto;display:flex;gap:22px;min-width:0;overflow:hidden}
-.fig{display:flex;flex-direction:column;align-items:flex-end;gap:2px;white-space:nowrap}
-.fig b{font-family:var(--wmono);font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1;color:var(--wt);font-variant-numeric:tabular-nums}
-.fig b.ok{color:var(--wgreen)}.fig b.warn{color:var(--wamber)}
-.fig i{font-style:normal;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--wf)}
-.fig i span{color:var(--ws)}
+
 /* amount presets: plain small buttons, the chosen one lit */
 .wk-pre{display:inline-flex;gap:5px}
 .wk-pre button{height:34px;padding:0 9px;border-radius:8px;border:1px solid var(--wbd2);background:transparent;color:var(--ws);font-size:11.5px;font-weight:700;cursor:pointer;transition:color .14s,border-color .14s,background .14s}
 .wk-pre button:hover{color:var(--wt);border-color:var(--ws)}
 .wk-pre button[aria-pressed=true]{color:var(--wcyan);border-color:var(--wcyan);background:rgba(98,217,255,.08);box-shadow:0 0 12px -4px rgba(98,217,255,.8)}
-.wk-ico{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex:0 0 auto;color:var(--a);
-background:color-mix(in srgb,var(--a) 12%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--a) 30%,transparent)}
-#p-dele .wk-ico svg,#txpop .wk-ico svg,#wpick .wk-ico svg{width:14px;height:14px;margin:0;max-height:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.wk-cn{font-size:11.5px;font-weight:600;color:var(--wf);margin-left:2px}
-.wk-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin:0 -6px;padding:0 6px;-webkit-mask:linear-gradient(#000 calc(100% - 16px),transparent);mask:linear-gradient(#000 calc(100% - 16px),transparent)}
-.wk-scroll::-webkit-scrollbar{width:8px}.wk-scroll::-webkit-scrollbar-thumb{background:var(--wbd);border-radius:9px}
+
 .wk-empty{font-size:12.5px;font-weight:600;color:var(--wf);padding:14px 4px}
 
 /* tag pills: an accent, tinted */
 .wk-pl{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:10.5px;font-weight:800;white-space:nowrap;
 --a:var(--ws);color:var(--a);background:color-mix(in srgb,var(--a) 8%,transparent);border:1px solid color-mix(in srgb,var(--a) 25%,transparent);
 box-shadow:0 0 12px -4px color-mix(in srgb,var(--a) 85%,transparent)}
-.wk-pl.ok{--a:var(--wgreen)}.wk-pl.warn{--a:var(--wamber)}.wk-pl.vio{--a:var(--wcyan)}.wk-pl.dim{--a:var(--wf);box-shadow:none}
+.wk-pl.ok{--a:var(--wgreen)}.wk-pl.warn{--a:var(--wamber)}.wk-pl.dim{--a:var(--wf);box-shadow:none}
 /* bars: an inset track, a gradient fill */
 .wk-hb{display:block;height:8px;border-radius:99px;background:var(--wi);border:1px solid var(--wbd);overflow:hidden;min-width:56px;width:100%}
 .wk-hb i{display:block;height:100%;min-width:3px;border-radius:99px;background:linear-gradient(90deg,#3B9EFF,#62D9FF)}
 .wk-hb.hld i{background:repeating-linear-gradient(135deg,#FFB155 0 3px,rgba(255,177,85,.35) 3px 6px)}
 .wk-hb.mv i{background:linear-gradient(90deg,#36D399,#8EF0C8)}
 
-.wk-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px}
-.wk-tbl th{position:sticky;top:0;z-index:1;background:var(--wc);font-size:9.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--wf);
-text-align:right;padding:4px 10px 8px;border-bottom:1px solid var(--wbd);white-space:nowrap}
-.wk-tbl td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--wbd);color:var(--ws);white-space:nowrap;vertical-align:middle;
-font-family:var(--wmono);font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}
-.wk-tbl tbody tr{transition:background .12s}
-.wk-tbl tbody tr:hover td{background:rgba(255,255,255,.025)}
-.wk-tbl tr:last-child td{border-bottom:0}
-.wk-tbl th.l,.wk-tbl td.l{text-align:left}
-.wk-tbl th.c,.wk-tbl td.c{text-align:center}
-.wk-tbl td.rk{font-size:11px;color:var(--wf);width:40px;padding-left:6px;padding-right:6px}
-.wk-tbl td.nm{font-family:var(--wsans);font-size:13.5px;font-weight:700;color:var(--wt);max-width:0;width:34%;overflow:hidden;text-overflow:ellipsis;text-align:left;white-space:nowrap}
-.wk-tbl td.nm span{vertical-align:middle}
 .wk-lg{display:inline-block;width:24px;height:24px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:10px;background:var(--wi);box-shadow:0 0 0 1px var(--wbd2);flex:0 0 auto}
 .wk-lgx{text-align:center;line-height:24px;font-size:10.5px;font-weight:800;color:#fff;font-family:var(--wsans)}
-.wk-tbl td.nm .j{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--wamber);margin-left:7px;vertical-align:middle;box-shadow:0 0 6px var(--wamber)}
-.wk-tbl td.amt{color:var(--wt);font-weight:700;font-size:13px}
-.wk-tbl td.amt .lk{display:inline-block;width:11px;height:11px;margin-left:6px;vertical-align:-1px;color:var(--wamber)}
-.wk-tbl td.amt .lk svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;margin:0;max-height:none;display:inline}
-.wk-tbl td.sh{width:120px}
-.wk-tbl td.sh .wk-hb{height:6px;min-width:0}
-.wk-tbl td.sh i{display:block;font-size:10px;color:var(--wf);text-align:right;margin-top:3px;font-style:normal}
-.wk-tbl td.rw{color:var(--wgreen)}
-.wk-tbl .ok{color:var(--wgreen)}.wk-tbl .warn{color:var(--wamber)}.wk-tbl .dim{color:var(--wf)}
+
 .wk-foot{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0 0;flex:0 0 auto}
 .wk-foot:empty{display:none}
 
 /* the plan: the answer first, then the three choices under it */
-.wk-res{flex:0 0 auto;padding:2px 0 10px;margin-bottom:6px;border-bottom:1px solid var(--wbd)}
-.wk-hint{font-size:11px;font-weight:600;color:var(--wf);white-space:nowrap}
-.wk-hint b{font-family:var(--wmono);color:var(--ws);font-weight:700}
-.wk-cmp{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.wk-c{display:flex;flex-direction:column;gap:5px;min-width:0}
-.wk-c b{font-family:var(--wmono);font-size:24px;font-weight:700;letter-spacing:-.04em;line-height:1;color:var(--wt);font-variant-numeric:tabular-nums}
-.wk-c.aft b{color:var(--wgreen);text-shadow:0 0 18px rgba(54,211,153,.35)}
-.wk-cb{display:block;height:6px;border-radius:99px;background:var(--wi);border:1px solid var(--wbd);overflow:hidden;margin-top:2px}
-.wk-cb u{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#3B9EFF,#62D9FF)}
-.wk-cb.up u{background:linear-gradient(90deg,#36D399,#8EF0C8)}
-.wk-gain{font-size:12px;font-weight:600;color:var(--ws);margin-top:6px;display:flex;align-items:baseline;gap:6px}
-.wk-gain b{font-family:var(--wmono);font-size:15px;font-weight:700;color:var(--wgreen);letter-spacing:-.02em}
-.wk-gain b.dim{color:var(--wf)}
-.wk-gain i{font-style:normal;color:var(--wf)}
-.wk-none{display:flex;flex-direction:column;gap:3px;padding:4px 0 2px}
-.wk-none b{font-family:var(--wmono);font-size:30px;font-weight:700;color:var(--wf)}
-.wk-none span{font-size:11.5px;font-weight:600;color:var(--wf)}
-.wk-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.wk-amt{display:flex;align-items:center;gap:7px;height:34px;padding:0 10px;border-radius:10px;background:var(--wi);border:1px solid var(--wbd);flex:0 0 auto;
-transition:border-color .15s,box-shadow .15s}
-.wk-amt:focus-within{border-color:var(--wcyan);box-shadow:0 0 0 3px rgba(98,217,255,.18)}
-.wk-amt input{background:none;border:0;padding:0;outline:none;width:7ch;color:var(--wt);font-family:var(--wmono);font-size:17px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.wk-amt span{font-size:10px;font-weight:700;letter-spacing:.02em;color:var(--wf);white-space:nowrap}
-.wk-amt span b{font-family:var(--wmono);color:var(--ws);font-weight:700;font-size:11px}
 
 /* the five, as a checklist: tick box, rank, mark, name and record, what it
    would get, the rate before and after */
-.wk-picks{display:flex;flex-direction:column;min-height:0;flex:1 1 auto;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin:0 -6px;padding:0 6px}
-.wk-pk{display:grid;grid-template-columns:18px 30px 22px minmax(0,1fr) 104px 100px;align-items:center;gap:0 10px;padding:4px 4px;border-bottom:1px solid var(--wbd);cursor:pointer;
-transition:background .14s;border-radius:8px}
-.wk-pk:hover{background:rgba(255,255,255,.025)}
-.wk-pk.head{padding:0 4px 6px;cursor:default;border-radius:0}
-.wk-pk.head:hover{background:transparent}
-.wk-pk.head span{font-size:9.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--wf)}
-.wk-pk.head .x,.wk-pk.head .r{text-align:right}
-.wk-pk input{appearance:none;-webkit-appearance:none;width:18px;height:18px;margin:0;border-radius:6px;border:1px solid var(--wbd2);background:var(--wi);cursor:pointer;position:relative;transition:background .14s,border-color .14s,box-shadow .14s}
-.wk-pk input:checked{background:linear-gradient(180deg,#36D399,#1FA877);border-color:transparent;box-shadow:0 0 12px -4px rgba(54,211,153,.9)}
-.wk-pk input:checked::after{content:"";position:absolute;left:5px;top:2px;width:5px;height:9px;border:solid #03130C;border-width:0 2px 2px 0;transform:rotate(45deg)}
-.wk-pk input:focus-visible{outline:2px solid var(--wcyan);outline-offset:2px}
-.wk-pk .rk{font-family:var(--wmono);font-size:10.5px;font-weight:700;color:var(--wf);text-align:center}
-.wk-pk .wk-lg{margin:0}
-.wk-pk .n{display:flex;flex-direction:column;gap:2px;min-width:0}
-.wk-pk .n b{font-size:13px;font-weight:700;color:var(--wt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.wk-pk .n small{font-size:10px;font-weight:600;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wk-pk .x{display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-family:var(--wmono);font-size:12.5px;font-weight:700;color:var(--wt);font-variant-numeric:tabular-nums}
-.wk-pk .x .wk-hb{width:88px;min-width:0;height:5px}
-.wk-pk .r{text-align:right;font-family:var(--wmono);font-size:12px;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
-.wk-pk .r s{color:var(--wf);margin-right:5px}
-.wk-pk .r b{color:var(--wgreen);font-weight:700}
-.wk-pk .r .dr{font-size:9.5px;font-weight:700;margin-left:4px}.wk-pk .r .dr.dn{color:var(--wburn)}.wk-pk .r .dr.up{color:var(--wgreen)}
-.wk-pk i{font-style:normal;color:var(--wf)}
-.wk-pk:not(.on):not(.head){opacity:.55}
-.wk-pk:not(.on) .n b{color:var(--ws)}
+
 /* the moves: one line per message, source → destination, the amount */
 .wk-mv{display:grid;grid-template-columns:minmax(0,1fr) 96px 104px 78px;grid-template-areas:"f a r g" "s s s s";align-items:center;gap:1px 10px;padding:6px 2px;border-bottom:1px solid var(--wbd)}
 .wk-mv:last-child{border-bottom:0}
@@ -1954,18 +1767,15 @@ transition:background .14s;border-radius:8px}
 .wk-mv .f .from,.wk-mv .f .dest{display:inline-flex;align-items:center;gap:7px;min-width:0}
 .wk-mv .f .from b{font-size:12px;font-weight:600;color:var(--ws);max-width:9ch}
 .wk-mv .f .from .wk-lg{width:18px;height:18px;line-height:18px;opacity:.8}
-.wk-mv .f .dest b{font-size:13px;font-weight:800;color:var(--wt)}
+
 .wk-mv .sub{grid-area:s;display:flex;flex-wrap:nowrap;align-items:center;gap:0 10px;overflow:hidden;padding:3px 0 0 0}
 .wk-mv .st{display:inline-flex;flex-direction:column;gap:1px;flex:0 0 auto}
 .wk-mv .st b{font-family:var(--wmono);font-size:10.5px;font-weight:700;color:var(--ws);font-variant-numeric:tabular-nums;white-space:nowrap}
 .wk-mv .st i{font-style:normal;font-size:7.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
 .wk-mv .st.ok b{color:var(--wgreen)}.wk-mv .st.warn b{color:var(--wamber)}
-.wk-cn b{color:var(--wgreen);font-weight:700}
-.wk-cta{display:flex;align-items:center;gap:14px;padding:12px 0 0;margin-top:10px;border-top:1px solid var(--wbd);flex:0 0 auto}
-.wk-ctan{font-size:11px;font-weight:600;color:var(--wf);white-space:nowrap}
 
 /* governance, not built yet */
-.wk-gov{padding:0}
+
 #p-gov>.w{padding:0;max-width:none;display:flex;flex-direction:column;gap:12px;height:100%;min-height:0}
 .wk-tab:disabled{cursor:default}
 .wk-soon{flex:1 1 auto;min-height:220px;display:grid;place-items:center;border:1px dashed var(--wbd2);border-radius:16px;background:rgba(255,255,255,.012)}
@@ -1976,8 +1786,7 @@ transition:background .14s;border-radius:8px}
 /* the signing card, in the same language */
 .pop .card.txcard{max-width:460px;background:var(--wc);border:1px solid var(--wbd2);border-radius:16px;box-shadow:0 30px 80px -30px #000}
 .wk-txh{display:flex;align-items:center;gap:11px;padding:18px 22px 14px;border-bottom:1px solid var(--wbd)}
-.wk-txh .wk-ico{width:32px;height:32px;border-radius:10px}
-#txpop .wk-txh .wk-ico svg{width:16px;height:16px}
+
 .wk-txh b{display:block;font-size:16px;font-weight:800;letter-spacing:-.01em;color:var(--wt)}
 .wk-txh span{display:block;font-size:11.5px;font-weight:600;color:var(--wf);margin-top:1px}
 /* one grid for every row, so the arrows line up whatever the amounts are */
@@ -1993,38 +1802,37 @@ transition:background .14s;border-radius:8px}
 .txbtns{display:flex;justify-content:flex-end;gap:8px;padding:16px 22px 18px}
 html[data-mono] #txpop .txcard,html[data-mono] #unpop .txcard,html[data-mono] #stpop .txcard,html[data-mono] #atpop .txcard,html[data-mono] #wpick .txcard{background:var(--wc);border-color:var(--wbd2)}
 
-
 /* the view row on a phone: the buttons keep the calculator's new scale on a
    wide screen; at 390px the row must still hold seven of them */
 @media(max-width:620px){.mbtn{padding:5px 7px;font-size:9px;letter-spacing:.05em}.modes .etabox.monob,.frow .etabox.monob{width:24px;min-width:24px;height:24px}}
-@media(max-width:1100px){.wk-grid{grid-template-columns:minmax(0,1fr)}.wk-figs{gap:14px}}
+
 @media(max-width:700px){
   #p-dele{overflow-y:auto;overscroll-behavior:contain}
   #p-dele>.pw{height:auto;min-height:100%}
   /* on a phone the column is a document: blocks in order, nothing scrolls inside
      anything (a nested flex chain with min-height:0 collapsed the ledger to 0px) */
   .wk-body,.wk-grid,.wk-col{display:block}
-  .wk-card{display:block;margin-bottom:12px;height:auto}
-  .wk-scroll,.wk-picks{display:block;overflow:visible;max-height:none;margin:0;padding:0;-webkit-mask:none;mask:none}
-  #wk-moves .wk-scroll{max-height:none}#wk-mine .wk-scroll{min-height:0}
-  .wk-head{flex-wrap:wrap;gap:10px;height:auto}
-  .wk-ch{flex-wrap:wrap}.wk-ch>.wk-row{flex:1 1 100%;margin:4px 0 0}
-  .wk-tabs{order:3;width:100%;margin:0;gap:18px;height:40px}.wk-tab{height:40px;font-size:14px}
-  .wk-ttl b{font-size:17px}
+  
+  
+  
+  
+  
+  .wk-tab{height:40px;font-size:14px}
+  
   /* columns: rank · validator · bar · ATONE · share · APR · a year · status - the phone keeps rank, name, ATONE, APR, status */
-  .wk-tbl td:nth-child(4),.wk-tbl th:nth-child(4),.wk-tbl td:nth-child(6),.wk-tbl th:nth-child(6){display:none}
-  .wk-card{padding:12px 12px 10px}
-  .wk-tbl{table-layout:fixed}.wk-tbl th:nth-child(1){width:30px}.wk-tbl th:nth-child(3){width:78px}.wk-tbl th:nth-child(5){width:56px}
-  .wk-tbl th{font-size:8.5px;letter-spacing:.04em;padding:0 4px 6px}
-  .wk-tbl td{padding:7px 4px;font-size:11px}.wk-tbl td.nm{width:auto;max-width:none;font-size:12px}.wk-tbl td.nm small{margin-right:5px}
-  .wk-tbl .wk-pl{font-size:9.5px;padding:2px 6px}.wk-foot .wk-pl{font-size:9.5px}
-  .wk-figs{margin:0;width:100%;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;overflow:visible}.fig{align-items:flex-start}.fig b{font-size:14px}
-  .wk-ch{flex-wrap:wrap}
+  
+  
+  
+  
+  
+  .wk-foot .wk-pl{font-size:9.5px}
+  
+  
   html[data-tab=dele] .calclab{display:none}
-  .wk-pk{grid-template-columns:18px 22px minmax(0,1fr) 84px}.wk-pk .rk,.wk-pk .r{display:none}
+  
   .wk-mv{grid-template-columns:minmax(0,1fr) 96px 90px;grid-template-areas:"f f f" "a r g" "s s s"}.wk-mv .a{align-items:flex-start}
   .wk-mv .sub{padding-left:0;overflow-x:auto;scrollbar-width:none}
-  .wk-cmp{grid-template-columns:1fr 1fr;gap:10px}.wk-c b{font-size:24px}
+  
 }
 /* ── the descent's content language, everywhere (version 1, chosen 2026-09-20) ──
    One palette (the calculator's), mono caps for every label, figure cards for
@@ -2058,64 +1866,26 @@ body{background:var(--void);background-image:radial-gradient(130% 62% at 50% 0%,
 /* the wallet: a lip, a figure strip, stages, rows */
 .wk-mark{border-radius:9px;border:0;background:transparent;width:34px;height:34px;box-shadow:none;overflow:visible}
 .wk-mark img{border-radius:9px}
-.wk-ttl b{font-size:16px;font-weight:400;letter-spacing:-.01em}
+
 .wk-addr{font-size:10px;letter-spacing:.06em;text-transform:none;color:var(--wf);font-weight:400}
 .wk-addr::before{display:none}
 .wk-tab{font-family:var(--wmono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;font-weight:400;color:var(--wf)}
 .wk-tab.on{color:var(--wt)}.wk-tab.on::after{background:var(--hot);box-shadow:0 0 12px var(--hot)}
 .wk-tab i{font-family:var(--wmono);font-weight:400;color:var(--hot);background:transparent;border-color:rgba(255,176,46,.35)}
 .wk-ib{border-radius:6px;background:var(--wchip);border-color:var(--wbd2);color:var(--ws);box-shadow:none;width:30px;height:30px}
-.wk-card{border-radius:8px;background:var(--wc);border:1px solid var(--wbd);box-shadow:none;padding:11px 13px}
-.wk-ch h3{font-family:var(--wmono);font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:400;color:var(--wf)}
-.wk-ico{display:none}
-.wk-cn{font-family:var(--wmono);font-size:8px;letter-spacing:.1em;text-transform:uppercase}
-.wk-figs{margin:0;gap:8px;flex:1 1 auto;overflow:visible}
-.fig{flex:1 1 0;align-items:flex-start;gap:1px;border:1px solid var(--wbd);border-radius:7px;padding:7px 11px;background:var(--wi);min-width:0}
-.fig b{font-size:19px;font-weight:400;letter-spacing:-.03em;color:#fff8dc;line-height:1.2}
-.fig b.ok{color:var(--wgreen)}.fig b.warn{color:var(--wburn)}
-.fig i{font-size:7.5px;letter-spacing:.16em;font-weight:400;color:var(--wf);order:-1}
-.fig i span{color:var(--wf)}
-#wk-mine .wk-ch{flex-wrap:wrap;gap:8px}
-#wk-mine .wk-ch h3{flex:0 0 auto}
-.wk-tbl{border-spacing:0 5px;font-family:var(--wsans)}
-.wk-tbl th{font-size:7.5px;letter-spacing:.16px;letter-spacing:.16em;font-weight:400;border:0;padding:0 9px 2px}
-.wk-tbl td{border:1px solid var(--wbd);border-left:0;border-right:0;background:var(--wchip);padding:6px 9px;font-size:11px;font-weight:400}
-.wk-tbl td:first-child{border-left:1px solid var(--wbd);border-radius:6px 0 0 6px}
-.wk-tbl td:last-child{border-right:1px solid var(--wbd);border-radius:0 6px 6px 0}
-.wk-tbl tbody tr:hover td{background:#0e0e1c}
-.wk-tbl td.nm{font-size:12px;font-weight:400;color:#fff8dc}
-.wk-tbl td.amt{font-size:11.5px;font-weight:400;color:#fff8dc}
+
 .wk-lg{width:15px;height:15px;box-shadow:0 0 0 1px #ffffff18;margin-right:8px}
 .wk-lgx{line-height:15px;font-size:7px}
 .wk-hb{height:4px;border:0;background:#16162c}
 .wk-hb i{background:linear-gradient(90deg,#6f66c8,#b9b0ff)}.wk-hb.mv i{background:linear-gradient(90deg,#2ee06a,#8ef0c8)}
-.wk-tbl td.sh i{font-size:8px}
+
 .wk-pl{font-family:var(--wmono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;border-radius:3px;box-shadow:none;background:transparent}
-.wk-amt{border-radius:5px;height:30px;border-color:var(--wbd)}
-.wk-amt input{font-size:14px;font-weight:400;color:#fff8dc}
-.wk-amt span{font-family:var(--wmono);font-size:8px;letter-spacing:.14em;text-transform:uppercase}
+
 .wk-pre button{height:30px;border-radius:4px;font-family:var(--wmono);font-size:8.5px;letter-spacing:.12em;font-weight:400;border-color:var(--wbd);color:var(--wf)}
 .wk-pre button[aria-pressed=true]{color:#1b1440;background:#b9b0ff;border-color:#b9b0ff;box-shadow:none}
-.wk-live{font-size:8px;letter-spacing:.12em;text-transform:uppercase}
-.wk-pk{border:1px solid var(--wbd);border-radius:6px;background:var(--wchip);margin-bottom:5px;padding:5px 8px}
-.wk-pk.head{border:0;background:transparent;margin:0;padding:0 8px 2px}
-.wk-pk.head span{font-size:7.5px;letter-spacing:.16em;font-weight:400}
-.wk-pk .n b{font-size:12px;font-weight:400;color:#fff8dc}
-.wk-pk .n small{font-family:var(--wmono);font-size:8px;letter-spacing:.06em;font-weight:400}
-.wk-pk .x{font-size:11px;font-weight:400;color:#fff8dc}
-.wk-pk .r{font-size:11px;font-weight:400}.wk-pk .r b{font-weight:400}
-.wk-pk input{border-radius:3px;width:14px;height:14px;border-color:var(--wbd2);background:var(--wi)}
-.wk-pk input:checked{background:var(--wgreen);box-shadow:none}
-.wk-pk input:checked::after{left:4px;top:1px;width:4px;height:8px;border-color:#062012}
-.wk-k{font-size:7.5px;letter-spacing:.16em;font-weight:400}
-.wk-c b{font-size:30px;font-weight:400;letter-spacing:-.045em;color:#fff8dc}
-.wk-c.aft b{text-shadow:none}
-.wk-cb{height:5px;border:0;background:#16162c}
-.wk-cb u{background:#6f66c8}.wk-cb.up u{background:var(--wgreen)}
-.wk-gain{font-family:var(--wmono);font-size:9px;letter-spacing:.06em;font-weight:400}
-.wk-gain b{font-size:13px;font-weight:400}
+
 .wk-mv{border:1px solid var(--wbd);border-radius:6px;background:var(--wchip);margin-bottom:5px;padding:6px 9px}
-.wk-mv .f .dest b{font-size:12px;font-weight:400;color:#fff8dc}
+
 .wk-mv .f .from b{font-size:11px;font-weight:400}
 .wk-mv .a{font-size:11.5px;font-weight:400;color:#fff8dc}
 .wk-mv .r{font-size:11px;font-weight:400}.wk-mv .r b{font-weight:400}
@@ -2127,13 +1897,13 @@ body{background:var(--void);background-image:radial-gradient(130% 62% at 50% 0%,
 .wk-btn.wk-go,.wk-btn.wk-primary{background:rgba(46,224,106,.05);border:1px solid rgba(46,224,106,.27);color:var(--wgreen);box-shadow:none}
 .wk-btn.wk-primary{background:rgba(255,176,46,.07);border-color:rgba(255,176,46,.35);color:var(--hot)}
 .wk-big{height:44px;padding:0 24px;font-size:10.5px}
-.wk-ctan{font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;font-weight:400}
+
 .wk-txh b{font-size:14px;font-weight:400}.wk-txh span{font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase}
 .txrow{font-weight:400;font-size:12px}.txrow b{font-weight:400;color:var(--wcyan)}
 .txfee,.txstep{font-family:var(--wmono);font-size:9px;letter-spacing:.06em;font-weight:400}
 .pop .card.txcard{border-radius:8px;box-shadow:none}
 .wopt{font-weight:400;font-size:12.5px;border-radius:5px}.wopt i{font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;font-weight:400}
-.wk-pick{border-radius:8px}
+
 /* ── the η, C and S cards in the same language: a stage for a card, figure
    cards for the numbers, a stage inside for the two-figure bands, caps for
    every label, notes for the prose. Markup untouched; the stack is untouched. */
@@ -2213,43 +1983,23 @@ html[data-mono] #qpop .vstat,html[data-mono] #cpop .vstat,html[data-mono] #spop 
 .pane .note{font-family:var(--mono);font-size:9px;letter-spacing:.04em;line-height:1.6;color:var(--ink3);max-width:none;margin-top:12px}
 html[data-mono] .duotab>div,html[data-mono] .ptab td{background:#000;border-color:var(--edge2)}
 /* ── the wallet, at a readable scale; a move as a comparison ── */
-.wk-ttl b{font-size:15px}
+
 .wk-mark{width:30px;height:30px}
 .wk-tab{font-size:9.5px;letter-spacing:.18em;position:relative;padding-right:0}
-.wk-head{height:44px}.wk-tabs,.wk-tab{height:44px}
+.wk-tabs,.wk-tab{height:44px}
 /* the soon tag on the wallet's tab: the bar's small superscript, not a pill */
 .wk-tab i{position:absolute;top:8px;right:-16px;font-size:6.5px;letter-spacing:.14em;border-radius:2px;padding:1px 3px;line-height:1.2;margin:0;border:1px solid rgba(255,176,46,.35);background:transparent}
 .wk-tab:has(i){margin-right:14px}
-.wk-acts .wk-ib{width:30px;height:30px}
+
 #p-dele .wk-ib svg{width:14px;height:14px}
-.wk-ch h3{font-size:10px;letter-spacing:.2em;color:var(--ws)}
-.wk-cn{font-size:9.5px;letter-spacing:.1em}
-.fig b{font-size:22px}
-.fig i{font-size:8.5px}
-.wk-tbl th{font-size:8.5px}
-.wk-tbl td{font-size:12px;padding:8px 10px}
-.wk-tbl td.nm{font-size:13.5px}
-.wk-tbl td.amt{font-size:13px}
+
 .wk-lg{width:20px;height:20px}
 .wk-lgx{line-height:20px;font-size:9px}
-.wk-amt{height:34px}.wk-amt input{font-size:16px}.wk-amt span{font-size:9px}
+
 .wk-pre button{height:34px;font-size:10px}
-.wk-pk{padding:7px 10px}
-.wk-pk.head span{font-size:8.5px}
-.wk-pk .n b{font-size:13.5px}.wk-pk .n small{font-size:9.5px}
-.wk-pk .rk{font-size:10px}
-.wk-pk .x{font-size:13px}
-.wk-pk .r{font-size:12.5px;display:inline-flex;align-items:center;justify-content:flex-end;gap:6px}
-.wk-pk .r s{text-decoration:none;color:var(--wf);margin:0}
-.wk-pk .r em{font-style:normal;color:var(--wf)}
-.wk-pk{grid-template-columns:18px 34px 22px minmax(0,1fr) 92px 150px}
-.wk-k{font-size:8.5px}
-.wk-c b{font-size:34px}
-.wk-gain{font-size:10.5px}.wk-gain b{font-size:15px}
-.wk-live{margin-left:auto;font-size:9.5px}
-#wk-moves .wk-ch .wk-ib{margin-left:8px;width:30px;height:30px}
+
 .wk-btn{font-size:10.5px;height:38px}
-.wk-ctan{font-size:9px}
+
 /* a move: one side, the amount and the difference, the other side; the
    destination's record under it */
 .wk-mv{display:grid;grid-template-columns:minmax(0,1fr) 128px minmax(0,1fr);grid-template-areas:"l m r" "s s s";align-items:center;gap:4px 12px;padding:9px 11px}
@@ -2279,8 +2029,7 @@ html[data-mono] .duotab>div,html[data-mono] .ptab td{background:#000;border-colo
 /* the wallet's tabs follow the name; the page tabs stay on the right of the
    title and wear their own shape - framed caps chips, the open one filled in
    its accent - so they never read as the bar's underlined words */
-.wk-tabs{margin-left:26px;margin-right:auto}
-.wk-acts{margin-left:0}
+
 .brandbar .tabs{margin-left:auto;gap:6px;height:auto}
 .tabs .tabb{height:30px;padding:0 13px;border:1px solid var(--edge2);border-radius:5px;font-size:9px;letter-spacing:.18em;color:var(--ink3);background:transparent;transition:color .15s,border-color .15s,background .15s}
 .tabs .tabb::before,.tabs .tabb.on::before{content:none}   /* the underline was the word-tab's; a chip has its fill */
@@ -2288,131 +2037,65 @@ html[data-mono] .duotab>div,html[data-mono] .ptab td{background:#000;border-colo
 .tabs .tabb.on{color:#140c00;background:var(--acc,var(--hot));border-color:var(--acc,var(--hot));box-shadow:0 0 14px -4px var(--acc,var(--hot))}
 .tabs .tabb.on[style*="2bc8bd"]{color:#062422}.tabs .tabb.on[style*="2ee06a"]{color:#062012}
 .tabs .tabb[disabled]{opacity:.55}
-@media(max-width:620px){.wk-tabs{margin-left:0;margin-right:0}.tabs .tabb{height:28px;padding:0 6px;font-size:8.5px;letter-spacing:.12em}}
+@media(max-width:620px){.tabs .tabb{height:28px;padding:0 6px;font-size:8.5px;letter-spacing:.12em}}
 /* three layers, told apart: the bar is the site; the section head is a band
    of its own (a framed strip with the title and its tabs); the content below
    is stages on the ground */
 .w#calc>.brandbar,#p-gov>.w>.brandbar{padding:0 16px 0 18px;height:50px;border:1px solid var(--edge);border-radius:8px;background:linear-gradient(180deg,#0e0e1e,#09090f);margin-bottom:12px;box-sizing:border-box}
-.wk-head{padding:0 12px 0 14px;height:50px;border:1px solid var(--wbd);border-radius:8px;background:linear-gradient(180deg,#0e0e1e,#09090f);margin-bottom:12px}
+
 .wk-tabs,.wk-tab{height:48px}
 .wk-tab.on::after{bottom:0}
 .tabs .tabb{height:28px}
-@media(max-width:620px){.w#calc>.brandbar,#p-gov>.w>.brandbar{height:auto;padding:8px 12px}.wk-head{height:auto;padding:6px 10px}.wk-tabs,.wk-tab{height:40px}}
+@media(max-width:620px){.w#calc>.brandbar,#p-gov>.w>.brandbar{height:auto;padding:8px 12px}.wk-tabs,.wk-tab{height:40px}}
 /* ── My wallet, uplifted: three stages, each in its colour; short labels;
    the figures as coloured cards; one distribution bar; the answer where the
    choice is made; the gain where the signature is ── */
-.wk-head{justify-content:flex-start;gap:14px}
-.wk-title{font-size:15px;font-weight:600;letter-spacing:-.01em;color:var(--ink);white-space:nowrap}
-.wk-title b{font-weight:800;color:var(--hot)}
-.wk-head .wk-id{margin-left:auto;flex-direction:row}
-.wk-head .wk-ttl{align-items:flex-end;text-align:right}
-.wk-head .wk-mark{width:28px;height:28px}
-.wk-tabs{display:none}
-.wk-acts{margin-left:0}
-.wk-card{position:relative;overflow:hidden}
-.wk-card::before{content:"";position:absolute;left:14px;right:14px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--a),transparent);opacity:.9}
+
 #wk-mine{--a:#6f66c8}#wk-plan{--a:#b9b0ff}#wk-moves{--a:#2ee06a}
-.wk-ch h3{color:var(--a);font-size:10px;letter-spacing:.22em}
-.wk-figs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 10px;flex:0 0 auto}
-.fig{--a:var(--wf);position:relative;display:flex;flex-direction:column;gap:3px;align-items:flex-start;padding:9px 12px 8px;border:1px solid var(--wbd);border-radius:7px;min-width:0;
-background:radial-gradient(120% 120% at 100% 0%,color-mix(in srgb,var(--a) 12%,transparent),transparent 60%),var(--wi)}
-.fig::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:2px;border-radius:2px;background:var(--a);box-shadow:0 0 8px var(--a)}
-.fig i{order:0;font-size:7.5px;letter-spacing:.18em;color:var(--wf)}
-.fig b{order:1;font-size:22px;letter-spacing:-.03em;color:#fff8dc;line-height:1.1}
-.fig em{order:2;font-style:normal;font-family:var(--wmono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.fig.f-bal{--a:#fff8dc}.fig.f-stk{--a:#6f66c8}.fig.f-rew{--a:#2ee06a}.fig.f-pho{--a:#ffb02e}
-.fig.f-stk b{color:#b9b0ff}.fig.f-rew b{color:#2ee06a}.fig.f-pho b{color:#ffb02e}
-.fig b.warn{color:#ff4d1f}
+
 /* the distribution: one bar, a segment per validator, its share as its width */
-.wk-stack{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--wi);border:1px solid var(--wbd);margin:0 0 10px;flex:0 0 auto}
-.wk-stack i{display:block;height:100%;min-width:2px;border-right:1px solid #06060c;transition:filter .15s}
-.wk-stack i:hover{filter:brightness(1.35)}
-.wk-stack i.hld{background-image:repeating-linear-gradient(135deg,transparent 0 3px,rgba(0,0,0,.45) 3px 6px)}
+
 /* the left column: My stake keeps its figures, its bar and three rows in view
    (the ledger scrolls for the rest); Strategy takes what is left and its list
    scrolls inside - the screen itself never does */
 #wk-mine{flex:0 0 auto;min-height:0}
-#wk-mine .wk-scroll{min-height:0;max-height:150px;overflow-y:auto}
+
 #wk-plan{flex:1 1 auto;min-height:220px}
-#wk-plan .wk-picks{flex:1 1 auto;min-height:0;overflow-y:auto}
+
 /* strategy: the answer as the big figure between the amount and the list */
-#wk-plan .wk-res{border:0;padding:4px 0 8px;margin:0 0 4px}
-#wk-plan .wk-cmp{gap:10px}
-#wk-plan .wk-c{padding:8px 12px;border:1px solid var(--wbd);border-radius:7px;background:var(--wi)}
-#wk-plan .wk-c b{font-size:24px}
-#wk-plan .wk-c{padding:6px 12px}
-#wk-plan .wk-c.aft{border-color:rgba(46,224,106,.3);background:radial-gradient(120% 120% at 100% 0%,rgba(46,224,106,.1),transparent 60%),var(--wi)}
-#wk-plan .wk-gain{margin-top:8px}
-.wk-pk.head .n{color:var(--a)}
-.wk-pk.on{border-color:rgba(185,176,255,.28)}
-.wk-pk{padding:5px 10px;grid-template-columns:18px 30px 22px minmax(0,1fr) 84px 150px}
-.wk-pk .n{flex-direction:row;align-items:baseline;gap:9px;overflow:hidden}
-.wk-pk .n b{font-size:13px;flex:0 1 auto}
-.wk-pk .n small{font-size:8.5px;flex:1 1 auto;min-width:0}
-.wk-pk .wk-lg{width:18px;height:18px}.wk-pk .wk-lgx{line-height:18px;font-size:8px}
+
 /* moves: the gain, big */
-.wk-gainbig{display:flex;align-items:baseline;gap:10px;padding:2px 0 10px;margin-bottom:8px;border-bottom:1px solid var(--wbd);flex:0 0 auto;flex-wrap:wrap}
-.wk-gainbig b{font-family:var(--wmono);font-size:34px;font-weight:400;letter-spacing:-.045em;color:var(--wgreen);line-height:1}
-.wk-gainbig b.dim{color:var(--wf)}
-.wk-gainbig i{font-style:normal;font-family:var(--wmono);font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--wf)}
-.wk-gainbig span{margin-left:auto;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ws)}
+
 .wk-mv{background:radial-gradient(120% 120% at 100% 0%,rgba(46,224,106,.05),transparent 55%),var(--wchip)}
 .wk-btn.wk-go{background:linear-gradient(180deg,rgba(46,224,106,.16),rgba(46,224,106,.06));border-color:rgba(46,224,106,.45);color:#8ef0c8;box-shadow:0 0 18px -8px rgba(46,224,106,.8)}
 .wk-btn.wk-go:hover{filter:brightness(1.15)}
 .wk-btn.wk-go:disabled{box-shadow:none}
-@media(max-width:700px){.wk-figs{grid-template-columns:1fr 1fr}.wk-head .wk-ttl{display:none}}
+
 /* ── one Strategy: the amount, the answer, every validator that would earn
    more than the stake earns now (the reader ticks; nothing is pre-ticked and
    nothing is called best), then what moves, then the signature ── */
-.wk-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+
 #wk-mine{flex:1 1 auto;min-height:0}
-#wk-mine .wk-scroll{max-height:none;flex:1 1 auto}
+
 #wk-plan{--a:#2ee06a;min-height:0}
-#wk-plan .wk-ch{flex-wrap:nowrap}
-#wk-plan .wk-ch .wk-row{margin-left:14px;margin-right:auto}
-#wk-plan .wk-ch .wk-live{margin-left:auto}
-#wk-plan .wk-ch .wk-ib{margin-left:8px;width:30px;height:30px}
-#wk-plan .wk-res{padding:2px 0 8px;margin:0 0 6px;border-bottom:1px solid var(--wbd)}
-.wk-cap{display:flex;align-items:baseline;gap:8px;font-family:var(--wmono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);padding:0 0 6px;flex:0 0 auto}
-.wk-cap b{font-size:13px;letter-spacing:0;color:#fff8dc;font-weight:400}
-.wk-cap span{margin-left:auto;color:var(--wf)}
-#wk-plan .wk-picks{flex:1 1 auto;min-height:120px;overflow-y:auto}
+
 .wk-moves{flex:0 0 auto}
-.wk-pk{grid-template-columns:18px 30px 22px minmax(0,1fr) 84px 150px}
-.wk-pk .n small{color:var(--wf)}
-.wk-pk.on{background:radial-gradient(120% 120% at 0% 50%,rgba(46,224,106,.08),transparent 60%),var(--wchip);border-color:rgba(46,224,106,.3)}
-.wk-pk:not(.on):not(.head){opacity:.8}
-.wk-mvcap{font-family:var(--wmono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);padding:8px 0 5px;border-top:1px solid var(--wbd);margin-top:6px;flex:0 0 auto}
-.wk-mvcap:empty{display:none}
+
 .wk-moves{flex:0 0 auto;min-height:0;max-height:118px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .wk-moves:empty{display:none}
 /* a move, in one line: from → to, the amount, the difference a year */
-.wk-ml{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) 74px 92px;align-items:center;gap:10px;padding:5px 8px;border-bottom:1px solid var(--wbd);font-size:12px}
-.wk-ml:last-child{border-bottom:0}
-.wk-ml .f{display:flex;align-items:center;gap:7px;min-width:0}
-.wk-ml .f b{font-weight:400;color:var(--ws);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.wk-ml .f.to b{color:#fff8dc}
-.wk-ml .f .wk-lg{margin:0;width:16px;height:16px}.wk-ml .f .wk-lgx{line-height:16px;font-size:7px}
-.wk-ml .ar{color:var(--wf)}
-.wk-ml .a{text-align:right;font-family:var(--wmono);color:#fff8dc}
-.wk-ml .g{text-align:right;font-family:var(--wmono);color:var(--wgreen);font-size:11px}
-.wk-ml .g.dim{color:var(--wf)}
-.wk-ml .g.warn{color:var(--wburn)}
-.wk-cta{padding-top:10px}
+
 .wk-gainbig,#wk-moves{display:none}
-@media(max-width:700px){#wk-plan .wk-ch{flex-wrap:wrap}#wk-plan .wk-ch .wk-row{margin:0;flex:1 1 100%}.wk-ml{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-areas:"f ar t" "a a g"}}
+
 /* the identity in the card's head, small; the gate keeps the room */
 #p-dele>.pw{padding-top:0}
-#wk-mine .wk-ch{flex-wrap:nowrap;margin-bottom:10px}
-#wk-mine .wk-ch .wk-id{margin-left:auto;display:flex;align-items:center;gap:9px;min-width:0}
-#wk-mine .wk-ttl{display:flex;flex-direction:column;align-items:flex-end;gap:1px;height:auto;min-width:0}
-#wk-mine .wk-ttl b{font-size:12px;font-weight:400;color:var(--wt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+
 #wk-mine .wk-addr{font-size:8.5px;white-space:nowrap}
-#wk-mine .wk-ttl{flex:0 0 auto}
+
 #wk-mine .wk-mark{width:22px;height:22px}#wk-mine .wk-mark img{border-radius:6px}
 #wk-mine .wk-ib{width:26px;height:26px}#wk-mine .wk-ib svg{width:12px;height:12px}
 .wk-gate{min-height:320px}
-.wk-cap span{display:none}
+
 /* the bar's wallet button: a lit chip, and the account's name once connected */
 .ftab.acct{background:linear-gradient(180deg,#14142c,#0b0b16);box-shadow:inset 0 0 0 1px var(--edge2),inset 0 1px 0 rgba(255,255,255,.06),0 6px 16px -10px #000}
 .ftab.acct:hover{box-shadow:inset 0 0 0 1px var(--hot),inset 0 1px 0 rgba(255,255,255,.06),0 0 16px -6px rgba(255,176,46,.5)}
@@ -2421,24 +2104,9 @@ background:radial-gradient(120% 120% at 100% 0%,color-mix(in srgb,var(--a) 12%,t
 html[data-wallet] .ftab.acct .wm{display:block}
 html[data-wallet] .ftab.acct>svg{display:none}
 .ftab.acct b{max-width:140px;overflow:hidden;text-overflow:ellipsis}
-.wk-figs{grid-template-columns:repeat(3,minmax(0,1fr))}
-.fig{align-items:center;text-align:center}
-.fig::before{left:50%;top:0;bottom:auto;width:36px;height:2px;transform:translateX(-50%);border-radius:0 0 2px 2px}
-.fig em{max-width:100%}
-.fig .two{display:flex;align-items:baseline;justify-content:center;gap:6px;order:1}
-.fig .two b{font-size:18px}
-.fig .two b.pho{color:#ffb02e}
-.fig .two em{font-size:7.5px}
-.fig.f-bal{--a:#ffb02e}
-@media(max-width:700px){.wk-figs{grid-template-columns:1fr 1fr}}
+
 /* the list's record as columns in colour: fee, 90-day uptime, jailed */
-.wk-pk{grid-template-columns:18px 30px 22px minmax(0,1fr) 38px 62px 44px 70px 128px;gap:0 8px}
-.wk-pk .n b{font-size:12.5px}
-.wk-pk .n{flex-direction:column;align-items:flex-start}
-.wk-pk .c1,.wk-pk .c2,.wk-pk .c3{font-family:var(--wmono);font-size:11.5px;text-align:right;color:var(--ws);font-variant-numeric:tabular-nums;white-space:nowrap}
-.wk-pk .ok{color:var(--wgreen)}.wk-pk .warn{color:var(--wamber)}.wk-pk .bad{color:var(--wburn)}.wk-pk .dim{color:var(--wf)}
-.wk-pk.head .c1,.wk-pk.head .c2,.wk-pk.head .c3{font-size:8.5px;color:var(--wf);letter-spacing:.12em}
-@media(max-width:700px){.wk-pk{grid-template-columns:18px 22px minmax(0,1fr) 64px 84px}.wk-pk .rk,.wk-pk .r,.wk-pk .c1,.wk-pk .c3{display:none}}
+
 /* ── one section, one column, the pane scrolls as a document: the wallet,
    the delegations, then the redelegation list under its announcement ── */
 #p-dele{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--edge2) transparent}
@@ -2446,24 +2114,9 @@ html[data-wallet] .ftab.acct>svg{display:none}
 .wk-body{display:block}
 #wk-mine{display:block;min-height:0;overflow:visible}
 #wk-mine .wk-foot{padding:8px 0 0}
-.wk-news{margin:18px 0 12px;padding:14px 18px;border:1px solid rgba(46,224,106,.3);border-radius:8px;
-background:radial-gradient(110% 160% at 0% 50%,rgba(46,224,106,.14),transparent 55%),#0a0f0c;display:flex;align-items:baseline;gap:12px;
-box-shadow:0 0 28px -12px rgba(46,224,106,.6),inset 0 1px 0 rgba(255,255,255,.04)}
-.wk-news b{font-family:var(--wmono);font-size:34px;font-weight:400;letter-spacing:-.04em;color:var(--wgreen);line-height:1;text-shadow:0 0 18px rgba(46,224,106,.45)}
-.wk-news span{font-size:14px;color:#e6e4f0;letter-spacing:-.01em}
-.wk-news.none{border-color:var(--wbd);background:var(--wi);box-shadow:none}
-.wk-news.none b{color:var(--wf);text-shadow:none;font-size:14px}
-.wk-bar2{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px}
-.wk-bar2 .wk-live{margin-left:auto}
-.wk-flt{height:34px;padding:0 11px;border-radius:4px;border:1px solid var(--wbd);background:transparent;color:var(--wf);font-family:var(--wmono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
-.wk-flt::before{content:"";width:10px;height:10px;border-radius:2px;border:1px solid var(--wbd2)}
-.wk-flt[aria-pressed=true]{color:var(--wgreen);border-color:rgba(46,224,106,.35)}
-.wk-flt[aria-pressed=true]::before{background:var(--wgreen);border-color:var(--wgreen)}
-#wk-mine .wk-picks{max-height:340px;overflow-y:auto;min-height:0;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
-#wk-mine .wk-res{margin:12px 0 6px;padding:0 0 8px;border-bottom:1px solid var(--wbd)}
+
 .wk-moves{max-height:none;overflow:visible}
-.wk-cap{display:none}
-@media(min-width:900px){.wk-figs{grid-template-columns:repeat(3,minmax(0,1fr));max-width:720px}}
+
 /* ── the gate: the wallet choice is the screen. A framed card on a lit ground,
    the two wallets as tiles, the chain and its live dot, one line of what is
    read. No popup, no lone button. ── */
@@ -2477,7 +2130,7 @@ border:1px solid var(--edge)}
 .wk-gatecard .wk-txh{padding:18px 22px 14px}
 .wk-gatecard .wk-txh b{font-size:16px;font-weight:400;color:var(--wt);display:block}
 .wk-gatecard .wk-txh span{display:block;font-family:var(--wmono);font-size:8.5px;letter-spacing:.04em;color:var(--wf);margin-top:2px;text-transform:none}
-.wk-gatecard .wk-txh .wchain{display:inline-flex;margin:0 0 0 auto;letter-spacing:.16em;text-transform:uppercase}
+
 .wk-gatecard .wk-state{position:static;padding:0 22px 4px;justify-content:flex-start;text-align:left;font-family:var(--wmono);font-size:9px;letter-spacing:.06em;color:var(--ws)}
 .wk-gatecard .wk-state:empty{display:none}
 /* the section words sit in the middle of the bar, between the mark and the wallet */
@@ -2514,36 +2167,21 @@ background:linear-gradient(180deg,#10101f,#0a0a14);box-shadow:inset 0 1px 0 rgba
    button, the wallet's mark at its left, the provider small over the word */
 .ftab.acct .wm,html[data-wallet] .ftab.acct .wm{display:none}
 html[data-wallet] .ftab.acct>svg{display:block}
-#wk-mine .wk-ch .wk-id{gap:14px}
+
 .wk-disc{display:inline-flex;align-items:center;gap:10px;height:38px;padding:0 14px 0 9px;border-radius:9px;cursor:pointer;
 border:1px solid var(--wbd2);background:linear-gradient(180deg,var(--wh),rgba(255,255,255,.02));color:var(--wt);
 box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -6px 14px -8px rgba(0,0,0,.6);transition:border-color .16s,box-shadow .16s,color .16s}
 .wk-disc:hover{border-color:var(--wburn);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 14px -6px var(--wburn)}
-.wk-disc:hover .wk-dtxt b{color:var(--wburn)}
+
 #wk-mine .wk-disc .wk-mark{width:22px;height:22px;display:block}
 #wk-mine .wk-disc .wk-mark[hidden]{display:none}
-.wk-dtxt{display:flex;flex-direction:column;align-items:flex-start;line-height:1.15;gap:1px}
-.wk-dtxt i{font-style:normal;font-family:var(--wmono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--wcyan)}
-.wk-dtxt b{font-size:12px;font-weight:400;color:var(--wt)}
+
 /* ── My wallet, dense. One strip for the wallet; two fixed panes side by
    side, both paged, rows of 30px, figures inline; nothing scrolls the page ── */
 #p-dele{overflow:hidden}
 #p-dele>.pw{height:100%;min-height:0;display:flex;flex-direction:column}
 .wk-body{display:flex;flex-direction:column;gap:10px;flex:1 1 auto;min-height:0}
-.wk-strip{display:flex;align-items:center;gap:22px;height:54px;padding:0 16px;border:1px solid var(--wbd);border-radius:8px;background:linear-gradient(180deg,#0e0e1e,#09090f);flex:0 0 auto}
-.wk-who{display:flex;flex-direction:column;gap:2px;min-width:0;flex:0 0 auto;padding-right:22px;border-right:1px solid var(--wbd)}
-.wk-who b{font-size:13.5px;font-weight:600;color:var(--wt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
-.wk-who .wk-addr{font-size:9px;letter-spacing:.04em;color:var(--wf)}
-.wk-kvs{display:flex;gap:26px;flex:1 1 auto;min-width:0;overflow:hidden}
-.kv{display:flex;flex-direction:column;gap:2px;white-space:nowrap}
-.kv i{font-style:normal;font-family:var(--wmono);font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--wf)}
-.kv b{font-family:var(--wmono);font-size:15px;font-weight:400;letter-spacing:-.02em;color:#fff8dc;line-height:1.1}
-.kv b.pho{color:#ffb02e}.kv b.stk{color:#b9b0ff}.kv b.rew{color:#2ee06a}.kv b.warn{color:#ff4d1f}
-.kv em{font-style:normal;font-family:var(--wmono);font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--wf)}
-.kv b+em{display:inline}
-.kv{flex-direction:row;align-items:baseline;gap:6px}
-.kv i{align-self:center;margin-right:2px}
-.wk-strip .wk-disc{margin-left:auto;height:34px}
+
 .wk-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:10px;flex:1 1 auto;min-height:0}
 .wk-pane{display:flex;flex-direction:column;min-height:0;border:1px solid var(--wbd);border-radius:8px;background:var(--wc);padding:8px 12px 8px;position:relative;overflow:hidden}
 .wk-pane::before{content:"";position:absolute;left:14px;right:14px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--a),transparent);opacity:.9}
@@ -2585,64 +2223,24 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -6px 14px -8px rgba(0,0,0
 .wk-tbl2 tr.pad td{border-bottom-color:transparent;background:transparent}
 .wk-tbl2 td.r2 s{text-decoration:none;color:var(--wf)}.wk-tbl2 td.r2 b{font-weight:400;color:var(--wgreen)}.wk-tbl2 td.r2 em{font-style:normal;color:var(--wf);margin:0 4px}
 .wk-pf{margin-top:auto;padding-top:8px;display:flex;align-items:center;gap:12px;flex:0 0 auto}
-.wk-pf .wk-stack{margin:0;flex:1 1 auto;height:6px}
+
 .wk-pf .wk-foot{padding:0;flex:0 0 auto}
 /* redelegation: the announcement inline, the controls in one row, the answer as a strip with the button */
-.wk-ph .wk-news{margin:0;padding:0;border:0;background:none;box-shadow:none;display:inline-flex;align-items:baseline;gap:6px}
-.wk-ph .wk-news b{font-size:15px;text-shadow:0 0 12px rgba(46,224,106,.5)}
-.wk-ph .wk-news span{font-size:10.5px;color:var(--ws)}
-.wk-ph .wk-news.none b{font-size:10px;color:var(--wf);text-shadow:none}
-.wk-ph .wk-live{margin-left:auto;font-size:8px}
+
 .wk-ph .wk-ib{width:26px;height:26px;margin-left:6px}
-.wk-bar2{margin:2px 0 6px;gap:6px}
-.wk-bar2 .wk-amt{height:28px;padding:0 9px}.wk-bar2 .wk-amt input{font-size:13px;width:6.5ch}.wk-bar2 .wk-amt span{font-size:7.5px}
-.wk-bar2 .wk-pre button{height:28px;padding:0 8px;font-size:8px}
-.wk-bar2 .wk-flt{height:28px;padding:0 9px;font-size:8px}
-.wk-bar2 .wk-pg{margin-left:auto}
-#wk-plan .wk-res{margin:8px 0 0;padding:8px 0 0;border:0;border-top:1px solid var(--wbd);flex:0 0 auto}
-#wk-plan .wk-res .strip{display:flex;align-items:center;gap:16px;flex-wrap:nowrap}
-.wk-res .strip .p{display:flex;flex-direction:column;gap:1px;white-space:nowrap}
-.wk-res .strip .p i{font-style:normal;font-family:var(--wmono);font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--wf)}
-.wk-res .strip .p b{font-family:var(--wmono);font-size:18px;font-weight:400;letter-spacing:-.03em;color:#fff8dc;line-height:1.1}
-.wk-res .strip .p.aft b{color:var(--wgreen)}
-.wk-res .strip .p.gain b{color:var(--wgreen);font-size:15px}
-.wk-res .strip .p b.dim{color:var(--wf)}
-.wk-res .strip .arr{color:var(--wf);font-size:16px}
-.wk-res .strip .wk-btn{margin-left:auto;height:32px;padding:0 14px;font-size:9px}
-.wk-res .strip .wk-ctan{font-size:7.5px}
+
 #wk-plan .wk-moves{margin-top:6px;max-height:none;flex:1 1 auto;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
-.wk-ml{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) 64px 84px;padding:3px 6px;font-size:11px;border-bottom-color:#16162a}
-.wk-ml .f .wk-lg{width:14px;height:14px}
-.wk-ml .f b{font-size:11px}
-.wk-ml .a,.wk-ml .g{font-size:10.5px}
-@media(max-width:900px){.wk-two{grid-template-columns:1fr}#p-dele{overflow-y:auto}#p-dele>.pw{height:auto;min-height:100%}.wk-pane{overflow:visible}.wk-strip{height:auto;flex-wrap:wrap;padding:10px 14px;gap:12px}.wk-who{border:0;padding:0}.wk-kvs{flex-wrap:wrap;gap:12px}}
+
+@media(max-width:900px){.wk-two{grid-template-columns:1fr}#p-dele{overflow-y:auto}#p-dele>.pw{height:auto;min-height:100%}.wk-pane{overflow:visible}}
 /* the strip's pairs: label, value, unit on one centre line, in their colours */
-.wk-kvs{gap:0;align-items:stretch}
-.kv{--k:#a5a3c4;flex-direction:row;align-items:center;gap:7px;padding:0 20px;border-right:1px solid var(--wbd);height:30px}
-.kv:last-child{border-right:0}
-.kv i{font-size:7.5px;letter-spacing:.18em;color:color-mix(in srgb,var(--k) 70%,#6f6d94);margin:0;line-height:1}
-.kv b{font-size:15px;color:var(--k);line-height:1}
-.kv em{font-size:7.5px;letter-spacing:.12em;color:var(--wf);line-height:1;padding-top:2px}
-.kv.k-bal{--k:#fff8dc}.kv.k-pho{--k:#ffb02e}.kv.k-stk{--k:#b9b0ff}.kv.k-rew{--k:#2ee06a}.kv.k-apr{--k:#2bc8bd}
-.kv b.warn{color:#ff4d1f}
-.wk-who{padding-right:20px}
-.wk-who b{color:#fff8dc}
+
 .wk-pf{justify-content:flex-end}
-.wk-stack{display:none}
+
 /* the announcement, two lines: the count with its noun, then the news */
-.wk-ph .wk-news{flex-direction:column;align-items:flex-start;gap:0;line-height:1.1;margin-left:6px}
-.wk-ph .wk-news .l1{font-size:11px;color:#e6e4f0}
-.wk-ph .wk-news .l1 b{font-size:15px;margin-right:4px}
-.wk-ph .wk-news .l2{font-family:var(--wmono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--wgreen)}
+
 /* the message under the title: the count with its noun, then the news, as a
    quiet green line across the pane */
-#wk-plan .wk-news{margin:0 0 8px;padding:6px 10px;border:1px solid rgba(46,224,106,.22);border-radius:5px;background:linear-gradient(90deg,rgba(46,224,106,.08),transparent 70%);
-display:flex;align-items:baseline;gap:8px;box-shadow:none;flex:0 0 auto}
-#wk-plan .wk-news .l1{font-size:12px;color:#e6e4f0}
-#wk-plan .wk-news .l1 b{font-size:16px;margin-right:4px;text-shadow:0 0 12px rgba(46,224,106,.5)}
-#wk-plan .wk-news .l2{font-family:var(--wmono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--wgreen)}
-#wk-plan .wk-news.none{border-color:var(--wbd);background:var(--wi)}
-#wk-plan .wk-news.none b{font-size:10px;color:var(--wf);text-shadow:none}
+
 /* a note on the map: every tile opens its validator */
 .tapnote{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);margin-right:auto;white-space:nowrap}
 #p-home .tapnote svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin:0;max-height:none;color:var(--hot);opacity:.85}
@@ -2709,12 +2307,12 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
   .modes .etabox.monob,.frow .etabox.monob{width:22px;min-width:22px;height:22px;margin-left:0}
   .duotab{grid-template-columns:1fr}
   /* the wallet */
-  .wk-strip{height:auto;flex-wrap:wrap;padding:10px 12px;gap:8px 0}
-  .wk-who{border:0;padding:0 0 6px;flex:1 1 100%}
-  .wk-kvs{flex-wrap:wrap;gap:4px 0;flex:1 1 100%}
-  .kv{padding:0 10px 0 0;border:0;height:22px;gap:5px}
-  .kv b{font-size:13px}
-  .wk-strip .wk-disc{margin:6px 0 0;height:32px}
+  
+  
+  
+  
+  
+  
   .wk-two{grid-template-columns:1fr;gap:10px}
   .wk-pane{overflow:hidden;padding:8px 10px}
   .wk-tbl2 table{table-layout:auto}
@@ -2723,22 +2321,18 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
   #dmy th:nth-child(5),#dmy td:nth-child(5){display:none}
   #dpicks th:nth-child(2),#dpicks td:nth-child(2),#dpicks th:nth-child(5),#dpicks td:nth-child(5),#dpicks th:nth-child(6),#dpicks td:nth-child(6),#dpicks th:nth-child(7),#dpicks td:nth-child(7),#dpicks th:nth-child(8),#dpicks td:nth-child(8){display:none}
   #dpicks td.r2 s,#dpicks td.r2 em{display:none}
-  .wk-bar2{gap:5px}.wk-bar2 .wk-pre button{padding:0 6px}
-  #wk-plan .wk-res .strip{flex-wrap:wrap;gap:10px 14px}
-  #wk-plan .wk-res .strip .wk-btn{flex:1 1 100%;margin:4px 0 0}
-  .wk-ml{grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr);grid-template-areas:"f ar t" "a a g";gap:2px 6px}
-  .wk-ml .f:first-child{grid-area:f}.wk-ml .ar{grid-area:ar}.wk-ml .f.to{grid-area:t}.wk-ml .a{grid-area:a;text-align:left}.wk-ml .g{grid-area:g}
+  
+  
+  
+  
+  
   .wk-pf{justify-content:flex-start}
   .txcard .txrow{grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr);grid-template-areas:"f ar t" "a a a"}
   .txcard .txrow .f:first-child{grid-area:f}.txcard .txrow i{grid-area:ar}.txcard .txrow .f.to{grid-area:t}.txcard .txrow .a{grid-area:a;text-align:left}
   .txans{flex-wrap:wrap;gap:10px 14px}
 }
 /* the stake input on the right, one max beside it; the list scrolls inside */
-.wk-bar2{justify-content:flex-end}
-.wk-stk{display:inline-flex;align-items:center;gap:8px}
-.wk-stk>i{font-style:normal;font-family:var(--wmono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--wf)}
-.wk-bar2 .wk-amt{height:28px;padding:0 9px}
-.wk-bar2 .wk-amt input{width:8ch;font-size:13px}
+
 .wk-max{height:28px;padding:0 9px;border-radius:4px;border:1px solid var(--wbd);background:transparent;color:var(--wf);font-family:var(--wmono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
 .wk-max b{font-weight:400;color:var(--ws);letter-spacing:.04em;font-size:9px}
 .wk-max:hover{color:var(--wt);border-color:var(--ws)}
@@ -2748,48 +2342,38 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 /* the wallet, lifted out of the dark: lighter grounds, brighter hairlines and
    type, so the figures read without leaning in */
 #p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
-.wk-strip{background:linear-gradient(180deg,#151529,#0e0e1d);border-color:var(--wbd)}
+
 .wk-pane{background:linear-gradient(180deg,#10101f,#0d0d1b)}
 .wk-tbl2 td{border-bottom-color:#22223c}
 .wk-tbl2 tr:hover td{background:#171730}
 .wk-tbl2 tr.on td{background:rgba(46,224,106,.09)}
 .wk-tbl2 th{color:#9d9bc2}
-.kv i,.kv em{color:#9d9bc2}
+
 .wk-ph h3{color:var(--a)}
-.wk-ml{border-bottom-color:#22223c}
-.wk-ml .f b{color:#c1bfdc}
-.wk-ml{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) 64px 124px}
+
 .wk-max,.wk-bar2 .wk-amt{border-color:var(--wbd2)}
 .wk-tbl2 td.ck input{border-color:#5a5a88;background:#12122a}
 .wk-tbl2 td .sb{display:none}
 /* the account is the disconnect: mark, name and address, the leave glyph */
-.wk-strip{padding-left:20px}
-.wk-strip .wk-kvs{padding-left:0}
-.wk-strip .kv:first-child{padding-left:0}
+
 .wk-disc{gap:10px;padding:0 10px 0 8px;height:38px}
-.wk-disc .wk-dtxt{align-items:flex-start;gap:2px}
-.wk-disc .wk-dtxt b{font-size:12px;font-weight:600;color:var(--wt);text-transform:none;letter-spacing:0;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.wk-disc .wk-dtxt i.wk-addr{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.04em;color:var(--wf);text-transform:none}
-.wk-disc .wk-dtxt i.wk-addr::before{display:none}
+
 #p-dele .wk-disc svg.wk-out{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin:0 0 0 4px;max-height:none;color:var(--wf);transition:color .16s}
 .wk-disc:hover svg.wk-out{color:var(--wburn)}
-.wk-disc:hover .wk-dtxt b{color:var(--wt)}
+
 /* no strip: the balances in the Delegations head, the account in the
    Redelegation head; both panes hug their tables like the Picks stages */
 .wk-two{align-items:start}
 .wk-pane{flex:0 0 auto;min-height:0}
-.wk-bal{display:inline-flex;align-items:baseline;gap:5px;margin-left:14px;font-family:var(--wmono);white-space:nowrap}
-.wk-bal b{font-size:12.5px;font-weight:400;color:#fff8dc}
-.wk-bal b.pho{color:#ffb02e;margin-left:10px}
-.wk-bal i{font-style:normal;font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
+
 #wk-plan .wk-ph{height:auto;min-height:38px;flex-wrap:nowrap}
 #wk-plan .wk-ph .wk-disc{height:32px;margin-left:12px}
-#wk-plan .wk-ph .wk-disc .wk-dtxt b{font-size:11px}
+
 #wk-plan .wk-ph .wk-disc .wk-mark{width:20px;height:20px}
 #wk-plan .wk-tbl2{flex:0 0 auto;height:262px;overflow-y:auto}
 #wk-mine .wk-ph{flex-wrap:nowrap;gap:8px}
 #wk-mine .wk-ph .wk-pn{white-space:nowrap}
-#wk-mine .wk-ph .wk-bal{margin-left:8px}
+
 #wk-mine .wk-ph .wk-pg{flex:0 0 auto}
 #wk-mine .wk-ph .wk-foot{margin-left:auto;display:flex;flex-wrap:nowrap;gap:6px;padding:0}
 #wk-mine .wk-ph .wk-foot:empty{display:none}
@@ -2812,24 +2396,14 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 /* the delegations head in two lines: title, count and the held tag; then the balances */
 #wk-mine .wk-ph{flex-wrap:wrap;height:auto;min-height:30px;row-gap:2px;padding-bottom:4px}
 #wk-mine .wk-ph .wk-foot{order:2}
-#wk-mine .wk-ph .wk-bal{order:3;flex:1 1 100%;margin:0;padding-top:2px}
+
 /* the left column: a small Balance pane (with the account), then the delegations */
-.wk-two>.wk-col{display:flex;flex-direction:column;gap:10px;min-height:0}
-.wk-balpane{--a:#ffb02e;padding-bottom:10px}
-.wk-balpane .wk-ph{height:auto;min-height:30px;flex-wrap:nowrap}
-.wk-balpane .wk-ph .wk-disc{margin-left:auto;height:32px}
-.wk-balpane .wk-ph .wk-disc .wk-dtxt b{font-size:11px;max-width:150px}
-.wk-balpane .wk-ph .wk-disc .wk-mark{width:20px;height:20px}
-.wk-balpane .wk-bal{display:flex;gap:22px;margin:2px 0 0;padding:0}
-.wk-balpane .wk-bal span{display:inline-flex;align-items:baseline;gap:6px}
-.wk-balpane .wk-bal b{font-size:18px}
-.wk-balpane .wk-bal b.pho{margin:0}
-#wk-mine .wk-ph .wk-bal{display:none}
+
 /* one pane, two headings: Balance (with the account) above a rule, then Delegations */
 #wk-mine .wk-bh{height:auto;min-height:32px;flex-wrap:nowrap}
 #wk-mine .wk-bh h3{color:#ffb02e}
 #wk-mine .wk-bh .wk-disc{margin-left:auto;height:32px}
-#wk-mine .wk-bh .wk-disc .wk-dtxt b{font-size:11px;max-width:150px}
+
 #wk-mine .wk-bh .wk-disc .wk-mark{width:20px;height:20px}
 /* Balance: five equal boxes across the pane - ATONE, PHOTON, staked, rewards, APR */
 #wk-mine .wk-bal5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:2px 0 0;padding:0 0 10px}
@@ -2845,7 +2419,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 /* the stake row: one field under the title, max riding inside its right edge; the
    placeholder is set in the sans face and dimmed so it reads as a hint, not a value;
    the page's amber focus halo does not belong here */
-#wk-plan .wk-bar2{justify-content:flex-start;margin:4px 0 8px;gap:6px}
+
 #wk-plan .wk-field{display:inline-flex;align-items:center;height:28px;width:200px;max-width:100%;padding:0 4px 0 0;border-radius:6px;border:1px solid var(--wbd2);
 background:linear-gradient(180deg,#0b0b18,#0e0e1d);box-shadow:inset 0 1px 0 #ffffff06;transition:border-color .15s,box-shadow .15s}
 #wk-plan .wk-field:hover{border-color:var(--ws)}
@@ -2892,13 +2466,12 @@ background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba
 /* the pane titles at a readable size; the account name stands at the same scale */
 #wk-mine .wk-ph h3,#wk-plan .wk-ph h3{font-size:10.5px;letter-spacing:.2em}
 /* Redelegate stands at the end of the stake row, the field at its left */
-#wk-plan .wk-bar2{flex-wrap:nowrap}
+
 #wk-plan .wk-field{flex:0 1 200px;min-width:120px}
-#wk-plan .wk-bar2 .wk-btn.wk-go{margin-left:auto;height:28px;padding:0 16px;font-size:9px;letter-spacing:.16em;border-radius:6px;flex:0 0 auto;font-family:var(--wmono);text-transform:uppercase}
-#wk-plan .wk-bar2 .wk-btn.wk-go:disabled{cursor:default}
+
 /* the answer rides in the stake row as three boxes: now -> after, ATONE/year, moves;
    Redelegate is grey until it can be signed; on a phone the boxes take the next line */
-#wk-plan .wk-bar2{flex-wrap:wrap;row-gap:6px}
+
 #wk-mv .wk-ans{display:flex;align-items:center;gap:6px;min-width:0}
 #wk-mv .wk-ans .p{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 9px;border-radius:5px;border:1px solid var(--wbd2);
 background:linear-gradient(180deg,#12122a,#0b0b18);box-shadow:inset 0 1px 0 #ffffff08;white-space:nowrap;position:relative;overflow:hidden}
@@ -2912,16 +2485,7 @@ background:linear-gradient(180deg,#12122a,#0b0b18);box-shadow:inset 0 1px 0 #fff
 #wk-mv .wk-ans .p.mv{--c:#2bc8bd}
 @media(max-width:700px){#wk-mv .wk-ans{order:3;flex:1 1 100%}#wk-mv .wk-ans .p{flex:1 1 0;justify-content:center;padding:0 6px}}
 /* the move as a live comparison: each side carries its figures, the better of each pair lit */
-.wk-ml.cmp{align-items:center;padding:6px 8px}
-.wk-ml.cmp .f{display:flex;flex-wrap:wrap;align-items:center;gap:2px 7px;min-width:0}
-.wk-ml.cmp .f b{flex:0 1 auto;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.wk-ml.cmp .vs{flex:1 1 100%;display:flex;gap:9px;padding-left:21px;font-family:var(--wmono);font-size:9.5px;color:var(--ws);white-space:nowrap;font-variant-numeric:tabular-nums}
-.wk-ml.cmp .vs em{font-style:normal;display:inline-flex;align-items:baseline;gap:4px}
-.wk-ml.cmp .vs em i{font-style:normal;font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
-.wk-ml.cmp .vs em.up{color:var(--wgreen)}
-.wk-ml.cmp .vs em.dn{color:var(--wf)}
-.wk-ml.cmp .ar{color:var(--wgreen);font-size:14px}
-@media(max-width:700px){.wk-ml.cmp .vs{gap:7px;padding-left:0}}
+
 /* ── the gate lives in the left pane: one Connect button in the centre, the two tiles
    in its place once tapped; the right pane shows the chain's numbers meanwhile ── */
 html:not([data-wallet]) .wk-two{align-content:start}
@@ -3070,14 +2634,14 @@ border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0d0d1c);
 #wk-mine .wk-bh .wk-addrw{margin:0;align-self:center}
 #wk-mine .wk-bh .wk-disc{align-self:center}
 #wk-mine .wk-bal5{margin:6px 0 0;padding:0 0 10px}
-#wk-plan .wk-bar2{margin:4px 0 8px}
+
 #wk-mv .wk-moves{margin-top:4px}
 #wk-mv .wk-mvh h3,#wk-plan>.wk-ph h3{align-self:center}
 /* the stake row in a narrower pane: field and button on the first line, the two
    figure boxes on their own line beneath, sharing the width */
-#wk-plan .wk-bar2{flex-wrap:wrap;row-gap:6px}
+
 #wk-plan .wk-field{flex:0 1 180px;width:180px;max-width:100%;min-width:120px}
-#wk-plan .wk-bar2 .wk-btn.wk-go{order:2;margin-left:auto}
+
 #wk-mv .wk-ans{order:3;flex:1 1 100%;display:flex;gap:6px}
 #wk-mv .wk-ans .p{flex:1 1 0;justify-content:center;min-width:0;padding:0 6px}
 #wk-mv .wk-ans .p b{font-size:11.5px}
@@ -3094,18 +2658,9 @@ border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0d0d1c);
 #dpicks tbody tr.lt td.r2 b{color:var(--wf)}
 #dpicks tbody tr.lt.on td{color:var(--ws)}
 /* the line lives in the title row, at its right end, as one quiet phrase */
-#wk-plan>.wk-ph .wk-news{margin:0 0 0 auto;padding:0 8px;height:22px;display:inline-flex;flex-direction:row;align-items:center;line-height:1;gap:5px;border:1px solid rgba(46,224,106,.22);border-radius:5px;background:linear-gradient(90deg,rgba(46,224,106,.08),transparent 80%);flex:0 0 auto;white-space:nowrap}
-#wk-plan>.wk-ph .wk-news .l1{font-size:10.5px;color:#e6e4f0}
-#wk-plan>.wk-ph .wk-news .l1 b{font-size:12px;margin-right:3px;color:var(--wgreen);text-shadow:0 0 10px rgba(46,224,106,.45)}
-#wk-plan>.wk-ph .wk-news .l2{font-family:var(--wmono);font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--wgreen)}
-#wk-plan>.wk-ph .wk-news.none{border-color:var(--wbd);background:var(--wi)}
-#wk-plan>.wk-ph .wk-news.none b{font-size:8px;color:var(--wf);text-shadow:none}
-#wk-plan>.wk-ph .wk-news[hidden]{display:none}
-@media(max-width:700px){#wk-plan>.wk-ph .wk-news .l1{font-size:9.5px}#wk-plan>.wk-ph .wk-news .l2{display:none}}
+
 /* the line sits right under the title; the stake row follows it */
-#wk-plan>.wk-news{margin:4px 0 0}
-#wk-plan>.wk-news[hidden]{display:none}
-#wk-plan .wk-bar2{margin:4px 0 6px}
+
 /* the two figure boxes open the What moves pane, on the same top as the stake row */
 #wk-mv .wk-ans{order:0;flex:0 0 auto;display:flex;gap:6px;margin:4px 0 0}
 #wk-mv .wk-ans .p{flex:2 1 0;justify-content:center;min-width:0;padding:0 5px;height:28px;gap:4px}
@@ -3121,16 +2676,7 @@ border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0d0d1c);
 #wk-mv .wk-ans .p.lock b{color:#ffb02e}
 #p-dele #wk-mv .wk-ans .p.lock svg{width:10px;height:10px;margin:0 1px 0 0;max-height:none;fill:none;stroke:#ffb02e;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
 /* the stake row as three columns: the phrase, the field, the button */
-#wk-plan .wk-bar2{flex-wrap:nowrap;gap:8px;align-items:center}
-#wk-plan .wk-bar2 .wk-news{order:0;margin:0;padding:0 8px;height:28px;display:inline-flex;flex-direction:row;align-items:center;line-height:1;gap:5px;flex:1 1 auto;min-width:0;overflow:hidden;
-border:1px solid rgba(46,224,106,.22);border-radius:5px;background:linear-gradient(90deg,rgba(46,224,106,.08),transparent 80%);white-space:nowrap}
-#wk-plan .wk-bar2 .wk-news .l1{font-size:10.5px;color:#e6e4f0}
-#wk-plan .wk-bar2 .wk-news .l1 b{font-size:12px;margin-right:3px;color:var(--wgreen);text-shadow:0 0 10px rgba(46,224,106,.45)}
-#wk-plan .wk-bar2 .wk-news .l2{font-family:var(--wmono);font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--wgreen);overflow:hidden;text-overflow:ellipsis}
-#wk-plan .wk-bar2 .wk-news.none{border-color:var(--wbd);background:var(--wi)}
-#wk-plan .wk-bar2 .wk-news.none b{font-size:8px;color:var(--wf);text-shadow:none}
-#wk-plan .wk-bar2 .wk-news[hidden]{display:none}
-#wk-plan .wk-bar2 .wk-news.off{visibility:hidden}
+
 /* stake under cooldown: an amber note at the end of the Redelegate title row */
 #wk-plan>.wk-ph .wk-lockn{margin-left:auto;height:22px;display:inline-flex;align-items:center;gap:4px;padding:0 6px;border-radius:5px;border:1px solid rgba(255,176,46,.35);background:rgba(255,176,46,.06);font-family:var(--wmono);font-size:7px;letter-spacing:.06em;text-transform:uppercase;color:var(--wamber);white-space:nowrap;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
 #wk-plan>.wk-ph .wk-lockn b{font-size:9.5px;font-weight:400;letter-spacing:0;color:#ffd58a}
@@ -3147,9 +2693,7 @@ border:1px solid rgba(46,224,106,.22);border-radius:5px;background:linear-gradie
 #dmy .wk-empty{font-family:var(--wmono);font-size:9px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--wf);padding:16px 0 0 14px}
 /* the pane's line at the right end of its title row: one chip in the "would earn you
    more" shape, in the pane's own colours */
-#wk-mv .wk-mvh .wk-tag{margin-left:auto;height:22px;display:inline-flex;align-items:center;gap:4px;padding:0 8px;border-radius:5px;border:1px solid rgba(185,176,255,.28);background:linear-gradient(90deg,rgba(185,176,255,.09),transparent 80%);font-family:var(--wmono);font-size:6.5px;letter-spacing:.12em;text-transform:uppercase;line-height:1;white-space:nowrap;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
-#wk-mv .wk-mvh .wk-tag b{font-weight:400;color:var(--wgreen)}
-#wk-mv .wk-mvh .wk-tag i{font-style:normal;color:#b9b0ff}
+
 /* ── unstake: a door in the Delegations head, a card of its own ── */
 #wk-mine .wk-t1 .wk-unb{margin-left:auto;height:22px;padding:0 9px;border-radius:5px;border:1px solid rgba(255,176,46,.4);background:linear-gradient(180deg,#1a1730,#12101f);color:var(--wamber);font-family:var(--wmono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;flex:0 0 auto;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);transition:border-color .15s,box-shadow .15s,transform .12s}
 #wk-mine .wk-t1 .wk-unb:hover{border-color:var(--wamber);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 12px -3px rgba(255,176,46,.6)}
@@ -3251,15 +2795,7 @@ border:1px solid rgba(46,224,106,.22);border-radius:5px;background:linear-gradie
 .uncard .wk-txh{padding:16px 20px 10px}
 .uncard .wk-txh b{color:#fff8dc}
 .uncard .txsum{color:var(--wamber)}
-.uncard .unstrip{display:flex;gap:6px;padding:0 20px}
-.uncard .unstrip .p{flex:1 1 0;min-width:0;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1px solid var(--wbd2);border-radius:6px;background:linear-gradient(180deg,#14142a,#0d0d1b);box-shadow:inset 0 1px 0 #ffffff08;position:relative;overflow:hidden}
-.uncard .unstrip .p::before{content:"";position:absolute;left:10px;right:10px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--c,#b9b0ff),transparent);opacity:.8}
-.uncard .unstrip .p i{font-style:normal;font-family:var(--wmono);font-size:6.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
-.uncard .unstrip .p b{font-family:var(--wmono);font-size:12px;font-weight:400;letter-spacing:-.02em;color:#fff8dc;white-space:nowrap;font-variant-numeric:tabular-nums}
-.uncard .unstrip .p.out{--c:#ffb02e}.uncard .unstrip .p.out b{color:var(--wamber)}
-.uncard .unstrip .p.left{--c:#6f66c8}
-.uncard .unstrip .p.back{--c:#2bc8bd}.uncard .unstrip .p.back b{color:#2bc8bd}
-.uncard .unstrip .p b.dim{color:var(--wf)}
+
 .uncard .unpick{padding-top:12px}
 .uncard .unamt{padding-top:10px}
 .stcard .txlock{margin:12px 20px 0;padding:9px 12px;border:1px solid rgba(255,176,46,.28);border-radius:6px;background:rgba(255,176,46,.05);display:flex;align-items:center;gap:8px}
@@ -3278,7 +2814,7 @@ border:1px solid rgba(46,224,106,.22);border-radius:5px;background:linear-gradie
 .pop .card.stcard{width:min(520px,94vw);max-width:520px}
 .pop .card.stcard::before{background:linear-gradient(90deg,transparent,var(--wgreen),transparent)}
 .stcard .txsum{color:var(--wgreen)}
-.stcard .unstrip .p.out{--c:#2ee06a}.stcard .unstrip .p.out b{color:var(--wgreen)}
+
 .stcard .stlist{margin:12px 20px 0;max-height:216px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;flex:0 0 auto}
 .stcard .stlist table{width:100%;border-collapse:collapse;table-layout:fixed}
 .stcard .stlist thead th{font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:400;color:#c1bfdc;text-align:right;white-space:nowrap;padding:8px 5px 7px;background:linear-gradient(180deg,#151530,#0f0f22);border-top:1px solid var(--wbd2);border-bottom:1px solid var(--wbd2);position:sticky;top:0;z-index:1}
@@ -3315,9 +2851,7 @@ border:1px solid rgba(46,224,106,.22);border-radius:5px;background:linear-gradie
 #wk-mine .wk-tbl2{height:calc(16px + 8 * 30px + 4px)}
 /* the name carries the titles' bar too (positioned, so ::first-letter still capitalises) */
 #wk-mine .wk-bh h3::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:12px;border-radius:2px;background:currentColor;box-shadow:0 0 8px currentColor;opacity:.9}
-#wk-plan .wk-bar2 .wk-field{order:1;flex:0 0 150px;width:150px;min-width:0}
-#wk-plan .wk-bar2 .wk-btn.wk-go{order:2;margin-left:0;padding:0 12px;flex:0 0 auto;min-width:106px;justify-content:center;display:inline-flex;align-items:center}
-@media(max-width:700px){#wk-plan .wk-bar2{flex-wrap:wrap;row-gap:6px}#wk-plan .wk-bar2 .wk-news{flex:1 1 100%;order:0}#wk-plan .wk-bar2 .wk-field{flex:1 1 0;width:auto;min-width:100px}#wk-plan .wk-bar2 .wk-btn.wk-go{flex:0 0 auto}}
+
 /* the three figures as one row of stacked boxes, the balance boxes' shape */
 #wk-mv .wk-ans{flex-wrap:nowrap;gap:6px;margin:4px 0 0}
 #wk-mv .wk-ans .p,#wk-mv .wk-ans .p.rate,#wk-mv .wk-ans .p.gain,#wk-mv .wk-ans .p.lock{flex:1 1 0;min-width:0;height:46px;padding:0 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
@@ -3372,11 +2906,7 @@ transition:color .16s,border-color .16s,box-shadow .16s,transform .12s}
 #dmy tbody tr[data-v]:hover td:first-child{box-shadow:inset 2px 0 0 var(--a)}
 #dmy tbody tr[data-v]:hover td.nm span{color:#fff8dc}
 /* Redelegate: filled and lit when it can be signed, a ghost until then */
-#wk-plan .wk-bar2 .wk-btn.wk-go{background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;color:#04150a;font-weight:600;letter-spacing:.16em;
-box-shadow:0 10px 24px -12px rgba(46,224,106,.75),inset 0 1px 0 rgba(255,255,255,.3);transition:filter .15s,transform .12s,box-shadow .15s}
-#wk-plan .wk-bar2 .wk-btn.wk-go:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 14px 28px -12px rgba(46,224,106,.85),inset 0 1px 0 rgba(255,255,255,.3)}
-#wk-plan .wk-bar2 .wk-btn.wk-go:active{transform:translateY(0) scale(.98)}
-#wk-plan .wk-bar2 .wk-btn.wk-go:disabled{background:linear-gradient(180deg,#1d1d36,#15152a);border-color:#2f2f52;color:#66648c;box-shadow:inset 0 1px 0 #ffffff06;transform:none;filter:none;font-weight:400;opacity:1}
+
 @media(prefers-reduced-motion:reduce){#wk-plan .wk-ph .wk-ib.spun svg,#wk-plan .wk-ph .wk-ib.busy svg{animation:none}}
 /* the heading: name, the whole address with a copy glyph after it, the wallet's
    button at the opposite edge; on a phone the address takes its own line */
@@ -3415,18 +2945,12 @@ background:linear-gradient(180deg,#12122a,#0b0b18);border-color:var(--wbd2);box-
 @media(max-width:700px){#wk-mine .wk-bal5{gap:4px}#wk-mine .wk-b5{padding:0 6px;height:42px}#wk-mine .wk-b5 b{font-size:11px}}
 .wk-rule{height:1px;margin:0 -12px 8px;background:linear-gradient(90deg,transparent,var(--wbd2) 12%,var(--wbd2) 88%,transparent)}
 /* the account, small, at the top right of the section - under the Wallet word in the bar */
-.wk-top{display:flex;justify-content:flex-end;margin:-4px 0 4px;flex:0 0 auto}
-.wk-top .wk-disc{height:28px;padding:0 8px 0 6px;gap:8px;border-radius:7px}
-.wk-top .wk-disc .wk-mark{width:16px;height:16px}#p-dele .wk-top .wk-mark img{border-radius:4px}
-.wk-top .wk-disc .wk-dtxt{flex-direction:row;align-items:baseline;gap:8px}
-.wk-top .wk-disc .wk-dtxt b{font-size:10.5px;max-width:140px}
-.wk-top .wk-disc .wk-dtxt i.wk-addr{font-size:8px}
-#p-dele .wk-top .wk-disc svg.wk-out{width:12px;height:12px;margin-left:2px}
+
 /* redelegation head: title, refresh, seconds ago; the account at the right */
 #wk-plan .wk-ph .wk-ib{margin-left:10px}
 #wk-plan .wk-ph .wk-ago{margin-left:8px}
 #p-dele #wk-plan .wk-disc svg.wk-out{width:12px;height:12px;margin-left:2px}
-.wk-top{display:none}
+
 /* delegations: eight rows in view, the rest by scrolling inside; the header stays */
 /* eight rows tall always (head 16 + 8 x 30) - fewer delegations leave the room, more scroll inside */
 #wk-mine .wk-tbl2{flex:0 0 auto;height:calc(16px + 8 * 30px);max-height:none;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
@@ -3434,7 +2958,7 @@ background:linear-gradient(180deg,#12122a,#0b0b18);border-color:var(--wbd2);box-
 #wk-mine .wk-pf{display:none}
 .wk-soon span{font-family:var(--wmono);font-weight:400}
 .ftab.acct b{white-space:nowrap}
-@media(max-width:700px){.fig{flex:1 1 44%}.wk-figs{flex-wrap:wrap}}
+
 /* the phone bar: the mark, two words, the wallet as its glyph alone */
 @media(max-width:620px){.ftab.acct b{display:none}.ftab.acct{padding:0 10px;gap:0}.ftab{margin-right:10px}.ftab b{font-size:9px;letter-spacing:.16em}.fsoon{top:10px;right:-12px}}
 /* ── the section fills the calculator's frame: the wallet down the left to the floor,
@@ -3466,9 +2990,7 @@ html[data-wallet] .fnav .ftab.acct b::before{width:5px;height:5px;margin:0 6px 1
 @media(max-width:620px){.fnav .ftab.acct{height:52px;padding:0 4px;margin:0 0 0 16px}.fnav .ftab.acct b{display:inline;font-size:9px;letter-spacing:.16em}}
 /* ── the tagline in the Redelegate head, between the clock and the cooldown note; the
    Outcome head carries its three figures as small chips at the right ── */
-#wk-plan>.wk-ph .wk-tag{margin-left:auto;height:22px;display:inline-flex;align-items:center;gap:4px;padding:0 8px;border-radius:5px;border:1px solid rgba(185,176,255,.28);background:linear-gradient(90deg,rgba(185,176,255,.09),transparent 80%);font-family:var(--wmono);font-size:6.5px;letter-spacing:.12em;text-transform:uppercase;line-height:1;white-space:nowrap;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
-#wk-plan>.wk-ph .wk-tag b{font-weight:400;color:var(--wgreen)}
-#wk-plan>.wk-ph .wk-tag i{font-style:normal;color:#b9b0ff}
+
 #wk-plan>.wk-ph .wk-lockn{margin-left:auto}
 #wk-mv .wk-mvh .wk-ans{margin:0 0 0 auto;flex:0 1 auto;min-width:0;display:flex;flex-wrap:nowrap;gap:5px;order:0}
 #wk-mv .wk-mvh .wk-ans .p,#wk-mv .wk-mvh .wk-ans .p.rate,#wk-mv .wk-mvh .wk-ans .p.gain,#wk-mv .wk-mvh .wk-ans .p.lock{flex:0 0 auto;height:22px;padding:0 7px;flex-direction:row;flex-flow:row nowrap;align-items:center;gap:4px;min-width:0}
@@ -3479,7 +3001,7 @@ html[data-wallet] .fnav .ftab.acct b::before{width:5px;height:5px;margin:0 6px 1
 #wk-mv .wk-mvh .wk-ans .p b{font-size:11px;letter-spacing:-.02em}
 #wk-mv .wk-mvh .wk-ans .p .arr{font-size:10px;margin:0 1px}
 #wk-mv .wk-moves{margin-top:4px}
-@media(max-width:700px){#wk-plan>.wk-ph .wk-tag{display:none}#wk-mv .wk-mvh{height:auto;max-height:none;flex-wrap:wrap}#wk-mv .wk-mvh .wk-ans{flex:1 1 100%;order:3;margin:4px 0 0}}
+@media(max-width:700px){#wk-mv .wk-mvh{height:auto;max-height:none;flex-wrap:wrap}#wk-mv .wk-mvh .wk-ans{flex:1 1 100%;order:3;margin:4px 0 0}}
 /* ── the wallet head: the name large with DISCONNECT tall beside it, the address on its
    own line beneath, then the five figures as one ruled strip instead of boxes ── */
 #wk-mine .wk-bh{height:auto;min-height:36px;max-height:none}
@@ -3490,17 +3012,7 @@ html[data-wallet] .fnav .ftab.acct b::before{width:5px;height:5px;margin:0 6px 1
 #wk-mine .wk-bh .wk-disc .wk-mark img{width:16px;height:16px}
 #wk-mine .wk-bh .wk-disc .wk-dword{font-size:8px}
 #p-dele #wk-mine .wk-bh .wk-disc svg.wk-out{width:12px;height:12px}
-#wk-mine .wk-addrrow{display:flex;align-items:center;margin:4px 0 0}
-#wk-mine .wk-addrrow .wk-addrw{height:22px;display:inline-flex;align-items:center;gap:0;padding:0 3px 0 8px;border-radius:5px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 1px 2px rgba(0,0,0,.4);min-width:0;max-width:100%}
-#wk-mine .wk-addrrow .wk-addr{font-family:var(--wmono);font-size:9px;letter-spacing:.03em;color:var(--ws);line-height:1;gap:1px;display:inline-flex;align-items:center;white-space:nowrap}
-#wk-mine .wk-addrrow .wk-addr em{font-style:normal;color:#b9b0ff}
-#wk-mine .wk-addrrow .wk-addr::before{display:none}
-#wk-mine .wk-addrrow .wk-copy{display:inline-flex;align-items:center;justify-content:center;margin-left:6px;padding:0 0 0 6px;border:0;border-left:1px solid var(--wbd2);border-radius:0;height:14px;background:transparent;color:var(--wf);cursor:pointer;transition:color .15s}
-#wk-mine .wk-addrrow .wk-copy:hover{color:#fff8dc}
-#p-dele #wk-mine .wk-addrrow .wk-copy svg{width:11px;height:11px;margin:0 3px 0 1px;max-height:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#p-dele #wk-mine .wk-addrrow .wk-copy svg.ok{display:none;stroke-width:2.6}
-#wk-mine .wk-addrrow .wk-copy.done{color:var(--wgreen)}
-#p-dele #wk-mine .wk-addrrow .wk-copy.done svg.cp{display:none}#p-dele #wk-mine .wk-addrrow .wk-copy.done svg.ok{display:block}
+
 /* the figures: one strip, hairlines above and below, thin dividers between, value over label */
 #wk-mine .wk-bal5{display:flex;gap:0;margin:10px 0 0;padding:7px 0;border-top:1px solid var(--wbd2);border-bottom:1px solid var(--wbd2)}
 #wk-mine .wk-b5{flex:1 1 0;min-width:0;height:auto;padding:2px 4px;border:0;border-radius:0;background:transparent;box-shadow:none;display:flex;flex-direction:column-reverse;align-items:center;justify-content:center;gap:4px;position:relative;overflow:visible}
@@ -3515,37 +3027,15 @@ html[data-wallet] .fnav .ftab.acct b::before{width:5px;height:5px;margin:0 6px 1
 @media(max-width:700px){#wk-mine .wk-bh h3{font-size:15px}#wk-mine .wk-b5 b{font-size:11px}#wk-mine .wk-bal5{margin-top:8px}}
 /* ── the two lines of the stake row, one style: 28px chips, the sans face, a number or
    a lead in colour, the rest in the pane's ink; the green one grows, the violet one holds ── */
-#wk-plan .wk-bar2 .wk-news,#wk-plan .wk-bar2 .wk-tag{order:0;margin:0;height:28px;display:inline-flex;flex-direction:row;align-items:center;gap:6px;padding:0 11px;border-radius:5px;font-family:var(--wsans);font-size:11.5px;letter-spacing:0;text-transform:none;line-height:1;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis;color:#e6e4f0}
-#wk-plan .wk-bar2 .wk-news{flex:1 1 auto;border:1px solid rgba(46,224,106,.26);background:linear-gradient(90deg,rgba(46,224,106,.09),transparent 80%)}
-#wk-plan .wk-bar2 .wk-tag{flex:0 1 auto;border:1px solid rgba(185,176,255,.3);background:linear-gradient(90deg,rgba(185,176,255,.1),transparent 80%)}
-#wk-plan .wk-bar2 .wk-news .l1{font-size:11.5px;color:#e6e4f0}
-#wk-plan .wk-bar2 .wk-news .l1 b{font-size:13px;margin-right:2px;color:var(--wgreen);text-shadow:0 0 10px rgba(46,224,106,.45);font-weight:600}
-#wk-plan .wk-bar2 .wk-news .l2{font-family:var(--wsans);font-size:11.5px;letter-spacing:0;text-transform:none;color:#e6e4f0}
-#wk-plan .wk-bar2 .wk-tag b{font-weight:600;color:#b9b0ff}
-#wk-plan .wk-bar2 .wk-tag i{font-style:normal;color:#e6e4f0}
-#wk-plan .wk-bar2 .wk-news.off{visibility:hidden}
-@media(max-width:700px){#wk-plan .wk-bar2 .wk-tag{display:none}#wk-plan .wk-bar2 .wk-news{flex:1 1 100%}}
+
 /* ── the stake row: the two lines, the field, then the three figure chips (they wrap to a
    second line when the row is short); Redelegate stands at the Outcome head's right ── */
-#wk-plan .wk-bar2{flex-wrap:wrap;row-gap:6px;gap:6px}
-#wk-plan .wk-bar2 .wk-news{flex:0 1 auto;max-width:330px}
-#wk-plan .wk-bar2 .wk-field{order:1;margin-left:0}
-#wk-plan .wk-bar2 .wk-ans{order:2;margin:0;flex:0 1 auto;min-width:0;display:flex;flex-wrap:nowrap;gap:6px}
-#wk-plan .wk-bar2 .wk-ans .p,#wk-plan .wk-bar2 .wk-ans .p.rate,#wk-plan .wk-bar2 .wk-ans .p.gain,#wk-plan .wk-bar2 .wk-ans .p.lock{display:inline-flex;flex:0 0 auto;height:28px;padding:0 9px;flex-direction:row;flex-flow:row nowrap;align-items:center;gap:5px;min-width:0;border:1px solid var(--wbd2);border-radius:5px;background:linear-gradient(180deg,#12122a,#0b0b18);box-shadow:inset 0 1px 0 #ffffff08;position:relative;overflow:hidden}
-#wk-plan .wk-bar2 .wk-ans .p::before{content:"";position:absolute;left:8px;right:8px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--c,#6f66c8),transparent);opacity:.9}
-#wk-plan .wk-bar2 .wk-ans .p i{font-style:normal;font-family:var(--wmono);font-size:6.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--wf);display:inline-flex;align-items:center;white-space:nowrap}
-#wk-plan .wk-bar2 .wk-ans .p b{font-family:var(--wmono);font-size:12px;font-weight:400;letter-spacing:-.02em;color:#fff8dc;white-space:nowrap;font-variant-numeric:tabular-nums}
-#wk-plan .wk-bar2 .wk-ans .p b.dim{color:var(--wf)}
-#wk-plan .wk-bar2 .wk-ans .p .arr{color:var(--wf);font-size:10px;margin:0 1px}
-#wk-plan .wk-bar2 .wk-ans .p.rate{--c:#b9b0ff}#wk-plan .wk-bar2 .wk-ans .p.rate b.aft{color:var(--wgreen)}
-#wk-plan .wk-bar2 .wk-ans .p.gain{--c:#2ee06a}#wk-plan .wk-bar2 .wk-ans .p.gain b{color:var(--wgreen)}
-#wk-plan .wk-bar2 .wk-ans .p.lock{--c:#ffb02e}#wk-plan .wk-bar2 .wk-ans .p.lock b{color:#ffb02e}
-#p-dele #wk-plan .wk-bar2 .wk-ans .p.lock svg{width:9px;height:9px;margin:0 2px 0 0;max-height:none;fill:none;stroke:#ffb02e;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
 #wk-mv .wk-mvh .wk-btn.wk-go{margin-left:auto;height:26px;padding:0 14px;min-width:100px;border-radius:6px;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;
 background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;color:#04150a;font-weight:600;box-shadow:0 10px 24px -12px rgba(46,224,106,.75),inset 0 1px 0 rgba(255,255,255,.3);transition:filter .15s,transform .12s}
 #wk-mv .wk-mvh .wk-btn.wk-go:hover{filter:brightness(1.08);transform:translateY(-1px)}
 #wk-mv .wk-mvh .wk-btn.wk-go:disabled{background:linear-gradient(180deg,#1d1d36,#15152a);border-color:#2f2f52;color:#66648c;box-shadow:inset 0 1px 0 #ffffff06;transform:none;filter:none;font-weight:400;opacity:1;cursor:default}
-@media(max-width:700px){#wk-plan .wk-bar2 .wk-news{max-width:none;flex:1 1 100%}#wk-plan .wk-bar2 .wk-ans{flex:1 1 100%;order:3}#wk-plan .wk-bar2 .wk-ans .p{flex:1 1 0;justify-content:center;padding:0 5px}}
+
 /* ── the Redelegate list at its new width: taller rows, larger figures, clearer names ── */
 #dpicks thead th{font-size:8px;letter-spacing:.16em;padding:9px 7px 8px;color:#d0cee6}
 #dpicks thead th.ck{padding:0 0 0 6px}
@@ -3558,25 +3048,15 @@ background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;colo
 #dpicks tbody tr.lt td.ok,#dpicks tbody tr.lt td.warn,#dpicks tbody tr.lt td.bad{color:var(--wf)}
 #dpicks td.nm .gtag{font-size:8.5px;padding:1px 5px}
 /* the line in the Outcome head, before the button, in the stake row's style */
-#wk-mv .wk-mvh .wk-tag{margin-left:auto;height:26px;display:inline-flex;align-items:center;gap:6px;padding:0 11px;border-radius:5px;border:1px solid rgba(185,176,255,.3);background:linear-gradient(90deg,rgba(185,176,255,.1),transparent 80%);font-family:var(--wsans);font-size:11.5px;letter-spacing:0;text-transform:none;line-height:1;white-space:nowrap;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;color:#e6e4f0}
-#wk-mv .wk-mvh .wk-tag b{font-weight:600;color:#b9b0ff}
-#wk-mv .wk-mvh .wk-tag i{font-style:normal;color:#e6e4f0}
+
 #wk-mv .wk-mvh .wk-btn.wk-go{margin-left:10px}
-@media(max-width:700px){#wk-mv .wk-mvh .wk-tag{display:none}}
+
 /* ── the account block: one framed block at the head's right, two rows - DISCONNECT over
    the address with its copy glyph - the address as wide as the button; the name at the
    left stands on the block's centre line. The balances are five readable tiles ── */
 #wk-mine .wk-bh{min-height:56px;align-items:center}
 #wk-mine .wk-bh h3{font-size:18px}
-#wk-mine .wk-acctblk{margin-left:auto;display:flex;flex-direction:column;align-items:stretch;border:1px solid var(--wbd2);border-radius:7px;overflow:hidden;background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 1px 2px rgba(0,0,0,.4);flex:0 0 auto}
-#wk-mine .wk-acctblk[hidden]{display:none}
-#wk-mine .wk-bh .wk-acctblk .wk-disc{margin:0;height:28px;border:0;border-radius:0;background:transparent;box-shadow:none;width:100%;justify-content:flex-start;padding:0 10px 0 8px}
-#wk-mine .wk-bh .wk-acctblk .wk-disc:hover{background:rgba(255,77,31,.08);box-shadow:none}
-#wk-mine .wk-bh .wk-acctblk .wk-disc .wk-dword{margin-right:auto}
-#wk-mine .wk-acctblk .wk-addrrow{margin:0;border-top:1px solid var(--wbd2);height:24px;display:flex;align-items:center}
-#wk-mine .wk-acctblk .wk-addrrow .wk-addrw{height:24px;width:100%;border:0;border-radius:0;background:transparent;box-shadow:none;padding:0 6px 0 8px;justify-content:space-between}
-#wk-mine .wk-acctblk .wk-addrrow .wk-addr{font-size:9.5px}
-#wk-mine .wk-acctblk .wk-addrrow .wk-copy{margin-left:8px;height:16px}
+
 /* five tiles, larger figures, in two rows: the wallet's tokens, then what is staked, earned, paid */
 #wk-mine .wk-bal5{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:10px 0 0;padding:0;border:0}
 #wk-mine .wk-b5{grid-column:span 2;flex-direction:column;height:54px;padding:0 6px;gap:5px;border:1px solid var(--wbd2);border-radius:6px;background:linear-gradient(180deg,#12122a,#0b0b18);box-shadow:inset 0 1px 0 #ffffff08;overflow:hidden}
@@ -3588,7 +3068,7 @@ background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;colo
 #wk-mine .wk-b5 i{font-size:7.5px;letter-spacing:.14em;color:var(--ws)}
 #wk-mine .wk-b5 i img{width:11px;height:11px}
 #wk-mine .wk-rule{margin-top:10px}
-@media(max-width:700px){#wk-mine .wk-bh h3{font-size:15px}#wk-mine .wk-b5 b{font-size:14px}#wk-mine .wk-b5{height:48px}#wk-mine .wk-acctblk .wk-addrrow .wk-addr{font-size:9px}}
+@media(max-width:700px){#wk-mine .wk-bh h3{font-size:15px}#wk-mine .wk-b5 b{font-size:14px}#wk-mine .wk-b5{height:48px}}
 /* ── the Dashboard sits exactly where the calculator pane sits: the same top under the
    title band, the same height - the flipbox's own box, measured by state() ── */
 @media(min-width:901px){
@@ -3597,17 +3077,11 @@ background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;colo
   html[data-tab=dele] .w#calc>#p-dele>.pw{padding-bottom:0}
 }
 /* the copy glyph as a real button in the address row: a bordered square, lit on hover */
-#wk-mine .wk-acctblk .wk-addrrow{height:28px}
-#wk-mine .wk-acctblk .wk-addrrow .wk-addrw{height:28px;padding:0 4px 0 9px}
-#wk-mine .wk-addrrow .wk-copy{margin-left:8px;width:20px;height:20px;padding:0;border:1px solid var(--wbd2);border-radius:4px;background:linear-gradient(180deg,#1d1d38,#12122a);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);color:var(--ws);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;transition:color .15s,border-color .15s,box-shadow .15s}
-#wk-mine .wk-addrrow .wk-copy:hover{color:#fff8dc;border-color:var(--ws);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 10px -3px rgba(185,176,255,.6)}
-#wk-mine .wk-addrrow .wk-copy:active{transform:scale(.94)}
-#wk-mine .wk-addrrow .wk-copy.done{color:var(--wgreen);border-color:rgba(46,224,106,.5)}
-#p-dele #wk-mine .wk-addrrow .wk-copy svg{width:12px;height:12px;margin:0}
+
 /* reverted: the button alone at the head's right, the address chip on its own line */
 #wk-mine .wk-bh{min-height:36px}
 #wk-mine .wk-bh h3{font-size:17px}
-#wk-mine .wk-addrrow .wk-addrw{height:26px;padding:0 4px 0 8px}
+
 /* ── the head: the name at the titles' size, the address chip at the row's right; the
    DISCONNECT button runs the full width along the wallet pane's floor ── */
 #wk-mine .wk-bh{min-height:32px;height:32px;max-height:32px}
@@ -3661,21 +3135,18 @@ background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba
 #dpicks tbody tr.lt td.ok{color:var(--wgreen)}#dpicks tbody tr.lt td.warn{color:var(--wamber)}#dpicks tbody tr.lt td.bad{color:var(--wburn)}
 #dpicks tbody tr.lt td.r2 b{color:var(--wburn)}
 /* the line at the left of the Outcome head, after the count; the button keeps the right */
-#wk-mv .wk-mvh .wk-tag{margin-left:12px}
+
 #wk-mv .wk-mvh .wk-btn.wk-go{margin-left:auto}
 /* the gain tag keeps a clear distance from the name */
 #dpicks td.nm .gtag{margin-left:16px}
 /* ── the actions, unmistakable: the field carries a lit STAKE label, a brighter frame and
    a readable placeholder; Redelegate is tall, bold and lit; the doors a size up ── */
-#wk-plan .wk-bar2 .wk-field{flex:0 0 220px;width:220px;height:34px;padding:0 4px 0 0;border:1px solid rgba(185,176,255,.45);background:linear-gradient(180deg,#12122a,#0f0f22);box-shadow:inset 0 1px 0 #ffffff08,0 0 0 1px rgba(185,176,255,.08),0 6px 18px -10px rgba(185,176,255,.5)}
-#wk-plan .wk-bar2 .wk-field:hover{border-color:rgba(185,176,255,.7)}
-#wk-plan .wk-bar2 .wk-field:focus-within{border-color:#b9b0ff;box-shadow:0 0 0 3px rgba(185,176,255,.16),inset 0 1px 0 #ffffff08}
-#wk-plan .wk-field .wk-flab{flex:0 0 auto;height:100%;display:inline-flex;align-items:center;padding:0 9px 0 10px;border-right:1px solid rgba(185,176,255,.25);font-family:var(--wmono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:#b9b0ff}
+
 #wk-plan input.wk-amt2{font-size:14px;padding:0 10px}
 #wk-plan input.wk-amt2::placeholder{font-size:9.5px;letter-spacing:.18em;color:var(--ws);opacity:.9}
 #wk-plan .wk-field .wk-max{height:24px;padding:0 9px;font-size:8px}
 #wk-plan .wk-field .wk-max b{font-size:10px;color:#fff8dc}
-#wk-plan .wk-bar2 .wk-news,#wk-plan .wk-bar2 .wk-ans .p{height:34px}
+
 #wk-mv .wk-mvh .wk-btn.wk-go{height:34px;min-width:150px;padding:0 20px;font-size:10.5px;letter-spacing:.2em;font-weight:700;border-radius:7px;color:#03120a;
 background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-shadow:0 0 0 1px rgba(46,224,106,.25),0 12px 28px -12px rgba(46,224,106,.9),inset 0 1px 0 rgba(255,255,255,.35)}
 #wk-mv .wk-mvh .wk-btn.wk-go:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 0 0 1px rgba(46,224,106,.35),0 16px 32px -12px rgba(46,224,106,1),inset 0 1px 0 rgba(255,255,255,.35)}
@@ -3684,55 +3155,45 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
 #wk-mine .wk-t1 .wk-unb{height:20px;padding:0 9px;font-size:8.5px;letter-spacing:.18em;font-weight:600;line-height:1;align-self:center;border-radius:5px}   /* the doors sit on the title's line, no taller than it */
 #wk-mine .wk-t1 .wk-unb.wk-stb{color:#4cf28a;border-color:rgba(46,224,106,.55)}
 #wk-mine .wk-t1 .wk-unb:not(.wk-stb){color:#ffc453;border-color:rgba(255,176,46,.55)}
-@media(max-width:700px){#wk-plan .wk-bar2 .wk-field{flex:1 1 auto;width:auto}#wk-mv .wk-mvh .wk-btn.wk-go{min-width:120px}}
+@media(max-width:700px){#wk-mv .wk-mvh .wk-btn.wk-go{min-width:120px}}
 /* the list at half the frame: the two lifetime columns step aside until the frame is wide */
 /* the count, large */
-#wk-plan .wk-bar2 .wk-news .l1 b{font-size:17px;margin-right:4px}
+
 /* in a narrow name cell the name keeps at least this much; the tag gives way instead */
 #dpicks td.nm .nmw>span{min-width:64px}
 #dpicks td.nm .gtag{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-left:12px}
 /* ── the stake field, made anew: a wide framed block with its own label, a large figure
    and MAX inside; Redelegate a full-width bar pinned to the Outcome pane's floor ── */
-#wk-plan .wk-bar2 .wk-field{flex:1 1 auto;width:auto;min-width:240px;height:44px;padding:0 6px 0 0;border-radius:8px;border:1px solid rgba(185,176,255,.55);
-background:linear-gradient(180deg,#141430,#0d0d20);box-shadow:inset 0 1px 0 #ffffff0a,0 0 0 1px rgba(185,176,255,.1),0 10px 24px -14px rgba(185,176,255,.7)}
-#wk-plan .wk-bar2 .wk-field:focus-within{border-color:#c9c2ff;box-shadow:0 0 0 3px rgba(185,176,255,.2),inset 0 1px 0 #ffffff0a}
-#wk-plan .wk-field .wk-flab{height:100%;padding:0 12px;border-right:1px solid rgba(185,176,255,.3);font-size:7.5px;letter-spacing:.18em;line-height:1.35;color:#b9b0ff;text-align:left;background:rgba(185,176,255,.06);border-radius:7px 0 0 7px}
+
 #wk-plan input.wk-amt2{font-size:18px;letter-spacing:-.02em;padding:0 12px;color:#fff8dc}
 #wk-plan input.wk-amt2::placeholder{font-size:10px;letter-spacing:.2em;color:var(--ws)}
 #wk-plan .wk-field .wk-max{height:30px;padding:0 12px;border-radius:6px;font-size:8.5px;letter-spacing:.16em;border-color:rgba(185,176,255,.4);background:rgba(185,176,255,.1);color:#d6d1ff}
 #wk-plan .wk-field .wk-max b{font-size:11px;color:#fff8dc}
 #wk-plan .wk-field .wk-max:hover{background:rgba(185,176,255,.2);border-color:#b9b0ff}
 #wk-plan .wk-field.need{border-color:#ffb02e;box-shadow:0 0 0 3px rgba(255,176,46,.16),0 0 18px -4px rgba(255,176,46,.7),inset 0 1px 0 #ffffff0a}
-#wk-plan .wk-field.need .wk-flab{color:#ffb02e;border-right-color:rgba(255,176,46,.35);background:rgba(255,176,46,.07)}
-#wk-plan .wk-bar2 .wk-news{height:44px;order:0;flex:0 1 auto;max-width:300px}
-#wk-plan .wk-bar2 .wk-ans{order:3;flex:1 1 100%}
-#wk-plan .wk-bar2 .wk-ans .p{height:30px}
+
 #wk-mv .wk-btn.wk-go{margin:8px 0 0;width:100%;height:40px;flex:0 0 auto;font-family:var(--wmono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;font-weight:700;border-radius:8px;color:#03120a;display:inline-flex;align-items:center;justify-content:center;
 background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-shadow:0 0 0 1px rgba(46,224,106,.25),0 14px 30px -12px rgba(46,224,106,.9),inset 0 1px 0 rgba(255,255,255,.35);transition:filter .15s,transform .12s,box-shadow .15s;cursor:pointer}
 #wk-mv .wk-btn.wk-go:hover{filter:brightness(1.06);transform:translateY(-1px)}
 #wk-mv .wk-btn.wk-go:active{transform:translateY(0) scale(.99)}
 #wk-mv .wk-btn.wk-go:disabled{background:linear-gradient(180deg,#232345,#191933);border-color:#3a3a62;color:#8a88b0;box-shadow:inset 0 1px 0 #ffffff08;font-weight:600;transform:none;filter:none;cursor:default;opacity:1}
-#wk-mv .wk-mvh .wk-tag{margin-left:auto}
+
 #wk-mv .wk-moves{flex:1 1 auto}
 #wk-mv .wk-mvempty{flex:1 1 auto}
 #wk-mv{padding-bottom:12px}
 #wk-mv::after{display:none}
-@media(max-width:700px){#wk-plan .wk-bar2 .wk-field{min-width:0;flex:1 1 100%}}
+
 /* the field shares the first line with the count; the initial-letter mark keeps its circle */
-#wk-plan .wk-bar2 .wk-field{flex:1 1 0;min-width:220px}
+
 #dpicks td.nm .nmw>span.wk-lgx{min-width:0;flex:0 0 17px;width:17px}
 /* ── Autopilot: the door in the Redelegate head, its card in violet ── */
-#wk-plan>.wk-ph .wk-auto{order:2;margin-left:auto;height:22px;padding:0 10px;border-radius:5px;border:1px solid rgba(185,176,255,.45);background:linear-gradient(180deg,#1a1730,#12101f);color:#c9c2ff;font-family:var(--wmono);font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;flex:0 0 auto;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);transition:border-color .15s,box-shadow .15s}
-#wk-plan>.wk-ph .wk-auto:hover{border-color:#b9b0ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 12px -3px rgba(185,176,255,.7)}
-#wk-plan>.wk-ph .wk-auto.on{border-color:var(--wgreen);color:#8ef0c8}
-#wk-plan>.wk-ph .wk-auto[hidden]{display:none}
-#wk-plan>.wk-ph .wk-auto~.wk-ago{margin-left:10px}
+
 #wk-plan>.wk-ph .wk-lockn{order:1;margin-left:auto}
-#wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-auto{margin-left:10px}
+
 .pop .card.atcard{width:min(520px,94vw);max-width:520px}
 .pop .card.atcard::before{content:"";position:absolute;left:24px;right:24px;top:0;height:1px;background:linear-gradient(90deg,transparent,#b9b0ff,transparent);opacity:.9}
 .atcard .txsum{color:#c9c2ff}
-.atcard .atwhat{padding:2px 20px 0;font-family:var(--wsans);font-size:11.5px;line-height:1.5;color:var(--ws)}
+
 .atcard .atstate{margin:12px 20px 0;padding:10px 12px;border:1px solid rgba(46,224,106,.28);border-radius:6px;background:rgba(46,224,106,.05);font-family:var(--wmono);font-size:9px;letter-spacing:.04em;color:var(--ws);line-height:1.6}
 .atcard .atstate b{color:#fff8dc;font-weight:400}
 .atcard .atstate .g{color:var(--wgreen)}
@@ -3742,12 +3203,7 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
 .atcard .atrow{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-top:1px solid var(--wbd)}
 .atcard .atrow:first-child{border-top:0}
 .atcard .atlab{flex:0 0 118px;padding-top:6px;font-family:var(--wmono);font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--wf)}
-.atcard .atopt{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-family:var(--wsans);font-size:11.5px;color:#e6e4f0;cursor:pointer}
-.atcard .atopt+.atopt{margin-top:2px}
-.atcard .atopt b{font-family:var(--wmono);font-weight:400;color:#b9b0ff;margin-left:6px}
-.atcard .atopt input{appearance:none;-webkit-appearance:none;width:14px;height:14px;margin:2px 0 0;border-radius:50%;border:1px solid var(--wbd2);background:var(--wi);position:relative;cursor:pointer;flex:0 0 auto}
-.atcard .atopt input:checked{border-color:#b9b0ff}
-.atcard .atopt input:checked::after{content:"";position:absolute;left:3px;top:3px;width:6px;height:6px;border-radius:50%;background:#b9b0ff;box-shadow:0 0 8px #b9b0ff}
+
 .atcard .atrow>div:not(.atseg){display:flex;flex-direction:column}
 .atcard .atfield{width:220px;height:30px}
 .atcard .atfield:focus-within{border-color:#b9b0ff;box-shadow:0 0 0 3px rgba(185,176,255,.13)}
@@ -3764,7 +3220,7 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
 .atcard .wk-btn.wk-danger[hidden]{display:none}
 #atpop .txfee{height:23px;min-height:23px;line-height:13px;overflow:hidden;white-space:nowrap}
 #atpop .txstep{min-height:20px}
-@media(max-width:700px){#wk-plan>.wk-ph .wk-auto{display:none}}
+
 /* the strategies as four cards */
 .atcard .atpre{display:grid;grid-template-columns:1fr 1fr;gap:6px;flex:1 1 auto}
 .atcard .atpc{display:grid;grid-template-columns:14px minmax(0,1fr);grid-template-areas:"r b" "r i" "r e";column-gap:8px;row-gap:3px;padding:8px 10px;border:1px solid var(--wbd2);border-radius:6px;background:linear-gradient(180deg,#12122a,#0b0b18);cursor:pointer;transition:border-color .12s,box-shadow .12s}
@@ -3787,7 +3243,7 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
   /* the Outcome head is narrow again: the tagline keeps to the title's line as a
      two-line chip on the right - "Earn more APR." over "Decentralize the chain." */
   #wk-mv .wk-mvh{flex-wrap:nowrap;height:auto;min-height:40px}
-  #wk-mv .wk-mvh .wk-tag{flex:0 0 auto;margin-left:auto;height:32px;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;padding:0 10px;font-size:10.5px;line-height:1;overflow:visible;text-overflow:clip}
+  
   /* the outcome boxes, legible: taller, the labels a real size, the figures larger */
   #wk-mv .wk-ans{margin:6px 0 0}
   #wk-mv .wk-ans .p,#wk-mv .wk-ans .p.rate,#wk-mv .wk-ans .p.gain,#wk-mv .wk-ans .p.lock{height:56px;gap:7px;padding:0 6px}
@@ -3798,8 +3254,8 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
   #wk-mv .wk-ans .p.rate{flex:1.7 1 0;row-gap:7px;column-gap:4px}
   #p-dele #wk-mv .wk-ans .p.lock svg{width:11px;height:11px;margin:0 3px 0 0}
   /* the amount field alone on its line: a set width on the left, not the whole line */
-  #wk-plan .wk-bar2 .wk-field{flex:0 0 auto;width:320px;min-width:0;max-width:100%;height:38px;border-radius:7px}
-  #wk-plan .wk-field .wk-flab{padding:0 10px;font-size:7px}
+  
+  
   #wk-plan input.wk-amt2{font-size:16px;padding:0 10px}
   #wk-plan .wk-field .wk-max{height:26px;padding:0 10px;font-size:8px}
   #wk-plan .wk-field .wk-max b{font-size:10.5px}
@@ -3839,7 +3295,7 @@ background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba
    the far right whether the note is up or not */
 #wk-plan>.wk-ph .wk-lockn{order:0;margin-left:10px}
 #wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-ago{margin-left:auto}
-#wk-plan>.wk-ph .wk-auto{order:2}
+
 @media(min-width:701px) and (max-width:1559px){
   #wk-plan>.wk-ph .wk-field{width:180px}
   #wk-plan>.wk-ph .wk-lockn .w{display:none}
@@ -3911,17 +3367,14 @@ box-shadow:0 10px 24px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);
 .atcard .atrow>div.atpre{display:grid;grid-template-columns:1fr 1fr;gap:6px;flex:1 1 auto}
 .atcard .atpc i{font-size:10.5px;line-height:1.35}
 /* the card must fit a laptop screen: tighter rows, empty lines take no room */
-.atcard .atwhat{font-size:11.5px;line-height:1.45;padding:8px 20px 6px}
+
 .atcard .atrow{padding:6px 0}
 .atcard .atpc{padding:7px 9px;row-gap:2px}
 .atcard .txfee:empty,.atcard .txstep:empty{display:none}
 .atcard .txbtns{padding-top:10px;padding-bottom:12px}
-@media(max-height:760px){.atcard .atwhat{display:none}.pop .card.atcard{max-height:96vh;max-height:96svh}}
+@media(max-height:760px){.pop .card.atcard{max-height:96vh;max-height:96svh}}
 /* with the Autopilot door on the line, a mid-width frame shows the note as "amount → date" */
-@media(min-width:701px) and (max-width:1559px){
-  #wk-plan>.wk-ph:has(.wk-auto:not([hidden])) .wk-lockn .w2{display:none}
-  #wk-plan>.wk-ph:has(.wk-auto:not([hidden])) .wk-lockn b:last-of-type::before{content:"\2192";margin:0 3px;color:var(--wamber)}
-}
+
 /* ── the Autopilot card in five rows: strategy, validators, stake, time, restake; a closing
    note; the strategies three across, the validator choice two across ── */
 .atcard .atrow>div.atpre.at3{grid-template-columns:1fr 1fr 1fr}
@@ -3994,6 +3447,10 @@ html[data-theme=light] .thbtn .moon{display:block}
 #wk-mine .wk-apb:hover{filter:brightness(1.06);transform:translateY(-1px)}
 #wk-mine .wk-apb:active{transform:translateY(0) scale(.98)}
 #wk-mine .wk-apb:focus-visible{outline:2px solid #b9b0ff;outline-offset:2px}
+/* stake on a validator outside the active set: the row reads as such, its APR nil */
+#dmy tbody tr.inactive td{color:var(--wf)}
+#dmy tbody tr.inactive td.nm span{color:var(--wamber)}
+#dmy tbody tr.inactive td.rw{color:var(--wf)}
 </style>
 <link rel=stylesheet href="assets/theme-day.css">
 </head><body>
