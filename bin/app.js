@@ -1452,6 +1452,32 @@ rememberGridH();
 })();
 
 
+/* ── day or night ─────────────────────────────────────────────────────────────
+   boot.js stamped <html data-theme> before the first paint; the switch flips it and
+   remembers the choice. With no choice made, the page follows the browser's preference
+   as it changes. The day sheet keys off the attribute alone. */
+(function(){
+  var b = document.getElementById("thbtn"), r = document.documentElement;
+  if(!b) return;
+  function paint(){
+    var day = r.getAttribute("data-theme") === "light";
+    b.setAttribute("aria-checked", day ? "true" : "false");
+    b.title = day ? "Night" : "Day";
+    var m = document.querySelector('meta[name=theme-color]'); if(m) m.setAttribute("content", day ? "#F4F1EA" : "#06060c");
+  }
+  paint();
+  b.addEventListener("click", function(){
+    var day = r.getAttribute("data-theme") !== "light";
+    r.setAttribute("data-theme", day ? "light" : "dark"); paint();
+    try{ localStorage.setItem("th_theme", day ? "light" : "dark"); }catch(e){}
+  });
+  if(window.matchMedia){ var mq = matchMedia("(prefers-color-scheme: light)");
+    var follow = function(){ var chosen = null; try{ chosen = localStorage.getItem("th_theme"); }catch(e){}
+      if(chosen === "light" || chosen === "dark") return;
+      r.setAttribute("data-theme", mq.matches ? "light" : "dark"); paint(); };
+    if(mq.addEventListener) mq.addEventListener("change", follow); else if(mq.addListener) mq.addListener(follow); }
+})();
+
 /* ── the poll ─────────────────────────────────────────────────────────────────
    One small file, one block apart. No websocket: a socket per reader against our
    own RPC is a cost with no benefit at this size, and a static file is served by
@@ -2270,6 +2296,7 @@ rememberGridH();
   function atScopeFor(v){
     var VD = window.__VDBY || {}, V = window.__VALS(), MEAN = window.__S() / V.length, out = [];
     if(v === "ticked"){ Object.keys(SEL).forEach(function(id){ var d = VD[id]; if(d && d.op) out.push(d.op); }); return out; }
+    if(v === "all"){ V.forEach(function(x){ var d = VD[x[3]]; if(d && d.op) out.push(d.op); }); return out; }   /* the whole set */
     window.__candidates({ except: {}, cleanRecord: false }).forEach(function(c){ var d = VD[c.id]; if(!d || !d.op || d.tomb) return;
       var d90 = d.d90 == null ? null : +d.d90, lu = d.life_up == null ? null : +d.life_up;
       if(v === "passive"){ if(c.rank <= V.length / 2 && !c.jail && (lu == null || lu >= 99) && (d90 == null || d90 >= 99)) out.push(d.op); }
@@ -2277,7 +2304,8 @@ rememberGridH();
       else { if(c.t < MEAN && !c.jail && (d90 == null || d90 >= 95)) out.push(d.op); } });
     return out;
   }
-  function atScope(){ return atScopeFor(atPick() === "selected" ? "ticked" : atPreset()); }
+  /* the allow-list: the whole set, or the reader's own selection; the strategy sets the pace */
+  function atScope(){ return atScopeFor(atPick() === "selected" ? "ticked" : "all"); }
   /* the memo the keeper reads: the strategy word, then the flags */
   var AT_WORD = { passive: "passive", below: "moderate", aggressive: "aggressive" };
   function atMemo(){ return "gata:" + (AT_WORD[atPreset()] || "moderate") + (atPick() === "selected" ? ":picks" : "") + (atRestake() ? ":restake" : ""); }
@@ -2316,12 +2344,13 @@ rememberGridH();
     if(n0) n0.textContent = atScopeFor("passive").length + " validators";
     if(n1) n1.textContent = atScopeFor("below").length + " validators";
     if(n3) n3.textContent = atScopeFor("aggressive").length + " validators";
-    if(na) na.textContent = atScopeFor(atPreset()).length + " validators";
+    if(na) na.textContent = atScopeFor("all").length + " validators";
+    var un = E("atuntil"); if(un) un.innerHTML = "until <b>" + window.__dayFull(Date.now() + AT.days * 86400000) + "</b>";
     var sel = Object.keys(SEL).length; if(n2) n2.textContent = sel ? sel + " selected" : "none selected yet";
     var ok = !!AT.addr && scope.length > 0 && cap > 0 && !!window.__WALLET && !!window.__WALLET.signDirect;
     if(hint){ hint.className = "unhint" + (!AT.addr ? " bad" : ""); hint.textContent = !AT.addr ? "Autopilot is not open yet" : (!window.__WALLET || !window.__WALLET.signDirect ? "Needs Keplr (direct signing)" : (!scope.length ? (atPick() === "selected" ? "select validators in the Redelegate list first" : "no validators fit that strategy today") : "ATONE the keeper may move in total, for the time")); }
     if(go) go.disabled = !ok;
-    if(sm) sm.innerHTML = ok ? fmt(cap) + " ATONE<br>" + (AT_WORD[atPreset()] || "moderate") + (atPick() === "selected" ? ", my selection" : "") + ", " + scope.length + " validators, " + atMonths() + (atRestake() ? ", restake" : "") : "";
+    if(sm) sm.innerHTML = ok ? fmt(cap) + " ATONE<br>" + (AT_WORD[atPreset()] || "moderate") + ", " + (atPick() === "selected" ? "my selection, " : "") + scope.length + " validators, " + atMonths() + (atRestake() ? ", restake" : "") : "";
     var fee = atFee();
     if(feeEl){ feeEl.hidden = !(fee > 0); if(fee > 0) feeEl.innerHTML = "Service fee <b>" + fmt(fee) + " ATONE</b> - " + AT.fee_pct + "% of the projected gain for " + atMonths() + ", paid with the grant in the same signature."; }
     E("attxfee").textContent = ""; var st = E("atstep"); st.textContent = ""; st.className = "txstep";

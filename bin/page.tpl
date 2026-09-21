@@ -3951,8 +3951,26 @@ box-shadow:0 10px 24px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);
 .atcard .atrow:has(.atfield) .atlab{flex:0 0 100%}
 .atcard .atrow:has(.atfield) .unhint{flex:1 1 auto;margin:0}
 @media(max-height:760px){.atcard .atrow{padding:5px 0;gap:4px}.atcard .atpc{padding:5px 8px}.atcard .atpc i{font-size:9.5px}.atcard .atnote{margin-top:6px;padding:6px 10px}.atcard .txbtns{padding-top:8px;padding-bottom:10px}.atcard .wk-txh{padding-bottom:6px}}
+/* the strategy and validator cards carry a name and a count only; the time row says when the grant ends */
+.atcard .atpc{grid-template-areas:"r b" "r e";row-gap:2px}
+.atcard .atpc em{grid-area:e}
+.atcard .atrow>div.attime{display:flex;flex-direction:row;align-items:center;gap:12px;align-self:flex-start}
+.atcard .atuntil{font-family:var(--wmono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ws)}
+.atcard .atuntil b{font-family:var(--wsans);font-size:11.5px;font-weight:600;letter-spacing:0;text-transform:none;color:#fff8dc;margin-left:4px}
+.atcard .atsw .atswt i{font-size:11px;color:var(--ws)}
+.atcard .atsw{align-items:center}
+/* ── day or night: a switch at the bar's end; the choice is stamped on <html data-theme>
+   by boot.js before the first paint (the reader's own, else the browser's preference) ── */
+.thbtn{margin-left:auto;width:36px;height:36px;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid var(--edge2);background:transparent;color:var(--ink2);cursor:pointer;transition:color .15s,border-color .15s,background .15s;align-self:center}
+.thbtn:hover{color:var(--ink);border-color:var(--ink3)}
+.thbtn:focus-visible{outline:2px solid var(--acc,var(--hot));outline-offset:2px}
+.thbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin:0;display:block}
+.thbtn .moon{display:none}
+html[data-theme=light] .thbtn .sun{display:none}
+html[data-theme=light] .thbtn .moon{display:block}
+@media(max-width:620px){.thbtn{width:32px;height:32px;margin-left:auto}}
 </style>
-<link rel=stylesheet href="assets/theme-day.css" media="(prefers-color-scheme: light)">
+<link rel=stylesheet href="assets/theme-day.css">
 </head><body>
 <svg width=0 height=0 style="position:absolute" aria-hidden=true><defs>
   <symbol id=g-eta viewBox="0 0 20 20"><path d="M6.6 4.6V14.6M6.6 8.2C7.6 5.8 13.4 5.4 13.4 9.4V15.6" fill=none stroke=currentColor stroke-width=2.2 stroke-linecap=round stroke-linejoin=round/></symbol>
@@ -3970,6 +3988,7 @@ box-shadow:0 10px 24px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);
       <button class="ftab acct" data-go=dele type=button style="--acc:#ffb02e" role=tab aria-selected=false title="your stake, your redelegation"><b id=fwn>Dashboard</b></button>
       <i class=ind id=ind aria-hidden=true></i>
     </nav>
+    <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
   </div>
   <div class=panes id=well>
   <div class=w id=calc>
@@ -4353,22 +4372,22 @@ box-shadow:0 10px 24px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);
   <div class=atform id=atform>
     <div class=atrow><span class=atlab>Strategy</span>
       <div class="atpre at3">
-        <label class=atpc><input type=radio name=atstrat value=passive><b>Passive</b><i>Top half by stake, 99%+ signed, never jailed. Moves only for a clear gain, checked weekly.</i><em id=atn0></em></label>
-        <label class=atpc><input type=radio name=atstrat value=below checked><b>Moderate</b><i>Below the average size with a clean 90-day record, where the bonus pays. Checked every six hours.</i><em id=atn1></em></label>
-        <label class=atpc><input type=radio name=atstrat value=aggressive><b>Aggressive</b><i>Every validator with a working record, the smallest included. Checked hourly.</i><em id=atn3></em></label>
+        <label class=atpc><input type=radio name=atstrat value=passive><b>Passive</b><em id=atn0></em></label>
+        <label class=atpc><input type=radio name=atstrat value=below checked><b>Moderate</b><em id=atn1></em></label>
+        <label class=atpc><input type=radio name=atstrat value=aggressive><b>Aggressive</b><em id=atn3></em></label>
       </div></div>
     <div class=atrow><span class=atlab>Validators</span>
       <div class="atpre at2">
-        <label class=atpc><input type=radio name=atpick value=all checked><b>All the strategy allows</b><i>Every validator that fits the strategy today.</i><em id=atna></em></label>
-        <label class=atpc><input type=radio name=atpick value=selected><b>My selection</b><i>Only the validators selected in the Redelegate list.</i><em id=atn2></em></label>
+        <label class=atpc><input type=radio name=atpick value=all checked><b>All</b><em id=atna></em></label>
+        <label class=atpc><input type=radio name=atpick value=selected><b>My selection</b><em id=atn2></em></label>
       </div></div>
     <div class=atrow><span class=atlab>Stake</span>
       <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
       <span class=unhint id=athint></span></div>
     <div class=atrow><span class=atlab>Time</span>
-      <div class=atseg id=atseg><button type=button data-d=90 aria-pressed=true>3 months</button><button type=button data-d=180 aria-pressed=false>6 months</button></div></div>
+      <div class=attime><div class=atseg id=atseg><button type=button data-d=90 aria-pressed=true>3 months</button><button type=button data-d=180 aria-pressed=false>6 months</button></div><span class=atuntil id=atuntil></span></div></div>
     <div class=atrow><span class=atlab>Restake</span>
-      <label class=atsw><input type=checkbox id=atrestake><span class=atswk aria-hidden=true></span><span class=atswt><b>Restake rewards</b><i>Rewards are claimed and staked back where the strategy puts them, on the same terms.</i></span></label></div>
+      <label class=atsw><input type=checkbox id=atrestake><span class=atswk aria-hidden=true></span><span class=atswt><i>Restakes your staking rewards regularly; growing stake and yielding higher APR.</i></span></label></div>
     <div class=atfee id=atfee hidden></div>
   </div>
   <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. You can revoke this at any time.</span></div>

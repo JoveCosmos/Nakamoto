@@ -1,384 +1,390 @@
   /* ════════════════════════════════════════════════════════════════════════════════════
      DAY - the hand layer. "Ledger paper": ivory ground, ink, one deep-teal accent. Every
      selector is scoped by daygen.py's wrapper (the light preference) and carries the
-     html:not([data-mono]) prefix here, so nothing reaches night or the wireframe.
+     html[data-theme=light]:not([data-mono]) prefix here, so nothing reaches night or the wireframe.
      ════════════════════════════════════════════════════════════════════════════════════ */
 
   /* ── type: Plex Sans for the page, Plex Mono for every figure, Fraunces for the display ── */
-  html:not([data-mono]){color-scheme:light}
-  html:not([data-mono]) body{background:var(--bg);color:var(--ink);font-family:var(--day-sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:auto}
-  html:not([data-mono]) .wordmark{font-family:var(--day-display);font-weight:500;font-size:22px;letter-spacing:-.01em;color:var(--ink)}
-  html:not([data-mono]) .ftab b{font-family:var(--day-sans);font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:500;color:var(--muted)}
-  html:not([data-mono]) .ftab.on b,html:not([data-mono]) .ftab:hover b{color:var(--ink)}
-  html:not([data-mono]) .fsoon{font-family:var(--day-sans);font-size:9px;letter-spacing:.06em;font-weight:500;color:var(--muted);background:var(--neutral-pill);border:0;border-radius:999px;padding:2px 7px;text-shadow:none}
+  html[data-theme=light]:not([data-mono]){color-scheme:light}
+  html[data-theme=light]:not([data-mono]) body{background:var(--bg);color:var(--ink);font-family:var(--day-sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:auto}
+  html[data-theme=light]:not([data-mono]) .wordmark{font-family:var(--day-display);font-weight:500;font-size:22px;letter-spacing:-.01em;color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .ftab b{font-family:var(--day-sans);font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:500;color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .ftab.on b,html[data-theme=light]:not([data-mono]) .ftab:hover b{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .fsoon{font-family:var(--day-sans);font-size:9px;letter-spacing:.06em;font-weight:500;color:var(--muted);background:var(--neutral-pill);border:0;border-radius:999px;padding:2px 7px;text-shadow:none}
 
   /* the bar: sticky, translucent ivory, a hairline; the open section a soft tab */
-  html:not([data-mono]) .folder{position:sticky;top:0;z-index:20;height:72px;background:rgba(244,241,234,.93);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);box-shadow:none}
-  html:not([data-mono]) .fnav,html:not([data-mono]) .ftab{height:72px}
-  html:not([data-mono]) .fnav .ftab{height:36px;align-self:center;padding:0 12px;margin-right:6px;border-radius:10px;border:1px solid transparent;transition:background .12s,border-color .12s,color .12s}
-  html:not([data-mono]) .fnav .ftab.on{background:var(--surface);border-color:var(--line)}
-  html:not([data-mono]) .fnav .ftab.acct{margin-left:24px}
-  html:not([data-mono]) .ind{display:none}
-  html:not([data-mono]) .brand .mark{filter:none}
-  html:not([data-mono]) .ftab:focus-visible,html:not([data-mono]) .brand:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:10px}
+  html[data-theme=light]:not([data-mono]) .folder{position:sticky;top:0;z-index:20;height:72px;background:rgba(244,241,234,.93);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .fnav,html[data-theme=light]:not([data-mono]) .ftab{height:72px}
+  html[data-theme=light]:not([data-mono]) .fnav .ftab{height:36px;align-self:center;padding:0 12px;margin-right:6px;border-radius:10px;border:1px solid transparent;transition:background .12s,border-color .12s,color .12s}
+  html[data-theme=light]:not([data-mono]) .fnav .ftab.on{background:var(--surface);border-color:var(--line)}
+  html[data-theme=light]:not([data-mono]) .fnav .ftab.acct{margin-left:24px}
+  html[data-theme=light]:not([data-mono]) .ind{display:none}
+  html[data-theme=light]:not([data-mono]) .brand .mark{filter:none}
+  html[data-theme=light]:not([data-mono]) .ftab:focus-visible,html[data-theme=light]:not([data-mono]) .brand:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:10px}
 
   /* every figure lines up */
-  html:not([data-mono]) .fig b,html:not([data-mono]) .wk-b5 b,html:not([data-mono]) .wk-tbl2 td,html:not([data-mono]) .ptab td,html:not([data-mono]) .vv,
-  html:not([data-mono]) .wk-ans .p b,html:not([data-mono]) .wk-moves td,html:not([data-mono]) .etabox,html:not([data-mono]) .aprbig,html:not([data-mono]) .cbn,
-  html:not([data-mono]) .upn,html:not([data-mono]) .wk-amt2,html:not([data-mono]) .wk-max b,html:not([data-mono]) .wk-lockn b,html:not([data-mono]) .txans .p b{font-family:var(--day-mono);font-variant-numeric:tabular-nums}
+  html[data-theme=light]:not([data-mono]) .fig b,html[data-theme=light]:not([data-mono]) .wk-b5 b,html[data-theme=light]:not([data-mono]) .wk-tbl2 td,html[data-theme=light]:not([data-mono]) .ptab td,html[data-theme=light]:not([data-mono]) .vv,
+  html[data-theme=light]:not([data-mono]) .wk-ans .p b,html[data-theme=light]:not([data-mono]) .wk-moves td,html[data-theme=light]:not([data-mono]) .etabox,html[data-theme=light]:not([data-mono]) .aprbig,html[data-theme=light]:not([data-mono]) .cbn,
+  html[data-theme=light]:not([data-mono]) .upn,html[data-theme=light]:not([data-mono]) .wk-amt2,html[data-theme=light]:not([data-mono]) .wk-max b,html[data-theme=light]:not([data-mono]) .wk-lockn b,html[data-theme=light]:not([data-mono]) .txans .p b{font-family:var(--day-mono);font-variant-numeric:tabular-nums}
 
   /* ── the calculator's frame: paper panels, no glow, generous corners ── */
-  html:not([data-mono]) .sec,html:not([data-mono]) .duo .sec,html:not([data-mono]) .panel,html:not([data-mono]) .ptw{background:var(--surface);border-color:var(--line);box-shadow:none}
-  html:not([data-mono]) .w#calc,html:not([data-mono]) .panes>.w,html:not([data-mono]) .panes,html:not([data-mono]) .below{background:transparent;border:0;box-shadow:none}
-  html:not([data-mono]) .tsfx{color:var(--accent)!important}
-  html:not([data-mono]) .bt,html:not([data-mono]) .btx{font-family:var(--day-display);font-weight:500;letter-spacing:-.01em;color:var(--ink)}
-  html:not([data-mono]) .tabb{font-family:var(--day-sans);font-size:12px;letter-spacing:.04em;text-transform:uppercase;font-weight:500;color:var(--muted);border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:6px 14px}
-  html:not([data-mono]) .tabb:hover{color:var(--ink);border-color:var(--line-strong);background:#ECE8DF}
-  html:not([data-mono]) .tabb.on{color:var(--accent);border-color:var(--accent);background:var(--accent-tint)}
-  html:not([data-mono]) .tabb:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  html:not([data-mono]) .ftab.acct.on::after{display:none}
-  html:not([data-mono]) .brand .wm,html:not([data-mono]) .brand i,html:not([data-mono]) .brand small{color:var(--muted)}
-  html:not([data-mono]) .sec{border-radius:20px;padding:22px 26px}
-  html:not([data-mono]) .sec.tight{padding:16px 20px}
-  html:not([data-mono]) .calclab{background:var(--surface);color:var(--muted);font-family:var(--day-sans);font-size:12px;letter-spacing:.06em;font-weight:500;text-transform:uppercase;text-shadow:none}
-  html:not([data-mono]) .etabox{font-family:var(--day-mono);font-size:12px;letter-spacing:.02em;color:var(--ink);background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;box-shadow:none;text-shadow:none}
-  html:not([data-mono]) .etabox b,html:not([data-mono]) .etabox strong{color:var(--ink)}
-  html:not([data-mono]) .etabox.eta.rise,html:not([data-mono]) .etabox.conc.low{border-color:var(--accent);color:var(--accent)}
-  html:not([data-mono]) .etabox.eta.fall,html:not([data-mono]) .etabox.conc{border-color:var(--line-strong)}
-  html:not([data-mono]) .mbtn{font-family:var(--day-sans);font-size:12px;font-weight:500;color:var(--muted);border:1px solid transparent;border-radius:999px;background:transparent;text-shadow:none;box-shadow:none}
-  html:not([data-mono]) .mbtn:hover{color:var(--ink);background:#ECE8DF}
-  html:not([data-mono]) .mbtn[aria-pressed=true]{background:var(--accent-tint);color:var(--accent);border-color:transparent}
-  html:not([data-mono]) .chip{font-family:var(--day-mono);font-size:11px;color:var(--muted);border:1px solid var(--line-strong);border-radius:999px;background:var(--surface);box-shadow:none}
-  html:not([data-mono]) .chip:hover{background:#ECE8DF;color:var(--ink)}
-  html:not([data-mono]) .chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
-  html:not([data-mono]) .tapnote{color:var(--faint);font-family:var(--day-sans);font-size:12px}
+  html[data-theme=light]:not([data-mono]) .sec,html[data-theme=light]:not([data-mono]) .duo .sec,html[data-theme=light]:not([data-mono]) .panel,html[data-theme=light]:not([data-mono]) .ptw{background:var(--surface);border-color:var(--line);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .w#calc,html[data-theme=light]:not([data-mono]) .panes>.w,html[data-theme=light]:not([data-mono]) .panes,html[data-theme=light]:not([data-mono]) .below{background:transparent;border:0;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .tsfx{color:var(--accent)!important}
+  html[data-theme=light]:not([data-mono]) .bt,html[data-theme=light]:not([data-mono]) .btx{font-family:var(--day-display);font-weight:500;letter-spacing:-.01em;color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .tabb{font-family:var(--day-sans);font-size:12px;letter-spacing:.04em;text-transform:uppercase;font-weight:500;color:var(--muted);border:1px solid var(--line-strong);background:var(--surface);border-radius:999px;padding:6px 14px}
+  html[data-theme=light]:not([data-mono]) .tabb:hover{color:var(--ink);border-color:var(--line-strong);background:#ECE8DF}
+  html[data-theme=light]:not([data-mono]) .tabb.on{color:var(--accent);border-color:var(--accent);background:var(--accent-tint)}
+  html[data-theme=light]:not([data-mono]) .tabb:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  html[data-theme=light]:not([data-mono]) .ftab.acct.on::after{display:none}
+  html[data-theme=light]:not([data-mono]) .brand .wm,html[data-theme=light]:not([data-mono]) .brand i,html[data-theme=light]:not([data-mono]) .brand small{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .sec{border-radius:20px;padding:22px 26px}
+  html[data-theme=light]:not([data-mono]) .sec.tight{padding:16px 20px}
+  html[data-theme=light]:not([data-mono]) .calclab{background:var(--surface);color:var(--muted);font-family:var(--day-sans);font-size:12px;letter-spacing:.06em;font-weight:500;text-transform:uppercase;text-shadow:none}
+  html[data-theme=light]:not([data-mono]) .etabox{font-family:var(--day-mono);font-size:12px;letter-spacing:.02em;color:var(--ink);background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;box-shadow:none;text-shadow:none}
+  html[data-theme=light]:not([data-mono]) .etabox b,html[data-theme=light]:not([data-mono]) .etabox strong{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .etabox.eta.rise,html[data-theme=light]:not([data-mono]) .etabox.conc.low{border-color:var(--accent);color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .etabox.eta.fall,html[data-theme=light]:not([data-mono]) .etabox.conc{border-color:var(--line-strong)}
+  html[data-theme=light]:not([data-mono]) .mbtn{font-family:var(--day-sans);font-size:12px;font-weight:500;color:var(--muted);border:1px solid transparent;border-radius:999px;background:transparent;text-shadow:none;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .mbtn:hover{color:var(--ink);background:#ECE8DF}
+  html[data-theme=light]:not([data-mono]) .mbtn[aria-pressed=true]{background:var(--accent-tint);color:var(--accent);border-color:transparent}
+  html[data-theme=light]:not([data-mono]) .chip{font-family:var(--day-mono);font-size:11px;color:var(--muted);border:1px solid var(--line-strong);border-radius:999px;background:var(--surface);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .chip:hover{background:#ECE8DF;color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+  html[data-theme=light]:not([data-mono]) .tapnote{color:var(--faint);font-family:var(--day-sans);font-size:12px}
 
   /* the figure strips as hairline grids */
-  html:not([data-mono]) .sbox,html:not([data-mono]) .vgrid{gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:none}
-  html:not([data-mono]) .sbox>*,html:not([data-mono]) .vstat,html:not([data-mono]) .vstat:hover{background:var(--surface);box-shadow:none;border:0}
-  html:not([data-mono]) .vstat.hot{background:var(--surface)}
-  html:not([data-mono]) .vk,html:not([data-mono]) .sbox .k,html:not([data-mono]) .rdgc,html:not([data-mono]) .cbl,html:not([data-mono]) .upl,html:not([data-mono]) .aprlab{font-family:var(--day-sans);font-size:12px;letter-spacing:.05em;text-transform:uppercase;font-weight:500;color:var(--muted)}
-  html:not([data-mono]) .vv,html:not([data-mono]) .sbox b,html:not([data-mono]) .cbn,html:not([data-mono]) .upn{font-family:var(--day-display);font-weight:500;font-size:26px;letter-spacing:-.01em;color:var(--ink);text-shadow:none}
-  html:not([data-mono]) .vv i,html:not([data-mono]) .vv .pc,html:not([data-mono]) .vsubn,html:not([data-mono]) .cbs{font-family:var(--day-sans);font-size:12px;color:var(--muted)}
-  html:not([data-mono]) .aprbig{font-family:var(--day-display);font-weight:500;font-size:42px;letter-spacing:-.02em;color:var(--ink);text-shadow:none}
-  html:not([data-mono]) .aprband{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;box-shadow:none}
-  html:not([data-mono]) .aprx,html:not([data-mono]) .aprnet{font-family:var(--day-sans);color:var(--muted)}
-  html:not([data-mono]) .aprx b{font-family:var(--day-mono);color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .sbox,html[data-theme=light]:not([data-mono]) .vgrid{gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sbox>*,html[data-theme=light]:not([data-mono]) .vstat,html[data-theme=light]:not([data-mono]) .vstat:hover{background:var(--surface);box-shadow:none;border:0}
+  html[data-theme=light]:not([data-mono]) .vstat.hot{background:var(--surface)}
+  html[data-theme=light]:not([data-mono]) .vk,html[data-theme=light]:not([data-mono]) .sbox .k,html[data-theme=light]:not([data-mono]) .rdgc,html[data-theme=light]:not([data-mono]) .cbl,html[data-theme=light]:not([data-mono]) .upl,html[data-theme=light]:not([data-mono]) .aprlab{font-family:var(--day-sans);font-size:12px;letter-spacing:.05em;text-transform:uppercase;font-weight:500;color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .vv,html[data-theme=light]:not([data-mono]) .sbox b,html[data-theme=light]:not([data-mono]) .cbn,html[data-theme=light]:not([data-mono]) .upn{font-family:var(--day-display);font-weight:500;font-size:26px;letter-spacing:-.01em;color:var(--ink);text-shadow:none}
+  html[data-theme=light]:not([data-mono]) .vv i,html[data-theme=light]:not([data-mono]) .vv .pc,html[data-theme=light]:not([data-mono]) .vsubn,html[data-theme=light]:not([data-mono]) .cbs{font-family:var(--day-sans);font-size:12px;color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .aprbig{font-family:var(--day-display);font-weight:500;font-size:42px;letter-spacing:-.02em;color:var(--ink);text-shadow:none}
+  html[data-theme=light]:not([data-mono]) .aprband{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .aprx,html[data-theme=light]:not([data-mono]) .aprnet{font-family:var(--day-sans);color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .aprx b{font-family:var(--day-mono);color:var(--ink)}
 
   /* the grid of validators: no glow on hover, a ring */
-  html:not([data-mono]) .cell{border-radius:6px}
-  html:not([data-mono]) .cell:hover,html:not([data-mono]) .cell:focus-visible{box-shadow:0 0 0 2px var(--accent);filter:none}
-  html:not([data-mono]) .grid.flat .cell .pct{color:var(--ink);text-shadow:none;font-family:var(--day-mono)}
+  html[data-theme=light]:not([data-mono]) .cell{border-radius:6px}
+  html[data-theme=light]:not([data-mono]) .cell:hover,html[data-theme=light]:not([data-mono]) .cell:focus-visible{box-shadow:0 0 0 2px var(--accent);filter:none}
+  html[data-theme=light]:not([data-mono]) .grid.flat .cell .pct{color:var(--ink);text-shadow:none;font-family:var(--day-mono)}
 
   /* tables in the calculator's sections */
-  html:not([data-mono]) .ptab{border-radius:0}
-  html:not([data-mono]) .ptab th{background:var(--surface-2);border-bottom:1px solid var(--line);font-family:var(--day-sans);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:500;color:var(--muted);position:sticky;top:0}
-  html:not([data-mono]) .ptab td{border-bottom:1px solid var(--line-soft);font-family:var(--day-mono);font-size:14px;color:var(--ink);padding:9px 13px}
-  html:not([data-mono]) .ptab tr.vrow:hover td,html:not([data-mono]) .ptab tr.wk:hover td{background:var(--surface-2)}
-  html:not([data-mono]) .ptab tr.now td{background:var(--accent-soft)}
-  html:not([data-mono]) .ptab .tlg,html:not([data-mono]) .ptab .tlgx{box-shadow:0 0 0 1px var(--line)}
+  html[data-theme=light]:not([data-mono]) .ptab{border-radius:0}
+  html[data-theme=light]:not([data-mono]) .ptab th{background:var(--surface-2);border-bottom:1px solid var(--line);font-family:var(--day-sans);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:500;color:var(--muted);position:sticky;top:0}
+  html[data-theme=light]:not([data-mono]) .ptab td{border-bottom:1px solid var(--line-soft);font-family:var(--day-mono);font-size:14px;color:var(--ink);padding:9px 13px}
+  html[data-theme=light]:not([data-mono]) .ptab tr.vrow:hover td,html[data-theme=light]:not([data-mono]) .ptab tr.wk:hover td{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .ptab tr.now td{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .ptab .tlg,html[data-theme=light]:not([data-mono]) .ptab .tlgx{box-shadow:0 0 0 1px var(--line)}
 
   /* ── inputs everywhere: white field, a ledger line, the accent when focused ── */
-  html:not([data-mono]) input[type=text],html:not([data-mono]) input[type=number],html:not([data-mono]) .wk-field,html:not([data-mono]) .unfield,html:not([data-mono]) .amtwrap{background:var(--field);border:1px solid var(--line-strong);border-radius:10px;box-shadow:none;color:var(--ink)}
-  html:not([data-mono]) .wk-field:focus-within,html:not([data-mono]) .unfield:focus-within,html:not([data-mono]) .amtwrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  html:not([data-mono]) .wk-field.need{border-color:var(--warn);box-shadow:0 0 0 3px var(--warn-bg)}
-  html:not([data-mono]) input.wk-amt2{color:var(--ink);font-family:var(--day-mono);font-weight:500}
-  html:not([data-mono]) input.wk-amt2::placeholder{color:var(--faint);font-family:var(--day-sans);letter-spacing:0;text-transform:none;font-size:12px}
-  html:not([data-mono]) .wk-max{background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;color:var(--ink);font-family:var(--day-sans);font-size:11px;letter-spacing:.04em;font-weight:500;box-shadow:none}
-  html:not([data-mono]) .wk-max b{color:var(--ink);font-family:var(--day-mono)}
-  html:not([data-mono]) .wk-max:hover{background:#ECE8DF;border-color:var(--line-strong)}
-  html:not([data-mono]) .wk-max:disabled{opacity:.42;cursor:not-allowed}
+  html[data-theme=light]:not([data-mono]) input[type=text],html[data-theme=light]:not([data-mono]) input[type=number],html[data-theme=light]:not([data-mono]) .wk-field,html[data-theme=light]:not([data-mono]) .unfield,html[data-theme=light]:not([data-mono]) .amtwrap{background:var(--field);border:1px solid var(--line-strong);border-radius:10px;box-shadow:none;color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .wk-field:focus-within,html[data-theme=light]:not([data-mono]) .unfield:focus-within,html[data-theme=light]:not([data-mono]) .amtwrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .wk-field.need{border-color:var(--warn);box-shadow:0 0 0 3px var(--warn-bg)}
+  html[data-theme=light]:not([data-mono]) input.wk-amt2{color:var(--ink);font-family:var(--day-mono);font-weight:500}
+  html[data-theme=light]:not([data-mono]) input.wk-amt2::placeholder{color:var(--faint);font-family:var(--day-sans);letter-spacing:0;text-transform:none;font-size:12px}
+  html[data-theme=light]:not([data-mono]) .wk-max{background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;color:var(--ink);font-family:var(--day-sans);font-size:11px;letter-spacing:.04em;font-weight:500;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .wk-max b{color:var(--ink);font-family:var(--day-mono)}
+  html[data-theme=light]:not([data-mono]) .wk-max:hover{background:#ECE8DF;border-color:var(--line-strong)}
+  html[data-theme=light]:not([data-mono]) .wk-max:disabled{opacity:.42;cursor:not-allowed}
 
   /* ── buttons: primary teal with white, secondary paper with a line, ghost text ── */
-  html:not([data-mono]) .wk-btn{font-family:var(--day-sans);font-weight:500;letter-spacing:0;text-transform:none;font-size:14px;border-radius:12px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);box-shadow:none;text-shadow:none;transition:background .12s}
-  html:not([data-mono]) .wk-btn:hover{background:#ECE8DF;filter:none;transform:none}
-  html:not([data-mono]) .wk-btn.wk-go,html:not([data-mono]) .wk-btn.wk-primary,html:not([data-mono]) #wk-mv .wk-btn.wk-go,html:not([data-mono]) .txbtns .wk-btn.wk-go{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500;letter-spacing:0;text-transform:none;font-size:14px;box-shadow:none}
-  html:not([data-mono]) .wk-btn.wk-go:hover,html:not([data-mono]) .wk-btn.wk-primary:hover,html:not([data-mono]) #wk-mv .wk-btn.wk-go:hover{background:var(--accent-hover);border-color:var(--accent-hover);filter:none;transform:none}
-  html:not([data-mono]) .wk-btn:disabled,html:not([data-mono]) #wk-mv .wk-btn.wk-go:disabled,html:not([data-mono]) .txbtns .wk-btn.wk-go:disabled{background:var(--accent);border-color:var(--accent);color:#fff;opacity:.42;cursor:not-allowed;box-shadow:none;transform:none;font-weight:500}
-  html:not([data-mono]) #wk-mv .wk-btn.wk-go{height:52px;font-size:15px;border-radius:12px}
-  html:not([data-mono]) .wk-btn.wk-danger{background:var(--surface);border-color:var(--danger-bar);color:var(--danger)}
-  html:not([data-mono]) .wk-btn.wk-danger:hover{background:var(--danger-bg)}
-  html:not([data-mono]) .wk-btn.wk-bell{background:transparent;border-color:transparent;color:var(--accent)}
-  html:not([data-mono]) .wk-btn.wk-bell:hover{background:var(--accent-soft)}
-  html:not([data-mono]) .wk-btn:focus-visible,html:not([data-mono]) button:focus-visible,html:not([data-mono]) input:focus-visible,html:not([data-mono]) a:focus-visible,html:not([data-mono]) [tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  html[data-theme=light]:not([data-mono]) .wk-btn{font-family:var(--day-sans);font-weight:500;letter-spacing:0;text-transform:none;font-size:14px;border-radius:12px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);box-shadow:none;text-shadow:none;transition:background .12s}
+  html[data-theme=light]:not([data-mono]) .wk-btn:hover{background:#ECE8DF;filter:none;transform:none}
+  html[data-theme=light]:not([data-mono]) .wk-btn.wk-go,html[data-theme=light]:not([data-mono]) .wk-btn.wk-primary,html[data-theme=light]:not([data-mono]) #wk-mv .wk-btn.wk-go,html[data-theme=light]:not([data-mono]) .txbtns .wk-btn.wk-go{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500;letter-spacing:0;text-transform:none;font-size:14px;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .wk-btn.wk-go:hover,html[data-theme=light]:not([data-mono]) .wk-btn.wk-primary:hover,html[data-theme=light]:not([data-mono]) #wk-mv .wk-btn.wk-go:hover{background:var(--accent-hover);border-color:var(--accent-hover);filter:none;transform:none}
+  html[data-theme=light]:not([data-mono]) .wk-btn:disabled,html[data-theme=light]:not([data-mono]) #wk-mv .wk-btn.wk-go:disabled,html[data-theme=light]:not([data-mono]) .txbtns .wk-btn.wk-go:disabled{background:var(--accent);border-color:var(--accent);color:#fff;opacity:.42;cursor:not-allowed;box-shadow:none;transform:none;font-weight:500}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-btn.wk-go{height:52px;font-size:15px;border-radius:12px}
+  html[data-theme=light]:not([data-mono]) .wk-btn.wk-danger{background:var(--surface);border-color:var(--danger-bar);color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .wk-btn.wk-danger:hover{background:var(--danger-bg)}
+  html[data-theme=light]:not([data-mono]) .wk-btn.wk-bell{background:transparent;border-color:transparent;color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .wk-btn.wk-bell:hover{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .wk-btn:focus-visible,html[data-theme=light]:not([data-mono]) button:focus-visible,html[data-theme=light]:not([data-mono]) input:focus-visible,html[data-theme=light]:not([data-mono]) a:focus-visible,html[data-theme=light]:not([data-mono]) [tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
   /* the connect gate */
-  html:not([data-mono]) #wk-mine .wk-gate .wk-btn.wk-big{background:var(--accent);border-color:var(--accent);color:#fff;font-family:var(--day-sans);font-size:14px;letter-spacing:0;text-transform:none;font-weight:500;height:48px;padding:0 24px;border-radius:12px;box-shadow:none}
-  html:not([data-mono]) #wk-mine .wk-gate .wk-btn.wk-big:hover{background:var(--accent-hover);filter:none;transform:none}
-  html:not([data-mono]) #wk-mine .wk-gatecard .wopt{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:none}
-  html:not([data-mono]) #wk-mine .wk-gatecard .wopt::before{display:none}
-  html:not([data-mono]) #wk-mine .wk-gatecard .wopt:hover{border-color:var(--accent);box-shadow:none;transform:none;background:var(--accent-soft)}
-  html:not([data-mono]) #wk-mine .wk-gatecard .wopt img{box-shadow:0 0 0 1px var(--line)}
-  html:not([data-mono]) #wk-mine .wk-gatecard .wopt b{color:var(--ink);font-family:var(--day-sans)}
-  html:not([data-mono]) #wk-mine .wk-gatecard .wopt i{color:var(--muted);font-family:var(--day-sans);font-size:10px;letter-spacing:.04em}
-  html:not([data-mono]) #wk-mine .wk-gatecard .wopt i.on{color:var(--accent)}
-  html:not([data-mono]) #wk-mine .wk-gatecard .wk-chain{color:var(--faint);font-family:var(--day-mono);font-size:11px;letter-spacing:.04em}
-  html:not([data-mono]) .wk-empty{border:1px dashed var(--line-strong);border-radius:12px;color:var(--muted);background:transparent;font-family:var(--day-sans)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-gate .wk-btn.wk-big{background:var(--accent);border-color:var(--accent);color:#fff;font-family:var(--day-sans);font-size:14px;letter-spacing:0;text-transform:none;font-weight:500;height:48px;padding:0 24px;border-radius:12px;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-gate .wk-btn.wk-big:hover{background:var(--accent-hover);filter:none;transform:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-gatecard .wopt{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-gatecard .wopt::before{display:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-gatecard .wopt:hover{border-color:var(--accent);box-shadow:none;transform:none;background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-gatecard .wopt img{box-shadow:0 0 0 1px var(--line)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-gatecard .wopt b{color:var(--ink);font-family:var(--day-sans)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-gatecard .wopt i{color:var(--muted);font-family:var(--day-sans);font-size:10px;letter-spacing:.04em}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-gatecard .wopt i.on{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-gatecard .wk-chain{color:var(--faint);font-family:var(--day-mono);font-size:11px;letter-spacing:.04em}
+  html[data-theme=light]:not([data-mono]) .wk-empty{border:1px dashed var(--line-strong);border-radius:12px;color:var(--muted);background:transparent;font-family:var(--day-sans)}
 
   /* ── the dashboard's three panels ── */
-  html:not([data-mono]) .wk-pane{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:none;padding:16px 16px 16px}
-  html:not([data-mono]) .wk-pane::after{display:none}
-  html:not([data-mono]) .wk-ph h3,html:not([data-mono]) #wk-mine .wk-t1 h3,html:not([data-mono]) #wk-plan .wk-t2 h3,html:not([data-mono]) #wk-mv .wk-t3 h3,html:not([data-mono]) #wk-mine .wk-bh h3{font-family:var(--day-sans);font-size:12px;letter-spacing:.07em;text-transform:uppercase;font-weight:500;color:var(--muted);text-shadow:none}
-  html:not([data-mono]) .wk-ph h3::before,html:not([data-mono]) #wk-mine .wk-t1 h3::before,html:not([data-mono]) #wk-plan .wk-t2 h3::before,html:not([data-mono]) #wk-mv .wk-t3 h3::before,html:not([data-mono]) #wk-mine .wk-bh h3::before{display:none}
-  html:not([data-mono]) #wk-mine .wk-bh h3{font-family:var(--day-display);font-size:22px;letter-spacing:-.01em;text-transform:none;font-weight:500;color:var(--ink);padding:0}
-  html:not([data-mono]) .wk-pn,html:not([data-mono]) #wk-mine .wk-t1 .wk-pn,html:not([data-mono]) #wk-mv .wk-t3 .wk-pn{font-family:var(--day-sans);font-size:12px;letter-spacing:0;text-transform:none;color:var(--faint)}
-  html:not([data-mono]) .wk-rule{background:var(--line)}
+  html[data-theme=light]:not([data-mono]) .wk-pane{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:none;padding:16px 16px 16px}
+  html[data-theme=light]:not([data-mono]) .wk-pane::after{display:none}
+  html[data-theme=light]:not([data-mono]) .wk-ph h3,html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 h3,html[data-theme=light]:not([data-mono]) #wk-plan .wk-t2 h3,html[data-theme=light]:not([data-mono]) #wk-mv .wk-t3 h3,html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh h3{font-family:var(--day-sans);font-size:12px;letter-spacing:.07em;text-transform:uppercase;font-weight:500;color:var(--muted);text-shadow:none}
+  html[data-theme=light]:not([data-mono]) .wk-ph h3::before,html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 h3::before,html[data-theme=light]:not([data-mono]) #wk-plan .wk-t2 h3::before,html[data-theme=light]:not([data-mono]) #wk-mv .wk-t3 h3::before,html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh h3::before{display:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh h3{font-family:var(--day-display);font-size:22px;letter-spacing:-.01em;text-transform:none;font-weight:500;color:var(--ink);padding:0}
+  html[data-theme=light]:not([data-mono]) .wk-pn,html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-pn,html[data-theme=light]:not([data-mono]) #wk-mv .wk-t3 .wk-pn{font-family:var(--day-sans);font-size:12px;letter-spacing:0;text-transform:none;color:var(--faint)}
+  html[data-theme=light]:not([data-mono]) .wk-rule{background:var(--line)}
 
   /* the address chip: a pill with a green dot */
-  html:not([data-mono]) #wk-mine .wk-bh .wk-addrw{background:var(--surface);border:1px solid var(--line);border-radius:999px;box-shadow:none;height:28px;padding:0 6px 0 12px}
-  html:not([data-mono]) #wk-mine .wk-bh .wk-addrw::before{content:"";width:8px;height:8px;border-radius:50%;background:#2F8F6B;margin-right:8px;flex:0 0 auto}
-  html:not([data-mono]) #wk-mine .wk-bh .wk-addr{font-family:var(--day-mono);font-size:13px;color:var(--ink);letter-spacing:0}
-  html:not([data-mono]) #wk-mine .wk-bh .wk-addr em{color:var(--accent)}
-  html:not([data-mono]) #wk-mine .wk-bh .wk-copy{border-left:1px solid var(--line);color:var(--muted)}
-  html:not([data-mono]) #wk-mine .wk-bh .wk-copy:hover{color:var(--ink)}
-  html:not([data-mono]) #wk-mine .wk-bh .wk-copy.done{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addrw{background:var(--surface);border:1px solid var(--line);border-radius:999px;box-shadow:none;height:28px;padding:0 6px 0 12px}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addrw::before{content:"";width:8px;height:8px;border-radius:50%;background:#2F8F6B;margin-right:8px;flex:0 0 auto}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addr{font-family:var(--day-mono);font-size:13px;color:var(--ink);letter-spacing:0}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addr em{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-copy{border-left:1px solid var(--line);color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-copy:hover{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-copy.done{color:var(--accent)}
 
   /* the five figures as a hairline grid; the balance large in Fraunces */
-  html:not([data-mono]) #wk-mine .wk-bal5{gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;padding:0;margin:14px 0 0;height:auto;max-height:none}
-  html:not([data-mono]) #wk-mine .wk-b5,html:not([data-mono]) #wk-mine .wk-b5:nth-child(n){background:var(--surface);border:0;border-radius:0;box-shadow:none;height:58px;padding:0 12px;align-items:flex-start;text-align:left;gap:3px}
-  html:not([data-mono]) #wk-mine .wk-b5::before{display:none}
-  html:not([data-mono]) #wk-mine .wk-b5 i{font-family:var(--day-sans);font-size:12px;letter-spacing:.05em;text-transform:uppercase;font-weight:500;color:var(--muted);justify-content:flex-start}
-  html:not([data-mono]) #wk-mine .wk-b5 i img{width:14px;height:14px;filter:none}
-  html:not([data-mono]) #wk-mine .wk-b5 b{font-family:var(--day-display);font-weight:500;font-size:18px;letter-spacing:-.01em;color:var(--ink);text-shadow:none}
-  html:not([data-mono]) #wk-mine .wk-b5:nth-child(1) b,html:not([data-mono]) #wk-mine .wk-b5:nth-child(2) b{font-size:22px}
-  html:not([data-mono]) #wk-mine .wk-b5 i{font-size:10.5px}
-  html:not([data-mono]) #wk-mine .wk-b5 b.pho{color:var(--ink)}
-  html:not([data-mono]) #wk-mine .wk-b5 b#ds-rew,html:not([data-mono]) #wk-mine .wk-b5 b.ok{color:var(--accent)}
-  html:not([data-mono]) #wk-mine .wk-b5 b#ds-apr{color:var(--ink)}
-  html:not([data-mono]) #wk-mine .wk-b5 b.warn{color:var(--danger)}
-  html:not([data-mono]) #wk-mine .wk-b5 b::after{display:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bal5{gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;padding:0;margin:14px 0 0;height:auto;max-height:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5,html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(n){background:var(--surface);border:0;border-radius:0;box-shadow:none;height:58px;padding:0 12px;align-items:flex-start;text-align:left;gap:3px}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5::before{display:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 i{font-family:var(--day-sans);font-size:12px;letter-spacing:.05em;text-transform:uppercase;font-weight:500;color:var(--muted);justify-content:flex-start}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 i img{width:14px;height:14px;filter:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 b{font-family:var(--day-display);font-weight:500;font-size:18px;letter-spacing:-.01em;color:var(--ink);text-shadow:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(1) b,html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(2) b{font-size:22px}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 i{font-size:10.5px}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 b.pho{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 b#ds-rew,html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 b.ok{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 b#ds-apr{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 b.warn{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 b::after{display:none}
 
   /* the doors and the disconnect */
-  html:not([data-mono]) #wk-mine .wk-t1 .wk-unb,html:not([data-mono]) #wk-mine .wk-t1 .wk-unb.wk-stb,html:not([data-mono]) #wk-mine .wk-t1 .wk-unb:not(.wk-stb){background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;color:var(--ink);font-family:var(--day-sans);font-size:12px;font-weight:500;height:26px;padding:0 10px;box-shadow:none}
-  html:not([data-mono]) #wk-mine .wk-t1 h3{font-size:11px}
-  html:not([data-mono]) #wk-mine .wk-t1 .wk-pn{font-size:11px}
-  html:not([data-mono]) #dmy tbody td{font-size:12px;padding:0 5px}
-  html:not([data-mono]) #dmy thead th{font-size:10px;letter-spacing:.04em;padding:8px 5px 7px}
-  html:not([data-mono]) .wk-tbl2 td.nm span,html:not([data-mono]) #dmy td.nm span{font-size:13px}
-  html:not([data-mono]) #wk-mine .wk-t1 .wk-unb:hover,html:not([data-mono]) #wk-mine .wk-t1 .wk-unb.wk-stb:hover,html:not([data-mono]) #wk-mine .wk-t1 .wk-unb:not(.wk-stb):hover{background:#ECE8DF;color:var(--ink);border-color:var(--line-strong);box-shadow:none;transform:none;filter:none}
-  html:not([data-mono]) #wk-mine .wk-t1 .wk-unb.wk-stb{background:var(--accent);border-color:var(--accent);color:#fff}
-  html:not([data-mono]) #wk-mine .wk-t1 .wk-unb.wk-stb:hover{background:var(--accent-hover);border-color:var(--accent-hover);color:#fff}
-  html:not([data-mono]) #wk-mine #wk-acct .wk-disc{background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;height:44px;box-shadow:none}
-  html:not([data-mono]) #wk-mine #wk-acct .wk-disc:hover{background:#ECE8DF;border-color:var(--line-strong);filter:none;transform:none;box-shadow:none}
-  html:not([data-mono]) #wk-mine #wk-acct .wk-disc .wk-dword{color:var(--ink);font-family:var(--day-sans);font-size:13px;letter-spacing:0;text-transform:none;font-weight:500}
-  html:not([data-mono]) #wk-mine #wk-acct .wk-disc:hover .wk-dword{color:var(--ink)}
-  html:not([data-mono]) #p-dele #wk-mine #wk-acct .wk-disc svg.wk-out{color:var(--muted)}
-  html:not([data-mono]) #wk-mine #wk-acct .wk-disc .wk-mark{border-right-color:var(--line)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb,html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb.wk-stb,html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb:not(.wk-stb){background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;color:var(--ink);font-family:var(--day-sans);font-size:12px;font-weight:500;height:26px;padding:0 10px;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 h3{font-size:11px}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-pn{font-size:11px}
+  html[data-theme=light]:not([data-mono]) #dmy tbody td{font-size:12px;padding:0 5px}
+  html[data-theme=light]:not([data-mono]) #dmy thead th{font-size:10px;letter-spacing:.04em;padding:8px 5px 7px}
+  html[data-theme=light]:not([data-mono]) .wk-tbl2 td.nm span,html[data-theme=light]:not([data-mono]) #dmy td.nm span{font-size:13px}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb:hover,html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb.wk-stb:hover,html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb:not(.wk-stb):hover{background:#ECE8DF;color:var(--ink);border-color:var(--line-strong);box-shadow:none;transform:none;filter:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb.wk-stb{background:var(--accent);border-color:var(--accent);color:#fff}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb.wk-stb:hover{background:var(--accent-hover);border-color:var(--accent-hover);color:#fff}
+  html[data-theme=light]:not([data-mono]) #wk-mine #wk-acct .wk-disc{background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;height:44px;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine #wk-acct .wk-disc:hover{background:#ECE8DF;border-color:var(--line-strong);filter:none;transform:none;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine #wk-acct .wk-disc .wk-dword{color:var(--ink);font-family:var(--day-sans);font-size:13px;letter-spacing:0;text-transform:none;font-weight:500}
+  html[data-theme=light]:not([data-mono]) #wk-mine #wk-acct .wk-disc:hover .wk-dword{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #p-dele #wk-mine #wk-acct .wk-disc svg.wk-out{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) #wk-mine #wk-acct .wk-disc .wk-mark{border-right-color:var(--line)}
 
   /* the lists: paper tables - a sunk header band, soft dividers, a hover, a selected row */
-  html:not([data-mono]) .wk-tbl2 th,html:not([data-mono]) #dmy thead th,html:not([data-mono]) #dpicks thead th,html:not([data-mono]) #dstrat thead th,html:not([data-mono]) #wk-mv .wk-moves th{background:var(--surface-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-left:0;border-right:0;color:var(--muted);font-family:var(--day-sans);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:500;padding:9px 8px 8px}
-  html:not([data-mono]) #dmy thead th:first-child,html:not([data-mono]) #dpicks thead th:first-child,html:not([data-mono]) #dstrat thead th:first-child{border-left:1px solid var(--line);border-radius:10px 0 0 10px}
-  html:not([data-mono]) #dmy thead th:last-child,html:not([data-mono]) #dpicks thead th:last-child,html:not([data-mono]) #dstrat thead th:last-child{border-right:1px solid var(--line);border-radius:0 10px 10px 0}
-  html:not([data-mono]) #dpicks thead th .lc{text-transform:none}
-  html:not([data-mono]) .wk-tbl2 td,html:not([data-mono]) #dmy tbody td,html:not([data-mono]) #wk-mv .wk-moves td{border-bottom:1px solid var(--line-soft);font-family:var(--day-mono);font-size:13px;color:var(--ink);background:transparent}
-  html:not([data-mono]) .wk-tbl2 td.nm,html:not([data-mono]) .wk-tbl2 td.nm span,html:not([data-mono]) #dpicks td.nm .nmw>span:not(.wk-lgx),html:not([data-mono]) #wk-mv .wk-moves td.nm .nmw>span:not(.wk-lgx){font-family:var(--day-sans);font-weight:500;color:var(--ink);font-size:14px}
-  html:not([data-mono]) .wk-tbl2 td.rk,html:not([data-mono]) .wk-tbl2 td.c.rk{color:var(--faint);font-size:11px}
-  html:not([data-mono]) .wk-tbl2 tbody tr:hover td,html:not([data-mono]) #dpicks tbody tr:hover td,html:not([data-mono]) #dmy tbody tr:hover td,html:not([data-mono]) #wk-mv .wk-moves tr:hover td{background:var(--surface-2)}
-  html:not([data-mono]) #dpicks tbody tr.on td{background:var(--accent-soft)}
-  html:not([data-mono]) #dpicks tbody tr.lt td{color:var(--muted)}
-  html:not([data-mono]) #dpicks tbody tr.lt td.r2 b,html:not([data-mono]) #dpicks td.r2 b{color:var(--accent);font-weight:500}
-  html:not([data-mono]) #dpicks tbody tr.lt td.r2 b{color:var(--danger)}
-  html:not([data-mono]) #dpicks td.r2 s{color:var(--faint)}
-  html:not([data-mono]) #dpicks td.r2 em{color:var(--faint)}
-  html:not([data-mono]) #dpicks td.ok{color:var(--accent)}html:not([data-mono]) #dpicks td.warn{color:var(--warn)}html:not([data-mono]) #dpicks td.bad{color:var(--danger)}html:not([data-mono]) #dpicks td.dim{color:var(--muted)}
-  html:not([data-mono]) #dpicks td.stk{color:var(--ink)}
-  html:not([data-mono]) #dpicks td.nm .gtag.add{color:var(--accent);font-family:var(--day-mono);font-size:12px;font-weight:500}
-  html:not([data-mono]) #dpicks td.nm[data-v]:hover .nmw>span:not(.wk-lgx){color:var(--accent);text-decoration-color:var(--accent)}
-  html:not([data-mono]) #dmy tbody td.rw{color:var(--accent)}
-  html:not([data-mono]) .wk-tbl2 td.amt .lk{color:var(--warn)}
-  html:not([data-mono]) #wk-mv .wk-moves td.gn{color:var(--accent)}
-  html:not([data-mono]) #wk-mv .wk-moves td.gn.neg{color:var(--danger)}
-  html:not([data-mono]) #wk-mv .wk-moves td.gn.dim,html:not([data-mono]) #wk-mv .wk-moves td.dim,html:not([data-mono]) #wk-mv .wk-moves tr.stay td{color:var(--muted)}
-  html:not([data-mono]) #wk-mv .wk-moves td.ar{color:var(--accent)}
-  html:not([data-mono]) .wk-lg,html:not([data-mono]) .wk-lgx,html:not([data-mono]) .tlg,html:not([data-mono]) .tlgx{box-shadow:0 0 0 1px var(--line)}
-  html:not([data-mono]) .wk-tbl2{scrollbar-color:var(--line-strong) transparent}
-  html:not([data-mono]) #wk-plan .wk-tbl2 thead th,html:not([data-mono]) #wk-mine .wk-tbl2 thead th{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .wk-tbl2 th,html[data-theme=light]:not([data-mono]) #dmy thead th,html[data-theme=light]:not([data-mono]) #dpicks thead th,html[data-theme=light]:not([data-mono]) #dstrat thead th,html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves th{background:var(--surface-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-left:0;border-right:0;color:var(--muted);font-family:var(--day-sans);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:500;padding:9px 8px 8px}
+  html[data-theme=light]:not([data-mono]) #dmy thead th:first-child,html[data-theme=light]:not([data-mono]) #dpicks thead th:first-child,html[data-theme=light]:not([data-mono]) #dstrat thead th:first-child{border-left:1px solid var(--line);border-radius:10px 0 0 10px}
+  html[data-theme=light]:not([data-mono]) #dmy thead th:last-child,html[data-theme=light]:not([data-mono]) #dpicks thead th:last-child,html[data-theme=light]:not([data-mono]) #dstrat thead th:last-child{border-right:1px solid var(--line);border-radius:0 10px 10px 0}
+  html[data-theme=light]:not([data-mono]) #dpicks thead th .lc{text-transform:none}
+  html[data-theme=light]:not([data-mono]) .wk-tbl2 td,html[data-theme=light]:not([data-mono]) #dmy tbody td,html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td{border-bottom:1px solid var(--line-soft);font-family:var(--day-mono);font-size:13px;color:var(--ink);background:transparent}
+  html[data-theme=light]:not([data-mono]) .wk-tbl2 td.nm,html[data-theme=light]:not([data-mono]) .wk-tbl2 td.nm span,html[data-theme=light]:not([data-mono]) #dpicks td.nm .nmw>span:not(.wk-lgx),html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td.nm .nmw>span:not(.wk-lgx){font-family:var(--day-sans);font-weight:500;color:var(--ink);font-size:14px}
+  html[data-theme=light]:not([data-mono]) .wk-tbl2 td.rk,html[data-theme=light]:not([data-mono]) .wk-tbl2 td.c.rk{color:var(--faint);font-size:11px}
+  html[data-theme=light]:not([data-mono]) .wk-tbl2 tbody tr:hover td,html[data-theme=light]:not([data-mono]) #dpicks tbody tr:hover td,html[data-theme=light]:not([data-mono]) #dmy tbody tr:hover td,html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves tr:hover td{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) #dpicks tbody tr.on td{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #dpicks tbody tr.lt td{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) #dpicks tbody tr.lt td.r2 b,html[data-theme=light]:not([data-mono]) #dpicks td.r2 b{color:var(--accent);font-weight:500}
+  html[data-theme=light]:not([data-mono]) #dpicks tbody tr.lt td.r2 b{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) #dpicks td.r2 s{color:var(--faint)}
+  html[data-theme=light]:not([data-mono]) #dpicks td.r2 em{color:var(--faint)}
+  html[data-theme=light]:not([data-mono]) #dpicks td.ok{color:var(--accent)}html[data-theme=light]:not([data-mono]) #dpicks td.warn{color:var(--warn)}html[data-theme=light]:not([data-mono]) #dpicks td.bad{color:var(--danger)}html[data-theme=light]:not([data-mono]) #dpicks td.dim{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) #dpicks td.stk{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #dpicks td.nm .gtag.add{color:var(--accent);font-family:var(--day-mono);font-size:12px;font-weight:500}
+  html[data-theme=light]:not([data-mono]) #dpicks td.nm[data-v]:hover .nmw>span:not(.wk-lgx){color:var(--accent);text-decoration-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #dmy tbody td.rw{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .wk-tbl2 td.amt .lk{color:var(--warn)}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td.gn{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td.gn.neg{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td.gn.dim,html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td.dim,html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves tr.stay td{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td.ar{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .wk-lg,html[data-theme=light]:not([data-mono]) .wk-lgx,html[data-theme=light]:not([data-mono]) .tlg,html[data-theme=light]:not([data-mono]) .tlgx{box-shadow:0 0 0 1px var(--line)}
+  html[data-theme=light]:not([data-mono]) .wk-tbl2{scrollbar-color:var(--line-strong) transparent}
+  html[data-theme=light]:not([data-mono]) #wk-plan .wk-tbl2 thead th,html[data-theme=light]:not([data-mono]) #wk-mine .wk-tbl2 thead th{background:var(--surface-2)}
 
   /* checkboxes: the accent */
-  html:not([data-mono]) #dpicks thead th.ck input,html:not([data-mono]) #dpicks tbody input,html:not([data-mono]) .aopt input,html:not([data-mono]) .stlist input{appearance:auto;-webkit-appearance:auto;width:18px;height:18px;accent-color:var(--accent);background:none;border:0;box-shadow:none;border-radius:4px}
-  html:not([data-mono]) #dpicks thead th.ck input::after,html:not([data-mono]) #dpicks tbody input::after{display:none}
-  html:not([data-mono]) #dpicks thead th.ck label{font-family:var(--day-sans);font-size:11px;letter-spacing:.06em;color:var(--muted);font-weight:500;text-transform:uppercase}
+  html[data-theme=light]:not([data-mono]) #dpicks thead th.ck input,html[data-theme=light]:not([data-mono]) #dpicks tbody input,html[data-theme=light]:not([data-mono]) .aopt input,html[data-theme=light]:not([data-mono]) .stlist input{appearance:auto;-webkit-appearance:auto;width:18px;height:18px;accent-color:var(--accent);background:none;border:0;box-shadow:none;border-radius:4px}
+  html[data-theme=light]:not([data-mono]) #dpicks thead th.ck input::after,html[data-theme=light]:not([data-mono]) #dpicks tbody input::after{display:none}
+  html[data-theme=light]:not([data-mono]) #dpicks thead th.ck label{font-family:var(--day-sans);font-size:11px;letter-spacing:.06em;color:var(--muted);font-weight:500;text-transform:uppercase}
 
   /* the amount chip in the Redelegate title row, the note, the clock, the refresh, the door */
-  html:not([data-mono]) #wk-plan>.wk-ph .wk-field{background:var(--field);border:1px solid var(--line-strong);border-radius:999px;box-shadow:none;height:30px;width:176px;margin-left:10px}
-  html:not([data-mono]) #wk-plan .wk-t2 h3{font-size:11px}
-  html:not([data-mono]) #dpicks thead th{font-size:10px;letter-spacing:.04em;padding:8px 6px 7px}
-  html:not([data-mono]) #dpicks tbody td{font-size:12px}
-  html:not([data-mono]) #dpicks td.r2 b{font-size:12px}
-  html:not([data-mono]) #wk-plan>.wk-ph .wk-field:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  html:not([data-mono]) #wk-plan>.wk-ph input.wk-amt2{font-size:13px;color:var(--ink)}
-  html:not([data-mono]) #wk-plan>.wk-ph .wk-field .wk-max{height:24px;border-radius:999px;background:var(--surface-2);border-color:var(--line-strong);color:var(--ink);font-size:11px}
-  html:not([data-mono]) #wk-plan>.wk-ph .wk-lockn{background:var(--warn-bg);border:1px solid transparent;border-radius:999px;color:var(--warn-ink);font-family:var(--day-sans);font-size:11px;letter-spacing:0;text-transform:none;height:26px;padding:0 10px;overflow:visible}
-  html:not([data-mono]) #wk-plan>.wk-ph .wk-lockn b{color:var(--warn-ink);font-family:var(--day-mono);font-size:11px;font-weight:500}
-  html:not([data-mono]) #wk-plan>.wk-ph .wk-ago{font-size:11px}
-  html:not([data-mono]) #wk-plan>.wk-ph .wk-auto{font-size:12px;padding:0 8px}
-  html:not([data-mono]) .wk-ph .wk-ib,html:not([data-mono]) #wk-plan .wk-ph .wk-ib{width:28px;height:28px}
-  html:not([data-mono]) #p-dele #wk-plan>.wk-ph .wk-lockn svg{stroke:var(--warn-ink)}
-  html:not([data-mono]) #wk-plan .wk-ph .wk-ago,html:not([data-mono]) #wk-plan>.wk-ph .wk-ago{color:var(--accent);font-family:var(--day-mono);font-size:12px}
-  html:not([data-mono]) .wk-ph .wk-ib,html:not([data-mono]) #wk-plan .wk-ph .wk-ib{background:var(--surface);border:1px solid var(--line-strong);border-radius:10px;color:var(--muted);box-shadow:none;width:30px;height:30px}
-  html:not([data-mono]) .wk-ph .wk-ib:hover,html:not([data-mono]) #wk-plan .wk-ph .wk-ib:hover{background:#ECE8DF;color:var(--ink);border-color:var(--line-strong)}
-  html:not([data-mono]) #wk-plan>.wk-ph .wk-auto{background:transparent;border:1px solid transparent;color:var(--accent);font-family:var(--day-sans);font-size:12px;letter-spacing:0;text-transform:none;font-weight:500;height:30px;padding:0 10px;border-radius:10px;box-shadow:none}
-  html:not([data-mono]) #wk-plan>.wk-ph .wk-auto:hover{background:var(--accent-soft);box-shadow:none}
-  html:not([data-mono]) #wk-plan>.wk-ph .wk-auto.on{border-color:var(--accent);color:var(--accent);background:var(--accent-tint)}
+  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-field{background:var(--field);border:1px solid var(--line-strong);border-radius:999px;box-shadow:none;height:30px;width:176px;margin-left:10px}
+  html[data-theme=light]:not([data-mono]) #wk-plan .wk-t2 h3{font-size:11px}
+  html[data-theme=light]:not([data-mono]) #dpicks thead th{font-size:10px;letter-spacing:.04em;padding:8px 6px 7px}
+  html[data-theme=light]:not([data-mono]) #dpicks tbody td{font-size:12px}
+  html[data-theme=light]:not([data-mono]) #dpicks td.r2 b{font-size:12px}
+  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-field:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph input.wk-amt2{font-size:13px;color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-field .wk-max{height:24px;border-radius:999px;background:var(--surface-2);border-color:var(--line-strong);color:var(--ink);font-size:11px}
+  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-lockn{background:var(--warn-bg);border:1px solid transparent;border-radius:999px;color:var(--warn-ink);font-family:var(--day-sans);font-size:11px;letter-spacing:0;text-transform:none;height:26px;padding:0 10px;overflow:visible}
+  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-lockn b{color:var(--warn-ink);font-family:var(--day-mono);font-size:11px;font-weight:500}
+  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-ago{font-size:11px}
+  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-auto{font-size:12px;padding:0 8px}
+  html[data-theme=light]:not([data-mono]) .wk-ph .wk-ib,html[data-theme=light]:not([data-mono]) #wk-plan .wk-ph .wk-ib{width:28px;height:28px}
+  html[data-theme=light]:not([data-mono]) #p-dele #wk-plan>.wk-ph .wk-lockn svg{stroke:var(--warn-ink)}
+  html[data-theme=light]:not([data-mono]) #wk-plan .wk-ph .wk-ago,html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-ago{color:var(--accent);font-family:var(--day-mono);font-size:12px}
+  html[data-theme=light]:not([data-mono]) .wk-ph .wk-ib,html[data-theme=light]:not([data-mono]) #wk-plan .wk-ph .wk-ib{background:var(--surface);border:1px solid var(--line-strong);border-radius:10px;color:var(--muted);box-shadow:none;width:30px;height:30px}
+  html[data-theme=light]:not([data-mono]) .wk-ph .wk-ib:hover,html[data-theme=light]:not([data-mono]) #wk-plan .wk-ph .wk-ib:hover{background:#ECE8DF;color:var(--ink);border-color:var(--line-strong)}
+  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-auto{background:transparent;border:1px solid transparent;color:var(--accent);font-family:var(--day-sans);font-size:12px;letter-spacing:0;text-transform:none;font-weight:500;height:30px;padding:0 10px;border-radius:10px;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-auto:hover{background:var(--accent-soft);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-auto.on{border-color:var(--accent);color:var(--accent);background:var(--accent-tint)}
 
   /* the outcome: a hairline grid of three figures, the moves, the note, the bar on the floor */
-  html:not([data-mono]) #wk-mv .wk-ans{gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:12px 0 0}
-  html:not([data-mono]) #wk-mv .wk-ans .p,html:not([data-mono]) #wk-mv .wk-ans .p.rate,html:not([data-mono]) #wk-mv .wk-ans .p.gain,html:not([data-mono]) #wk-mv .wk-ans .p.lock{background:var(--surface);border:0;border-radius:0;box-shadow:none;height:62px;padding:0 10px;align-items:flex-start;text-align:left;flex:1 1 0;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:4px;flex-wrap:nowrap}
-  html:not([data-mono]) #wk-mv .wk-ans .p.rate{flex:1.35 1 0;flex-flow:column nowrap}
-  html:not([data-mono]) #wk-mv .wk-ans .p::before{display:none}
-  html:not([data-mono]) #wk-mv .wk-ans .p i{font-family:var(--day-sans);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:500;color:var(--muted);white-space:nowrap}
-  html:not([data-mono]) #wk-mv .wk-ans .p.rate i:first-child{text-align:left;flex:0 0 auto;width:auto}
-  html:not([data-mono]) #wk-mv .wk-ans .p b{font-family:var(--day-display);font-weight:500;font-size:19px;letter-spacing:-.01em;color:var(--ink);white-space:nowrap}
-  html:not([data-mono]) #wk-mv .wk-ans .p.rate b{font-size:15px;font-family:var(--day-mono)}
-  html:not([data-mono]) #wk-mv .wk-ans .p.rate>b,html:not([data-mono]) #wk-mv .wk-ans .p.rate>.arr{display:inline}
-  html:not([data-mono]) #wk-mv .wk-ans .p.rate .figs{display:flex;align-items:baseline;gap:4px}
-  html:not([data-mono]) #wk-mv .wk-ans .p.rate b.aft,html:not([data-mono]) #wk-mv .wk-ans .p.gain b{color:var(--accent)}
-  html:not([data-mono]) #wk-mv .wk-ans .p.rate b.aft.neg,html:not([data-mono]) #wk-mv .wk-ans .p.gain b.neg{color:var(--danger)}
-  html:not([data-mono]) #wk-mv .wk-ans .p b.dim{color:var(--faint)}
-  html:not([data-mono]) #wk-mv .wk-ans .p .arr{color:var(--faint)}
-  html:not([data-mono]) #wk-mv .wk-ans .p.lock b{color:var(--warn)}
-  html:not([data-mono]) #p-dele #wk-mv .wk-ans .p.lock svg{stroke:var(--warn)}
-  html:not([data-mono]) #wk-mv .wk-mvempty{border:1px dashed var(--line-strong);border-radius:14px;color:var(--muted);font-family:var(--day-sans);font-size:13px;letter-spacing:0;text-transform:none;margin:12px 0}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans{gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:12px 0 0}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p,html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.rate,html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.gain,html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.lock{background:var(--surface);border:0;border-radius:0;box-shadow:none;height:62px;padding:0 10px;align-items:flex-start;text-align:left;flex:1 1 0;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:4px;flex-wrap:nowrap}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.rate{flex:1.35 1 0;flex-flow:column nowrap}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p::before{display:none}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p i{font-family:var(--day-sans);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:500;color:var(--muted);white-space:nowrap}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.rate i:first-child{text-align:left;flex:0 0 auto;width:auto}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p b{font-family:var(--day-display);font-weight:500;font-size:19px;letter-spacing:-.01em;color:var(--ink);white-space:nowrap}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.rate b{font-size:15px;font-family:var(--day-mono)}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.rate>b,html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.rate>.arr{display:inline}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.rate .figs{display:flex;align-items:baseline;gap:4px}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.rate b.aft,html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.gain b{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.rate b.aft.neg,html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.gain b.neg{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p b.dim{color:var(--faint)}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p .arr{color:var(--faint)}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.lock b{color:var(--warn)}
+  html[data-theme=light]:not([data-mono]) #p-dele #wk-mv .wk-ans .p.lock svg{stroke:var(--warn)}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-mvempty{border:1px dashed var(--line-strong);border-radius:14px;color:var(--muted);font-family:var(--day-sans);font-size:13px;letter-spacing:0;text-transform:none;margin:12px 0}
 
   /* ── cards (popups): ivory on a dim overlay, a real shadow, a big serif title ── */
-  html:not([data-mono]) .pop{background:var(--overlay)}
-  html:not([data-mono]) .pop .card,html:not([data-mono]) .pop .card.vcard,html:not([data-mono]) .pop .card.txcard{background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-modal);scrollbar-color:var(--line-strong) var(--surface)}
-  html:not([data-mono]) .pop .card::before,html:not([data-mono]) .pop .card.atcard::before{display:none}
-  html:not([data-mono]) .wk-txh b,html:not([data-mono]) .vname .vnm{font-family:var(--day-display);font-weight:500;font-size:26px;letter-spacing:-.01em;color:var(--ink);text-shadow:none}
-  html:not([data-mono]) .wk-txh span,html:not([data-mono]) .txsum{font-family:var(--day-sans);font-size:12px;color:var(--muted);letter-spacing:0;text-transform:none}
-  html:not([data-mono]) .wk-txh{border-bottom:1px solid var(--line)}
-  html:not([data-mono]) .txbtns{border-top:1px solid var(--line)}
-  html:not([data-mono]) .txbtns .wk-btn{height:52px;padding:0 22px;font-size:14px}
-  html:not([data-mono]) .vgrid .vstat .vk{color:var(--muted)}
-  html:not([data-mono]) .vrk,html:not([data-mono]) .ptag,html:not([data-mono]) .badge,html:not([data-mono]) .tag{font-family:var(--day-sans);font-size:12px;font-weight:500;letter-spacing:0;text-transform:none;padding:3px 10px;border-radius:999px;background:var(--neutral-pill);color:var(--muted);border:0;box-shadow:none;text-shadow:none}
-  html:not([data-mono]) .badge.ok,html:not([data-mono]) .badge.on,html:not([data-mono]) .tag.ok{background:var(--accent-tint);color:var(--accent)}
-  html:not([data-mono]) .badge.bad,html:not([data-mono]) .badge.jail,html:not([data-mono]) .tag.bad{background:var(--danger-bg);color:var(--danger)}
-  html:not([data-mono]) .badge.warn,html:not([data-mono]) .badge.new,html:not([data-mono]) .tag.warn{background:var(--warn-bg);color:var(--warn-ink)}
-  html:not([data-mono]) .vweb{color:var(--accent)}
-  html:not([data-mono]) .notify,html:not([data-mono]) .tgbtn{background:var(--accent);border:1px solid var(--accent);color:#fff;border-radius:12px;font-family:var(--day-sans);font-weight:500;letter-spacing:0;text-transform:none;box-shadow:none;text-shadow:none}
-  html:not([data-mono]) .notify:hover,html:not([data-mono]) .tgbtn:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
-  html:not([data-mono]) .tgbtn.off{opacity:.42;cursor:not-allowed}
-  html:not([data-mono]) .notify .march{display:none}
-  html:not([data-mono]) .aopt{border:1px solid var(--line);border-radius:12px;background:var(--surface);min-height:44px;font-family:var(--day-sans);font-size:14px;color:var(--ink)}
-  html:not([data-mono]) .aopt:hover{background:var(--surface-2);border-color:var(--line-strong)}
-  html:not([data-mono]) .aopt span i{color:var(--muted);font-family:var(--day-sans);font-size:12px}
-  html:not([data-mono]) .txlock,html:not([data-mono]) .unnote,html:not([data-mono]) .stnote{background:var(--warn-bg);color:var(--warn-ink);border:0;border-radius:10px;font-family:var(--day-sans);font-size:13px}
-  html:not([data-mono]) .txlock b,html:not([data-mono]) .unnote b{color:var(--warn-ink)}
-  html:not([data-mono]) .txstep{font-family:var(--day-sans);color:var(--muted)}
-  html:not([data-mono]) .txstep.ok{color:var(--accent)}html:not([data-mono]) .txstep.err{color:var(--danger)}
-  html:not([data-mono]) .txfee{font-family:var(--day-mono);color:var(--muted)}
-  html:not([data-mono]) .txans .p i{font-family:var(--day-sans);font-size:12px;letter-spacing:.05em;color:var(--muted)}
-  html:not([data-mono]) .txans .p b{font-family:var(--day-display);color:var(--ink);font-size:24px;font-weight:500}
-  html:not([data-mono]) .txans .p.aft b,html:not([data-mono]) .txans .p.gain b{color:var(--accent)}
-  html:not([data-mono]) .txans .p.aft.neg b,html:not([data-mono]) .txans .p.gain.neg b{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .pop{background:var(--overlay)}
+  html[data-theme=light]:not([data-mono]) .pop .card,html[data-theme=light]:not([data-mono]) .pop .card.vcard,html[data-theme=light]:not([data-mono]) .pop .card.txcard{background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-modal);scrollbar-color:var(--line-strong) var(--surface)}
+  html[data-theme=light]:not([data-mono]) .pop .card::before,html[data-theme=light]:not([data-mono]) .pop .card.atcard::before{display:none}
+  html[data-theme=light]:not([data-mono]) .wk-txh b,html[data-theme=light]:not([data-mono]) .vname .vnm{font-family:var(--day-display);font-weight:500;font-size:26px;letter-spacing:-.01em;color:var(--ink);text-shadow:none}
+  html[data-theme=light]:not([data-mono]) .wk-txh span,html[data-theme=light]:not([data-mono]) .txsum{font-family:var(--day-sans);font-size:12px;color:var(--muted);letter-spacing:0;text-transform:none}
+  html[data-theme=light]:not([data-mono]) .wk-txh{border-bottom:1px solid var(--line)}
+  html[data-theme=light]:not([data-mono]) .txbtns{border-top:1px solid var(--line)}
+  html[data-theme=light]:not([data-mono]) .txbtns .wk-btn{height:52px;padding:0 22px;font-size:14px}
+  html[data-theme=light]:not([data-mono]) .vgrid .vstat .vk{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .vrk,html[data-theme=light]:not([data-mono]) .ptag,html[data-theme=light]:not([data-mono]) .badge,html[data-theme=light]:not([data-mono]) .tag{font-family:var(--day-sans);font-size:12px;font-weight:500;letter-spacing:0;text-transform:none;padding:3px 10px;border-radius:999px;background:var(--neutral-pill);color:var(--muted);border:0;box-shadow:none;text-shadow:none}
+  html[data-theme=light]:not([data-mono]) .badge.ok,html[data-theme=light]:not([data-mono]) .badge.on,html[data-theme=light]:not([data-mono]) .tag.ok{background:var(--accent-tint);color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .badge.bad,html[data-theme=light]:not([data-mono]) .badge.jail,html[data-theme=light]:not([data-mono]) .tag.bad{background:var(--danger-bg);color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .badge.warn,html[data-theme=light]:not([data-mono]) .badge.new,html[data-theme=light]:not([data-mono]) .tag.warn{background:var(--warn-bg);color:var(--warn-ink)}
+  html[data-theme=light]:not([data-mono]) .vweb{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .notify,html[data-theme=light]:not([data-mono]) .tgbtn{background:var(--accent);border:1px solid var(--accent);color:#fff;border-radius:12px;font-family:var(--day-sans);font-weight:500;letter-spacing:0;text-transform:none;box-shadow:none;text-shadow:none}
+  html[data-theme=light]:not([data-mono]) .notify:hover,html[data-theme=light]:not([data-mono]) .tgbtn:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+  html[data-theme=light]:not([data-mono]) .tgbtn.off{opacity:.42;cursor:not-allowed}
+  html[data-theme=light]:not([data-mono]) .notify .march{display:none}
+  html[data-theme=light]:not([data-mono]) .aopt{border:1px solid var(--line);border-radius:12px;background:var(--surface);min-height:44px;font-family:var(--day-sans);font-size:14px;color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .aopt:hover{background:var(--surface-2);border-color:var(--line-strong)}
+  html[data-theme=light]:not([data-mono]) .aopt span i{color:var(--muted);font-family:var(--day-sans);font-size:12px}
+  html[data-theme=light]:not([data-mono]) .txlock,html[data-theme=light]:not([data-mono]) .unnote,html[data-theme=light]:not([data-mono]) .stnote{background:var(--warn-bg);color:var(--warn-ink);border:0;border-radius:10px;font-family:var(--day-sans);font-size:13px}
+  html[data-theme=light]:not([data-mono]) .txlock b,html[data-theme=light]:not([data-mono]) .unnote b{color:var(--warn-ink)}
+  html[data-theme=light]:not([data-mono]) .txstep{font-family:var(--day-sans);color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .txstep.ok{color:var(--accent)}html[data-theme=light]:not([data-mono]) .txstep.err{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .txfee{font-family:var(--day-mono);color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .txans .p i{font-family:var(--day-sans);font-size:12px;letter-spacing:.05em;color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .txans .p b{font-family:var(--day-display);color:var(--ink);font-size:24px;font-weight:500}
+  html[data-theme=light]:not([data-mono]) .txans .p.aft b,html[data-theme=light]:not([data-mono]) .txans .p.gain b{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .txans .p.aft.neg b,html[data-theme=light]:not([data-mono]) .txans .p.gain.neg b{color:var(--danger)}
 
   /* the Autopilot card's parts */
-  html:not([data-mono]) .atcard .atlab{font-family:var(--day-sans);font-size:12px;letter-spacing:.06em;color:var(--muted);font-weight:500}
-  html:not([data-mono]) .atcard .atpc{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:none}
-  html:not([data-mono]) .atcard .atpc:hover{border-color:var(--line-strong);background:var(--surface-2)}
-  html:not([data-mono]) .atcard .atpc:has(input:checked){border-color:var(--accent);background:var(--accent-soft);box-shadow:none}
-  html:not([data-mono]) .atcard .atpc b,html:not([data-mono]) .atcard .atpc:nth-child(n) b{font-family:var(--day-sans);font-size:15px;font-weight:500;color:var(--ink)}
-  html:not([data-mono]) .atcard .atpc i{font-family:var(--day-sans);font-size:13px;color:var(--muted)}
-  html:not([data-mono]) .atcard .atpc em{font-family:var(--day-mono);font-size:12px;color:var(--accent)}
-  html:not([data-mono]) .atcard .atpc input{border-color:var(--line-strong);background:var(--field);box-shadow:none}
-  html:not([data-mono]) .atcard .atpc input:checked{border-color:var(--accent)}
-  html:not([data-mono]) .atcard .atpc input:checked::after{background:var(--accent);box-shadow:none}
-  html:not([data-mono]) .atcard .atseg{background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;box-shadow:none}
-  html:not([data-mono]) .atcard .atseg button{font-family:var(--day-sans);font-size:13px;letter-spacing:0;text-transform:none;font-weight:500;color:var(--muted);border-radius:10px}
-  html:not([data-mono]) .atcard .atseg button[aria-pressed=true]{background:var(--accent);color:#fff}
-  html:not([data-mono]) .atcard .atsw .atswk{background:var(--surface-2);border-color:var(--line-strong);box-shadow:none}
-  html:not([data-mono]) .atcard .atsw .atswk::after{background:var(--faint)}
-  html:not([data-mono]) .atcard .atsw input:checked+.atswk{background:var(--accent);border-color:var(--accent)}
-  html:not([data-mono]) .atcard .atsw input:checked+.atswk::after{background:#fff}
-  html:not([data-mono]) .atcard .atsw b{font-family:var(--day-sans);font-size:15px;color:var(--ink)}
-  html:not([data-mono]) .atcard .atsw i{font-size:13px;color:var(--muted)}
-  html:not([data-mono]) .atcard .atnote{background:var(--surface-sunk);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:13px}
-  html:not([data-mono]) .atcard .atnote svg{stroke:var(--accent)}
-  html:not([data-mono]) .atcard .atstate{font-family:var(--day-sans);color:var(--ink);background:var(--surface-sunk);border-radius:12px}
-  html:not([data-mono]) .atcard .atstate .g{color:var(--accent)}
-  html:not([data-mono]) .atcard .atrow{border-top-color:var(--line-soft)}
-  html:not([data-mono]) .atcard .atrow .unhint{font-family:var(--day-sans);font-size:12px;color:var(--muted);letter-spacing:0}
-  html:not([data-mono]) .atcard .atrow .unhint.bad{color:var(--warn)}
-  html:not([data-mono]) .atcard .atfee{background:var(--warn-bg);color:var(--warn-ink);border-radius:10px}
+  html[data-theme=light]:not([data-mono]) .atcard .atlab{font-family:var(--day-sans);font-size:12px;letter-spacing:.06em;color:var(--muted);font-weight:500}
+  html[data-theme=light]:not([data-mono]) .atcard .atpc{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .atcard .atpc:hover{border-color:var(--line-strong);background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .atcard .atpc:has(input:checked){border-color:var(--accent);background:var(--accent-soft);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .atcard .atpc b,html[data-theme=light]:not([data-mono]) .atcard .atpc:nth-child(n) b{font-family:var(--day-sans);font-size:15px;font-weight:500;color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .atcard .atpc i{font-family:var(--day-sans);font-size:13px;color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .atcard .atpc em{font-family:var(--day-mono);font-size:12px;color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .atcard .atpc input{border-color:var(--line-strong);background:var(--field);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .atcard .atpc input:checked{border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .atcard .atpc input:checked::after{background:var(--accent);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .atcard .atseg{background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .atcard .atseg button{font-family:var(--day-sans);font-size:13px;letter-spacing:0;text-transform:none;font-weight:500;color:var(--muted);border-radius:10px}
+  html[data-theme=light]:not([data-mono]) .atcard .atseg button[aria-pressed=true]{background:var(--accent);color:#fff}
+  html[data-theme=light]:not([data-mono]) .atcard .atsw .atswk{background:var(--surface-2);border-color:var(--line-strong);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .atcard .atsw .atswk::after{background:var(--faint)}
+  html[data-theme=light]:not([data-mono]) .atcard .atsw input:checked+.atswk{background:var(--accent);border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .atcard .atsw input:checked+.atswk::after{background:#fff}
+  html[data-theme=light]:not([data-mono]) .atcard .atsw b{font-family:var(--day-sans);font-size:15px;color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .atcard .atsw i{font-size:13px;color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .atcard .atnote{background:var(--surface-sunk);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:13px}
+  html[data-theme=light]:not([data-mono]) .atcard .atnote svg{stroke:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .atcard .atstate{font-family:var(--day-sans);color:var(--ink);background:var(--surface-sunk);border-radius:12px}
+  html[data-theme=light]:not([data-mono]) .atcard .atstate .g{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .atcard .atrow{border-top-color:var(--line-soft)}
+  html[data-theme=light]:not([data-mono]) .atcard .atrow .unhint{font-family:var(--day-sans);font-size:12px;color:var(--muted);letter-spacing:0}
+  html[data-theme=light]:not([data-mono]) .atcard .atrow .unhint.bad{color:var(--warn)}
+  html[data-theme=light]:not([data-mono]) .atcard .atfee{background:var(--warn-bg);color:var(--warn-ink);border-radius:10px}
 
   /* ── the intro / governance pages, misc ── */
-  html:not([data-mono]) .intro,html:not([data-mono]) .gov{color:var(--ink)}
-  html:not([data-mono]) a{color:var(--accent)}
-  html:not([data-mono]) ::selection{background:var(--accent-tint);color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .intro,html[data-theme=light]:not([data-mono]) .gov{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) a{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) ::selection{background:var(--accent-tint);color:var(--ink)}
 
   /* scrollbars */
-  html:not([data-mono]) ::-webkit-scrollbar{width:10px;height:10px}
-  html:not([data-mono]) ::-webkit-scrollbar-thumb{background:#D8D2C5;border:2px solid var(--surface);border-radius:10px}
-  html:not([data-mono]) ::-webkit-scrollbar-track,html:not([data-mono]) .pop .card::-webkit-scrollbar-track{background:transparent}
-  html:not([data-mono]) .pop .card::-webkit-scrollbar-thumb{background:#D8D2C5;border:2px solid var(--surface);border-radius:10px}
+  html[data-theme=light]:not([data-mono]) ::-webkit-scrollbar{width:10px;height:10px}
+  html[data-theme=light]:not([data-mono]) ::-webkit-scrollbar-thumb{background:#D8D2C5;border:2px solid var(--surface);border-radius:10px}
+  html[data-theme=light]:not([data-mono]) ::-webkit-scrollbar-track,html[data-theme=light]:not([data-mono]) .pop .card::-webkit-scrollbar-track{background:transparent}
+  html[data-theme=light]:not([data-mono]) .pop .card::-webkit-scrollbar-thumb{background:#D8D2C5;border:2px solid var(--surface);border-radius:10px}
 
   /* motion: backgrounds only, and none when the reader asks for none */
-  html:not([data-mono]) .wk-btn,html:not([data-mono]) .mbtn,html:not([data-mono]) .chip,html:not([data-mono]) .aopt,html:not([data-mono]) .atpc{transition:background .12s}
-  @media(prefers-reduced-motion:reduce){html:not([data-mono]) *{transition:none!important;animation:none!important}}
+  html[data-theme=light]:not([data-mono]) .wk-btn,html[data-theme=light]:not([data-mono]) .mbtn,html[data-theme=light]:not([data-mono]) .chip,html[data-theme=light]:not([data-mono]) .aopt,html[data-theme=light]:not([data-mono]) .atpc{transition:background .12s}
+  @media(prefers-reduced-motion:reduce){html[data-theme=light]:not([data-mono]) *{transition:none!important;animation:none!important}}
 
   /* ── the phone: tighter paper ── */
   @media(max-width:480px){
-    html:not([data-mono]) .wk-pane,html:not([data-mono]) .sec{border-radius:16px;padding:16px}
-    html:not([data-mono]) .pop .card{border-radius:16px}
-    html:not([data-mono]) #wk-mine .wk-b5 b{font-size:18px}
-    html:not([data-mono]) #wk-mine .wk-b5:nth-child(1) b{font-size:20px}
+    html[data-theme=light]:not([data-mono]) .wk-pane,html[data-theme=light]:not([data-mono]) .sec{border-radius:16px;padding:16px}
+    html[data-theme=light]:not([data-mono]) .pop .card{border-radius:16px}
+    html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 b{font-size:18px}
+    html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(1) b{font-size:20px}
   }
 
   /* ── second pass: what the first screenshots showed ── */
-  html:not([data-mono]) #wk-mine .wk-bal5{flex:0 0 auto}
-  html:not([data-mono]) #wk-mine .wk-b5,html:not([data-mono]) #wk-mine .wk-b5:nth-child(n){height:52px}
-  html:not([data-mono]) #dmy thead th,html:not([data-mono]) #dpicks thead th,html:not([data-mono]) #dstrat thead th,html:not([data-mono]) #wk-mv .wk-moves th{font-size:9.5px;letter-spacing:.02em;padding:8px 4px 7px}
-  html:not([data-mono]) #dmy thead th:first-child,html:not([data-mono]) #dpicks thead th:first-child{padding-left:6px}
-  html:not([data-mono]) #dpicks tbody td,html:not([data-mono]) #dmy tbody td,html:not([data-mono]) #wk-mv .wk-moves td{font-size:11.5px;padding:0 5px}
-  html:not([data-mono]) #dpicks td.r2 b{font-size:11.5px}
-  html:not([data-mono]) #dpicks tbody td.ck,html:not([data-mono]) #dpicks thead th.ck{padding-left:4px}
-  html:not([data-mono]) #wk-plan>.wk-ph .wk-lockn{overflow:hidden;min-width:0;flex:0 1 auto;text-overflow:ellipsis}
-  @media(max-width:1600px){html:not([data-mono]) #wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-ago{display:none}}
-  html:not([data-mono]) #wk-mv .wk-ans .p.rate{display:grid;grid-template-columns:max-content max-content max-content;column-gap:5px;row-gap:4px;align-items:baseline;justify-content:start;align-content:center}
-  html:not([data-mono]) #wk-mv .wk-ans .p.rate i:first-child{grid-column:1/4}
-  html:not([data-mono]) #wk-mv .wk-ans .p.rate b{font-size:14px}
-  html:not([data-mono]) #wk-mv .wk-ans .p i{overflow:hidden;text-overflow:ellipsis;max-width:100%}
-  html:not([data-mono]) #wk-mv .wk-ans .p b{font-size:18px}
-  html:not([data-mono]) #wk-mine .wk-b5:nth-child(3) b,html:not([data-mono]) #wk-mine .wk-b5:nth-child(4) b,html:not([data-mono]) #wk-mine .wk-b5:nth-child(5) b{font-size:12px;font-family:var(--day-mono);font-weight:500}
-  html:not([data-mono]) #wk-mine .wk-b5:nth-child(1) b,html:not([data-mono]) #wk-mine .wk-b5:nth-child(2) b{font-size:20px}
-  html:not([data-mono]) #dmy thead th:first-child,html:not([data-mono]) #dpicks thead th.c{font-size:9px;letter-spacing:0;padding-left:3px;padding-right:3px}
-  html:not([data-mono]) #wk-mv .wk-moves td.ar{overflow:visible;text-overflow:clip;padding:0;color:var(--accent)}
-  html:not([data-mono]) .fnav .ftab,html:not([data-mono]) .fnav .ftab.acct{color:var(--muted)}
-  html:not([data-mono]) .fnav .ftab.on,html:not([data-mono]) .fnav .ftab:hover,html:not([data-mono]) .fnav .ftab.acct.on,html:not([data-mono]) .fnav .ftab.acct:hover{color:var(--ink)}
-  html:not([data-mono]) .fnav .ftab b,html:not([data-mono]) .fnav .ftab.acct b{color:inherit;font-family:var(--day-sans);font-size:13px;letter-spacing:.06em;font-weight:500}
-  html:not([data-mono]) .tabs .tabb{height:32px;padding:0 14px;border:1px solid var(--line-strong);border-radius:999px;font-family:var(--day-sans);font-size:12px;letter-spacing:.04em;font-weight:500;color:var(--muted);background:var(--surface);box-shadow:none;text-shadow:none}
-  html:not([data-mono]) .tabs .tabb:hover{color:var(--ink);border-color:var(--line-strong);background:#ECE8DF}
-  html:not([data-mono]) .tabs .tabb.on,html:not([data-mono]) .tabs .tabb.on[style*="2bc8bd"],html:not([data-mono]) .tabs .tabb.on[style*="2ee06a"]{color:var(--accent);background:var(--accent-tint);border-color:var(--accent);box-shadow:none}
-  html:not([data-mono]) .tabs .tabb[disabled]{opacity:.42;cursor:not-allowed}
-  html:not([data-mono]) .fig b{font-family:var(--day-display);font-weight:500;font-size:30px;letter-spacing:-.01em;color:var(--ink);text-shadow:none}
-  html:not([data-mono]) .fig b.ok{color:var(--accent)}html:not([data-mono]) .fig b.warn{color:var(--danger)}
-  html:not([data-mono]) .fig i,html:not([data-mono]) .fig i span{font-family:var(--day-sans);font-size:13px;letter-spacing:.05em;text-transform:uppercase;font-weight:500;color:var(--muted)}
-  html:not([data-mono]) .fig small,html:not([data-mono]) .fig .sub{font-family:var(--day-sans);font-size:12px;color:var(--muted)}
-  html:not([data-mono]) .note,html:not([data-mono]) .pane .note{font-family:var(--day-sans);font-size:13px;line-height:1.5;color:var(--muted);letter-spacing:0}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bal5{flex:0 0 auto}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5,html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(n){height:52px}
+  html[data-theme=light]:not([data-mono]) #dmy thead th,html[data-theme=light]:not([data-mono]) #dpicks thead th,html[data-theme=light]:not([data-mono]) #dstrat thead th,html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves th{font-size:9.5px;letter-spacing:.02em;padding:8px 4px 7px}
+  html[data-theme=light]:not([data-mono]) #dmy thead th:first-child,html[data-theme=light]:not([data-mono]) #dpicks thead th:first-child{padding-left:6px}
+  html[data-theme=light]:not([data-mono]) #dpicks tbody td,html[data-theme=light]:not([data-mono]) #dmy tbody td,html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td{font-size:11.5px;padding:0 5px}
+  html[data-theme=light]:not([data-mono]) #dpicks td.r2 b{font-size:11.5px}
+  html[data-theme=light]:not([data-mono]) #dpicks tbody td.ck,html[data-theme=light]:not([data-mono]) #dpicks thead th.ck{padding-left:4px}
+  html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-lockn{overflow:hidden;min-width:0;flex:0 1 auto;text-overflow:ellipsis}
+  @media(max-width:1600px){html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-ago{display:none}}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.rate{display:grid;grid-template-columns:max-content max-content max-content;column-gap:5px;row-gap:4px;align-items:baseline;justify-content:start;align-content:center}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.rate i:first-child{grid-column:1/4}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.rate b{font-size:14px}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p i{overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p b{font-size:18px}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(3) b,html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(4) b,html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(5) b{font-size:12px;font-family:var(--day-mono);font-weight:500}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(1) b,html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(2) b{font-size:20px}
+  html[data-theme=light]:not([data-mono]) #dmy thead th:first-child,html[data-theme=light]:not([data-mono]) #dpicks thead th.c{font-size:9px;letter-spacing:0;padding-left:3px;padding-right:3px}
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td.ar{overflow:visible;text-overflow:clip;padding:0;color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .fnav .ftab,html[data-theme=light]:not([data-mono]) .fnav .ftab.acct{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .fnav .ftab.on,html[data-theme=light]:not([data-mono]) .fnav .ftab:hover,html[data-theme=light]:not([data-mono]) .fnav .ftab.acct.on,html[data-theme=light]:not([data-mono]) .fnav .ftab.acct:hover{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .fnav .ftab b,html[data-theme=light]:not([data-mono]) .fnav .ftab.acct b{color:inherit;font-family:var(--day-sans);font-size:13px;letter-spacing:.06em;font-weight:500}
+  html[data-theme=light]:not([data-mono]) .tabs .tabb{height:32px;padding:0 14px;border:1px solid var(--line-strong);border-radius:999px;font-family:var(--day-sans);font-size:12px;letter-spacing:.04em;font-weight:500;color:var(--muted);background:var(--surface);box-shadow:none;text-shadow:none}
+  html[data-theme=light]:not([data-mono]) .tabs .tabb:hover{color:var(--ink);border-color:var(--line-strong);background:#ECE8DF}
+  html[data-theme=light]:not([data-mono]) .tabs .tabb.on,html[data-theme=light]:not([data-mono]) .tabs .tabb.on[style*="2bc8bd"],html[data-theme=light]:not([data-mono]) .tabs .tabb.on[style*="2ee06a"]{color:var(--accent);background:var(--accent-tint);border-color:var(--accent);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .tabs .tabb[disabled]{opacity:.42;cursor:not-allowed}
+  html[data-theme=light]:not([data-mono]) .fig b{font-family:var(--day-display);font-weight:500;font-size:30px;letter-spacing:-.01em;color:var(--ink);text-shadow:none}
+  html[data-theme=light]:not([data-mono]) .fig b.ok{color:var(--accent)}html[data-theme=light]:not([data-mono]) .fig b.warn{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .fig i,html[data-theme=light]:not([data-mono]) .fig i span{font-family:var(--day-sans);font-size:13px;letter-spacing:.05em;text-transform:uppercase;font-weight:500;color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .fig small,html[data-theme=light]:not([data-mono]) .fig .sub{font-family:var(--day-sans);font-size:12px;color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .note,html[data-theme=light]:not([data-mono]) .pane .note{font-family:var(--day-sans);font-size:13px;line-height:1.5;color:var(--muted);letter-spacing:0}
 
   /* ── contrast: the small tertiary text reads at 4.5:1 or better (muted, not faint) ── */
-  html:not([data-mono]) .wk-tbl2 td.rk,html:not([data-mono]) .wk-tbl2 td.c.rk,html:not([data-mono]) #dpicks td.r2 s,html:not([data-mono]) #dpicks td.r2 em,
-  html:not([data-mono]) .wk-pn,html:not([data-mono]) #wk-mine .wk-t1 .wk-pn,html:not([data-mono]) #wk-mv .wk-t3 .wk-pn,html:not([data-mono]) #wk-mv .wk-ans .p .arr,
-  html:not([data-mono]) #wk-mv .wk-ans .p b.dim,html:not([data-mono]) .tapnote,html:not([data-mono]) .brand .wm,html:not([data-mono]) .brand i,html:not([data-mono]) .brand small,
-  html:not([data-mono]) .wk-txh span,html:not([data-mono]) .txsum,html:not([data-mono]) .cbs,html:not([data-mono]) .vsubn,html:not([data-mono]) #wk-mine .wk-gatecard .wk-chain{color:var(--muted)}
-  html:not([data-mono]) .wk-lgx,html:not([data-mono]) .tlgx,html:not([data-mono]) #dpicks td.nm .nmw>span.wk-lgx,html:not([data-mono]) #wk-mv .wk-moves td.nm .nmw>span.wk-lgx{color:#fff}
-  html:not([data-mono]) .atcard .atpc i{font-size:12px}
-  html:not([data-mono]) .bheight,html:not([data-mono]) .bheight b,html:not([data-mono]) .aplab,html:not([data-mono]) .apmid{color:var(--muted);font-family:var(--day-mono)}
-  html:not([data-mono]) .bheight i{background:var(--accent);box-shadow:none}
-  html:not([data-mono]) .sub,html:not([data-mono]) .rkc,html:not([data-mono]) .wk-max,html:not([data-mono]) .atcard .wk-max,html:not([data-mono]) .pk .rk,html:not([data-mono]) .ptab td.rk{color:var(--muted)}
-  html:not([data-mono]) .ptab .rkc,html:not([data-mono]) .pingttl,html:not([data-mono]) .unhint,html:not([data-mono]) #sthint,html:not([data-mono]) #unhint,html:not([data-mono]) #athint{color:var(--muted)}
-  html:not([data-mono]) .wk-lg.wk-lgx,html:not([data-mono]) span.wk-lg{color:#fff}
-  html:not([data-mono]) .wk-tbl2 td.nm span.wk-lgx,html:not([data-mono]) .wk-tbl2 td.nm span.wk-lg{color:#fff;font-family:var(--day-mono);font-weight:500}
-  html:not([data-mono]) .wk-lgx,html:not([data-mono]) .tlgx{color:#fff!important}
+  html[data-theme=light]:not([data-mono]) .wk-tbl2 td.rk,html[data-theme=light]:not([data-mono]) .wk-tbl2 td.c.rk,html[data-theme=light]:not([data-mono]) #dpicks td.r2 s,html[data-theme=light]:not([data-mono]) #dpicks td.r2 em,
+  html[data-theme=light]:not([data-mono]) .wk-pn,html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-pn,html[data-theme=light]:not([data-mono]) #wk-mv .wk-t3 .wk-pn,html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p .arr,
+  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p b.dim,html[data-theme=light]:not([data-mono]) .tapnote,html[data-theme=light]:not([data-mono]) .brand .wm,html[data-theme=light]:not([data-mono]) .brand i,html[data-theme=light]:not([data-mono]) .brand small,
+  html[data-theme=light]:not([data-mono]) .wk-txh span,html[data-theme=light]:not([data-mono]) .txsum,html[data-theme=light]:not([data-mono]) .cbs,html[data-theme=light]:not([data-mono]) .vsubn,html[data-theme=light]:not([data-mono]) #wk-mine .wk-gatecard .wk-chain{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .wk-lgx,html[data-theme=light]:not([data-mono]) .tlgx,html[data-theme=light]:not([data-mono]) #dpicks td.nm .nmw>span.wk-lgx,html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td.nm .nmw>span.wk-lgx{color:#fff}
+  html[data-theme=light]:not([data-mono]) .atcard .atpc i{font-size:12px}
+  html[data-theme=light]:not([data-mono]) .bheight,html[data-theme=light]:not([data-mono]) .bheight b,html[data-theme=light]:not([data-mono]) .aplab,html[data-theme=light]:not([data-mono]) .apmid{color:var(--muted);font-family:var(--day-mono)}
+  html[data-theme=light]:not([data-mono]) .bheight i{background:var(--accent);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sub,html[data-theme=light]:not([data-mono]) .rkc,html[data-theme=light]:not([data-mono]) .wk-max,html[data-theme=light]:not([data-mono]) .atcard .wk-max,html[data-theme=light]:not([data-mono]) .pk .rk,html[data-theme=light]:not([data-mono]) .ptab td.rk{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .ptab .rkc,html[data-theme=light]:not([data-mono]) .pingttl,html[data-theme=light]:not([data-mono]) .unhint,html[data-theme=light]:not([data-mono]) #sthint,html[data-theme=light]:not([data-mono]) #unhint,html[data-theme=light]:not([data-mono]) #athint{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .wk-lg.wk-lgx,html[data-theme=light]:not([data-mono]) span.wk-lg{color:#fff}
+  html[data-theme=light]:not([data-mono]) .wk-tbl2 td.nm span.wk-lgx,html[data-theme=light]:not([data-mono]) .wk-tbl2 td.nm span.wk-lg{color:#fff;font-family:var(--day-mono);font-weight:500}
+  html[data-theme=light]:not([data-mono]) .wk-lgx,html[data-theme=light]:not([data-mono]) .tlgx{color:#fff!important}
 
   /* ── the phone bar ── */
   @media(max-width:620px){
-    html:not([data-mono]) .folder{height:56px;padding:0 12px}
-    html:not([data-mono]) .fnav,html:not([data-mono]) .ftab{height:56px}
-    html:not([data-mono]) .fnav .ftab{height:32px;padding:0 8px;margin-right:2px}
-    html:not([data-mono]) .fnav .ftab b,html:not([data-mono]) .fnav .ftab.acct b{font-size:11px;letter-spacing:.04em}
-    html:not([data-mono]) .fnav .ftab.acct{margin-left:6px}
-    html:not([data-mono]) .fsoon{font-size:8px;padding:1px 5px;top:2px}
-    html:not([data-mono]) .brand{margin-right:10px}
+    html[data-theme=light]:not([data-mono]) .folder{height:56px;padding:0 12px}
+    html[data-theme=light]:not([data-mono]) .fnav,html[data-theme=light]:not([data-mono]) .ftab{height:56px}
+    html[data-theme=light]:not([data-mono]) .fnav .ftab{height:32px;padding:0 8px;margin-right:2px}
+    html[data-theme=light]:not([data-mono]) .fnav .ftab b,html[data-theme=light]:not([data-mono]) .fnav .ftab.acct b{font-size:11px;letter-spacing:.04em}
+    html[data-theme=light]:not([data-mono]) .fnav .ftab.acct{margin-left:6px}
+    html[data-theme=light]:not([data-mono]) .fsoon{font-size:8px;padding:1px 5px;top:2px}
+    html[data-theme=light]:not([data-mono]) .brand{margin-right:10px}
   }
-  html:not([data-mono]) #stmax,html:not([data-mono]) #unmax,html:not([data-mono]) #atmax,html:not([data-mono]) #amtmax{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) #stmax,html[data-theme=light]:not([data-mono]) #unmax,html[data-theme=light]:not([data-mono]) #atmax,html[data-theme=light]:not([data-mono]) #amtmax{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .atcard .atuntil{font-family:var(--day-sans);font-size:12px;letter-spacing:0;text-transform:none;color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .atcard .atuntil b{font-family:var(--day-mono);color:var(--ink);font-weight:500;font-size:13px}
+  html[data-theme=light]:not([data-mono]) .atcard .atsw .atswt i{font-size:13px;color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .atcard .atpc em{font-size:11px;white-space:nowrap}
+  html[data-theme=light]:not([data-mono]) .thbtn{border-color:var(--line-strong);background:var(--surface);color:var(--muted);border-radius:10px}
+  html[data-theme=light]:not([data-mono]) .thbtn:hover{color:var(--ink);background:#ECE8DF;border-color:var(--line-strong)}
