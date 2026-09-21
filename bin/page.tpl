@@ -3858,9 +3858,11 @@ box-shadow:0 0 0 1px rgba(255,77,31,.25),0 14px 30px -12px rgba(255,77,31,.85),i
 #wk-mine #wk-acct .wk-disc:hover .wk-dword,#wk-mine #wk-acct .wk-disc:hover svg.wk-out{color:#2a0d05}
 #p-dele #wk-mine #wk-acct .wk-disc svg.wk-out{color:#2a0d05;width:13px;height:13px}
 #wk-mine #wk-acct .wk-disc .wk-mark{border-right-color:rgba(42,13,5,.35)}
-/* the stake column: the validator's own figure, and what the plan adds beside it */
+/* the stake column is the validator's own figure; what the plan adds is a tag at the right
+   end of the name cell, against that column - its left edge moves with its size, nothing else does */
 #dpicks td.stk{white-space:nowrap;font-variant-numeric:tabular-nums}
-#dpicks td.stk .add{display:inline-block;margin-left:5px;padding:1px 4px;border-radius:3px;border:1px solid rgba(46,224,106,.3);background:rgba(46,224,106,.06);font-family:var(--wmono);font-size:9.5px;letter-spacing:.02em;color:#fff8dc;font-style:normal;vertical-align:1px}
+#dpicks td.nm .gtag.add{margin-left:auto;flex:0 0 auto;overflow:visible;padding:0;border:0;background:transparent;color:var(--wgreen);font-size:10.5px;letter-spacing:.02em}
+#dpicks td.nm .nmw:has(.gtag.add)>span:not(.wk-lgx){flex:0 1 auto;margin-right:10px}
 </style></head><body>
 <svg width=0 height=0 style="position:absolute" aria-hidden=true><defs>
   <symbol id=g-eta viewBox="0 0 20 20"><path d="M6.6 4.6V14.6M6.6 8.2C7.6 5.8 13.4 5.4 13.4 9.4V15.6" fill=none stroke=currentColor stroke-width=2.2 stroke-linecap=round stroke-linejoin=round/></symbol>
