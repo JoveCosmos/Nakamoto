@@ -2662,7 +2662,7 @@ rememberGridH();
         if(acct) acct.hidden = false;
         /* the name whole, and an eight-letter form with two dots for a phone */
         if(window.__atDoor) setTimeout(window.__atDoor, 0);
-        var wn = E("wname"); if(wn){ var nm0 = String(window.__WALLET.label || ""), sh = nm0.length > 8 ? nm0.slice(0, 8) + ".." : nm0;
+        var wn = E("wname"); if(wn){ var nm0 = String(window.__WALLET.label || ""), sh = nm0.length > 8 && nm0 !== "My wallet" ? nm0.slice(0, 8) + ".." : nm0;
           wn.innerHTML = '<span class=nf>' + att(nm0) + '</span><span class=ns>' + att(sh) + '</span>'; wn.title = nm0; }
         var wm = E("wmark"); if(wm){ wm.querySelector("img").src = "assets/wallet-" + w.name.toLowerCase() + ".svg"; wm.hidden = false; }
 
