@@ -3870,7 +3870,7 @@ box-shadow:0 10px 24px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);
 /* the count beside a title: its baseline on the title's, not its box centred on the box */
 #wk-mine .wk-t1 .wk-pn,#wk-mv .wk-t3 .wk-pn{position:relative;top:1px;line-height:1}
 /* the two doors read as buttons: filled, lifted on hover, pressed on tap */
-#wk-mine .wk-t1 .wk-unb{cursor:pointer;border-radius:5px;font-weight:700;letter-spacing:.2em;box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:filter .12s,transform .12s,box-shadow .12s}
+#wk-mine .wk-t1 .wk-unb{cursor:pointer;border-radius:5px;height:22px;padding:0 11px;font-family:var(--wsans);font-size:11px;font-weight:600;letter-spacing:.01em;text-transform:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:filter .12s,transform .12s,box-shadow .12s}
 #wk-mine .wk-t1 .wk-unb.wk-stb{color:#03120a;border-color:#3cf07a;background:linear-gradient(180deg,#46f585,#22c65e)}
 #wk-mine .wk-t1 .wk-unb:not(.wk-stb){color:#1a1000;border-color:#ffc453;background:linear-gradient(180deg,#ffc453,#f0a020)}
 #wk-mine .wk-t1 .wk-unb:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 14px -8px rgba(0,0,0,.9)}
