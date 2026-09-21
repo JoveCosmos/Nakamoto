@@ -1835,7 +1835,7 @@ rememberGridH();
       /* what this plan adds sits at the right end of the name cell, against the stake
          column: it grows leftwards into the name's spare room, and no column moves */
       h += '<tr class="' + (on ? 'on' : '') + (pos && !o.better ? ' lt' : '') + '"><td class=ck>' + (pos ? '<input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + '>' : '') + '</td>' +
-           '<td class="c rk">' + o.rank + '</td><td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span>' +
+           '<td class="c rk">' + o.rank + '</td><td class="l nm" data-v="' + att(o.id) + '" tabindex=0 title="Open this validator"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span>' +
            (mv != null ? '<em class="gtag add" title="what this plan adds">+' + fmt(mv) + '</em>' : '') + '</div></td>' +
            '<td class="stk" title="' + big(o.t) + ' ATONE, ' + vp.toFixed(vp < 1 ? 2 : 1) + '% of all stake; ' + (o.t < MEAN ? 'below the average size: the bonus pays here' : 'above the average size') + '">' + big(o.t) + '</td>' +
            (wide ? '<td class="' + (lu == null ? 'dim' : lu >= 99.9 ? 'ok' : lu >= 99 ? 'warn' : 'bad') + '">' + (lu == null ? '\u2014' : lu.toFixed(2) + '%') + '</td>' : '') +
@@ -1984,12 +1984,14 @@ rememberGridH();
   var go0 = E("dgo"); if(go0) go0.addEventListener("click", function(){ if(window.__goSign) window.__goSign(); });
   var dmy = E("dmy");
   function rowCard(ev){
-    var tr = ev.target.closest ? ev.target.closest("tr[data-v]") : null;
+    var tr = ev.target.closest ? ev.target.closest("[data-v]") : null;
     if(!tr || !window.__vshow) return;
     if(ev.type === "keydown" && ev.key !== "Enter" && ev.key !== " ") return;
     ev.preventDefault(); window.__vshow(tr.getAttribute("data-v"));
   }
   if(dmy){ dmy.addEventListener("click", rowCard); dmy.addEventListener("keydown", rowCard); }
+  /* the Redelegate list too: its name cells open the card, its boxes keep the tick */
+  var dpk = E("dpicks"); if(dpk){ dpk.addEventListener("click", rowCard); dpk.addEventListener("keydown", rowCard); }
   /* max is what can actually move; with nothing free (all in cooldown) or no wallet it does nothing */
   var mx = E("amtmax"); if(mx) mx.addEventListener("click", function(){ var pos = window.__POS; if(!pos || !(pos.free > 0)) return; amt.value = exact(pos.free); window.__driftReset(); draw(); });
   /* amount presets: a share of what can move */

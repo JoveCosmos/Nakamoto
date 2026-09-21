@@ -3863,6 +3863,10 @@ box-shadow:0 10px 24px -14px rgba(156,36,51,.9),inset 0 1px 0 rgba(255,255,255,.
 #dpicks td.stk{white-space:nowrap;font-variant-numeric:tabular-nums;color:#fff8dc}
 #dpicks td.nm .gtag.add{margin-left:auto;flex:0 0 auto;overflow:visible;padding:0;border:0;background:transparent;color:var(--wgreen);font-size:10.5px;letter-spacing:.02em}
 #dpicks td.nm .nmw:has(.gtag.add)>span:not(.wk-lgx){flex:0 1 auto;margin-right:10px}
+/* a validator's name in the Redelegate list is a door to its card, like a delegation row */
+#dpicks td.nm[data-v]{cursor:pointer}
+#dpicks td.nm[data-v]:hover .nmw>span:not(.wk-lgx){color:#fff;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--wf)}
+#dpicks td.nm[data-v]:focus-visible{outline:2px solid var(--wgreen);outline-offset:-2px;border-radius:4px}
 </style></head><body>
 <svg width=0 height=0 style="position:absolute" aria-hidden=true><defs>
   <symbol id=g-eta viewBox="0 0 20 20"><path d="M6.6 4.6V14.6M6.6 8.2C7.6 5.8 13.4 5.4 13.4 9.4V15.6" fill=none stroke=currentColor stroke-width=2.2 stroke-linecap=round stroke-linejoin=round/></symbol>
