@@ -3878,6 +3878,12 @@ box-shadow:0 10px 24px -14px rgba(156,36,51,.9),inset 0 1px 0 rgba(255,255,255,.
 #wk-mine .wk-t1 .wk-unb:not(.wk-stb):hover{border-color:#ffc453;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 14px -6px rgba(255,176,46,.7)}
 #wk-mine .wk-t1 .wk-unb:active{transform:translateY(0) scale(.97);filter:brightness(.98)}
 #wk-mine .wk-t1 .wk-unb:focus-visible{outline:2px solid #fff;outline-offset:2px}
+/* the five tiles, tighter: less empty room, a label one can read, a mark one can see */
+#wk-mine .wk-b5{height:46px;padding:0 6px;gap:3px;justify-content:center}
+#wk-mine .wk-b5 i{font-size:9px;letter-spacing:.1em;color:#c1bfdc;gap:5px}
+#wk-mine .wk-b5 i img{width:15px;height:15px}
+#wk-mine .wk-b5 b{font-size:13.5px;letter-spacing:-.02em}
+@media(max-width:700px){#wk-mine .wk-b5{height:44px}#wk-mine .wk-b5 b{font-size:12px}#wk-mine .wk-b5 i{font-size:8.5px}#wk-mine .wk-b5 i img{width:13px;height:13px}}
 </style></head><body>
 <svg width=0 height=0 style="position:absolute" aria-hidden=true><defs>
   <symbol id=g-eta viewBox="0 0 20 20"><path d="M6.6 4.6V14.6M6.6 8.2C7.6 5.8 13.4 5.4 13.4 9.4V15.6" fill=none stroke=currentColor stroke-width=2.2 stroke-linecap=round stroke-linejoin=round/></symbol>
