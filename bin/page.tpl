@@ -3981,6 +3981,7 @@ html[data-theme=light] .thbtn .moon{display:block}
 .fnav .ind,.ftab.acct.on::after{display:none}
 .fnav .fsoon{top:-1px;transform:translate(-50%,-50%);background:var(--void);padding:0 4px}
 @media(max-width:620px){.fnav .ftab,.fnav .ftab.acct{height:32px;padding:0 10px}.fnav .ftab+.ftab{margin-left:6px}.fnav .ftab.acct{padding:0 10px}}
+.atcard .txsum .atclosed{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:5px;border:1px solid rgba(255,176,46,.4);background:rgba(255,176,46,.08);font-family:var(--wmono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--wamber);white-space:nowrap}
 </style>
 <link rel=stylesheet href="assets/theme-day.css">
 </head><body>

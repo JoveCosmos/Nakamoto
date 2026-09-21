@@ -2348,9 +2348,10 @@ rememberGridH();
     var un = E("atuntil"); if(un) un.innerHTML = "until <b>" + window.__dayFull(Date.now() + AT.days * 86400000) + "</b>";
     var sel = Object.keys(SEL).length; if(n2) n2.textContent = sel ? sel + " selected" : "none selected yet";
     var ok = !!AT.addr && scope.length > 0 && cap > 0 && !!window.__WALLET && !!window.__WALLET.signDirect;
-    if(hint){ hint.className = "unhint" + (!AT.addr ? " bad" : ""); hint.textContent = !AT.addr ? "Autopilot is not open yet" : (!window.__WALLET || !window.__WALLET.signDirect ? "Needs Keplr (direct signing)" : (!scope.length ? (atPick() === "selected" ? "select validators in the Redelegate list first" : "no validators fit that strategy today") : "ATONE the keeper may move in total, for the time")); }
+    if(hint){ hint.className = "unhint"; hint.textContent = (!window.__WALLET || !window.__WALLET.signDirect ? "Needs Keplr (direct signing)" : (!scope.length ? (atPick() === "selected" ? "select validators in the Redelegate list first" : "no validators fit that strategy today") : "ATONE the keeper may move in total, for the time")); }
     if(go) go.disabled = !ok;
-    if(sm) sm.innerHTML = ok ? fmt(cap) + " ATONE<br>" + (AT_WORD[atPreset()] || "moderate") + ", " + (atPick() === "selected" ? "my selection, " : "") + scope.length + " validators, " + atMonths() + (atRestake() ? ", restake" : "") : "";
+    /* the header's right side: the plan in a line once it can be granted; until the keeper is open, that word */
+    if(sm) sm.innerHTML = !AT.addr ? '<span class=atclosed>Autopilot is not open yet</span>' : ok ? fmt(cap) + " ATONE<br>" + (AT_WORD[atPreset()] || "moderate") + ", " + (atPick() === "selected" ? "my selection, " : "") + scope.length + " validators, " + atMonths() + (atRestake() ? ", restake" : "") : "";
     var fee = atFee();
     if(feeEl){ feeEl.hidden = !(fee > 0); if(fee > 0) feeEl.innerHTML = "Service fee <b>" + fmt(fee) + " ATONE</b> - " + AT.fee_pct + "% of the projected gain for " + atMonths() + ", paid with the grant in the same signature."; }
     E("attxfee").textContent = ""; var st = E("atstep"); st.textContent = ""; st.className = "txstep";

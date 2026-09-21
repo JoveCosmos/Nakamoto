@@ -392,3 +392,4 @@
   html[data-theme=light]:not([data-mono]) .fnav .ftab.on,html[data-theme=light]:not([data-mono]) .fnav .ftab.acct.on{border-color:var(--accent);background:var(--accent-tint);color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .fnav .ftab[disabled]{opacity:.55;background:transparent}
   html[data-theme=light]:not([data-mono]) .fnav .fsoon{background:var(--bg)}
+  html[data-theme=light]:not([data-mono]) .atcard .txsum .atclosed{background:var(--warn-bg);border:0;color:var(--warn-ink);font-family:var(--day-sans);font-size:12px;letter-spacing:0;text-transform:none;border-radius:999px;height:26px;padding:0 11px}

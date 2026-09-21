@@ -794,6 +794,7 @@
   html[data-theme=light]:not([data-mono]) .thbtn svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .fnav .ftab,html[data-theme=light]:not([data-mono]) .fnav .ftab.acct{background:transparent}
   html[data-theme=light]:not([data-mono]) .fnav .ftab.on,html[data-theme=light]:not([data-mono]) .fnav .ftab.acct.on{background:color-mix(in srgb,var(--acc,var(--amber-bar)) 9%,transparent)}
+  html[data-theme=light]:not([data-mono]) .atcard .txsum .atclosed{border:1px solid var(--amber-bar);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]){--void:var(--bg);--edge:var(--line);--edge2:var(--line-strong);--ink2:var(--muted);--ink3:var(--faint);--hot:var(--warn);--burn:var(--danger);--cold:var(--accent);--lit:var(--ink);--card:var(--surface);--card2:var(--surface-2);--inset:var(--surface-sunk);--blue:var(--accent);--cyan:var(--accent);--green:var(--accent);--amber:var(--warn);--cv:var(--bg);--ce:var(--line);--ce2:var(--line-strong);--ci:var(--ink);--ci2:var(--muted);--ci3:var(--faint);--cf:var(--faint);--ch:var(--warn);--cb:var(--danger);--cc:var(--accent);--cl:var(--ink);--mono:var(--day-mono);--sans:var(--day-sans)}
   html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-dele *,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) .pop,html[data-theme=light]:not([data-mono]) .pop *{--wc:var(--surface);--wh:var(--surface-2);--wbd:var(--line);--wbd2:var(--line-strong);--wi:var(--surface-sunk);--wchip:var(--surface-2);--wt:var(--ink);--ws:var(--muted);--wf:var(--faint);--wblue:var(--accent);--wcyan:var(--accent);--wgreen:var(--accent);--wamber:var(--warn);--wburn:var(--danger);--wgold:var(--warn);--wsans:var(--day-sans);--wmono:var(--day-mono)}
   /* ── the hand layer: the day spec's typography, shape, spacing and components ── */
@@ -1191,4 +1192,5 @@
   html[data-theme=light]:not([data-mono]) .fnav .ftab.on,html[data-theme=light]:not([data-mono]) .fnav .ftab.acct.on{border-color:var(--accent);background:var(--accent-tint);color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .fnav .ftab[disabled]{opacity:.55;background:transparent}
   html[data-theme=light]:not([data-mono]) .fnav .fsoon{background:var(--bg)}
+  html[data-theme=light]:not([data-mono]) .atcard .txsum .atclosed{background:var(--warn-bg);border:0;color:var(--warn-ink);font-family:var(--day-sans);font-size:12px;letter-spacing:0;text-transform:none;border-radius:999px;height:26px;padding:0 11px}
 
