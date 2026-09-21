@@ -3969,6 +3969,18 @@ box-shadow:0 10px 24px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);
 html[data-theme=light] .thbtn .sun{display:none}
 html[data-theme=light] .thbtn .moon{display:block}
 @media(max-width:620px){.thbtn{width:32px;height:32px;margin-left:auto}}
+/* ── the three words in the bar as boxes: a hairline box a little wider than the word, the open
+   one in its own colour, Governance boxed too but dim while it is closed; the keyboard ring
+   sits outside the box ── */
+.fnav .ftab,.fnav .ftab.acct{height:36px;align-self:center;padding:0 14px;border:1px solid var(--edge2);border-radius:9px;background:transparent;transition:color .15s,border-color .15s,background .15s}
+.fnav .ftab+.ftab{margin-left:10px}
+.fnav .ftab:hover:not([disabled]){border-color:var(--ink3)}
+.fnav .ftab.on,.fnav .ftab.acct.on{border-color:var(--acc,var(--hot));background:color-mix(in srgb,var(--acc,#ffb02e) 9%,transparent)}
+.fnav .ftab[disabled]{opacity:.55;cursor:default}
+.fnav .ftab:focus-visible{outline:2px solid var(--acc,var(--hot));outline-offset:2px;border-radius:9px}
+.fnav .ind,.ftab.acct.on::after{display:none}
+.fnav .fsoon{top:-1px;transform:translate(-50%,-50%);background:var(--void);padding:0 4px}
+@media(max-width:620px){.fnav .ftab,.fnav .ftab.acct{height:32px;padding:0 10px}.fnav .ftab+.ftab{margin-left:6px}.fnav .ftab.acct{padding:0 10px}}
 </style>
 <link rel=stylesheet href="assets/theme-day.css">
 </head><body>

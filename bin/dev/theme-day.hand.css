@@ -388,3 +388,7 @@
   html[data-theme=light]:not([data-mono]) .atcard .atpc em{font-size:11px;white-space:nowrap}
   html[data-theme=light]:not([data-mono]) .thbtn{border-color:var(--line-strong);background:var(--surface);color:var(--muted);border-radius:10px}
   html[data-theme=light]:not([data-mono]) .thbtn:hover{color:var(--ink);background:#ECE8DF;border-color:var(--line-strong)}
+  html[data-theme=light]:not([data-mono]) .fnav .ftab,html[data-theme=light]:not([data-mono]) .fnav .ftab.acct{border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:0 14px}
+  html[data-theme=light]:not([data-mono]) .fnav .ftab.on,html[data-theme=light]:not([data-mono]) .fnav .ftab.acct.on{border-color:var(--accent);background:var(--accent-tint);color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .fnav .ftab[disabled]{opacity:.55;background:transparent}
+  html[data-theme=light]:not([data-mono]) .fnav .fsoon{background:var(--bg)}

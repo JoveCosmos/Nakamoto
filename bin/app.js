@@ -2371,7 +2371,7 @@ rememberGridH();
         (last ? 'Last check <b>' + window.__dayFull(last.getTime()) + '</b>' + (rp.moves && rp.moves.length ? ', <b>' + rp.moves.length + '</b> move' + (rp.moves.length === 1 ? '' : 's') + ' ' + (rp.dry ? 'planned (dry run)' : 'made') + ', <b class=g>+' + one(rp.gain || 0) + '</b> ATONE a year' : ', nothing to move') : 'The keeper has not checked this address yet') +
         (rp && rp.history && rp.history.length ? '<br>Moves made: <b>' + rp.history.length + '</b>, last ' + window.__dayFull(rp.history[0].at * 1000) : '');
       if(sm) sm.innerHTML = "on";
-    } else { st.hidden = true; form.hidden = false; rv.hidden = true; go.hidden = false; atState(); }
+    } else { st.hidden = true; form.hidden = false; rv.hidden = true; go.hidden = !AT.addr; atState(); }   /* no Grant button until the keeper is open */
   }
   var atbtn = E("atbtn");
   if(atbtn) atbtn.addEventListener("click", function(){
