@@ -3835,10 +3835,17 @@ background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba
 /* the title row must also hold the cooldown note, the clock and the refresh: below a wide
    frame the note says "locked until" and the clock steps off while the note is up */
 #wk-plan>.wk-ph .wk-lockn .w2{display:none}
+/* the note sits right after the field, on the field's side; the clock and the refresh keep
+   the far right whether the note is up or not */
+#wk-plan>.wk-ph .wk-lockn{order:0;margin-left:10px}
+#wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-ago{margin-left:auto}
+#wk-plan>.wk-ph .wk-auto{order:2}
 @media(min-width:701px) and (max-width:1559px){
   #wk-plan>.wk-ph .wk-field{width:180px}
   #wk-plan>.wk-ph .wk-lockn .w{display:none}
   #wk-plan>.wk-ph .wk-lockn .w2{display:inline}
+}
+@media(min-width:701px) and (max-width:1439px){
   #wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-ago{display:none}
 }
 @media(max-width:700px){#wk-plan>.wk-ph{flex-wrap:wrap;row-gap:6px;height:auto;max-height:none;min-height:32px}#wk-plan>.wk-ph .wk-field{order:5;flex:1 1 100%;width:auto;margin:0}}
