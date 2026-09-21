@@ -3850,9 +3850,9 @@ background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba
 }
 @media(max-width:700px){#wk-plan>.wk-ph{flex-wrap:wrap;row-gap:6px;height:auto;max-height:none;min-height:32px}#wk-plan>.wk-ph .wk-field{order:5;flex:1 1 100%;width:auto;margin:0}}
 /* ── Disconnect as a filled bar, the wallet's amber, the mirror of the green Redelegate bar ── */
-#wk-mine #wk-acct .wk-disc{height:40px;border-radius:8px;border:1px solid #3a4170;background:linear-gradient(180deg,#262c4e,#1a1f3a);
+#wk-mine #wk-acct .wk-disc{height:40px;border-radius:8px;border:1px solid #2c3258;background:linear-gradient(180deg,#181c33,#101327);
 box-shadow:0 10px 24px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);transition:filter .15s,transform .12s,box-shadow .15s,border-color .15s}
-#wk-mine #wk-acct .wk-disc:hover{border-color:#5d66a8;filter:brightness(1.12);transform:translateY(-1px);box-shadow:0 12px 26px -14px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,.1)}
+#wk-mine #wk-acct .wk-disc:hover{border-color:#4a5290;filter:brightness(1.18);transform:translateY(-1px);box-shadow:0 12px 26px -14px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,.1)}
 #wk-mine #wk-acct .wk-disc:active{transform:translateY(0) scale(.99)}
 #wk-mine #wk-acct .wk-disc .wk-dword{font-size:11px;letter-spacing:.24em;font-weight:600;color:#e6e4f0}
 #wk-mine #wk-acct .wk-disc:hover .wk-dword,#wk-mine #wk-acct .wk-disc:hover svg.wk-out{color:#fff}
@@ -3870,12 +3870,12 @@ box-shadow:0 10px 24px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);
 /* the count beside a title: its baseline on the title's, not its box centred on the box */
 #wk-mine .wk-t1 .wk-pn,#wk-mv .wk-t3 .wk-pn{position:relative;top:1px;line-height:1}
 /* the two doors read as buttons: filled, lifted on hover, pressed on tap */
-#wk-mine .wk-t1 .wk-unb{cursor:pointer;border-radius:5px;height:22px;padding:0 11px;font-family:var(--wsans);font-size:11px;font-weight:600;letter-spacing:.01em;text-transform:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:filter .12s,transform .12s,box-shadow .12s}
-#wk-mine .wk-t1 .wk-unb.wk-stb{color:#03120a;border-color:#3cf07a;background:linear-gradient(180deg,#46f585,#22c65e)}
-#wk-mine .wk-t1 .wk-unb:not(.wk-stb){color:#1a1000;border-color:#ffc453;background:linear-gradient(180deg,#ffc453,#f0a020)}
-#wk-mine .wk-t1 .wk-unb:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 14px -8px rgba(0,0,0,.9)}
-#wk-mine .wk-t1 .wk-unb.wk-stb:hover{border-color:#3cf07a;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 14px -6px rgba(46,224,106,.7)}
-#wk-mine .wk-t1 .wk-unb:not(.wk-stb):hover{border-color:#ffc453;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 6px 14px -6px rgba(255,176,46,.7)}
+#wk-mine .wk-t1 .wk-unb{cursor:pointer;border-radius:5px;height:22px;padding:0 11px;font-family:var(--wsans);font-size:11px;font-weight:600;letter-spacing:.01em;text-transform:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);transition:filter .12s,transform .12s,box-shadow .12s}
+#wk-mine .wk-t1 .wk-unb.wk-stb{color:#5cf08f;border-color:rgba(46,224,106,.55);background:linear-gradient(180deg,rgba(46,224,106,.2),rgba(46,224,106,.1))}
+#wk-mine .wk-t1 .wk-unb:not(.wk-stb){color:#ffc453;border-color:rgba(255,176,46,.55);background:linear-gradient(180deg,rgba(255,176,46,.2),rgba(255,176,46,.1))}
+#wk-mine .wk-t1 .wk-unb:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 14px -8px rgba(0,0,0,.9)}
+#wk-mine .wk-t1 .wk-unb.wk-stb:hover{color:#8ef0c8;border-color:#3cf07a;background:linear-gradient(180deg,rgba(46,224,106,.3),rgba(46,224,106,.16));box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 14px -6px rgba(46,224,106,.5)}
+#wk-mine .wk-t1 .wk-unb:not(.wk-stb):hover{color:#ffd58a;border-color:#ffc453;background:linear-gradient(180deg,rgba(255,176,46,.3),rgba(255,176,46,.16));box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 14px -6px rgba(255,176,46,.5)}
 #wk-mine .wk-t1 .wk-unb:active{transform:translateY(0) scale(.97);filter:brightness(.98)}
 #wk-mine .wk-t1 .wk-unb:focus-visible{outline:2px solid #fff;outline-offset:2px}
 /* the five tiles, tighter: less empty room, a label one can read, a mark one can see */
