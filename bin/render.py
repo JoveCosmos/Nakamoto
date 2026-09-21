@@ -1,0 +1,307 @@
+#!/usr/bin/env python3
+"""
+Render data.json into index.html. Pure function of the JSON - no network, no DB.
+Split from collect.py so a render bug can never leave stale or partial DATA up:
+collect writes data.json atomically, render writes index.html atomically.
+"""
+import html, json, os, re, sys
+
+OUT = os.environ.get("OUT_DIR", "/srv/atomone-app/web")
+D = json.load(open(os.path.join(OUT, "data.json")))
+
+e, s, th, nk = D["eta"], D["set"], D["rule"], D["nakamoto"]
+M = lambda u: u / 1e6
+f = lambda n, d=0: f"{n:,.{d}f}"
+esc = html.escape
+
+# ── the figure that decides the headline ─────────────────────────────────────
+rate_line = (f"falling {abs(nk['rate_before']):.2f} points a week before the bonus"
+             if nk["rate_before"] is not None else "trend not yet measurable")
+if nk["rate_after"] is not None:
+    after = f"<div class=r>{nk['rate_after']:+.2f}<span class=u> pts/wk</span></div>" \
+            f"<div class=l>since the bonus, {nk['n_after']} weeks</div>"
+else:
+    after = (f"<div class=r style='color:var(--ink3)'>—</div>"
+             f"<div class=l>since the bonus</div>"
+             f"<div class=d><b>Too early to fit.</b> Only {nk['n_after']} full months since "
+             f"{nk['bonus_from']}; a slope needs {nk['min_fit']}. Two points is one interval, "
+             f"not a trend. {esc(nk['partial_month'])} is excluded as partial.</div>")
+
+mv = D.get("move13")
+def _m(n): return f"{n/1e6:.2f}M" if abs(n) >= 1e6 else f(n)
+mv_top  = _m(mv["from_top"])   if mv else "—"
+mv_small= _m(mv["to_small"])   if mv else "—"
+mv_new  = _m(mv["bonded_delta"]) if mv else "—"
+mv_grew = str(mv["grew"])      if mv else "—"
+mv_wk   = str(mv["weeks"])     if mv else "—"
+
+t10 = nk.get("t10_change")
+if t10:
+    t10_line = (f"Blocks proposed by the 10 largest validators "
+                f"{'decreased' if t10['pct'] < 0 else 'increased'} by "
+                f"{abs(t10['pct']):.1f}% last {t10['days'] // 7}W")
+else:
+    t10_line = "Share of blocks proposed by the ten largest validators"
+
+# "Is it working?" is answered by the kink at the bonus line, not by two slopes
+# side by side that the reader has to divide in their head. Do the division.
+_rb, _ra = nk.get("rate_before"), nk.get("rate_after")
+if _rb and _ra and _rb < 0 and _ra < 0:
+    speedup     = f"{_ra / _rb:.1f}\u00d7"
+    speedup_k   = "faster since bonus"
+    speedup_sub = f"{_ra:+.2f} vs {_rb:+.2f} pts/wk"
+elif _ra is not None and _rb is not None and _ra < 0 <= _rb:
+    speedup     = "reversed"
+    speedup_k   = "since the bonus"
+    speedup_sub = f"was {_rb:+.2f}, now {_ra:+.2f} pts/wk"
+elif _ra is not None:
+    speedup     = f"{_ra:+.2f}"
+    speedup_k   = "pts / week"
+    speedup_sub = f"since the bonus, {nk.get('n_after', 0)} weeks"
+else:
+    speedup, speedup_k, speedup_sub = "\u2014", "since the bonus", "not enough weeks yet"
+
+es = D["eta_stats"]
+sched = "".join(
+    f"<tr class='wk {'now' if r['now'] else 'next' if r['next'] else 'past' if r['past'] else 'fut'}'"
+    f" tabindex=0 role=button data-w='{r['week']}' data-d='{esc(r['iso'])}' data-e='{r['eta']:.2f}'"
+    f" data-s='{'now' if r['now'] else 'next' if r['next'] else 'past' if r['past'] else 'projected'}'>"
+    f"<td>{r['week']}</td><td class=hdt>{esc(r['date'])}"
+    f"{'<span class=tag-n>NOW</span>' if r['now'] else '<span class=tag-x>NEXT</span>' if r['next'] else ''}"
+    f"</td><td>{r['eta']:.2f}</td><td>{r['pct']:.0f}%</td>"
+    f"<td class=hc>{f'{r[chr(99)]:.2f}&times;' if r['c'] is not None else '&mdash;'}</td>"
+    f"</tr>" for r in D["schedule"])
+
+trend_rows = "".join(
+    f"<tr><td>{esc(t['month'])}</td><td>{t['proposers']}</td><td>{t['nakamoto']}</td>"
+    f"<td>{t['top10']:.2f}%</td></tr>" for t in D["trend"])
+
+V = D["validators"]
+
+# ── who actually pays best, and who pays best with a clean record ────────────
+# Commission is the chain-wide floor for every validator in the set, so a
+# commission column would be the same number a hundred times; stake is what the
+# map is for. What is worth a column here is the record, because the top of the
+# raw APR list is not the top of the list you would delegate to.
+UP_MIN = 99.0
+def _vlogo(v):
+    vid = v.get("id") or ""
+    return (f"<img class=tlg src=\"assets/val/{esc(vid)}.jpg\" alt=\"\" loading=lazy>"
+            if v.get("av") and re.fullmatch(r"[A-Za-z0-9_.-]{1,32}", vid)
+            else "<span class='tlg tlgx'></span>")
+
+def prow(v, extra):
+    return (f"<tr class=vrow tabindex=0 role=button data-v={v['rank']-1}>"
+            f"<td class=rkc>{v['rank']}</td>"
+            f"<td class=nm>{_vlogo(v)}<span>{esc(v['m'])}</span></td>"
+            f"<td class='{'up' if v['t'] < s['mean'] else 'dn'}'>{v['net']*100:.1f}%</td>"
+            f"{extra}</tr>")
+
+by_apr = sorted(V, key=lambda v: -v["apr"])
+def _up(v):
+    return (f"{(1 - v['life_missed']/v['life_n'])*100:.2f}%"
+            if v.get("life_up") is not None and v["life_n"] else "&mdash;")
+tbl_apr = "".join(
+    prow(v, f"<td class=ok>{_up(v)}</td>"
+            f"<td class='{'warn' if v['jail'] else 'ok'}'>"
+            f"{v['jail'] if v['jail'] else 'Never'}</td>") for v in by_apr[:5])
+
+# ── the longest clean signing record we can actually prove ──────────────────
+# Ranked on the ratio, not the miss count: a validator that joined in June has a
+# shorter window and an easier record, and the ratio prices that in. A floor on
+# the window keeps a two-week-old validator off the list entirely.
+LIFE_MIN = 500_000
+def _kf(n):                                   # 10,448,436 -> 10.4M, 572,164 -> 572k
+    return (f"{n/1e6:.1f}M" if n >= 1e6 else f"{n/1e3:.0f}k" if n >= 1e3 else str(n))
+cov = D["coverage"]
+lv = [v for v in V if v.get("life_up") is not None and v["life_n"] >= LIFE_MIN]
+lv.sort(key=lambda v: (-(1 - v["life_missed"] / v["life_n"]), -v["life_n"]))
+tbl_up = "".join(
+    f"<tr class=vrow tabindex=0 role=button data-v={v['rank']-1}>"
+    f"<td class=rkc>{v['rank']}</td>"
+    f"<td class=nm>{_vlogo(v)}<span>{esc(v['m'])}</span></td>"
+    f"<td class=ok>{(1 - v['life_missed']/v['life_n'])*100:.4f}%</td>"
+    # the window itself, so a record that began five weeks ago reads as five weeks
+    f"<td title='{f(v['life_n'] - v['life_missed'])} blocks signed'>{_kf(v['life_n'] - v['life_missed'])}</td>"
+    f"<td>{f(v['life_missed'])}</td>"
+    f"<td class='{'warn' if v['jail'] else 'ok'}'>"
+    f"{v['jail'] if v['jail'] else 'Never'}</td></tr>" for v in lv[:5])
+life_win = f"{f(max((v['life_n'] for v in lv), default=0))}"
+
+# ── what each validator actually earned, per epoch, uptime included ─────────
+ev = [v for v in V if v.get("earn_avg") and v.get("earn_n", 0) >= 3]
+ev.sort(key=lambda v: -v["earn_avg"])
+tbl_earn = "".join(
+    f"<tr class=vrow tabindex=0 role=button data-v={v['rank']-1}>"
+    f"<td class=rkc>{v['rank']}</td>"
+    f"<td class=nm>{_vlogo(v)}<span>{esc(v['m'])}</span></td>"
+    f"<td class=ok>{v['earn_avg']*100:.1f}%</td>"
+    f"<td>{v['earn_hi']*100:.0f}%</td><td>{v['earn_lo']*100:.0f}%</td></tr>" for v in ev[:5])
+earn_weeks = max((v["earn_n"] for v in ev), default=0)
+
+n_clean = sum(1 for v in by_apr
+              if not v["jail"] and not v["slash"] and not v["tomb"] and v["d30"] >= UP_MIN)
+
+def knob_left(v, lo, hi):
+    t = min(1.0, max(0.0, (v - lo) / (hi - lo)))
+    return f"left:calc(12px + {t:.5f} * (100% - 24px))"
+
+KL_ETA = knob_left(e["now"] * 100, 3, 100)
+KL_C   = knob_left(th["ratio"] * 100, 100, 1600)
+KL_S   = knob_left(s["bonded_pct"], 5, 100)
+
+payload = json.dumps({"generated": D["generated"], "thresh": th["threshold"],
+                      "bot": D.get("bot"),
+                      "weekly": nk["weekly"], "schedule": D["schedule"], "eta_stats": es,
+                      "vdetail": D["validators"], "sign_window": D["sign_window"],
+                        "uptime_days": D["uptime_days"], "uptime_from": D["uptime_from"],
+                      "validators": [[v["m"], v["t"], v["c"], v["op"][-6:], v.get("jail") or 0,
+                                      round((1 - v["life_missed"]/v["life_n"]) * 100, 3)
+                                      if v.get("life_n") else None] for v in V],
+                      "trend": D["trend"], "eta": e, "set": s}, separators=(",", ":"))
+
+TPL = open(os.path.join(os.path.dirname(__file__), "page.tpl")).read()
+page = (TPL
+  .replace("{{GENERATED}}", D["generated"]).replace("{{HEIGHT}}", f(D["height"]))
+  .replace("{{CHAIN}}", esc(D["chain"]))
+  .replace("{{ETA}}", f"{e['now']:.2f}").replace("{{ETA_PCT}}", f"{e['now']*100:.0f}")
+  .replace("{{ETA_NEXT}}", f"{min(e['now']+e['step'], e['max']):.2f}")
+  .replace("{{NOW_DATE}}", next((r["date"] for r in D["schedule"] if r["now"]), "—"))
+  .replace("{{RATE_AFTER}}", f"{nk['rate_after']:+.2f}" if nk["rate_after"] is not None else "—")
+  .replace("{{N_AFTER}}", str(nk["n_after"]))
+  .replace("{{NEXT_DATE}}", next((r["date"] for r in D["schedule"] if r["next"]), "—"))
+  .replace("{{WEEK}}", str(e["week"])).replace("{{WEEKDAY}}", str(e["week_day"]))
+  .replace("{{MIN}}", f"{e['min']:.2f}").replace("{{MAX}}", f"{e['max']:.2f}")
+  .replace("{{STEP}}", f"{e['step']:.2f}")
+  .replace("{{NK}}", str(nk["proposals"])).replace("{{NK_STAKE}}", str(nk["stake"]))
+  .replace("{{RATIO}}", f"{th['ratio']:.2f}").replace("{{THRESH}}", f"{th['threshold']:.2f}")
+  .replace("{{TRIPS}}", f"{th['threshold'] - 0.01:.2f}")
+  .replace("{{TRIPS_C}}", str(int(round((th['threshold'] - 0.01) * 100))))
+  .replace("{{HIGH}}", f(M(th["high_avg"]))).replace("{{LOW}}", f(M(th["low_avg"])))
+  .replace("{{MOVE}}", f(M(th["move_to_reverse"])))
+  .replace("{{MOVE_PCT}}", f"{th['move_pct_bonded']:.1f}")
+  .replace("{{MOVE_TOP}}", f"{th['move_pct_top']:.1f}")
+  .replace("{{MOVE_EACH}}", f(M(th["move_each"])))
+  .replace("{{LOW_AFTER}}", f(M(th["low_avg_after"])))
+  .replace("{{GROUP}}", str(th["group"])).replace("{{GROUP_LO}}", str(th["group_lo"]))
+  .replace("{{MOVE_FROM}}", th["move_from"]).replace("{{MOVE_TO}}", th["move_to"])
+  .replace("{{N}}", str(s["n"])).replace("{{MEAN}}", f(M(s["mean"])))
+  .replace("{{BASE_APR}}", f"{s['base_apr']*100:.2f}")
+  .replace("{{BONDED_C}}", f"{M(s['bonded'])/1e6:.1f}M")
+  .replace("{{BONDED}}", f(M(s["bonded"]))).replace("{{BONDED_PCT}}", f"{s['bonded_pct']:.1f}")
+  .replace("{{INFL}}", f"{s['inflation']*100:.0f}")
+  .replace("{{SUPPLY}}", f(M(s["supply"]))).replace("{{TAX}}", f"{s['community_tax']*100:.0f}")
+  .replace("{{BELOW}}", str(s["below_mean"]))
+  .replace("{{REST_PCT}}", f"{100 - e['now']*100:.0f}")
+  .replace("{{DELEG}}", f(D["delegators"]["unique"]) if D.get("delegators") else "—")
+  .replace("{{MINTED}}", f(M(s["inflation"] * s["supply"])))
+  .replace("{{CTAKE}}", f(M(s["inflation"] * s["supply"] * s["community_tax"])))
+  .replace("{{MINCOMM}}", f"{s['min_commission']*100:.0f}").replace("{{CPOOL}}", f(M(s["community_pool"])))
+  # only one of these two can be true, and it is the live state, not a legend
+  .replace("{{RISE_ON}}", "hot" if th["rising"] else "")
+  .replace("{{FALL_ON}}", "" if th["rising"] else "hot")
+  .replace("{{POOL}}", f(M(s["reward_pool"])))
+  .replace("{{TOP10}}", f"{nk['top10_now']:.1f}").replace("{{TOP10_FIRST}}", f"{nk['top10_first']:.1f}")
+  .replace("{{RATE_BEFORE}}", f"{nk['rate_before']:+.2f}" if nk["rate_before"] is not None else "—")
+  .replace("{{N_BEFORE}}", str(nk["n_before"]))
+  .replace("{{AFTER_BLOCK}}", after).replace("{{RATE_LINE}}", rate_line)
+  .replace("{{FLOOR}}", f"{es['floor']:.2f}").replace("{{CAP}}", f"{es['cap']:.2f}")
+  .replace("{{HIGHEST}}", f"{es['highest']:.2f}").replace("{{HIGHEST_WK}}", str(es['highest_week']))
+  .replace("{{W2CAP}}", str(es['weeks_to_cap'])).replace("{{TODAY}}", esc(es["today"]))
+  .replace("{{START_DATE}}", esc(D["schedule"][0]["date"]) if D.get("schedule") else "\u2014")
+  .replace("{{Y2CAP}}", f"{es['weeks_to_cap']/52:.1f}")
+  .replace("{{T10LINE}}", esc(t10_line))
+  .replace("{{SPEEDUP}}", speedup).replace("{{SPEEDUP_K}}", speedup_k)
+  .replace("{{SPEEDUP_SUB}}", esc(speedup_sub))
+  .replace("{{KL_ETA}}", KL_ETA).replace("{{KL_C}}", KL_C).replace("{{KL_S}}", KL_S)
+  .replace("{{MV_TOP}}", mv_top).replace("{{MV_SMALL}}", mv_small)
+  .replace("{{MV_NEW}}", mv_new).replace("{{MV_GREW}}", mv_grew).replace("{{MV_WK}}", mv_wk).replace("{{SCHEDULE}}", sched).replace("{{TRENDROWS}}", trend_rows)
+  .replace("{{APRTABLE}}", tbl_apr)
+  .replace("{{NCLEAN}}", str(n_clean)).replace("{{UPMIN}}", f"{UP_MIN:.0f}")
+  .replace("{{PICKTABLE}}", "").replace("{{LIFEWIN}}", life_win)
+  .replace("{{UPTABLE}}", tbl_up)
+  .replace("{{EARNTABLE}}", tbl_earn).replace("{{EARNWK}}", str(earn_weeks))
+  .replace("{{COVFROM}}", "genesis" if cov["genesis"] else esc(cov["from_date"]))
+  .replace("{{DATA}}", payload.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")))
+# ^ the payload sits inside a <script> element: a moniker containing "</script>"
+#   would end the element and inject markup. JSON string escapes are transparent
+#   to JSON.parse, so the data is unchanged and the parser can never see a tag.
+
+# app.js is static but published from bin/ so /srv/atomone-app/web is entirely
+# reproducible - nothing in it is hand-edited, and a stale copy cannot linger.
+import shutil, subprocess
+# A save re-renders within a second (atomone-app-render.path), so a script that
+# does not parse must never reach web/: the last good page keeps serving instead.
+for _js in ("app.js", "boot.js", "tx.js"):
+    _chk = subprocess.run(["/usr/bin/node", "--check", os.path.join(os.path.dirname(__file__), _js)],
+                          capture_output=True, text=True)
+    if _chk.returncode != 0:
+        sys.exit("atomone-app: FATAL %s does not parse:\n%s" % (_js, _chk.stderr.strip()[-600:]))
+for _js in ("app.js", "boot.js", "tx.js"):
+    shutil.copyfile(os.path.join(os.path.dirname(__file__), _js),
+                    os.path.join(OUT, "." + _js + ".tmp"))
+    os.chmod(os.path.join(OUT, "." + _js + ".tmp"), 0o640)
+    os.replace(os.path.join(OUT, "." + _js + ".tmp"), os.path.join(OUT, _js))
+# Brand marks: AtomOne and PHOTON are the official chain-registry SVGs, GATA is the
+# same mark the snapshot pages use. Published from bin/ like everything else.
+src_a = os.path.join(os.path.dirname(__file__), "assets")
+dst_a = os.path.join(OUT, "assets")
+os.makedirs(dst_a, exist_ok=True)
+for fn in os.listdir(src_a):
+    t = os.path.join(dst_a, "." + fn + ".tmp")
+    shutil.copyfile(os.path.join(src_a, fn), t)
+    os.replace(t, os.path.join(dst_a, fn))
+# the tab icon is the GATA mark (the same file the GATA app serves); browsers and
+# bookmark tools also ask for /favicon.ico at the root, so it lives there too
+t = os.path.join(OUT, ".favicon.ico.tmp")
+shutil.copyfile(os.path.join(src_a, "favicon.ico"), t); os.replace(t, os.path.join(OUT, "favicon.ico"))
+
+# Validator avatars, cached in state/ and published as static tiles so the browser
+# never touches Keybase.
+import glob
+vdir = os.path.join(OUT, "assets", "val")
+os.makedirs(vdir, exist_ok=True)
+have = set()
+for src in glob.glob("/srv/atomone-app/state/avatars/*.jpg"):
+    fn = os.path.basename(src); have.add(fn)
+    dst = os.path.join(vdir, fn)
+    if not os.path.exists(dst) or os.path.getmtime(src) > os.path.getmtime(dst):
+        t = dst + ".tmp"; shutil.copyfile(src, t); os.replace(t, dst)
+for old_f in os.listdir(vdir):
+    if old_f not in have:
+        try: os.remove(os.path.join(vdir, old_f))
+        except OSError: pass
+
+# ── CSS sanity: a stray declaration fragment breaks the rule AFTER it ────────
+# Deleting a multi-line rule by its first line leaves its tail behind, and a
+# browser swallows the next rule recovering from it. That has bitten this page
+# twice; it should never reach the server again.
+import re as _re
+_css = "\n".join(_re.findall(r"<style[^>]*>(.*?)</style>", page, _re.S))
+_depth, _bad = 0, []
+for _n, _l in enumerate(_css.split("\n"), 1):
+    _t = _l.strip()
+    if (_depth == 0 and _t and _t.endswith("}") and "{" not in _t
+            and not _t.startswith(("/*", "*", "@", "}"))):
+        _bad.append((_n, _t[:70]))
+    _depth += _l.count("{") - _l.count("}")
+if _bad:
+    raise SystemExit("atomone-app: FATAL orphaned CSS fragment(s): "
+                     + "; ".join(f"line {n}: {t}" for n, t in _bad))
+if _depth != 0:
+    raise SystemExit(f"atomone-app: FATAL unbalanced CSS braces ({_depth:+d})")
+
+# The page and its scripts are cached for five minutes each, separately, so a
+# reader could hold yesterday's app.js against today's markup - and a script that
+# looks for an element the markup no longer has dies at bind time (the alert
+# button "did nothing" that way on 2026-09-19). Versioning the script URLs by
+# content makes a fresh page always fetch its own scripts.
+import hashlib
+for _js in ("app.js", "boot.js", "tx.js"):
+    _h = hashlib.sha256(open(os.path.join(OUT, _js), "rb").read()).hexdigest()[:10]
+    page = page.replace(f'src="{_js}"', f'src="{_js}?v={_h}"')
+tmp = os.path.join(OUT, ".index.html.tmp")
+open(tmp, "w").write(page)
+os.chmod(tmp, 0o640)                     # the published mode, whatever umask the caller had
+os.replace(tmp, os.path.join(OUT, "index.html"))
+print(f"atomone-app: rendered {len(page):,} bytes")

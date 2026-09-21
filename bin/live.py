@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+"""
+Publish the live stake vector, every few seconds, as a static file.
+
+WHY THIS EXISTS. Every delegation changes a validator's stake, which changes its
+rank AND its APR - and under the Nakamoto Bonus it changes everyone else's too,
+because the bonus is a share of one pool. With many people delegating at once the
+answer to "where should this go" is genuinely moving, so a page rebuilt every 15
+minutes cannot be trusted to answer it.
+
+WHY IT IS STILL A STATIC FILE. Everything the page draws is a pure function of a
+small vector: each validator's stake, the bonded total, the validator count, the
+coefficient and the reward pool. The browser already computes ranks, APRs,
+concentration and the map from exactly those inputs. So the fast path does not
+need a server - it needs this vector kept fresh. Fetching it costs ~0.11s and it
+gzips to 1.4KB, against a 5.8s block time.
+
+This process holds NO database credential and talks only to our own node.
+"""
+import json, os, sys, time, urllib.parse, urllib.request
+
+RPC = os.environ["ATOMONE_RPC"]
+API = os.environ["ATOMONE_API"]
+OUT = os.environ.get("OUT_DIR", "/srv/atomone-app/web")
+EVERY = float(os.environ.get("LIVE_SECONDS", "6"))      # one block
+CHAIN = os.environ.get("CHAIN_ID", "atomone-1")
+DST = os.path.join(OUT, "live.json")
+
+
+def get(url, timeout=12):
+    with urllib.request.urlopen(url, timeout=timeout) as r:
+        return json.loads(r.read())
+
+
+def snapshot():
+    st = get(f"{RPC}/status")["result"]
+    if st["node_info"]["network"] != CHAIN:
+        raise RuntimeError(f"node serves {st['node_info']['network']}")
+    if st["sync_info"]["catching_up"]:
+        raise RuntimeError("node catching up")
+    vs, key = [], ""
+    while True:
+        u = (f"{API}/cosmos/staking/v1beta1/validators"
+             f"?status=BOND_STATUS_BONDED&pagination.limit=200")
+        if key:
+            u += "&pagination.key=" + urllib.parse.quote(key)
+        d = get(u)
+        vs += d["validators"]
+        key = d["pagination"].get("next_key")
+        if not key:
+            break
+    v = {x["operator_address"][-6:]: int(x["tokens"])
+         for x in vs if not x.get("jailed")}
+    if len(v) < 3:
+        raise RuntimeError(f"only {len(v)} bonded validators")
+    tax = float(get(f"{API}/cosmos/distribution/v1beta1/params")["params"]["community_tax"])
+    prov = float(get(f"{API}/cosmos/mint/v1beta1/annual_provisions")["annual_provisions"])
+    eta = float(get(f"{API}/cosmos/distribution/v1beta1/nakamoto_bonus_coefficient")["coefficient"])
+    return {
+        "h": int(st["sync_info"]["latest_block_height"]),
+        "t": st["sync_info"]["latest_block_time"],
+        "eta": eta,
+        "n": len(v),
+        "s": sum(v.values()),
+        "r": prov * (1.0 - tax),
+        "v": v,
+    }
+
+
+def write(obj):
+    # atomic, same as every other published file here
+    tmp = DST + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(obj, f, separators=(",", ":"))
+    os.replace(tmp, DST)
+
+
+def main():
+    fails = 0
+    while True:
+        t0 = time.time()
+        try:
+            write(snapshot())
+            fails = 0
+        except Exception as e:
+            fails += 1
+            # A stale live.json is better than a wrong one: leave the last good
+            # file in place and let the page notice its own staleness.
+            print(f"live: {e}", file=sys.stderr, flush=True)
+            if fails >= 20:
+                sys.exit(1)             # let systemd restart us
+        time.sleep(max(1.0, EVERY - (time.time() - t0)))
+
+
+if __name__ == "__main__":
+    main()
