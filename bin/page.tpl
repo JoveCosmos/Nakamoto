@@ -3982,6 +3982,16 @@ html[data-theme=light] .thbtn .moon{display:block}
 .fnav .fsoon{top:-1px;transform:translate(-50%,-50%);background:var(--void);padding:0 4px}
 @media(max-width:620px){.fnav .ftab,.fnav .ftab.acct{height:32px;padding:0 10px}.fnav .ftab+.ftab{margin-left:6px}.fnav .ftab.acct{padding:0 10px}}
 .atcard .txsum .atclosed{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:5px;border:1px solid rgba(255,176,46,.4);background:rgba(255,176,46,.08);font-family:var(--wmono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--wamber);white-space:nowrap}
+/* ── Autopilot's line in the wallet: its state at a glance, and the door to set it up,
+   manage it or revoke it ── */
+#wk-mine .wk-ap{display:flex;align-items:center;gap:10px;height:34px;margin:8px 0 0;padding:0 10px;border:1px solid var(--wbd2);border-radius:7px;background:linear-gradient(180deg,#12122a,#0b0b18);box-shadow:inset 0 1px 0 #ffffff08;flex:0 0 auto}
+#wk-mine .wk-ap[hidden]{display:none}
+#wk-mine .wk-apk{font-family:var(--wsans);font-size:12px;font-weight:600;color:#c9c2ff;letter-spacing:-.01em;flex:0 0 auto}
+#wk-mine .wk-aps{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--wmono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--wf)}
+#wk-mine .wk-aps.on{color:var(--wgreen)}
+#wk-mine .wk-apb{flex:0 0 auto;height:22px;padding:0 10px;border-radius:5px;border:1px solid rgba(185,176,255,.45);background:linear-gradient(180deg,#1a1730,#12101f);color:#c9c2ff;font-family:var(--wsans);font-size:11px;font-weight:600;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);transition:border-color .15s,box-shadow .15s}
+#wk-mine .wk-apb:hover{border-color:#b9b0ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 12px -3px rgba(185,176,255,.7)}
+#wk-mine .wk-apb:focus-visible{outline:2px solid #b9b0ff;outline-offset:2px}
 </style>
 <link rel=stylesheet href="assets/theme-day.css">
 </head><body>
@@ -4181,6 +4191,7 @@ html[data-theme=light] .thbtn .moon{display:block}
           <div id=wk-acct hidden>
           <header class="wk-ph wk-bh"><h3 id=wname>My wallet</h3><span class=wk-addrw><i class=wk-addr id=waddr hidden></i><button class=wk-copy id=wcopy type=button hidden title="Copy address" aria-label="Copy address"><svg class=cp viewBox="0 0 24 24" aria-hidden=true><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class=ok viewBox="0 0 24 24" aria-hidden=true><path d="M4 12.5l5 5L20 6.5"/></svg></button></span></header>
           <div class=wk-bal5><div class=wk-b5><i><img src="assets/atomone.svg" alt="">ATONE</i><b id=ds-bal>&mdash;</b></div><div class=wk-b5><i><img src="assets/photon.svg" alt="">PHOTON</i><b id=ds-photon class=pho>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">staked</i><b id=ds-staked>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">rewards</i><b id=ds-rew>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">APR</i><b id=ds-apr>&mdash;</b></div></div>
+          <div class=wk-ap id=wkap hidden><span class=wk-apk>Autopilot</span><span class=wk-aps id=wkaps>off</span><button class=wk-apb id=atbtn type=button title="Let GATA keep this stake where it earns most, inside limits you set">Set up</button></div>
           <div class=wk-rule></div>
           <header class="wk-ph wk-t1"><h3>Delegations</h3><span class=wk-pn id=dmyn></span>
             <div class=wk-foot id=dstat></div>
@@ -4195,7 +4206,6 @@ html[data-theme=light] .thbtn .moon{display:block}
           <header class="wk-ph wk-t2"><h3>Redelegate</h3><div class=wk-field><input class=wk-amt2 id=amt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to move"><button class=wk-max id=amtmax type=button title="Everything that can move">max <b id=ds-mov>&mdash;</b></button></div><div class=wk-pre id=amtseg hidden><button data-p=100 type=button aria-pressed=true>All</button></div>
             <button class=wk-ib id=wrefresh type=button title="Read the chain again now" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6M20.5 3.5v5h-5"/></svg></button>
             <span class=wk-ago id=dago title="the numbers follow every block tick; refresh re-reads your position">&mdash;</span>
-            <button class=wk-auto id=atbtn type=button hidden title="Let GATA keep this stake where it earns most, inside limits you set">Autopilot</button>
             <span class=wk-lockn id=dlockn hidden></span></header>
           <div class=wk-tbl2 id=dpicks></div>
         </section>
@@ -4403,7 +4413,7 @@ html[data-theme=light] .thbtn .moon{display:block}
       <label class=atsw><input type=checkbox id=atrestake><span class=atswk aria-hidden=true></span><span class=atswt><i>Restakes rewards regularly; growing stake and yielding higher APR.</i></span></label></div>
     <div class=atfee id=atfee hidden></div>
   </div>
-  <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. You can revoke this at any time.</span></div>
+  <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. You can revoke authz at any time.</span></div>
   <div class=txfee id=attxfee></div>
   <div class=txstep id=atstep></div>
   <div class=txbtns><button class=wk-btn id=atcancel type=button>Cancel</button><button class="wk-btn wk-danger" id=atrevoke type=button hidden>Revoke</button><button class="wk-btn wk-go" id=atgrant type=button disabled>Grant</button></div>

@@ -2397,7 +2397,7 @@ rememberGridH();
     .then(function(r){
       step.className = "txstep ok"; step.innerHTML = "Done in block <b>" + Number(r.height).toLocaleString() + "</b>, " + att(r.hash).slice(0, 12) + "\u2026";
       btn.textContent = done;
-      setTimeout(function(){ atGrant().then(function(g){ AT.grant = g; atShow(); var ab = E("atbtn"); if(ab) ab.classList.toggle("on", !!g); }); }, 1500);
+      setTimeout(function(){ atGrant().then(function(g){ AT.grant = g; atShow(); atLine(); var ab = E("atbtn"); if(ab) ab.classList.toggle("on", !!g); }); }, 1500);
     })
     .catch(function(e){ step.className = "txstep err"; step.textContent = att(e && e.message || String(e)); btn.disabled = false; btn.textContent = "Try again"; });
   }
@@ -2407,13 +2407,21 @@ rememberGridH();
     var types = {}; (AT.grants || []).forEach(function(x){ var t = grantType(x); if(t) types[t] = 1; }); if(!types[REDEL]) types[REDEL] = 1;
     atSend(Object.keys(types).map(function(t){ return { type: "cosmos-sdk/MsgRevoke", value: { granter: window.__ADDR, grantee: AT.addr, msg_type_url: t } }; }), atrevoke, "Revoked"); });
   /* the door shows with a wallet once the keeper's address is known; lit while a grant stands */
+  /* the wallet's Autopilot line: off, or on with the grant's bounds; the door reads Set up / Manage */
+  function atLine(){
+    var row = E("wkap"), st = E("wkaps"), b = E("atbtn"); if(!row) return;
+    var g = AT.grant, a = g && g.authorization || {};
+    if(g){ var n = ((a.allow_list || {}).address || []).length, exp = g.expiration ? window.__dayFull(new Date(g.expiration).getTime()) : "no expiry";
+      st.className = "wk-aps on"; st.textContent = "on, " + n + " validators, until " + exp; if(b) b.textContent = "Manage"; }
+    else { st.className = "wk-aps"; st.textContent = AT.addr ? "off" : "off, not open yet"; if(b) b.textContent = "Set up"; }
+  }
   window.__atDoor = function(){
-    var b = E("atbtn"); if(!b) return;
-    if(!window.__POS){ b.hidden = true; return; }
-    /* the door shows for every connected wallet; while the keeper has no address yet the
+    var row = E("wkap"), b = E("atbtn"); if(!b || !row) return;
+    if(!window.__POS){ row.hidden = true; return; }
+    /* the line shows for every connected wallet; while the keeper has no address yet the
        card says "Autopilot is not open yet" and Grant stays disabled */
-    b.hidden = false;
-    atStatus().then(function(){ if(AT.addr) atGrant().then(function(g){ AT.grant = g; b.classList.toggle("on", !!g); }); });
+    row.hidden = false; atLine();
+    atStatus().then(function(){ atLine(); if(AT.addr) atGrant().then(function(g){ AT.grant = g; b.classList.toggle("on", !!g); atLine(); }); });
   };
 
   /* the bells on the two cards: every validator the transaction lands on */
@@ -2626,7 +2634,7 @@ rememberGridH();
     document.documentElement.removeAttribute("data-wallet");
     var wa = E("waddr"); if(wa) wa.hidden = true;
     var wc0 = E("wcopy"); if(wc0){ wc0.hidden = true; wc0.classList.remove("done"); }
-    var ab0 = E("atbtn"); if(ab0){ ab0.hidden = true; ab0.classList.remove("on"); }
+    var ab0 = E("atbtn"); if(ab0) ab0.classList.remove("on"); var ap0 = E("wkap"); if(ap0) ap0.hidden = true;
     box.hidden = true; if(dis) dis.hidden = true; var blk0 = E("wblk"); if(blk0) blk0.hidden = true; var rf0 = E("wrefresh"); if(rf0) rf0.hidden = true;
     btn.disabled = false; btn.querySelector("span").textContent = "Connect wallet"; btn.hidden = false; if(pick) pick.hidden = true; chooser(true);
     var gate = E("wgate"), acct = E("wk-acct"); if(gate) gate.hidden = false; if(acct) acct.hidden = true;
