@@ -1788,7 +1788,7 @@ rememberGridH();
     var slice = rows; pager(E("dmypg"), 0, 0, LPS, "l");
     var LOCK = '<i class=lk><svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></i>';
     var RB = window.__REWBY || {};
-    h += '<table><colgroup><col style="width:28px"><col><col style="width:74px"><col style="width:46px"><col style="width:46px"></colgroup><thead><tr><th class=c>rank</th><th class=l>validator</th><th>ATONE</th><th>APR</th><th>rewards</th></tr></thead><tbody>';
+    h += '<table><colgroup><col style="width:30px"><col><col style="width:80px"><col style="width:50px"><col style="width:56px"></colgroup><thead><tr><th class=c>rank</th><th class=l>validator</th><th>ATONE</th><th>APR</th><th>rewards</th></tr></thead><tbody>';
     for(k = 0; k < slice.length; k++){
       var rw = slice[k], rk = rankOf(V, rw.id);
       h += '<tr data-v="' + att(rw.id) + '" tabindex=0 title="Open this validator"><td class="c rk">' + rk + '</td><td class="l nm">' + logo(rw.id, rw.m) + '<span>' + att(rw.m) + '</span></td>' +

@@ -3884,6 +3884,18 @@ box-shadow:0 10px 24px -14px rgba(156,36,51,.9),inset 0 1px 0 rgba(255,255,255,.
 #wk-mine .wk-b5 i img{width:15px;height:15px}
 #wk-mine .wk-b5 b{font-size:13.5px;letter-spacing:-.02em}
 @media(max-width:700px){#wk-mine .wk-b5{height:44px}#wk-mine .wk-b5 b{font-size:12px}#wk-mine .wk-b5 i{font-size:8.5px}#wk-mine .wk-b5 i img{width:13px;height:13px}}
+/* the delegations table: a breath under the title, a band of column names one can read,
+   room between the columns */
+#wk-mine .wk-tbl2{margin-top:10px}
+#dmy thead th{font-size:8.5px;letter-spacing:.14em;color:#c1bfdc;padding:8px 6px 7px;background:linear-gradient(180deg,#151530,#0f0f22);border-top:1px solid var(--wbd2);border-bottom:1px solid var(--wbd2)}
+#dmy thead th:first-child{border-left:1px solid var(--wbd2);border-radius:5px 0 0 5px;padding-left:6px}
+#dmy thead th:last-child{border-right:1px solid var(--wbd2);border-radius:0 5px 5px 0}
+#dmy thead th.l{padding-left:8px}
+#dmy tbody td{padding:0 6px;height:32px;font-size:11.5px}
+#dmy tbody td.rk{padding-left:6px}
+#dmy tbody td.nm{padding-left:8px}
+#dmy tbody tr:first-child td{border-top:0}
+@media(max-width:700px){#dmy thead th{padding:7px 5px 6px}#dmy tbody td{padding:0 5px;height:30px}}
 </style></head><body>
 <svg width=0 height=0 style="position:absolute" aria-hidden=true><defs>
   <symbol id=g-eta viewBox="0 0 20 20"><path d="M6.6 4.6V14.6M6.6 8.2C7.6 5.8 13.4 5.4 13.4 9.4V15.6" fill=none stroke=currentColor stroke-width=2.2 stroke-linecap=round stroke-linejoin=round/></symbol>
