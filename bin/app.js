@@ -1840,11 +1840,11 @@ rememberGridH();
       h += '<tr class="' + (on ? 'on' : '') + (pos && !o.better ? ' lt' : '') + '"><td class=ck>' + (pos ? '<input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + '>' : '') + '</td>' +
            '<td class="c rk">' + o.rank + '</td><td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span>' +
            (mv != null ? '<em class="gtag add" title="what this plan adds">+' + fmt(mv) + '</em>' : '') + '</div></td>' +
-           '<td class="stk ' + (o.t < MEAN ? 'ok' : 'warn') + '" title="' + big(o.t) + ' ATONE, ' + vp.toFixed(vp < 1 ? 2 : 1) + '% of all stake; ' + (o.t < MEAN ? 'below the average size: the bonus pays here' : 'above the average size') + '">' + big(o.t) + '</td>' +
+           '<td class="stk" title="' + big(o.t) + ' ATONE, ' + vp.toFixed(vp < 1 ? 2 : 1) + '% of all stake; ' + (o.t < MEAN ? 'below the average size: the bonus pays here' : 'above the average size') + '">' + big(o.t) + '</td>' +
            (wide ? '<td class="' + (lu == null ? 'dim' : lu >= 99.9 ? 'ok' : lu >= 99 ? 'warn' : 'bad') + '">' + (lu == null ? '\u2014' : lu.toFixed(2) + '%') + '</td>' : '') +
-           '<td class="' + (u90 == null ? 'dim' : u90 >= 99 ? 'ok' : u90 >= 95 ? 'warn' : 'bad') + '">' + (u90 == null ? '\u2014' : u90.toFixed(1) + '%') + '</td>' +
+           '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '\u2014' : u90.toFixed(1) + '%') + '</td>' +
            (wide ? '<td>' + (pr == null ? '\u2014' : pr >= 1e6 ? (pr / 1e6).toFixed(2) + 'M' : pr >= 1e3 ? (pr / 1e3).toFixed(1) + 'k' : pr) + '</td>' : '') +
-           '<td class="' + (o.jail ? 'warn' : 'ok') + '">' + (o.jail ? o.jail : 'never') + '</td>' +
+           '<td class="' + (!o.jail ? '' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>' +
            (lay ? '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '\u2014') + '</s><em>→</em><b>' + pct(there) + '</b></td>' : '<td class=r2><b>' + pct(o.rate0) + '</b></td>') + '</tr>';
     });
     var top = el.scrollTop;
@@ -2176,8 +2176,8 @@ rememberGridH();
       var on = !!STSEL[o.id], m = by[o.id], d = (window.__VDBY && window.__VDBY[o.id]) || {}, u90 = d.d90 != null ? +d.d90 : (o.up != null ? +o.up : null);
       h += '<tr' + (on ? ' class=on' : '') + '><td class=ck><input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + '></td>' +
            '<td>' + o.rank + '</td><td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span></div></td>' +
-           '<td class="' + (u90 == null ? 'dim' : u90 >= 99 ? 'ok' : u90 >= 95 ? 'warn' : 'bad') + '">' + (u90 == null ? '\u2014' : u90.toFixed(1) + '%') + '</td>' +
-           '<td class="' + (o.jail ? 'warn' : 'ok') + '">' + (o.jail ? o.jail : 'never') + '</td>' +
+           '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '\u2014' : u90.toFixed(1) + '%') + '</td>' +
+           '<td class="' + (!o.jail ? '' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>' +
            '<td>' + (m ? fmt(m.x) : '\u2014') + '</td><td class=r2><b>' + pct(m ? m.after : o.rate0) + '</b></td></tr>';
     });
     var top = el.scrollTop; el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;

@@ -3860,7 +3860,7 @@ box-shadow:0 10px 24px -14px rgba(168,55,44,.9),inset 0 1px 0 rgba(255,255,255,.
 #wk-mine #wk-acct .wk-disc .wk-mark{border-right-color:rgba(255,255,255,.28)}
 /* the stake column is the validator's own figure; what the plan adds is a tag at the right
    end of the name cell, against that column - its left edge moves with its size, nothing else does */
-#dpicks td.stk{white-space:nowrap;font-variant-numeric:tabular-nums}
+#dpicks td.stk{white-space:nowrap;font-variant-numeric:tabular-nums;color:#fff8dc}
 #dpicks td.nm .gtag.add{margin-left:auto;flex:0 0 auto;overflow:visible;padding:0;border:0;background:transparent;color:var(--wgreen);font-size:10.5px;letter-spacing:.02em}
 #dpicks td.nm .nmw:has(.gtag.add)>span:not(.wk-lgx){flex:0 1 auto;margin-right:10px}
 </style></head><body>
