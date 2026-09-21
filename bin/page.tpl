@@ -3849,6 +3849,15 @@ background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba
   #wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-ago{display:none}
 }
 @media(max-width:700px){#wk-plan>.wk-ph{flex-wrap:wrap;row-gap:6px;height:auto;max-height:none;min-height:32px}#wk-plan>.wk-ph .wk-field{order:5;flex:1 1 100%;width:auto;margin:0}}
+/* ── Disconnect as a filled bar, the wallet's amber, the mirror of the green Redelegate bar ── */
+#wk-mine #wk-acct .wk-disc{height:40px;border-radius:8px;border:1px solid #ffc453;background:linear-gradient(180deg,#ffc453,#f0a020);
+box-shadow:0 0 0 1px rgba(255,176,46,.25),0 14px 30px -12px rgba(255,176,46,.85),inset 0 1px 0 rgba(255,255,255,.35);transition:filter .15s,transform .12s,box-shadow .15s}
+#wk-mine #wk-acct .wk-disc:hover{border-color:#ffc453;filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 0 0 1px rgba(255,176,46,.25),0 14px 30px -12px rgba(255,176,46,.85),inset 0 1px 0 rgba(255,255,255,.35)}
+#wk-mine #wk-acct .wk-disc:active{transform:translateY(0) scale(.99)}
+#wk-mine #wk-acct .wk-disc .wk-dword{font-size:11px;letter-spacing:.24em;font-weight:700;color:#1a1000}
+#wk-mine #wk-acct .wk-disc:hover .wk-dword,#wk-mine #wk-acct .wk-disc:hover svg.wk-out{color:#1a1000}
+#p-dele #wk-mine #wk-acct .wk-disc svg.wk-out{color:#1a1000;width:13px;height:13px}
+#wk-mine #wk-acct .wk-disc .wk-mark{border-right-color:rgba(26,16,0,.35)}
 </style></head><body>
 <svg width=0 height=0 style="position:absolute" aria-hidden=true><defs>
   <symbol id=g-eta viewBox="0 0 20 20"><path d="M6.6 4.6V14.6M6.6 8.2C7.6 5.8 13.4 5.4 13.4 9.4V15.6" fill=none stroke=currentColor stroke-width=2.2 stroke-linecap=round stroke-linejoin=round/></symbol>
