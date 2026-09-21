@@ -3306,7 +3306,7 @@ border:1px solid rgba(46,224,106,.22);border-radius:5px;background:linear-gradie
 .stcard .wk-btn.wk-go{background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;color:#04150a;box-shadow:0 10px 24px -12px rgba(46,224,106,.75),inset 0 1px 0 rgba(255,255,255,.3)}
 .stcard .wk-btn.wk-go:disabled{background:linear-gradient(180deg,#1d1d36,#15152a);border-color:#2f2f52;color:#66648c;box-shadow:none}
 #p-dele #wk-plan>.wk-ph .wk-lockn svg{width:9px;height:9px;margin:0 1px 0 0;max-height:none;fill:none;stroke:var(--wamber);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
-@media(max-width:700px){#wk-plan>.wk-ph .wk-lockn{font-size:6.5px;padding:0 6px}#wk-plan>.wk-ph .wk-lockn .w{display:none}#wk-plan>.wk-ph .wk-lockn b+b::before{content:"\2192";margin:0 2px;color:var(--wamber)}}
+@media(max-width:700px){#wk-plan>.wk-ph .wk-lockn{font-size:6.5px;padding:0 6px}#wk-plan>.wk-ph .wk-lockn .w{display:none}#wk-plan>.wk-ph .wk-lockn b:last-of-type::before{content:"\2192";margin:0 2px;color:var(--wamber)}}
 /* ── every pane has a floor: the list fades out over its last pixels and a hairline
    closes the section above the pane's edge, so nothing falls off the bottom ── */
 #wk-mine,#wk-plan,#wk-mv{padding-bottom:14px}
@@ -3917,6 +3917,11 @@ box-shadow:0 10px 24px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);
 .atcard .txfee:empty,.atcard .txstep:empty{display:none}
 .atcard .txbtns{padding-top:10px;padding-bottom:12px}
 @media(max-height:760px){.atcard .atwhat{display:none}.pop .card.atcard{max-height:96vh;max-height:96svh}}
+/* with the Autopilot door on the line, a mid-width frame shows the note as "amount → date" */
+@media(min-width:701px) and (max-width:1559px){
+  #wk-plan>.wk-ph:has(.wk-auto:not([hidden])) .wk-lockn .w2{display:none}
+  #wk-plan>.wk-ph:has(.wk-auto:not([hidden])) .wk-lockn b:last-of-type::before{content:"\2192";margin:0 3px;color:var(--wamber)}
+}
 </style></head><body>
 <svg width=0 height=0 style="position:absolute" aria-hidden=true><defs>
   <symbol id=g-eta viewBox="0 0 20 20"><path d="M6.6 4.6V14.6M6.6 8.2C7.6 5.8 13.4 5.4 13.4 9.4V15.6" fill=none stroke=currentColor stroke-width=2.2 stroke-linecap=round stroke-linejoin=round/></symbol>
