@@ -79,7 +79,12 @@ def preset_of(granter):
         for t in get(q).get("txs", []):
             if any(m.get("@type") == "/cosmos.authz.v1beta1.MsgGrant" and m.get("grantee") == GRANTEE for m in t["body"]["messages"]):
                 memo = (t["body"].get("memo") or "").strip().lower()
-                if memo.startswith("gata:") and memo[5:] in PRESETS: return memo[5:]
+                # "gata:<strategy>[:picks][:restake]" - the strategy sets the pace and thresholds;
+                # the flags say the allow-list is the reader's own selection / that rewards are to
+                # be restaked (the second is not acted on yet: this keeper moves stake only)
+                if memo.startswith("gata:"):
+                    word = memo[5:].split(":")[0]
+                    if word in PRESETS: return word
                 return "moderate"
     except Exception as e:
         log("preset lookup failed for %s: %s" % (granter, e))

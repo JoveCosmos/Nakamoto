@@ -3922,6 +3922,34 @@ box-shadow:0 10px 24px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);
   #wk-plan>.wk-ph:has(.wk-auto:not([hidden])) .wk-lockn .w2{display:none}
   #wk-plan>.wk-ph:has(.wk-auto:not([hidden])) .wk-lockn b:last-of-type::before{content:"\2192";margin:0 3px;color:var(--wamber)}
 }
+/* ── the Autopilot card in five rows: strategy, validators, stake, time, restake; a closing
+   note; the strategies three across, the validator choice two across ── */
+.atcard .atrow>div.atpre.at3{grid-template-columns:1fr 1fr 1fr}
+.atcard .atrow>div.atpre.at2{grid-template-columns:1fr 1fr}
+.atcard .atpc b{font-size:11.5px}
+.atcard .atpc i{font-size:10px;line-height:1.35}
+.atcard .atsw{display:grid;grid-template-columns:34px minmax(0,1fr);column-gap:10px;align-items:start;cursor:pointer;padding:2px 0}
+.atcard .atsw input{position:absolute;opacity:0;width:0;height:0}
+.atcard .atsw .atswk{position:relative;width:34px;height:20px;border-radius:999px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#0b0b18,#0e0e1d);box-shadow:inset 0 1px 0 #ffffff06;transition:background .15s,border-color .15s;margin-top:1px}
+.atcard .atsw .atswk::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--wf);transition:transform .15s,background .15s}
+.atcard .atsw input:checked+.atswk{background:rgba(46,224,106,.22);border-color:#2ee06a}
+.atcard .atsw input:checked+.atswk::after{transform:translateX(14px);background:#2ee06a}
+.atcard .atsw input:focus-visible+.atswk{outline:2px solid #b9b0ff;outline-offset:2px}
+.atcard .atsw .atswt{display:flex;flex-direction:column;gap:2px}
+.atcard .atsw b{font-family:var(--wsans);font-size:11.5px;font-weight:600;color:#fff8dc}
+.atcard .atsw i{font-style:normal;font-family:var(--wsans);font-size:10px;line-height:1.35;color:var(--ws)}
+.atcard .atnote{display:flex;align-items:center;gap:9px;margin:10px 20px 0;padding:8px 11px;border-radius:6px;border:1px solid rgba(46,224,106,.28);background:rgba(46,224,106,.06);font-family:var(--wsans);font-size:11.5px;color:#d9f7e4}
+#p-dele .atcard .atnote svg,.atcard .atnote svg{width:15px;height:15px;flex:0 0 auto;fill:none;stroke:#2ee06a;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin:0;max-height:none}
+@media(max-width:620px){.atcard .atrow>div.atpre.at3,.atcard .atrow>div.atpre.at2{grid-template-columns:1fr}}
+/* each category: its name above, its controls full width beneath */
+.atcard .atrow{flex-direction:column;align-items:stretch;gap:6px;padding:9px 0}
+.atcard .atlab{flex:0 0 auto;padding:0}
+.atcard .atrow>div.atfield{width:240px}
+.atcard .atrow .unhint{margin:2px 0 0}
+.atcard .atrow>.atseg{align-self:flex-start}
+.atcard .atrow:has(.atfield){flex-direction:row;flex-wrap:wrap;align-items:center;column-gap:12px}
+.atcard .atrow:has(.atfield) .atlab{flex:0 0 100%}
+.atcard .atrow:has(.atfield) .unhint{flex:1 1 auto;margin:0}
 </style></head><body>
 <svg width=0 height=0 style="position:absolute" aria-hidden=true><defs>
   <symbol id=g-eta viewBox="0 0 20 20"><path d="M6.6 4.6V14.6M6.6 8.2C7.6 5.8 13.4 5.4 13.4 9.4V15.6" fill=none stroke=currentColor stroke-width=2.2 stroke-linecap=round stroke-linejoin=round/></symbol>
@@ -4318,16 +4346,33 @@ box-shadow:0 10px 24px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);
 
 <div class=pop id=atpop><div class="card txcard uncard atcard">
   <header class=wk-txh><div><b>Autopilot</b><span>atomone-1</span></div><span class=txsum id=atsum></span></header>
-  <div class=atwhat>GATA moves this stake to where it earns more, whenever it can, inside limits you set here. Your stake never leaves your address. The chain itself refuses anything outside these limits, and you can revoke at any time.</div>
   <div class=atstate id=atstate hidden></div>
   <div class=atform id=atform>
     <div class=atrow><span class=atlab>Strategy</span>
-      <div class=atpre>
-        <label class=atpc><input type=radio name=atscope value=passive><b>Passive</b><i>Established validators only: top half by stake, 99%+ signed, never jailed. Moves only for a clear gain, checked weekly.</i><em id=atn0></em></label>
-        <label class=atpc><input type=radio name=atscope value=below checked><b>Moderate</b><i>Below the average size with a clean 90-day record - where the Nakamoto bonus pays. Checked every six hours.</i><em id=atn1></em></label>
-        <label class=atpc><input type=radio name=atscope value=aggressive><b>Aggressive</b><i>Every validator with a working record, the smallest included; more destinations, smaller gains taken, checked hourly.</i><em id=atn3></em></label>
-        <label class=atpc><input type=radio name=atscope value=ticked><b>My picks</b><i>Only the validators ticked in the list.</i><em id=atn2></em></label>
+      <div class="atpre at3">
+        <label class=atpc><input type=radio name=atstrat value=passive><b>Passive</b><i>Top half by stake, 99%+ signed, never jailed. Moves only for a clear gain, checked weekly.</i><em id=atn0></em></label>
+        <label class=atpc><input type=radio name=atstrat value=below checked><b>Moderate</b><i>Below the average size with a clean 90-day record, where the bonus pays. Checked every six hours.</i><em id=atn1></em></label>
+        <label class=atpc><input type=radio name=atstrat value=aggressive><b>Aggressive</b><i>Every validator with a working record, the smallest included. Checked hourly.</i><em id=atn3></em></label>
       </div></div>
+    <div class=atrow><span class=atlab>Validators</span>
+      <div class="atpre at2">
+        <label class=atpc><input type=radio name=atpick value=all checked><b>All the strategy allows</b><i>Every validator that fits the strategy today.</i><em id=atna></em></label>
+        <label class=atpc><input type=radio name=atpick value=selected><b>My selection</b><i>Only the validators selected in the Redelegate list.</i><em id=atn2></em></label>
+      </div></div>
+    <div class=atrow><span class=atlab>Stake</span>
+      <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
+      <span class=unhint id=athint></span></div>
+    <div class=atrow><span class=atlab>Time</span>
+      <div class=atseg id=atseg><button type=button data-d=90 aria-pressed=true>3 months</button><button type=button data-d=180 aria-pressed=false>6 months</button></div></div>
+    <div class=atrow><span class=atlab>Restake</span>
+      <label class=atsw><input type=checkbox id=atrestake><span class=atswk aria-hidden=true></span><span class=atswt><b>Restake rewards</b><i>Rewards are claimed and staked back where the strategy puts them, on the same terms.</i></span></label></div>
+    <div class=atfee id=atfee hidden></div>
+  </div>
+  <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. You can revoke this at any time.</span></div>
+  <div class=txfee id=attxfee></div>
+  <div class=txstep id=atstep></div>
+  <div class=txbtns><button class=wk-btn id=atcancel type=button>Cancel</button><button class="wk-btn wk-danger" id=atrevoke type=button hidden>Revoke</button><button class="wk-btn wk-go" id=atgrant type=button disabled>Grant</button></div>
+</div></div>
     <div class=atrow><span class=atlab>At most</span>
       <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
       <span class=unhint id=athint></span></div>

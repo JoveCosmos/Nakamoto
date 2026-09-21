@@ -2249,10 +2249,14 @@ rememberGridH();
     return fetch("keeper/_status.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
       AT.addr = j && j.grantee ? j.grantee : null; AT.dry = !j || j.dry !== false; AT.fee_pct = j && j.fee_pct ? +j.fee_pct : 0; AT.fee_to = j && j.fee_to ? j.fee_to : null; return j; }).catch(function(){ AT.addr = null; return null; });
   }
+  var REDEL = "/cosmos.staking.v1beta1.MsgBeginRedelegate", DELEG = "/cosmos.staking.v1beta1.MsgDelegate", WDRAW = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward";
+  function grantType(g){ var a = g && g.authorization || {}; return a.msg || ({ AUTHORIZATION_TYPE_REDELEGATE: REDEL, AUTHORIZATION_TYPE_DELEGATE: DELEG })[a.authorization_type] || ""; }
+  /* every grant standing between the reader and the keeper: the redelegate one is the
+     switch, the delegate + withdraw pair is the restake; a revoke names what stands */
   function atGrant(){
     if(!AT.addr || !window.__ADDR) return Promise.resolve(null);
-    return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/authz/v1beta1/grants?granter=" + window.__ADDR + "&grantee=" + AT.addr + "&msg_type_url=" + encodeURIComponent("/cosmos.staking.v1beta1.MsgBeginRedelegate"), { cache: "no-store" })
-      .then(function(r){ return r.json(); }).then(function(d){ var g = (d.grants || [])[0]; return g || null; }).catch(function(){ return null; });
+    return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/authz/v1beta1/grants?granter=" + window.__ADDR + "&grantee=" + AT.addr + "&pagination.limit=50", { cache: "no-store" })
+      .then(function(r){ return r.json(); }).then(function(d){ AT.grants = d.grants || []; var g = null; AT.grants.forEach(function(x){ if(grantType(x) === REDEL) g = x; }); return g; }).catch(function(){ AT.grants = []; return null; });
   }
   function atReport(){
     if(!window.__ADDR) return Promise.resolve(null);
@@ -2260,7 +2264,9 @@ rememberGridH();
   }
   /* the strategies: each is a set of validators the grant allows, and a word in the memo the
      keeper reads for its own pace and thresholds (the chain enforces only the set) */
-  function atPreset(){ return (document.querySelector("#atpop input[name=atscope]:checked") || {}).value || "below"; }
+  function atPreset(){ return (document.querySelector("#atpop input[name=atstrat]:checked") || {}).value || "below"; }
+  function atPick(){ return (document.querySelector("#atpop input[name=atpick]:checked") || {}).value || "all"; }
+  function atRestake(){ var c = E("atrestake"); return !!(c && c.checked); }
   function atScopeFor(v){
     var VD = window.__VDBY || {}, V = window.__VALS(), MEAN = window.__S() / V.length, out = [];
     if(v === "ticked"){ Object.keys(SEL).forEach(function(id){ var d = VD[id]; if(d && d.op) out.push(d.op); }); return out; }
@@ -2271,8 +2277,11 @@ rememberGridH();
       else { if(c.t < MEAN && !c.jail && (d90 == null || d90 >= 95)) out.push(d.op); } });
     return out;
   }
-  function atScope(){ return atScopeFor(atPreset()); }
-  var AT_MEMO = { passive: "gata:passive", below: "gata:moderate", aggressive: "gata:aggressive", ticked: "gata:picks" };
+  function atScope(){ return atScopeFor(atPick() === "selected" ? "ticked" : atPreset()); }
+  /* the memo the keeper reads: the strategy word, then the flags */
+  var AT_WORD = { passive: "passive", below: "moderate", aggressive: "aggressive" };
+  function atMemo(){ return "gata:" + (AT_WORD[atPreset()] || "moderate") + (atPick() === "selected" ? ":picks" : "") + (atRestake() ? ":restake" : ""); }
+  function atMonths(){ return AT.days >= 180 ? "6 months" : "3 months"; }
   function atCap(){ var a = E("atcap"), n = parseFloat((a.value || "").replace(/[^0-9.]/g, "")); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
   function atMsgs(){
     var scope = atScope(), cap = atCap(), pos = window.__POS;
@@ -2280,6 +2289,14 @@ rememberGridH();
     var exp = Date.now() + AT.days * 86400000;
     var msgs = [{ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
       grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: { authorization_type: "redelegate", max_tokens: { denom: "uatone", amount: String(cap) }, allow_list: scope } }, expiration: exp } } }];
+    /* restake: the keeper may claim the rewards and stake them back, only onto the same set,
+       up to the same cap, for the same time */
+    if(atRestake()){
+      msgs.push({ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
+        grant: { authorization: { type: "cosmos-sdk/GenericAuthorization", value: { msg: WDRAW } }, expiration: exp } } });
+      msgs.push({ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
+        grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: { authorization_type: "delegate", max_tokens: { denom: "uatone", amount: String(cap) }, allow_list: scope } }, expiration: exp } } });
+    }
     /* the service fee, when one is set: paid with the grant, in the same signature */
     var fee = atFee(); if(fee > 0 && AT.fee_to) msgs.push({ type: "cosmos-sdk/MsgSend", value: { from_address: window.__ADDR, to_address: AT.fee_to, amount: [{ denom: "uatone", amount: String(fee) }] } });
     return msgs;
@@ -2295,17 +2312,18 @@ rememberGridH();
     var pos = window.__POS, cap = atCap(), scope = atScope(), mx = E("atmaxv"), hint = E("athint"), go = E("atgrant"), sm = E("atsum"), n1 = E("atn1"), n2 = E("atn2"), feeEl = E("atfee");
     var movable = pos ? pos.free : 0;
     if(mx) mx.textContent = pos ? exact(movable, 2) : "\u2014";
-    var n0 = E("atn0"), n3 = E("atn3");
+    var n0 = E("atn0"), n3 = E("atn3"), na = E("atna");
     if(n0) n0.textContent = atScopeFor("passive").length + " validators";
     if(n1) n1.textContent = atScopeFor("below").length + " validators";
     if(n3) n3.textContent = atScopeFor("aggressive").length + " validators";
-    var tick = Object.keys(SEL).length; if(n2) n2.textContent = tick + " ticked";
+    if(na) na.textContent = atScopeFor(atPreset()).length + " validators";
+    var sel = Object.keys(SEL).length; if(n2) n2.textContent = sel ? sel + " selected" : "none selected yet";
     var ok = !!AT.addr && scope.length > 0 && cap > 0 && !!window.__WALLET && !!window.__WALLET.signDirect;
-    if(hint){ hint.className = "unhint" + (!AT.addr ? " bad" : ""); hint.textContent = !AT.addr ? "Autopilot is not open yet" : (!window.__WALLET || !window.__WALLET.signDirect ? "Needs Keplr (direct signing)" : (!scope.length ? "no validators in that scope" : "ATONE the keeper may move in total, for the period")); }
+    if(hint){ hint.className = "unhint" + (!AT.addr ? " bad" : ""); hint.textContent = !AT.addr ? "Autopilot is not open yet" : (!window.__WALLET || !window.__WALLET.signDirect ? "Needs Keplr (direct signing)" : (!scope.length ? (atPick() === "selected" ? "select validators in the Redelegate list first" : "no validators fit that strategy today") : "ATONE the keeper may move in total, for the time")); }
     if(go) go.disabled = !ok;
-    if(sm) sm.innerHTML = ok ? fmt(cap) + " ATONE<br>" + (AT_MEMO[atPreset()] || "").replace("gata:", "") + ", " + scope.length + " validators, " + AT.days + " days" : "";
+    if(sm) sm.innerHTML = ok ? fmt(cap) + " ATONE<br>" + (AT_WORD[atPreset()] || "moderate") + (atPick() === "selected" ? ", my selection" : "") + ", " + scope.length + " validators, " + atMonths() + (atRestake() ? ", restake" : "") : "";
     var fee = atFee();
-    if(feeEl){ feeEl.hidden = !(fee > 0); if(fee > 0) feeEl.innerHTML = "Service fee <b>" + fmt(fee) + " ATONE</b> - " + AT.fee_pct + "% of the projected gain for " + AT.days + " days, paid with the grant in the same signature."; }
+    if(feeEl){ feeEl.hidden = !(fee > 0); if(fee > 0) feeEl.innerHTML = "Service fee <b>" + fmt(fee) + " ATONE</b> - " + AT.fee_pct + "% of the projected gain for " + atMonths() + ", paid with the grant in the same signature."; }
     E("attxfee").textContent = ""; var st = E("atstep"); st.textContent = ""; st.className = "txstep";
     if(ok && window.__TX && window.__WALLET){
       var w = window.__WALLET, msgs = atMsgs(), fe = E("attxfee"); fe.textContent = "fee: estimating\u2026";
@@ -2319,7 +2337,8 @@ rememberGridH();
       var a = AT.grant.authorization || {}, cap = a.max_tokens ? fmt(+a.max_tokens.amount) + " ATONE" : "no cap", n = ((a.allow_list || {}).address || []).length, exp = AT.grant.expiration ? window.__dayFull(new Date(AT.grant.expiration).getTime()) : "no expiry";
       var rp = AT.report, last = rp && rp.checked ? new Date(rp.checked * 1000) : null;
       st.hidden = false; form.hidden = true; rv.hidden = false; go.hidden = true;
-      st.innerHTML = '<span class=g>Autopilot is on.</span> Cap left <b>' + cap + '</b>, <b>' + n + '</b> allowed validators, until <b>' + exp + '</b>.<br>' +
+      var restk = (AT.grants || []).some(function(x){ return grantType(x) === DELEG; });
+      st.innerHTML = '<span class=g>Autopilot is on' + (restk ? ', restaking rewards' : '') + '.</span> Cap left <b>' + cap + '</b>, <b>' + n + '</b> allowed validators, until <b>' + exp + '</b>.<br>' +
         (last ? 'Last check <b>' + window.__dayFull(last.getTime()) + '</b>' + (rp.moves && rp.moves.length ? ', <b>' + rp.moves.length + '</b> move' + (rp.moves.length === 1 ? '' : 's') + ' ' + (rp.dry ? 'planned (dry run)' : 'made') + ', <b class=g>+' + one(rp.gain || 0) + '</b> ATONE a year' : ', nothing to move') : 'The keeper has not checked this address yet') +
         (rp && rp.history && rp.history.length ? '<br>Moves made: <b>' + rp.history.length + '</b>, last ' + window.__dayFull(rp.history[0].at * 1000) : '');
       if(sm) sm.innerHTML = "on";
@@ -2335,7 +2354,7 @@ rememberGridH();
   });
   var atcapEl = E("atcap"); if(atcapEl) atcapEl.addEventListener("input", atState);
   var atmax = E("atmax"); if(atmax) atmax.addEventListener("click", function(){ var pos = window.__POS; if(!pos || !(pos.free > 0)) return; E("atcap").value = exact(pos.free); atState(); });
-  Array.prototype.forEach.call(document.querySelectorAll("#atpop input[name=atscope]"), function(r){ r.addEventListener("change", atState); });
+  Array.prototype.forEach.call(document.querySelectorAll("#atpop input[name=atstrat],#atpop input[name=atpick],#atpop #atrestake"), function(r){ r.addEventListener("change", atState); });
   Array.prototype.forEach.call(document.querySelectorAll("#atseg button"), function(b){ b.addEventListener("click", function(){
     AT.days = +b.dataset.d; Array.prototype.forEach.call(document.querySelectorAll("#atseg button"), function(o){ o.setAttribute("aria-pressed", o === b ? "true" : "false"); }); atState(); }); });
   var atcancel = E("atcancel"); if(atcancel) atcancel.addEventListener("click", function(){ POP.close(atpop); });
@@ -2352,9 +2371,11 @@ rememberGridH();
     })
     .catch(function(e){ step.className = "txstep err"; step.textContent = att(e && e.message || String(e)); btn.disabled = false; btn.textContent = "Try again"; });
   }
-  var atgrant = E("atgrant"); if(atgrant) atgrant.addEventListener("click", function(){ atSend(atMsgs(), atgrant, "Granted", AT_MEMO[atPreset()] || "gata:moderate"); });
+  var atgrant = E("atgrant"); if(atgrant) atgrant.addEventListener("click", function(){ atSend(atMsgs(), atgrant, "Granted", atMemo()); });
+  /* revoke names every grant that stands (a revoke of one that does not fails the whole tx) */
   var atrevoke = E("atrevoke"); if(atrevoke) atrevoke.addEventListener("click", function(){
-    atSend([{ type: "cosmos-sdk/MsgRevoke", value: { granter: window.__ADDR, grantee: AT.addr, msg_type_url: "/cosmos.staking.v1beta1.MsgBeginRedelegate" } }], atrevoke, "Revoked"); });
+    var types = {}; (AT.grants || []).forEach(function(x){ var t = grantType(x); if(t) types[t] = 1; }); if(!types[REDEL]) types[REDEL] = 1;
+    atSend(Object.keys(types).map(function(t){ return { type: "cosmos-sdk/MsgRevoke", value: { granter: window.__ADDR, grantee: AT.addr, msg_type_url: t } }; }), atrevoke, "Revoked"); });
   /* the door shows with a wallet once the keeper's address is known; lit while a grant stands */
   window.__atDoor = function(){
     var b = E("atbtn"); if(!b) return;
