@@ -620,6 +620,30 @@ function applyLive(d){
 }
 
 window.__applyLive = applyLive;
+/* the whole set again, from data.json: monikers, commissions, jailings, the lifetime
+   record, and every detail the cards and the dashboard read - what the refresh button
+   is for. The live tokens (the 6-second vector) are kept; a validator new to the set
+   takes the build's figure until the next tick. */
+function applyData(d){
+  if(!d || !d.validators || !d.validators.length || !d.set) return false;
+  var live = {}, i;
+  for(i = 0; i < VALS.length; i++) live[VALS[i][3]] = VALS[i][1];
+  var next = d.validators.map(function(v){
+    var id = String(v.op).slice(-6);
+    return [v.m, live[id] != null ? live[id] : v.t, v.c, id, v.jail || 0,
+            v.life_n ? Math.round((1 - v.life_missed / v.life_n) * 100000) / 1000 : null];
+  });
+  VALS.length = 0; Array.prototype.push.apply(VALS, next);
+  VALS.sort(function(a, b){ return b[1] - a[1]; });
+  D.set = d.set; D.eta = d.eta || D.eta; D.vdetail = d.validators; D.generated = d.generated || D.generated;
+  if(!LIVE_AT){ S = d.set.bonded; R = d.set.reward_pool; }     /* a live tick outranks the build */
+  N = VALS.length; MEAN = S / N; BASE = R / S; maxT = VALS[0][1];
+  CG = Math.floor(N / 3); CGL = N - 2 * CG;
+  LIVE_C = ratioOf(VALS.map(function(v){ return v[1]; }));
+  if(window.__setVD) window.__setVD(d.validators);
+  return true;
+}
+window.__applyData = applyData;
 function render(){
   /* data-b=0 is the live ratio - a fixed chip would go stale the moment the chain's
      bonded share moved, and this page is regenerated every 15 minutes. */
@@ -830,6 +854,8 @@ rememberGridH();
      key the live vector uses) so a stake crossing never opens the wrong card. */
   var VDBY = {}; VD.forEach(function(d){ if(d.op) VDBY[String(d.op).slice(-6)] = d; });
   window.__VDBY = VDBY;
+  /* a refresh brings a new detail list: the same map, refilled, so every holder of it reads the new rows */
+  window.__setVD = function(list){ VD = list || []; for(var k in VDBY) delete VDBY[k]; VD.forEach(function(d){ if(d.op) VDBY[String(d.op).slice(-6)] = d; }); };
   /* other sections open a card by the validator's id (the wallet's delegation rows) */
   window.__vshow = function(id){ for(var k = 0; k < VALS.length; k++) if(VALS[k][3] === id){ vshow(k); return true; } return false; };
   function vshow(i){
@@ -1634,7 +1660,13 @@ rememberGridH();
     wr.classList.remove("spun"); void wr.offsetWidth; wr.classList.add("spun");
     wr.classList.add("busy");
     var done = function(){ wr.classList.remove("busy"); draw(); tickAgo(); };
-    if(window.__refreshPos) window.__refreshPos().then(done, done); else done();
+    /* first the set itself - ranks, APRs, jailings, records - straight from data.json
+       as it stands now (no cache), then the reader's own position; then one redraw */
+    var fresh = fetch("data.json", { cache: "no-store" })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){ if(d && window.__applyData && window.__applyData(d)) window.__redraw(); })
+      .catch(function(){});
+    fresh.then(function(){ return window.__refreshPos ? window.__refreshPos() : null; }).then(done, done);
   });
 
   function value(){

@@ -3681,7 +3681,7 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
 #wk-mv .wk-mvh .wk-btn.wk-go:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 0 0 1px rgba(46,224,106,.35),0 16px 32px -12px rgba(46,224,106,1),inset 0 1px 0 rgba(255,255,255,.35)}
 #wk-mv .wk-mvh .wk-btn.wk-go:disabled{background:linear-gradient(180deg,#232345,#191933);border-color:#3a3a62;color:#8a88b0;box-shadow:inset 0 1px 0 #ffffff08;font-weight:600}
 #wk-mv .wk-mvh{height:auto;min-height:40px;max-height:none}
-#wk-mine .wk-t1 .wk-unb{height:26px;padding:0 12px;font-size:8.5px;letter-spacing:.18em;font-weight:600}
+#wk-mine .wk-t1 .wk-unb{height:20px;padding:0 9px;font-size:8.5px;letter-spacing:.18em;font-weight:600;line-height:1;align-self:center;border-radius:5px}   /* the doors sit on the title's line, no taller than it */
 #wk-mine .wk-t1 .wk-unb.wk-stb{color:#4cf28a;border-color:rgba(46,224,106,.55)}
 #wk-mine .wk-t1 .wk-unb:not(.wk-stb){color:#ffc453;border-color:rgba(255,176,46,.55)}
 @media(max-width:700px){#wk-plan .wk-bar2 .wk-field{flex:1 1 auto;width:auto}#wk-mv .wk-mvh .wk-btn.wk-go{min-width:120px}}
