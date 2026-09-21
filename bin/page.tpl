@@ -3850,9 +3850,9 @@ background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba
 }
 @media(max-width:700px){#wk-plan>.wk-ph{flex-wrap:wrap;row-gap:6px;height:auto;max-height:none;min-height:32px}#wk-plan>.wk-ph .wk-field{order:5;flex:1 1 100%;width:auto;margin:0}}
 /* ── Disconnect as a filled bar, the wallet's amber, the mirror of the green Redelegate bar ── */
-#wk-mine #wk-acct .wk-disc{height:40px;border-radius:8px;border:1px solid #b5453a;background:linear-gradient(180deg,#a8372c,#8a2b22);
-box-shadow:0 10px 24px -14px rgba(168,55,44,.9),inset 0 1px 0 rgba(255,255,255,.12);transition:filter .15s,transform .12s,box-shadow .15s}
-#wk-mine #wk-acct .wk-disc:hover{border-color:#c9584c;filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 12px 26px -14px rgba(168,55,44,.95),inset 0 1px 0 rgba(255,255,255,.14)}
+#wk-mine #wk-acct .wk-disc{height:40px;border-radius:8px;border:1px solid #ad2f3e;background:linear-gradient(180deg,#9c2433,#761b27);
+box-shadow:0 10px 24px -14px rgba(156,36,51,.9),inset 0 1px 0 rgba(255,255,255,.12);transition:filter .15s,transform .12s,box-shadow .15s}
+#wk-mine #wk-acct .wk-disc:hover{border-color:#c43a4b;filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 12px 26px -14px rgba(156,36,51,.95),inset 0 1px 0 rgba(255,255,255,.14)}
 #wk-mine #wk-acct .wk-disc:active{transform:translateY(0) scale(.99)}
 #wk-mine #wk-acct .wk-disc .wk-dword{font-size:11px;letter-spacing:.24em;font-weight:600;color:#fff4f1}
 #wk-mine #wk-acct .wk-disc:hover .wk-dword,#wk-mine #wk-acct .wk-disc:hover svg.wk-out{color:#fff}
