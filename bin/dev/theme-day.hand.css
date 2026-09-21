@@ -399,3 +399,7 @@
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-aps.on{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-apb{background:var(--accent);border:1px solid var(--accent);color:#fff;border-radius:8px;font-family:var(--day-sans);font-size:12px;font-weight:500;height:26px;box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-apb:hover{background:var(--accent-hover);border-color:var(--accent-hover);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-ap{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;box-shadow:none;height:46px}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-ap::before{display:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-apk{font-size:14px;font-weight:600;color:var(--accent);text-shadow:none}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-apb{height:28px;font-weight:500;filter:none;transform:none}

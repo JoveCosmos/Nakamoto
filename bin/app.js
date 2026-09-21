@@ -1770,7 +1770,8 @@ rememberGridH();
        hide that the rest could do better. */
     var low = Infinity;
     if(pos) pos.rows.forEach(function(x){ if(x.x - x.locked > 0 && x.rate < low) low = x.rate; });
-    return window.__candidates({ except: {}, cleanRecord: CLEAN }).map(function(v){ v.rate0 = window.__rateAfter(v.t, v.c, 0); v.better = v.rate0 > low + 0.0005; return v; })
+    /* nothing movable (no stake, or all of it under cooldown): nothing is "lower" either */
+    return window.__candidates({ except: {}, cleanRecord: CLEAN }).map(function(v){ v.rate0 = window.__rateAfter(v.t, v.c, 0); v.better = !isFinite(low) || v.rate0 > low + 0.0005; return v; })
       /* with a wallet: best rate first; without one it is the chain's own list, by rank */
       .sort(function(a, b){ return pos ? b.rate0 - a.rate0 : a.rank - b.rank; });
   }
@@ -2348,7 +2349,7 @@ rememberGridH();
     var un = E("atuntil"); if(un) un.innerHTML = "until <b>" + window.__dayFull(Date.now() + AT.days * 86400000) + "</b>";
     var sel = Object.keys(SEL).length; if(n2) n2.textContent = sel ? sel + " selected" : "none selected yet";
     var ok = !!AT.addr && scope.length > 0 && cap > 0 && !!window.__WALLET && !!window.__WALLET.signDirect;
-    if(hint){ hint.className = "unhint"; hint.textContent = (!window.__WALLET || !window.__WALLET.signDirect ? "Needs Keplr (direct signing)" : (!scope.length ? (atPick() === "selected" ? "select validators in the Redelegate list first" : "no validators fit that strategy today") : "ATONE the keeper may move in total, for the time")); }
+    if(hint){ hint.className = "unhint"; hint.textContent = (!window.__WALLET || !window.__WALLET.signDirect ? "Needs Keplr (direct signing)" : (!scope.length ? (atPick() === "selected" ? "select validators in the Redelegate list first" : "no validators fit that strategy today") : "")); }
     if(go) go.disabled = !ok;
     /* the header's right side: the plan in a line once it can be granted; until the keeper is open, that word */
     if(sm) sm.innerHTML = !AT.addr ? '<span class=atclosed>Autopilot is not open yet</span>' : ok ? fmt(cap) + " ATONE<br>" + (AT_WORD[atPreset()] || "moderate") + ", " + (atPick() === "selected" ? "my selection, " : "") + scope.length + " validators, " + atMonths() + (atRestake() ? ", restake" : "") : "";
@@ -2412,7 +2413,7 @@ rememberGridH();
     var row = E("wkap"), st = E("wkaps"), b = E("atbtn"); if(!row) return;
     var g = AT.grant, a = g && g.authorization || {};
     if(g){ var n = ((a.allow_list || {}).address || []).length, exp = g.expiration ? window.__dayFull(new Date(g.expiration).getTime()) : "no expiry";
-      st.className = "wk-aps on"; st.textContent = "on, " + n + " validators, until " + exp; if(b) b.textContent = "Manage"; }
+      st.className = "wk-aps on"; st.textContent = "on, until " + exp; st.title = n + " allowed validators"; if(b) b.textContent = "Manage"; }
     else { st.className = "wk-aps"; st.textContent = AT.addr ? "off" : "off, not open yet"; if(b) b.textContent = "Set up"; }
   }
   window.__atDoor = function(){

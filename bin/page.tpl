@@ -3984,13 +3984,15 @@ html[data-theme=light] .thbtn .moon{display:block}
 .atcard .txsum .atclosed{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:5px;border:1px solid rgba(255,176,46,.4);background:rgba(255,176,46,.08);font-family:var(--wmono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--wamber);white-space:nowrap}
 /* ── Autopilot's line in the wallet: its state at a glance, and the door to set it up,
    manage it or revoke it ── */
-#wk-mine .wk-ap{display:flex;align-items:center;gap:10px;height:34px;margin:8px 0 0;padding:0 10px;border:1px solid var(--wbd2);border-radius:7px;background:linear-gradient(180deg,#12122a,#0b0b18);box-shadow:inset 0 1px 0 #ffffff08;flex:0 0 auto}
+#wk-mine .wk-ap{display:flex;align-items:center;gap:10px;height:44px;margin:8px 0 0;padding:0 12px;border:1px solid rgba(185,176,255,.5);border-radius:8px;background:linear-gradient(180deg,#1b1735,#100e22);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(185,176,255,.12),0 10px 24px -14px rgba(185,176,255,.8);flex:0 0 auto;position:relative;overflow:hidden}
+#wk-mine .wk-ap::before{content:"";position:absolute;left:12px;right:12px;top:0;height:1px;background:linear-gradient(90deg,transparent,#b9b0ff,transparent);opacity:.9}
 #wk-mine .wk-ap[hidden]{display:none}
-#wk-mine .wk-apk{font-family:var(--wsans);font-size:12px;font-weight:600;color:#c9c2ff;letter-spacing:-.01em;flex:0 0 auto}
+#wk-mine .wk-apk{font-family:var(--wsans);font-size:14px;font-weight:700;color:#d6d1ff;letter-spacing:-.01em;flex:0 0 auto;text-shadow:0 0 14px rgba(185,176,255,.45)}
 #wk-mine .wk-aps{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--wmono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--wf)}
 #wk-mine .wk-aps.on{color:var(--wgreen)}
-#wk-mine .wk-apb{flex:0 0 auto;height:22px;padding:0 10px;border-radius:5px;border:1px solid rgba(185,176,255,.45);background:linear-gradient(180deg,#1a1730,#12101f);color:#c9c2ff;font-family:var(--wsans);font-size:11px;font-weight:600;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);transition:border-color .15s,box-shadow .15s}
-#wk-mine .wk-apb:hover{border-color:#b9b0ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 12px -3px rgba(185,176,255,.7)}
+#wk-mine .wk-apb{flex:0 0 auto;height:28px;padding:0 14px;border-radius:6px;border:1px solid #c9c2ff;background:linear-gradient(180deg,#cdc6ff,#9f95f2);color:#14103a;font-family:var(--wsans);font-size:12px;font-weight:700;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 18px -10px rgba(185,176,255,.9);transition:filter .15s,transform .12s}
+#wk-mine .wk-apb:hover{filter:brightness(1.06);transform:translateY(-1px)}
+#wk-mine .wk-apb:active{transform:translateY(0) scale(.98)}
 #wk-mine .wk-apb:focus-visible{outline:2px solid #b9b0ff;outline-offset:2px}
 </style>
 <link rel=stylesheet href="assets/theme-day.css">
@@ -4410,7 +4412,7 @@ html[data-theme=light] .thbtn .moon{display:block}
     <div class=atrow><span class=atlab>Time</span>
       <div class=attime><div class=atseg id=atseg><button type=button data-d=90 aria-pressed=true>3 months</button><button type=button data-d=180 aria-pressed=false>6 months</button></div><span class=atuntil id=atuntil></span></div></div>
     <div class=atrow><span class=atlab>Restake</span>
-      <label class=atsw><input type=checkbox id=atrestake><span class=atswk aria-hidden=true></span><span class=atswt><i>Restakes rewards regularly; growing stake and yielding higher APR.</i></span></label></div>
+      <label class=atsw><input type=checkbox id=atrestake><span class=atswk aria-hidden=true></span><span class=atswt><i>Restake rewards regularly; growing stake and yielding higher APR.</i></span></label></div>
     <div class=atfee id=atfee hidden></div>
   </div>
   <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. You can revoke authz at any time.</span></div>
