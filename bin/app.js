@@ -2359,7 +2359,10 @@ rememberGridH();
   window.__atDoor = function(){
     var b = E("atbtn"); if(!b) return;
     if(!window.__POS){ b.hidden = true; return; }
-    atStatus().then(function(){ b.hidden = !AT.addr; if(AT.addr) atGrant().then(function(g){ AT.grant = g; b.classList.toggle("on", !!g); }); });
+    /* the door shows for every connected wallet; while the keeper has no address yet the
+       card says "Autopilot is not open yet" and Grant stays disabled */
+    b.hidden = false;
+    atStatus().then(function(){ if(AT.addr) atGrant().then(function(g){ AT.grant = g; b.classList.toggle("on", !!g); }); });
   };
 
   /* the bells on the two cards: every validator the transaction lands on */

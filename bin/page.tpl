@@ -3896,6 +3896,16 @@ box-shadow:0 10px 24px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);
 #dmy tbody td.nm{padding-left:8px}
 #dmy tbody tr:first-child td{border-top:0}
 @media(max-width:700px){#dmy thead th{padding:7px 5px 6px}#dmy tbody td{padding:0 5px;height:30px}}
+/* the Autopilot card's amount row: the field is a row (figure and MAX side by side), the
+   note beneath it under the field, never off the card's edge */
+.atcard .atrow{flex-wrap:wrap}
+.atcard .atrow>div.atfield{flex-direction:row;width:200px;height:30px;display:inline-flex;align-items:center;padding:0 4px 0 0;border-radius:6px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#0b0b18,#0e0e1d);box-shadow:inset 0 1px 0 #ffffff06}
+.atcard .atrow>div.atfield:focus-within{border-color:#b9b0ff;box-shadow:0 0 0 3px rgba(185,176,255,.13)}
+.atcard .atrow>div.atfield input.wk-amt2{flex:1 1 auto;min-width:0;height:100%;width:auto;margin:0;border:0;background:transparent;font-size:12px;padding:0 8px;color:#fff8dc}
+.atcard .atrow>div.atfield .wk-max{height:22px;padding:0 8px;font-size:7.5px;letter-spacing:.14em;border-radius:4px;flex:0 0 auto;white-space:nowrap}
+.atcard .atrow>div.atfield .wk-max b{font-size:9.5px}
+.atcard .atrow .unhint{flex:1 1 100%;margin:6px 0 0 130px;font-family:var(--wmono);font-size:8.5px;letter-spacing:.06em;color:var(--wf);white-space:normal}
+.atcard .atrow .unhint.bad{color:var(--wamber)}
 </style></head><body>
 <svg width=0 height=0 style="position:absolute" aria-hidden=true><defs>
   <symbol id=g-eta viewBox="0 0 20 20"><path d="M6.6 4.6V14.6M6.6 8.2C7.6 5.8 13.4 5.4 13.4 9.4V15.6" fill=none stroke=currentColor stroke-width=2.2 stroke-linecap=round stroke-linejoin=round/></symbol>
