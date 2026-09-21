@@ -3850,14 +3850,14 @@ background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba
 }
 @media(max-width:700px){#wk-plan>.wk-ph{flex-wrap:wrap;row-gap:6px;height:auto;max-height:none;min-height:32px}#wk-plan>.wk-ph .wk-field{order:5;flex:1 1 100%;width:auto;margin:0}}
 /* ── Disconnect as a filled bar, the wallet's amber, the mirror of the green Redelegate bar ── */
-#wk-mine #wk-acct .wk-disc{height:40px;border-radius:8px;border:1px solid #c9c2ff;background:linear-gradient(180deg,#cdc6ff,#9f95f2);
-box-shadow:0 0 0 1px rgba(185,176,255,.25),0 14px 30px -12px rgba(185,176,255,.85),inset 0 1px 0 rgba(255,255,255,.35);transition:filter .15s,transform .12s,box-shadow .15s}
-#wk-mine #wk-acct .wk-disc:hover{border-color:#c9c2ff;filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 0 0 1px rgba(185,176,255,.25),0 14px 30px -12px rgba(185,176,255,.85),inset 0 1px 0 rgba(255,255,255,.35)}
+#wk-mine #wk-acct .wk-disc{height:40px;border-radius:8px;border:1px solid #ff7a45;background:linear-gradient(180deg,#ff8a5c,#f0521f);
+box-shadow:0 0 0 1px rgba(255,77,31,.25),0 14px 30px -12px rgba(255,77,31,.85),inset 0 1px 0 rgba(255,255,255,.3);transition:filter .15s,transform .12s,box-shadow .15s}
+#wk-mine #wk-acct .wk-disc:hover{border-color:#ff8a5c;filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 0 0 1px rgba(255,77,31,.25),0 14px 30px -12px rgba(255,77,31,.85),inset 0 1px 0 rgba(255,255,255,.3)}
 #wk-mine #wk-acct .wk-disc:active{transform:translateY(0) scale(.99)}
-#wk-mine #wk-acct .wk-disc .wk-dword{font-size:11px;letter-spacing:.24em;font-weight:700;color:#14103a}
-#wk-mine #wk-acct .wk-disc:hover .wk-dword,#wk-mine #wk-acct .wk-disc:hover svg.wk-out{color:#14103a}
-#p-dele #wk-mine #wk-acct .wk-disc svg.wk-out{color:#14103a;width:13px;height:13px}
-#wk-mine #wk-acct .wk-disc .wk-mark{border-right-color:rgba(20,16,58,.35)}
+#wk-mine #wk-acct .wk-disc .wk-dword{font-size:11px;letter-spacing:.24em;font-weight:700;color:#2a0d05}
+#wk-mine #wk-acct .wk-disc:hover .wk-dword,#wk-mine #wk-acct .wk-disc:hover svg.wk-out{color:#2a0d05}
+#p-dele #wk-mine #wk-acct .wk-disc svg.wk-out{color:#2a0d05;width:13px;height:13px}
+#wk-mine #wk-acct .wk-disc .wk-mark{border-right-color:rgba(42,13,5,.35)}
 /* the stake column: the validator's own figure, and what the plan adds beside it */
 #dpicks td.stk{white-space:nowrap;font-variant-numeric:tabular-nums}
 #dpicks td.stk .add{display:inline-block;margin-left:5px;padding:1px 4px;border-radius:3px;border:1px solid rgba(46,224,106,.3);background:rgba(46,224,106,.06);font-family:var(--wmono);font-size:9.5px;letter-spacing:.02em;color:#fff8dc;font-style:normal;vertical-align:1px}
