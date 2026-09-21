@@ -2720,7 +2720,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
   .wk-tbl2 table{table-layout:auto}
   .wk-tbl2 th,.wk-tbl2 td{padding:0 4px}
   .wk-tbl2 td.nm{max-width:0;width:40%}
-  #dmy th:nth-child(4),#dmy td:nth-child(4),#dmy th:nth-child(6),#dmy td:nth-child(6){display:none}
+  #dmy th:nth-child(5),#dmy td:nth-child(5){display:none}
   #dpicks th:nth-child(2),#dpicks td:nth-child(2),#dpicks th:nth-child(5),#dpicks td:nth-child(5),#dpicks th:nth-child(6),#dpicks td:nth-child(6),#dpicks th:nth-child(7),#dpicks td:nth-child(7),#dpicks th:nth-child(8),#dpicks td:nth-child(8){display:none}
   #dpicks td.r2 s,#dpicks td.r2 em{display:none}
   .wk-bar2{gap:5px}.wk-bar2 .wk-pre button{padding:0 6px}
