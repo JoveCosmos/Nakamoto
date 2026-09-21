@@ -8,16 +8,20 @@ set -e
 # WEB is the rendered tree to probe and URL where it is served: the dev tree by default,
 # production with WEB=/srv/atomone-app/web URL=https://atomone.gatahub.zone
 WEB=${WEB:-/srv/atomone-app-dev/web}; URL=${URL:-http://127.0.0.1:8089}
+# CHROME_FLAGS adds flags (--force-dark-mode renders the night theme); NODAY=1 drops the day sheet's <link>
+CHROME_FLAGS=${CHROME_FLAGS:-}; NODAY=${NODAY:-}
 # whatever happens, nothing of ours stays in the published tree
 trap 'rm -f $WEB/_probe.html $WEB/_probe.js $WEB/_probe_err.js $WEB/_shot.html $WEB/_shot.js' EXIT
 WH=${1:?usage: probe.sh WxH snippet.js [--phone]}; SNIP=${2:?}; MODE=${3:-}
 W=${WH%x*}; H=${WH#*x}
 OUT=$WEB/_probe.html
-python3 - "$SNIP" "$MODE" "$WEB" <<'PY'
-import io,sys
+python3 - "$SNIP" "$MODE" "$WEB" "$NODAY" <<'PY'
+import io,sys,re
 WEB=sys.argv[3]
+NODAY=sys.argv[4]
 snip=io.open(sys.argv[1],encoding='utf-8').read()
 h=io.open(WEB+'/index.html',encoding='utf-8').read()
+if NODAY: h=re.sub(r'<link rel=stylesheet href="assets/theme-day.css"[^>]*>\n?','',h)
 
 extra=''
 if sys.argv[2]=='--phone':
@@ -33,7 +37,7 @@ io.open(WEB+'/_probe_err.js','w',encoding='utf-8').write(
 js='<script src="_probe.js"></script>'
 io.open(WEB+'/_probe.html','w',encoding='utf-8').write(h.replace('</body>',extra+js+'</body>'))
 PY
-google-chrome --headless=new --disable-gpu --no-sandbox --virtual-time-budget=9000 \
+google-chrome $CHROME_FLAGS --headless=new --disable-gpu --no-sandbox --virtual-time-budget=9000 \
   --dump-dom --window-size="$W,$H" \
   "$URL/_probe.html" 2>/dev/null \
   | grep -oE '<title>RES[^<]*' | sed 's|<title>RES|  |'

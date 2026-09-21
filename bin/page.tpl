@@ -3951,7 +3951,9 @@ box-shadow:0 10px 24px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);
 .atcard .atrow:has(.atfield) .atlab{flex:0 0 100%}
 .atcard .atrow:has(.atfield) .unhint{flex:1 1 auto;margin:0}
 @media(max-height:760px){.atcard .atrow{padding:5px 0;gap:4px}.atcard .atpc{padding:5px 8px}.atcard .atpc i{font-size:9.5px}.atcard .atnote{margin-top:6px;padding:6px 10px}.atcard .txbtns{padding-top:8px;padding-bottom:10px}.atcard .wk-txh{padding-bottom:6px}}
-</style></head><body>
+</style>
+<link rel=stylesheet href="assets/theme-day.css" media="(prefers-color-scheme: light)">
+</head><body>
 <svg width=0 height=0 style="position:absolute" aria-hidden=true><defs>
   <symbol id=g-eta viewBox="0 0 20 20"><path d="M6.6 4.6V14.6M6.6 8.2C7.6 5.8 13.4 5.4 13.4 9.4V15.6" fill=none stroke=currentColor stroke-width=2.2 stroke-linecap=round stroke-linejoin=round/></symbol>
   <symbol id=g-c viewBox="0 0 20 20"><path d="M14.6 6.2A6 6 0 1 0 14.6 13.8" fill=none stroke=currentColor stroke-width=2.3 stroke-linecap=round/></symbol>

@@ -248,8 +248,15 @@ src_a = os.path.join(os.path.dirname(__file__), "assets")
 dst_a = os.path.join(OUT, "assets")
 os.makedirs(dst_a, exist_ok=True)
 for fn in os.listdir(src_a):
+    sp = os.path.join(src_a, fn)
+    if os.path.isdir(sp):                      # assets/fonts: the day theme's self-hosted faces
+        dd = os.path.join(dst_a, fn); os.makedirs(dd, exist_ok=True)
+        for f2 in os.listdir(sp):
+            t = os.path.join(dd, "." + f2 + ".tmp")
+            shutil.copyfile(os.path.join(sp, f2), t); os.replace(t, os.path.join(dd, f2))
+        continue
     t = os.path.join(dst_a, "." + fn + ".tmp")
-    shutil.copyfile(os.path.join(src_a, fn), t)
+    shutil.copyfile(sp, t)
     os.replace(t, os.path.join(dst_a, fn))
 # the tab icon is the GATA mark (the same file the GATA app serves); browsers and
 # bookmark tools also ask for /favicon.ico at the root, so it lives there too
