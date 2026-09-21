@@ -1702,6 +1702,7 @@ rememberGridH();
   /* every validator that would pay this stake more than it earns now (its
      rate before the stake arrives, so the list is stable), best rate first;
      the two smallest on the chain left out, as everywhere in the wallet */
+  function expectWallet(){ try{ var w = localStorage.getItem("th_wallet"); return w === "Keplr" || w === "Adena" || w === "1"; }catch(e){ return false; } }
   function options(B, pos){
     /* who pays more does not depend on the amount: the list stands while the
        field is still empty, priced at zero stake, and reprices as the reader types */
@@ -1788,10 +1789,14 @@ rememberGridH();
        the last 90 days, blocks proposed, jailings; then what this stake gets and earns */
     var MEAN = window.__S() / window.__VALS().length;
     var wide = window.innerWidth > 1560 || window.innerWidth <= 900;   /* the two lifetime columns need a wide frame */
-    var h = '<table><colgroup><col style="width:' + (pos ? 30 : 22) + 'px"><col style="width:36px"><col><col style="width:56px">' + (wide ? '<col style="width:70px">' : '') + '<col style="width:72px">' + (wide ? '<col style="width:64px">' : '') + '<col style="width:50px">' + (pos ? '<col style="width:66px">' : '') + '<col style="width:' + (pos ? 104 : 60) + 'px"></colgroup>' +
+    /* the wallet's columns (tick, stake, now -> there) are laid out from the first paint for a
+       reader who will be reconnected, with dashes until the position lands - so the list does
+       not shift when it does */
+    var lay = !!pos || expectWallet();
+    var h = '<table><colgroup><col style="width:' + (lay ? 30 : 22) + 'px"><col style="width:36px"><col><col style="width:56px">' + (wide ? '<col style="width:70px">' : '') + '<col style="width:72px">' + (wide ? '<col style="width:64px">' : '') + '<col style="width:50px">' + (lay ? '<col style="width:66px">' : '') + '<col style="width:' + (lay ? 104 : 60) + 'px"></colgroup>' +
             '<thead><tr><th class=ck>' + (pos ? '<input type=checkbox id=ckall aria-label="Tick every validator"' + (sel.n && sel.n === opt.length ? ' checked' : '') + '>' : '') + '</th><th class=c>rank</th><th class=l>validator</th>' +
             '<th title="share of all stake; green below the average size, where the bonus pays">share</th>' + (wide ? '<th title="blocks signed over every block indexed">signed</th>' : '') + '<th>90<span class=lc>d</span> uptime</th>' + (wide ? '<th title="blocks proposed">proposed</th>' : '') + '<th>jailed</th>' +
-            (pos ? '<th>stake</th>' : '') + '<th>' + (pos ? 'APR now → there' : 'APR') + '</th></tr></thead><tbody>';
+            (lay ? '<th>stake</th>' : '') + '<th>' + (lay ? 'APR now → there' : 'APR') + '</th></tr></thead><tbody>';
     slice.forEach(function(o){
       var on = !!SEL[o.id], m = by[o.id], there = m ? m.after : o.rate0;
       var d = (window.__VDBY && window.__VDBY[o.id]) || {}, u90 = d.d90 != null ? +d.d90 : (o.up != null ? +o.up : null);
@@ -1805,8 +1810,8 @@ rememberGridH();
            '<td class="' + (u90 == null ? 'dim' : u90 >= 99 ? 'ok' : u90 >= 95 ? 'warn' : 'bad') + '">' + (u90 == null ? '\u2014' : u90.toFixed(1) + '%') + '</td>' +
            (wide ? '<td>' + (pr == null ? '\u2014' : pr >= 1e6 ? (pr / 1e6).toFixed(2) + 'M' : pr >= 1e3 ? (pr / 1e3).toFixed(1) + 'k' : pr) + '</td>' : '') +
            '<td class="' + (o.jail ? 'warn' : 'ok') + '">' + (o.jail ? o.jail : 'never') + '</td>' +
-           (pos ? '<td class=amt>' + (mv != null ? fmt(mv) : '\u2014') + '</td>' : '') +
-           (pos ? '<td class=r2><s>' + (pos.rows.length ? pct(now) : '\u2014') + '</s><em>→</em><b>' + pct(there) + '</b></td>' : '<td class=r2><b>' + pct(o.rate0) + '</b></td>') + '</tr>';
+           (lay ? '<td class=amt>' + (pos && mv != null ? fmt(mv) : '\u2014') + '</td>' : '') +
+           (lay ? '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '\u2014') + '</s><em>→</em><b>' + pct(there) + '</b></td>' : '<td class=r2><b>' + pct(o.rate0) + '</b></td>') + '</tr>';
     });
     var top = el.scrollTop;
     el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;

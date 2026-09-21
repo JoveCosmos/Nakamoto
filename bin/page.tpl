@@ -3627,7 +3627,7 @@ background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;colo
 background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 1px 2px rgba(0,0,0,.4);transition:color .16s,border-color .16s,box-shadow .16s,transform .12s}
 #wk-mine #wk-acct .wk-disc:hover{border-color:var(--wburn);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 12px -3px rgba(255,77,31,.7)}
 #wk-mine #wk-acct .wk-disc:active{transform:scale(.99)}
-#wk-mine #wk-acct .wk-disc .wk-mark{width:16px;height:16px;margin-right:8px;padding-right:8px;border-right:1px solid var(--wbd2);box-sizing:content-box;display:block}
+#wk-mine #wk-acct .wk-disc .wk-mark{width:16px;height:16px;margin-right:8px;padding-right:8px;border-right:1px solid var(--wbd2);box-sizing:content-box;display:block;border-radius:0}   /* a radius on a one-sided border drew an arc behind the mark */
 #wk-mine #wk-acct .wk-disc .wk-mark img{width:16px;height:16px;border-radius:4px;display:block}
 #wk-mine #wk-acct .wk-disc .wk-dword{font-family:var(--wmono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ws);margin-right:8px;display:inline}
 #wk-mine #wk-acct .wk-disc:hover .wk-dword,#wk-mine #wk-acct .wk-disc:hover svg.wk-out{color:var(--wburn)}
