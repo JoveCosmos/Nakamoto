@@ -1734,6 +1734,7 @@ rememberGridH();
   /* every validator that would pay this stake more than it earns now (its
      rate before the stake arrives, so the list is stable), best rate first;
      the two smallest on the chain left out, as everywhere in the wallet */
+  function big(u){ var a = u / 1e6; return a >= 1e6 ? (a / 1e6).toFixed(2) + "M" : a >= 1e3 ? (a / 1e3).toFixed(1) + "k" : String(Math.floor(a)); }
   function expectWallet(){ try{ var w = localStorage.getItem("th_wallet"); return w === "Keplr" || w === "Adena" || w === "1"; }catch(e){ return false; } }
   function options(B, pos){
     /* who pays more does not depend on the amount: the list stands while the
@@ -1825,24 +1826,23 @@ rememberGridH();
        reader who will be reconnected, with dashes until the position lands - so the list does
        not shift when it does */
     var lay = !!pos || expectWallet();
-    var h = '<table><colgroup><col style="width:' + (lay ? 30 : 22) + 'px"><col style="width:36px"><col><col style="width:56px">' + (wide ? '<col style="width:70px">' : '') + '<col style="width:72px">' + (wide ? '<col style="width:64px">' : '') + '<col style="width:50px">' + (lay ? '<col style="width:66px">' : '') + '<col style="width:' + (lay ? 104 : 60) + 'px"></colgroup>' +
+    var h = '<table><colgroup><col style="width:' + (lay ? 30 : 22) + 'px"><col style="width:36px"><col><col style="width:' + (lay ? 138 : 64) + 'px">' + (wide ? '<col style="width:70px">' : '') + '<col style="width:72px">' + (wide ? '<col style="width:64px">' : '') + '<col style="width:50px"><col style="width:' + (lay ? 104 : 60) + 'px"></colgroup>' +
             '<thead><tr><th class=ck>' + (pos ? '<input type=checkbox id=ckall aria-label="Tick every validator"' + (sel.n && sel.n === opt.length ? ' checked' : '') + '>' : '') + '</th><th class=c>rank</th><th class=l>validator</th>' +
-            '<th title="share of all stake; green below the average size, where the bonus pays">share</th>' + (wide ? '<th title="blocks signed over every block indexed">signed</th>' : '') + '<th>90<span class=lc>d</span> uptime</th>' + (wide ? '<th title="blocks proposed">proposed</th>' : '') + '<th>jailed</th>' +
-            (lay ? '<th>stake</th>' : '') + '<th>' + (lay ? 'APR now → there' : 'APR') + '</th></tr></thead><tbody>';
+            '<th title="the validator\'s stake; green below the average size, where the bonus pays">stake</th>' + (wide ? '<th title="blocks signed over every block indexed">signed</th>' : '') + '<th>90<span class=lc>d</span> uptime</th>' + (wide ? '<th title="blocks proposed">proposed</th>' : '') + '<th>jailed</th>' +
+            '<th>' + (lay ? 'APR now → there' : 'APR') + '</th></tr></thead><tbody>';
     slice.forEach(function(o){
       var on = !!SEL[o.id], m = by[o.id], there = m ? m.after : o.rate0;
       var d = (window.__VDBY && window.__VDBY[o.id]) || {}, u90 = d.d90 != null ? +d.d90 : (o.up != null ? +o.up : null);
       var vp = o.t / window.__S() * 100, lu = d.life_up != null ? +d.life_up : null, pr = d.prop != null ? +d.prop : null;
-      var g = on && MOVED[o.id] > 0 ? GAINBY[o.id] : null, mv = on && MOVED[o.id] > 0 ? MOVED[o.id] : null;
+      var mv = on && MOVED[o.id] > 0 ? MOVED[o.id] : null;
+      /* the validator's stake, and beside it what this plan adds to it */
       h += '<tr class="' + (on ? 'on' : '') + (pos && !o.better ? ' lt' : '') + '"><td class=ck>' + (pos ? '<input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + '>' : '') + '</td>' +
-           '<td class="c rk">' + o.rank + '</td><td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span>' +
-           (g != null ? '<em class="gtag' + (g > 0.5 ? '' : g < -0.5 ? ' neg' : ' dim') + '" title="ATONE a year, this validator">' + (g > 0.5 ? '+' + one(g) : g < -0.5 ? '\u2212' + one(-g) : '\u00b1 0') + '<i>/year</i></em>' : '') + '</div></td>' +
-           '<td class="' + (o.t < MEAN ? 'ok' : 'warn') + '" title="' + (o.t < MEAN ? 'below the average size: the bonus pays here' : 'above the average size') + '">' + vp.toFixed(vp < 1 ? 2 : 1) + '%</td>' +
+           '<td class="c rk">' + o.rank + '</td><td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span></div></td>' +
+           '<td class="stk ' + (o.t < MEAN ? 'ok' : 'warn') + '" title="' + big(o.t) + ' ATONE, ' + vp.toFixed(vp < 1 ? 2 : 1) + '% of all stake; ' + (o.t < MEAN ? 'below the average size: the bonus pays here' : 'above the average size') + '">' + big(o.t) + (mv != null ? '<em class=add title="what this plan adds">+' + fmt(mv) + '</em>' : '') + '</td>' +
            (wide ? '<td class="' + (lu == null ? 'dim' : lu >= 99.9 ? 'ok' : lu >= 99 ? 'warn' : 'bad') + '">' + (lu == null ? '\u2014' : lu.toFixed(2) + '%') + '</td>' : '') +
            '<td class="' + (u90 == null ? 'dim' : u90 >= 99 ? 'ok' : u90 >= 95 ? 'warn' : 'bad') + '">' + (u90 == null ? '\u2014' : u90.toFixed(1) + '%') + '</td>' +
            (wide ? '<td>' + (pr == null ? '\u2014' : pr >= 1e6 ? (pr / 1e6).toFixed(2) + 'M' : pr >= 1e3 ? (pr / 1e3).toFixed(1) + 'k' : pr) + '</td>' : '') +
            '<td class="' + (o.jail ? 'warn' : 'ok') + '">' + (o.jail ? o.jail : 'never') + '</td>' +
-           (lay ? '<td class=amt>' + (pos && mv != null ? fmt(mv) : '\u2014') + '</td>' : '') +
            (lay ? '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '\u2014') + '</s><em>→</em><b>' + pct(there) + '</b></td>' : '<td class=r2><b>' + pct(o.rate0) + '</b></td>') + '</tr>';
     });
     var top = el.scrollTop;
@@ -2606,7 +2606,9 @@ rememberGridH();
         /* what the signing step needs: the wallet, the address, the public key */
         /* label: the account's own name as the wallet reports it (what the reader
            called it in Keplr/Adena); name: the provider, kept for the mark */
-        window.__WALLET = { name: w.name, label: (k.name || "").trim() || w.name, address: k.bech32Address, pubKey: k.pubKey,
+        /* Adena's API carries no account name (getKey: algo, pubKey, address; GetAccount: no
+           name either), so an Adena account reads "My wallet" beside its address */
+        window.__WALLET = { name: w.name, label: (k.name || "").trim() || (w.name === "Adena" ? "My wallet" : w.name), address: k.bech32Address, pubKey: k.pubKey,
                             signAmino: function(doc){ return w.signAmino(k.bech32Address, doc); },
                             signDirect: w.signDirect ? function(doc){ return w.signDirect(k.bech32Address, doc); } : null };
         return get("/cosmos/staking/v1beta1/delegations/" + k.bech32Address);

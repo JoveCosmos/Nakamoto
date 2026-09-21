@@ -2721,7 +2721,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
   .wk-tbl2 th,.wk-tbl2 td{padding:0 4px}
   .wk-tbl2 td.nm{max-width:0;width:40%}
   #dmy th:nth-child(4),#dmy td:nth-child(4),#dmy th:nth-child(6),#dmy td:nth-child(6){display:none}
-  #dpicks th:nth-child(2),#dpicks td:nth-child(2),#dpicks th:nth-child(4),#dpicks td:nth-child(4),#dpicks th:nth-child(5),#dpicks td:nth-child(5),#dpicks th:nth-child(6),#dpicks td:nth-child(6),#dpicks th:nth-child(7),#dpicks td:nth-child(7),#dpicks th:nth-child(8),#dpicks td:nth-child(8){display:none}
+  #dpicks th:nth-child(2),#dpicks td:nth-child(2),#dpicks th:nth-child(5),#dpicks td:nth-child(5),#dpicks th:nth-child(6),#dpicks td:nth-child(6),#dpicks th:nth-child(7),#dpicks td:nth-child(7),#dpicks th:nth-child(8),#dpicks td:nth-child(8){display:none}
   #dpicks td.r2 s,#dpicks td.r2 em{display:none}
   .wk-bar2{gap:5px}.wk-bar2 .wk-pre button{padding:0 6px}
   #wk-plan .wk-res .strip{flex-wrap:wrap;gap:10px 14px}
@@ -3858,6 +3858,9 @@ box-shadow:0 0 0 1px rgba(185,176,255,.25),0 14px 30px -12px rgba(185,176,255,.8
 #wk-mine #wk-acct .wk-disc:hover .wk-dword,#wk-mine #wk-acct .wk-disc:hover svg.wk-out{color:#14103a}
 #p-dele #wk-mine #wk-acct .wk-disc svg.wk-out{color:#14103a;width:13px;height:13px}
 #wk-mine #wk-acct .wk-disc .wk-mark{border-right-color:rgba(20,16,58,.35)}
+/* the stake column: the validator's own figure, and what the plan adds beside it */
+#dpicks td.stk{white-space:nowrap;font-variant-numeric:tabular-nums}
+#dpicks td.stk .add{display:inline-block;margin-left:5px;padding:1px 4px;border-radius:3px;border:1px solid rgba(46,224,106,.3);background:rgba(46,224,106,.06);font-family:var(--wmono);font-size:9.5px;letter-spacing:.02em;color:#fff8dc;font-style:normal;vertical-align:1px}
 </style></head><body>
 <svg width=0 height=0 style="position:absolute" aria-hidden=true><defs>
   <symbol id=g-eta viewBox="0 0 20 20"><path d="M6.6 4.6V14.6M6.6 8.2C7.6 5.8 13.4 5.4 13.4 9.4V15.6" fill=none stroke=currentColor stroke-width=2.2 stroke-linecap=round stroke-linejoin=round/></symbol>
