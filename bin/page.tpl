@@ -4399,21 +4399,10 @@ html[data-theme=light] .thbtn .moon{display:block}
     <div class=atrow><span class=atlab>Time</span>
       <div class=attime><div class=atseg id=atseg><button type=button data-d=90 aria-pressed=true>3 months</button><button type=button data-d=180 aria-pressed=false>6 months</button></div><span class=atuntil id=atuntil></span></div></div>
     <div class=atrow><span class=atlab>Restake</span>
-      <label class=atsw><input type=checkbox id=atrestake><span class=atswk aria-hidden=true></span><span class=atswt><i>Restakes your staking rewards regularly; growing stake and yielding higher APR.</i></span></label></div>
+      <label class=atsw><input type=checkbox id=atrestake><span class=atswk aria-hidden=true></span><span class=atswt><i>Restakes rewards regularly; growing stake and yielding higher APR.</i></span></label></div>
     <div class=atfee id=atfee hidden></div>
   </div>
   <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. You can revoke this at any time.</span></div>
-  <div class=txfee id=attxfee></div>
-  <div class=txstep id=atstep></div>
-  <div class=txbtns><button class=wk-btn id=atcancel type=button>Cancel</button><button class="wk-btn wk-danger" id=atrevoke type=button hidden>Revoke</button><button class="wk-btn wk-go" id=atgrant type=button disabled>Grant</button></div>
-</div></div>
-    <div class=atrow><span class=atlab>At most</span>
-      <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
-      <span class=unhint id=athint></span></div>
-    <div class=atrow><span class=atlab>For</span>
-      <div class=atseg id=atseg><button type=button data-d=30>30 days</button><button type=button data-d=90 aria-pressed=true>90 days</button><button type=button data-d=180>180 days</button></div></div>
-    <div class=atfee id=atfee hidden></div>
-  </div>
   <div class=txfee id=attxfee></div>
   <div class=txstep id=atstep></div>
   <div class=txbtns><button class=wk-btn id=atcancel type=button>Cancel</button><button class="wk-btn wk-danger" id=atrevoke type=button hidden>Revoke</button><button class="wk-btn wk-go" id=atgrant type=button disabled>Grant</button></div>
