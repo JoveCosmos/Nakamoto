@@ -2973,7 +2973,7 @@ background:linear-gradient(180deg,#12122a,#0b0b18);border-color:var(--wbd2);box-
   #wk-mine .wk-gate{min-height:0}
   /* the delegations take the wallet's extra room, eight rows at the least */
   #wk-mine #wk-acct{flex:1 1 auto;min-height:0}
-  #wk-mine .wk-tbl2{flex:1 1 auto;height:auto;min-height:calc(16px + 8 * 30px);max-height:none}
+  #wk-mine .wk-tbl2{flex:1 1 auto;height:auto;min-height:calc(16px + 5 * 30px);max-height:none}
   #wk-plan .wk-tbl2,html:not([data-wallet]) #wk-plan .wk-tbl2{flex:1 1 0;height:auto;min-height:calc(16px + 4 * 30px)}
   #wk-mv .wk-moves{flex:1 1 auto;max-height:none;min-height:0}
   #wk-mv .wk-mvempty{flex:1 1 auto}
@@ -3506,6 +3506,9 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
   html[data-tab=dele] #wk-mine .wk-gate{min-height:300px;display:flex;align-items:center;justify-content:center}
   #wk-mine .wk-gin{height:auto;min-height:0;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
 }
+/* the head line never wraps for want of a few px: the count is the one that yields */
+#wk-mine .wk-t1{flex-wrap:nowrap}
+#wk-mine .wk-t1 .wk-pn{min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 <link rel=stylesheet href="assets/theme-day.css">
 </head><body>
