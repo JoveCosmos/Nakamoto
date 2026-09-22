@@ -32,6 +32,8 @@ MAX_MOVES_DAY = int(os.environ.get("KEEPER_MAX_MOVES_PER_DAY", "7"))
 MAX_DESTS = int(os.environ.get("KEEPER_MAX_DESTS", "5"))                  # split across at most this many
 FEE_PCT = float(os.environ.get("KEEPER_FEE_PCT", "0"))                     # service fee, % of the projected gain, paid with the grant
 FEE_TO = os.environ.get("KEEPER_FEE_TO", "").strip() or None
+SPLIT_PCT = float(os.environ.get("KEEPER_SPLIT_PCT", "0") or 0)            # our share of restaked rewards, percent (0 = free)
+SPLIT_TO = os.environ.get("KEEPER_SPLIT_TO", "").strip() or None           # the treasury allowed to receive it
 DATA = "/srv/atomone-app/web/data.json"
 STATE = "/srv/atomone-app/keeper/state/keeper.db"
 REPORTS = "/srv/atomone-app/web/keeper"
@@ -49,6 +51,9 @@ def db():
     c.execute("CREATE TABLE IF NOT EXISTS run(at INT, grants INT, acted INT, note TEXT)")
     c.execute("CREATE TABLE IF NOT EXISTS move(at INT, granter TEXT, src TEXT, dst TEXT, uatone INT, gain REAL, txhash TEXT, dry INT)")
     c.execute("CREATE TABLE IF NOT EXISTS run_g(at INT, granter TEXT)")
+    # the reward-split ledger: what each granter's stake has earned since we first saw
+    # them, and what we have collected of our share - the difference is the due
+    c.execute("CREATE TABLE IF NOT EXISTS fee_ledger(granter TEXT PRIMARY KEY, earned INT, collected INT, updated INT)")
     return c
 
 # ── the model, as the page has it ──────────────────────────────────────────
@@ -204,6 +209,67 @@ def execute(granter, moves):
         try: return {"error": json.load(e)}
         except Exception: return {"error": "HTTP %d" % e.code}
 
+# ── the reward split (accounting only; the send that collects it ships with the
+#    restake execution - the signer still signs MsgBeginRedelegate and nothing else) ──
+def _uatone(v):
+    """'123uatone,4uphoton' -> 123"""
+    t = 0
+    for part in (v or "").split(","):
+        if part.endswith("uatone"):
+            try: t += int(part[:-6])
+            except ValueError: pass
+    return t
+
+def rewards_withdrawn(granter, since_ts):
+    """Every reward withdrawal names its delegator in the withdraw_rewards event,
+    whoever fired the message - so a manual claim counts exactly like ours."""
+    import datetime
+    total, page = 0, None
+    q = urllib.parse.quote("withdraw_rewards.delegator='%s'" % granter)
+    for _ in range(20):                                   # hard page cap
+        path = "/cosmos/tx/v1beta1/txs?query=%s&limit=100&order_by=ORDER_BY_DESC" % q + (("&pagination.key=" + urllib.parse.quote(page)) if page else "")
+        d = get(path)
+        older = False
+        for t in d.get("tx_responses", []):
+            try:
+                at = int(datetime.datetime.strptime(t.get("timestamp", "")[:19], "%Y-%m-%dT%H:%M:%S")
+                         .replace(tzinfo=datetime.timezone.utc).timestamp())
+            except ValueError:
+                at = 0
+            if at and at < since_ts:
+                older = True; continue
+            for ev in t.get("events", []):
+                if ev.get("type") != "withdraw_rewards": continue
+                a = {x.get("key"): x.get("value") for x in ev.get("attributes", [])}
+                if a.get("delegator") == granter: total += _uatone(a.get("amount"))
+        page = (d.get("pagination") or {}).get("next_key")
+        if older or not page: break
+    return total
+
+def split_due(c, granter):
+    """Our share as it stands: split% of (everything withdrawn since we first saw this
+    granter + what is pending now), minus what we have collected. A manual claim in
+    between changes nothing - it is in the withdrawn sum."""
+    if not (SPLIT_PCT > 0) or not SPLIT_TO: return None
+    since = c.execute("SELECT min(at) FROM run_g WHERE granter=?", (granter,)).fetchone()[0] or int(time.time())
+    withdrawn = rewards_withdrawn(granter, since)
+    pend = 0
+    try:
+        d = get("/cosmos/distribution/v1beta1/delegators/%s/rewards" % granter)
+        for cn in d.get("total", []):
+            if cn.get("denom") == "uatone": pend = int(float(cn.get("amount", "0")))
+    except Exception:
+        pass
+    earned = withdrawn + pend
+    row = c.execute("SELECT collected FROM fee_ledger WHERE granter=?", (granter,)).fetchone()
+    collected = row[0] if row else 0
+    c.execute("INSERT INTO fee_ledger(granter, earned, collected, updated) VALUES(?,?,?,?) "
+              "ON CONFLICT(granter) DO UPDATE SET earned=excluded.earned, updated=excluded.updated",
+              (granter, earned, collected, int(time.time())))
+    c.commit()
+    return {"pct": SPLIT_PCT, "earned": earned, "collected": collected,
+            "due": max(0, int(earned * SPLIT_PCT / 100) - collected)}
+
 def moves_today(c, granter):
     return c.execute("SELECT count(*) FROM move WHERE granter=? AND at>? AND dry=0", (granter, int(time.time()) - 86400)).fetchone()[0]
 
@@ -250,6 +316,11 @@ def once(c, only=None, live=None, force=False):
                         c.execute("INSERT INTO move VALUES(?,?,?,?,?,?,?,?)", (int(time.time()), g["granter"], e["src"], e["dst"], int(e["amount"]), e["gain"], None, 1))
                     c.commit()
                     log("DRY granter=%s would move %d: %s" % (g["granter"], len(p["moves"]), ", ".join("%s->%s %d" % (e["src"][-6:], e["dst"][-6:], e["amount"]) for e in p["moves"])))
+            try:
+                sd = split_due(c, g["granter"])
+                if sd: rep["split"] = sd
+            except Exception as e:
+                log("split accounting failed for %s: %s" % (g["granter"], e))
             report(g["granter"], rep)
         except Exception as e:
             log("granter %s failed: %s" % (g["granter"], e))
@@ -259,7 +330,7 @@ def once(c, only=None, live=None, force=False):
         s = get("/cosmos/bank/v1beta1/balances/%s" % GRANTEE)
         photon = next((int(b["amount"]) for b in s.get("balances", []) if b["denom"] == "uphoton"), 0)
         report("_status", {"grantee": GRANTEE, "checked": int(time.time()), "grants": len(gs), "dry": DRY, "photon": photon, "every": EVERY,
-                           "fee_pct": FEE_PCT, "fee_to": FEE_TO})
+                           "fee_pct": FEE_PCT, "fee_to": FEE_TO, "split_pct": SPLIT_PCT, "split_to": SPLIT_TO})
     except Exception as e:
         log("status failed: %s" % e)
 

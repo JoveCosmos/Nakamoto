@@ -66,9 +66,16 @@ function stakeAuth(a){
     uintField(4, kind)));
 }
 function timestamp(ms){ return cat(uintField(1, Math.floor(ms / 1000)), uintField(2, (ms % 1000) * 1e6)); }
+/* SendAuthorization{spend_limit repeated Coin(1), allow_list repeated string(2)} */
+function sendAuth(a){
+  var o = []; (a.spend_limit || []).forEach(function(c){ o = o.concat(bytesField(1, coin(c))); });
+  (a.allow_list || []).forEach(function(x){ o = o.concat(strField(2, x)); });
+  return any("/cosmos.bank.v1beta1.SendAuthorization", o);
+}
 function grant(g){
   var auth = g.authorization.type === "cosmos-sdk/StakeAuthorization" ? stakeAuth(g.authorization.value)
            : g.authorization.type === "cosmos-sdk/GenericAuthorization" ? any("/cosmos.authz.v1beta1.GenericAuthorization", strField(1, g.authorization.value.msg))
+           : g.authorization.type === "cosmos-sdk/SendAuthorization" ? sendAuth(g.authorization.value)
            : null;
   if(!auth) throw new Error("unsupported authorization " + g.authorization.type);
   return cat(bytesField(1, auth), g.expiration ? bytesField(2, timestamp(g.expiration)) : []);

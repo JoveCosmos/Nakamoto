@@ -2294,10 +2294,15 @@ rememberGridH();
   var atpop = E("atpop"), AT = { addr: null, dry: true, grant: null, days: 90, fee_pct: 0, fee_to: null, report: null };
   function atStatus(){
     return fetch("keeper/_status.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
-      AT.addr = j && j.grantee ? j.grantee : null; AT.dry = !j || j.dry !== false; AT.fee_pct = j && j.fee_pct ? +j.fee_pct : 0; AT.fee_to = j && j.fee_to ? j.fee_to : null; return j; }).catch(function(){ AT.addr = null; return null; });
+      AT.addr = j && j.grantee ? j.grantee : null; AT.dry = !j || j.dry !== false; AT.fee_pct = j && j.fee_pct ? +j.fee_pct : 0; AT.fee_to = j && j.fee_to ? j.fee_to : null;
+      /* the reward split: our share of the staking rewards the restake claims (0 = free) */
+      AT.split_pct = j && j.split_pct ? +j.split_pct : 0; AT.split_to = j && j.split_to ? j.split_to : null; return j; }).catch(function(){ AT.addr = null; return null; });
   }
   var REDEL = "/cosmos.staking.v1beta1.MsgBeginRedelegate", DELEG = "/cosmos.staking.v1beta1.MsgDelegate", WDRAW = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward";
-  function grantType(g){ var a = g && g.authorization || {}; return a.msg || ({ AUTHORIZATION_TYPE_REDELEGATE: REDEL, AUTHORIZATION_TYPE_DELEGATE: DELEG })[a.authorization_type] || ""; }
+  var MSEND = "/cosmos.bank.v1beta1.MsgSend";
+  function grantType(g){ var a = g && g.authorization || {};
+    if(a["@type"] === "/cosmos.bank.v1beta1.SendAuthorization") return MSEND;
+    return a.msg || ({ AUTHORIZATION_TYPE_REDELEGATE: REDEL, AUTHORIZATION_TYPE_DELEGATE: DELEG })[a.authorization_type] || ""; }
   /* every grant standing between the reader and the keeper: the redelegate one is the
      switch, the delegate + withdraw pair is the restake; a revoke names what stands */
   function atGrant(){
@@ -2346,11 +2351,23 @@ rememberGridH();
       msgs.push({ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
         grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: { authorization_type: "delegate", max_tokens: { denom: "uatone", amount: String(cap) }, allow_list: scope } }, expiration: exp } } });
     }
+    /* the reward split, when one is set and rewards are being restaked: the send that
+       collects our share may only reach our address, only up to the period's projection */
+    var sl = atSplitLimit();
+    if(atRestake() && sl > 0) msgs.push({ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
+      grant: { authorization: { type: "cosmos-sdk/SendAuthorization", value: { spend_limit: [{ denom: "uatone", amount: String(sl) }], allow_list: [AT.split_to] } }, expiration: exp } } });
     /* the service fee, when one is set: paid with the grant, in the same signature */
     var fee = atFee(); if(fee > 0 && AT.fee_to) msgs.push({ type: "cosmos-sdk/MsgSend", value: { from_address: window.__ADDR, to_address: AT.fee_to, amount: [{ denom: "uatone", amount: String(fee) }] } });
     return msgs;
   }
   window.__atMsgs = atMsgs;
+  /* the SendAuthorization's cap: split% of the rewards this stake is projected to earn
+     over the grant's months, at today's blended rate - never an open-ended limit */
+  function atSplitLimit(){
+    var pos = window.__POS;
+    if(!(AT.split_pct > 0) || !AT.split_to || !pos || !(pos.total > 0)) return 0;
+    return Math.floor(pos.total * pos.rate * (AT.days / 365) * AT.split_pct / 100);
+  }
   function atFee(){
     /* 5% (or whatever _status says) of the projected yearly gain, pro-rated to the period */
     var an = window.__ANS || {}, gain = an.gain > 0 ? an.gain : 0;
@@ -2373,8 +2390,10 @@ rememberGridH();
     if(go) go.disabled = !ok;
     /* the header's right side: the plan in a line once it can be granted; until the keeper is open, that word */
     if(sm) sm.innerHTML = !AT.addr ? '<span class=atclosed>Autopilot is not open yet</span>' : ok ? fmt(cap) + " ATONE<br>" + (AT_WORD[atPreset()] || "moderate") + ", " + (atPick() === "selected" ? "my selection, " : "") + scope.length + " validators, " + atMonths() + (atRestake() ? ", restake" : "") : "";
-    var fee = atFee();
-    if(feeEl){ feeEl.hidden = !(fee > 0); if(fee > 0) feeEl.innerHTML = "Service fee <b>" + fmt(fee) + " ATONE</b> - " + AT.fee_pct + "% of the projected gain for " + atMonths() + ", paid with the grant in the same signature."; }
+    var fee = atFee(), sl = atRestake() ? atSplitLimit() : 0;
+    if(feeEl){ feeEl.hidden = !(fee > 0 || sl > 0);
+      if(sl > 0) feeEl.innerHTML = "<b>" + AT.split_pct + "%</b> of restaked rewards go to GATA - allows sending up to <b>" + fmt(sl) + " ATONE</b> to GATA over " + atMonths() + ".";
+      else if(fee > 0) feeEl.innerHTML = "Service fee <b>" + fmt(fee) + " ATONE</b> - " + AT.fee_pct + "% of the projected gain for " + atMonths() + ", paid with the grant in the same signature."; }
     E("attxfee").textContent = ""; var st = E("atstep"); st.textContent = ""; st.className = "txstep";
     if(ok && window.__TX && window.__WALLET){
       var w = window.__WALLET, msgs = atMsgs(), fe = E("attxfee"); fe.textContent = "fee: estimating\u2026";
