@@ -3480,6 +3480,18 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
 .txstep:empty{display:none}
 /* the empty state sits in the middle of the list's room, not against its left edge */
 #dmy .wk-empty{padding:0;height:100%;min-height:120px;display:flex;align-items:center;justify-content:center;text-align:center}
+/* ── the phone reads the dashboard as a page, not a window: the panes stack at their own
+   height and the PHONE scrolls - no inner scroll, no dead band under a capped frame ── */
+@media(max-width:620px){
+  /* the frame itself lets go: .below is the viewport-height window on every other tab,
+     here it is simply the page (the bar stays sticky on its own) */
+  html[data-tab=dele] .below{height:auto;min-height:100svh;overflow:visible}
+  html[data-tab=dele] #p-dele,html[data-tab=dele] .w#calc>#p-dele{height:auto;max-height:none;margin-top:0;flex:1 1 auto;overflow:visible;overscroll-behavior:auto}
+  html[data-tab=dele] .panes{overflow:visible;height:auto}
+  html[data-tab=dele] .w#calc{overflow:visible}
+  html[data-tab=dele] #p-dele>.pw{height:auto;min-height:0}
+  html[data-tab=dele] .folder{position:sticky;top:0;z-index:20;background:var(--void)}
+}
 </style>
 <link rel=stylesheet href="assets/theme-day.css">
 </head><body>
