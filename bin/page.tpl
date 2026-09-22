@@ -3478,6 +3478,8 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
 .wk-btn.busy{pointer-events:none;position:relative;color:transparent!important;text-shadow:none!important}
 .wk-btn.busy::after{content:"";position:absolute;left:calc(50% - 8px);top:calc(50% - 8px);width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;animation:notespin .8s linear infinite}
 .txstep:empty{display:none}
+/* the empty state sits in the middle of the list's room, not against its left edge */
+#dmy .wk-empty{padding:0;height:100%;min-height:120px;display:flex;align-items:center;justify-content:center;text-align:center}
 </style>
 <link rel=stylesheet href="assets/theme-day.css">
 </head><body>
