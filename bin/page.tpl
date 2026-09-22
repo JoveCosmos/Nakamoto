@@ -2319,8 +2319,6 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
   .wk-tbl2 th,.wk-tbl2 td{padding:0 4px}
   .wk-tbl2 td.nm{max-width:0;width:40%}
   #dmy th:nth-child(5),#dmy td:nth-child(5){display:none}
-  #dpicks th:nth-child(2),#dpicks td:nth-child(2),#dpicks th:nth-child(5),#dpicks td:nth-child(5),#dpicks th:nth-child(6),#dpicks td:nth-child(6),#dpicks th:nth-child(7),#dpicks td:nth-child(7),#dpicks th:nth-child(8),#dpicks td:nth-child(8){display:none}
-  #dpicks td.r2 s,#dpicks td.r2 em{display:none}
   
   
   
@@ -3491,6 +3489,22 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
   html[data-tab=dele] .w#calc{overflow:visible}
   html[data-tab=dele] #p-dele>.pw{height:auto;min-height:0}
   html[data-tab=dele] .folder{position:sticky;top:0;z-index:20;background:var(--void)}
+}
+/* ── the phone's Redelegate list: four real columns (its markup is its own), laid out
+   fixed so nothing is cut; the APR pair shows whole; the plan's addition keeps room ── */
+@media(max-width:700px){
+  #dpicks table{table-layout:fixed}
+  #dpicks td.r2{white-space:nowrap;font-size:10px;padding-right:6px}
+  #dpicks td.r2 s{font-size:9.5px}
+  #dpicks td.r2 em{font-size:9px;margin:0 1px}
+  #dpicks td.r2 b{font-size:10.5px}
+  #dpicks td.nm .nmw>span:not(.wk-lgx){min-width:0;flex:0 1 auto}
+  #dpicks td.nm .gtag.add{flex:0 0 auto;margin-left:6px}
+  #dpicks td.stk{padding:0 4px}
+  #dpicks td.ck{text-overflow:clip;padding:0 2px 0 4px}
+  /* the connect gate sits in the middle of its section; the squares with it */
+  html[data-tab=dele] #wk-mine .wk-gate{min-height:300px;display:flex;align-items:center;justify-content:center}
+  #wk-mine .wk-gin{height:auto;min-height:0;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
 }
 </style>
 <link rel=stylesheet href="assets/theme-day.css">

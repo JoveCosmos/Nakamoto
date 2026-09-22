@@ -1877,12 +1877,19 @@ rememberGridH();
        average size - where the bonus pays), its signing record over every block indexed,
        the last 90 days, blocks proposed, jailings; then what this stake gets and earns */
     var MEAN = window.__S() / window.__VALS().length;
-    var wide = window.innerWidth > 1560 || window.innerWidth <= 900;   /* the two lifetime columns need a wide frame */
+    /* three frames: a phone renders only what fits (tick, name with the plan's addition,
+       stake, the full APR pair); a wide frame adds the two lifetime columns */
+    var ph = window.innerWidth <= 700;
+    var wide = !ph && (window.innerWidth > 1560 || window.innerWidth <= 900);
     /* the wallet's columns (tick, stake, now -> there) are laid out from the first paint for a
        reader who will be reconnected, with dashes until the position lands - so the list does
        not shift when it does */
     var lay = !!pos || expectWallet();
-    var h = '<table><colgroup><col style="width:' + (lay ? 30 : 22) + 'px"><col style="width:36px"><col><col style="width:64px">' + (wide ? '<col style="width:70px">' : '') + '<col style="width:72px">' + (wide ? '<col style="width:64px">' : '') + '<col style="width:50px"><col style="width:' + (lay ? 104 : 60) + 'px"></colgroup>' +
+    var h = ph
+      ? '<table><colgroup><col style="width:' + (lay ? 30 : 24) + 'px"><col><col style="width:50px"><col style="width:' + (lay ? 96 : 56) + 'px"></colgroup>' +
+        '<thead><tr><th class=ck>' + (pos ? '<input type=checkbox id=ckall aria-label="Tick every validator"' + (sel.n && sel.n === opt.length ? ' checked' : '') + '>' : '') + '</th><th class=l>validator</th>' +
+        '<th title="the validator\'s stake">stake</th><th>' + (lay ? 'APR' : 'APR') + '</th></tr></thead><tbody>'
+      : '<table><colgroup><col style="width:' + (lay ? 30 : 22) + 'px"><col style="width:36px"><col><col style="width:64px">' + (wide ? '<col style="width:70px">' : '') + '<col style="width:72px">' + (wide ? '<col style="width:64px">' : '') + '<col style="width:50px"><col style="width:' + (lay ? 104 : 60) + 'px"></colgroup>' +
             '<thead><tr><th class=ck>' + (pos ? '<input type=checkbox id=ckall aria-label="Tick every validator"' + (sel.n && sel.n === opt.length ? ' checked' : '') + '>' : '') + '</th><th class=c>rank</th><th class=l>validator</th>' +
             '<th title="the validator\'s stake; green below the average size, where the bonus pays">stake</th>' + (wide ? '<th title="blocks signed over every block indexed">signed</th>' : '') + '<th>90<span class=lc>d</span> uptime</th>' + (wide ? '<th title="blocks proposed">proposed</th>' : '') + '<th>jailed</th>' +
             '<th>' + (lay ? 'APR now → there' : 'APR') + '</th></tr></thead><tbody>';
@@ -1893,6 +1900,14 @@ rememberGridH();
       var mv = on && MOVED[o.id] > 0 ? MOVED[o.id] : null;
       /* what this plan adds sits at the right end of the name cell, against the stake
          column: it grows leftwards into the name's spare room, and no column moves */
+      if(ph){
+        h += '<tr class="' + (on ? 'on' : '') + (pos && !o.better ? ' lt' : '') + '"><td class=ck>' + (pos ? '<input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + '>' : '') + '</td>' +
+             '<td class="l nm" data-v="' + att(o.id) + '" tabindex=0 title="Open this validator"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span>' +
+             (mv != null ? '<em class="gtag add">+' + fmt(mv) + '</em>' : '') + '</div></td>' +
+             '<td class=stk>' + big(o.t) + '</td>' +
+             (lay ? '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '\u2014') + '</s><em>→</em><b>' + pct(there) + '</b></td>' : '<td class=r2><b>' + pct(o.rate0) + '</b></td>') + '</tr>';
+        return;
+      }
       h += '<tr class="' + (on ? 'on' : '') + (pos && !o.better ? ' lt' : '') + '"><td class=ck>' + (pos ? '<input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + '>' : '') + '</td>' +
            '<td class="c rk">' + o.rank + '</td><td class="l nm" data-v="' + att(o.id) + '" tabindex=0 title="Open this validator"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span>' +
            (mv != null ? '<em class="gtag add" title="what this plan adds">+' + fmt(mv) + '</em>' : '') + '</div></td>' +
