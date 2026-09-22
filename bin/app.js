@@ -1479,6 +1479,35 @@ rememberGridH();
     if(mq.addEventListener) mq.addEventListener("change", follow); else if(mq.addListener) mq.addListener(follow); }
 })();
 
+/* ── transaction notifies ─────────────────────────────────────────────────────
+   window.__notify() opens the card and returns {ok, fail, close}; it spins until
+   one of them is called. Modeled on the GATA app's toast, anchored top right. */
+(function(){
+  var box = document.getElementById("txnotes");
+  if(!box) return;
+  var OKI = '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12.5l5 5L20 6.5"/></svg>';
+  var NOI = '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  function esc(v){ return String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  window.__notify = function(){
+    var el = document.createElement("div"), timer = null;
+    el.setAttribute("role", "status");
+    function close(){ if(timer){ clearTimeout(timer); timer = null; } if(el.parentNode) el.parentNode.removeChild(el); }
+    function fill(cls, icon, word, detail, ms){
+      el.className = "wk-note" + (cls ? " " + cls : "");
+      el.innerHTML = icon + "<b>" + word + "</b>" + (detail ? "<i>" + esc(detail).slice(0, 220) + "</i>" : "") +
+                     '<button class=x type=button aria-label="Close">\u2715</button>';
+      el.querySelector(".x").addEventListener("click", close);
+      if(!el.parentNode){ box.appendChild(el); while(box.children.length > 3) box.removeChild(box.firstChild); }
+      if(timer) clearTimeout(timer);
+      timer = ms ? setTimeout(close, ms) : null;
+    }
+    fill("", '<span class=sp aria-hidden=true></span>', "Confirming", "", 0);
+    return { ok: function(){ fill("ok", OKI, "Confirmed", "", 5000); },
+             fail: function(why){ fill("err", NOI, "Failed", why || "", 9000); },
+             close: close };
+  };
+})();
+
 /* ── the poll ─────────────────────────────────────────────────────────────────
    One small file, one block apart. No websocket: a socket per reader against our
    own RPC is a cost with no benefit at this size, and a static file is served by
@@ -2079,22 +2108,19 @@ rememberGridH();
   };
   var txsign = E("txsign"), txcancel = E("txcancel");
   if(txcancel) txcancel.addEventListener("click", function(){ POP.close(txpop); });
+  /* the flow: the button spins, the notify at the top right spins with it until the
+     chain confirms the transaction, then answers green or red; the card closes on green */
   if(txsign) txsign.addEventListener("click", function(){
-    var msgs = txMsgs(), step = E("txstep"); if(!msgs.length || !window.__TX || !window.__WALLET) return;
-    txsign.disabled = true; step.className = "txstep";
-    window.__TX.send(window.__WALLET, msgs, "", function(s, x){
-      step.textContent = s === "simulating" ? "Estimating gas…" : s === "signing" ? "Waiting for your signature…"
-                       : s === "broadcasting" ? "Sending to the chain…" : s === "pending" ? "In the mempool, " + String(x).slice(0, 10) + "… waiting for a block" : s; })
-    .then(function(r){
-      step.className = "txstep ok"; step.innerHTML = "Done in block <b>" + Number(r.height).toLocaleString() + "</b>, " + att(r.hash).slice(0, 12) + "…";
-      txsign.textContent = "Done";
+    var msgs = txMsgs(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
+    txsign.disabled = true; txsign.classList.add("busy");
+    var n = window.__notify();
+    window.__TX.send(window.__WALLET, msgs, "", function(){})
+    .then(function(){
+      n.ok(); POP.close(txpop);
       if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); });
-      setTimeout(function(){ POP.close(txpop); }, 4000);
     })
-    .catch(function(e){
-      step.className = "txstep err"; step.textContent = att(e && e.message || String(e));
-      txsign.disabled = false; txsign.textContent = "Try again";
-    });
+    .catch(function(e){ n.fail(e && e.message || String(e)); })
+    .then(function(){ txsign.disabled = false; txsign.classList.remove("busy"); });
   });
   /* ── unstake: one validator, an amount up to what sits there, one MsgUndelegate ──
      Undelegating is allowed even while a delegation is in its redelegation cooldown;
@@ -2166,21 +2192,16 @@ rememberGridH();
   var uncancel = E("uncancel"); if(uncancel) uncancel.addEventListener("click", function(){ POP.close(unpop); });
   var unsign = E("unsign");
   if(unsign) unsign.addEventListener("click", function(){
-    var msgs = unMsgs(), step = E("unstep"); if(!msgs.length || !window.__TX || !window.__WALLET) return;
-    unsign.disabled = true; step.className = "txstep";
-    window.__TX.send(window.__WALLET, msgs, "", function(s, x){
-      step.textContent = s === "simulating" ? "Estimating gas\u2026" : s === "signing" ? "Waiting for your signature\u2026"
-                       : s === "broadcasting" ? "Sending to the chain\u2026" : s === "pending" ? "In the mempool, " + String(x).slice(0, 10) + "\u2026 waiting for a block" : s; })
-    .then(function(r){
-      step.className = "txstep ok"; step.innerHTML = "Done in block <b>" + Number(r.height).toLocaleString() + "</b>, " + att(r.hash).slice(0, 12) + "\u2026";
-      unsign.textContent = "Done";
+    var msgs = unMsgs(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
+    unsign.disabled = true; unsign.classList.add("busy");
+    var n = window.__notify();
+    window.__TX.send(window.__WALLET, msgs, "", function(){})
+    .then(function(){
+      n.ok(); POP.close(unpop);
       if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); });
-      setTimeout(function(){ POP.close(unpop); }, 4000);
     })
-    .catch(function(e){
-      step.className = "txstep err"; step.textContent = att(e && e.message || String(e));
-      unsign.disabled = false; unsign.textContent = "Try again";
-    });
+    .catch(function(e){ n.fail(e && e.message || String(e)); })
+    .then(function(){ unsign.disabled = false; unsign.classList.remove("busy"); });
   });
 
   /* ── stake: liquid ATONE onto validators the reader ticks, split equally, one
@@ -2254,21 +2275,16 @@ rememberGridH();
   var stcancel = E("stcancel"); if(stcancel) stcancel.addEventListener("click", function(){ POP.close(stpop); });
   var stsign = E("stsign");
   if(stsign) stsign.addEventListener("click", function(){
-    var msgs = stMsgs(), step = E("ststep"); if(!msgs.length || !window.__TX || !window.__WALLET) return;
-    stsign.disabled = true; step.className = "txstep";
-    window.__TX.send(window.__WALLET, msgs, "", function(s, x){
-      step.textContent = s === "simulating" ? "Estimating gas\u2026" : s === "signing" ? "Waiting for your signature\u2026"
-                       : s === "broadcasting" ? "Sending to the chain\u2026" : s === "pending" ? "In the mempool, " + String(x).slice(0, 10) + "\u2026 waiting for a block" : s; })
-    .then(function(r){
-      step.className = "txstep ok"; step.innerHTML = "Done in block <b>" + Number(r.height).toLocaleString() + "</b>, " + att(r.hash).slice(0, 12) + "\u2026";
-      stsign.textContent = "Done";
+    var msgs = stMsgs(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
+    stsign.disabled = true; stsign.classList.add("busy");
+    var n = window.__notify();
+    window.__TX.send(window.__WALLET, msgs, "", function(){})
+    .then(function(){
+      n.ok(); POP.close(stpop);
       if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); });
-      setTimeout(function(){ POP.close(stpop); }, 4000);
     })
-    .catch(function(e){
-      step.className = "txstep err"; step.textContent = att(e && e.message || String(e));
-      stsign.disabled = false; stsign.textContent = "Try again";
-    });
+    .catch(function(e){ n.fail(e && e.message || String(e)); })
+    .then(function(){ stsign.disabled = false; stsign.classList.remove("busy"); });
   });
 
   /* ── Autopilot: a StakeAuthorization REDELEGATE grant to GATA's keeper address, with
@@ -2393,24 +2409,23 @@ rememberGridH();
   Array.prototype.forEach.call(document.querySelectorAll("#atseg button"), function(b){ b.addEventListener("click", function(){
     AT.days = +b.dataset.d; Array.prototype.forEach.call(document.querySelectorAll("#atseg button"), function(o){ o.setAttribute("aria-pressed", o === b ? "true" : "false"); }); atState(); }); });
   var atcancel = E("atcancel"); if(atcancel) atcancel.addEventListener("click", function(){ POP.close(atpop); });
-  function atSend(msgs, btn, done, memo){
-    var step = E("atstep"); if(!msgs.length || !window.__TX || !window.__WALLET) return;
-    btn.disabled = true; step.className = "txstep";
-    window.__TX.sendDirect(window.__WALLET, msgs, memo || "", function(s, x){
-      step.textContent = s === "simulating" ? "Estimating gas\u2026" : s === "signing" ? "Waiting for your signature\u2026"
-                       : s === "broadcasting" ? "Sending to the chain\u2026" : s === "pending" ? "In the mempool, " + String(x).slice(0, 10) + "\u2026 waiting for a block" : s; })
-    .then(function(r){
-      step.className = "txstep ok"; step.innerHTML = "Done in block <b>" + Number(r.height).toLocaleString() + "</b>, " + att(r.hash).slice(0, 12) + "\u2026";
-      btn.textContent = done;
-      setTimeout(function(){ atGrant().then(function(g){ AT.grant = g; atShow(); atLine(); var ab = E("atbtn"); if(ab) ab.classList.toggle("on", !!g); }); }, 1500);
+  function atSend(msgs, btn, memo){
+    if(!msgs.length || !window.__TX || !window.__WALLET) return;
+    btn.disabled = true; btn.classList.add("busy");
+    var n = window.__notify();
+    window.__TX.sendDirect(window.__WALLET, msgs, memo || "", function(){})
+    .then(function(){
+      n.ok(); POP.close(atpop);
+      atGrant().then(function(g){ AT.grant = g; atShow(); atLine(); var ab = E("atbtn"); if(ab) ab.classList.toggle("on", !!g); });
     })
-    .catch(function(e){ step.className = "txstep err"; step.textContent = att(e && e.message || String(e)); btn.disabled = false; btn.textContent = "Try again"; });
+    .catch(function(e){ n.fail(e && e.message || String(e)); })
+    .then(function(){ btn.disabled = false; btn.classList.remove("busy"); });
   }
-  var atgrant = E("atgrant"); if(atgrant) atgrant.addEventListener("click", function(){ atSend(atMsgs(), atgrant, "Granted", atMemo()); });
+  var atgrant = E("atgrant"); if(atgrant) atgrant.addEventListener("click", function(){ atSend(atMsgs(), atgrant, atMemo()); });
   /* revoke names every grant that stands (a revoke of one that does not fails the whole tx) */
   var atrevoke = E("atrevoke"); if(atrevoke) atrevoke.addEventListener("click", function(){
     var types = {}; (AT.grants || []).forEach(function(x){ var t = grantType(x); if(t) types[t] = 1; }); if(!types[REDEL]) types[REDEL] = 1;
-    atSend(Object.keys(types).map(function(t){ return { type: "cosmos-sdk/MsgRevoke", value: { granter: window.__ADDR, grantee: AT.addr, msg_type_url: t } }; }), atrevoke, "Revoked"); });
+    atSend(Object.keys(types).map(function(t){ return { type: "cosmos-sdk/MsgRevoke", value: { granter: window.__ADDR, grantee: AT.addr, msg_type_url: t } }; }), atrevoke); });
   /* the door shows with a wallet once the keeper's address is known; lit while a grant stands */
   /* the wallet's Autopilot line: off, or on with the grant's bounds; the door reads Set up / Manage */
   function atLine(){

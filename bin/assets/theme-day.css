@@ -617,6 +617,15 @@
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-apk{color:var(--muted);text-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-apb{border:1px solid var(--line-strong);background:var(--accent);color:#FFFFFF;box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-apb:focus-visible{outline:2px solid var(--accent)}
+  html[data-theme=light]:not([data-mono]) .wk-note{background:var(--wc,var(--surface));color:var(--wt,var(--ink));border:1px solid var(--accent);border-left:3px solid var(--accent);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .wk-note.ok{border-color:var(--accent);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .wk-note.err{border-color:var(--danger-bar);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .wk-note .sp{border:2px solid var(--accent-soft);border-top-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #p-dele~.wk-notes svg,html[data-theme=light]:not([data-mono]) .wk-note svg{fill:none}
+  html[data-theme=light]:not([data-mono]) .wk-note .x{background:none}
+  html[data-theme=light]:not([data-mono]) .wk-note .x:focus-visible{outline:2px solid var(--accent)}
+  html[data-theme=light]:not([data-mono]) .wk-btn.busy{color:transparent!important;text-shadow:none!important}
+  html[data-theme=light]:not([data-mono]) .wk-btn.busy::after{border:2px solid var(--surface-2);border-top-color:var(--accent)}
   html[data-theme=light]:not([data-mono]){--void:var(--bg);--edge:var(--line);--edge2:var(--line-strong);--ink2:var(--muted);--ink3:var(--faint);--hot:var(--warn);--burn:var(--danger);--cold:var(--accent);--lit:var(--ink);--card:var(--surface);--card2:var(--surface-2);--inset:var(--surface-sunk);--blue:var(--accent);--cyan:var(--accent);--green:var(--accent);--amber:var(--warn);--cv:var(--bg);--ce:var(--line);--ce2:var(--line-strong);--ci:var(--ink);--ci2:var(--muted);--ci3:var(--faint);--cf:var(--faint);--ch:var(--warn);--cb:var(--danger);--cc:var(--accent);--cl:var(--ink);--mono:var(--day-mono);--sans:var(--day-sans)}
   html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-dele *,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) .pop,html[data-theme=light]:not([data-mono]) .pop *{--wc:var(--surface);--wh:var(--surface-2);--wbd:var(--line);--wbd2:var(--line-strong);--wi:var(--surface-sunk);--wchip:var(--surface-2);--wt:var(--ink);--ws:var(--muted);--wf:var(--faint);--wblue:var(--accent);--wcyan:var(--accent);--wgreen:var(--accent);--wamber:var(--warn);--wburn:var(--danger);--wgold:var(--warn);--wsans:var(--day-sans);--wmono:var(--day-mono)}
   /* ── the hand layer: the day spec's typography, shape, spacing and components ── */
@@ -1025,4 +1034,17 @@
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-ap::before{display:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-apk{font-size:14px;font-weight:600;color:var(--accent);text-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-apb{height:28px;font-weight:500;filter:none;transform:none}
+  /* ── the transaction notify in day: the spec's toast - ink card on the paper ── */
+  html[data-theme=light]:not([data-mono]) .wk-notes{top:84px}
+  html[data-theme=light]:not([data-mono]) .wk-note{background:var(--ink);color:var(--surface);border:0;border-left:3px solid var(--accent);border-radius:14px;box-shadow:var(--shadow-toast);font-family:var(--day-sans);font-size:13px}
+  html[data-theme=light]:not([data-mono]) .wk-note.ok{border-left-color:#2F8F6B;box-shadow:var(--shadow-toast)}
+  html[data-theme=light]:not([data-mono]) .wk-note.err{border-left-color:var(--danger-bar);box-shadow:var(--shadow-toast)}
+  html[data-theme=light]:not([data-mono]) .wk-note i{color:#C9C5BC}
+  html[data-theme=light]:not([data-mono]) .wk-note .sp{border-color:rgba(255,253,248,.25);border-top-color:var(--surface)}
+  html[data-theme=light]:not([data-mono]) .wk-note svg{stroke:#7FD8B8}
+  html[data-theme=light]:not([data-mono]) .wk-note.err svg{stroke:#F0A090}
+  html[data-theme=light]:not([data-mono]) .wk-note .x{color:#A8A49B}
+  html[data-theme=light]:not([data-mono]) .wk-note .x:hover{color:var(--surface)}
+  html[data-theme=light]:not([data-mono]) .wk-btn.busy::after{border-color:rgba(23,25,28,.2);border-top-color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .wk-btn.wk-go.busy::after{border-color:rgba(255,255,255,.35);border-top-color:#fff}
 

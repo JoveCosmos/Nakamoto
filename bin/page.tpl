@@ -3451,6 +3451,33 @@ html[data-theme=light] .thbtn .moon{display:block}
 #dmy tbody tr.inactive td{color:var(--wf)}
 #dmy tbody tr.inactive td.nm span{color:var(--wamber)}
 #dmy tbody tr.inactive td.rw{color:var(--wf)}
+/* ── transaction notifies: one small card at the top right, under the bar, above the
+   Outcome column (the GATA app's toast, top-anchored). A spinner from the moment a
+   signing starts until the chain itself confirms the transaction, then green for a
+   block or red with the chain's reason; a cross closes it. Nothing else narrates a
+   signing - the button spins, this card answers. ── */
+.wk-notes{position:fixed;top:78px;right:28px;z-index:120;display:flex;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:none;max-width:min(92vw,380px)}
+.wk-note{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:10px 12px 10px 13px;border-radius:12px;background:var(--wc,#0b0b16);color:var(--wt,#e6e4f0);
+font-family:var(--wsans);font-size:12.5px;line-height:1.4;border:1px solid rgba(185,176,255,.4);border-left:3px solid #b9b0ff;
+box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:notein .18s ease-out both}
+.wk-note.ok{border-color:rgba(46,224,106,.4);border-left-color:var(--wgreen);box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px var(--wgreen)}
+.wk-note.err{border-color:rgba(255,77,31,.4);border-left-color:var(--wburn);box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px var(--wburn)}
+.wk-note .sp{width:14px;height:14px;flex:0 0 auto;border-radius:50%;border:2px solid rgba(185,176,255,.25);border-top-color:#b9b0ff;animation:notespin .8s linear infinite}
+#p-dele~.wk-notes svg,.wk-note svg{width:15px;height:15px;flex:0 0 auto;fill:none;stroke:var(--wgreen);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;margin:0;max-height:none}
+.wk-note.err svg{stroke:var(--wburn)}
+.wk-note b{font-weight:600;letter-spacing:0;white-space:nowrap}
+.wk-note i{font-style:normal;color:var(--ws);min-width:0;word-break:break-word}
+.wk-note .x{flex:0 0 auto;margin-left:2px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;border:0;background:none;color:var(--wf);font-size:13px;line-height:1;cursor:pointer;padding:0}
+.wk-note .x:hover{color:var(--wt)}
+.wk-note .x:focus-visible{outline:2px solid #b9b0ff;outline-offset:2px;border-radius:4px}
+@keyframes notein{from{opacity:0;transform:translateX(18px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes notespin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.wk-note{animation:none}.wk-note .sp{animation-duration:2.4s}}
+@media(max-width:620px){.wk-notes{top:58px;right:10px;left:10px;align-items:stretch;max-width:none}}
+/* a button that is signing spins in place; its word comes back with the answer */
+.wk-btn.busy{pointer-events:none;position:relative;color:transparent!important;text-shadow:none!important}
+.wk-btn.busy::after{content:"";position:absolute;left:calc(50% - 8px);top:calc(50% - 8px);width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;animation:notespin .8s linear infinite}
+.txstep:empty{display:none}
 </style>
 <link rel=stylesheet href="assets/theme-day.css">
 </head><body>
@@ -3682,6 +3709,8 @@ html[data-theme=light] .thbtn .moon{display:block}
   </div>
 </div>
 
+
+<div class=wk-notes id=txnotes aria-live=polite></div>
 
 <div class=pop id=vpop><div class="card vcard">
   <div class="vhead vwrap"><img class=vlogo id=vlogo alt=""><span class=vmono id=vmono></span>

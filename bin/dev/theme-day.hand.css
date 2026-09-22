@@ -403,3 +403,16 @@
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-ap::before{display:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-apk{font-size:14px;font-weight:600;color:var(--accent);text-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-apb{height:28px;font-weight:500;filter:none;transform:none}
+  /* ── the transaction notify in day: the spec's toast - ink card on the paper ── */
+  html[data-theme=light]:not([data-mono]) .wk-notes{top:84px}
+  html[data-theme=light]:not([data-mono]) .wk-note{background:var(--ink);color:var(--surface);border:0;border-left:3px solid var(--accent);border-radius:14px;box-shadow:var(--shadow-toast);font-family:var(--day-sans);font-size:13px}
+  html[data-theme=light]:not([data-mono]) .wk-note.ok{border-left-color:#2F8F6B;box-shadow:var(--shadow-toast)}
+  html[data-theme=light]:not([data-mono]) .wk-note.err{border-left-color:var(--danger-bar);box-shadow:var(--shadow-toast)}
+  html[data-theme=light]:not([data-mono]) .wk-note i{color:#C9C5BC}
+  html[data-theme=light]:not([data-mono]) .wk-note .sp{border-color:rgba(255,253,248,.25);border-top-color:var(--surface)}
+  html[data-theme=light]:not([data-mono]) .wk-note svg{stroke:#7FD8B8}
+  html[data-theme=light]:not([data-mono]) .wk-note.err svg{stroke:#F0A090}
+  html[data-theme=light]:not([data-mono]) .wk-note .x{color:#A8A49B}
+  html[data-theme=light]:not([data-mono]) .wk-note .x:hover{color:var(--surface)}
+  html[data-theme=light]:not([data-mono]) .wk-btn.busy::after{border-color:rgba(23,25,28,.2);border-top-color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .wk-btn.wk-go.busy::after{border-color:rgba(255,255,255,.35);border-top-color:#fff}
