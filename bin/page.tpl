@@ -3612,6 +3612,91 @@ text-align:right;padding:9px 10px;background:var(--wi);border-top:1px solid var(
 .sv-can u{text-decoration:none;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
 .sv-can p{margin:0;display:flex;gap:14px;flex-wrap:wrap}
 .sv-can p span{display:inline-flex;align-items:center;gap:6px}
+/* ══ Simple view, second pass (2026-09-25): depth, colour with meaning, one hero ══════════
+   The calculator takes its colour from its content (the map, the gradient tracks); this view
+   has none of that, so it gets its own. Three levels of depth - the page ground, a lifted
+   slate card on the calculator's edges, raised tiles inside it - so groups read without
+   lines; a tinted badge per figure; one green hero with a solid action where the gain is;
+   labels in sentence case a person reads at a glance. Scoped to #sv: Advanced keeps its look. */
+#sv{--wc:#0f1322;--wh:#161c2e;--wi:#0c1019;--wchip:#141a2b;--wbd:#232b41;--wbd2:#323c59;--wt:#eef1f8;--ws:#adb4c9;--wf:#8a93ad}
+.sv-screen{background:linear-gradient(180deg,#111627,#0d111d);border-color:#232b42;padding:16px 18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+.sv-screen>:not(:first-child){border-top:0;margin-top:14px;padding-top:0}
+.sv-screen>.sv-panel,.sv-screen>.sv-strip{background:var(--wh);border:1px solid var(--wbd);border-radius:12px;padding:14px 16px}
+.sv-screen .sv-cards{gap:12px}
+.sv-screen .sv-card,.sv-screen .sv-card:first-child{background:var(--wh);border:1px solid var(--wbd);border-radius:12px;padding:14px 16px}
+.sv-screen .sv-card+.sv-card{border-left:1px solid var(--wbd)}
+.sv-kl{display:inline-flex;align-items:center;gap:10px;min-width:0}
+.sv-ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--icb);color:var(--ic);flex:0 0 auto}
+.sv-ic svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.sv-k{font-family:var(--wsans);font-size:12.5px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--ws)}
+.sv-big{font-size:30px;margin-top:6px}
+.sv-big em{font-family:var(--wsans);font-size:13px;font-weight:500;letter-spacing:0;color:var(--ws)}
+.sv-sub{font-size:12px}
+.sv-tag{font-family:var(--wsans);font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;padding:4px 10px}
+.sv-ph h3{font-size:16.5px;font-weight:700}
+.sv-note{font-size:12.5px}
+.sv-btn{font-family:var(--wsans);font-size:13px;font-weight:600;letter-spacing:0;text-transform:none;height:40px;border-radius:10px}
+.sv-btn.sml{font-size:12px;height:32px;padding:0 14px}
+/* the one action the page is about: solid, and lit */
+.sv-btn.go{background:#2ee06a;border-color:#2ee06a;color:#05170c;box-shadow:0 10px 26px -14px rgba(46,224,106,.9)}
+.sv-btn.go:hover:not(:disabled){background:#52ea88;border-color:#52ea88;color:#05170c}
+.sv-btn.pri{background:#ffb02e;border-color:#ffb02e;color:#1d1300}
+.sv-btn.pri:hover:not(:disabled){background:#ffc25a;border-color:#ffc25a;color:#1d1300}
+/* the hero: the gain on a green wash, its figures as inset tiles */
+#sv-optp.hero{background:radial-gradient(120% 160% at 0% 0%,rgba(46,224,106,.17),rgba(46,224,106,0) 55%),linear-gradient(120deg,rgba(43,200,189,.07),rgba(43,200,189,0) 60%),var(--wh);
+border-color:rgba(46,224,106,.3)}
+.sv-fig{background:rgba(8,11,19,.55);border-color:rgba(255,255,255,.06);padding:10px 12px}
+.sv-fig span{font-family:var(--wsans);font-size:11.5px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--ws)}
+.sv-fig b{font-size:20px}
+.sv-fig b i{font-family:var(--wsans);font-size:11px;font-weight:500}
+/* the allocation reads as data: a thicker bar in parted segments, chips inset in their tile */
+.sv-bar{height:12px;border:0;background:transparent;gap:3px;border-radius:0;overflow:visible}
+.sv-bar i{border-radius:4px}
+.sv-chip{background:var(--wi);border-color:var(--wbd)}
+.sv-chip em{font-family:var(--wsans);font-size:12.5px;font-weight:700}
+.sv-chip u{font-family:var(--wsans);font-size:11px}
+/* status: a dot that says on or off, not a sentence in grey */
+.sv-stat{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--wt)}
+.sv-stat i{width:8px;height:8px;border-radius:50%;background:var(--wf);box-shadow:0 0 0 3px rgba(127,136,163,.18)}
+.sv-stat.on i{background:#2ee06a;box-shadow:0 0 0 3px rgba(46,224,106,.2)}
+/* the network and autopilot screens speak the same type */
+.sv-tbl th{font-family:var(--wsans);font-size:11.5px;font-weight:600;letter-spacing:0;text-transform:none}
+.sv-seg{font-family:var(--wsans);font-size:12px;font-weight:500;letter-spacing:0;text-transform:none}
+.sv-can u{font-family:var(--wsans);font-size:12px;font-weight:600;letter-spacing:0;text-transform:none}
+.sv-tbl tbody tr:hover{background:rgba(255,255,255,.025)}
+/* a desktop window is the calculator's box, so every screen has to fit it whole: tiles sized to
+   the frame, and the chips one row that scrolls sideways when a stake spans many validators
+   (a wrapped second row would push the last part out of the box) */
+@media(min-width:901px){
+  .sv-screen{padding:14px 16px}
+  .sv-screen>:not(:first-child){margin-top:12px}
+  .sv-screen>.sv-panel,.sv-screen>.sv-strip{padding:12px 16px;gap:9px}
+  .sv-screen .sv-card,.sv-screen .sv-card:first-child{padding:12px 16px}
+  .sv-ic{width:26px;height:26px;border-radius:8px}
+  .sv-ic svg{width:14px;height:14px}
+  .sv-big{font-size:26px;margin-top:2px}
+  .sv-btn{height:36px}
+  .sv-fig{padding:7px 12px 8px;gap:2px}
+  .sv-fig b{font-size:18px}
+  .sv-chips{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(160px,1fr);overflow-x:auto;scrollbar-width:thin}
+  .sv-chip{padding-top:7px;padding-bottom:7px}
+}
+/* a short window (a laptop at 720-800px) shrinks the calculator's box with it: the same parts, closer */
+@media(min-width:901px) and (max-height:820px){
+  .sv-screen{padding:10px 14px}
+  .sv-screen>:not(:first-child){margin-top:9px}
+  .sv-screen>.sv-panel,.sv-screen>.sv-strip{padding:9px 14px;gap:7px}
+  .sv-screen .sv-card,.sv-screen .sv-card:first-child{padding:9px 14px}
+  .sv-ic{width:22px;height:22px;border-radius:7px}
+  .sv-ic svg{width:12px;height:12px}
+  .sv-big{font-size:22px;margin-top:0}
+  .sv-btn{height:32px}
+  .sv-ph h3{font-size:15px}
+  .sv-fig{padding:5px 11px 6px}
+  .sv-fig b{font-size:16px}
+  .sv-chip{padding-top:5px;padding-bottom:5px}
+}
+@media(max-width:900px){.sv-screen .sv-card+.sv-card{border-left:1px solid var(--wbd)}}
 .sv-can p span::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;flex:0 0 auto}
 @media(max-width:900px){
   .sv-cards,.sv-cards.four{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -3917,11 +4002,11 @@ html[data-tab=connect] .l2host{display:none}
     <main class=sv-main>
       <section class=sv-screen id=sv-over data-sc=over aria-label=Overview>
         <div class=sv-cards>
-          <div class=sv-card><span class=sv-kr><span class=sv-k>Staked balance</span><span class="sv-tag g">Self-custody</span></span>
+          <div class=sv-card><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#ffb02e;--icb:rgba(255,176,46,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l8 4.5-8 4.5-8-4.5z"/><path d="M4 12l8 4.5 8-4.5"/><path d="M4 16.5l8 4.5 8-4.5"/></svg></span><span class=sv-k>Staked balance</span></span><span class="sv-tag g">Self-custody</span></span>
             <span class=sv-big id=sv-staked>&mdash;<em>ATONE</em></span><span class=sv-sub id=sv-stsub></span></div>
-          <div class=sv-card><span class=sv-k>Your APR</span>
+          <div class=sv-card><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#2bc8bd;--icb:rgba(43,200,189,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span><span class=sv-k>Your APR</span></span></span>
             <span class=sv-big id=sv-apr>&mdash;</span><span class=sv-sub id=sv-aprsub></span></div>
-          <div class=sv-card><span class=sv-k>Rewards waiting</span>
+          <div class=sv-card><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#2ee06a;--icb:rgba(46,224,106,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 21V7"/><path d="M12 7C10 3 6 4 7 6.5 7.8 8 12 7 12 7zM12 7c2-4 6-3 5-.5C16.2 8 12 7 12 7z"/></svg></span><span class=sv-k>Rewards waiting</span></span></span>
             <span class=sv-big id=sv-rew>&mdash;<em>ATONE</em></span><span class=sv-sub id=sv-rewsub></span></div>
         </div>
         <div class=sv-panel id=sv-optp></div>

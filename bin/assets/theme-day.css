@@ -626,6 +626,18 @@
   html[data-theme=light]:not([data-mono]) .sv-nm img,html[data-theme=light]:not([data-mono]) .sv-nm span.lg{box-shadow:0 0 0 1px var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sv-nm span.lg{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .sv-can u{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .sv-screen{background:var(--surface-2);border-color:var(--surface-2);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-ic svg{fill:none;stroke:currentColor}
+  html[data-theme=light]:not([data-mono]) .sv-btn.go{background:var(--accent);border-color:var(--accent);color:#FFFFFF;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-btn.go:hover:not(:disabled){background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .sv-btn.pri{background:var(--amber-bar);border-color:var(--amber-bar);color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .sv-btn.pri:hover:not(:disabled){background:var(--amber-bar);border-color:var(--amber-bar);color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) #sv-optp.hero{background:var(--accent-soft),var(--wh);border-color:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sv-fig{background:var(--surface-2);border-color:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sv-bar{background:transparent}
+  html[data-theme=light]:not([data-mono]) .sv-stat i{box-shadow:0 0 0 3px var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sv-stat.on i{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sv-tbl tbody tr:hover{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .l1tab{background:transparent}
   html[data-theme=light]:not([data-mono]) .l2tab{background:transparent}
   html[data-theme=light]:not([data-mono]) .shell-act{background:transparent;text-decoration:none}
@@ -729,4 +741,16 @@
 
   /* the navigation shell's "soon" badge: on a lit level-1 tab the tint lowers its ground */
   html[data-theme=light]:not([data-mono]) .l1badge{color:var(--warn-ink)}
+
+  /* the simple view's hero on paper: the night wash is layered gradients the shadow cannot
+     carry as one token, so it is named here - the accent's own soft green, its figures on
+     white tiles, the icon badges on a soft ground */
+  html[data-theme=light]:not([data-mono]) #sv-optp.hero{background:linear-gradient(120deg,var(--accent-tint),var(--surface) 70%);border-color:#B9D6CC}
+  html[data-theme=light]:not([data-mono]) #sv-optp.hero .sv-fig{background:var(--field);border-color:var(--line-soft)}
+  html[data-theme=light]:not([data-mono]) .sv-screen{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sv-screen>.sv-panel,html[data-theme=light]:not([data-mono]) .sv-screen>.sv-strip,
+  html[data-theme=light]:not([data-mono]) .sv-screen .sv-card,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card:first-child{background:var(--surface);border-color:var(--line)}
+  html[data-theme=light]:not([data-mono]) #sv .sv-chip{background:var(--surface-2);border-color:var(--line-soft)}
+  /* the amber action on paper carries dark ink: white on the day amber is under 4.5:1 */
+  html[data-theme=light]:not([data-mono]) #sv .sv-btn.pri,html[data-theme=light]:not([data-mono]) #sv .sv-btn.pri:hover:not(:disabled){color:var(--ink)}
 

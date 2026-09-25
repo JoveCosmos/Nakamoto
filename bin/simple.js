@@ -102,6 +102,8 @@
           ', all in one signature. Redelegated stake cannot move again for 21 days.</div>';
     }
     box.innerHTML = h;
+    /* the hero wash only when there is a move to make - the page's one call to action */
+    box.classList.toggle("hero", h.indexOf("data-act=opt") >= 0);
 
     /* where the stake sits now */
     var al = E("sv-allocp");
@@ -121,7 +123,7 @@
     /* the line under it: autopilot, freshness, the two plain controls */
     var at = window.__atInfo ? window.__atInfo() : null;
     var f = E("sv-foot");
-    f.innerHTML = '<span>' + autopilotWord(at) + '</span>' +
+    f.innerHTML = '<span class="sv-stat' + (at && at.grant ? ' on' : '') + '"><i></i>' + autopilotWord(at) + '</span>' +
       (pos ? '<span class=sv-sep>|</span><span>' + (window.__POSAT ? "read " + ago(window.__POSAT) : "") + '</span>' : "") +
       '<div class=sv-rt>' +
         (pos ? '<button class="sv-btn sml" type=button data-act=refresh>Refresh</button>' : "") +

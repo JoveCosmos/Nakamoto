@@ -1236,6 +1236,12 @@ rememberGridH();
       root.style.setProperty("--maph", map + "px");
       h = need(); r = room();
     }
+    /* the calculator's box, read while Home is up: state() can only read it when the
+       calculator is open, so a first visit that lands on the dashboard (nothing
+       remembered yet) or a resize there would otherwise leave the dashboard on a guess */
+    var fb = document.getElementById("flipbox");
+    if(fb && fb.offsetHeight > 100){ root.style.setProperty("--calc-top", fb.offsetTop + "px"); root.style.setProperty("--calc-h", fb.offsetHeight + "px");
+      try{ localStorage.setItem("th_calcbox", fb.offsetTop + "/" + fb.offsetHeight + "/" + innerWidth); }catch(e){} }
     root.setAttribute("data-tab", cur);
     h = Math.min(h, r);
     if(h > 0) root.style.setProperty("--paneh", Math.round(h) + "px");
