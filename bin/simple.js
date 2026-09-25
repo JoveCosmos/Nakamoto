@@ -158,9 +158,8 @@
   }
   function ago(at){ var s = Math.max(0, Math.round((Date.now() - at) / 1000)); return s < 60 ? s + "s ago" : Math.floor(s / 60) + "m ago"; }
   function autopilotWord(at){
-    if(!at || !at.addr) return "Autopilot is not open yet";
-    if(at.grant) return "Autopilot is on" + (at.restake ? ", restaking rewards" : "");
-    return "Autopilot is off";
+    if(at && at.grant) return "Autopilot is active" + (at.restake ? ", restaking rewards" : "");
+    return "Autopilot is inactive";
   }
 
   /* ── AUTOPILOT ──────────────────────────────────────────────────────────── */
@@ -169,7 +168,7 @@
     var a = g && g.authorization || {};
     var allow = ((a.allow_list || {}).address || []).length;
     var until = g && g.expiration && window.__dayFull ? window.__dayFull(new Date(g.expiration).getTime()) : null;
-    var state = !at || !at.addr ? tag("a", "not open yet") : g ? tag("g", "on") : tag("q", "off");
+    var state = g ? tag("g", "Active") : tag("q", "Inactive");
     var door = !pos ? "" : '<button class="sv-btn ' + (g ? "" : "pri") + '" type=button data-act=autopilot>' + (g ? "Manage" : "Set up") + '</button>';
 
     E("sv-atp").innerHTML =

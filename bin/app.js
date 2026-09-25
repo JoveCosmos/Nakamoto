@@ -2419,7 +2419,7 @@ rememberGridH();
     if(hint){ hint.className = "unhint"; hint.textContent = (!window.__WALLET || !window.__WALLET.signDirect ? "Needs Keplr (direct signing)" : (!scope.length ? (atPick() === "selected" ? "select validators in the Redelegate list first" : "no validators fit that strategy today") : "")); }
     if(go) go.disabled = !ok;
     /* the header's right side: the plan in a line once it can be granted; until the keeper is open, that word */
-    if(sm) sm.innerHTML = !AT.addr ? '<span class=atclosed>Autopilot is not open yet</span>' : ok ? fmt(cap) + " ATONE<br>" + (AT_WORD[atPreset()] || "moderate") + ", " + (atPick() === "selected" ? "my selection, " : "") + scope.length + " validators, " + atMonths() + (atRestake() ? ", restake" : "") : "";
+    if(sm) sm.innerHTML = !AT.addr ? '<span class=atclosed>Inactive</span>' : ok ? fmt(cap) + " ATONE<br>" + (AT_WORD[atPreset()] || "moderate") + ", " + (atPick() === "selected" ? "my selection, " : "") + scope.length + " validators, " + atMonths() + (atRestake() ? ", restake" : "") : "";
     var fee = atFee(), sl = atRestake() ? atSplitLimit() : 0;
     if(feeEl){ feeEl.hidden = !(fee > 0 || sl > 0);
       if(sl > 0) feeEl.innerHTML = "<b>" + AT.split_pct + "%</b> of restaked rewards go to GATA - allows sending up to <b>" + fmt(sl) + " ATONE</b> to GATA over " + atMonths() + ".";
@@ -2438,10 +2438,10 @@ rememberGridH();
       var rp = AT.report, last = rp && rp.checked ? new Date(rp.checked * 1000) : null;
       st.hidden = false; form.hidden = true; rv.hidden = false; go.hidden = true;
       var restk = (AT.grants || []).some(function(x){ return grantType(x) === DELEG; });
-      st.innerHTML = '<span class=g>Autopilot is on' + (restk ? ', restaking rewards' : '') + '.</span> Cap left <b>' + cap + '</b>, <b>' + n + '</b> allowed validators, until <b>' + exp + '</b>.<br>' +
+      st.innerHTML = '<span class=g>Autopilot is active' + (restk ? ', restaking rewards' : '') + '.</span> Cap left <b>' + cap + '</b>, <b>' + n + '</b> allowed validators, until <b>' + exp + '</b>.<br>' +
         (last ? 'Last check <b>' + window.__dayFull(last.getTime()) + '</b>' + (rp.moves && rp.moves.length ? ', <b>' + rp.moves.length + '</b> move' + (rp.moves.length === 1 ? '' : 's') + ' ' + (rp.dry ? 'planned (dry run)' : 'made') + ', <b class=g>+' + one(rp.gain || 0) + '</b> ATONE a year' : ', nothing to move') : 'The keeper has not checked this address yet') +
         (rp && rp.history && rp.history.length ? '<br>Moves made: <b>' + rp.history.length + '</b>, last ' + window.__dayFull(rp.history[0].at * 1000) : '');
-      if(sm) sm.innerHTML = "on";
+      if(sm) sm.innerHTML = "Active";
     } else { st.hidden = true; form.hidden = false; rv.hidden = true; go.hidden = false; atState(); }
   }
   var atbtn = E("atbtn");
@@ -2476,19 +2476,19 @@ rememberGridH();
     var types = {}; (AT.grants || []).forEach(function(x){ var t = grantType(x); if(t) types[t] = 1; }); if(!types[REDEL]) types[REDEL] = 1;
     atSend(Object.keys(types).map(function(t){ return { type: "cosmos-sdk/MsgRevoke", value: { granter: window.__ADDR, grantee: AT.addr, msg_type_url: t } }; }), atrevoke); });
   /* the door shows with a wallet once the keeper's address is known; lit while a grant stands */
-  /* the wallet's Autopilot line: off, or on with the grant's bounds; the door reads Set up / Manage */
+  /* the wallet's Autopilot line: inactive, or active with the grant's bounds; the door reads Set up / Manage */
   function atLine(){
     var row = E("wkap"), st = E("wkaps"), b = E("atbtn"); if(!row) return;
     var g = AT.grant, a = g && g.authorization || {};
     if(g){ var n = ((a.allow_list || {}).address || []).length, exp = g.expiration ? window.__dayFull(new Date(g.expiration).getTime()) : "no expiry";
-      st.className = "wk-aps on"; st.textContent = "on, until " + exp; st.title = n + " allowed validators"; if(b) b.textContent = "Manage"; }
-    else { st.className = "wk-aps"; st.textContent = AT.addr ? "off" : "off, not open yet"; if(b) b.textContent = "Set up"; }
+      st.className = "wk-aps on"; st.textContent = "active, until " + exp; st.title = n + " allowed validators"; if(b) b.textContent = "Manage"; }
+    else { st.className = "wk-aps"; st.textContent = "inactive"; if(b) b.textContent = "Set up"; }
   }
   window.__atDoor = function(){
     var row = E("wkap"), b = E("atbtn"); if(!b || !row) return;
     if(!window.__POS){ row.hidden = true; return; }
     /* the line shows for every connected wallet; while the keeper has no address yet the
-       card says "Autopilot is not open yet" and Grant stays disabled */
+       card reads Inactive and Grant stays disabled */
     row.hidden = false; atLine();
     atStatus().then(function(){ atLine(); if(AT.addr) atGrant().then(function(g){ AT.grant = g; b.classList.toggle("on", !!g); atLine(); }); });
   };
