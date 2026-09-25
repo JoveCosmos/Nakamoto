@@ -237,12 +237,12 @@
           tag("q", (s.bonded_pct != null ? s.bonded_pct.toFixed(1) : "—") + "% of supply") +
           tag("q", S.n + " validators") + '</div>' +
       '</div>' +
-      '<div class=sv-note>AtomOne pays part of the block reward <b>equally to every validator</b> and the rest by stake. ' +
+      '<div class=sv-note>AtomOne shares part of <b>the reward pool, after the community tax,</b> equally between validators and the rest by stake. ' +
       'That is why a smaller validator can pay a higher APR on the same ATONE, and why spreading a stake earns more than concentrating it.</div>';
 
     E("sv-netcards").innerHTML =
       card("Bonus coefficient", 'η ' + (e.now != null ? e.now.toFixed(2) : "—"),
-           e.now != null ? Math.round(e.now * 100) + "% of the pool shared equally" : "") +
+           e.now != null ? Math.round(e.now * 100) + "% of the reward pool, shared equally" : "") +
       card("APR across the set", pct(S.lo) + '<em>to</em>' + pct(S.hi), "median " + pct(S.mid)) +
       card("Concentration", (isFinite(ratio) ? ratio.toFixed(1) : "—") + '<em>×</em>',
            "largest third against smallest, top ten hold " + top10.toFixed(0) + "%") +
