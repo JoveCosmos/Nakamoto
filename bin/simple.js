@@ -30,6 +30,10 @@
     var c = String(name || "?").replace(/[^A-Za-z0-9]/g, "").charAt(0) || "?";
     return '<span class=lg style="background:hsl(' + hueOf(name) + ',42%,30%)">' + esc(c.toUpperCase()) + '</span>';
   }
+  /* write a box only when its markup changed: a block tick that changes nothing touches no
+     DOM, and the row or chip the keyboard is on keeps its focus */
+  var LASTH = {};
+  function put(id, h){ var el = E(id); if(!el || LASTH[id] === h) return el; LASTH[id] = h; el.innerHTML = h; return el; }
   function rate0(t, c){ return window.__rateAfter ? window.__rateAfter(t, c, 0) : 0; }
   function VALS(){ return window.__VALS ? window.__VALS() : []; }
   function DD(){ return window.__D || { set: {}, eta: {}, nakamoto: {}, rule: {} }; }
@@ -58,17 +62,16 @@
 
   function drawOver(){
     var pos = window.__POS, S = setStats();
-    var st = E("sv-staked"), su = E("sv-stsub"), ap = E("sv-apr"), au = E("sv-aprsub"), rw = E("sv-rew"), ru = E("sv-rewsub");
-    st.innerHTML = (pos ? whole(pos.total) : "—") + '<em>ATONE</em>';
-    su.innerHTML = pos ? (pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s") +
-      (pos.locked > 0 ? ', <s>' + fmt(pos.locked) + " under cooldown</s>" : "")) : "connect a wallet to read your position";
-    ap.innerHTML = pos && pos.rows.length ? pct(pos.rate) : "—";
-    au.innerHTML = "the set pays <b>" + pct(S.lo) + "</b> to <b>" + pct(S.hi) + "</b>";
-    rw.innerHTML = (window.__REW != null ? fmt(window.__REW) : "—") + '<em>ATONE</em>';
-    ru.innerHTML = window.__REW > 0 ? "earned and not yet claimed" : pos ? "nothing waiting" : "";
+    put("sv-staked", (pos ? whole(pos.total) : "—") + '<em>ATONE</em>');
+    put("sv-stsub", pos ? (pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s") +
+      (pos.locked > 0 ? ', <s>' + fmt(pos.locked) + " under cooldown</s>" : "")) : "connect a wallet to read your position");
+    put("sv-apr", pos && pos.rows.length ? pct(pos.rate) : "—");
+    put("sv-aprsub", "the set pays <b>" + pct(S.lo) + "</b> to <b>" + pct(S.hi) + "</b>");
+    put("sv-rew", (window.__REW != null ? fmt(window.__REW) : "—") + '<em>ATONE</em>');
+    put("sv-rewsub", window.__REW > 0 ? "earned and not yet claimed" : pos ? "nothing waiting" : "");
 
     /* the opportunity: the same plan the advanced view would sign */
-    var box = E("sv-optp"), plan = planNow(pos);
+    var plan = planNow(pos);
     var h = "";
     if(!pos){
       h = '<div class=sv-ph><h3>Your stake, in one screen</h3></div>' +
@@ -101,34 +104,32 @@
           '</b> validator' + (plan.picks.length === 1 ? "" : "s") + ' in <b>' + plan.moves + '</b> move' + (plan.moves === 1 ? "" : "s") +
           ', all in one signature. Redelegated stake cannot move again for 21 days.</div>';
     }
-    box.innerHTML = h;
     /* the hero wash only when there is a move to make - the page's one call to action */
-    box.classList.toggle("hero", h.indexOf("data-act=opt") >= 0);
+    put("sv-optp", h).classList.toggle("hero", h.indexOf("data-act=opt") >= 0);
 
     /* where the stake sits now */
     var al = E("sv-allocp");
     if(!pos){
       /* no wallet: the section keeps its shape, like the wallet pane in the other view */
       al.hidden = false;
-      al.innerHTML = '<div class=sv-ph><h3>Where your stake sits</h3></div>' + skelAlloc();
+      put("sv-allocp", '<div class=sv-ph><h3>Where your stake sits</h3></div>' + skelAlloc());
     }
     else if(!pos.rows.length){ al.hidden = true; }
     else {
       al.hidden = false;
-      al.innerHTML = '<div class=sv-ph><h3>Where your stake sits</h3>' +
+      put("sv-allocp", '<div class=sv-ph><h3>Where your stake sits</h3>' +
         tag("q", pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s")) +
-        '<div class=sv-rt>' + tag("g", "APR " + pct(pos.rate)) + '</div></div>' + allocation(pos);
+        '<div class=sv-rt>' + tag("g", "APR " + pct(pos.rate)) + '</div></div>' + allocation(pos));
     }
 
     /* the line under it: autopilot, freshness, the two plain controls */
     var at = window.__atInfo ? window.__atInfo() : null;
-    var f = E("sv-foot");
-    f.innerHTML = '<span class="sv-stat' + (at && at.grant ? ' on' : '') + '"><i></i>' + autopilotWord(at) + '</span>' +
+    put("sv-foot", '<span class="sv-stat' + (at && at.grant ? ' on' : '') + '"><i></i>' + autopilotWord(at) + '</span>' +
       (pos ? '<span class=sv-sep>|</span><span>' + (window.__POSAT ? "read " + ago(window.__POSAT) : "") + '</span>' : "") +
       '<div class=sv-rt>' +
         (pos ? '<button class="sv-btn sml" type=button data-act=refresh>Refresh</button>' : "") +
         '<button class="sv-btn sml" type=button data-route="dashboard/autopilot">Autopilot</button>' +
-      '</div>';
+      '</div>');
   }
   /* Pricing the plan runs the whole optimiser and two quiet redraws of the
      advanced pane, so it is done once per block tick - the only thing that can
@@ -171,9 +172,13 @@
     var allow = ((a.allow_list || {}).address || []).length;
     var until = g && g.expiration && window.__dayFull ? window.__dayFull(new Date(g.expiration).getTime()) : null;
     var state = g ? tag("g", "Active") : tag("q", "Inactive");
-    var door = !pos ? "" : '<button class="sv-btn ' + (g ? "" : "pri") + '" type=button data-act=autopilot>' + (g ? "Manage" : "Set up") + '</button>';
+    /* the one door this screen needs, for where the reader is: no wallet, a wallet with
+       nothing staked, a stake with no grant, a grant standing */
+    var door = !pos ? '<button class="sv-btn pri" type=button data-act=connect>Connect wallet</button>'
+      : !pos.rows.length ? '<button class="sv-btn pri" type=button data-act=stake>Stake ATONE</button>'
+      : '<button class="sv-btn ' + (g ? "" : "pri") + '" type=button data-act=autopilot>' + (g ? "Manage" : "Set up") + '</button>';
 
-    E("sv-atp").innerHTML =
+    put("sv-atp",
       '<div class=sv-ph><h3>Autopilot</h3>' + state + '<div class=sv-rt>' + door + '</div></div>' +
       '<div class=sv-note>Autopilot is an <b>authz grant</b>: you allow GATA\'s keeper to redelegate <i>your</i> stake between validators <i>you</i> allow, ' +
       'for a period <i>you</i> set. Your stake never leaves your wallet, and you can revoke authz at any time.</div>' +
@@ -182,22 +187,26 @@
         card("Stake it may move", g ? esc(a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "—", g ? "the cap you signed" : "a cap you set") +
         card("Runs until", until || "—", g ? "then it lapses on its own" : "3 or 6 months", "sm") +
         card("Your APR", pos && pos.rows.length ? pct(pos.rate) : "—", pos && pos.rows.length ? "on " + whole(pos.total) + " ATONE" : "") +
-      '</div>';
+      '</div>');
 
     var al = E("sv-atalloc");
-    if(pos && pos.rows.length){
+    if(!pos){
+      /* no wallet: the section keeps its shape, as on the overview */
+      al.hidden = false;
+      put("sv-atalloc", '<div class=sv-ph><h3>What it would manage</h3></div>' + skelAlloc());
+    } else if(pos.rows.length){
       al.hidden = false;
       var rp = at && at.report, last = rp && rp.checked ? window.__dayFull(rp.checked * 1000) : null;
-      al.innerHTML = '<div class=sv-ph><h3>' + (g ? "What it manages" : "What it would manage") + '</h3>' +
+      put("sv-atalloc", '<div class=sv-ph><h3>' + (g ? "What it manages" : "What it would manage") + '</h3>' +
           tag("q", pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s")) +
           '<div class=sv-rt>' + tag(g ? "g" : "q", g ? (last ? "last check " + last : "not checked yet") : "your stake as it stands") + '</div></div>' +
         allocation(pos) +
         (g ? '<div class=sv-note>' + (rp && rp.history && rp.history.length
           ? '<b>' + rp.history.length + '</b> move' + (rp.history.length === 1 ? "" : "s") + ' made, the last on <b>' + window.__dayFull(rp.history[0].at * 1000) + '</b>.'
-          : "No move yet. The keeper only moves stake when the gain is worth the 21-day cooldown it costs.") + '</div>' : "");
+          : "No move yet. The keeper only moves stake when the gain is worth the 21-day cooldown it costs.") + '</div>' : ""));
     } else al.hidden = true;
 
-    E("sv-atauth").innerHTML =
+    put("sv-atauth",
       '<div class=sv-ph><h3>What the grant allows</h3>' + tag("q", "enforced by the chain, not by us") + '</div>' +
       '<div class=sv-can>' +
         '<div><u>it may</u><p>' +
@@ -214,7 +223,7 @@
         ? 'GATA takes <b>' + at.split_pct + '%</b> of the rewards a restake claims. Nothing else is charged.'
         : 'GATA takes <b>no share</b> of your rewards today.') +
       ' The keeper signs with its own key, off this machine, and the chain rejects anything outside the grant.</div>' +
-      (g ? '<div class=sv-tools><button class="sv-btn red" type=button data-act=autopilot>Revoke authz</button></div>' : "");
+      (g ? '<div class=sv-tools><button class="sv-btn red" type=button data-act=autopilot>Revoke authz</button></div>' : ""));
   }
   /* the strategy word lives in the grant's memo, which the chain does not keep:
      what stands on chain is the allow-list, so that is what this states */
@@ -231,7 +240,7 @@
     for(i10 = 0; i10 < 10 && i10 < V.length; i10++) t10 += V[i10][1];
     var top10 = s.bonded ? t10 / s.bonded * 100 : 0;
     var ratio = window.__ratio ? window.__ratio() : NaN;
-    E("sv-nethead").innerHTML =
+    put("sv-nethead",
       '<div class=sv-ph><h3>The AtomOne set</h3>' +
         (e.enabled ? tag("a", "Nakamoto bonus active") : tag("q", "bonus off")) +
         (e.week ? tag("q", "week " + e.week) : "") +
@@ -240,20 +249,20 @@
           tag("q", S.n + " validators") + '</div>' +
       '</div>' +
       '<div class=sv-note>AtomOne shares part of <b>the reward pool, after the community tax,</b> equally between validators and the rest by stake. ' +
-      'That is why a smaller validator can pay a higher APR on the same ATONE, and why spreading a stake earns more than concentrating it.</div>';
+      'That is why a smaller validator can pay a higher APR on the same ATONE, and why spreading a stake earns more than concentrating it.</div>');
 
-    E("sv-netcards").innerHTML =
+    put("sv-netcards",
       card("Bonus coefficient", 'η ' + (e.now != null ? e.now.toFixed(2) : "—"),
            e.now != null ? Math.round(e.now * 100) + "% of the reward pool, shared equally" : "") +
       card("APR across the set", pct(S.lo) + '<em>to</em>' + pct(S.hi), "median " + pct(S.mid)) +
       card("Concentration", (isFinite(ratio) ? ratio.toFixed(1) : "—") + '<em>×</em>',
            "largest third against smallest, top ten hold " + top10.toFixed(0) + "%") +
       card("Record", (S.up != null ? S.up.toFixed(2) + "%" : "—"),
-           "average 30-day uptime, " + S.clean + " never jailed");
+           "average 30-day uptime, " + S.clean + " never jailed"));
 
     var segs = [["all", "All " + S.n], ["mine", "My stake"], ["clean", "Never jailed"], ["small", "Below average"]];
-    E("sv-segs").innerHTML = segs.map(function(x){
-      return '<button class=sv-seg type=button data-f="' + x[0] + '" aria-pressed="' + (FILTER === x[0] ? "true" : "false") + '">' + x[1] + '</button>'; }).join("");
+    put("sv-segs", segs.map(function(x){
+      return '<button class=sv-seg type=button data-f="' + x[0] + '" aria-pressed="' + (FILTER === x[0] ? "true" : "false") + '">' + x[1] + '</button>'; }).join(""));
 
     var mean = (s.bonded || 0) / (S.n || 1), q = FIND.toLowerCase(), rows = [], i;
     for(i = 0; i < V.length; i++){
@@ -261,11 +270,31 @@
       if(FILTER === "mine" && !mine[v[3]]) continue;
       if(FILTER === "clean" && v[4]) continue;
       if(FILTER === "small" && v[1] >= mean) continue;
-      if(q && String(v[0]).toLowerCase().indexOf(q) < 0 && String(d.op || "").toLowerCase().indexOf(q) < 0) continue;
+      if(q && String(v[0]).toLowerCase().indexOf(q) < 0 && !(q.length >= 5 && String(d.op || "").toLowerCase().indexOf(q) >= 0)) continue;
       rows.push({ i: i, v: v, d: d });
     }
     var pos = window.__POS, held = {};
     if(pos) pos.rows.forEach(function(r){ held[r.id] = r.x; });
+    /* a phone gets its own four columns - the validator with its power and record beneath
+       the name - rather than a table wider than the screen */
+    if(innerWidth <= 620){
+      var hp = '<table class="sv-tbl ph"><colgroup><col style="width:30px"><col><col style="width:58px"><col style="width:66px"></colgroup>' +
+               '<thead><tr><th>#</th><th class=l>validator</th><th>APR</th><th>yours</th></tr></thead><tbody>';
+      rows.forEach(function(r){
+        var v = r.v, d = r.d, up = d.d30 != null ? +d.d30 : null, j = v[4] || 0;
+        hp += '<tr' + (held[v[3]] ? ' class=mine' : "") + ' data-v="' + esc(v[3]) + '" tabindex=0 title="Open this validator">' +
+          '<td>' + (r.i + 1) + '</td>' +
+          '<td class=l><span class=sv-nm>' + logo(v[3], v[0]) + '<span class=tx><b>' + esc(v[0]) + '</b><i>' + big(v[1]) + ' ATONE, ' +
+            '<span class="' + (up == null ? "sv-dim" : up >= 95 ? "sv-ok" : up >= 85 ? "sv-warn" : "sv-bad") + '">' + (up == null ? "—" : up.toFixed(1) + "%") + '</span>' +
+            (j ? ', <span class="' + (j === 1 ? "sv-warn" : "sv-bad") + '">jailed ' + j + '×</span>' : '') + '</i></span></span></td>' +
+          '<td><span class=sv-apr>' + pct(rate0(v[1], v[2])) + '</span></td>' +
+          '<td>' + (held[v[3]] ? '<b>' + big(held[v[3]]) + '</b>' : '<span class=sv-dim>—</span>') + '</td></tr>';
+      });
+      put("sv-nettbl", hp + '</tbody></table>');
+      put("sv-netfoot", '<span>' + rows.length + " of " + S.n + " validators</span>" +
+        '<div class=sv-rt>' + (window.__LIVEH && window.__LIVEH() ? "block " + window.__LIVEH().toLocaleString() : "") + '</div>');
+      return;
+    }
     var h = '<table class=sv-tbl><thead><tr><th>#</th><th class=l>validator</th><th>voting power</th><th>30d uptime</th>' +
             '<th>jailed</th><th>fee</th><th>APR</th><th>your stake</th></tr></thead><tbody>';
     rows.forEach(function(r){
@@ -280,9 +309,9 @@
         '<td><span class=sv-apr>' + pct(rate0(v[1], v[2])) + '</span></td>' +
         '<td>' + (held[v[3]] ? '<b>' + fmt(held[v[3]]) + '</b>' : '<span class=sv-dim>—</span>') + '</td></tr>';
     });
-    E("sv-nettbl").innerHTML = h + '</tbody></table>';
-    E("sv-netfoot").innerHTML = '<span>' + rows.length + " of " + S.n + " validators</span>" +
-      '<div class=sv-rt>' + (window.__LIVEH && window.__LIVEH() ? "block " + window.__LIVEH().toLocaleString() : "") + '</div>';
+    put("sv-nettbl", h + '</tbody></table>');
+    put("sv-netfoot", '<span>' + rows.length + " of " + S.n + " validators</span>" +
+      '<div class=sv-rt>' + (window.__LIVEH && window.__LIVEH() ? "block " + window.__LIVEH().toLocaleString() : "") + '</div>');
   }
 
   /* ── the head: chain, address, the way out ── */
@@ -323,19 +352,6 @@
           '<img src="assets/wallet-' + n.toLowerCase() + '.svg" alt="">' + n +
           (have[n] ? "" : '<i>not installed</i>') + '</button>'; }).join("");
   }
-  var adT;
-  /* the menu's own copy: the row says so for a moment, then goes back */
-  function copyAddr(row, done){
-    var a = window.__ADDR; if(!a) return;
-    var ok = function(){ if(done){ done(); return; } if(!row) return; var t = row.textContent; row.textContent = "Copied";
-      clearTimeout(adT); adT = setTimeout(function(){ row.textContent = t; }, 1200); };
-    /* the same fallback the wallet pane uses where the clipboard API is refused */
-    var old = function(){ try{ var e = document.createElement("textarea"); e.value = a; e.setAttribute("readonly", "");
-      e.style.position = "fixed"; e.style.opacity = "0"; document.body.appendChild(e); e.select();
-      document.execCommand("copy"); document.body.removeChild(e); ok(); }catch(err){} };
-    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(a).then(ok, old);
-    else old();
-  }
   var conn = E("svconn");
   if(conn) conn.addEventListener("click", function(ev){ ev.stopPropagation();
     if(menu && !menu.hidden){ closeMenu(); return; } openMenu(walletMenu(), conn); });
@@ -345,12 +361,10 @@
   });
   document.addEventListener("keydown", function(ev){ if(ev.key === "Escape") closeMenu(); });
   if(menu) menu.addEventListener("click", function(ev){
-    var t = ev.target.closest ? ev.target.closest("[data-w],[data-act]") : null;
+    var t = ev.target.closest ? ev.target.closest("[data-w]") : null;
     if(!t) return;
     /* the bar answers the click itself, without waiting for the next redraw */
-    if(t.dataset.w){ closeMenu(); if(window.__wconnect) window.__wconnect(t.dataset.w); setTimeout(render, 0); return; }
-    if(t.dataset.act === "copy"){ copyAddr(t); return; }
-    if(t.dataset.act === "disconnect"){ closeMenu(); if(window.__wdisconnect) window.__wdisconnect(); setTimeout(render, 0); }
+    closeMenu(); if(window.__wconnect) window.__wconnect(t.dataset.w); setTimeout(render, 0);
   });
 
   /* ── one draw: the wallet in the header on every section; a screen only for the
@@ -382,9 +396,8 @@
   };
 
   function onClick(ev){
-    var t = ev.target.closest ? ev.target.closest("[data-act],[data-w],[data-f],[data-v]") : null;
+    var t = ev.target.closest ? ev.target.closest("[data-act],[data-f],[data-v]") : null;
     if(!t) return;
-    if(t.dataset.w){ if(window.__wconnect) window.__wconnect(t.dataset.w); return; }
     if(t.dataset.f){ FILTER = t.dataset.f; render(); return; }
     var act = t.dataset.act;
     if(act === "opt"){
@@ -397,8 +410,8 @@
     }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "refresh"){ var rf = E("wrefresh"); if(rf) rf.click(); return; }
-    if(act === "disconnect"){ if(window.__wdisconnect) window.__wdisconnect(); return; }
     if(act === "autopilot"){ var ab = E("atbtn"); if(ab) ab.click(); return; }
+    if(act === "connect"){ var cb = E("svconn"); if(cb){ ev.stopPropagation(); cb.click(); } return; }
     if(t.dataset.v && window.__vshow) window.__vshow(t.dataset.v);
   }
   function onKey(ev){
@@ -414,7 +427,7 @@
 
   /* the pill's two controls: the address copies, the icon disconnects - no menu */
   var cp = E("svcopy"), out = E("svout"), cpT = 0;
-  if(cp) cp.addEventListener("click", function(){ copyAddr(null, function(){
+  if(cp) cp.addEventListener("click", function(){ if(window.__ADDR && window.copyText) window.copyText(window.__ADDR, function(){
     cp.classList.add("done"); cp.title = "Copied"; clearTimeout(cpT);
     cpT = setTimeout(function(){ cp.classList.remove("done"); cp.title = "Copy address"; }, 1400); }); });
   if(out) out.addEventListener("click", function(){ if(window.__wdisconnect) window.__wdisconnect(); setTimeout(render, 0); });

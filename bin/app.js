@@ -14,8 +14,16 @@
    lands on home. Every popup in the app goes through here; nothing toggles
    "on" by hand any more. */
 var POP = (function(){
-  var st = [];                                     /* [{el, from}] bottom -> top */
+  var st = [];                                     /* [{el, from, back}] bottom -> top */
+  var R = document.documentElement;
   function top(){ return st.length ? st[st.length - 1].el : null; }
+  function card(el){ return el.querySelector(".card") || el; }
+  /* the keyboard follows the card: focus moves into it on open and back to whatever
+     opened it on close; Tab walks the card's own controls and never the page behind */
+  function focusIn(el){
+    var c = card(el); if(!c.hasAttribute("tabindex")) c.tabIndex = -1;
+    try{ c.focus({ preventScroll: true }); }catch(e){ c.focus(); }
+  }
   function open(el){
     if(!el) return;
     if(el === top() && el.classList.contains("on")) return;
@@ -24,27 +32,42 @@ var POP = (function(){
     var from = top();
     if(from && !from.classList.contains("on")) from = null;
     if(from) from.classList.remove("on");
-    st.push({ el: el, from: from });
+    st.push({ el: el, from: from, back: document.activeElement });
     el.classList.remove("back");
     el.classList.add("on");
+    R.classList.add("popon");
+    focusIn(el);
   }
   function close(el){
     el = el || top(); if(!el) return;
     var i = -1;
     for(var k = st.length - 1; k >= 0; k--) if(st[k].el === el){ i = k; break; }
-    if(i < 0){ el.classList.remove("on"); return; }
+    if(i < 0){ el.classList.remove("on"); if(!st.length) R.classList.remove("popon"); return; }
     var gone = st.splice(i);                         /* el and anything above it */
     gone.forEach(function(p){ p.el.classList.remove("on"); if(p.el.__onclose) p.el.__onclose(); });
     /* "back" keeps the entrance animation from replaying on the way back */
-    if(gone[0].from) gone[0].from.classList.add("on", "back");
+    if(gone[0].from){ gone[0].from.classList.add("on", "back"); focusIn(gone[0].from); }
+    if(!st.length) R.classList.remove("popon");
+    var b = gone[0].back;
+    if(!gone[0].from && b && b.focus && document.contains(b)) try{ b.focus({ preventScroll: true }); }catch(e){}
   }
+  function closeAll(){ while(st.length) close(st[0].el); }
   document.addEventListener("keydown", function(ev){
-    if(ev.key !== "Escape" || !st.length) return;
-    ev.preventDefault(); close(); });
+    if(!st.length) return;
+    if(ev.key === "Escape"){ ev.preventDefault(); close(); return; }
+    if(ev.key !== "Tab") return;
+    var c = card(top()), f = [].filter.call(c.querySelectorAll("button,input,select,textarea,a[href],[tabindex]:not([tabindex='-1'])"),
+      function(x){ return !x.disabled && x.offsetParent !== null; });
+    if(!f.length){ ev.preventDefault(); return; }
+    var a = document.activeElement, first = f[0], last = f[f.length - 1];
+    if(!c.contains(a)){ ev.preventDefault(); first.focus(); }
+    else if(ev.shiftKey && (a === first || a === c)){ ev.preventDefault(); last.focus(); }
+    else if(!ev.shiftKey && a === last){ ev.preventDefault(); first.focus(); }
+  });
   document.addEventListener("click", function(ev){
     var t = ev.target;
     if(t && t.classList && t.classList.contains("pop") && t === top()) close(t); });
-  return { open: open, close: close, top: top };
+  return { open: open, close: close, closeAll: closeAll, top: top };
 })();
 window.__POP = POP;
 /* the node's RPC, proxied on this host (nginx: /rpc/status, /rpc/block) so the
@@ -53,6 +76,13 @@ window.__POP = POP;
 function att(v){
   return String(v).replace(/&/g, "&amp;").replace(/"/g, "&quot;")
                   .replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+/* the clipboard, with the old selection route where the API is refused; ok() on success */
+function copyText(v, ok){
+  var old = function(){ try{ var e = document.createElement("textarea"); e.value = v; e.setAttribute("readonly", "");
+    e.style.position = "fixed"; e.style.opacity = "0"; document.body.appendChild(e); e.select();
+    document.execCommand("copy"); document.body.removeChild(e); ok(); }catch(err){} };
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(v).then(ok, old); else old();
 }
 
 (function(){
@@ -2306,8 +2336,14 @@ rememberGridH();
   /* ── Autopilot: a StakeAuthorization REDELEGATE grant to GATA's keeper address, with
      an allow-list, a cap and an expiry the reader sets; the keeper (a separate signer,
      its own key, off this box) executes inside those bounds; the chain enforces them.
-     The keeper's address and standing come from keeper/_status.json ── */
-  var atpop = E("atpop"), AT = { addr: null, dry: true, grant: null, days: 90, fee_pct: 0, fee_to: null, report: null };
+     The keeper's address and standing come from keeper/_status.json. The card is one
+     screen: the terms on the left, the validator set on the right to choose from. ── */
+  var atpop = E("atpop"), atcard = atpop && atpop.querySelector(".atcard");
+  var AT = { addr: null, dry: true, grant: null, grants: [], days: 90, fee_pct: 0, fee_to: null, report: null, who: null };
+  /* the validators the grant may use, chosen in this card - apart from the Redelegate list's
+     selection (that is where stake moves now; this is where the keeper may move it later) -
+     and the card's own view: a standing grant shows its terms until "Change" */
+  var ATSEL = {}, AT_EDIT = false, AT_FIND = "", AT_FLT = "all", AT_OPEN = 0, AT_SIM = 0, AT_SIMT = 0;
   function atStatus(){
     return fetch("keeper/_status.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
       AT.addr = j && j.grantee ? j.grantee : null; AT.dry = !j || j.dry !== false; AT.fee_pct = j && j.fee_pct ? +j.fee_pct : 0; AT.fee_to = j && j.fee_to ? j.fee_to : null;
@@ -2319,35 +2355,60 @@ rememberGridH();
   function grantType(g){ var a = g && g.authorization || {};
     if(a["@type"] === "/cosmos.bank.v1beta1.SendAuthorization") return MSEND;
     return a.msg || ({ AUTHORIZATION_TYPE_REDELEGATE: REDEL, AUTHORIZATION_TYPE_DELEGATE: DELEG })[a.authorization_type] || ""; }
+  /* what a grant this card builds is for, to set against the kinds that stand */
+  function authType(a){
+    if(!a) return "";
+    if(a.type === "cosmos-sdk/StakeAuthorization") return a.value.authorization_type === "delegate" ? DELEG : REDEL;
+    if(a.type === "cosmos-sdk/GenericAuthorization") return a.value.msg;
+    if(a.type === "cosmos-sdk/SendAuthorization") return MSEND;
+    return "";
+  }
+  function revokeMsg(t){ return { type: "cosmos-sdk/MsgRevoke", value: { granter: window.__ADDR, grantee: AT.addr, msg_type_url: t } }; }
   /* every grant standing between the reader and the keeper: the redelegate one is the
      switch, the delegate + withdraw pair is the restake; a revoke names what stands */
+  /* answers { grant: the redelegate one or null, grants: all that stand }, for the address
+     asked about - the caller keeps it only if that is still the wallet on the page */
   function atGrant(){
-    if(!AT.addr || !window.__ADDR) return Promise.resolve(null);
-    return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/authz/v1beta1/grants?granter=" + window.__ADDR + "&grantee=" + AT.addr + "&pagination.limit=50", { cache: "no-store" })
-      .then(function(r){ return r.json(); }).then(function(d){ AT.grants = d.grants || []; var g = null; AT.grants.forEach(function(x){ if(grantType(x) === REDEL) g = x; }); return g; }).catch(function(){ AT.grants = []; return null; });
+    var who = window.__ADDR;
+    if(!AT.addr || !who) return Promise.resolve({ who: who, grant: null, grants: [] });
+    return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/authz/v1beta1/grants?granter=" + who + "&grantee=" + AT.addr + "&pagination.limit=50", { cache: "no-store" })
+      .then(function(r){ return r.json(); })
+      .then(function(d){ var all = d.grants || [], g = null; all.forEach(function(x){ if(grantType(x) === REDEL) g = x; }); return { who: who, grant: g, grants: all }; })
+      .catch(function(){ return { who: who, grant: null, grants: [] }; });
   }
+  function atKeep(r){ if(!r || r.who !== window.__ADDR) return false; AT.grant = r.grant; AT.grants = r.grants; return true; }
   function atReport(){
     if(!window.__ADDR) return Promise.resolve(null);
     return fetch("keeper/" + window.__ADDR + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
   }
-  /* the strategies: each is a set of validators the grant allows, and a word in the memo the
-     keeper reads for its own pace and thresholds (the chain enforces only the set) */
   function atPreset(){ return (document.querySelector("#atpop input[name=atstrat]:checked") || {}).value || "below"; }
   function atPick(){ return (document.querySelector("#atpop input[name=atpick]:checked") || {}).value || "all"; }
+  function atSetPick(v){ var r = document.querySelector('#atpop input[name=atpick][value="' + v + '"]'); if(r) r.checked = true; }
   function atRestake(){ var c = E("atrestake"); return !!(c && c.checked); }
-  function atScopeFor(v){
+  function atViewing(){ return !!AT.grant && !AT_EDIT; }
+  /* the set by id: all of it, or the ones a strategy would pick - a count on its card, a
+     "fits" mark in the list and a one-tap selection (the chain enforces only the list) */
+  function atIdsFor(v){
     var VD = window.__VDBY || {}, V = window.__VALS(), MEAN = window.__S() / V.length, out = [];
-    if(v === "ticked"){ Object.keys(SEL).forEach(function(id){ var d = VD[id]; if(d && d.op) out.push(d.op); }); return out; }
-    if(v === "all"){ V.forEach(function(x){ var d = VD[x[3]]; if(d && d.op) out.push(d.op); }); return out; }   /* the whole set */
+    if(v === "all"){ V.forEach(function(x){ var d = VD[x[3]]; if(d && d.op) out.push(x[3]); }); return out; }
     window.__candidates({ except: {}, cleanRecord: false }).forEach(function(c){ var d = VD[c.id]; if(!d || !d.op || d.tomb) return;
       var d90 = d.d90 == null ? null : +d.d90, lu = d.life_up == null ? null : +d.life_up;
-      if(v === "passive"){ if(c.rank <= V.length / 2 && !c.jail && (lu == null || lu >= 99) && (d90 == null || d90 >= 99)) out.push(d.op); }
-      else if(v === "aggressive"){ if(d90 == null || d90 >= 50) out.push(d.op); }
-      else { if(c.t < MEAN && !c.jail && (d90 == null || d90 >= 95)) out.push(d.op); } });
+      if(v === "passive"){ if(c.rank <= V.length / 2 && !c.jail && (lu == null || lu >= 99) && (d90 == null || d90 >= 99)) out.push(c.id); }
+      else if(v === "aggressive"){ if(d90 == null || d90 >= 50) out.push(c.id); }
+      else { if(c.t < MEAN && !c.jail && (d90 == null || d90 >= 95)) out.push(c.id); } });
+    return out;
+  }
+  function atOps(ids){ var VD = window.__VDBY || {}, out = []; ids.forEach(function(id){ var d = VD[id]; if(d && d.op) out.push(d.op); }); return out; }
+  function atSelIds(){ var VD = window.__VDBY || {}; return Object.keys(ATSEL).filter(function(id){ return VD[id] && VD[id].op; }); }
+  /* a standing grant's allow-list, as the set's ids */
+  function atGrantIds(){
+    var a = AT.grant && AT.grant.authorization || {}, ops = (a.allow_list || {}).address || [], by = {}, VD = window.__VDBY || {}, out = {}, k;
+    for(k in VD) if(VD[k].op) by[VD[k].op] = k;
+    ops.forEach(function(op){ if(by[op]) out[by[op]] = 1; });
     return out;
   }
   /* the allow-list: the whole set, or the reader's own selection; the strategy sets the pace */
-  function atScope(){ return atScopeFor(atPick() === "selected" ? "ticked" : "all"); }
+  function atScope(){ return atOps(atPick() === "selected" ? atSelIds() : atIdsFor("all")); }
   /* the memo the keeper reads: the strategy word, then the flags */
   var AT_WORD = { passive: "passive", below: "moderate", aggressive: "aggressive" };
   function atMemo(){ return "gata:" + (AT_WORD[atPreset()] || "moderate") + (atPick() === "selected" ? ":picks" : "") + (atRestake() ? ":restake" : ""); }
@@ -2372,6 +2433,15 @@ rememberGridH();
     var sl = atSplitLimit();
     if(atRestake() && sl > 0) msgs.push({ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
       grant: { authorization: { type: "cosmos-sdk/SendAuthorization", value: { spend_limit: [{ denom: "uatone", amount: String(sl) }], allow_list: [AT.split_to] } }, expiration: exp } } });
+    if(AT.grant){
+      /* replacing the grant that stands: each new grant overwrites the one of its kind, and a
+         kind the new terms leave out (restake switched off) is revoked in the same signature;
+         a change is not charged the service fee again */
+      var keep = {}, gone = {};
+      msgs.forEach(function(m){ keep[authType(m.value.grant.authorization)] = 1; });
+      (AT.grants || []).forEach(function(x){ var t = grantType(x); if(t && !keep[t]) gone[t] = 1; });
+      return Object.keys(gone).map(revokeMsg).concat(msgs);
+    }
     /* the service fee, when one is set: paid with the grant, in the same signature */
     var fee = atFee(); if(fee > 0 && AT.fee_to) msgs.push({ type: "cosmos-sdk/MsgSend", value: { from_address: window.__ADDR, to_address: AT.fee_to, amount: [{ denom: "uatone", amount: String(fee) }] } });
     return msgs;
@@ -2390,60 +2460,178 @@ rememberGridH();
     if(!AT.fee_pct || !(gain > 0)) return 0;
     return Math.floor(gain * 1e6 * AT.fee_pct / 100 * AT.days / 365);
   }
+  /* the counts: on the strategy and validator cards, over the list, on the phone's tab */
+  function atCounts(){
+    var set = atIdsFor("all").length, sel = atSelIds().length, view = atViewing();
+    [["atn0", "passive"], ["atn1", "below"], ["atn3", "aggressive"]].forEach(function(x){ var e = E(x[0]); if(e) e.textContent = atIdsFor(x[1]).length + " fit"; });
+    var na = E("atna"); if(na) na.textContent = set + " validators";
+    var n2 = E("atn2"); if(n2) n2.textContent = sel ? sel + " selected" : "none yet";
+    var n = view ? Object.keys(atGrantIds()).length : atPick() === "all" ? set : sel;
+    var c = E("atcount"); if(c) c.innerHTML = view ? "<b>" + n + "</b> allowed by your grant" : atPick() === "all" ? "All <b>" + set + "</b> of the set" : "<b>" + sel + "</b> of " + set + " selected";
+    var vn = E("atvn"); if(vn) vn.textContent = n;
+    var qf = E("atqfit"); if(qf) qf.textContent = "Fits " + (AT_WORD[atPreset()] || "moderate");
+  }
+  /* the set, in rank order: a box per validator, what it pays, its record, and marks for the
+     ones already holding the reader's stake and the ones the strategy would pick */
+  function atRows(){
+    var el = E("atlist"); if(!el) return;
+    var view = atViewing(), all = !view && atPick() === "all", allow = view ? atGrantIds() : null;
+    var fit = {}; atIdsFor(atPreset()).forEach(function(id){ fit[id] = 1; });
+    var mine = window.__MINE || {}, VD = window.__VDBY || {}, q = AT_FIND.trim().toLowerCase(), ph = innerWidth <= 620;
+    var rows = window.__candidates({ except: {}, cleanRecord: false }).filter(function(o){
+      var d = VD[o.id]; if(!d || !d.op) return false;
+      o.on = view ? !!allow[o.id] : all || !!ATSEL[o.id];
+      if(AT_FLT === "sel" && !o.on) return false;
+      /* a name matches on any letters; an operator key only from five on, or every key matches "at" */
+      return !q || String(o.m).toLowerCase().indexOf(q) >= 0 || (q.length >= 5 && String(d.op).toLowerCase().indexOf(q) >= 0); });
+    var h = '<table><colgroup><col style="width:30px">' + (ph ? '' : '<col style="width:34px">') + '<col><col style="width:' + (ph ? 54 : 64) + 'px">' +
+            (ph ? '' : '<col style="width:50px">') + '<col style="width:' + (ph ? 56 : 62) + 'px"></colgroup>' +
+            '<thead><tr><th></th>' + (ph ? '' : '<th>rank</th>') + '<th class=l>validator</th><th>90<span class=lc>d</span> uptime</th>' + (ph ? '' : '<th>jailed</th>') + '<th>APR</th></tr></thead><tbody>';
+    rows.forEach(function(o){
+      var d = VD[o.id], u90 = d.d90 != null ? +d.d90 : (o.up != null ? +o.up : null);
+      h += '<tr' + (o.on ? ' class=on' : '') + ' data-id="' + att(o.id) + '"><td class=ck><input type=checkbox aria-label="' + att(o.m) + '"' + (o.on ? ' checked' : '') + (view ? ' disabled' : '') + '></td>' +
+           (ph ? '' : '<td>' + o.rank + '</td>') +
+           '<td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span class=nmt>' + att(o.m) + '</span>' +
+             (mine[o.id] ? '<span class="attg y">yours</span>' : '') + (fit[o.id] && !ph ? '<span class="attg f">fits</span>' : '') + '</div></td>' +
+           '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '—' : u90.toFixed(1) + '%') + '</td>' +
+           (ph ? '' : '<td class="' + (!o.jail ? 'dim' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail + '×' : 'never') + '</td>') +
+           '<td class=r2><b>' + pct(window.__rateAfter(o.t, o.c, 0)) + '</b></td></tr>';
+    });
+    if(!rows.length) h += '<tr><td class=atnone colspan=' + (ph ? 4 : 6) + '>' +
+      (q ? 'No validator matches “' + att(AT_FIND.trim()) + '”.' : AT_FLT === "sel" ? 'None selected yet.' : 'The set has not loaded yet.') + '</td></tr>';
+    var top = el.scrollTop; el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
+    el.classList.toggle("ro", view);
+  }
+  function atFltSync(){ Array.prototype.forEach.call(document.querySelectorAll("#atflt button"), function(o){ o.setAttribute("aria-pressed", o.dataset.f === AT_FLT ? "true" : "false"); }); }
+  /* a phone shows one side at a time */
+  function atView(v){
+    if(atcard) atcard.setAttribute("data-v", v);
+    Array.prototype.forEach.call(document.querySelectorAll("#atpop .atview [data-v]"), function(o){
+      var on = o.dataset.v === v; o.setAttribute("aria-selected", on ? "true" : "false"); o.tabIndex = on ? 0 : -1; });
+  }
   function atState(){
-    var pos = window.__POS, cap = atCap(), scope = atScope(), mx = E("atmaxv"), hint = E("athint"), go = E("atgrant"), sm = E("atsum"), n1 = E("atn1"), n2 = E("atn2"), feeEl = E("atfee");
-    var movable = pos ? pos.free : 0;
-    if(mx) mx.textContent = pos ? exact(movable, 2) : "\u2014";
-    var n0 = E("atn0"), n3 = E("atn3"), na = E("atna");
-    if(n0) n0.textContent = atScopeFor("passive").length + " validators";
-    if(n1) n1.textContent = atScopeFor("below").length + " validators";
-    if(n3) n3.textContent = atScopeFor("aggressive").length + " validators";
-    if(na) na.textContent = atScopeFor("all").length + " validators";
+    var pos = window.__POS, cap = atCap(), scope = atScope(), view = atViewing();
+    atCounts();
+    var mx = E("atmaxv"); if(mx) mx.textContent = pos ? exact(pos.free, 2) : "—";
     var un = E("atuntil"); if(un) un.innerHTML = "until <b>" + window.__dayFull(Date.now() + AT.days * 86400000) + "</b>";
-    var sel = Object.keys(SEL).length; if(n2) n2.textContent = sel ? sel + " selected" : "none selected yet";
-    var ok = !!AT.addr && scope.length > 0 && cap > 0 && !!window.__WALLET && !!window.__WALLET.signDirect;
-    if(hint){ hint.className = "unhint"; hint.textContent = (!window.__WALLET || !window.__WALLET.signDirect ? "Needs Keplr (direct signing)" : (!scope.length ? (atPick() === "selected" ? "select validators in the Redelegate list first" : "no validators fit that strategy today") : "")); }
-    if(go) go.disabled = !ok;
-    /* the header's right side: the plan in a line once it can be granted; until the keeper is open, that word */
-    if(sm) sm.innerHTML = !AT.addr ? '<span class=atclosed>Inactive</span>' : ok ? fmt(cap) + " ATONE<br>" + (AT_WORD[atPreset()] || "moderate") + ", " + (atPick() === "selected" ? "my selection, " : "") + scope.length + " validators, " + atMonths() + (atRestake() ? ", restake" : "") : "";
-    var fee = atFee(), sl = atRestake() ? atSplitLimit() : 0;
-    if(feeEl){ feeEl.hidden = !(fee > 0 || sl > 0);
+    var qa = E("atqa"); if(qa) qa.hidden = view;
+    var qm = E("atqmine"); if(qm) qm.disabled = !Object.keys(window.__MINE || {}).length;
+    var signer = !!window.__WALLET && !!window.__WALLET.signDirect;
+    var ok = !view && !!AT.addr && scope.length > 0 && cap > 0 && signer;
+    var hint = E("athint");
+    if(hint){ hint.className = "unhint"; hint.textContent = !signer ? "Needs Keplr (direct signing)"
+      : !scope.length ? (atPick() === "selected" ? "select the validators it may use" + (innerWidth <= 620 ? ", under Validators" : ", on the right") : "the set has not loaded yet") : ""; }
+    var go = E("atgrant"); if(go) go.disabled = !ok;
+    var sm = E("atsum");
+    if(sm) sm.innerHTML = view ? "Active" : !AT.addr ? '<span class=atclosed>Inactive</span>' : ok ? fmt(cap) + " ATONE<br>" + (AT_WORD[atPreset()] || "moderate") + ", " +
+      (atPick() === "selected" ? "my selection, " : "") + scope.length + " validators, " + atMonths() + (atRestake() ? ", restake" : "") : "";
+    var fee = AT.grant ? 0 : atFee(), sl = atRestake() ? atSplitLimit() : 0, feeEl = E("atfee");
+    if(feeEl){ feeEl.hidden = view || !(fee > 0 || sl > 0);
       if(sl > 0) feeEl.innerHTML = "<b>" + AT.split_pct + "%</b> of restaked rewards go to GATA - allows sending up to <b>" + fmt(sl) + " ATONE</b> to GATA over " + atMonths() + ".";
       else if(fee > 0) feeEl.innerHTML = "Service fee <b>" + fmt(fee) + " ATONE</b> - " + AT.fee_pct + "% of the projected gain for " + atMonths() + ", paid with the grant in the same signature."; }
-    E("attxfee").textContent = ""; var st = E("atstep"); st.textContent = ""; st.className = "txstep";
+    var fe = E("attxfee"), st = E("atstep"); fe.textContent = ""; st.textContent = ""; st.className = "txstep";
+    /* the network fee, estimated once the terms settle rather than on every keystroke;
+       an answer that arrives after the terms changed again is dropped */
+    clearTimeout(AT_SIMT); var seq = ++AT_SIM;
     if(ok && window.__TX && window.__WALLET){
-      var w = window.__WALLET, msgs = atMsgs(), fe = E("attxfee"); fe.textContent = "fee: estimating\u2026";
-      window.__TX.account(w.address).then(function(acc){ return window.__TX.simulate(msgs, "", w.pubKey, acc.sequence); }).catch(function(){ return 0; })
-        .then(function(g){ if(atCap() !== cap) return; var f = window.__TX.feeFor(g, msgs.length); fe.textContent = "fee \u2248 " + (parseInt(f.amount[0].amount, 10) / 1e6).toFixed(3) + " PHOTON, gas " + f.gas.toLocaleString(); });
+      var w = window.__WALLET; fe.textContent = "fee: estimating…";
+      AT_SIMT = setTimeout(function(){
+        var msgs = atMsgs(); if(!msgs.length || seq !== AT_SIM) return;
+        window.__TX.account(w.address).then(function(acc){ return window.__TX.simulate(msgs, "", w.pubKey, acc.sequence); }).catch(function(){ return 0; })
+          .then(function(g){ if(seq !== AT_SIM) return; var f = window.__TX.feeFor(g, msgs.length); fe.textContent = "fee ≈ " + (parseInt(f.amount[0].amount, 10) / 1e6).toFixed(3) + " PHOTON, gas " + f.gas.toLocaleString(); });
+      }, 350);
     }
   }
+  function atRefresh(){ atRows(); atState(); }
+  /* a standing grant, read back into the card: its list, its cap, its restake */
+  function atFromGrant(){
+    var ids = atGrantIds(), a = AT.grant.authorization || {}, cap = E("atcap"), rs = E("atrestake");
+    ATSEL = ids; atSetPick(Object.keys(ids).length >= atIdsFor("all").length ? "all" : "selected");
+    if(cap) cap.value = a.max_tokens ? exact(+a.max_tokens.amount) : "";
+    if(rs) rs.checked = (AT.grants || []).some(function(x){ return grantType(x) === DELEG; });
+  }
   function atShow(){
-    var st = E("atstate"), form = E("atform"), rv = E("atrevoke"), go = E("atgrant"), sm = E("atsum");
-    if(AT.grant){
-      var a = AT.grant.authorization || {}, cap = a.max_tokens ? fmt(+a.max_tokens.amount) + " ATONE" : "no cap", n = ((a.allow_list || {}).address || []).length, exp = AT.grant.expiration ? window.__dayFull(new Date(AT.grant.expiration).getTime()) : "no expiry";
+    var g = AT.grant, view = atViewing(), st = E("atstate");
+    st.hidden = !g;
+    if(g){
+      var a = g.authorization || {}, cap = a.max_tokens ? fmt(+a.max_tokens.amount) + " ATONE" : "no cap", n = ((a.allow_list || {}).address || []).length, exp = g.expiration ? window.__dayFull(new Date(g.expiration).getTime()) : "no expiry";
       var rp = AT.report, last = rp && rp.checked ? new Date(rp.checked * 1000) : null;
-      st.hidden = false; form.hidden = true; rv.hidden = false; go.hidden = true;
       var restk = (AT.grants || []).some(function(x){ return grantType(x) === DELEG; });
       st.innerHTML = '<span class=g>Autopilot is active' + (restk ? ', restaking rewards' : '') + '.</span> Cap left <b>' + cap + '</b>, <b>' + n + '</b> allowed validators, until <b>' + exp + '</b>.<br>' +
         (last ? 'Last check <b>' + window.__dayFull(last.getTime()) + '</b>' + (rp.moves && rp.moves.length ? ', <b>' + rp.moves.length + '</b> move' + (rp.moves.length === 1 ? '' : 's') + ' ' + (rp.dry ? 'planned (dry run)' : 'made') + ', <b class=g>+' + one(rp.gain || 0) + '</b> ATONE a year' : ', nothing to move') : 'The keeper has not checked this address yet') +
-        (rp && rp.history && rp.history.length ? '<br>Moves made: <b>' + rp.history.length + '</b>, last ' + window.__dayFull(rp.history[0].at * 1000) : '');
-      if(sm) sm.innerHTML = "Active";
-    } else { st.hidden = true; form.hidden = false; rv.hidden = true; go.hidden = false; atState(); }
+        (rp && rp.history && rp.history.length ? '<br>Moves made: <b>' + rp.history.length + '</b>, last ' + window.__dayFull(rp.history[0].at * 1000) : '') +
+        (AT_EDIT ? '<br><span class=g>Changing it:</span> the terms below replace these when you sign.' : '');
+    }
+    E("atform").hidden = view;
+    E("atrevoke").hidden = !view; E("atedit").hidden = !view;
+    var go = E("atgrant"); go.hidden = view; go.textContent = g ? "Update" : "Grant";
+    E("atcancel").textContent = view ? "Close" : g ? "Back" : "Cancel";
+    atFltSync(); atRefresh();
   }
+  /* the door: the card opens at once on what is known, then re-reads the keeper and the
+     chain and follows only if a grant appeared or went in the meantime */
   var atbtn = E("atbtn");
   if(atbtn) atbtn.addEventListener("click", function(){
     if(!atpop || !window.__POS) return;
+    var go = E("atgrant"); if(go){ go.disabled = true; go.classList.remove("busy"); }
+    AT_EDIT = false; AT_FIND = ""; var f = E("atfind"); if(f) f.value = "";
     var a = E("atcap"); if(a) a.value = "";
-    var go = E("atgrant"); if(go){ go.disabled = true; go.textContent = "Grant"; }
-    E("atstep").textContent = "";
-    atStatus().then(function(){ return Promise.all([atGrant(), atReport()]); }).then(function(r){ AT.grant = r[0]; AT.report = r[1]; atShow(); POP.open(atpop); });
+    if(AT.grant) atFromGrant();
+    else if(!atSelIds().length) Object.keys(SEL).forEach(function(id){ ATSEL[id] = 1; });   /* a first selection: the Redelegate list's */
+    AT_FLT = AT.grant ? "sel" : "all";
+    atView("setup"); atShow(); POP.open(atpop);
+    var tok = ++AT_OPEN;
+    atStatus().then(function(){ return Promise.all([atGrant(), atReport()]); }).then(function(r){
+      if(tok !== AT_OPEN || !atpop.classList.contains("on")) return;
+      var had = !!AT.grant; if(!atKeep(r[0])) return; AT.report = r[1];
+      if(!!AT.grant !== had){ AT_EDIT = false; if(AT.grant){ atFromGrant(); AT_FLT = "sel"; } }
+      atShow(); });
   });
+  if(atpop) atpop.__onclose = function(){ AT_EDIT = false; AT_OPEN++; AT_SIM++; clearTimeout(AT_SIMT); };
   var atcapEl = E("atcap"); if(atcapEl) atcapEl.addEventListener("input", atState);
   var atmax = E("atmax"); if(atmax) atmax.addEventListener("click", function(){ var pos = window.__POS; if(!pos || !(pos.free > 0)) return; E("atcap").value = exact(pos.free); atState(); });
-  Array.prototype.forEach.call(document.querySelectorAll("#atpop input[name=atstrat],#atpop input[name=atpick],#atpop #atrestake"), function(r){ r.addEventListener("change", atState); });
+  Array.prototype.forEach.call(document.querySelectorAll("#atpop input[name=atstrat],#atpop input[name=atpick]"), function(r){ r.addEventListener("change", atRefresh); });
+  var atrs = E("atrestake"); if(atrs) atrs.addEventListener("change", atState);
   Array.prototype.forEach.call(document.querySelectorAll("#atseg button"), function(b){ b.addEventListener("click", function(){
     AT.days = +b.dataset.d; Array.prototype.forEach.call(document.querySelectorAll("#atseg button"), function(o){ o.setAttribute("aria-pressed", o === b ? "true" : "false"); }); atState(); }); });
-  var atcancel = E("atcancel"); if(atcancel) atcancel.addEventListener("click", function(){ POP.close(atpop); });
+  /* the list: a tap anywhere on a row selects it or lets it go; from "All", the first tap
+     starts a selection of the whole set less that one */
+  var atlist = E("atlist");
+  if(atlist) atlist.addEventListener("click", function(ev){
+    var tr = ev.target.closest ? ev.target.closest("tr[data-id]") : null;
+    if(!tr || atViewing()) return;
+    var box = tr.querySelector("input"), on = ev.target === box ? box.checked : !tr.classList.contains("on");
+    if(atPick() === "all"){ ATSEL = {}; atIdsFor("all").forEach(function(x){ ATSEL[x] = 1; }); atSetPick("selected"); }
+    if(on) ATSEL[tr.dataset.id] = 1; else delete ATSEL[tr.dataset.id];
+    atRefresh();
+  });
+  var atqa = E("atqa");
+  if(atqa) atqa.addEventListener("click", function(ev){
+    var b = ev.target.closest ? ev.target.closest("[data-q]") : null;
+    if(!b || b.disabled || atViewing()) return;
+    var mine = window.__MINE || {}, ids = b.dataset.q === "fit" ? atIdsFor(atPreset()) : b.dataset.q === "mine" ? atIdsFor("all").filter(function(id){ return mine[id]; }) : [];
+    ATSEL = {}; ids.forEach(function(id){ ATSEL[id] = 1; });
+    atSetPick("selected"); atRefresh();
+  });
+  var atflt = E("atflt");
+  if(atflt) atflt.addEventListener("click", function(ev){ var b = ev.target.closest ? ev.target.closest("[data-f]") : null; if(!b) return; AT_FLT = b.dataset.f; atFltSync(); atRows(); });
+  var atfind = E("atfind");
+  if(atfind){
+    atfind.addEventListener("input", function(){ AT_FIND = atfind.value; atRows(); });
+    /* Escape in a search that has text clears it, and leaves the card open */
+    atfind.addEventListener("keydown", function(ev){ if(ev.key === "Escape" && atfind.value){ ev.preventDefault(); ev.stopPropagation(); atfind.value = ""; AT_FIND = ""; atRows(); } });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("#atpop .atview [data-v]"), function(b){
+    b.addEventListener("click", function(){ atView(b.dataset.v); });
+    b.addEventListener("keydown", function(ev){ if(ev.key !== "ArrowLeft" && ev.key !== "ArrowRight") return; ev.preventDefault();
+      var v = b.dataset.v === "setup" ? "vals" : "setup"; atView(v); var o = document.querySelector('#atpop .atview [data-v="' + v + '"]'); if(o) o.focus(); });
+  });
+  /* the list's columns follow the width: a turned phone gets the wide markup */
+  var atRz = 0; addEventListener("resize", function(){ if(!atpop || !atpop.classList.contains("on")) return; clearTimeout(atRz); atRz = setTimeout(atRows, 150); });
+  var atedit = E("atedit"); if(atedit) atedit.addEventListener("click", function(){ AT_EDIT = true; atFromGrant(); AT_FLT = "all"; atShow(); });
+  var atcancel = E("atcancel"); if(atcancel) atcancel.addEventListener("click", function(){
+    if(AT.grant && AT_EDIT){ AT_EDIT = false; atFromGrant(); AT_FLT = "sel"; atShow(); return; }
+    POP.close(atpop); });
   function atSend(msgs, btn, memo){
     if(!msgs.length || !window.__TX || !window.__WALLET) return;
     btn.disabled = true; btn.classList.add("busy");
@@ -2451,7 +2639,7 @@ rememberGridH();
     window.__TX.sendDirect(window.__WALLET, msgs, memo || "", function(){})
     .then(function(){
       n.ok(); POP.close(atpop);
-      atGrant().then(function(g){ AT.grant = g; atShow(); atLine(); var ab = E("atbtn"); if(ab) ab.classList.toggle("on", !!g); });
+      atGrant().then(function(r){ if(!atKeep(r)) return; atLine(); var ab = E("atbtn"); if(ab) ab.classList.toggle("on", !!AT.grant); draw(); });
     })
     .catch(function(e){ n.fail(e && e.message || String(e)); })
     .then(function(){ btn.disabled = false; btn.classList.remove("busy"); });
@@ -2460,8 +2648,7 @@ rememberGridH();
   /* revoke names every grant that stands (a revoke of one that does not fails the whole tx) */
   var atrevoke = E("atrevoke"); if(atrevoke) atrevoke.addEventListener("click", function(){
     var types = {}; (AT.grants || []).forEach(function(x){ var t = grantType(x); if(t) types[t] = 1; }); if(!types[REDEL]) types[REDEL] = 1;
-    atSend(Object.keys(types).map(function(t){ return { type: "cosmos-sdk/MsgRevoke", value: { granter: window.__ADDR, grantee: AT.addr, msg_type_url: t } }; }), atrevoke); });
-  /* the door shows with a wallet once the keeper's address is known; lit while a grant stands */
+    atSend(Object.keys(types).map(revokeMsg), atrevoke); });
   /* the wallet's Autopilot line: inactive, or active with the grant's bounds; the door reads Set up / Manage */
   function atLine(){
     var row = E("wkap"), st = E("wkaps"), b = E("atbtn"); if(!row) return;
@@ -2472,11 +2659,15 @@ rememberGridH();
   }
   window.__atDoor = function(){
     var row = E("wkap"), b = E("atbtn"); if(!b || !row) return;
-    if(!window.__POS){ row.hidden = true; return; }
+    /* another wallet (or none): what was read for the last one is dropped at once, so no
+       screen shows its grant while this one's is being read */
+    var who = window.__POS ? window.__ADDR : null;
+    if(who !== AT.who){ AT.who = who; AT.grant = null; AT.grants = []; AT.report = null; ATSEL = {}; b.classList.remove("on"); if(atpop && atpop.classList.contains("on")) POP.close(atpop); }
+    if(!who){ row.hidden = true; return; }
     /* the line shows for every connected wallet; while the keeper has no address yet the
        card reads Inactive and Grant stays disabled */
     row.hidden = false; atLine();
-    atStatus().then(function(){ atLine(); if(AT.addr) atGrant().then(function(g){ AT.grant = g; b.classList.toggle("on", !!g); atLine(); }); });
+    atStatus().then(function(){ atLine(); if(AT.addr && AT.who === who) atGrant().then(function(r){ if(AT.who !== who || !atKeep(r)) return; b.classList.toggle("on", !!AT.grant); atLine(); draw(); }); });
   };
 
   /* the bells on the two cards: every validator the transaction lands on */
@@ -2680,14 +2871,13 @@ rememberGridH();
     '<svg class=ok viewBox="0 0 24 24" aria-hidden=true><path d="M4 12.5l5 5L20 6.5"/></svg>';
   var wcp = E("waddr"), wcpT = 0;
   if(wcp) wcp.addEventListener("click", function(){
-    var a = window.__ADDR; if(!a) return;
-    var ok = function(){ wcp.classList.add("done"); wcp.title = "Copied"; clearTimeout(wcpT);
-      wcpT = setTimeout(function(){ wcp.classList.remove("done"); wcp.title = "Copy address"; }, 1400); };
-    var old = function(){ try{ var t = document.createElement("textarea"); t.value = a; t.setAttribute("readonly", ""); t.style.position = "fixed"; t.style.opacity = "0";
-      document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t); ok(); }catch(e){} };
-    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(a).then(ok, old); else old();
+    if(!window.__ADDR) return;
+    copyText(window.__ADDR, function(){ wcp.classList.add("done"); wcp.title = "Copied"; clearTimeout(wcpT);
+      wcpT = setTimeout(function(){ wcp.classList.remove("done"); wcp.title = "Copy address"; }, 1400); });
   });
   function disconnect(){
+    CONN++;
+    if(window.__onPos){ var f0 = window.__onPos; window.__onPos = null; f0(); }
     window.__ADDR = null; window.__POS = null; window.__REDS = null; window.__MINE = null; window.__LOCKNOTE = "";
     window.__DELS = null; window.__WALLET = null; window.__BAL = null;
     window.__UNB = null; window.__REW = null; window.__REWBY = null; window.__POSAT = 0;
@@ -2699,6 +2889,7 @@ rememberGridH();
     var blk0 = E("wblk"); if(blk0) blk0.hidden = true; var rf0 = E("wrefresh"); if(rf0) rf0.hidden = true;
     busy(false);
     var wn = E("wname"); if(wn) wn.textContent = "Wallet";
+    if(window.__atDoor) window.__atDoor();          /* no wallet: nothing of the last one's grant stays */
     if(window.__redraw) window.__redraw();
     if(window.__planDraw) window.__planDraw();
   }
@@ -2712,8 +2903,12 @@ rememberGridH();
     return new Promise(function(res){ window.__onPos = res; connect(true); });
   };
 
+  /* one connection at a time: every connect (and a disconnect) takes a new ticket, and a read
+     still in flight for an older ticket is dropped - a slow answer for the last account, or
+     for a wallet since disconnected, must never land on the page */
+  var CONN = 0, STALE = new Error("stale");
   function connect(chosen){
-    var ps = providers(), w = null;
+    var ps = providers(), w = null, tok;
     if(CHOSEN){ for(var i = 0; i < ps.length; i++) if(ps[i].name === CHOSEN) w = ps[i]; }
     if(!chosen && !w) return;
     if(!w){
@@ -2722,9 +2917,12 @@ rememberGridH();
       return;
     }
     busy(true, w.name);
+    tok = ++CONN;
+    function live(v){ if(tok !== CONN) throw STALE; return v; }
     w.enable()
-      .then(function(){ return w.getKey(); })
+      .then(function(){ live(); return w.getKey(); })
       .then(function(k){
+        live();
         window.__ADDR = k.bech32Address;
         /* what the signing step needs: the wallet, the address, the public key */
         /* label: the account's own name as the wallet reports it (what the reader
@@ -2737,6 +2935,7 @@ rememberGridH();
         return get("/cosmos/staking/v1beta1/delegations/" + k.bech32Address);
       })
       .then(function(d){
+        live();
         window.__DELS = d.delegation_responses || [];
         /* Stake that ARRIVED by redelegation cannot leave again until its entry
            matures - the chain rejects it outright (ErrTransitiveRedelegation),
@@ -2746,10 +2945,12 @@ rememberGridH();
         return get("/cosmos/staking/v1beta1/delegators/" + window.__ADDR + "/redelegations");
       })
       .then(function(rd){
+        live();
         window.__REDS = rd.redelegation_responses || [];
         return get("/cosmos/staking/v1beta1/delegators/" + window.__ADDR + "/unbonding_delegations").catch(function(){ return {}; });
       })
       .then(function(ub){
+        live();
         var V = window.__VALS(), by = {}, i; for(i = 0; i < V.length; i++) by[V[i][3]] = V[i][0];
         window.__UNB = [];
         (ub.unbonding_responses || []).forEach(function(u){
@@ -2759,6 +2960,7 @@ rememberGridH();
         return get("/cosmos/distribution/v1beta1/delegators/" + window.__ADDR + "/rewards").catch(function(){ return {}; });
       })
       .then(function(rw){
+        live();
         var tot = 0; ((rw && rw.total) || []).forEach(function(c){ if(c.denom === "uatone") tot += parseFloat(c.amount); });
         window.__REW = rw && rw.total ? tot : null;
         /* and per validator, for the ledger */
@@ -2768,6 +2970,7 @@ rememberGridH();
         return get("/cosmos/bank/v1beta1/balances/" + window.__ADDR).catch(function(){ return {}; });
       })
       .then(function(bl){
+        live();
         window.__BAL = { uatone: 0, uphoton: 0 };
         (bl.balances || []).forEach(function(c){ if(c.denom in window.__BAL) window.__BAL[c.denom] = parseInt(c.amount, 10); });
         var rd = { redelegation_responses: window.__REDS };
@@ -2814,6 +3017,7 @@ rememberGridH();
         if(window.__onPos){ var f = window.__onPos; window.__onPos = null; f(); }
       })
       .catch(function(e){
+        if(e === STALE) return;                        /* a newer connect, or a disconnect, owns the page now */
         if(window.__onPos){ var f2 = window.__onPos; window.__onPos = null; f2(); }
         if(!window.__POS){ window.__ADDR = null; window.__DELS = null; window.__REDS = null; }
         busy(false);

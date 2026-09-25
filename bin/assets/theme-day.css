@@ -176,6 +176,7 @@
   html[data-theme=light]:not([data-mono]) .vnote{color:var(--faint)}
   html[data-theme=light]:not([data-mono]) #cpop .vgrid{border-top:none}
   html[data-theme=light]:not([data-mono]) .vrk{border-color:var(--amber-bar);background:var(--warn-bg)}
+  html[data-theme=light]:not([data-mono]) .pop .card:focus{outline:none}
   html[data-theme=light]:not([data-mono]) .tabb{background:transparent}
   html[data-theme=light]:not([data-mono]) .tabb.on{border-color:color-mix(in srgb,var(--acc,var(--amber-bar)) 48%,transparent);background:color-mix(in srgb,var(--acc,var(--amber-bar)) 9%,transparent)}
   html[data-theme=light]:not([data-mono]) .panes>.w{background:var(--surface-2)}
@@ -520,27 +521,6 @@
   html[data-theme=light]:not([data-mono]) #wk-plan .wk-field.need{border-color:var(--amber-bar);box-shadow:0 0 0 3px var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-btn.wk-go{color:#FFFFFF;background:var(--accent);border:1px solid var(--accent);box-shadow:0 0 0 1px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-btn.wk-go:disabled{background:var(--surface-2);border-color:var(--line-strong);color:var(--faint);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .pop .card.atcard::before{background:transparent}
-  html[data-theme=light]:not([data-mono]) .atcard .txsum{color:var(--muted)}
-  html[data-theme=light]:not([data-mono]) .atcard .atstate{border:1px solid var(--accent-soft);background:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .atcard .atstate b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .atcard .atfield:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .atcard .atseg button{background:transparent}
-  html[data-theme=light]:not([data-mono]) .atcard .atseg button[aria-pressed=true]{background:var(--accent);color:#FFFFFF}
-  html[data-theme=light]:not([data-mono]) .atcard .atfee{border:1px solid var(--warn-bg);background:var(--warn-bg)}
-  html[data-theme=light]:not([data-mono]) .atcard .wk-btn.wk-go{background:var(--line-strong);border:1px solid var(--accent);color:#FFFFFF;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .atcard .wk-btn.wk-go:disabled{background:var(--surface-2);border-color:var(--line);color:var(--faint);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .atcard .wk-btn.wk-danger{border-color:var(--danger-bar);color:var(--danger);background:transparent}
-  html[data-theme=light]:not([data-mono]) .atcard .atpc{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .atcard .atpc:has(input:checked){border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .atcard .atpc input:checked{border-color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .atcard .atpc input:checked::after{background:var(--accent);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .atcard .atpc b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .atcard .atpc em{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .atcard .atpc:nth-child(1) b{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .atcard .atpc:nth-child(2) b{color:var(--muted)}
-  html[data-theme=light]:not([data-mono]) .atcard .atpc:nth-child(3) b{color:var(--warn)}
-  html[data-theme=light]:not([data-mono]) .atcard .atpc:nth-child(4) b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.gain:has(b.neg){--c:var(--danger)}
   html[data-theme=light]:not([data-mono]) #dpicks td.nm .gtag.neg{border-color:var(--danger-bar);background:var(--danger-bg)}
   html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-field{background:var(--surface-2);box-shadow:none}
@@ -567,20 +547,8 @@
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb:focus-visible{outline:2px solid var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 i{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) #dmy thead th{color:var(--muted);background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .atcard .atrow>div.atfield{background:var(--surface);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .atcard .atrow>div.atfield:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .atcard .atrow>div.atfield input.wk-amt2{background:transparent;color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .atcard .atsw .atswk{background:var(--surface);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .atcard .atsw input:checked+.atswk{background:var(--accent-soft);border-color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .atcard .atsw input:checked+.atswk::after{background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .atcard .atsw input:focus-visible+.atswk{outline:2px solid var(--accent)}
-  html[data-theme=light]:not([data-mono]) .atcard .atsw b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .atcard .atnote{border:1px solid var(--accent-soft);background:var(--accent-soft);color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #p-dele .atcard .atnote svg,html[data-theme=light]:not([data-mono]) .atcard .atnote svg{fill:none;stroke:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .atcard .atuntil b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .thbtn{background:transparent}
   html[data-theme=light]:not([data-mono]) .thbtn svg{fill:none;stroke:currentColor}
-  html[data-theme=light]:not([data-mono]) .atcard .txsum .atclosed{border:1px solid var(--amber-bar);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-ap{border:1px solid var(--accent);background:var(--surface-2);box-shadow:0 0 0 1px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-ap::before{background:transparent}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-apk{color:var(--muted);text-shadow:none}
@@ -638,6 +606,56 @@
   html[data-theme=light]:not([data-mono]) .sv-stat i{box-shadow:0 0 0 3px var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sv-stat.on i{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .sv-tbl tbody tr:hover{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .pop .card.atcard{--av:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .pop .card.atcard::before{background:transparent}
+  html[data-theme=light]:not([data-mono]) .atcard .txsum{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .atcard .txsum .atclosed{border:1px solid var(--amber-bar);background:var(--warn-bg)}
+  html[data-theme=light]:not([data-mono]) .atstate{border:1px solid var(--accent-soft);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .atstate b{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .atpc{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .atpc:has(input:checked){box-shadow:0 0 0 3px var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .atpc input:checked::after{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .atpc b{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .at3 .atpc:nth-child(1) b{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .at3 .atpc:nth-child(2) b{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .at3 .atpc:nth-child(3) b{color:var(--warn)}
+  html[data-theme=light]:not([data-mono]) .atcard .unfield.atfield:focus-within{box-shadow:0 0 0 3px var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .atseg button{background:transparent}
+  html[data-theme=light]:not([data-mono]) .atseg button[aria-pressed=true]{color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .atuntil b{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .atswk{background:var(--surface)}
+  html[data-theme=light]:not([data-mono]) .atsw input:checked+.atswk{background:var(--accent-soft);border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .atsw input:checked+.atswk::after{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .atfee{border:1px solid var(--warn-bg);background:var(--warn-bg)}
+  html[data-theme=light]:not([data-mono]) .atnote{border:1px solid var(--accent-soft);background:var(--accent-soft);color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .atnote svg{fill:none;stroke:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .atrt b{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .atq{background:transparent}
+  html[data-theme=light]:not([data-mono]) .atq:hover{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .atfind{color:var(--ink);outline:none}
+  html[data-theme=light]:not([data-mono]) .atfind:focus{box-shadow:0 0 0 3px var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .atflt button{background:transparent}
+  html[data-theme=light]:not([data-mono]) .atflt button[aria-pressed=true]{color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .atlist thead th{background:var(--surface-2);color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .atlist td{border-bottom:1px solid var(--line-soft)}
+  html[data-theme=light]:not([data-mono]) .atlist tr:hover td{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .atlist tr.on td{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .atlist tr.on td:first-child{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .atlist td.ck input{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .atlist td.ck input:checked{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .atlist td.ck input:checked::after{border:solid var(--surface)}
+  html[data-theme=light]:not([data-mono]) .atlist .nmw>span.nmt{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .atlist .wk-lgx{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .atlist .attg.y{border-color:var(--amber-bar)}
+  html[data-theme=light]:not([data-mono]) .atlist .attg.f{border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .atcard .wk-btn.wk-go{background:var(--line-strong);color:#FFFFFF;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .atcard .wk-btn.wk-go:disabled{background:var(--surface-2);border-color:var(--line);color:var(--faint);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .atcard .wk-btn.wk-danger{border-color:var(--danger-bar);color:var(--danger);background:transparent}
+  @media(max-width:620px){
+    html[data-theme=light]:not([data-mono]) .atview button{background:transparent}
+    html[data-theme=light]:not([data-mono]) .atview button[aria-selected=true]{color:#FFFFFF}
+    html[data-theme=light]:not([data-mono]) .atview button[aria-selected=true] b{color:#FFFFFF}
+  }
   html[data-theme=light]:not([data-mono]) .l1tab{background:transparent}
   html[data-theme=light]:not([data-mono]) .l2tab{background:transparent}
   html[data-theme=light]:not([data-mono]) .l2vb{background:transparent}

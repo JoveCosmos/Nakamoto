@@ -1088,11 +1088,16 @@ line-height:1.25;min-height:23px;min-width:0}
 .vrk{font-size:10px;color:var(--hot);border-color:#ffb02e55;background:#ffb02e12;
 padding:2px 8px;margin-left:0;letter-spacing:.02em;line-height:1.5}
 
-/* room to dismiss: a card that reaches the edges leaves nowhere to tap */
-.pop{padding:28px 20px}
+/* room to dismiss: a card that reaches the edges leaves nowhere to tap - on a phone a margin
+   a thumb can find on every side; and the page behind never scrolls while a card is up (a
+   drag on the scrim is not a scroll, a drag inside the card scrolls only the card) */
+.pop{padding:28px 20px;touch-action:none;overscroll-behavior:contain}
+.pop .card{overscroll-behavior:contain}
+.pop .card:focus{outline:none}
+html.popon,html.popon body{overflow:hidden}
 .pop .card{max-height:84vh;max-height:84svh}
 @media(max-width:620px){
-  .pop{padding:22px 14px}
+  .pop{padding:28px 22px}
   .pop .card{max-height:80vh;max-height:80svh}
   .vhead{gap:12px}
   .vlogo,.vmono{width:40px;height:40px}
@@ -2762,6 +2767,7 @@ border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0d0d1c);
 #wk-mv .wk-ans{flex-wrap:nowrap;gap:6px;margin:4px 0 0}
 #wk-mv .wk-ans .p,#wk-mv .wk-ans .p.rate,#wk-mv .wk-ans .p.gain,#wk-mv .wk-ans .p.lock{flex:1 1 0;min-width:0;height:46px;padding:0 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
 #wk-mv .wk-ans .p.rate{flex:1.25 1 0}
+#wk-mv .wk-ans .p.lock{flex:1.2 1 0}
 #wk-mv .wk-ans .p i{font-size:6.5px;letter-spacing:.14em;white-space:nowrap}
 #wk-mv .wk-ans .p b{font-size:12px;letter-spacing:-.02em;white-space:nowrap}
 #wk-mv .wk-ans .p .arr{font-size:10px;margin:0 1px}
@@ -3073,53 +3079,12 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
 /* the field shares the first line with the count; the initial-letter mark keeps its circle */
 
 #dpicks td.nm .nmw>span.wk-lgx{min-width:0;flex:0 0 17px;width:17px}
-/* ── Autopilot: the door in the Redelegate head, its card in violet ── */
 
 #wk-plan>.wk-ph .wk-lockn{order:1;margin-left:auto}
 
-.pop .card.atcard{width:min(520px,94vw);max-width:520px}
-.pop .card.atcard::before{content:"";position:absolute;left:24px;right:24px;top:0;height:1px;background:linear-gradient(90deg,transparent,#b9b0ff,transparent);opacity:.9}
-.atcard .txsum{color:#c9c2ff}
 
-.atcard .atstate{margin:12px 20px 0;padding:10px 12px;border:1px solid rgba(46,224,106,.28);border-radius:6px;background:rgba(46,224,106,.05);font-family:var(--wmono);font-size:9px;letter-spacing:.04em;color:var(--ws);line-height:1.6}
-.atcard .atstate b{color:#fff8dc;font-weight:400}
-.atcard .atstate .g{color:var(--wgreen)}
-.atcard .atstate[hidden]{display:none}
-.atcard .atform{padding:8px 20px 0}
-.atcard .atform[hidden]{display:none}
-.atcard .atrow{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-top:1px solid var(--wbd)}
-.atcard .atrow:first-child{border-top:0}
-.atcard .atlab{flex:0 0 118px;padding-top:6px;font-family:var(--wmono);font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--wf)}
 
-.atcard .atrow>div:not(.atseg){display:flex;flex-direction:column}
-.atcard .atfield{width:220px;height:30px}
-.atcard .atfield:focus-within{border-color:#b9b0ff;box-shadow:0 0 0 3px rgba(185,176,255,.13)}
-.atcard .atseg{display:inline-flex;gap:4px;padding:3px;border:1px solid var(--wbd2);border-radius:6px;background:var(--wi)}
-.atcard .atseg button{height:24px;padding:0 12px;border:0;border-radius:4px;background:transparent;color:var(--ws);font-family:var(--wmono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
-.atcard .atseg button[aria-pressed=true]{background:#b9b0ff;color:#1b1440}
-.atcard .atfee{margin:10px 0 0;padding:9px 12px;border:1px solid rgba(255,176,46,.28);border-radius:6px;background:rgba(255,176,46,.05);font-family:var(--wmono);font-size:9px;letter-spacing:.04em;color:var(--ws);line-height:1.5}
-.atcard .atfee b{color:var(--wamber);font-weight:400}
-.atcard .atfee[hidden]{display:none}
-.atcard .wk-btn.wk-go{background:linear-gradient(180deg,#c9c2ff,#9d93f0);border:1px solid #b9b0ff;color:#1b1440;box-shadow:0 10px 24px -12px rgba(185,176,255,.8),inset 0 1px 0 rgba(255,255,255,.3)}
-.atcard .wk-btn.wk-go:disabled{background:linear-gradient(180deg,#1d1d36,#15152a);border-color:#2f2f52;color:#66648c;box-shadow:none;opacity:1}
-.atcard .wk-btn.wk-danger{border-color:rgba(255,77,31,.45);color:#ff8a66;background:transparent}
-.atcard .wk-btn.wk-danger:hover{border-color:var(--wburn);color:var(--wburn)}
-.atcard .wk-btn.wk-danger[hidden]{display:none}
-#atpop .txfee{height:23px;min-height:23px;line-height:13px;overflow:hidden;white-space:nowrap}
-#atpop .txstep{min-height:20px}
 
-/* the strategies as four cards */
-.atcard .atpre{display:grid;grid-template-columns:1fr 1fr;gap:6px;flex:1 1 auto}
-.atcard .atpc{display:grid;grid-template-columns:14px minmax(0,1fr);grid-template-areas:"r b" "r i" "r e";column-gap:8px;row-gap:3px;padding:8px 10px;border:1px solid var(--wbd2);border-radius:6px;background:linear-gradient(180deg,#12122a,#0b0b18);cursor:pointer;transition:border-color .12s,box-shadow .12s}
-.atcard .atpc:hover{border-color:var(--ws)}
-.atcard .atpc:has(input:checked){border-color:#b9b0ff;box-shadow:0 0 0 3px rgba(185,176,255,.12)}
-.atcard .atpc input{grid-area:r;appearance:none;-webkit-appearance:none;width:14px;height:14px;margin:1px 0 0;border-radius:50%;border:1px solid var(--wbd2);background:var(--wi);position:relative;cursor:pointer}
-.atcard .atpc input:checked{border-color:#b9b0ff}
-.atcard .atpc input:checked::after{content:"";position:absolute;left:3px;top:3px;width:6px;height:6px;border-radius:50%;background:#b9b0ff;box-shadow:0 0 8px #b9b0ff}
-.atcard .atpc b{grid-area:b;font-family:var(--wsans);font-size:12px;font-weight:600;color:#fff8dc}
-.atcard .atpc i{grid-area:i;font-style:normal;font-family:var(--wsans);font-size:10px;line-height:1.4;color:var(--ws)}
-.atcard .atpc em{grid-area:e;font-style:normal;font-family:var(--wmono);font-size:8px;letter-spacing:.1em;color:#b9b0ff}
-.atcard .atpc:nth-child(1) b{color:#8ef0c8}.atcard .atpc:nth-child(2) b{color:#c9c2ff}.atcard .atpc:nth-child(3) b{color:#ffc453}.atcard .atpc:nth-child(4) b{color:#fff8dc}
 /* ── three columns again, in the calculator's frame: the wallet down the left,
    Redelegate in the middle taking what is left, Outcome on the right ── */
 @media(min-width:901px){
@@ -3239,66 +3204,8 @@ box-shadow:0 10px 24px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);
 #dmy tbody td.nm{padding-left:8px}
 #dmy tbody tr:first-child td{border-top:0}
 @media(max-width:700px){#dmy thead th{padding:7px 5px 6px}#dmy tbody td{padding:0 5px;height:30px}}
-/* the Autopilot card's amount row: the field is a row (figure and MAX side by side), the
-   note beneath it under the field, never off the card's edge */
-.atcard .atrow{flex-wrap:wrap}
-.atcard .atrow>div.atfield{flex-direction:row;width:200px;height:30px;display:inline-flex;align-items:center;padding:0 4px 0 0;border-radius:6px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#0b0b18,#0e0e1d);box-shadow:inset 0 1px 0 #ffffff06}
-.atcard .atrow>div.atfield:focus-within{border-color:#b9b0ff;box-shadow:0 0 0 3px rgba(185,176,255,.13)}
-.atcard .atrow>div.atfield input.wk-amt2{flex:1 1 auto;min-width:0;height:100%;width:auto;margin:0;border:0;background:transparent;font-size:12px;padding:0 8px;color:#fff8dc}
-.atcard .atrow>div.atfield .wk-max{height:22px;padding:0 8px;font-size:7.5px;letter-spacing:.14em;border-radius:4px;flex:0 0 auto;white-space:nowrap}
-.atcard .atrow>div.atfield .wk-max b{font-size:9.5px}
-.atcard .atrow .unhint{flex:1 1 100%;margin:6px 0 0 130px;font-family:var(--wmono);font-size:8.5px;letter-spacing:.06em;color:var(--wf);white-space:normal}
-.atcard .atrow .unhint.bad{color:var(--wamber)}
-/* the strategies as the two-by-two grid they were drawn as (a later column rule had stacked
-   them, and the card ran off a laptop screen) */
-.atcard .atrow>div.atpre{display:grid;grid-template-columns:1fr 1fr;gap:6px;flex:1 1 auto}
-.atcard .atpc i{font-size:10.5px;line-height:1.35}
-/* the card must fit a laptop screen: tighter rows, empty lines take no room */
 
-.atcard .atrow{padding:6px 0}
-.atcard .atpc{padding:7px 9px;row-gap:2px}
-.atcard .txfee:empty,.atcard .txstep:empty{display:none}
-.atcard .txbtns{padding-top:10px;padding-bottom:12px}
-@media(max-height:760px){.pop .card.atcard{max-height:96vh;max-height:96svh}}
-/* with the Autopilot door on the line, a mid-width frame shows the note as "amount → date" */
 
-/* ── the Autopilot card in five rows: strategy, validators, stake, time, restake; a closing
-   note; the strategies three across, the validator choice two across ── */
-.atcard .atrow>div.atpre.at3{grid-template-columns:1fr 1fr 1fr}
-.atcard .atrow>div.atpre.at2{grid-template-columns:1fr 1fr}
-.atcard .atpc b{font-size:11.5px}
-.atcard .atpc i{font-size:10px;line-height:1.35}
-.atcard .atsw{display:grid;grid-template-columns:34px minmax(0,1fr);column-gap:10px;align-items:start;cursor:pointer;padding:2px 0}
-.atcard .atsw input{position:absolute;opacity:0;width:0;height:0}
-.atcard .atsw .atswk{position:relative;width:34px;height:20px;border-radius:999px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#0b0b18,#0e0e1d);box-shadow:inset 0 1px 0 #ffffff06;transition:background .15s,border-color .15s;margin-top:1px}
-.atcard .atsw .atswk::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--wf);transition:transform .15s,background .15s}
-.atcard .atsw input:checked+.atswk{background:rgba(46,224,106,.22);border-color:#2ee06a}
-.atcard .atsw input:checked+.atswk::after{transform:translateX(14px);background:#2ee06a}
-.atcard .atsw input:focus-visible+.atswk{outline:2px solid #b9b0ff;outline-offset:2px}
-.atcard .atsw .atswt{display:flex;flex-direction:column;gap:2px}
-.atcard .atsw b{font-family:var(--wsans);font-size:11.5px;font-weight:600;color:#fff8dc}
-.atcard .atsw i{font-style:normal;font-family:var(--wsans);font-size:10px;line-height:1.35;color:var(--ws)}
-.atcard .atnote{display:flex;align-items:center;gap:9px;margin:10px 20px 0;padding:8px 11px;border-radius:6px;border:1px solid rgba(46,224,106,.28);background:rgba(46,224,106,.06);font-family:var(--wsans);font-size:11.5px;color:#d9f7e4}
-#p-dele .atcard .atnote svg,.atcard .atnote svg{width:15px;height:15px;flex:0 0 auto;fill:none;stroke:#2ee06a;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin:0;max-height:none}
-@media(max-width:620px){.atcard .atrow>div.atpre.at3,.atcard .atrow>div.atpre.at2{grid-template-columns:1fr}}
-/* each category: its name above, its controls full width beneath */
-.atcard .atrow{flex-direction:column;align-items:stretch;gap:6px;padding:9px 0}
-.atcard .atlab{flex:0 0 auto;padding:0}
-.atcard .atrow>div.atfield{width:240px}
-.atcard .atrow .unhint{margin:2px 0 0}
-.atcard .atrow>.atseg{align-self:flex-start}
-.atcard .atrow:has(.atfield){flex-direction:row;flex-wrap:wrap;align-items:center;column-gap:12px}
-.atcard .atrow:has(.atfield) .atlab{flex:0 0 100%}
-.atcard .atrow:has(.atfield) .unhint{flex:1 1 auto;margin:0}
-@media(max-height:760px){.atcard .atrow{padding:5px 0;gap:4px}.atcard .atpc{padding:5px 8px}.atcard .atpc i{font-size:9.5px}.atcard .atnote{margin-top:6px;padding:6px 10px}.atcard .txbtns{padding-top:8px;padding-bottom:10px}.atcard .wk-txh{padding-bottom:6px}}
-/* the strategy and validator cards carry a name and a count only; the time row says when the grant ends */
-.atcard .atpc{grid-template-areas:"r b" "r e";row-gap:2px}
-.atcard .atpc em{grid-area:e}
-.atcard .atrow>div.attime{display:flex;flex-direction:row;align-items:center;gap:12px;align-self:flex-start}
-.atcard .atuntil{font-family:var(--wmono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ws)}
-.atcard .atuntil b{font-family:var(--wsans);font-size:11.5px;font-weight:600;letter-spacing:0;text-transform:none;color:#fff8dc;margin-left:4px}
-.atcard .atsw .atswt i{font-size:11px;color:var(--ws)}
-.atcard .atsw{align-items:center}
 /* ── day or night: a switch at the bar's end; the choice is stamped on <html data-theme>
    by boot.js before the first paint (the reader's own, else the browser's preference) ── */
 .thbtn{margin-left:auto;width:36px;height:36px;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid var(--edge2);background:transparent;color:var(--ink2);cursor:pointer;transition:color .15s,border-color .15s,background .15s;align-self:center}
@@ -3313,7 +3220,6 @@ html[data-theme=light] .thbtn .moon{display:block}
    one in its own colour, Governance boxed too but dim while it is closed; the keyboard ring
    sits outside the box ── */
 
-.atcard .txsum .atclosed{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:5px;border:1px solid rgba(255,176,46,.4);background:rgba(255,176,46,.08);font-family:var(--wmono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--wamber);white-space:nowrap}
 /* ── Autopilot's line in the wallet: its state at a glance, and the door to set it up,
    manage it or revoke it ── */
 #wk-mine .wk-ap{display:flex;align-items:center;gap:10px;height:44px;margin:8px 0 0;padding:0 12px;border:1px solid rgba(185,176,255,.5);border-radius:8px;background:linear-gradient(180deg,#1b1735,#100e22);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 1px rgba(185,176,255,.12),0 10px 24px -14px rgba(185,176,255,.8);flex:0 0 auto;position:relative;overflow:hidden}
@@ -3502,7 +3408,7 @@ border-radius:99px;padding:4px 9px;border:1px solid var(--wbd2);color:var(--ws);
 .sv-panel{border:1px solid var(--wbd);border-radius:12px;background:var(--wc);padding:13px 15px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
 .sv-ph{display:flex;align-items:center;gap:11px;flex-wrap:wrap;min-width:0}
 .sv-ph h3{margin:0;font-size:16px;font-weight:800;letter-spacing:-.01em}
-.sv-ph .sv-rt{margin-left:auto;display:flex;align-items:center;gap:9px}
+.sv-ph .sv-rt{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:9px;min-width:0}
 .sv-note{font-size:11.5px;color:var(--ws);line-height:1.5}
 .sv-note b{color:var(--wt)}
 /* the four figures of the opportunity, and the button that signs it */
@@ -3722,6 +3628,157 @@ border-color:rgba(46,224,106,.3)}
   .welc{flex:1 1 100%;margin-left:0;padding-left:0;border-left:0}
   .sv-list .sv-wrap{max-height:62svh}
   .sv-chips{grid-template-columns:minmax(0,1fr)}
+}
+/* ══ Autopilot: one screen to set it up ═══════════════════════════════════════════════
+   The terms on the left (strategy, which validators, stake, time, restake), the validator set
+   on the right to choose from - search it, narrow it, select one by one or by a rule - and one
+   footer across both with the fee, the step and the buttons. A phone shows one side at a time
+   (Setup | Validators). Violet is Autopilot's colour, as on its line in the wallet. */
+.pop .card.atcard{--av:#b9b0ff;width:min(1040px,100%);max-width:none;height:min(700px,100%);max-height:none;padding:0;
+display:flex;flex-direction:column;overflow:hidden}
+.pop .card.atcard::before{content:"";position:absolute;left:24px;right:24px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--av),transparent);opacity:.9}
+.atcard .wk-txh{flex:0 0 auto}
+.atcard .txsum{color:#c9c2ff}
+.atcard .txsum .atclosed{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:5px;border:1px solid rgba(255,176,46,.4);background:rgba(255,176,46,.08);font-family:var(--wmono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--wamber);white-space:nowrap}
+.atview{display:none}
+.atbody{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr)}
+.atL{min-height:0;overflow-y:auto;padding:6px 20px 16px;border-right:1px solid var(--wbd);scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
+.atR{min-height:0;display:flex;flex-direction:column;padding:14px 20px 0 18px}
+/* the state of a standing grant */
+.atstate{margin:10px 0 4px;padding:10px 12px;border:1px solid rgba(46,224,106,.28);border-radius:6px;background:rgba(46,224,106,.05);font-family:var(--wmono);font-size:9px;letter-spacing:.04em;color:var(--ws);line-height:1.7}
+.atstate b{color:#fff8dc;font-weight:400}
+.atstate .g{color:var(--wgreen)}
+.atstate[hidden],.atform[hidden],.atfee[hidden]{display:none}
+/* the terms: each category's name above its controls */
+.atrow{display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:10px 0;border-top:1px solid var(--wbd)}
+.atrow:first-child{border-top:0}
+.atlab{font-family:var(--wmono);font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--wf)}
+.atpre{display:grid;gap:6px}
+.atpre.at3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.atpre.at2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.atpc{display:grid;grid-template-columns:14px minmax(0,1fr);grid-template-areas:"r b" "r e";column-gap:8px;row-gap:2px;align-items:center;padding:7px 9px;
+border:1px solid var(--wbd2);border-radius:6px;background:linear-gradient(180deg,#12122a,#0b0b18);cursor:pointer;transition:border-color .12s,box-shadow .12s}
+.atpc:hover{border-color:var(--ws)}
+.atpc:has(input:checked){border-color:var(--av);box-shadow:0 0 0 3px rgba(185,176,255,.12)}
+.atpc input{grid-area:r;appearance:none;-webkit-appearance:none;width:14px;height:14px;margin:0;border-radius:50%;border:1px solid var(--wbd2);background:var(--wi);position:relative;cursor:pointer}
+.atpc input:checked{border-color:var(--av)}
+.atpc input:checked::after{content:"";position:absolute;left:3px;top:3px;width:6px;height:6px;border-radius:50%;background:var(--av);box-shadow:0 0 8px var(--av)}
+.atpc input:focus-visible{outline:2px solid var(--av);outline-offset:2px}
+.atpc b{grid-area:b;font-family:var(--wsans);font-size:11.5px;font-weight:600;color:#fff8dc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.atpc em{grid-area:e;font-style:normal;font-family:var(--wmono);font-size:8px;letter-spacing:.1em;color:var(--av);white-space:nowrap}
+.at3 .atpc:nth-child(1) b{color:#8ef0c8}.at3 .atpc:nth-child(2) b{color:#c9c2ff}.at3 .atpc:nth-child(3) b{color:#ffc453}
+.atrow:has(.atfield){flex-direction:row;flex-wrap:wrap;align-items:center;column-gap:12px}
+.atrow:has(.atfield) .atlab{flex:0 0 100%}
+.atcard .unfield.atfield{width:240px;height:30px}
+.atcard .unfield.atfield:focus-within{border-color:var(--av);box-shadow:0 0 0 3px rgba(185,176,255,.13)}
+.atcard .atrow .unhint{flex:1 1 auto;min-width:0;margin:0;font-family:var(--wmono);font-size:8.5px;letter-spacing:.06em;color:var(--wf);white-space:normal}
+.atcard .atrow .unhint.bad{color:var(--wamber)}
+.attime{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.atseg{display:inline-flex;gap:4px;padding:3px;border:1px solid var(--wbd2);border-radius:6px;background:var(--wi)}
+.atseg button{height:24px;padding:0 12px;border:0;border-radius:4px;background:transparent;color:var(--ws);font-family:var(--wmono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.atseg button[aria-pressed=true]{background:var(--av);color:#1b1440}
+.atseg button:focus-visible{outline:2px solid var(--av);outline-offset:2px}
+.atuntil{font-family:var(--wmono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ws)}
+.atuntil b{font-family:var(--wsans);font-size:11.5px;font-weight:600;letter-spacing:0;text-transform:none;color:#fff8dc;margin-left:4px}
+.atsw{display:grid;grid-template-columns:34px minmax(0,1fr);column-gap:10px;align-items:center;cursor:pointer;padding:2px 0;position:relative}
+.atsw input{position:absolute;opacity:0;width:0;height:0}
+.atswk{position:relative;width:34px;height:20px;border-radius:999px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#0b0b18,#0e0e1d);transition:background .15s,border-color .15s}
+.atswk::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--wf);transition:transform .15s,background .15s}
+.atsw input:checked+.atswk{background:rgba(46,224,106,.22);border-color:#2ee06a}
+.atsw input:checked+.atswk::after{transform:translateX(14px);background:#2ee06a}
+.atsw input:focus-visible+.atswk{outline:2px solid var(--av);outline-offset:2px}
+.atswt{font-family:var(--wsans);font-size:11px;line-height:1.35;color:var(--ws)}
+.atfee{margin:8px 0 0;padding:9px 12px;border:1px solid rgba(255,176,46,.28);border-radius:6px;background:rgba(255,176,46,.05);font-family:var(--wmono);font-size:9px;letter-spacing:.04em;color:var(--ws);line-height:1.5}
+.atfee b{color:var(--wamber);font-weight:400}
+.atnote{display:flex;align-items:center;gap:9px;margin:12px 0 0;padding:8px 11px;border-radius:6px;border:1px solid rgba(46,224,106,.28);background:rgba(46,224,106,.06);font-family:var(--wsans);font-size:11.5px;color:#d9f7e4}
+.atnote svg{width:15px;height:15px;flex:0 0 auto;fill:none;stroke:#2ee06a;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin:0;max-height:none}
+/* the validators: a head with the count and the quick rules, a search and a filter, the list */
+.atrh{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.atrt{display:flex;flex-direction:column;gap:3px;min-width:0}
+.atrt b{font-family:var(--wsans);font-size:13px;font-weight:600;color:#fff8dc}
+.atrt span{font-family:var(--wmono);font-size:9px;letter-spacing:.06em;color:var(--ws)}
+.atrt span b{font-family:var(--wmono);font-size:9px;font-weight:400;color:var(--av)}
+.atqa{display:flex;gap:6px;flex-wrap:wrap}
+.atqa[hidden]{display:none}
+.atq{height:26px;padding:0 10px;border-radius:5px;border:1px solid var(--wbd2);background:transparent;color:var(--ws);font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;cursor:pointer;transition:color .12s,border-color .12s}
+.atq:hover{border-color:var(--av);color:#d6d1ff}
+.atq:focus-visible{outline:2px solid var(--av);outline-offset:2px}
+.atq:disabled{opacity:.4;cursor:default}
+.atrs{display:flex;align-items:center;gap:8px;margin-top:12px}
+.atfind{flex:1 1 auto;min-width:0;height:30px;padding:0 10px;margin:0;border-radius:6px;border:1px solid var(--wbd2);background:var(--wi);color:#fff8dc;font-family:var(--wsans);font-size:12px;outline:none;-webkit-appearance:none;appearance:none}
+.atfind::placeholder{color:var(--wf)}
+.atfind:focus{border-color:var(--av);box-shadow:0 0 0 3px rgba(185,176,255,.13)}
+.atflt{display:inline-flex;gap:3px;padding:3px;border:1px solid var(--wbd2);border-radius:6px;background:var(--wi);flex:0 0 auto}
+.atflt button{height:22px;padding:0 10px;border:0;border-radius:4px;background:transparent;color:var(--ws);font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.atflt button[aria-pressed=true]{background:var(--av);color:#1b1440}
+.atflt button:focus-visible{outline:2px solid var(--av);outline-offset:2px}
+.atlist{flex:1 1 auto;min-height:0;overflow-y:auto;margin-top:10px;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;overscroll-behavior:contain}
+.atlist table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
+.atlist thead th{position:sticky;top:0;z-index:1;height:28px;padding:0 5px;background:#12122a;border-top:1px solid var(--wbd2);border-bottom:1px solid var(--wbd2);
+font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:400;color:#c1bfdc;text-align:right;white-space:nowrap}
+.atlist thead th:first-child{border-left:1px solid var(--wbd2);border-radius:5px 0 0 5px}
+.atlist thead th:last-child{border-right:1px solid var(--wbd2);border-radius:0 5px 5px 0}
+.atlist th.l,.atlist td.l{text-align:left}
+.atlist td{height:32px;padding:0 5px;border-bottom:1px solid #22223c;text-align:right;font-family:var(--wmono);font-size:10.5px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:clip;cursor:pointer}
+.atlist tr:hover td{background:#171730}
+.atlist tr.on td{background:rgba(185,176,255,.06)}
+.atlist tr.on td:first-child{box-shadow:inset 2px 0 0 var(--av)}
+.atlist.ro td{cursor:default}
+.atlist td.ck{padding:0 0 0 6px}
+.atlist td.ck input{appearance:none;-webkit-appearance:none;display:block;width:15px;height:15px;margin:0;border-radius:4px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0e0e1d);position:relative;cursor:pointer}
+.atlist td.ck input:checked{background:linear-gradient(180deg,#d4ceff,#9d93f0);border-color:var(--av);box-shadow:0 0 0 3px rgba(185,176,255,.14)}
+.atlist td.ck input:checked::after{content:"";position:absolute;left:4.5px;top:1.5px;width:4px;height:8px;border:solid #1b1440;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.atlist td.ck input:focus-visible{outline:2px solid var(--av);outline-offset:2px}
+.atlist td.ck input:disabled{cursor:default}
+.atlist .nmw{display:flex;align-items:center;gap:7px;min-width:0}
+.atlist .nmw>span.nmt{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--wsans);font-size:11.5px;color:#fff8dc}
+.atlist .wk-lg{width:16px;height:16px;margin:0;flex:0 0 auto}
+.atlist .wk-lgx{flex:0 0 16px;width:16px;height:16px;line-height:16px;font-size:7px;text-align:center;font-family:var(--wmono);color:#fff}
+.atlist .attg{flex:0 0 auto;font-family:var(--wmono);font-size:6.5px;letter-spacing:.12em;text-transform:uppercase;line-height:1;padding:3px 5px;border-radius:3px;border:1px solid}
+.atlist .attg.y{color:var(--wamber);border-color:rgba(255,176,46,.4)}
+.atlist .attg.f{color:var(--av);border-color:rgba(185,176,255,.4)}
+.atlist td.ok{color:var(--wgreen)}.atlist td.warn{color:var(--wamber)}.atlist td.bad{color:var(--wburn)}.atlist td.dim{color:var(--wf)}
+.atlist td.r2 b{font-weight:400;color:var(--wgreen)}
+.atlist .atnone{padding:28px 12px;text-align:center;font-family:var(--wsans);font-size:12px;color:var(--wf);cursor:default;white-space:normal}
+/* the footer across both sides: the fee and the step on the left, the buttons on the right */
+.atfoot{flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:12px 20px 14px;border-top:1px solid var(--wbd)}
+.atfs{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
+.atcard .atfoot .txfee,.atcard .atfoot .txstep{padding:0;min-height:0}
+.atcard .atfoot .txfee{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.atcard .atfoot .txfee:empty,.atcard .atfoot .txstep:empty{display:none}
+.atcard .atfoot .txbtns{flex:0 0 auto;padding:0;margin:0;border:0}
+.atcard .wk-btn[hidden]{display:none}
+.atcard .wk-btn.wk-go{background:linear-gradient(180deg,#c9c2ff,#9d93f0);border:1px solid var(--av);color:#1b1440;box-shadow:0 10px 24px -12px rgba(185,176,255,.8),inset 0 1px 0 rgba(255,255,255,.3)}
+.atcard .wk-btn.wk-go:disabled{background:linear-gradient(180deg,#1d1d36,#15152a);border-color:#2f2f52;color:#66648c;box-shadow:none;opacity:1}
+.atcard .wk-btn.wk-danger{border-color:rgba(255,77,31,.45);color:#ff8a66;background:transparent}
+.atcard .wk-btn.wk-danger:hover{border-color:var(--wburn);color:var(--wburn)}
+/* a short window: the terms closer together */
+@media(max-height:760px) and (min-width:621px){
+  .atrow{padding:7px 0;gap:5px}
+  .atpc{padding:5px 8px}
+  .atnote{margin-top:8px;padding:6px 10px}
+}
+/* a phone: the whole viewport less a margin to tap outside, and one side at a time */
+@media(max-width:620px){
+  .pop .card.atcard{height:100%}
+  .atview{display:flex;gap:4px;margin:10px 16px 0;padding:3px;border:1px solid var(--wbd2);border-radius:8px;background:var(--wi);flex:0 0 auto}
+  .atview button{flex:1 1 0;height:34px;border:0;border-radius:6px;background:transparent;color:var(--ws);font-family:var(--wmono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+  .atview button b{font-weight:400;color:var(--av);margin-left:4px}
+  .atview button[aria-selected=true]{background:var(--av);color:#1b1440}
+  .atview button[aria-selected=true] b{color:#1b1440}
+  .atview button:focus-visible{outline:2px solid var(--av);outline-offset:2px}
+  .atbody{grid-template-columns:minmax(0,1fr)}
+  .atcard[data-v=setup] .atR,.atcard[data-v=vals] .atL{display:none}
+  .atL{border-right:0;padding:4px 16px 14px}
+  .atR{padding:12px 16px 0}
+  .atrs{flex-wrap:wrap}
+  .atfind{flex:1 1 100%;height:36px}
+  .atq{height:32px}
+  .atlist td{height:40px}
+  .atcard .unfield.atfield{width:100%;max-width:260px}
+  .atfoot{flex-wrap:wrap;gap:8px;padding:10px 16px 12px}
+  .atfs{flex:1 1 100%}
+  .atcard .atfoot .txbtns{flex:1 1 100%;justify-content:flex-end}
 }
 /* ══ the navigation shell ═══════════════════════════════════════════════════════════
    Two levels that must never look alike. Level 1 - the sections - is chrome: words in
@@ -4222,34 +4279,51 @@ html[data-tab=connect] .l2host{display:none}
   <div class=txbtns><button class="wk-btn wk-bell" id=stbell type=button title="Alerts for these validators"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>Alerts</button><button class=wk-btn id=stcancel type=button>Cancel</button><button class="wk-btn wk-go" id=stsign type=button disabled>Stake</button></div>
 </div></div>
 
-<div class=pop id=atpop><div class="card txcard uncard atcard">
-  <header class=wk-txh><div><b>Autopilot</b><span>atomone-1</span></div><span class=txsum id=atsum></span></header>
-  <div class=atstate id=atstate hidden></div>
-  <div class=atform id=atform>
-    <div class=atrow><span class=atlab>Strategy</span>
-      <div class="atpre at3">
-        <label class=atpc><input type=radio name=atstrat value=passive><b>Passive</b><em id=atn0></em></label>
-        <label class=atpc><input type=radio name=atstrat value=below checked><b>Moderate</b><em id=atn1></em></label>
-        <label class=atpc><input type=radio name=atstrat value=aggressive><b>Aggressive</b><em id=atn3></em></label>
-      </div></div>
-    <div class=atrow><span class=atlab>Validators</span>
-      <div class="atpre at2">
-        <label class=atpc><input type=radio name=atpick value=all checked><b>All</b><em id=atna></em></label>
-        <label class=atpc><input type=radio name=atpick value=selected><b>My selection</b><em id=atn2></em></label>
-      </div></div>
-    <div class=atrow><span class=atlab>Stake</span>
-      <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
-      <span class=unhint id=athint></span></div>
-    <div class=atrow><span class=atlab>Time</span>
-      <div class=attime><div class=atseg id=atseg><button type=button data-d=90 aria-pressed=true>3 months</button><button type=button data-d=180 aria-pressed=false>6 months</button></div><span class=atuntil id=atuntil></span></div></div>
-    <div class=atrow><span class=atlab>Restake</span>
-      <label class=atsw><input type=checkbox id=atrestake><span class=atswk aria-hidden=true></span><span class=atswt><i>Restake rewards regularly; growing stake and yielding higher APR.</i></span></label></div>
-    <div class=atfee id=atfee hidden></div>
+<div class=pop id=atpop><div class="card txcard uncard atcard" role=dialog aria-modal=true aria-labelledby=atttl data-v=setup>
+  <header class=wk-txh><div><b id=atttl>Autopilot</b><span>atomone-1</span></div><span class=txsum id=atsum></span></header>
+  <!-- a phone shows one side at a time; a wide window shows both -->
+  <div class=atview role=tablist aria-label="Autopilot">
+    <button type=button role=tab id=atvs aria-controls=atL aria-selected=true data-v=setup>Setup</button>
+    <button type=button role=tab id=atvv aria-controls=atR aria-selected=false tabindex=-1 data-v=vals>Validators <b id=atvn></b></button>
   </div>
-  <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. You can revoke authz at any time.</span></div>
-  <div class=txfee id=attxfee></div>
-  <div class=txstep id=atstep></div>
-  <div class=txbtns><button class=wk-btn id=atcancel type=button>Cancel</button><button class="wk-btn wk-danger" id=atrevoke type=button hidden>Revoke</button><button class="wk-btn wk-go" id=atgrant type=button disabled>Grant</button></div>
+  <div class=atbody>
+    <section class=atL id=atL aria-labelledby=atttl>
+      <div class=atstate id=atstate hidden></div>
+      <div class=atform id=atform>
+        <div class=atrow><span class=atlab>Strategy</span>
+          <div class="atpre at3">
+            <label class=atpc><input type=radio name=atstrat value=passive><b>Passive</b><em id=atn0></em></label>
+            <label class=atpc><input type=radio name=atstrat value=below checked><b>Moderate</b><em id=atn1></em></label>
+            <label class=atpc><input type=radio name=atstrat value=aggressive><b>Aggressive</b><em id=atn3></em></label>
+          </div></div>
+        <div class=atrow><span class=atlab>Validators</span>
+          <div class="atpre at2">
+            <label class=atpc><input type=radio name=atpick value=all checked><b>All</b><em id=atna></em></label>
+            <label class=atpc><input type=radio name=atpick value=selected><b>My selection</b><em id=atn2></em></label>
+          </div></div>
+        <div class=atrow><span class=atlab>Stake</span>
+          <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
+          <span class=unhint id=athint></span></div>
+        <div class=atrow><span class=atlab>Time</span>
+          <div class=attime><div class=atseg id=atseg><button type=button data-d=90 aria-pressed=true>3 months</button><button type=button data-d=180 aria-pressed=false>6 months</button></div><span class=atuntil id=atuntil></span></div></div>
+        <div class=atrow><span class=atlab>Restake</span>
+          <label class=atsw><input type=checkbox id=atrestake><span class=atswk aria-hidden=true></span><span class=atswt>Restake rewards regularly; growing stake and yielding higher APR.</span></label></div>
+        <div class=atfee id=atfee hidden></div>
+      </div>
+      <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. You can revoke authz at any time.</span></div>
+    </section>
+    <section class=atR id=atR aria-label="Validators the keeper may use">
+      <div class=atrh><div class=atrt><b>Validators the keeper may use</b><span id=atcount></span></div>
+        <div class=atqa id=atqa><button type=button class=atq data-q=fit id=atqfit>Fits strategy</button><button type=button class=atq data-q=mine id=atqmine>Yours</button><button type=button class=atq data-q=clear>Clear</button></div></div>
+      <div class=atrs><input class=atfind id=atfind type=search placeholder="Find by name or operator key" aria-label="Find a validator" autocomplete=off spellcheck=false>
+        <div class=atflt id=atflt role=group aria-label="Show"><button type=button data-f=all aria-pressed=true>All</button><button type=button data-f=sel aria-pressed=false>Selected</button></div></div>
+      <div class=atlist id=atlist></div>
+    </section>
+  </div>
+  <div class=atfoot>
+    <div class=atfs><div class=txfee id=attxfee></div><div class=txstep id=atstep></div></div>
+    <div class=txbtns><button class=wk-btn id=atcancel type=button>Cancel</button><button class="wk-btn wk-danger" id=atrevoke type=button hidden>Revoke</button><button class=wk-btn id=atedit type=button hidden>Change</button><button class="wk-btn wk-go" id=atgrant type=button disabled>Grant</button></div>
+  </div>
 </div></div>
 
 <div class=pop id=apop><div class="card vcard acard">

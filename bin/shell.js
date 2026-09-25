@@ -224,6 +224,8 @@
   /* back, forward, and links: the address says where to be */
   function fromAddress(){
     var r = parse(location.hash); if(!r) return;
+    /* Back or Forward while a card is up: the card goes with the page it was opened on */
+    if(window.__POP) window.__POP.closeAll();
     if(r.intro){ if(cur.s || R.getAttribute("data-tab") !== "intro") go(null, null, "pop"); return; }
     if(r.s !== cur.s || r.v !== cur.v) go(r.s, r.v, "pop");
   }
