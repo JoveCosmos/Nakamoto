@@ -3506,7 +3506,6 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
 #sv{display:none;min-width:0;overflow:hidden}
 html[data-ui=simple][data-tab=dele] .w#calc>#p-dele{display:none}
 /* the switch is the dashboard's; elsewhere it keeps its slot and says nothing */
-html:not([data-tab=dele]) .uibtn{visibility:hidden;pointer-events:none}
 /* the sub-header: the row the calculator gives its brandbar, on the dashboard.
    It carries who is connected in both views, and the screens in the simple one. */
 .sv-head{display:none;align-items:center;gap:16px;height:50px;flex:0 0 auto;min-width:0;
@@ -3563,10 +3562,22 @@ html:not([data-wallet]) #wk-mine .wk-addrw{display:none}
 .wk-tbl2 tr.skel td{opacity:.55}
 .wk-tbl2 tr.skel td b{display:block;height:7px;border-radius:4px;background:var(--wbd2);opacity:.6}
 /* the pane's own inner column: the same box .pw gives the advanced view */
-.sv-main{height:100%;min-height:0;width:100%;display:flex;flex-direction:column;padding:12px 0 16px;font-family:var(--wsans);color:var(--wt)}
+.sv-main{height:100%;min-height:0;width:100%;display:flex;flex-direction:column;padding:0;font-family:var(--wsans);color:var(--wt)}
 .sv-main b{font-weight:700}
 /* the page's own section rule (70px and a rule above) is not for these */
-.sv-screen{display:none;flex-direction:column;gap:10px;padding:0 2px 0 0;border-top:0;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden}
+.sv-screen{display:none;flex-direction:column;gap:0;padding:14px 16px;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
+border:1px solid var(--wbd);border-radius:8px;background:var(--wc)}
+/* ONE section per screen, on the calculator's own edges (its four sections span the same
+   box, 8px corners): the parts inside are flat and parted by hairlines rather than
+   floating as separate cards; spare room is shared out between the parts, so the box
+   has no dead band anywhere - on Network the list grows into the room instead */
+.sv-screen>.sv-panel,.sv-screen>.sv-strip{border:0;border-radius:0;background:transparent;padding:0}
+.sv-screen>:not(:first-child){border-top:1px solid var(--wbd);margin-top:12px;padding-top:12px}
+.sv-screen{justify-content:space-between}
+.sv-screen .sv-cards{gap:0}
+.sv-screen .sv-card{border:0;border-radius:0;background:transparent;padding:2px 18px}
+.sv-screen .sv-card:first-child{padding-left:0}
+.sv-screen .sv-card+.sv-card{border-left:1px solid var(--wbd)}
 #sv[data-s=over] .sv-screen[data-sc=over],#sv[data-s=auto] .sv-screen[data-sc=auto],#sv[data-s=net] .sv-screen[data-sc=net]{display:flex}
 /* the parts every screen is built from */
 .sv-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
@@ -3663,9 +3674,8 @@ text-transform:uppercase;padding:8px 12px;border-radius:8px;cursor:pointer;white
 .sv-list .sv-wrap{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain}
 .sv-list .sv-tbl thead th{position:sticky;top:0;z-index:2}
 /* this screen's figures give the list more of the window: tighter cards, tighter rows */
-.sv-screen[data-sc=net] .sv-card{padding:9px 13px 10px;gap:3px}
+.sv-screen[data-sc=net] .sv-card{gap:3px}
 .sv-screen[data-sc=net] .sv-big{font-size:23px}
-.sv-screen[data-sc=net] #sv-nethead{padding:11px 15px 12px;gap:8px}
 .sv-list .sv-tbl td{padding-top:6px;padding-bottom:6px}
 .sv-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px;min-width:760px}
 .sv-tbl th{font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);font-weight:400;
@@ -3704,13 +3714,18 @@ text-align:right;padding:9px 10px;background:var(--wi);border-top:1px solid var(
 .sv-can p{margin:0;display:flex;gap:14px;flex-wrap:wrap}
 .sv-can p span{display:inline-flex;align-items:center;gap:6px}
 .sv-can p span::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;flex:0 0 auto}
-/* the mode switch lives beside the day/night one */
-.uibtn{width:auto;padding:0 11px;gap:7px;font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;margin-left:8px}
-.uibtn .uiw{line-height:1}
-.uibtn .uig{display:none}
-html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
+/* the view switch: in the wallet's corner of the sub-header, both states named, the
+   one on show pressed - it works before a wallet is connected too */
+.sv-mode{display:inline-flex;align-items:center;gap:2px;padding:2px;border:1px solid var(--wbd);border-radius:8px;background:var(--wi);flex:0 0 auto}
+.sv-mode button{border:0;background:transparent;color:var(--wf);font-family:var(--wmono);font-size:9px;letter-spacing:.14em;
+text-transform:uppercase;padding:7px 11px;border-radius:6px;cursor:pointer;line-height:1;transition:color .16s,background .16s}
+.sv-mode button:hover{color:var(--ws)}
+.sv-mode button[aria-pressed=true]{color:var(--wt);background:var(--wh);box-shadow:inset 0 0 0 1px var(--wbd2)}
+.sv-mode button:focus-visible{outline:2px solid var(--wcyan);outline-offset:1px}
 @media(max-width:900px){
   .sv-cards,.sv-cards.four{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sv-screen .sv-cards{gap:10px}
+  .sv-screen .sv-card,.sv-screen .sv-card:first-child,.sv-screen .sv-card+.sv-card{border:1px solid var(--wbd);border-radius:9px;padding:10px 12px}
   .sv-figs{grid-template-columns:repeat(2,minmax(0,1fr))}
   .sv-head{flex-wrap:wrap;gap:12px}
   .sv-nav{order:3;width:100%;margin:0;justify-content:flex-start;overflow-x:auto}
@@ -3721,21 +3736,14 @@ html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
   /* the bar wraps on a phone: its box grows with it rather than letting the
      screens' words fall out of it */
   html[data-tab=dele] .w#calc>.sv-head{margin-bottom:10px;height:auto;min-height:44px;padding:8px 12px;flex-wrap:wrap;row-gap:8px}
-  .sv-main{padding:14px 16px 34px}
+  .sv-main{padding:0 0 24px}
+  /* no window to fill on a phone: the parts simply stack */
+  .sv-screen{justify-content:flex-start}
   .sv-cards,.sv-cards.four{grid-template-columns:minmax(0,1fr)}
   .sv-big{font-size:28px}
   .sv-bw i{display:none}
   .sv-list .sv-wrap{max-height:62svh}
-  .uibtn{width:30px;height:30px;padding:0;margin-left:2px}
-  .uibtn .uiw{display:none}
-  .uibtn .uig{display:block}
-  /* two buttons where the bar was drawn for one - in both views, since the switch
-     stands in both: the bar gives back its side room and the words close up */
-  .folder{padding:0 10px}
-  .thbtn{width:30px;height:30px}
-  .fnav .ftab+.ftab{margin-left:6px}
-  .fnav .ftab{padding:0 4px}
-  .fnav .ftab b{font-size:8.5px;letter-spacing:.12em}
+  .sv-mode button{padding:7px 9px}
   .sv-chips{grid-template-columns:minmax(0,1fr)}
 }
 </style>
@@ -3758,7 +3766,6 @@ html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
       <i class=ind id=ind aria-hidden=true></i>
     </nav>
     <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
-    <button class="thbtn uibtn" id=uibtn type=button role=switch aria-checked=false aria-label="Simple or advanced view" title="The simple view"><svg class=uig viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/></svg><span class=uiw>Simple</span></button>
   </div>
   <div class=panes id=well>
   <div class=w id=calc>
@@ -3782,6 +3789,7 @@ html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
         <button class=sv-tab data-s=net type=button role=tab aria-selected=false>Network</button>
       </nav>
       <div class=sv-who>
+        <div class=sv-mode id=uiseg role=group aria-label="Dashboard view"><button type=button data-ui=pro aria-pressed=true>Advanced</button><button type=button data-ui=simple aria-pressed=false>Simple</button></div>
         <button class="sv-btn sml pri" id=svconn type=button aria-haspopup=true aria-expanded=false>Connect wallet</button>
         <button class=sv-acct id=svacct type=button hidden title="This wallet" aria-label="This wallet" aria-haspopup=true aria-expanded=false><img alt=""></button>
         <div class=sv-menu id=svmenu hidden></div>

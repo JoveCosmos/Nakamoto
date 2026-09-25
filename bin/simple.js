@@ -421,18 +421,19 @@
   if(acct) acct.addEventListener("click", function(ev){ ev.stopPropagation();
     if(menu && !menu.hidden){ closeMenu(); return; } openMenu(acctMenu(), acct); });
 
-  /* ── the switch, beside the day/night one ── */
-  var ui = E("uibtn");
+  /* ── the view switch, in the wallet's corner of the sub-header ── */
+  var seg = E("uiseg");
   function setUI(mode, remember){
     var on = mode === "simple";
     if(on) root.setAttribute("data-ui", "simple"); else root.removeAttribute("data-ui");
     if(remember) try{ localStorage.setItem("th_ui", on ? "simple" : "pro"); }catch(e){}
-    if(ui){ ui.setAttribute("aria-checked", on ? "true" : "false");
-      ui.querySelector(".uiw").textContent = on ? "Advanced" : "Simple";
-      ui.title = on ? "The advanced view" : "The simple view"; }
+    if(seg) Array.prototype.forEach.call(seg.querySelectorAll("button[data-ui]"), function(b){
+      b.setAttribute("aria-pressed", (b.dataset.ui === "simple") === on ? "true" : "false"); });
     render();
   }
-  if(ui) ui.addEventListener("click", function(){ setUI(root.getAttribute("data-ui") === "simple" ? "pro" : "simple", true); });
+  if(seg) seg.addEventListener("click", function(ev){
+    var b = ev.target.closest ? ev.target.closest("button[data-ui]") : null;
+    if(b) setUI(b.dataset.ui, true); });
   setUI(root.getAttribute("data-ui") === "simple" ? "simple" : "pro", false);
 
   /* opening the dashboard draws the bar, whichever view is on */

@@ -89,4 +89,5 @@
   html[data-theme=light]:not([data-mono]) #svbar .sv-bw i,
   html[data-theme=light]:not([data-mono]) #svbar .sv-tab,html[data-theme=light]:not([data-mono]) #svbar .sv-menu .mh,
   html[data-theme=light]:not([data-mono]) #svbar .sv-menu .ma,html[data-theme=light]:not([data-mono]) #svbar .sv-menu .mi i,
-  html[data-theme=light]:not([data-mono]) #svbar .sv-menu .mi:disabled{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) #svbar .sv-menu .mi:disabled,html[data-theme=light]:not([data-mono]) #svbar .sv-mode button{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) #svbar .sv-mode button[aria-pressed=true]{color:var(--ink)}
