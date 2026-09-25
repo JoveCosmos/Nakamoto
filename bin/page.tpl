@@ -3655,7 +3655,19 @@ text-transform:uppercase;padding:8px 12px;border-radius:8px;cursor:pointer;white
 .sv-seg:hover{color:var(--ws);border-color:var(--wbd2)}
 .sv-seg[aria-pressed=true]{color:var(--wt);background:var(--wh);border-color:var(--wbd2)}
 .sv-wrap{overflow-x:auto}
-.sv-tbl{width:100%;border-collapse:collapse;font-size:12.5px;min-width:760px}
+/* the Network list: the head and the figures stand, the list takes the rest of the
+   window and scrolls inside itself - its search and its column heads stay put, its
+   count line stays under it, and the panel's end is always on screen. Below 240px of
+   room the screen itself scrolls rather than squeezing the list to nothing. */
+.sv-list{flex:1 1 auto;min-height:240px}
+.sv-list .sv-wrap{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain}
+.sv-list .sv-tbl thead th{position:sticky;top:0;z-index:2}
+/* this screen's figures give the list more of the window: tighter cards, tighter rows */
+.sv-screen[data-sc=net] .sv-card{padding:9px 13px 10px;gap:3px}
+.sv-screen[data-sc=net] .sv-big{font-size:23px}
+.sv-screen[data-sc=net] #sv-nethead{padding:11px 15px 12px;gap:8px}
+.sv-list .sv-tbl td{padding-top:6px;padding-bottom:6px}
+.sv-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px;min-width:760px}
 .sv-tbl th{font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);font-weight:400;
 text-align:right;padding:9px 10px;background:var(--wi);border-top:1px solid var(--wbd);border-bottom:1px solid var(--wbd);white-space:nowrap}
 .sv-tbl th:first-child,.sv-tbl th.l{text-align:left}
@@ -3713,6 +3725,7 @@ html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
   .sv-cards,.sv-cards.four{grid-template-columns:minmax(0,1fr)}
   .sv-big{font-size:28px}
   .sv-bw i{display:none}
+  .sv-list .sv-wrap{max-height:62svh}
   .uibtn{width:30px;height:30px;padding:0;margin-left:2px}
   .uibtn .uiw{display:none}
   .uibtn .uig{display:block}
@@ -3992,7 +4005,7 @@ html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
       <section class=sv-screen data-sc=net aria-label=Network>
         <div class=sv-panel id=sv-nethead></div>
         <div class="sv-cards four" id=sv-netcards></div>
-        <div class=sv-panel>
+        <div class="sv-panel sv-list">
           <div class=sv-tools>
             <input class=sv-find id=sv-find type=search placeholder="Filter by name or operator key" aria-label="Filter validators" autocomplete=off spellcheck=false>
             <div class=sv-segs id=sv-segs></div>
