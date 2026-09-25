@@ -73,6 +73,9 @@
       if(s){ calc.setAttribute("aria-labelledby", "l1-" + s.id); calc.removeAttribute("aria-label"); }
       else { calc.removeAttribute("aria-labelledby"); calc.setAttribute("aria-label", "AtomOne"); }
     }
+    /* a section title may name its open view (.tsub), in the view's accent or the section's */
+    if(s && v) Array.prototype.forEach.call(document.querySelectorAll('[data-title-for="' + s.id + '"] .tsub'), function(t){
+      t.textContent = v.label; t.style.color = v.accent || s.accent || ""; });
     requestAnimationFrame(reveal);
   }
   /* a narrow strip scrolls sideways: the open view is brought into sight */

@@ -3710,7 +3710,7 @@ html[data-tab=connect] .l2host{display:none}
       <span class=calclab>Nakamoto</span>
     <header class=brandbar>
       <div class=bwrap data-title-for=staking><div class=bt><span class=btx><i class=nk>Nakamoto </i><i class=tsfx id=tsfx>Bonus</i></span></div></div>
-      <div class=bwrap data-title-for=governance><div class=bt><span class=btx><i class=nk>Governance</i></span></div></div>
+      <div class=bwrap data-title-for=governance><div class=bt><span class=btx><i class=nk>Governance </i><i class="tsfx tsub">Proposals</i></span></div></div>
       <span class=sv-brand data-title-for=dashboard><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><b>GATA</b><i>non-custodial staking</i></span></span>
       <div class=l2host>{{SHELL_L2}}</div>
     </header>
