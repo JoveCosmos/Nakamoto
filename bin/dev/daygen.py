@@ -25,7 +25,7 @@ TPL = os.path.join(BIN, "page.tpl")
 HAND = os.path.join(HERE, "theme-day.hand.css")
 OUT = os.path.join(BIN, "assets", "theme-day.css")
 
-SCOPE = "html[data-theme=light]:not([data-mono])"   # day is the reader's choice (boot.js stamps it), never the wireframe
+SCOPE = "html[data-theme=light]:not([data-mono])"   # day is the reader's choice (boot.js stamps it). The wireframe theme is gone (2026-09-25); the :not() stays only because every shadow rule's specificity was tuned with it
 
 # ── the tokens (the spec's, verbatim) ───────────────────────────────────────────────
 TOKENS = """

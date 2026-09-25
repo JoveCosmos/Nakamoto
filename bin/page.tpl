@@ -86,7 +86,6 @@ font-variant-numeric:tabular-nums;pointer-events:none;line-height:1;z-index:1;
 .grid.flat .cell .pct{font-size:13px;letter-spacing:-.01em;color:#8f8fc8;
 text-shadow:0 1px 1px #000000b0,0 -1px 0 #ffffff12}
 .grid.flat .cell:hover .pct,.grid.flat .cell:focus-visible .pct{color:#d9d8f0}
-html[data-mono] .grid.flat .cell .pct{color:#b5b5b5;text-shadow:none}
 .grid.flat .cell .pct em{font-weight:700}
 .grid.flat .cell .pct i{opacity:.8;font-size:.7em;font-weight:600}
 @media(max-width:620px){.grid.flat .cell .pct{font-size:10px;letter-spacing:-.03em}
@@ -134,7 +133,6 @@ box-shadow:0 0 0 1.5px #fff8,0 0 0 3px #ffb02e55,0 6px 16px -2px #000c,0 0 14px 
 filter:brightness(1.12) saturate(1.08)}
 .grid.flat .cell:hover .pct,.grid.flat .cell:focus-visible .pct{color:var(--lit);text-shadow:0 0 8px #ffb02e88}
 @media(prefers-reduced-motion:reduce){.cell{transition:none}.cell:hover,.cell:focus-visible{transform:none}}
-html[data-mono] .cell:hover,html[data-mono] .cell:focus-visible{box-shadow:0 0 0 1.5px #fff,0 0 10px #fff8;filter:none}
 /* Three grid columns, not inline-flex inside a large-font span: the multiplier
    and its arrow sit in their own centre cell, so they cannot drift off the
    numbers' baseline the way a vertical-align hack did. */
@@ -583,10 +581,13 @@ display:flex;flex-direction:column;gap:6px}
    the row's handle is away from live */
 .rv{display:inline-flex;align-items:center;gap:6px}
 /* the reset keeps its place whether shown or not, so the value never shifts */
-.rreset{width:16px;height:16px;padding:0;border:1px solid var(--hot);border-radius:50%;background:transparent;
-color:var(--hot);font-size:11px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
-visibility:hidden;opacity:0;transition:opacity .15s}
-.rreset:hover{background:#ffb02e22}
+/* a moved slider's way back: a labelled chip in plain ink on its own fill - never the
+   amber the moved value turns - named after the LIVE marks on the track it returns to */
+.rreset{height:22px;padding:0 9px 0 7px;border:1px solid var(--edge2);border-radius:99px;background:var(--card2);
+color:var(--ink);font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;line-height:1;cursor:pointer;
+display:inline-flex;align-items:center;justify-content:center;gap:5px;visibility:hidden;opacity:0;transition:opacity .15s,border-color .15s,background .15s}
+.rreset span{font-size:12px;letter-spacing:0}
+.rreset:hover{border-color:var(--ink2);background:var(--inset)}
 .rreset:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
 .wrow.dirty .rreset{visibility:visible;opacity:1}
 /* the row's label IS the readout button: the disc, the name, the arrow that
@@ -612,7 +613,8 @@ text-underline-offset:3px;text-decoration-thickness:1px}
 .rlab .etabox:focus-visible{outline:2px solid var(--hot);outline-offset:3px}
 .rlab{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);
 font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin-bottom:8px}
-.wrow .rlab{margin-bottom:22px}   /* the same in all three rows: the C row needs it for the trip label */
+.wrow .rlab{margin:8px 0 0}   /* the track above, the title under it: the LIVE labels hang between them */
+.wrow .trackwrap{margin-top:14px}   /* room over the track for the trip label; the same in all three rows */
 .rval{font-size:14px;font-weight:400;color:var(--ink);letter-spacing:0;text-transform:none;
 font-variant-numeric:tabular-nums;transition:color .2s}
 .wrow.dirty .rval{color:var(--hot)}
@@ -659,8 +661,6 @@ input[type=range].gradrange{box-shadow:inset 0 1px 0 #ffffff40,inset 0 -2px 3px 
 border-radius:3px;pointer-events:none;z-index:1;
 background:linear-gradient(180deg,#ffffff2e 0,#ffffff0a 45%,#00000000 55%,#00000040 100%)}
 .knob{background:linear-gradient(180deg,#fbf9ff 0,#d8d2ea 100%)}
-html[data-mono] input[type=range].gradrange{box-shadow:none}
-html[data-mono] .trackwrap::before{content:none}
 /* the staked track runs a cool ramp so it is never mistaken for the coefficient
    track above it; its handle and its button follow the same colour */
 /* the three handles are one plain selector: the row's title already carries
@@ -1412,80 +1412,30 @@ margin:16px 0 -6px}
    black, panels a hair above black, hairline greys, soft white type that does
    not vibrate, and the accents pulled to greys - rather than a line drawing.
    Two inks stay: green for good, red for bad. The map keeps magnitude in grey. */
-html[data-mono]:not([data-tab=dele]):not([data-tab=empty]):not([data-tab=connect]) #calc,html[data-mono] .pop .card:not(.txcard){
-  --void:#000;--edge:#202024;--edge2:#34343a;--ink:#e8e8ea;--ink2:#9a9aa1;--ink3:#6a6a71;
-  --faint:#4a4a50;--hot:#d1d1d1;--burn:#ff6a4a;--cold:#9d9d9d;--lit:#f2f2f4}
-html[data-mono] #calc .grid:not(.flat){filter:grayscale(1)}
-/* 1. every filled surface -> black */
-html[data-mono] #calc .sec,html[data-mono] #calc .duo .sec,html[data-mono] #calc .panel,html[data-mono] #calc .ptw,html[data-mono] #calc .panes>.w,html[data-mono] #calc .sbox>*,html[data-mono] #calc .aprband,html[data-mono] .pop .card,html[data-mono] .pop .scroll,html[data-mono] .pop table,html[data-mono] .pop td,html[data-mono] .pop th,html[data-mono] .pop .card::-webkit-scrollbar-track,html[data-mono] .pop .scroll::-webkit-scrollbar-track,html[data-mono] #calc .vhead,html[data-mono] #calc .vstat,html[data-mono] #calc .vstat:hover,html[data-mono] #calc .vstat.vrow:hover,html[data-mono] #calc .upcell,html[data-mono] #calc .aopt,html[data-mono] #calc .aopt:hover,html[data-mono] #calc .cbcap,html[data-mono] #calc .cbrow,html[data-mono] #calc .cbx,html[data-mono] #calc .rdgbox,html[data-mono] #calc tr.now td,html[data-mono] #calc tr.wk:hover td,html[data-mono] #calc .ptab th,html[data-mono] #calc .ptab thead th,html[data-mono] #calc .ptab tr.vrow:hover td,html[data-mono] #calc .ptab .tlg,html[data-mono] #calc .ptab .tlgx,html[data-mono] #calc .vlogo,html[data-mono] #calc .gcard #trendbig,html[data-mono] #calc .amtwrap,html[data-mono] #calc .mv,html[data-mono] #calc .calclab,html[data-mono] .pop .card .sec,html[data-mono] .pop .card .duo .sec,html[data-mono] .pop .card .panel,html[data-mono] .pop .card .ptw,html[data-mono] .pop .card .panes>.w,html[data-mono] .pop .card .sbox>*,html[data-mono] .pop .card .aprband,html[data-mono] .pop .card .vhead,html[data-mono] .pop .card .vstat,html[data-mono] .pop .card .vstat:hover,html[data-mono] .pop .card .vstat.vrow:hover,html[data-mono] .pop .card .upcell,html[data-mono] .pop .card .aopt,html[data-mono] .pop .card .aopt:hover,html[data-mono] .pop .card .cbcap,html[data-mono] .pop .card .cbrow,html[data-mono] .pop .card .cbx,html[data-mono] .pop .card .rdgbox,html[data-mono] .pop .card tr.now td,html[data-mono] .pop .card tr.wk:hover td,html[data-mono] .pop .card .ptab th,html[data-mono] .pop .card .ptab thead th,html[data-mono] .pop .card .ptab tr.vrow:hover td,html[data-mono] .pop .card .ptab .tlg,html[data-mono] .pop .card .ptab .tlgx,html[data-mono] .pop .card .vlogo,html[data-mono] .pop .card .gcard #trendbig,html[data-mono] .pop .card .amtwrap,html[data-mono] .pop .card .mv,html[data-mono] .pop .card .calclab{background:#08080a;box-shadow:none}
-/* the 1px gap-fills are the grid lines */
-html[data-mono] #calc .vgrid,html[data-mono] .pop .card .vgrid{background:var(--edge);border-color:var(--edge)}
-html[data-mono] #calc .sec,html[data-mono] #calc .duo .sec,html[data-mono] #calc .duo .sec:nth-child(n){border-color:var(--edge2);background:#000;box-shadow:none}
-html[data-mono] #calc .frow .etabox.eta,html[data-mono] #calc .frow .etabox.conc,html[data-mono] #calc .frow .etabox.cool,
-html[data-mono] #calc .frow .etabox.eta.rise,html[data-mono] #calc .frow .etabox.eta.fall,html[data-mono] #calc .frow .etabox.conc.low{background:transparent;box-shadow:none}
-html[data-mono] #calc .tsfx{color:#fff!important}
-html[data-mono] #calc .tick{background:#fff;box-shadow:none}
-html[data-mono] #calc .tick.trip,html[data-mono] #calc .tick.trip::after,html[data-mono] #calc .rreset,html[data-mono] #calc .wrow.dirty .rval,html[data-mono] .pop .card .tick.trip,html[data-mono] .pop .card .tick.trip::after,html[data-mono] .pop .card .rreset,html[data-mono] .pop .card .wrow.dirty .rval{color:var(--burn);border-color:var(--burn)}
-html[data-mono] #calc .tick.trip{background:var(--burn)}         /* the tab tint is set inline */
-html[data-mono] #calc #vpop .vgrid,html[data-mono] .pop .card #vpop .vgrid{border-color:var(--edge)}
-html[data-mono] .pop .card{border-color:var(--edge2)}
-html[data-mono] .pop .card,html[data-mono] .pop .scroll,html[data-mono] #calc .moves{scrollbar-color:var(--edge) #000}
-html[data-mono] #calc .vhead,html[data-mono] #calc .aprband,html[data-mono] #calc .bul,html[data-mono] #calc td,html[data-mono] #calc .ptab td,html[data-mono] #calc .vnote,html[data-mono] #calc .vcard:not(.gcard)::after,html[data-mono] .pop .card .vhead,html[data-mono] .pop .card .aprband,html[data-mono] .pop .card .bul,html[data-mono] .pop .card td,html[data-mono] .pop .card .ptab td,html[data-mono] .pop .card .vnote,html[data-mono] .pop .card .vcard:not(.gcard)::after{border-color:var(--edge);background:#000}
 
-html[data-mono] #calc .vlogo,html[data-mono] #calc .vmono,html[data-mono] .pop .card .vlogo,html[data-mono] .pop .card .vmono{box-shadow:0 0 0 1px var(--edge2)}
-html[data-mono] #calc .ptab .tlg,html[data-mono] .pop .card .ptab .tlg{border-color:var(--edge)}
-html[data-mono] #calc .rdgbox,html[data-mono] .pop .card .rdgbox{border-color:var(--edge2)}
-html[data-mono] #calc .rdgc,html[data-mono] #calc .vk,html[data-mono] .pop .card .rdgc,html[data-mono] .pop .card .vk{color:var(--ink3)}
+/* 1. every filled surface -> black */
+
+/* the 1px gap-fills are the grid lines */
+         /* the tab tint is set inline */
+
 /* 2. tinted buttons, chips and tags -> hollow: white line, white type */
-html[data-mono] #calc .etabox,html[data-mono] #calc .etabox:hover,html[data-mono] #calc .etabox.eta.rise,html[data-mono] #calc .etabox.eta.rise:hover,html[data-mono] #calc .etabox.eta.fall,html[data-mono] #calc .etabox.eta.fall:hover,html[data-mono] #calc .etabox.conc,html[data-mono] #calc .etabox.conc:hover,html[data-mono] #calc .etabox.conc.low,html[data-mono] #calc .etabox.conc.low:hover,html[data-mono] #calc .etabox.cool,html[data-mono] #calc .etabox.cool:hover,html[data-mono] #calc .chip,html[data-mono] #calc .chip:hover,html[data-mono] #calc .chiprow .chip.static,html[data-mono] #calc .mbtn,html[data-mono] #calc .mbtn:hover,html[data-mono] #calc .backq,html[data-mono] #calc .backq:hover,html[data-mono] #calc .notify,html[data-mono] #calc .notify:hover,html[data-mono] #calc .wbtn,html[data-mono] #calc .wbtn:hover,html[data-mono] #calc .ptag,html[data-mono] #calc .badge,html[data-mono] #calc .tag,html[data-mono] #calc .vrk,html[data-mono] #calc .cgate,html[data-mono] #calc .cgate:hover,html[data-mono] #calc .mv .warn,html[data-mono] #calc .wstate .lockb,html[data-mono] #calc .tgbtn,html[data-mono] #calc .tgbtn:hover,html[data-mono] #calc .rreset,html[data-mono] #calc .rreset:hover,html[data-mono] .pop .card .etabox,html[data-mono] .pop .card .etabox:hover,html[data-mono] .pop .card .etabox.eta.rise,html[data-mono] .pop .card .etabox.eta.rise:hover,html[data-mono] .pop .card .etabox.eta.fall,html[data-mono] .pop .card .etabox.eta.fall:hover,html[data-mono] .pop .card .etabox.conc,html[data-mono] .pop .card .etabox.conc:hover,html[data-mono] .pop .card .etabox.conc.low,html[data-mono] .pop .card .etabox.conc.low:hover,html[data-mono] .pop .card .etabox.cool,html[data-mono] .pop .card .etabox.cool:hover,html[data-mono] .pop .card .chip,html[data-mono] .pop .card .chip:hover,html[data-mono] .pop .card .chiprow .chip.static,html[data-mono] .pop .card .mbtn,html[data-mono] .pop .card .mbtn:hover,html[data-mono] .pop .card .backq,html[data-mono] .pop .card .backq:hover,html[data-mono] .pop .card .notify,html[data-mono] .pop .card .notify:hover,html[data-mono] .pop .card .wbtn,html[data-mono] .pop .card .wbtn:hover,html[data-mono] .pop .card .ptag,html[data-mono] .pop .card .badge,html[data-mono] .pop .card .tag,html[data-mono] .pop .card .vrk,html[data-mono] .pop .card .cgate,html[data-mono] .pop .card .cgate:hover,html[data-mono] .pop .card .mv .warn,html[data-mono] .pop .card .wstate .lockb,html[data-mono] .pop .card .tgbtn,html[data-mono] .pop .card .tgbtn:hover,html[data-mono] .pop .card .rreset,html[data-mono] .pop .card .rreset:hover{background:transparent;border-color:var(--edge2);color:var(--ink);box-shadow:none}
-html[data-mono] #calc .etabox b,html[data-mono] #calc .etabox::after,html[data-mono] #calc .cgate::after,html[data-mono] #calc .etabox.cool b,html[data-mono] #calc .etabox.cool::after,html[data-mono] #calc .chiprow.narrow .chip span,html[data-mono] #calc .chiprow .chip b,html[data-mono] #calc .notify .march rect,html[data-mono] .pop .card .etabox b,html[data-mono] .pop .card .etabox::after,html[data-mono] .pop .card .cgate::after,html[data-mono] .pop .card .etabox.cool b,html[data-mono] .pop .card .etabox.cool::after,html[data-mono] .pop .card .chiprow.narrow .chip span,html[data-mono] .pop .card .chiprow .chip b,html[data-mono] .pop .card .notify .march rect{color:#fff;stroke:#fff}
+
 /* the two permitted inks: green is good, red is bad */
-html[data-mono] #calc .etabox.eta.rise b,html[data-mono] #calc .etabox.eta.rise::after,
-html[data-mono] #calc .etabox.conc.low b,html[data-mono] #calc .etabox.conc.low::after,
-html[data-mono] #calc .badge.ok,html[data-mono] #calc .ptab .ok,html[data-mono] #calc .mv .rate b,html[data-mono] #calc .mv .dr.up,html[data-mono] .pop .card .badge.ok,html[data-mono] .pop .card .ptab .ok,html[data-mono] .pop .card .mv .rate b,html[data-mono] .pop .card .mv .dr.up{color:#5cf08f}
-html[data-mono] #calc .etabox.eta.fall b,html[data-mono] #calc .etabox.eta.fall::after,
-html[data-mono] #calc .etabox.conc b,html[data-mono] #calc .etabox.conc::after,
-html[data-mono] #calc .badge.warn,html[data-mono] #calc .tag.hot,html[data-mono] #calc .mv .warn,html[data-mono] #calc .wstate .lockb,
-html[data-mono] #calc .mv .dr.dn,html[data-mono] #calc .rdgv,html[data-mono] #calc b.hotc,html[data-mono] #calc .haltn,html[data-mono] .pop .card .mv .dr.dn,html[data-mono] .pop .card .rdgv,html[data-mono] .pop .card b.hotc,html[data-mono] .pop .card .haltn{color:var(--burn)}
+
 /* 3. pressed states: the one permitted fill, inverted */
-html[data-mono] #calc .chip[aria-pressed=true],
-html[data-mono] #calc .chiprow.narrow .chip[aria-pressed=true],
-html[data-mono] #calc .chiprow.narrow.cchips.low .chip[aria-pressed=true],
-html[data-mono] #calc .mbtn[aria-pressed=true]{background:#fff;border-color:#fff;color:#000}
-html[data-mono] #calc .chiprow.narrow .chip[aria-pressed=true] span,
-html[data-mono] #calc .chiprow.narrow .chip[aria-pressed=true] b,
-html[data-mono] #calc .chip[aria-pressed=true]:hover b{color:#000}
+
 /* 4. discs and handles: hollow rings, no glow */
-html[data-mono] #calc .disc,html[data-mono] #calc .disc.de,html[data-mono] #calc .disc.dc,html[data-mono] #calc .disc.ds,
-html[data-mono] #calc .etabox.conc.low .disc.dc,
-html[data-mono] #calc .knob,html[data-mono] #calc .knob.kconc,html[data-mono] #calc .knob.kcool{background:#fff;color:#000;border-color:#000;box-shadow:0 0 0 1px #fff}
-html[data-mono] #calc .disc,html[data-mono] #calc .knob,html[data-mono] .pop .card .disc,html[data-mono] .pop .card .knob{--h:#fff;--g:transparent}
-html[data-mono] #calc .cell .mono,html[data-mono] #calc .vmono,html[data-mono] .pop .card .cell .mono,html[data-mono] .pop .card .vmono{background:#000;color:#fff;box-shadow:0 0 0 1px #fff}
+
 /* 5. the inline styles nothing else can beat */
-html[data-mono] #calc input[type=range]{background:#fff!important}
-html[data-mono] #calc input[type=range]::-webkit-slider-thumb{box-shadow:none;background:#000;border:1.5px solid #fff}
-html[data-mono] #calc input[type=range]::-moz-range-thumb{background:#000;border:1.5px solid #fff}
-html[data-mono] #calc .grid.flat .cell{background:#000!important;border-color:var(--edge2)}
-html[data-mono] #calc .cell.halt{box-shadow:0 0 0 1.5px var(--burn)}
+
 /* 6. status strips */
 @media(max-height:720px){#vpop .vstat{padding:8px 20px 9px;gap:4px}#vpop .upsec{padding:11px 24px 12px;gap:8px}
 #vpop .vhead{padding-top:16px;padding-bottom:12px}#vpop .aprband{padding-top:8px;padding-bottom:8px}#vpop .vbadges{padding-top:8px}}
-html[data-mono] #calc .upbars b,html[data-mono] .pop .card .upbars b{background:#000;box-shadow:inset 0 0 0 1px #fff}
-html[data-mono] #calc .upbars b.tip,html[data-mono] .pop .card .upbars b.tip{background:#fff}
-html[data-mono] #calc .apspan{background:#fff}
-html[data-mono] #calc .upbars b.n,html[data-mono] .pop .card .upbars b.n{background:#000;box-shadow:inset 0 0 0 1px var(--edge)}
-html[data-mono] #calc .upbars b.z,html[data-mono] .pop .card .upbars b.z{box-shadow:none}
 /* the switch itself */
-.modes .etabox.monob,.frow .etabox.monob{flex:0 0 auto;padding:0;width:28px;min-width:28px;height:28px;display:grid;place-items:center;
-border-radius:3px;cursor:pointer;margin-left:4px;justify-content:center}
-.monob::after{content:none}
+
 /* the switch shows what a press would give: a grey dot while the calculator is
    in colour, a coloured dot while it is grey */
-.monod{width:12px;height:12px;border-radius:50%;box-sizing:border-box;
-border:1.5px solid #9a9aa1;background:linear-gradient(90deg,#9a9aa1 50%,#2a2a2e 50%)}
-.monob:hover .monod{border-color:#e8e8ea}
-html[data-mono] .monod{border:0;background:conic-gradient(#ff4d1f,#ffb02e,#2ee06a,#6f66c8,#ff4d1f);box-shadow:0 0 8px #ffb02e66}
-@media(max-width:620px){.monob{width:24px;height:24px}.brandbar .monob{flex:0 0 auto}}
+
 
 /* ── the folder. Above 1100px the page is one document: a lip with the mark
    and the live line, then three folder tabs on the top edge of the window, the
@@ -1589,10 +1539,6 @@ box-shadow:inset 0 1px 0 #ffffff0a,0 2px 6px #0008}
 .mbtn:hover{background:#ffffff0a;color:var(--ink)}
 .mbtn[aria-pressed=true]{background:linear-gradient(180deg,#ffd07a,#ffb02e);color:#140c00;
 box-shadow:inset 0 1px 0 #ffffff55,0 0 12px #ffb02e66}
-.modes .etabox.monob{border:0;background:transparent;margin-left:2px}
-.modes .etabox.monob:hover{background:#ffffff0a}
-html[data-mono] .modes{background:#000;border-color:#fff;box-shadow:none}
-html[data-mono] .mbtn[aria-pressed=true]{background:#fff;color:#000;box-shadow:none}
 .nk{font-style:normal;color:var(--ink)}
 /* Staking is a card with two faces: the chain's stake on the front, the
    reader's own on the back. Manage my stake turns it over; the header stays.
@@ -1780,11 +1726,10 @@ box-shadow:0 0 12px -4px color-mix(in srgb,var(--a) 85%,transparent)}
 .txstep.ok{color:var(--wgreen)}.txstep.err{color:var(--wburn);white-space:pre-wrap;word-break:break-word}
 .txstep b{color:var(--wt)}
 .txbtns{display:flex;justify-content:flex-end;gap:8px;padding:16px 22px 18px}
-html[data-mono] #txpop .txcard,html[data-mono] #unpop .txcard,html[data-mono] #stpop .txcard,html[data-mono] #atpop .txcard,html[data-mono] #wpick .txcard{background:var(--wc);border-color:var(--wbd2)}
 
 /* the view row on a phone: the buttons keep the calculator's new scale on a
    wide screen; at 390px the row must still hold seven of them */
-@media(max-width:620px){.mbtn{padding:5px 7px;font-size:9px;letter-spacing:.05em}.modes .etabox.monob,.frow .etabox.monob{width:24px;min-width:24px;height:24px}}
+@media(max-width:620px){.mbtn{padding:5px 7px;font-size:9px;letter-spacing:.05em}}
 
 @media(max-width:700px){
   #p-dele{overflow-y:auto;overscroll-behavior:contain}
@@ -1932,8 +1877,7 @@ background:transparent;border:0;box-shadow:none;padding:0;color:var(--ink2)}
 #spop .vgrid{padding-bottom:14px}
 #qpop .card,#cpop .card,#spop .card{scrollbar-color:var(--edge2) #09090f}
 /* the mode: the same cards, black */
-html[data-mono] #qpop .card,html[data-mono] #cpop .card,html[data-mono] #spop .card{background:#000}
-html[data-mono] #qpop .vstat,html[data-mono] #cpop .vstat,html[data-mono] #spop .vstat,html[data-mono] #cpop .cbrow,html[data-mono] #cpop .rdgbox{background:#000;border-color:var(--edge2)}
+
 /* ── Picks: three stages, five rows each, one figure that matters per row ── */
 .duotab{gap:12px;align-items:start}
 .duotab>div{background:#09090f;border:1px solid var(--edge);border-radius:8px;padding:11px 13px 8px}
@@ -1957,7 +1901,6 @@ html[data-mono] #qpop .vstat,html[data-mono] #cpop .vstat,html[data-mono] #spop 
 .ptab .ok{color:var(--green)}.ptab td:nth-child(3).ok{color:var(--green)}
 .ptab .warn{color:var(--burn)}
 .pane .note{font-family:var(--mono);font-size:9px;letter-spacing:.04em;line-height:1.6;color:var(--ink3);max-width:none;margin-top:12px}
-html[data-mono] .duotab>div,html[data-mono] .ptab td{background:#000;border-color:var(--edge2)}
 /* ── the wallet, at a readable scale; a move as a comparison ── */
 
 .wk-mark{width:30px;height:30px}
@@ -2270,7 +2213,6 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
   .tapnote{flex:1 1 100%;margin:0 0 2px}
   .modes{width:100%;justify-content:space-between;gap:1px;padding:2px}
   .mbtn{flex:1 1 0;padding:6px 0;font-size:7.5px;letter-spacing:.06em;text-align:center}
-  .modes .etabox.monob,.frow .etabox.monob{width:22px;min-width:22px;height:22px;margin-left:0}
   .duotab{grid-template-columns:1fr}
   /* the wallet */
   
@@ -3770,7 +3712,6 @@ html[data-tab=connect] .l2host{display:none}
         <button class=mbtn data-m=rank aria-pressed=false>Rank</button>
         <button class=mbtn data-m=logo aria-pressed=false>Logo</button>
         <button class=mbtn data-m=graph aria-pressed=false>Graph</button>
-        <button class="etabox monob" id=monob type=button role=switch aria-checked=false aria-label="Wireframe"><span class=monod></span></button>
       </div></div>
     <div id=gwrap><div class=grid id=g2></div></div>
     <div id=cwrap style="display:none"><svg id=foldchart viewBox="0 0 900 232" role=img
@@ -3788,18 +3729,16 @@ html[data-tab=connect] .l2host{display:none}
 
   <div class=duo>
   <div class="sec tight wrow" data-w=e>
-    <div class=rlab><button class="etabox eta" id=qbtn type=button aria-label="How the coefficient works"><span
-        class="disc de eb"><svg class=kg aria-hidden=true><use href="#g-eta"/></svg></span>bonus share <span class=sgoarr>&rarr;</span></button><span class=rv><b class=rval id=etatop>{{ETA}}</b><button class=rreset data-r=e type=button title="Back to the chain as it is" aria-label="Reset to live">&#8635;</button></span></div>
     <div class=trackwrap>
       <input type=range id=eta class=gradrange min=3 max=100 value={{ETA_PCT}} aria-label="coefficient">
       <span class=knob id=knob style="{{KL_ETA}}"><svg class=kg aria-hidden=true><use href="#g-eta"/></svg></span>
       <span class="tick live" id=tke data-l="live"></span>
     </div>
+    <div class=rlab><button class="etabox eta" id=qbtn type=button aria-label="How the coefficient works"><span
+        class="disc de eb"><svg class=kg aria-hidden=true><use href="#g-eta"/></svg></span>bonus share <span class=sgoarr>&rarr;</span></button><span class=rv><b class=rval id=etatop>{{ETA}}</b><button class=rreset data-r=e type=button title="Back to the chain as it is" aria-label="Reset to live"><span aria-hidden=true>&#8635;</span>live</button></span></div>
   </div>
 
   <div class="sec tight wrow" data-w=c>
-    <div class=rlab><button class="etabox conc" id=cbtn type=button aria-label="How concentration steers the coefficient"><span
-        class="disc dc eb"><svg class=kg aria-hidden=true><use href="#g-c"/></svg></span>concentration <span class=sgoarr>&rarr;</span></button><span class=rv><b class=rval id=ctop>{{RATIO}}&times;</b><button class=rreset data-r=c type=button title="Back to the chain as it is" aria-label="Reset to live">&#8635;</button></span></div>
     <div class=trackwrap>
       <input type=range id=concr class=gradrange min=100 max=1600 value=1041
         aria-label="concentration of staked ATONE">
@@ -3807,16 +3746,18 @@ html[data-tab=connect] .l2host{display:none}
       <span class="tick trip" id=tkt data-l="trips {{TRIPS}}x" data-v={{TRIPS_C}}></span>
       <span class="tick live" id=tkc data-l="live"></span>
     </div>
+    <div class=rlab><button class="etabox conc" id=cbtn type=button aria-label="How concentration steers the coefficient"><span
+        class="disc dc eb"><svg class=kg aria-hidden=true><use href="#g-c"/></svg></span>concentration <span class=sgoarr>&rarr;</span></button><span class=rv><b class=rval id=ctop>{{RATIO}}&times;</b><button class=rreset data-r=c type=button title="Back to the chain as it is" aria-label="Reset to live"><span aria-hidden=true>&#8635;</span>live</button></span></div>
   </div>
   <div class="sec tight wrow" data-w=s>
-    <div class=rlab><button class="etabox cool" id=sbtn type=button aria-label="Staking figures"><span
-        class="disc ds eb"><svg class=kg aria-hidden=true><use href="#g-s"/></svg></span>ATONE staked <span class=sgoarr>&rarr;</span></button><span class=rv><b class=rval id=bstake>{{BONDED_C}}</b><button class=rreset data-r=s type=button title="Back to the chain as it is" aria-label="Reset to live">&#8635;</button></span></div>
     <div class=trackwrap>
       <input type=range id=bondr class=gradrange min=5 max=100 value=40
         aria-label="share of supply staked">
       <span class="knob kcool" id=knob2 style="{{KL_S}}"><svg class=kg aria-hidden=true><use href="#g-s"/></svg></span>
       <span class="tick live" id=tks data-l="live"></span>
     </div>
+    <div class=rlab><button class="etabox cool" id=sbtn type=button aria-label="Staking figures"><span
+        class="disc ds eb"><svg class=kg aria-hidden=true><use href="#g-s"/></svg></span>ATONE staked <span class=sgoarr>&rarr;</span></button><span class=rv><b class=rval id=bstake>{{BONDED_C}}</b><button class=rreset data-r=s type=button title="Back to the chain as it is" aria-label="Reset to live"><span aria-hidden=true>&#8635;</span>live</button></span></div>
     <input type=hidden id=bond value=0>
   </div>
   </div>

@@ -93,8 +93,6 @@
   html[data-theme=light]:not([data-mono]) .duo .sec:nth-child(1){border-color:var(--warn-bg);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .duo .sec:nth-child(2){border-color:var(--danger-bg);background:var(--surface)}
   html[data-theme=light]:not([data-mono]) .duo .sec:nth-child(3){border-color:var(--accent-soft);background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .rreset{background:transparent}
-  html[data-theme=light]:not([data-mono]) .rreset:hover{background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) .rlab .etabox,html[data-theme=light]:not([data-mono]) .rlab .etabox:hover,html[data-theme=light]:not([data-mono]) .rlab .etabox.eta.rise,html[data-theme=light]:not([data-mono]) .rlab .etabox.eta.fall,html[data-theme=light]:not([data-mono]) .rlab .etabox.conc,html[data-theme=light]:not([data-mono]) .rlab .etabox.conc.low,html[data-theme=light]:not([data-mono]) .rlab .etabox.cool,html[data-theme=light]:not([data-mono]) .rlab .etabox.eta.rise:hover,html[data-theme=light]:not([data-mono]) .rlab .etabox.eta.fall:hover,html[data-theme=light]:not([data-mono]) .rlab .etabox.conc:hover,html[data-theme=light]:not([data-mono]) .rlab .etabox.conc.low:hover,html[data-theme=light]:not([data-mono]) .rlab .etabox.cool:hover{background:transparent;box-shadow:none}
   html[data-theme=light]:not([data-mono]) .rlab .etabox{text-decoration-color:currentColor}
   html[data-theme=light]:not([data-mono]) .rlab .etabox.eta{--h:var(--warn)}
@@ -202,8 +200,6 @@
   html[data-theme=light]:not([data-mono]) .tcap.earn{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .tcap.cool{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .tcap.good{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .monod{border:1.5px solid var(--line-strong);background:var(--line-strong)}
-  html[data-theme=light]:not([data-mono]) .monob:hover .monod{border-color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .folder{background:var(--surface)}
   html[data-theme=light]:not([data-mono]) .brand{text-decoration:none;color:inherit}
   html[data-theme=light]:not([data-mono]) .intro::before{background:transparent}
@@ -226,8 +222,6 @@
   html[data-theme=light]:not([data-mono]) .mbtn{background:transparent}
   html[data-theme=light]:not([data-mono]) .mbtn:hover{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .mbtn[aria-pressed=true]{background:var(--amber-bar);color:#FFFFFF;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .modes .etabox.monob{background:transparent}
-  html[data-theme=light]:not([data-mono]) .modes .etabox.monob:hover{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) .hdr-r,html[data-theme=light]:not([data-mono]) .brandbar,html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard,html[data-theme=light]:not([data-mono]) #wpick .txcard{--wsolid:var(--ink)}
   html[data-theme=light]:not([data-mono]) .wk-mark{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-addr::before{box-shadow:none}

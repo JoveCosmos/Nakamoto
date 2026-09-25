@@ -1411,25 +1411,6 @@ rememberGridH();
 })();
 
 
-/* ── the monochrome switch ────────────────────────────────────────────────────
-   State lives on <html data-mono> and in localStorage; boot.js stamps it before
-   the first paint so the page never flashes colour. Nothing else in the app has
-   to know about it - the whole treatment is CSS. */
-(function(){
-  var b = document.getElementById("monob"), r = document.documentElement;
-  if(!b) return;
-  function paint(on){
-    r.toggleAttribute("data-mono", on);
-    b.setAttribute("aria-checked", on ? "true" : "false");
-    b.title = on ? "Colour" : "Wireframe";
-  }
-  paint(r.hasAttribute("data-mono"));
-  b.addEventListener("click", function(){
-    var on = !r.hasAttribute("data-mono");
-    paint(on);
-    try{ localStorage.setItem("th_mono", on ? "1" : "0"); }catch(e){}
-  });
-})();
 
 
 /* ── day or night ─────────────────────────────────────────────────────────────

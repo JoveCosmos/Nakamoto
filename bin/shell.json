@@ -35,7 +35,9 @@
          "empty": {"title": "Constitution", "text": "The AtomOne constitution will be readable here.",
                    "action": {"label": "Read it on GitHub", "href": "https://github.com/atomone-hub/genesis/blob/main/CONSTITUTION.md"}}},
         {"id": "core-daos", "label": "Core DAOs", "route": "core-daos",
-         "empty": {"title": "Core DAOs", "text": "AtomOne's core DAOs will be listed here."}}
+         "empty": {"title": "Core DAOs", "text": "AtomOne's core DAOs will be listed here."}},
+        {"id": "governors", "label": "Governors", "route": "governors",
+         "empty": {"title": "Governors", "text": "AtomOne's governors will be listed here."}}
       ]
     },
     {

@@ -1,6 +1,6 @@
 /* before paint: no default pane should ever flash */
 try{
- if(localStorage.getItem("th_mono")==="1") document.documentElement.setAttribute("data-mono","1");
+ localStorage.removeItem("th_mono");   /* the wireframe theme is gone (2026-09-25) */
  /* day or night: the reader's own choice first, else what the browser prefers */
  var _th=localStorage.getItem("th_theme");
  if(_th!=="light"&&_th!=="dark") _th=(window.matchMedia&&matchMedia("(prefers-color-scheme: light)").matches)?"light":"dark";
