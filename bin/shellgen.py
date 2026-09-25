@@ -3,7 +3,8 @@
 render.py calls build() with the config and the page template and splices the results in:
   SHELL_CFG  the config itself, embedded in <head> for boot.js (pre-paint) and shell.js
   SHELL_L1   the level-1 tablist (the sections) for the header
-  SHELL_L2   one level-2 tablist per section, for the window's title row
+  SHELL_L2   one level-2 tablist per section, for the window's title row (and, for a section
+             with a version switch, its Simple / Advanced control just before it)
   SHELL_CSS  the rules that key on html[data-sec] / html[data-sv] / html[data-svs]: which
              strip and which title show, which tab is lit, which dashboard screen is up.
              boot.js stamps those attributes before the first paint, so the right tab is lit
@@ -18,6 +19,7 @@ import re
 ROUTE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 HEX = re.compile(r"^#[0-9a-fA-F]{6}$")
 ACCOUNT = ("none", "uses", "required")
+OVERRIDE = {"ui", "panel", "screen", "tab", "label"}
 
 
 def _esc(s):
@@ -85,6 +87,25 @@ def validate(cfg, tpl):
                     errs.append(f"{sid}/{vid}: no tab, so it needs an empty state {{title, text}}")
             if v.get("accent") and not HEX.match(v["accent"]):
                 errs.append(f"{sid}/{vid}: accent must be #rrggbb")
+            for k in ("pro", "pro_b"):
+                o = v.get(k)
+                if o is None or o == "hide":
+                    continue
+                if not isinstance(o, dict) or set(o) - OVERRIDE:
+                    errs.append(f"{sid}/{vid}: {k} is 'hide' or an object of {sorted(OVERRIDE)}")
+                elif o.get("panel") and not re.search(r"\bid=\"?%s\"?[\s>]" % re.escape(o["panel"]), tpl):
+                    errs.append(f"{sid}/{vid}: {k} panel #{o['panel']} is not in the page")
+            if (v.get("pro") is not None or v.get("pro_b") is not None) and not s.get("version"):
+                errs.append(f"{sid}/{vid}: 'pro' needs the section to have a version switch")
+        ver = s.get("version")
+        if ver:
+            opts = [o.get("id") for o in ver.get("options") or []]
+            if len(opts) != 2 or "pro" not in opts or len(set(opts)) != 2 or not all(o.get("label") for o in ver["options"]):
+                errs.append(f"section {sid}: version has two options {{id, label}}, one of them 'pro'")
+            if ver.get("default") not in opts:
+                errs.append(f"section {sid}: version default must be one of its options")
+            if ver.get("group") and ver["group"] not in [v.get("group") for v in subs]:
+                errs.append(f"section {sid}: version group '{ver['group']}' is not one of its groups")
     home = (cfg.get("home") or "").split("/")
     if len(home) != 2 or not any(s.get("route") == home[0] and any(v.get("route") == home[1] for v in s.get("sub") or []) for s in secs):
         errs.append("home must name an existing section/sub-view route")
@@ -124,6 +145,12 @@ def build(cfg, tpl):
             g = v.get("group")
             if g and g not in groups:
                 groups.append(g)
+        ver = s.get("version")
+        if ver:
+            l2.append(f'<div class=l2ver data-for="{_esc(s["id"])}" role=group aria-label="{_esc(ver.get("group") or s["label"])} view">' +
+                      '<span class=l2gl aria-hidden=true>View</span><div class=l2trk>' +
+                      "".join(f'<button class=l2vb type=button data-ver="{_esc(o["id"])}" aria-pressed="false">{_esc(o["label"])}</button>'
+                              for o in ver["options"]) + "</div></div>")
         attrs = (f'data-for="{_esc(s["id"])}" role=tablist aria-label="{_esc(s["label"])} views" '
                  f'style="--acc:{s["accent"]}"')
         if not groups:
@@ -143,6 +170,18 @@ def build(cfg, tpl):
     lit_l1 = ",".join(f"html[data-sec={q(s['id'])}] .l1tab[data-section={q(s['id'])}]" for s in secs)
     lit_l2 = ",".join(f"html[data-sv={q(s['id'] + '/' + v['id'])}] .l2tab[data-key={q(s['id'] + '/' + v['id'])}]"
                       for s in secs for v in s["sub"])
+    show_ver = ",".join(f"html[data-sec={q(s['id'])}] .l2ver[data-for={q(s['id'])}]" for s in secs if s.get("version"))
+    lit_ver = ",".join(f"html[data-ver={q(o['id'])}] .l2vb[data-ver={q(o['id'])}]"
+                       for o in {o["id"]: o for s in secs if s.get("version") for o in s["version"]["options"]}.values())
+    # a tab the second version leaves out: the live layout reads 'pro', the preview (?dash=b) 'pro_b'
+    hide = []
+    for s in secs:
+        for v in s["sub"]:
+            key = q(s["id"] + "/" + v["id"])
+            if v.get("pro") == "hide":
+                hide.append(f'html[data-ver="pro"]:not([data-var="b"]) .l2tab[data-key={key}]')
+            if (v["pro_b"] if "pro_b" in v else v.get("pro")) == "hide":
+                hide.append(f'html[data-ver="pro"][data-var="b"] .l2tab[data-key={key}]')
     screens = sorted({v["screen"] for s in secs for v in s["sub"] if v.get("screen")})
     show_scr = ",".join(f"html[data-svs={q(x)}] .sv-screen[data-sc={q(x)}]" for x in screens)
     css = ("/* ── generated from shell.json by render.py (shellgen.py): do not edit here ── */\n"
@@ -150,7 +189,9 @@ def build(cfg, tpl):
            f"{show_ttl}{{display:flex}}\n"
            f"{lit_l1}{{background:var(--tint);color:var(--l1-on);font-weight:500}}\n"
            f"{lit_l2}{{background:var(--l2-on);color:var(--l2-on-ink);font-weight:500}}\n"
-           + (f"{show_scr}{{display:flex}}\n" if show_scr else ""))
+           + (f"{show_scr}{{display:flex}}\n" if show_scr else "")
+           + (f"{show_ver}{{display:inline-flex}}\n{lit_ver}{{background:var(--l2-on);color:var(--l2-on-ink);font-weight:500}}\n" if show_ver else "")
+           + (",".join(hide) + "{display:none}\n" if hide else ""))
 
     blob = json.dumps(cfg, separators=(",", ":"), ensure_ascii=False)
     blob = blob.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")

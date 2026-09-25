@@ -3412,7 +3412,7 @@ html[data-ui=simple][data-tab=dele] .w#calc>#p-dele{display:none}
 .sv-bw{display:flex;align-items:baseline;gap:10px;line-height:1;min-width:0}
 .sv-bw b{font-size:19px;font-weight:800;letter-spacing:-.01em;color:var(--wt)}
 .sv-bw i{font-style:normal;font-family:var(--wsans);font-size:13px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-html[data-ui=simple] .svtag.a,html:not([data-ui=simple]) .svtag.s{display:none}
+html:not([data-ver=pro]) .svtag.a,html[data-ver=pro] .svtag.s{display:none}
 .sv-who{display:flex;align-items:center;gap:9px;flex:1 1 0;justify-content:flex-end;min-width:0}
 /* connected: one pill the size of the Connect button - the wallet's mark, its address with a
    small copy glyph (one control), and a disconnect icon behind a hairline. No menu. */
@@ -3433,6 +3433,10 @@ color:var(--wt);font-family:var(--wmono);font-size:10.5px;cursor:pointer}
 /* the dashboard's title greets the connected wallet by the name it gave itself */
 .welc{margin-left:14px;padding-left:14px;border-left:1px solid var(--wbd2);font-size:13px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .welc b{color:var(--wt);font-weight:700}
+/* the title line is one 50px row and never wraps: as the window narrows, the greeting yields
+   first (the wallet pill still says who is connected), then the tagline; the tabs keep it all */
+@media(min-width:621px) and (max-width:1199px){.brandbar .welc{display:none}}
+@media(min-width:621px) and (max-width:1023px){.brandbar .svtag{display:none}}
 .sv-who{position:relative}
 .sv-menu{position:absolute;right:0;top:calc(100% + 9px);z-index:60;min-width:232px;padding:7px;border:1px solid var(--wbd2);
 border-radius:12px;background:var(--wsolid);box-shadow:0 30px 70px -30px #000;display:flex;flex-direction:column;gap:4px}
@@ -3757,6 +3761,16 @@ color:var(--ink2);font:inherit;font-family:var(--sans);font-size:12px;font-weigh
 /* label and track share the 50px title line: the pills there run a little smaller */
 .l2.split .l2trk{padding:2px}
 .l2.split .l2tab{height:25px;padding:0 12px}
+/* a section's version switch (the dashboard's Simple / Advanced): a two-pill track of its
+   own, labelled like a group and set off from the views by the same hairline; it is a
+   pair of toggle buttons, not tabs - it changes how the views look, not which one is open */
+.l2ver{display:none;flex-direction:column;align-items:flex-start;gap:3px;align-self:flex-end;margin-right:12px;padding-right:12px;border-right:.5px solid var(--edge2)}
+.l2ver .l2trk{padding:2px}
+.l2vb{position:relative;flex:0 0 auto;display:inline-flex;align-items:center;height:25px;padding:0 12px;border:0;border-radius:999px;background:transparent;
+color:var(--ink2);font:inherit;font-family:var(--sans);font-size:12px;font-weight:400;line-height:1;white-space:nowrap;cursor:pointer;transition:color .15s,background .15s}
+.l2vb::after{content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
+.l2vb:hover{color:var(--ink)}
+.l2vb:focus-visible{outline:2px solid var(--acc,var(--hot));outline-offset:2px}
 /* the shell's own panes: a view with nothing built yet, or the one connect screen */
 .shell-box{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;border:1px solid var(--edge);border-radius:8px;background:var(--card)}
 .shell-empty{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;max-width:46ch;padding:24px}
@@ -3784,6 +3798,10 @@ html[data-tab=connect] .l2host{display:none}
   .l2.split{flex-direction:column;align-items:stretch;gap:8px}
   .l2g{align-items:stretch}
   .l2div{display:none}
+  .l2host{flex-wrap:wrap;row-gap:8px}
+  .l2ver{flex:1 1 100%;align-items:stretch;margin-right:0;padding-right:0;border-right:0}
+  .l2ver .l2trk{display:grid;grid-template-columns:1fr 1fr;padding:5px}
+  .l2vb{height:34px;justify-content:center}
 }
 </style>
 <link rel=stylesheet href="assets/theme-day.css">

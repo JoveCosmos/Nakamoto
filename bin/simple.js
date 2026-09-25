@@ -371,12 +371,13 @@
   }
 
   /* The shell (shell.js) owns which dashboard view is open - it is a level-2 tab with its
-     own route - and calls this to show it: the simple view on one of its screens, or the
-     advanced one. th_ui / th_svs keep the choice for a visit that arrives with no route. */
+     own route - and calls this with the view as the version switch has it: a simple screen,
+     or the advanced one. th_svs keeps the screen for a visit that arrives with no route. */
   window.__dashView = function(ui, scr){
     if(ui === "simple"){ root.setAttribute("data-ui", "simple"); if(scr) root.setAttribute("data-svs", scr); }
     else root.removeAttribute("data-ui");
-    try{ localStorage.setItem("th_ui", ui === "simple" ? "simple" : "pro"); if(scr) localStorage.setItem("th_svs", scr); }catch(e){}
+    /* th_ui is the version switch's (shell.js); this only remembers the screen */
+    try{ if(scr) localStorage.setItem("th_svs", scr); }catch(e){}
     render();
   };
 

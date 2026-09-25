@@ -99,7 +99,7 @@ go('staking/bonus');
 /* the wallet section: no gate of its own any more - the sub-header is the only door,
    and the pane stands with its structure (a skeleton) until a wallet fills it */
 t('wallet-door', function(){
-  var root=document.documentElement; go('dashboard/advanced');
+  var root=document.documentElement; window.__shellVer('pro'); go('dashboard/overview');
   var g=document.getElementById('wgate'), a=document.getElementById('wk-acct');
   var skel=document.querySelectorAll('#dmy tr.skel').length;
   var rows=document.querySelectorAll('#dpicks tbody tr').length, cap=!document.getElementById('dcap');   /* the count line is gone from the page */
@@ -109,16 +109,16 @@ t('wallet-door', function(){
   var menu=document.getElementById('svmenu'), tiles=menu.querySelectorAll('[data-w]').length;
   var ok=!g && !document.getElementById('wdisc') && !a.hidden && skel===5 && rows>=90 && cap && barShown && !conn.hidden && !menu.hidden && tiles===2;
   menu.hidden=true; menu.innerHTML='';
-  go('staking/bonus');
+  window.__shellVer('simple'); go('staking/bonus');
   return ok || 'gate '+!!g+' acct '+a.hidden+' skel '+skel+' rows '+rows+' cap '+cap+' bar '+barShown+' conn '+conn.hidden+' tiles '+tiles;
 });
 
 /* the dashboard's two views share one window: the same box, one at a time */
 t('simple-view', function(){
-  go('dashboard/advanced');
+  window.__shellVer('pro'); go('dashboard/overview');
   var pane=document.getElementById('p-dele'), sv=document.getElementById('sv');
   var advBox=pane.getBoundingClientRect();
-  go('dashboard/overview');
+  window.__shellVer('simple');
   var svBox=sv.getBoundingClientRect(), paneGone=getComputedStyle(pane).display==='none';
   /* the three screens, one shown at a time, each its own level-2 view */
   var seen=[];
@@ -187,6 +187,34 @@ t('shell-aria', function(){
   document.querySelectorAll('[role=tabpanel]').forEach(function(p){
     var lb=p.getAttribute('aria-labelledby'); if(lb && !document.getElementById(lb)) bad.push(p.id+' labelledby '+lb);
   });
+  return !bad.length || bad.join(', ');
+});
+/* the dashboard's version switch: Simple / Advanced changes how its views look, never the
+   route; in Advanced, Overview is the three-pane screen; the live layout (A) keeps every tab,
+   the preview (?dash=b) leaves out the ones its config hides */
+t('shell-version', function(){
+  var R=document.documentElement, bad=[], B=R.getAttribute('data-var')==='b';
+  function vis(id){ var e=document.getElementById(id); return !!e && e.offsetParent!==null && e.getBoundingClientRect().height>0; }
+  function tabs(){ return [].filter.call(document.querySelectorAll('.l2[data-for=dashboard] .l2tab'),function(b){ return b.offsetParent!==null; }).map(function(b){ return b.dataset.sub; }).join(); }
+  window.__shellVer('simple'); go('dashboard/overview');
+  var sw=document.querySelector('.l2ver[data-for=dashboard]');
+  if(!sw || sw.offsetParent===null) bad.push('switch not shown');
+  if(sw && sw.closest('[role=tablist]')) bad.push('switch inside a tablist');
+  if(!vis('sv-over') || vis('p-dele')) bad.push('simple overview');
+  document.querySelector('.l2vb[data-ver=pro]').click();
+  if(R.getAttribute('data-ver')!=='pro' || location.hash!=='#/dashboard/overview') bad.push('pro: ver '+R.getAttribute('data-ver')+' '+location.hash);
+  if(!vis('p-dele') || vis('sv')) bad.push('pro overview is not the three panes');
+  if(document.getElementById('l2-dashboard-overview').getAttribute('aria-controls')!=='p-dele') bad.push('overview controls');
+  if(document.querySelector('.l2vb[data-ver=pro]').getAttribute('aria-pressed')!=='true') bad.push('pressed');
+  var want=B?'overview,votes,governors':'overview,autopilot,network,votes,governors';
+  if(tabs()!==want) bad.push('pro tabs '+tabs());
+  var tg=[].filter.call(document.querySelectorAll('.brandbar .svtag'),function(x){ return x.offsetParent!==null; });
+  if(innerWidth>1023 && innerWidth>620 && (tg.length!==1 || !tg[0].classList.contains('a'))) bad.push('pro tagline');
+  [].forEach.call(document.querySelectorAll('.l2vb'),function(b){ var h=parseFloat(getComputedStyle(b,'::after').height); if(!(h>=44) && b.getBoundingClientRect().height<44) bad.push('switch target '+h); });
+  document.querySelector('.l2vb[data-ver=simple]').click();
+  if(!vis('sv-over') || tabs()!=='overview,autopilot,network,votes,governors') bad.push('back to simple '+tabs());
+  try{ localStorage.removeItem('th_ui'); }catch(e){}
+  go('staking/bonus');
   return !bad.length || bad.join(', ');
 });
 t('shell-no-sideways-page', function(){

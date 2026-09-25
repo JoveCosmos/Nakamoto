@@ -22,6 +22,18 @@
 
   function sec(k, v){ for(var i = 0; i < SECS.length; i++) if(SECS[i][k] === v) return SECS[i]; return null; }
   function sub(s, k, v){ for(var i = 0; i < s.sub.length; i++) if(s.sub[i][k] === v) return s.sub[i]; return null; }
+  /* the version switch: Simple or Advanced, the reader's own (th_ui), never part of a route.
+     A view's 'pro' (or, previewing the second layout with ?dash=b, its 'pro_b') says what it
+     shows in Advanced - fields over its own - or 'hide'. eff() is the view as it stands now. */
+  var VER = R.getAttribute("data-ver") || "simple", VB = R.getAttribute("data-var") === "b";
+  function eff(s, v){
+    if(!s || !v) return v;
+    var o = VB && "pro_b" in v ? v.pro_b : v.pro, r = {}, k;
+    if(VER !== "pro" || !s.version || !o) return v;
+    if(o === "hide") return null;
+    for(k in v) r[k] = v[k]; for(k in o) r[k] = o[k]; return r;
+  }
+  function shown(s, v){ if(eff(s, v)) return v; for(var i = 0; i < s.sub.length; i++) if(eff(s, s.sub[i])) return s.sub[i]; return v; }
   function esc(v){ return String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
 
   /* ── memory: each section's last view, for this session ── */
@@ -31,7 +43,7 @@
   function remember(s, v){ var m = mem(); m[s.id] = v.id; keep(m); }
   /* a section with entry "first" always opens on its first view (Staking on Bonus); the
      others come back to the view last open this session */
-  function last(s){ return s.entry === "first" ? s.sub[0] : sub(s, "id", mem()[s.id]) || s.sub[0]; }
+  function last(s){ return shown(s, s.entry === "first" ? s.sub[0] : sub(s, "id", mem()[s.id]) || s.sub[0]); }
 
   /* ── routes ── */
   function hashOf(s, v){ return s ? "#/" + s.route + "/" + v.route : "#/intro"; }
@@ -46,7 +58,8 @@
   function wantsConnect(s){ return s.account === "required" && !connected(); }
   function panelOf(s, v){
     if(!s) return E("p-intro");
-    return E(wantsConnect(s) ? "p-connect" : (v.panel || "p-empty"));
+    var e = eff(s, v);
+    return E(wantsConnect(s) ? "p-connect" : (e.panel || "p-empty"));
   }
 
   var cur = { s: null, v: null };
@@ -68,6 +81,11 @@
       });
       if(!hit && tabs.length) tabs[0].tabIndex = 0;
     });
+    /* what each tab controls follows the version (Overview is the three-pane screen in Advanced) */
+    SECS.forEach(function(x){ x.sub.forEach(function(w){
+      var b = E("l2-" + x.id + "-" + w.id), e = eff(x, w); if(b && e) b.setAttribute("aria-controls", e.panel || "p-empty"); }); });
+    Array.prototype.forEach.call(document.querySelectorAll(".l2vb"), function(b){
+      b.setAttribute("aria-pressed", b.dataset.ver === VER ? "true" : "false"); });
     var calc = E("calc");
     if(calc){
       if(s){ calc.setAttribute("aria-labelledby", "l1-" + s.id); calc.removeAttribute("aria-label"); }
@@ -133,13 +151,16 @@
 
   /* ── one move: section and view in, everything else follows ── */
   function go(s, v, how){
-    var prevS = cur.s, prevV = cur.v, tab;
+    var prevS = cur.s, prevV = cur.v, tab, e;
+    if(s) v = shown(s, v);
+    e = eff(s, v);
     cur = { s: s, v: v };
     if(!s){ tab = "intro"; R.removeAttribute("data-sec"); R.removeAttribute("data-sv"); }
     else {
-      tab = wantsConnect(s) ? "connect" : (v.tab || "empty");
+      tab = wantsConnect(s) ? "connect" : (e.tab || "empty");
       R.setAttribute("data-sec", s.id); R.setAttribute("data-sv", s.id + "/" + v.id);
-      if(tab === "dele" && window.__dashView) window.__dashView(v.ui, v.screen);
+      if(tab === "dele" && window.__dashView) window.__dashView(e.ui, e.screen);
+      var pn = panelOf(s, v); if(pn && pn.id !== "p-connect") pn.setAttribute("aria-labelledby", "l2-" + s.id + "-" + v.id);
       if(tab === "empty") fillEmpty(s, v);
       if(tab === "connect") fillConnect(s);
     }
@@ -156,6 +177,15 @@
     if(s) remember(s, v);
     if(prevS !== s || prevV !== v) toTop(s, v);
   }
+  /* the switch: the same view, the other way of looking at it (or, if that version leaves it
+     out, the section's first view that it keeps); the address does not change */
+  function setVer(x){
+    if(x === VER) return;
+    VER = x; R.setAttribute("data-ver", x);
+    try{ localStorage.setItem("th_ui", x); }catch(e){}
+    if(cur.s) go(cur.s, cur.v, "replace"); else sync();
+  }
+  window.__shellVer = setVer;
   window.__shellGo = function(route){ var r = parse("#/" + route); if(r) r.intro ? go(null, null, "push") : go(r.s, r.v, "push"); };
 
   function activate(b){
@@ -167,8 +197,9 @@
   /* clicks: the tabs, any [data-route] door, and the connect screen's button (links to
      #/... need nothing - the address changes and hashchange below answers it) */
   document.addEventListener("click", function(ev){
-    var t = ev.target.closest ? ev.target.closest(".l1tab,.l2tab,[data-route],[data-shell-connect]") : null;
+    var t = ev.target.closest ? ev.target.closest(".l1tab,.l2tab,.l2vb,[data-route],[data-shell-connect]") : null;
     if(!t) return;
+    if(t.classList.contains("l2vb")){ setVer(t.dataset.ver); return; }
     if(t.hasAttribute("data-shell-connect")){ var c = E("svconn"); if(c) c.click(); return; }
     if(t.hasAttribute("data-route")){ ev.preventDefault(); window.__shellGo(t.getAttribute("data-route")); return; }
     activate(t);
@@ -179,7 +210,8 @@
     var t = ev.target;
     if(!t || !t.getAttribute || t.getAttribute("role") !== "tab") return;
     var list = t.closest("[role=tablist]"); if(!list) return;
-    var tabs = [].slice.call(list.querySelectorAll("[role=tab]")), i = tabs.indexOf(t), j = -1;
+    /* a tab the open version leaves out is not there to land on */
+    var tabs = [].slice.call(list.querySelectorAll("[role=tab]")).filter(function(b){ return b.offsetParent !== null; }), i = tabs.indexOf(t), j = -1;
     if(ev.key === "ArrowRight" || ev.key === "ArrowDown") j = (i + 1) % tabs.length;
     else if(ev.key === "ArrowLeft" || ev.key === "ArrowUp") j = (i - 1 + tabs.length) % tabs.length;
     else if(ev.key === "Home") j = 0;
@@ -214,7 +246,7 @@
     if(a === seen) return;
     seen = a;
     var m = mem(); SECS.forEach(function(s){ if(s.account !== "none") delete m[s.id]; }); keep(m);
-    if(cur.s && cur.s.account !== "none") go(cur.s, cur.s.sub[0], "replace");
+    if(cur.s && cur.s.account !== "none") go(cur.s, shown(cur.s, cur.s.sub[0]), "replace");
   }
   window.addEventListener("thermo:draw", identity);
 

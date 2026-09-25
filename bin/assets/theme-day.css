@@ -640,6 +640,7 @@
   html[data-theme=light]:not([data-mono]) .sv-tbl tbody tr:hover{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .l1tab{background:transparent}
   html[data-theme=light]:not([data-mono]) .l2tab{background:transparent}
+  html[data-theme=light]:not([data-mono]) .l2vb{background:transparent}
   html[data-theme=light]:not([data-mono]) .shell-act{background:transparent;text-decoration:none}
   html[data-theme=light]:not([data-mono]) [role=tabpanel]:focus{outline:none}
   html[data-theme=light]:not([data-mono]){--void:var(--bg);--edge:var(--line);--edge2:var(--line-strong);--ink2:var(--muted);--ink3:var(--faint);--hot:var(--warn);--burn:var(--danger);--cold:var(--accent);--lit:var(--ink);--card:var(--surface);--card2:var(--surface-2);--inset:var(--surface-sunk);--blue:var(--accent);--cyan:var(--accent);--green:var(--accent);--amber:var(--warn);--cv:var(--bg);--ce:var(--line);--ce2:var(--line-strong);--ci:var(--ink);--ci2:var(--muted);--ci3:var(--faint);--cf:var(--faint);--ch:var(--warn);--cb:var(--danger);--cc:var(--accent);--cl:var(--ink);--mono:var(--day-mono);--sans:var(--day-sans)}
