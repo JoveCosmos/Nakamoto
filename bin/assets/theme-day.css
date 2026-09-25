@@ -628,7 +628,6 @@
   html[data-theme=light]:not([data-mono]) .wk-btn.busy::after{border:2px solid var(--surface-2);border-top-color:var(--accent)}
   html[data-theme=light]:not([data-mono])[data-tab=dele] .w#calc>.sv-head{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sv-tab{background:transparent}
-  html[data-theme=light]:not([data-mono]) .sv-chain i{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-addr svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .sv-acct svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .sv-menu{box-shadow:none}
@@ -744,7 +743,7 @@
 
   /* the dashboard's sub-header sits outside #sv (it is the window's own row), so the
      same floors are named for it: colour only, the sizes are the night sheet's */
-  html[data-theme=light]:not([data-mono]) #svbar .sv-bw i,html[data-theme=light]:not([data-mono]) #svbar .sv-chain,
+  html[data-theme=light]:not([data-mono]) #svbar .sv-bw i,
   html[data-theme=light]:not([data-mono]) #svbar .sv-tab,html[data-theme=light]:not([data-mono]) #svbar .sv-menu .mh,
   html[data-theme=light]:not([data-mono]) #svbar .sv-menu .ma,html[data-theme=light]:not([data-mono]) #svbar .sv-menu .mi i,
   html[data-theme=light]:not([data-mono]) #svbar .sv-menu .mi:disabled{color:var(--muted)}

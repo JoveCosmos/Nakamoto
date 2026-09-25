@@ -3532,22 +3532,21 @@ font-family:var(--wsans);color:var(--wt)}
 /* and it is the same bar the calculator draws in that slot: one box, one border */
 html[data-tab=dele] .w#calc>.sv-head{display:flex;margin-bottom:12px;padding:0 16px 0 18px;
 border:1px solid var(--edge);border-radius:8px;background:linear-gradient(180deg,#0e0e1e,#09090f)}
-.sv-brand{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+/* three columns: the lockup, the screens centred, the wallet pinned right - so the
+   wallet still sits at the end when the screens are not there (the advanced view) */
+.sv-brand{display:flex;align-items:center;gap:10px;flex:1 1 0;min-width:0}
 .sv-brand img{width:28px;height:28px;border-radius:8px;display:block}
 .sv-bw{display:flex;flex-direction:column;gap:2px;line-height:1}
 .sv-bw b{font-size:15px;font-weight:800;color:var(--wt)}
 .sv-bw i{font-style:normal;font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
-.sv-nav{display:none;align-items:center;gap:6px;margin:0 auto}
+.sv-nav{display:none;align-items:center;gap:6px;margin:0;flex:0 0 auto}
 html[data-ui=simple] .sv-nav{display:flex}
 .sv-tab{border:1px solid transparent;background:transparent;color:var(--ws);font-family:var(--wmono);font-size:10px;letter-spacing:.16em;
 text-transform:uppercase;padding:8px 15px;border-radius:8px;cursor:pointer;transition:color .16s,border-color .16s,background .16s}
 .sv-tab:hover{color:var(--wt);border-color:var(--wbd2)}
 .sv-tab.on{color:var(--wt);background:var(--wh);border-color:var(--wbd2)}
 .sv-tab:focus-visible,.sv-acct:focus-visible,.sv-addr:focus-visible{outline:2px solid var(--wcyan);outline-offset:2px}
-.sv-who{display:flex;align-items:center;gap:9px;flex:0 0 auto}
-.sv-chain{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--wbd);background:var(--wchip);border-radius:99px;
-padding:6px 12px;font-size:11.5px;color:var(--ws);white-space:nowrap}
-.sv-chain i{width:6px;height:6px;border-radius:50%;background:var(--wgreen);box-shadow:0 0 8px var(--wgreen);flex:0 0 auto}
+.sv-who{display:flex;align-items:center;gap:9px;flex:1 1 0;justify-content:flex-end;min-width:0}
 .sv-addr{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--wbd);background:var(--wchip);border-radius:99px;padding:6px 12px;
 font-family:var(--wmono);font-size:11px;color:var(--wt);cursor:pointer;transition:border-color .16s,color .16s}
 .sv-addr:hover{border-color:var(--wbd2);color:var(--wcyan)}
@@ -3715,7 +3714,7 @@ html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
   .sv-figs{grid-template-columns:repeat(2,minmax(0,1fr))}
   .sv-head{flex-wrap:wrap;gap:12px}
   .sv-nav{order:3;width:100%;margin:0;justify-content:flex-start;overflow-x:auto}
-  .sv-who{margin-left:auto}
+  .sv-who{margin-left:auto;flex:0 0 auto}
 }
 @media(max-width:620px){
   .sv-head{margin-bottom:10px}
@@ -3725,7 +3724,7 @@ html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
   .sv-main{padding:14px 16px 34px}
   .sv-cards,.sv-cards.four{grid-template-columns:minmax(0,1fr)}
   .sv-big{font-size:28px}
-  .sv-bw i,.sv-chain{display:none}
+  .sv-bw i{display:none}
   .uibtn{width:30px;height:30px;padding:0;margin-left:2px}
   .uibtn .uiw{display:none}
   .uibtn .uig{display:block}
@@ -3782,7 +3781,6 @@ html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
         <button class=sv-tab data-s=net type=button role=tab aria-selected=false>Network</button>
       </nav>
       <div class=sv-who>
-        <span class=sv-chain><i></i>AtomOne Mainnet</span>
         <button class=sv-addr id=svaddr type=button hidden title="Copy address"><span></span><svg viewBox="0 0 24 24" aria-hidden=true><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
         <button class="sv-btn sml pri" id=svconn type=button aria-haspopup=true aria-expanded=false>Connect wallet</button>
         <button class=sv-acct id=svacct type=button hidden title="This wallet" aria-label="This wallet" aria-haspopup=true aria-expanded=false><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="8" r="3.4"/><path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"/></svg></button>
