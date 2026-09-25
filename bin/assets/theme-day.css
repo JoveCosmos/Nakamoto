@@ -345,6 +345,7 @@
   html[data-theme=light]:not([data-mono]) .txcard .txrow .f.to b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .txlock{border:1px solid var(--warn-bg);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) .txlock svg{fill:none}
+  html[data-theme=light]:not([data-mono]) .bheight{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .bheight i{box-shadow:none}
   @media(max-width:700px){
     html[data-theme=light]:not([data-mono]) .w#calc,html[data-theme=light]:not([data-mono]) .panes>.w{background:transparent;box-shadow:none}
@@ -658,6 +659,7 @@
   }
   html[data-theme=light]:not([data-mono]) .l1tab{background:transparent}
   html[data-theme=light]:not([data-mono]) .l2tab{background:transparent}
+  html[data-theme=light]:not([data-mono]) .l2gl{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .l2vb{background:transparent}
   html[data-theme=light]:not([data-mono]) .shell-act{background:transparent;text-decoration:none}
   html[data-theme=light]:not([data-mono]) [role=tabpanel]:focus{outline:none}
@@ -772,4 +774,15 @@
   html[data-theme=light]:not([data-mono]) #sv .sv-chip{background:var(--surface-2);border-color:var(--line-soft)}
   /* the amber action on paper carries dark ink: white on the day amber is under 4.5:1 */
   html[data-theme=light]:not([data-mono]) #sv .sv-btn.pri,html[data-theme=light]:not([data-mono]) #sv .sv-btn.pri:hover:not(:disabled){color:var(--ink)}
+
+  /* Autopilot's card on paper: its colour is the accent. What the shadow cannot map - a colour
+     held in --av, a gradient on the action, white letters on the logo monograms - is named here */
+  html[data-theme=light]:not([data-mono]) .atseg button[aria-pressed=true],html[data-theme=light]:not([data-mono]) .atflt button[aria-pressed=true],
+  html[data-theme=light]:not([data-mono]) .atview button[aria-selected=true]{background:var(--accent);color:#fff}
+  html[data-theme=light]:not([data-mono]) .atview button[aria-selected=true] b{color:#fff}
+  html[data-theme=light]:not([data-mono]) .atcard .wk-btn.wk-go{background:var(--accent);border:1px solid var(--accent);color:#fff;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .atcard .wk-btn.wk-go:disabled{background:var(--surface-2);border-color:var(--line);color:var(--faint);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .atlist .wk-lgx{color:#fff}
+  html[data-theme=light]:not([data-mono]) .atlist td.dim,html[data-theme=light]:not([data-mono]) .atcard .atfoot .txfee,
+  html[data-theme=light]:not([data-mono]) .l2gl{color:var(--muted)}
 

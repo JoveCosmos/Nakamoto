@@ -165,7 +165,7 @@ function lum(u){ u=Math.max(0,Math.min(1,u));
 })();
 
 var maxT = VALS[0][1], MODE = "color";
-var LIVE_H = D.height || 0, LIVE_AT = 0, LIVE_MOVED = true;   /* did the last tick move a stake? (a redraw costs 300 rows) */
+var LIVE_H = D.height || 0, LIVE_AT = 0, LIVE_MOVED = true, LIVE_V = 0;   /* did the last tick move a stake? (a redraw costs 300 rows) */
 
 /* ── concentration as a model input ────────────────────────────────────────
    eta and the bonded share are single numbers; concentration is a property of
@@ -174,7 +174,11 @@ var LIVE_H = D.height || 0, LIVE_AT = 0, LIVE_MOVED = true;   /* did the last ti
    within each, so the order never changes - and the TOTAL is preserved, which
    keeps the average validator (and therefore the break-even point) fixed. The
    ADR's own group split is used: 33 / 33 / 34 at N=100. */
-var CG = Math.floor(N/3), CGL = N - 2*CG, CTARGET = null;
+var CTARGET = null;
+/* the thirds are taken over the validators actually drawn (t.length), never over the chain's
+   count N: between rebuilds a validator can join the set before this page has a row for it,
+   and reading past the end of the list made every ratio NaN */
+function thirds(t){ var n = t.length, g = Math.floor(n / 3); return { n: n, g: g, gl: n - 2 * g }; }
 
 /* Reshape by pulling every holding toward the mean by one factor:
      t(lambda) = mean + lambda * (t - mean)
@@ -190,14 +194,14 @@ var CG = Math.floor(N/3), CGL = N - 2*CG, CTARGET = null;
      mean + lambda*A = r * (mean + lambda*B)  ->  lambda = mean*(r-1) / (A - r*B)
 */
 function lambdaFor(r){
-  var t = VALS.map(function(v){ return v[1]; }), i, Hi = 0, Lo = 0;
-  for(i = 0; i < CG; i++) Hi += t[i];
-  for(i = N - CGL; i < N; i++) Lo += t[i];
-  var A = Hi/CG - MEAN, B = Lo/CGL - MEAN, den = A - r*B;
+  var t = VALS.map(function(v){ return v[1]; }), k = thirds(t), i, Hi = 0, Lo = 0;
+  for(i = 0; i < k.g; i++) Hi += t[i];
+  for(i = k.n - k.gl; i < k.n; i++) Lo += t[i];
+  var A = Hi/k.g - MEAN, B = Lo/k.gl - MEAN, den = A - r*B;
   if(!den) return 1;
   var lam = MEAN*(r - 1)/den;
   /* never take a holding below zero: the smallest one sets the ceiling */
-  var tmin = t[N-1];
+  var tmin = t[k.n-1];
   if(tmin < MEAN) lam = Math.min(lam, MEAN/(MEAN - tmin) * 0.999);
   return Math.max(0, lam);
 }
@@ -208,10 +212,10 @@ function shaped(){
   return t.map(function(x){ return MEAN + lam*(x - MEAN); });
 }
 function ratioOf(t){
-  var Hi = 0, Lo = 0, i;
-  for(i = 0; i < CG; i++) Hi += t[i];
-  for(i = N - CGL; i < N; i++) Lo += t[i];
-  return Lo ? (Hi/CG)/(Lo/CGL) : Infinity;
+  var k = thirds(t), Hi = 0, Lo = 0, i;
+  for(i = 0; i < k.g; i++) Hi += t[i];
+  for(i = k.n - k.gl; i < k.n; i++) Lo += t[i];
+  return Lo ? (Hi/k.g)/(Lo/k.gl) : Infinity;
 }
 
 /* What goes INSIDE a cell. The heat fill never changes - the modes add to it
@@ -334,7 +338,7 @@ function fields(e){
     return;
   }
   E("g2").classList.toggle("flat", !heat);
-  E("g2").innerHTML = VALS.map(function(v,i){
+  var g2h = VALS.map(function(v,i){
     var u = byStake ? Math.pow(T[i]/maxT, .55)
                     : (rb[1] ? .08 + .92*Math.pow(Math.max(0, Math.min(1, (ys[i]-rb[0])/rb[1])), .55) : .5);
     /* .08 floor: the three largest sit at or under the 2nd-percentile clip and
@@ -345,12 +349,9 @@ function fields(e){
                   ? (T[i]/D.set.bonded*100).toFixed(2) + '% of stake'
                   : (ys[i]*100).toFixed(1) + '% APR'), flat);
   }).join("");
-  /* The stake-coloured grid is optional now: "% Stake" shows the same ranking on
-     the one grid, so the second strip only renders if the page still has it. */
-  var g1 = E("g1");
-  if(g1) g1.innerHTML = VALS.map(function(v,i){
-    return cell(i, Math.pow(T[i]/maxT,.55), ys[i]*100, v[0] + ' — tap for detail');
-  }).join("");
+  /* a hundred cells are re-parsed only when one of them changed: a tick that moves no
+     figure costs nothing, and the cell the keyboard is on keeps its focus */
+  var g2 = E("g2"); if(g2.__h !== g2h){ g2.__h = g2h; g2.innerHTML = g2h; }
   /* the reservation has done its job the moment there are cells to measure */
   var gw = E("gwrap");
   if(gw && gw.style.aspectRatio !== "auto") gw.style.aspectRatio = "auto";
@@ -635,16 +636,23 @@ function applyLive(d){
   }
   /* A validator can leave or join the bonded set between rebuilds. Dropping one
      we no longer see is safe; adding one we have no moniker for is not, so that
-     waits for the next full rebuild rather than inventing a row. */
-  if(VALS.length !== d.n) moved = true;
+     waits for the next full rebuild rather than inventing a row (the model still
+     counts it: N is the chain's count). A vector that lost half the set is a bad
+     read, not a departure, and drops nothing. */
+  var gone = 0;
+  for(i = 0; i < VALS.length; i++) if(typeof d.v[VALS[i][3]] !== "number") gone++;
+  if(gone && gone < VALS.length / 2){
+    for(i = VALS.length - 1; i >= 0; i--) if(typeof d.v[VALS[i][3]] !== "number") VALS.splice(i, 1);
+    moved = true;
+  }
+  if(d.n !== N) moved = true;
   if(!moved && d.h === LIVE_H) return false;
-  LIVE_H = d.h || LIVE_H; LIVE_AT = Date.now(); LIVE_MOVED = moved;
+  LIVE_H = d.h || LIVE_H; LIVE_AT = Date.now(); LIVE_MOVED = moved; if(moved) LIVE_V++;
   /* rank is stake order, and stake just moved */
   VALS.sort(function(a, b){ return b[1] - a[1]; });
   S = d.s; N = d.n; R = d.r || R;
   MEAN = S / N; BASE = R / S;
   maxT = VALS[0][1];
-  CG = Math.floor(N / 3); CGL = N - 2 * CG;
   LIVE_C = ratioOf(VALS.map(function(v){ return v[1]; }));
   return true;
 }
@@ -669,7 +677,6 @@ function applyData(d){
   D.set = d.set; D.eta = d.eta || D.eta; D.vdetail = d.validators; D.generated = d.generated || D.generated;
   if(!LIVE_AT){ S = d.set.bonded; R = d.set.reward_pool; }     /* a live tick outranks the build */
   N = VALS.length; MEAN = S / N; BASE = R / S; maxT = VALS[0][1];
-  CG = Math.floor(N / 3); CGL = N - 2 * CG;
   LIVE_C = ratioOf(VALS.map(function(v){ return v[1]; }));
   if(window.__setVD) window.__setVD(d.validators);
   return true;
@@ -687,20 +694,12 @@ function render(){
      rather than the chain - the chip beside it keeps the live figure */
   var ct = E("ctop");
   if(ct) ct.textContent = (CTARGET === null ? LIVE_C : CTARGET).toFixed(2) + "\u00d7";
-  Array.prototype.forEach.call(document.querySelectorAll(".chip"), function(b){
-    if(b.dataset.c!==undefined)
-      b.setAttribute("aria-pressed",
-        (CTARGET === null ? +b.dataset.c === 0
-                          : Math.abs(+b.dataset.c/100 - CTARGET) < 1e-9) ? "true" : "false"); });
   /* eta's accent follows the modelled concentration, so dragging C below the
      threshold flips the coefficient from rising to falling in front of you */
   var up = (CTARGET === null ? LIVE_C : CTARGET) >= THRESH;
-  [E("qbtn"), document.querySelector(".echips")].forEach(function(n){
-    if(!n) return;
-    n.classList.toggle("rise", up); n.classList.toggle("fall", !up); });
+  var qb = E("qbtn"); if(qb){ qb.classList.toggle("rise", up); qb.classList.toggle("fall", !up); }
   /* same flag, inverted reading: green is the low-concentration side */
-  [E("cbtn"), document.querySelector(".cchips")].forEach(function(n){
-    if(n) n.classList.toggle("low", !up); });
+  var cb = E("cbtn"); if(cb) cb.classList.toggle("low", !up);
   if(CTARGET === null && cr) cr.value = Math.round(LIVE_C * 100);   /* the handle rides the live tick */
   placeKnob();
   /* Show the ATONE that would be staked at the chosen ratio - the quantity the
@@ -710,12 +709,14 @@ function render(){
   if(st) st.textContent =
     ((raw === 0 ? D.set.bonded : D.set.supply * pct / 100) / 1e12).toFixed(1) + "M";
   fields(e);
-  window.dispatchEvent(new Event("thermo:redraw"));
-  Array.prototype.forEach.call(document.querySelectorAll(".chip"), function(b){
-    if(b.dataset.e!==undefined)
-      b.setAttribute("aria-pressed", (+b.dataset.e===+sl.value)?"true":"false");
-    if(b.dataset.b!==undefined)
-      b.setAttribute("aria-pressed", (+b.dataset.b===+bd.value)?"true":"false"); }); }
+  window.dispatchEvent(new Event("thermo:redraw")); }
+/* a finger or a mouse dragging a handle fires input many times a frame on some devices: one
+   redraw per frame is all anyone can see (an event raised by script still redraws at once) */
+var RQ = false;
+function soon(ev){
+  if(ev && ev.isTrusted === false){ render(); return; }
+  if(RQ) return; RQ = true; requestAnimationFrame(function(){ RQ = false; render(); });
+}
 window.__redraw = render;   /* redraws every derived figure from module state */
 window.__S = function(){ return S; };
 window.__ETA = function(){ return D.eta.now; };      /* the live coefficient, for the wallet's pricing */
@@ -727,31 +728,32 @@ window.__ratio = function(){ return ratioOf(VALS.map(function(v){ return v[1]; }
 window.__thresh = function(){ return +D.thresh || 3; };                                        /* the page's own vector: set, eta, trend, detail */
 window.__LIVEH = function(){ return LIVE_H; };
 window.__LIVEAT = function(){ return LIVE_AT; };
+window.__LIVEV = function(){ return LIVE_V; };       /* counts the ticks that moved a stake */
 /* the height under the name, on every tick */
 (function(){
   function tick(){ var e = document.getElementById("dlive"); if(e && LIVE_H) e.querySelector("b").textContent = LIVE_H.toLocaleString(); }
   window.addEventListener("thermo:live", tick); tick();
 })();
 
-sl.addEventListener("input", render);
+sl.addEventListener("input", soon);
 /* The track and the four buttons write the same hidden field, so neither can get
    out of step with the other. data-b=0 still means "follow the live ratio". */
 var br = E("bondr");
 if(br){
   br.value = Math.round(LIVE_BONDED);
-  br.addEventListener("input", function(){ bd.value = (+br.value === Math.round(LIVE_BONDED)) ? 0 : br.value; render(); });
+  br.addEventListener("input", function(ev){ bd.value = (+br.value === Math.round(LIVE_BONDED)) ? 0 : br.value; soon(ev); });
 }
 /* the concentration track carries hundredths of a multiple, so 1041 is 10.41x */
 var THRESH = +D.thresh || 3;
 var cr = E("concr"), LIVE_C = ratioOf(VALS.map(function(v){ return v[1]; }));
 if(cr){
   cr.value = Math.round(LIVE_C * 100);
-  cr.addEventListener("input", function(){
+  cr.addEventListener("input", function(ev){
     CTARGET = +cr.value / 100;
-    render();
+    soon(ev);
   });
 }
-if(bd.addEventListener) bd.addEventListener("input", render);
+if(bd.addEventListener) bd.addEventListener("input", soon);
 /* ── the what-if strip ───────────────────────────────────────────────────────
    No chips: every value is on the track. A white tick marks the chain as it is
    (it moves with the live feed); a handle within one step of it snaps home. The
@@ -1047,6 +1049,16 @@ rememberGridH();
     pingTick();
     pingTimer = setInterval(pingTick, 9000);
   }
+  /* a block never changes once made: each height's signers are read once and kept (the last
+     few dozen), so a tick fetches only the heights new since the last one - usually one or
+     two - and a second card opens on a strip already known */
+  var PCACHE = {};
+  function signersOf(b){
+    var lc = b && b.result && b.result.block && b.result.block.last_commit, sigs = lc && lc.signatures;
+    if(!sigs) return null;
+    var on = {}; for(var i = 0; i < sigs.length; i++) if(sigs[i].block_id_flag === 2) on[sigs[i].validator_address] = 1;
+    return { h: lc.height, on: on };
+  }
   function pingTick(){
     var addr = pingAddr;
     if(!addr || pingBusy) return;
@@ -1054,40 +1066,37 @@ rememberGridH();
     fetch("/rpc/status", { cache: "no-store" })
       .then(function(r){ return r.json(); })
       .then(function(j){
-        var head = Number(j.result.sync_info.latest_block_height);
-        var hs = [];
-        for(var i = PING_N - 1; i >= 0; i--) hs.push(head - i);
+        var head = Number(j.result.sync_info.latest_block_height), hs = [], i;
+        for(i = PING_N - 1; i >= 0; i--) hs.push(head - i);
+        for(var k in PCACHE) if(+k < head - 3 * PING_N) delete PCACHE[k];
         return Promise.all(hs.map(function(h){
+          if(PCACHE[h] !== undefined) return PCACHE[h];
           return fetch("/rpc/block?height=" + h, { cache: "no-store" })
             .then(function(r){ return r.json(); })
+            .then(function(b){ var v = signersOf(b); if(v) PCACHE[h] = v; return v; })
             .catch(function(){ return null; });
         }));
       })
-      .then(function(blocks){
+      .then(function(rows){
         if(pingAddr !== addr) return;            // card changed mid-flight
         var el = E("ubping"); if(!el) return;
         el.innerHTML = "";
         var top = "";
-        blocks.forEach(function(b, k){
+        rows.forEach(function(r, k){
           var el2 = document.createElement("b");
-          var lc = b && b.result && b.result.block && b.result.block.last_commit;
-          var sigs = (lc && lc.signatures) || null;
           el2.style.height = "100%";
-          if(!sigs){
+          if(!r){
             el2.className = "n";
             el2.title = "no commit";
           } else {
-            var signed = false;
-            for(var i = 0; i < sigs.length; i++){
-              if(sigs[i].validator_address === addr && sigs[i].block_id_flag === 2){ signed = true; break; }
-            }
+            var signed = !!r.on[addr];
             if(!signed) el2.className = "z";
             /* the newest column is marked so the strip visibly advances: every
                block signed looks identical otherwise, and a live view that never
                changes reads as a frozen picture */
-            else if(k === blocks.length - 1) el2.className = "tip";
-            if(lc.height) top = lc.height;
-            el2.title = (lc.height || "") + (signed ? " — signed" : " — missed");
+            else if(k === rows.length - 1) el2.className = "tip";
+            if(r.h) top = r.h;
+            el2.title = (r.h || "") + (signed ? " — signed" : " — missed");
           }
           el.appendChild(el2);
         });
@@ -1121,45 +1130,6 @@ rememberGridH();
 })();
 
 
-/* The page is a static file rebuilt on a timer, so the height baked into it is
-   as old as the last build. The node's RPC is the SAME ORIGIN as this page, so
-   poll it and show the real head - a beating "live" dot beside a number that is
-   twelve minutes stale is a lie. Everything else on the page stays as-built,
-   which is what the dot below reports on. */
-(function(){
-  var el = E("hgt"); if(!el || !window.fetch) return;
-  function tick(){
-    fetch("/rpc/status", { cache: "no-store" })
-      .then(function(r){ return r.json(); })
-      .then(function(j){
-        var h = j && j.result && j.result.sync_info &&
-                j.result.sync_info.latest_block_height;
-        if(h) el.textContent = Number(h).toLocaleString("en-US");
-      })
-      .catch(function(){ /* a missed poll just leaves the last good number */ });
-  }
-  tick();
-  setInterval(tick, 10000);
-})();
-
-/* Live dot. Green and beating while the data is within one rebuild cycle; amber and
-   still once it is not. A dot that is always green is decoration - this one is the
-   same signal as the footer timestamp, which is what stops advancing if collect.py
-   starts refusing to publish. */
-(function(){
-  var d = E("dot"), gen = D.generated;
-  if(!d || !gen) return;
-  function tick(){
-    var age = (Date.now() - Date.parse(gen)) / 60000;      // minutes
-    var stale = age > 20;                                   // 15 min cycle + 5 min cache
-    d.className = "dot" + (stale ? " stale" : "");
-    d.title = stale
-      ? "data is " + Math.round(age) + " min old - the rebuild may have stopped"
-      : "live - rebuilt " + Math.round(age) + " min ago";
-  }
-  tick(); setInterval(tick, 30000);
-})();
-
 })();
 
 /* ── the page buttons ───────────────────────────────────────────────────────
@@ -1180,7 +1150,7 @@ rememberGridH();
       for(var j = 0; j < C.sections[i].sub.length; j++) if(C.sections[i].sub[j].id === k[1]) return C.sections[i].sub[j];
     return null;
   }
-  function pick(k){
+  function setTab(k){
     document.documentElement.setAttribute("data-tab", k);
     title();
     try{ localStorage.setItem("th_tab", k); }catch(e){}
@@ -1209,13 +1179,18 @@ rememberGridH();
     if(well){ well.style.setProperty("--acc", acc); well.style.borderColor = acc + "66"; }
     title();
   }
+  /* one switch at a time: every change of pane takes a ticket, and a fade still running for an
+     older one lands nothing - a quick Dashboard-then-Staking must not end on the dashboard */
+  var FLIP = 0;
+  function pick(k){ FLIP++; if(calc) calc.classList.remove("fade"); setTab(k); }
   function goSection(k){
-    var cur = root.getAttribute("data-tab") || "home";
-    if(cur === k) return;
-    var after = function(){ pick(k); state(); if(k === "dele" && window.__planDraw) window.__planDraw(); };
+    var tok = ++FLIP, cur = root.getAttribute("data-tab") || "home";
+    if(cur === k){ if(calc) calc.classList.remove("fade"); return; }   /* back before the last one landed */
+    var after = function(){ setTab(k); state(); if(k === "dele" && window.__planDraw) window.__planDraw(); };
     if(!calc || getComputedStyle(calc).transitionDuration === "0s"){ after(); return; }
     var done = false, finish = function(){
       if(done) return; done = true; calc.removeEventListener("transitionend", finish);
+      if(tok !== FLIP) return;
       after();
       calc.classList.remove("fade"); calc.classList.add("fadein"); void calc.offsetWidth; calc.classList.remove("fadein");
     };
@@ -1402,7 +1377,7 @@ rememberGridH();
    type stay crisp at any zoom instead of going soft. */
 (function(){
   var E = function(i){ return document.getElementById(i); };
-  var src = E("trend"), pop = E("gpop"), big = E("trendbig"), rst = E("gzreset");
+  var src = E("trend"), pop = E("gpop"), big = E("trendbig");
   if(!src || !pop || !big) return;
   var V0 = [0, 0, 900, 300], vb = V0.slice(), MINW = 90;
 
@@ -1419,7 +1394,6 @@ rememberGridH();
   src.addEventListener("click", open);
   src.addEventListener("keydown", function(ev){
     if(ev.key === "Enter" || ev.key === " "){ ev.preventDefault(); open(); } });
-  if(rst) rst.addEventListener("click", reset);
 
   function dist(t){ return Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY); }
   function mid(t){ return [(t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2]; }
@@ -1848,7 +1822,6 @@ rememberGridH();
     /* the tiles carry the whole figure, to the micro-ATONE */
     if(bl) bl.textContent = b ? exact(b.uatone) : "—";
     if(st) st.textContent = exact(pos.total);
-    var mn = E("dminen"); if(mn) mn.textContent = pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s");
     if(rw){ rw.textContent = window.__REW != null ? exact(window.__REW) : "—"; rw.className = window.__REW > 0 ? "ok" : ""; }
     if(mv){ mv.textContent = pos.free > 0 ? exact(pos.free, 2) : "0"; mv.title = pos.free > 0 ? exact(pos.free) + " ATONE can move" : "nothing can move until the cooldown ends"; mv.className = pos.free > 0 ? "" : "warn";
       var mxb = E("amtmax"); if(mxb) mxb.disabled = !(pos.free > 0); }
@@ -1890,7 +1863,7 @@ rememberGridH();
   /* ── the list: every validator that would earn more, a page at a time; a
      tick builds the plan, a ticked row carries what it would get ── */
   function picks(opt, r, B, pos){
-    var el = E("dpicks"), cap = E("dcap"); if(!el) return;
+    var el = E("dpicks"); if(!el) return;
     var sel = chosen(opt);
     var now = pos ? pos.rate : 0;
     /* without a wallet the chip is invisible but keeps its slot, so the field and the
@@ -1899,7 +1872,6 @@ rememberGridH();
        slot invisibly so the field and the button never move */
     /* the count line ("N validators earn a higher APR") is gone from the page; the rows
        say it themselves (a lower-paying row shows its rate in red) */
-    if(cap) cap.hidden = true;
     var slice = opt;
     if(!opt.length){ el.innerHTML = ""; return; }
     var by = {}; r.moves.forEach(function(m){ by[m.id] = m; });
@@ -2064,10 +2036,6 @@ rememberGridH();
       r.rate = earned / B;
     }
     stats(pos);
-    var sk = E("dstack");
-    if(sk){ sk.innerHTML = pos ? pos.rows.slice().sort(function(a, b){ return b.x - a.x; }).map(function(rw){
-      var d = window.__VDBY && window.__VDBY[rw.id], hue = 0; for(var q = 0; q < rw.m.length; q++) hue = (hue * 31 + rw.m.charCodeAt(q)) % 360;
-      return '<i class="' + (rw.locked > 0 ? 'hld' : '') + '" style="width:' + (rw.x / pos.total * 100).toFixed(2) + '%;background:hsl(' + hue + ',48%,52%)" title="' + att(rw.m) + ', ' + fmt(rw.x) + ' ATONE, ' + Math.round(rw.x / pos.total * 100) + '%"></i>'; }).join("") : ""; }
     var a = E("dmy"), c = E("dstrat");
     if(a) a.innerHTML = myRows(pos, V);
     var mv = movesPanel(pos, V, r);                /* first: the list shows each tick's gain */
@@ -2144,14 +2112,17 @@ rememberGridH();
     fee.textContent = "fee: estimating…"; step.textContent = ""; step.className = "txstep";
     sign.disabled = false; sign.textContent = "Redelegate";
     POP.open(txpop);
-    /* a first pass estimates the fee so the reader sees it before signing */
+    /* a first pass estimates the fee so the reader sees it before signing; an answer for an
+       earlier opening of the card (another plan) is dropped */
+    var tok = ++TXS;
     if(window.__TX && window.__WALLET){
       window.__TX.account(window.__ADDR).then(function(acc){
         return window.__TX.simulate(msgs, "", window.__WALLET.pubKey, acc.sequence); })
-      .then(function(g){ var f = window.__TX.feeFor(g, msgs.length); fee.textContent = "fee ≈ " + (parseInt(f.amount[0].amount, 10) / 1e6).toFixed(3) + " PHOTON, gas " + f.gas.toLocaleString(); })
-      .catch(function(e){ fee.textContent = "the node could not simulate it: " + att(e.message || e); });
+      .then(function(g){ if(tok !== TXS) return; var f = window.__TX.feeFor(g, msgs.length); fee.textContent = "fee ≈ " + (parseInt(f.amount[0].amount, 10) / 1e6).toFixed(3) + " PHOTON, gas " + f.gas.toLocaleString(); })
+      .catch(function(e){ if(tok !== TXS) return; fee.textContent = "the node could not simulate it: " + String(e && e.message || e); });
     }
   };
+  var TXS = 0;
   var txsign = E("txsign"), txcancel = E("txcancel");
   if(txcancel) txcancel.addEventListener("click", function(){ POP.close(txpop); });
   /* the flow: the button spins, the notify at the top right spins with it until the
@@ -2168,6 +2139,22 @@ rememberGridH();
     .catch(function(e){ n.fail(e && e.message || String(e)); })
     .then(function(){ txsign.disabled = false; txsign.classList.remove("busy"); });
   });
+  /* the network fee for a card, estimated once its terms settle rather than on every
+     keystroke; an answer for terms that have changed since is dropped. get() returns the
+     messages; without it any estimate still in flight is dropped */
+  var FEEQ = {};
+  function feeSoon(key, el, get){
+    var q = FEEQ[key] || (FEEQ[key] = { n: 0, t: 0 }), n = ++q.n, w = window.__WALLET;
+    clearTimeout(q.t);
+    if(!get || !w || !window.__TX || !el) return;
+    el.textContent = "fee: estimating\u2026";
+    q.t = setTimeout(function(){
+      var msgs = get(); if(!msgs || !msgs.length || n !== q.n) return;
+      window.__TX.account(w.address).then(function(acc){ return window.__TX.simulate(msgs, "", w.pubKey, acc.sequence); }).catch(function(){ return 0; })
+        .then(function(g){ if(n !== q.n) return; var f = window.__TX.feeFor(g, msgs.length);
+          el.textContent = "fee \u2248 " + (parseInt(f.amount[0].amount, 10) / 1e6).toFixed(3) + " PHOTON, gas " + f.gas.toLocaleString(); });
+    }, 350);
+  }
   /* ── unstake: one validator, an amount up to what sits there, one MsgUndelegate ──
      Undelegating is allowed even while a delegation is in its redelegation cooldown;
      the ATONE then unbonds for 21 days, earning nothing, before it is liquid. */
@@ -2202,12 +2189,7 @@ rememberGridH();
     if(lk) lk.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
       '<span>Unstaked ATONE unbonds for <b>21 days</b>, until <b>' + window.__day(until.getTime()) + '</b>, and earns nothing meanwhile</span>';
     E("unfee").textContent = ""; var st = E("unstep"); st.textContent = ""; st.className = "txstep";
-    if(ok && window.__TX && window.__WALLET){
-      var w = window.__WALLET, msgs = unMsgs(), fee = E("unfee");
-      fee.textContent = "fee: estimating\u2026";
-      window.__TX.account(w.address).then(function(acc){ return window.__TX.simulate(msgs, "", w.pubKey, acc.sequence); }).catch(function(){ return 0; })
-        .then(function(g){ if(unAmount() !== u) return; var f = window.__TX.feeFor(g, msgs.length); fee.textContent = "fee \u2248 " + (parseInt(f.amount[0].amount, 10) / 1e6).toFixed(3) + " PHOTON, gas " + f.gas.toLocaleString(); });
-    }
+    feeSoon("un", E("unfee"), ok ? unMsgs : null);
   }
   function unMsgs(){
     var r = unRow(), u = unAmount(), VD = window.__VDBY || {}, pos = window.__POS;
@@ -2235,6 +2217,7 @@ rememberGridH();
   });
   var unamtEl = E("unamt"); if(unamtEl) unamtEl.addEventListener("input", unState);
   var unmax = E("unmax"); if(unmax) unmax.addEventListener("click", function(){ var r = unRow(); if(!r) return; E("unamt").value = exact(r.x); unState(); });
+  if(unpop) unpop.__onclose = function(){ feeSoon("un"); };
   var uncancel = E("uncancel"); if(uncancel) uncancel.addEventListener("click", function(){ POP.close(unpop); });
   var unsign = E("unsign");
   if(unsign) unsign.addEventListener("click", function(){
@@ -2302,12 +2285,7 @@ rememberGridH();
     if(lk) lk.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
       '<span>Staked ATONE earns from the next block; locked; unbonding takes <b>21 days</b>.</span>';
     E("stfee").textContent = ""; var st = E("ststep"); st.textContent = ""; st.className = "txstep";
-    if(ok && window.__TX && window.__WALLET){
-      var w = window.__WALLET, msgs = stMsgs(), fee = E("stfee");
-      fee.textContent = "fee: estimating\u2026";
-      window.__TX.account(w.address).then(function(acc){ return window.__TX.simulate(msgs, "", w.pubKey, acc.sequence); }).catch(function(){ return 0; })
-        .then(function(g){ if(stAmount() !== P.u) return; var f = window.__TX.feeFor(g, msgs.length); fee.textContent = "fee \u2248 " + (parseInt(f.amount[0].amount, 10) / 1e6).toFixed(3) + " PHOTON, gas " + f.gas.toLocaleString(); });
-    }
+    feeSoon("st", E("stfee"), ok ? stMsgs : null);
   }
   var stbtn = E("stbtn");
   if(stbtn) stbtn.addEventListener("click", function(){
@@ -2319,6 +2297,7 @@ rememberGridH();
   var stamtEl = E("stamt"); if(stamtEl) stamtEl.addEventListener("input", function(){ stRows(); stState(); });
   var stmax = E("stmax"); if(stmax) stmax.addEventListener("click", function(){ if(!(stBal() > 0)) return; E("stamt").value = exact(stBal()); stRows(); stState(); });
   var stcancel = E("stcancel"); if(stcancel) stcancel.addEventListener("click", function(){ POP.close(stpop); });
+  if(stpop) stpop.__onclose = function(){ feeSoon("st"); };
   var stsign = E("stsign");
   if(stsign) stsign.addEventListener("click", function(){
     var msgs = stMsgs(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
@@ -2343,7 +2322,7 @@ rememberGridH();
   /* the validators the grant may use, chosen in this card - apart from the Redelegate list's
      selection (that is where stake moves now; this is where the keeper may move it later) -
      and the card's own view: a standing grant shows its terms until "Change" */
-  var ATSEL = {}, AT_EDIT = false, AT_FIND = "", AT_FLT = "all", AT_OPEN = 0, AT_SIM = 0, AT_SIMT = 0;
+  var ATSEL = {}, AT_EDIT = false, AT_FIND = "", AT_FLT = "all", AT_OPEN = 0;
   function atStatus(){
     return fetch("keeper/_status.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
       AT.addr = j && j.grantee ? j.grantee : null; AT.dry = !j || j.dry !== false; AT.fee_pct = j && j.fee_pct ? +j.fee_pct : 0; AT.fee_to = j && j.fee_to ? j.fee_to : null;
@@ -2530,17 +2509,7 @@ rememberGridH();
       if(sl > 0) feeEl.innerHTML = "<b>" + AT.split_pct + "%</b> of restaked rewards go to GATA - allows sending up to <b>" + fmt(sl) + " ATONE</b> to GATA over " + atMonths() + ".";
       else if(fee > 0) feeEl.innerHTML = "Service fee <b>" + fmt(fee) + " ATONE</b> - " + AT.fee_pct + "% of the projected gain for " + atMonths() + ", paid with the grant in the same signature."; }
     var fe = E("attxfee"), st = E("atstep"); fe.textContent = ""; st.textContent = ""; st.className = "txstep";
-    /* the network fee, estimated once the terms settle rather than on every keystroke;
-       an answer that arrives after the terms changed again is dropped */
-    clearTimeout(AT_SIMT); var seq = ++AT_SIM;
-    if(ok && window.__TX && window.__WALLET){
-      var w = window.__WALLET; fe.textContent = "fee: estimating…";
-      AT_SIMT = setTimeout(function(){
-        var msgs = atMsgs(); if(!msgs.length || seq !== AT_SIM) return;
-        window.__TX.account(w.address).then(function(acc){ return window.__TX.simulate(msgs, "", w.pubKey, acc.sequence); }).catch(function(){ return 0; })
-          .then(function(g){ if(seq !== AT_SIM) return; var f = window.__TX.feeFor(g, msgs.length); fe.textContent = "fee ≈ " + (parseInt(f.amount[0].amount, 10) / 1e6).toFixed(3) + " PHOTON, gas " + f.gas.toLocaleString(); });
-      }, 350);
-    }
+    feeSoon("at", fe, ok ? atMsgs : null);
   }
   function atRefresh(){ atRows(); atState(); }
   /* a standing grant, read back into the card: its list, its cap, its restake */
@@ -2587,7 +2556,7 @@ rememberGridH();
       if(!!AT.grant !== had){ AT_EDIT = false; if(AT.grant){ atFromGrant(); AT_FLT = "sel"; } }
       atShow(); });
   });
-  if(atpop) atpop.__onclose = function(){ AT_EDIT = false; AT_OPEN++; AT_SIM++; clearTimeout(AT_SIMT); };
+  if(atpop) atpop.__onclose = function(){ AT_EDIT = false; AT_OPEN++; feeSoon("at"); };
   var atcapEl = E("atcap"); if(atcapEl) atcapEl.addEventListener("input", atState);
   var atmax = E("atmax"); if(atmax) atmax.addEventListener("click", function(){ var pos = window.__POS; if(!pos || !(pos.free > 0)) return; E("atcap").value = exact(pos.free); atState(); });
   Array.prototype.forEach.call(document.querySelectorAll("#atpop input[name=atstrat],#atpop input[name=atpick]"), function(r){ r.addEventListener("change", atRefresh); });
@@ -2709,17 +2678,6 @@ rememberGridH();
     restake: (AT.grants || []).some(function(x){ return grantType(x) === DELEG; }) }; };
   window.__planDraw = draw;
   draw();
-  /* the wallet's two tabs: my stake, my governance (empty for now) */
-  Array.prototype.forEach.call(document.querySelectorAll(".wtabs .wk-tab"), function(b){
-    b.addEventListener("click", function(){
-      Array.prototype.forEach.call(document.querySelectorAll(".wtabs .wk-tab"), function(o){
-        var on = o === b; o.classList.toggle("on", on); o.setAttribute("aria-selected", on ? "true" : "false"); });
-      var gov = b.dataset.wt === "gov", connected = !!window.__POS;
-      var wb = E("wbody"), wg = E("wgovbody");
-      if(wb) wb.hidden = gov || !connected;
-      if(wg) wg.hidden = !gov || !connected;
-    });
-  });
 
 })();
 
@@ -2876,7 +2834,7 @@ rememberGridH();
       wcpT = setTimeout(function(){ wcp.classList.remove("done"); wcp.title = "Copy address"; }, 1400); });
   });
   function disconnect(){
-    CONN++;
+    CONN++; SEEN = null;
     if(window.__onPos){ var f0 = window.__onPos; window.__onPos = null; f0(); }
     window.__ADDR = null; window.__POS = null; window.__REDS = null; window.__MINE = null; window.__LOCKNOTE = "";
     window.__DELS = null; window.__WALLET = null; window.__BAL = null;
@@ -2886,7 +2844,7 @@ rememberGridH();
     document.documentElement.removeAttribute("data-wallet");
     var wa = E("waddr"); if(wa){ wa.hidden = true; wa.classList.remove("done"); }
     var ab0 = E("atbtn"); if(ab0) ab0.classList.remove("on"); var ap0 = E("wkap"); if(ap0) ap0.hidden = true;
-    var blk0 = E("wblk"); if(blk0) blk0.hidden = true; var rf0 = E("wrefresh"); if(rf0) rf0.hidden = true;
+    var rf0 = E("wrefresh"); if(rf0) rf0.hidden = true;
     busy(false);
     var wn = E("wname"); if(wn) wn.textContent = "Wallet";
     if(window.__atDoor) window.__atDoor();          /* no wallet: nothing of the last one's grant stays */
@@ -2906,7 +2864,7 @@ rememberGridH();
   /* one connection at a time: every connect (and a disconnect) takes a new ticket, and a read
      still in flight for an older ticket is dropped - a slow answer for the last account, or
      for a wallet since disconnected, must never land on the page */
-  var CONN = 0, STALE = new Error("stale");
+  var CONN = 0, STALE = new Error("stale"), SEEN = null;
   function connect(chosen){
     var ps = providers(), w = null, tok;
     if(CHOSEN){ for(var i = 0; i < ps.length; i++) if(ps[i].name === CHOSEN) w = ps[i]; }
@@ -2971,6 +2929,7 @@ rememberGridH();
       })
       .then(function(bl){
         live();
+        var fresh = SEEN !== window.__ADDR; SEEN = window.__ADDR;
         window.__BAL = { uatone: 0, uphoton: 0 };
         (bl.balances || []).forEach(function(c){ if(c.denom in window.__BAL) window.__BAL[c.denom] = parseInt(c.amount, 10); });
         var rd = { redelegation_responses: window.__REDS };
@@ -2982,7 +2941,7 @@ rememberGridH();
         if(window.__redraw) window.__redraw();
         try{ localStorage.setItem("th_wallet", w.name); }catch(e){}
         document.documentElement.setAttribute("data-wallet", w.name);
-        var blk1 = E("wblk"); if(blk1) blk1.hidden = false; var rf1 = E("wrefresh"); if(rf1) rf1.hidden = false; busy(false);
+        var rf1 = E("wrefresh"); if(rf1) rf1.hidden = false; busy(false);
         var acct = E("wk-acct");
         if(acct) acct.hidden = false;
         /* the name whole, and an eight-letter form with two dots for a phone */
@@ -3001,10 +2960,9 @@ rememberGridH();
                          "<span class=ap>\u2026" + att(window.__ADDR.slice(-4)) + "</span>" + COPYG;
           wa.title = "Copy address"; }
         if(amt && p.free > 0){
-          /* the field starts empty behind its placeholder; max fills it on demand */
-          amt.value = "";
-          Array.prototype.forEach.call(document.querySelectorAll(".amtchips .chip"),
-            function(o){ o.setAttribute("aria-pressed", "false"); });
+          /* the field starts empty behind its placeholder for a new wallet; a refresh of the
+             same one keeps what the reader typed */
+          if(fresh) amt.value = "";
         } else if(amt && p.total > 0){
           /* every ATONE is mid-redelegation: a plan here could not be signed at
              all, so show the release date rather than a number nobody can act on */

@@ -2213,7 +2213,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 /* the chain's height under the name, ending where the name ends */
 .bw{position:relative;display:flex;align-items:center}
 .bheight{position:absolute;right:0;top:100%;margin-top:1px}
-.bheight{display:inline-flex;align-items:center;justify-content:flex-end;min-width:9ch;gap:5px;font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;color:var(--ink3);line-height:1;font-variant-numeric:tabular-nums}
+.bheight{display:inline-flex;align-items:center;justify-content:flex-end;min-width:9ch;gap:5px;font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;color:#7c7aa3;line-height:1;font-variant-numeric:tabular-nums}
 .bheight i{width:4px;height:4px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green)}
 .bheight b{font-weight:400}
 .wordmark{padding-top:0}
@@ -3487,6 +3487,13 @@ text-transform:uppercase;padding:8px 12px;border-radius:8px;cursor:pointer;white
 .sv-screen[data-sc=net] .sv-big{font-size:23px}
 .sv-list .sv-tbl td{padding-top:6px;padding-bottom:6px}
 .sv-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px;min-width:760px}
+/* the phone's own four columns: fixed widths, the name cell takes the rest and ellipsises */
+.sv-tbl.ph{min-width:0;table-layout:fixed}
+.sv-tbl.ph th,.sv-tbl.ph td{padding-left:6px;padding-right:6px}
+.sv-tbl.ph th:first-child,.sv-tbl.ph td:first-child{padding-left:8px}
+.sv-tbl.ph th:last-child,.sv-tbl.ph td:last-child{padding-right:8px}
+.sv-tbl.ph td.l{overflow:hidden}
+.sv-tbl.ph .sv-nm .tx i{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sv-tbl th{font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);font-weight:400;
 text-align:right;padding:9px 10px;background:var(--wi);border-top:1px solid var(--wbd);border-bottom:1px solid var(--wbd);white-space:nowrap}
 .sv-tbl th:first-child,.sv-tbl th.l{text-align:left}
@@ -3813,7 +3820,7 @@ color:var(--ink2);font:inherit;font-family:var(--sans);font-size:12px;font-weigh
 /* a section with twice the usual views: named groups on one line, a hairline between */
 .l2.split{align-items:flex-end;gap:12px}
 .l2g{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
-.l2gl{font-family:var(--mono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);padding-left:10px;line-height:1}
+.l2gl{font-family:var(--mono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:#7c7aa3;padding-left:10px;line-height:1}
 .l2div{align-self:stretch;width:.5px;background:var(--edge2)}
 /* label and track share the 50px title line: the pills there run a little smaller */
 .l2.split .l2trk{padding:2px}

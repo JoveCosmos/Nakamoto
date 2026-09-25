@@ -132,12 +132,14 @@
       '</div>');
   }
   /* Pricing the plan runs the whole optimiser and two quiet redraws of the
-     advanced pane, so it is done once per block tick - the only thing that can
-     change the answer - and read from cache in between. */
+     advanced pane, so it is done once per change that can move the answer and
+     read from cache in between. */
   var PC = { key: null, val: null };
   function planNow(pos){
     if(!pos || !(pos.free > 0) || !window.__optPlan) return null;
-    var key = pos.total + "/" + pos.free + "/" + (window.__LIVEH ? window.__LIVEH() : 0);
+    /* the answer changes only when a stake moves (anyone's) or the reader's position is re-read -
+       not on every block */
+    var key = pos.total + "/" + pos.free + "/" + (window.__LIVEV ? window.__LIVEV() : 0) + "/" + (window.__POSAT || 0);
     if(PC.key !== key){ PC.key = key; PC.val = window.__optPlan(false); }
     return PC.val;
   }
@@ -434,6 +436,8 @@
 
   /* every figure follows the dashboard's own redraw, and the height ticks on its own */
   window.addEventListener("thermo:draw", schedule);
+  /* a turned phone gets the other table markup at once, not at the next block */
+  var rzT = 0; window.addEventListener("resize", function(){ clearTimeout(rzT); rzT = setTimeout(schedule, 150); });
   window.addEventListener("thermo:live", schedule);
   setInterval(function(){ if(root.getAttribute("data-ui") === "simple" && screen() === "over") schedule(); }, 15000);
   render();

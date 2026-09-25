@@ -215,11 +215,13 @@ function waitFor(hash, tries){
     return call("GET", "/cosmos/tx/v1beta1/txs/" + hash).then(function(d){
       var tr = d.tx_response || {};
       if(tr.height && tr.height !== "0"){
-        if(tr.code && tr.code !== 0) throw new Error("failed in block " + tr.height + ": " + (tr.raw_log || tr.code));
+        /* in a block but failed there: that is the answer, not a reason to keep asking */
+        if(tr.code && tr.code !== 0){ var bad = new Error("failed in block " + tr.height + ": " + (tr.raw_log || tr.code)); bad.final = true; throw bad; }
         return { hash: hash, height: tr.height, gasUsed: tr.gas_used };
       }
       throw new Error("not yet");
     }).catch(function(e){
+      if(e && e.final) throw e;
       if(tries < 20) return waitFor(hash, tries + 1);
       throw new Error("still pending after a minute: " + hash);
     });
