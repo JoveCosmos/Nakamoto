@@ -1842,9 +1842,19 @@ rememberGridH();
   }
 
   /* ── the delegations, a page at a time ── */
+  var HEAD2 = '<table><colgroup><col style="width:30px"><col><col style="width:80px"><col style="width:50px"><col style="width:56px"></colgroup>' +
+    '<thead><tr><th class=c>rank</th><th class=l>validator</th><th>ATONE</th><th>APR</th><th>rewards</th></tr></thead><tbody>';
   function myRows(pos, V){
     var pn = E("dmyn");
-    if(!pos) return "";
+    /* no wallet: the section keeps its shape - the same table, waiting - rather than
+       a door, because the door is in the bar above */
+    if(!pos){
+      if(pn) pn.textContent = ""; pager(E("dmypg"), 0, 0, LPS, "l");
+      var sk = HEAD2, q;
+      for(q = 0; q < 5; q++) sk += '<tr class=skel><td class="c rk"><b></b></td><td class="l nm"><b style="width:' +
+        (54 + (q % 3) * 12) + '%"></b></td><td class=amt><b></b></td><td><b></b></td><td class=rw><b></b></td></tr>';
+      return sk + '</tbody></table>';
+    }
     if(!pos.rows.length){ if(pn) pn.textContent = ""; pager(E("dmypg"), 0, 0, LPS, "l"); return empty("No stake on AtomOne"); }
     var rows = pos.rows.slice().sort(function(a, b){ return b.x - a.x; }), h = "", k;
     if(pn) pn.textContent = rows.length + " validator" + (rows.length === 1 ? "" : "s");
@@ -2725,8 +2735,8 @@ rememberGridH();
     var ab0 = E("atbtn"); if(ab0) ab0.classList.remove("on"); var ap0 = E("wkap"); if(ap0) ap0.hidden = true;
     box.hidden = true; if(dis) dis.hidden = true; var blk0 = E("wblk"); if(blk0) blk0.hidden = true; var rf0 = E("wrefresh"); if(rf0) rf0.hidden = true;
     btn.disabled = false; btn.querySelector("span").textContent = "Connect wallet"; btn.hidden = false; if(pick) pick.hidden = true; chooser(true);
-    var gate = E("wgate"), acct = E("wk-acct"); if(gate) gate.hidden = false; if(acct) acct.hidden = true;
-    var wn = E("wname"); if(wn) wn.textContent = "My wallet";
+    var gate = E("wgate"), acct = E("wk-acct"); if(gate) gate.hidden = true; if(acct) acct.hidden = false;
+    var wn = E("wname"); if(wn) wn.textContent = "Wallet";
     var wm = E("wmark"); if(wm) wm.hidden = true;
     var fwn = E("fwn"); if(fwn) fwn.textContent = "Dashboard";
     if(window.__redraw) window.__redraw();

@@ -83,3 +83,10 @@
   html[data-theme=light]:not([data-mono]) #sv .sv-btn.w i,html[data-theme=light]:not([data-mono]) #sv .sv-empty,html[data-theme=light]:not([data-mono]) #sv .sv-sep{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) #sv .sv-find::placeholder{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) #sv .sv-nm span.lg{color:#fff}
+
+  /* the dashboard's sub-header sits outside #sv (it is the window's own row), so the
+     same floors are named for it: colour only, the sizes are the night sheet's */
+  html[data-theme=light]:not([data-mono]) #svbar .sv-bw i,html[data-theme=light]:not([data-mono]) #svbar .sv-chain,
+  html[data-theme=light]:not([data-mono]) #svbar .sv-tab,html[data-theme=light]:not([data-mono]) #svbar .sv-menu .mh,
+  html[data-theme=light]:not([data-mono]) #svbar .sv-menu .ma,html[data-theme=light]:not([data-mono]) #svbar .sv-menu .mi i,
+  html[data-theme=light]:not([data-mono]) #svbar .sv-menu .mi:disabled{color:var(--muted)}

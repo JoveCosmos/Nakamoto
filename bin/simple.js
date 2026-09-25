@@ -55,15 +55,6 @@
   }
 
   /* ── OVERVIEW ───────────────────────────────────────────────────────────── */
-  function connectRow(){
-    var have = {};
-    (window.__wproviders ? window.__wproviders() : []).forEach(function(p){ have[p.name] = 1; });
-    return ["Keplr", "Adena"].filter(function(n){ return !(PHONE && n !== "Keplr"); }).map(function(n){
-      return '<button class="sv-btn pri w" type=button data-w="' + n + '"' + (have[n] ? "" : ' disabled') + '>' +
-        '<img src="assets/wallet-' + n.toLowerCase() + '.svg" alt="">' + n +
-        (have[n] ? "" : '<i>not installed</i>') + '</button>';
-    }).join("");
-  }
 
   function drawOver(){
     var pos = window.__POS, S = setStats();
@@ -81,9 +72,8 @@
     var h = "";
     if(!pos){
       h = '<div class=sv-ph><h3>Your stake, in one screen</h3></div>' +
-          '<div class=sv-note>Connect a wallet to see what your stake earns, and what it would earn better placed. ' +
-          'Nothing leaves your wallet: every move is a transaction you sign yourself.</div>' +
-          '<div class=sv-tools>' + connectRow() + '</div>';
+          '<div class=sv-note>Connect a wallet in the bar above to see what your stake earns, and what it would earn better ' +
+          'placed. Nothing leaves your wallet: every move is a transaction you sign yourself.</div>';
     } else if(!pos.rows.length){
       h = '<div class=sv-ph><h3>No stake on AtomOne yet</h3></div>' +
           '<div class=sv-note>Stake ATONE with a validator and this screen fills in: what it earns, what it could earn, and where it sits.</div>' +
@@ -115,7 +105,12 @@
 
     /* where the stake sits now */
     var al = E("sv-allocp");
-    if(!pos || !pos.rows.length){ al.hidden = true; }
+    if(!pos){
+      /* no wallet: the section keeps its shape, like the wallet pane in the other view */
+      al.hidden = false;
+      al.innerHTML = '<div class=sv-ph><h3>Where your stake sits</h3></div>' + skelAlloc();
+    }
+    else if(!pos.rows.length){ al.hidden = true; }
     else {
       al.hidden = false;
       al.innerHTML = '<div class=sv-ph><h3>Where your stake sits</h3>' +
@@ -131,7 +126,6 @@
       '<div class=sv-rt>' +
         (pos ? '<button class="sv-btn sml" type=button data-act=refresh>Refresh</button>' : "") +
         '<button class="sv-btn sml" type=button data-s=auto>Autopilot</button>' +
-        (pos ? '<button class="sv-btn sml red" type=button data-act=disconnect>Disconnect</button>' : "") +
       '</div>';
   }
   /* Pricing the plan runs the whole optimiser and two quiet redraws of the
@@ -143,6 +137,12 @@
     var key = pos.total + "/" + pos.free + "/" + (window.__LIVEH ? window.__LIVEH() : 0);
     if(PC.key !== key){ PC.key = key; PC.val = window.__optPlan(false); }
     return PC.val;
+  }
+  /* the same shape, waiting for a wallet */
+  function skelAlloc(){
+    var h = '<div class=sv-bar></div><div class=sv-chips>', i;
+    for(i = 0; i < 5; i++) h += '<div class="sv-chip skel"><span class=sv-dot></span><b></b><em></em><s></s><u></u></div>';
+    return h + '</div>';
   }
   /* the bar and the chips: the stake as it stands, largest first */
   function allocation(pos){
@@ -285,25 +285,81 @@
   }
 
   /* ── the head: chain, address, the way out ── */
+  var WAS = null;
   function drawHead(){
-    var a = window.__ADDR, ad = E("svaddr"), ac = E("svacct");
+    var a = window.__ADDR, ad = E("svaddr"), ac = E("svacct"), cn = E("svconn");
     if(a){ ad.hidden = false; ad.querySelector("span").textContent = a.slice(0, 9) + "…" + a.slice(-4); ad.title = a;
-           ac.hidden = false; }
-    else { ad.hidden = true; ac.hidden = true; }
+           ac.hidden = false; if(cn) cn.hidden = true; }
+    else { ad.hidden = true; ac.hidden = true; if(cn) cn.hidden = false; }
+    /* a redraw every block must not shut a menu the reader just opened: only a
+       change of state - connected, or no longer - closes it */
+    if(WAS !== !!a){ WAS = !!a; closeMenu(); }
   }
+  /* the only door in or out, in both views: the wallet list, then the account */
+  var menu = E("svmenu");
+  function closeMenu(){
+    if(!menu || menu.hidden) return;
+    menu.hidden = true; menu.innerHTML = "";
+    ["svconn", "svacct"].forEach(function(id){ var b = E(id); if(b) b.setAttribute("aria-expanded", "false"); });
+  }
+  function openMenu(html, owner){
+    if(!menu) return;
+    menu.innerHTML = html; menu.hidden = false;
+    if(owner) owner.setAttribute("aria-expanded", "true");
+  }
+  function walletMenu(){
+    var have = {};
+    (window.__wproviders ? window.__wproviders() : []).forEach(function(p){ have[p.name] = 1; });
+    return '<div class=mh>Connect a wallet</div>' + ["Keplr", "Adena"].filter(function(n){ return !(PHONE && n !== "Keplr"); })
+      .map(function(n){
+        return '<button class=mi type=button data-w="' + n + '"' + (have[n] ? "" : " disabled") + '>' +
+          '<img src="assets/wallet-' + n.toLowerCase() + '.svg" alt="">' + n +
+          (have[n] ? "" : '<i>not installed</i>') + '</button>'; }).join("");
+  }
+  function acctMenu(){
+    var w = window.__WALLET || {}, a = window.__ADDR || "";
+    return '<div class=mh>' + esc(w.label || w.name || "Wallet") + '</div>' +
+      '<div class=ma>' + esc(a) + '</div>' +
+      '<button class=mi type=button data-act=copy>Copy address</button>' +
+      '<button class="mi out" type=button data-act=disconnect>Disconnect</button>';
+  }
+  var adT;
+  function copyAddr(){
+    var a = window.__ADDR, ad = E("svaddr"); if(!a || !ad) return;
+    var ok = function(){ ad.classList.add("done"); clearTimeout(adT); adT = setTimeout(function(){ ad.classList.remove("done"); }, 1400); };
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(a).then(ok, function(){});
+    else ok();
+  }
+  var conn = E("svconn");
+  if(conn) conn.addEventListener("click", function(ev){ ev.stopPropagation();
+    if(menu && !menu.hidden){ closeMenu(); return; } openMenu(walletMenu(), conn); });
+  document.addEventListener("click", function(ev){
+    if(!menu || menu.hidden || menu.contains(ev.target)) return;
+    closeMenu();
+  });
+  document.addEventListener("keydown", function(ev){ if(ev.key === "Escape") closeMenu(); });
+  if(menu) menu.addEventListener("click", function(ev){
+    var t = ev.target.closest ? ev.target.closest("[data-w],[data-act]") : null;
+    if(!t) return;
+    /* the bar answers the click itself, without waiting for the next redraw */
+    if(t.dataset.w){ closeMenu(); if(window.__wconnect) window.__wconnect(t.dataset.w); setTimeout(render, 0); return; }
+    if(t.dataset.act === "copy"){ copyAddr(); closeMenu(); return; }
+    if(t.dataset.act === "disconnect"){ closeMenu(); if(window.__wdisconnect) window.__wdisconnect(); setTimeout(render, 0); }
+  });
 
   /* ── one draw, only for the screen on show ── */
   var pending = false;
   function render(){
-    if(root.getAttribute("data-ui") !== "simple") return;
+    if(root.getAttribute("data-tab") !== "dele") return;
     drawHead();
+    if(root.getAttribute("data-ui") !== "simple") return;
     var s = sv.getAttribute("data-s");
     if(s === "over") drawOver();
     else if(s === "auto") drawAuto();
     else drawNet();
   }
   function schedule(){
-    if(pending || root.getAttribute("data-ui") !== "simple") return;
+    if(pending || root.getAttribute("data-tab") !== "dele") return;
     pending = true; requestAnimationFrame(function(){ pending = false; render(); });
   }
 
@@ -311,16 +367,16 @@
   function go(s){
     if(!s || sv.getAttribute("data-s") === s){ render(); return; }
     sv.setAttribute("data-s", s);
-    Array.prototype.forEach.call(sv.querySelectorAll(".sv-nav .sv-tab"), function(b){
+    Array.prototype.forEach.call(document.querySelectorAll(".sv-nav .sv-tab"), function(b){
       var on = b.dataset.s === s; b.classList.toggle("on", on); b.setAttribute("aria-selected", on ? "true" : "false"); });
     try{ localStorage.setItem("th_svs", s); }catch(e){}
-    /* the app's own header keeps up: the set is Staking, the rest is the dashboard */
-    if(window.__flipTo) window.__flipTo(s === "net" ? "home" : "dele");
     render();
   }
   try{ var s0 = localStorage.getItem("th_svs"); if(s0 === "over" || s0 === "auto" || s0 === "net") go(s0); }catch(e){}
 
-  sv.addEventListener("click", function(ev){
+  /* the bar lives outside #sv (it is the window's own row), so both roots listen */
+  var svbar = E("svbar");
+  function onClick(ev){
     var t = ev.target.closest ? ev.target.closest("[data-s],[data-act],[data-w],[data-f],[data-v]") : null;
     if(!t) return;
     if(t.dataset.s){ go(t.dataset.s); return; }
@@ -340,26 +396,24 @@
     if(act === "disconnect"){ if(window.__wdisconnect) window.__wdisconnect(); return; }
     if(act === "autopilot"){ var ab = E("atbtn"); if(ab) ab.click(); return; }
     if(t.dataset.v && window.__vshow) window.__vshow(t.dataset.v);
-  });
-  sv.addEventListener("keydown", function(ev){
+  }
+  function onKey(ev){
     if(ev.key !== "Enter" && ev.key !== " ") return;
     var t = ev.target.closest ? ev.target.closest("[data-v]") : null;
     if(!t || !window.__vshow) return;
     ev.preventDefault(); window.__vshow(t.dataset.v);
-  });
+  }
+  sv.addEventListener("click", onClick);
+  sv.addEventListener("keydown", onKey);
+  if(svbar) svbar.addEventListener("click", onClick);
   var find = E("sv-find");
   if(find) find.addEventListener("input", function(){ FIND = find.value.trim(); if(sv.getAttribute("data-s") === "net") drawNet(); });
 
-  /* the address chip copies, like the dashboard's */
-  var ad = E("svaddr"), adT;
-  if(ad) ad.addEventListener("click", function(){
-    var a = window.__ADDR; if(!a) return;
-    var ok = function(){ ad.classList.add("done"); clearTimeout(adT); adT = setTimeout(function(){ ad.classList.remove("done"); }, 1400); };
-    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(a).then(ok, function(){});
-    else ok();
-  });
+  var ad0 = E("svaddr");
+  if(ad0) ad0.addEventListener("click", function(){ copyAddr(); });
   var acct = E("svacct");
-  if(acct) acct.addEventListener("click", function(){ if(window.__wdisconnect) window.__wdisconnect(); });
+  if(acct) acct.addEventListener("click", function(ev){ ev.stopPropagation();
+    if(menu && !menu.hidden){ closeMenu(); return; } openMenu(acctMenu(), acct); });
 
   /* ── the switch, beside the day/night one ── */
   var ui = E("uibtn");
@@ -370,25 +424,19 @@
     if(ui){ ui.setAttribute("aria-checked", on ? "true" : "false");
       ui.querySelector(".uiw").textContent = on ? "Advanced" : "Simple";
       ui.title = on ? "The advanced view" : "The simple view"; }
-    if(on){ var s = sv.getAttribute("data-s");
-      if(window.__flipTo) window.__flipTo(s === "net" ? "home" : "dele");
-      render(); }
+    render();
   }
   if(ui) ui.addEventListener("click", function(){ setUI(root.getAttribute("data-ui") === "simple" ? "pro" : "simple", true); });
   setUI(root.getAttribute("data-ui") === "simple" ? "simple" : "pro", false);
 
-  /* the app's own header still steers: Staking is the set, the dashboard is you */
+  /* opening the dashboard draws the bar, whichever view is on */
   Array.prototype.forEach.call(document.querySelectorAll(".ftab[data-go]"), function(b){
-    b.addEventListener("click", function(){
-      if(root.getAttribute("data-ui") !== "simple") return;
-      var g = b.dataset.go;
-      if(g === "home") go("net"); else if(g === "dele") go(sv.getAttribute("data-s") === "net" ? "over" : sv.getAttribute("data-s"));
-    });
+    b.addEventListener("click", function(){ setTimeout(render, 300); });
   });
 
   /* every figure follows the dashboard's own redraw, and the height ticks on its own */
   window.addEventListener("thermo:draw", schedule);
   window.addEventListener("thermo:live", schedule);
-  setInterval(function(){ if(sv.getAttribute("data-s") === "over") schedule(); }, 15000);
+  setInterval(function(){ if(root.getAttribute("data-ui") === "simple" && sv.getAttribute("data-s") === "over") schedule(); }, 15000);
   render();
 })();

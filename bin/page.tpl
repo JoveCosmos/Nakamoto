@@ -1177,7 +1177,7 @@ color:var(--ink3);pointer-events:none}
    before the body is parsed; the .on class stays for the buttons */
 html:not([data-tab]) #p-home,
 html[data-tab=home] #p-home,html[data-tab=eta] #p-eta,
-html[data-tab=pays] #p-pays,html[data-tab=gov] #p-gov,html[data-tab=dele] #p-dele,html[data-tab=intro] #p-intro{display:flex;
+html[data-tab=pays] #p-pays,html[data-tab=gov] #p-gov,html[data-tab=dele] #p-dele,html[data-ui=simple][data-tab=dele] #sv,html[data-tab=intro] #p-intro{display:flex;
 flex-direction:column;justify-content:flex-start;flex:0 0 auto;
 height:var(--paneh,auto);min-height:0;
 animation:panein .22s ease}
@@ -1186,7 +1186,7 @@ animation:panein .22s ease}
    really has (frame() measures it as --roomh), so Picks, Manage and the
    placeholders never leave a dead band under clipped content */
 html[data-tab=eta] #p-eta,html[data-tab=pays] #p-pays,html[data-tab=gov] #p-gov,
-html[data-tab=dele] #p-dele,html[data-tab=intro] #p-intro{height:var(--roomh,var(--paneh,auto))}
+html[data-tab=dele] #p-dele,html[data-tab=dele] #sv,html[data-tab=intro] #p-intro{height:var(--roomh,var(--paneh,auto))}
 .pane>.pw{height:100%;min-height:0;display:flex;flex-direction:column}
 .pane>.pw>.duo2{flex:1 1 auto;min-height:0}
 
@@ -1561,7 +1561,7 @@ box-shadow:inset 0 0 0 1px var(--edge2),inset 0 1px 0 rgba(255,255,255,.04);tran
   /* the window's inner column fills the window, so a section that hides the
      calculator's title row gets that row's height back instead of a dead band */
   .w#calc{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
-  html[data-tab=gov] #p-gov,html[data-tab=dele] #p-dele,html[data-tab=intro] #p-intro{height:auto;flex:1 1 auto}
+  html[data-tab=gov] #p-gov,html[data-tab=dele] #p-dele,html[data-tab=dele] #sv,html[data-tab=intro] #p-intro{height:auto;flex:1 1 auto}
   .w#calc>.brandbar{padding:0 0 4px}
   .w#calc>.flipbox,.w#calc>#p-dele{padding:0}
   .w#calc>#p-gov,.w#calc>#p-intro{padding:0}
@@ -1630,7 +1630,7 @@ html[data-mono] .mbtn[aria-pressed=true]{background:#fff;color:#000;box-shadow:n
    top edge), Inter at 600-800, solid gradient buttons, tinted tag pills, inset
    tracks. Every class here is prefixed wk- or scoped under #p-dele, so nothing
    the calculator names can reach in - and nothing here reaches out. */
-#sv,#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{
+#sv,#svbar,#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{
   --wc:#0E1622;--wh:#121C2B;--wbd:#1B2738;--wbd2:#2A3C54;--wi:#0A1320;--wchip:#0E1826;--wsolid:rgba(14,24,38,.97);
   --wt:#E9EFF7;--ws:#8595AB;--wf:#566679;
   --wblue:#3B9EFF;--wcyan:#62D9FF;--wgreen:#36D399;--wamber:#FFB155;--wburn:#FF7A45;--wgold:#F5C66B;
@@ -1843,7 +1843,7 @@ html[data-mono] #txpop .txcard,html[data-mono] #unpop .txcard,html[data-mono] #s
 :root{--void:#06060c;--edge:#232342;--edge2:#34345c;--ink:#e6e4f0;--ink2:#a5a3c4;--ink3:#6f6d94;--faint:#3a3a54;
 --hot:#ffb02e;--burn:#ff4d1f;--cold:#6f66c8;--lit:#fff8dc;--card:#0b0b16;--card2:#111124;--inset:#0a0a14;
 --blue:#6f66c8;--cyan:#2bc8bd;--green:#2ee06a;--amber:#ffb02e}
-#sv,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
+#sv,#svbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
 --wt:#e6e4f0;--ws:#a5a3c4;--wf:#6f6d94;--wblue:#6f66c8;--wcyan:#2bc8bd;--wgreen:#2ee06a;--wamber:#ffb02e;--wburn:#ff4d1f;--wgold:#ffb02e;
 --wsans:"Helvetica Neue",Helvetica,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--wmono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
 body{background:var(--void);background-image:radial-gradient(130% 62% at 50% 0%,#16162e 0%,#0a0a16 42%,var(--void) 74%)}
@@ -2339,7 +2339,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 #wk-plan .wk-moves{flex:0 0 auto;max-height:150px}
 /* the wallet, lifted out of the dark: lighter grounds, brighter hairlines and
    type, so the figures read without leaning in */
-#sv,#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
+#sv,#svbar,#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
 
 .wk-pane{background:linear-gradient(180deg,#10101f,#0d0d1b)}
 .wk-tbl2 td{border-bottom-color:#22223c}
@@ -3071,7 +3071,9 @@ background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;colo
    title band, the same height - the flipbox's own box, measured by state() ── */
 @media(min-width:901px){
   .w#calc{position:relative}
-  html[data-tab=dele] .w#calc>#p-dele{flex:0 0 auto;margin-top:var(--calc-top,70px);height:var(--calc-h,499px);max-height:var(--calc-h,499px)}
+  /* the sub-header stands in the row the brandbar had, so the pane starts where the
+     calculator's content starts: the same top, the same height, on both tabs */
+  html[data-tab=dele] .w#calc>#p-dele,html[data-tab=dele] .w#calc>#sv{flex:0 0 auto;margin-top:0;height:var(--calc-h,499px);max-height:var(--calc-h,499px)}
   html[data-tab=dele] .w#calc>#p-dele>.pw{padding-bottom:0}
 }
 /* the copy glyph as a real button in the address row: a bordered square, lit on hover */
@@ -3484,10 +3486,10 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
   /* the frame itself lets go: .below is the viewport-height window on every other tab,
      here it is simply the page (the bar stays sticky on its own) */
   html[data-tab=dele] .below{height:auto;min-height:100svh;overflow:visible}
-  html[data-tab=dele] #p-dele,html[data-tab=dele] .w#calc>#p-dele{height:auto;max-height:none;margin-top:0;flex:1 1 auto;overflow:visible;overscroll-behavior:auto}
+  html[data-tab=dele] #p-dele,html[data-tab=dele] .w#calc>#p-dele,html[data-tab=dele] #sv,html[data-tab=dele] .w#calc>#sv{height:auto;max-height:none;margin-top:0;flex:1 1 auto;overflow:visible;overscroll-behavior:auto}
   html[data-tab=dele] .panes{overflow:visible;height:auto}
   html[data-tab=dele] .w#calc{overflow:visible}
-  html[data-tab=dele] #p-dele>.pw{height:auto;min-height:0}
+  html[data-tab=dele] #p-dele>.pw,html[data-tab=dele] #sv>.sv-main{height:auto;min-height:0}
   html[data-tab=dele] .folder{position:sticky;top:0;z-index:20;background:var(--void)}
 }
 /* ── the phone's Redelegate list: four real columns (its markup is its own), laid out
@@ -3514,19 +3516,29 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
    screens: what the reader holds, what the keeper would do, what the set looks
    like. Every figure is read from the state the advanced dashboard already
    draws, so the two views can never disagree. Classes are sv-, scoped to #sv. */
-#sv{display:none}
-html[data-ui=simple] #sv{display:block}
-html[data-ui=simple] .panes{display:none}
-html[data-ui=simple] .below{height:auto;min-height:100svh;overflow:visible}
-html[data-ui=simple] .folder{position:sticky;top:0;z-index:20;background:var(--void)}
-/* the second header: the product's own row, under the app's */
-.sv-head{display:flex;align-items:center;gap:18px;min-height:58px;padding:9px 28px;border-bottom:1px solid var(--wbd);background:var(--wc)}
+/* The dashboard has two faces in ONE window: the simple screens are a sibling of
+   the advanced pane inside .w#calc and carry the same frame rules, so switching
+   between them moves nothing, and the calculator's grid is the dashboard's grid. */
+#sv{display:none;min-width:0;overflow:hidden}
+html[data-ui=simple][data-tab=dele] .w#calc>#p-dele{display:none}
+/* the switch is the dashboard's; elsewhere it keeps its slot and says nothing */
+html:not([data-tab=dele]) .uibtn{visibility:hidden;pointer-events:none}
+/* the sub-header: the row the calculator gives its brandbar, on the dashboard.
+   It carries who is connected in both views, and the screens in the simple one. */
+.sv-head{display:none;align-items:center;gap:16px;height:50px;flex:0 0 auto;min-width:0;
+font-family:var(--wsans);color:var(--wt)}
+/* the bar takes the brandbar's own slot, and gives back exactly the gap the
+   calculator leaves under it, so both tabs put their content on the same line */
+/* and it is the same bar the calculator draws in that slot: one box, one border */
+html[data-tab=dele] .w#calc>.sv-head{display:flex;margin-bottom:12px;padding:0 16px 0 18px;
+border:1px solid var(--edge);border-radius:8px;background:linear-gradient(180deg,#0e0e1e,#09090f)}
 .sv-brand{display:flex;align-items:center;gap:10px;flex:0 0 auto}
 .sv-brand img{width:28px;height:28px;border-radius:8px;display:block}
 .sv-bw{display:flex;flex-direction:column;gap:2px;line-height:1}
 .sv-bw b{font-size:15px;font-weight:800;color:var(--wt)}
 .sv-bw i{font-style:normal;font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
-.sv-nav{display:flex;align-items:center;gap:6px;margin:0 auto}
+.sv-nav{display:none;align-items:center;gap:6px;margin:0 auto}
+html[data-ui=simple] .sv-nav{display:flex}
 .sv-tab{border:1px solid transparent;background:transparent;color:var(--ws);font-family:var(--wmono);font-size:10px;letter-spacing:.16em;
 text-transform:uppercase;padding:8px 15px;border-radius:8px;cursor:pointer;transition:color .16s,border-color .16s,background .16s}
 .sv-tab:hover{color:var(--wt);border-color:var(--wbd2)}
@@ -3544,17 +3556,37 @@ font-family:var(--wmono);font-size:11px;color:var(--wt);cursor:pointer;transitio
 .sv-acct{width:34px;height:34px;border-radius:50%;border:1px solid var(--wbd2);background:var(--wchip);color:var(--ws);display:grid;place-items:center;cursor:pointer;padding:0;flex:0 0 auto}
 .sv-acct:hover{color:var(--wt);border-color:var(--wcyan)}
 .sv-acct svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.sv-main{max-width:1280px;margin:0 auto;padding:18px 28px 44px;font-family:var(--wsans);color:var(--wt)}
+.sv-who{position:relative}
+.sv-menu{position:absolute;right:0;top:calc(100% + 9px);z-index:60;min-width:232px;padding:7px;border:1px solid var(--wbd2);
+border-radius:12px;background:var(--wsolid);box-shadow:0 30px 70px -30px #000;display:flex;flex-direction:column;gap:4px}
+.sv-menu .mh{padding:7px 9px 5px;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
+.sv-menu .mi{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:1px solid transparent;border-radius:9px;
+background:transparent;color:var(--wt);font-family:var(--wsans);font-size:13px;text-align:left;cursor:pointer;min-width:0}
+.sv-menu .mi:hover:not(:disabled){border-color:var(--wbd2);background:var(--wh)}
+.sv-menu .mi:disabled{color:var(--wf);cursor:default}
+.sv-menu .mi img{width:18px;height:18px;flex:0 0 auto}
+.sv-menu .mi i{font-style:normal;margin-left:auto;font-family:var(--wmono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--wf)}
+.sv-menu .mi.out{color:var(--wburn)}
+.sv-menu .ma{padding:2px 10px 8px;font-family:var(--wmono);font-size:10px;color:var(--ws);word-break:break-all}
+/* the wallet pane keeps its structure but not its door: connect and disconnect
+   are the sub-header's now, and the pane shows the shape of what will fill it */
+#wgate{display:none}
+#p-dele #wk-mine .wk-disc{display:none}
+html:not([data-wallet]) #wk-mine .wk-addrw{display:none}
+.wk-tbl2 tr.skel td{opacity:.55}
+.wk-tbl2 tr.skel td b{display:block;height:7px;border-radius:4px;background:var(--wbd2);opacity:.6}
+/* the pane's own inner column: the same box .pw gives the advanced view */
+.sv-main{height:100%;min-height:0;width:100%;display:flex;flex-direction:column;padding:12px 0 16px;font-family:var(--wsans);color:var(--wt)}
 .sv-main b{font-weight:700}
 /* the page's own section rule (70px and a rule above) is not for these */
-.sv-screen{display:none;flex-direction:column;gap:14px;padding:0;border-top:0}
+.sv-screen{display:none;flex-direction:column;gap:10px;padding:0 2px 0 0;border-top:0;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden}
 #sv[data-s=over] .sv-screen[data-sc=over],#sv[data-s=auto] .sv-screen[data-sc=auto],#sv[data-s=net] .sv-screen[data-sc=net]{display:flex}
 /* the parts every screen is built from */
 .sv-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .sv-cards.four{grid-template-columns:repeat(4,minmax(0,1fr))}
-.sv-card{border:1px solid var(--wbd);border-radius:14px;background:var(--wc);padding:15px 17px 17px;display:flex;flex-direction:column;gap:7px;position:relative;min-width:0}
+.sv-card{border:1px solid var(--wbd);border-radius:12px;background:var(--wc);padding:12px 14px 13px;display:flex;flex-direction:column;gap:5px;position:relative;min-width:0}
 .sv-k{font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sv-big{font-size:32px;font-weight:800;letter-spacing:-.022em;line-height:1.05;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:8px;min-width:0}
+.sv-big{font-size:28px;font-weight:800;letter-spacing:-.022em;line-height:1.05;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:8px;min-width:0}
 .sv-big em{font-style:normal;font-family:var(--wmono);font-size:12px;font-weight:400;letter-spacing:.06em;color:var(--ws)}
 .sv-big.sm{font-size:22px}
 .sv-sub{font-size:11.5px;color:var(--ws);min-height:16px}
@@ -3566,17 +3598,17 @@ border-radius:99px;padding:4px 9px;border:1px solid var(--wbd2);color:var(--ws);
 .sv-tag.r{color:var(--wburn);border-color:rgba(255,77,31,.38);background:rgba(255,77,31,.06)}
 .sv-tag.q{color:var(--wf)}
 .sv-kr{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
-.sv-panel{border:1px solid var(--wbd);border-radius:14px;background:var(--wc);padding:16px 18px 18px;display:flex;flex-direction:column;gap:13px;min-width:0}
+.sv-panel{border:1px solid var(--wbd);border-radius:12px;background:var(--wc);padding:13px 15px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
 .sv-ph{display:flex;align-items:center;gap:11px;flex-wrap:wrap;min-width:0}
-.sv-ph h3{margin:0;font-size:17px;font-weight:800;letter-spacing:-.01em}
+.sv-ph h3{margin:0;font-size:16px;font-weight:800;letter-spacing:-.01em}
 .sv-ph .sv-rt{margin-left:auto;display:flex;align-items:center;gap:9px}
 .sv-note{font-size:11.5px;color:var(--ws);line-height:1.5}
 .sv-note b{color:var(--wt)}
 /* the four figures of the opportunity, and the button that signs it */
 .sv-figs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;min-width:0}
-.sv-fig{border:1px solid var(--wbd);border-radius:10px;background:var(--wi);padding:10px 12px 11px;display:flex;flex-direction:column;gap:5px;min-width:0}
+.sv-fig{border:1px solid var(--wbd);border-radius:9px;background:var(--wi);padding:8px 11px 9px;display:flex;flex-direction:column;gap:4px;min-width:0}
 .sv-fig span{font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sv-fig b{font-size:20px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+.sv-fig b{font-size:18px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
 .sv-fig b i{font-style:normal;font-family:var(--wmono);font-size:10px;font-weight:400;color:var(--ws);margin-left:5px}
 .sv-fig.up b{color:var(--wgreen)}
 .sv-fig.dn b{color:var(--wburn)}
@@ -3607,16 +3639,19 @@ border:2px solid rgba(255,255,255,.25);border-top-color:var(--wt);animation:wksp
 .sv-bar i.hld{opacity:.45}
 .sv-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
 .sv-chip{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:3px 10px;border:1px solid var(--wbd);border-radius:10px;
-background:var(--wi);padding:10px 12px;min-width:0}
+background:var(--wi);padding:8px 11px;min-width:0}
 .sv-chip .sv-dot{width:8px;height:8px;border-radius:50%;grid-row:span 2}
 .sv-chip b{font-size:13px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sv-chip em{font-style:normal;font-family:var(--wmono);font-size:11px;color:var(--wt);justify-self:end}
 .sv-chip s{grid-column:2;text-decoration:none;font-size:11px;color:var(--ws);font-variant-numeric:tabular-nums}
 .sv-chip u{grid-column:3;text-decoration:none;font-family:var(--wmono);font-size:9.5px;color:var(--wf);justify-self:end}
+.sv-chip.skel b,.sv-chip.skel em,.sv-chip.skel s,.sv-chip.skel u{height:7px;border-radius:4px;background:var(--wbd2);opacity:.5}
+.sv-chip.skel b{width:64%}.sv-chip.skel em{width:22px}.sv-chip.skel s{width:52%}.sv-chip.skel u{width:26px}
+.sv-chip.skel .sv-dot{background:var(--wbd2)}
 .sv-chip.click{cursor:pointer;transition:border-color .16s}
 .sv-chip.click:hover{border-color:var(--wbd2)}
 /* the line under a screen: state, then what to do about it */
-.sv-strip{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--wbd);border-radius:12px;background:var(--wc);padding:12px 16px;font-size:12px;color:var(--ws)}
+.sv-strip{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--wbd);border-radius:12px;background:var(--wc);padding:9px 15px;font-size:12px;color:var(--ws)}
 .sv-strip .sv-sep{color:var(--wf)}
 .sv-strip .sv-rt{margin-left:auto;display:flex;align-items:center;gap:9px}
 .sv-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:26px 10px;color:var(--ws);font-size:12.5px}
@@ -3663,7 +3698,7 @@ text-align:right;padding:9px 10px;background:var(--wi);border-top:1px solid var(
 .sv-foot2 .sv-rt{margin-left:auto}
 /* the autopilot screen: what stands, what it may do, what it may never do */
 .sv-rows{display:flex;flex-direction:column;gap:9px}
-.sv-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;border:1px solid var(--wbd);border-radius:10px;background:var(--wi);padding:11px 14px}
+.sv-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;border:1px solid var(--wbd);border-radius:10px;background:var(--wi);padding:9px 13px}
 .sv-can{display:flex;gap:18px;flex-wrap:wrap;font-size:11.5px}
 .sv-can div{display:flex;flex-direction:column;gap:5px;min-width:0}
 .sv-can u{text-decoration:none;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
@@ -3683,7 +3718,10 @@ html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
   .sv-who{margin-left:auto}
 }
 @media(max-width:620px){
-  .sv-head{padding:9px 16px}
+  .sv-head{margin-bottom:10px}
+  /* the bar wraps on a phone: its box grows with it rather than letting the
+     screens' words fall out of it */
+  html[data-tab=dele] .w#calc>.sv-head{margin-bottom:10px;height:auto;min-height:44px;padding:8px 12px;flex-wrap:wrap;row-gap:8px}
   .sv-main{padding:14px 16px 34px}
   .sv-cards,.sv-cards.four{grid-template-columns:minmax(0,1fr)}
   .sv-big{font-size:28px}
@@ -3733,6 +3771,23 @@ html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
           role=tab aria-selected=false>Trend</button>
         <button class="etabox tabb" data-t=pays data-title="Picks" data-acc="#2ee06a" style="--acc:#2ee06a" type=button role=tab aria-selected=false>Picks</button>
       </nav>
+    </header>
+    <header class=sv-head id=svbar>
+<!-- the dashboard's sub-header: who is connected, and in the simple view its screens.
+     It stands in the row the calculator gives its brandbar, so both tabs share one grid. -->
+      <span class=sv-brand><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><b>GATA</b><i>non-custodial staking</i></span></span>
+      <nav class=sv-nav role=tablist aria-label="Simple view">
+        <button class="sv-tab on" data-s=over type=button role=tab aria-selected=true>Overview</button>
+        <button class=sv-tab data-s=auto type=button role=tab aria-selected=false>Autopilot</button>
+        <button class=sv-tab data-s=net type=button role=tab aria-selected=false>Network</button>
+      </nav>
+      <div class=sv-who>
+        <span class=sv-chain><i></i>AtomOne Mainnet</span>
+        <button class=sv-addr id=svaddr type=button hidden title="Copy address"><span></span><svg viewBox="0 0 24 24" aria-hidden=true><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        <button class="sv-btn sml pri" id=svconn type=button aria-haspopup=true aria-expanded=false>Connect wallet</button>
+        <button class=sv-acct id=svacct type=button hidden title="This wallet" aria-label="This wallet" aria-haspopup=true aria-expanded=false><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="8" r="3.4"/><path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"/></svg></button>
+        <div class=sv-menu id=svmenu hidden></div>
+      </div>
     </header>
   <div class=flipbox id=flipbox>
   <section class="pane on" id=p-home>
@@ -3884,7 +3939,7 @@ html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
     <div class=wk-body id=wbody>
       <div class=wk-two>
         <section class=wk-pane id=wk-mine>
-    <div class=wk-gate id=wgate>
+    <div class="wk-gate" id=wgate hidden>
       <div class=wk-gin>
       <button class="wk-btn wk-primary wk-big" id=wconn type=button aria-haspopup=true><span>Connect wallet</span><em class=sgoarr>&rarr;</em></button>
       <div class=wk-gatecard id=wpick role=group aria-label="Choose a wallet" hidden>
@@ -3897,8 +3952,8 @@ html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
       </div>
       </div>
     </div>
-          <div id=wk-acct hidden>
-          <header class="wk-ph wk-bh"><h3 id=wname>My wallet</h3><span class=wk-addrw><i class=wk-addr id=waddr hidden></i><button class=wk-copy id=wcopy type=button hidden title="Copy address" aria-label="Copy address"><svg class=cp viewBox="0 0 24 24" aria-hidden=true><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class=ok viewBox="0 0 24 24" aria-hidden=true><path d="M4 12.5l5 5L20 6.5"/></svg></button></span></header>
+          <div id=wk-acct>
+          <header class="wk-ph wk-bh"><h3 id=wname>Wallet</h3><span class=wk-addrw><i class=wk-addr id=waddr hidden></i><button class=wk-copy id=wcopy type=button hidden title="Copy address" aria-label="Copy address"><svg class=cp viewBox="0 0 24 24" aria-hidden=true><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class=ok viewBox="0 0 24 24" aria-hidden=true><path d="M4 12.5l5 5L20 6.5"/></svg></button></span></header>
           <div class=wk-bal5><div class=wk-b5><i><img src="assets/atomone.svg" alt="">ATONE</i><b id=ds-bal>&mdash;</b></div><div class=wk-b5><i><img src="assets/photon.svg" alt="">PHOTON</i><b id=ds-photon class=pho>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">staked</i><b id=ds-staked>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">rewards</i><b id=ds-rew>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">APR</i><b id=ds-apr>&mdash;</b></div></div>
           <div class=wk-ap id=wkap hidden><span class=wk-apk>Autopilot</span><span class=wk-aps id=wkaps>off</span><button class=wk-apb id=atbtn type=button title="Let GATA keep this stake where it earns most, inside limits you set">Set up</button></div>
           <div class=wk-rule></div>
@@ -3928,25 +3983,8 @@ html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
       </div>
     </div>
   </div></section>
-  </div>
-  </div>
-  <!-- ── Simple: its own header under the app's, three screens, one engine ──
-       Nothing here holds state: simple.js fills every figure from the same
-       position, set and plan the advanced dashboard draws from. -->
+  <!-- Simple: the dashboard's other face. Same window, same frame as the pane above. -->
   <div id=sv data-s=over>
-    <header class=sv-head>
-      <span class=sv-brand><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><b>GATA</b><i>non-custodial staking</i></span></span>
-      <nav class=sv-nav role=tablist aria-label="Simple view">
-        <button class="sv-tab on" data-s=over type=button role=tab aria-selected=true>Overview</button>
-        <button class=sv-tab data-s=auto type=button role=tab aria-selected=false>Autopilot</button>
-        <button class=sv-tab data-s=net type=button role=tab aria-selected=false>Network</button>
-      </nav>
-      <div class=sv-who>
-        <span class=sv-chain><i></i>AtomOne Mainnet</span>
-        <button class=sv-addr id=svaddr type=button hidden title="Copy address"><span></span><svg viewBox="0 0 24 24" aria-hidden=true><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-        <button class=sv-acct id=svacct type=button hidden title="Disconnect this wallet" aria-label="Disconnect this wallet"><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="8" r="3.4"/><path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"/></svg></button>
-      </div>
-    </header>
     <main class=sv-main>
       <section class=sv-screen data-sc=over aria-label=Overview>
         <div class=sv-cards>
@@ -3979,6 +4017,8 @@ html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
         </div>
       </section>
     </main>
+  </div>
+  </div>
   </div>
 </div>
 

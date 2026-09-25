@@ -93,19 +93,48 @@ document.querySelector('[data-t=home]').click();
   });
 });
 
-/* the wallet section: its own classes, nothing shared with the calculator */
-t('wallet-gate', function(){
+/* the wallet section: no gate of its own any more - the sub-header is the only door,
+   and the pane stands with its structure (a skeleton) until a wallet fills it */
+t('wallet-door', function(){
   var root=document.documentElement; root.setAttribute('data-tab','dele');   /* the flip is animated; the attribute is the state */
-  /* the gate is the left pane: a Connect button in its centre, the two tiles once tapped,
-     the account block hidden; the right pane already lists the chain's validators */
-  var g=document.getElementById('wgate'), a=document.getElementById('wk-acct'), btn=document.getElementById('wconn'), p=document.getElementById('wpick');
+  var g=document.getElementById('wgate'), a=document.getElementById('wk-acct');
+  var skel=document.querySelectorAll('#dmy tr.skel').length;
   var rows=document.querySelectorAll('#dpicks tbody tr').length, cap=!document.getElementById('dcap');   /* the count line is gone from the page */
-  btn.click();
-  var c=p.getBoundingClientRect(), tiles=p.querySelectorAll('.wopt').length;
-  var ok=!g.hidden && a.hidden && btn.hidden && !p.hidden && c.height>120 && tiles===2 && rows>=90 && cap;
-  btn.hidden=false; p.hidden=true;
+  var conn=document.getElementById('svconn'), bar=document.getElementById('svbar');
+  var barShown=getComputedStyle(bar).display!=='none';
+  conn.click();
+  var menu=document.getElementById('svmenu'), tiles=menu.querySelectorAll('[data-w]').length;
+  var ok=g.hidden && !a.hidden && skel===5 && rows>=90 && cap && barShown && !conn.hidden && !menu.hidden && tiles===2;
+  menu.hidden=true; menu.innerHTML='';
   root.setAttribute('data-tab','home');
-  return ok || 'gate '+g.hidden+' acct '+a.hidden+' btn '+btn.hidden+' card '+Math.round(c.height)+' tiles '+tiles+' rows '+rows+' cap '+cap;
+  return ok || 'gate '+g.hidden+' acct '+a.hidden+' skel '+skel+' rows '+rows+' cap '+cap+' bar '+barShown+' conn '+conn.hidden+' tiles '+tiles;
+});
+
+/* the dashboard's two views share one window: the same box, one at a time */
+t('simple-view', function(){
+  var root=document.documentElement, was=root.getAttribute('data-ui');
+  root.setAttribute('data-tab','dele');
+  var pane=document.getElementById('p-dele'), sv=document.getElementById('sv');
+  var advBox=pane.getBoundingClientRect();
+  root.setAttribute('data-ui','simple');
+  var svBox=sv.getBoundingClientRect(), paneGone=getComputedStyle(pane).display==='none';
+  /* the three screens, one shown at a time */
+  var seen=[];
+  ['over','auto','net'].forEach(function(k){
+    sv.setAttribute('data-s',k);
+    seen.push(document.querySelectorAll('.sv-screen').length===3 &&
+      getComputedStyle(document.querySelector('.sv-screen[data-sc='+k+']')).display!=='none');
+  });
+  sv.setAttribute('data-s','over');
+  if(was) root.setAttribute('data-ui',was); else root.removeAttribute('data-ui');
+  root.setAttribute('data-tab','home');
+  /* the fixed frame is the desktop's; below 901 both views are content-height and
+     the page scrolls, so only the switch itself is asserted there */
+  var same=innerWidth<901 || (Math.abs(advBox.left-svBox.left)<1 && Math.abs(advBox.top-svBox.top)<1 &&
+           Math.abs(advBox.width-svBox.width)<1 && Math.abs(advBox.height-svBox.height)<1);
+  return (same && paneGone && seen.every(Boolean)) ||
+    'box '+[advBox.left,advBox.top,advBox.width,advBox.height].map(Math.round)+' vs '+
+    [svBox.left,svBox.top,svBox.width,svBox.height].map(Math.round)+' paneGone '+paneGone+' screens '+seen;
 });
 
 document.title='RES '+(fails.length? 'FAIL '+fails.length+' :: '+fails.join(' | ')
