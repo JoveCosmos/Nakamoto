@@ -1,0 +1,51 @@
+{
+  "about": [
+    "The navigation shell, whole: level-1 sections and their level-2 sub-views. render.py builds both",
+    "tab strips, the pre-paint CSS and the page's embedded copy of this file from it; boot.js reads that",
+    "copy before the first paint; shell.js routes (#/{section}/{subview}), keys and remembers from it.",
+    "Adding a sub-view is one entry here. A sub-view with no 'tab' renders its 'empty' state in the",
+    "shell's own pane, so a new one is never a blank screen.",
+    "",
+    "Section: id, label, route, account ('none' | 'uses': renders without a wallet, resets to its first",
+    "sub-view when the wallet changes | 'required': a single connect screen while disconnected),",
+    "accent, optional hint (tooltip) and badge.",
+    "Sub-view: id, label, route, optional group (sub-views sharing a group sit together under its",
+    "label), and either what it shows - tab (the window's pane, html[data-tab]), panel (its element",
+    "id), ui/screen for the dashboard's two views - or an empty state {title, text, action?}."
+  ],
+  "home": "staking/bonus",
+  "sections": [
+    {
+      "id": "staking", "label": "Staking", "route": "staking", "account": "none", "accent": "#ffb02e",
+      "hint": "the validators, the Nakamoto bonus",
+      "sub": [
+        {"id": "bonus", "label": "Bonus", "route": "bonus", "tab": "home", "panel": "p-home", "accent": "#ffb02e"},
+        {"id": "trend", "label": "Trend", "route": "trend", "tab": "eta",  "panel": "p-eta",  "accent": "#2bc8bd"},
+        {"id": "picks", "label": "Picks", "route": "picks", "tab": "pays", "panel": "p-pays", "accent": "#2ee06a"}
+      ]
+    },
+    {
+      "id": "governance", "label": "Governance", "route": "governance", "account": "none", "accent": "#2bc8bd",
+      "hint": "proposals, the constitution, the core DAOs", "badge": "soon",
+      "sub": [
+        {"id": "proposals", "label": "Proposals", "route": "proposals",
+         "empty": {"title": "Proposals", "text": "Governance proposals on AtomOne will be listed here."}},
+        {"id": "constitution", "label": "Constitution", "route": "constitution",
+         "empty": {"title": "Constitution", "text": "The AtomOne constitution will be readable here.",
+                   "action": {"label": "Read it on GitHub", "href": "https://github.com/atomone-hub/genesis/blob/main/CONSTITUTION.md"}}},
+        {"id": "core-daos", "label": "Core DAOs", "route": "core-daos",
+         "empty": {"title": "Core DAOs", "text": "AtomOne's core DAOs will be listed here."}}
+      ]
+    },
+    {
+      "id": "dashboard", "label": "Dashboard", "route": "dashboard", "account": "uses", "accent": "#ffb02e",
+      "hint": "your stake, your redelegation",
+      "sub": [
+        {"id": "overview",  "label": "Overview",  "route": "overview",  "tab": "dele", "ui": "simple", "screen": "over", "panel": "sv-over"},
+        {"id": "autopilot", "label": "Autopilot", "route": "autopilot", "tab": "dele", "ui": "simple", "screen": "auto", "panel": "sv-auto"},
+        {"id": "network",   "label": "Network",   "route": "network",   "tab": "dele", "ui": "simple", "screen": "net",  "panel": "sv-net"},
+        {"id": "advanced",  "label": "Advanced",  "route": "advanced",  "tab": "dele", "ui": "pro",                       "panel": "p-dele"}
+      ]
+    }
+  ]
+}

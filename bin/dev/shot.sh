@@ -8,6 +8,8 @@ set -e
 WEB=${WEB:-/srv/atomone-app-dev/web}; URL=${URL:-http://127.0.0.1:8089}
 # CHROME_FLAGS adds flags (--force-dark-mode renders the night theme); NODAY=1 drops the day sheet's <link>
 CHROME_FLAGS=${CHROME_FLAGS:-}; NODAY=${NODAY:-}
+# HASH opens the page on a route, e.g. HASH='#/dashboard/network'
+HASH=${HASH:-}
 # whatever happens, nothing of ours stays in the published tree
 trap 'rm -f $WEB/_probe.html $WEB/_probe.js $WEB/_probe_err.js $WEB/_shot.html $WEB/_shot.js' EXIT
 WH=${1:?}; SNIP=${2:?}; OUT=${3:?}; MODE=${4:-}
@@ -31,5 +33,5 @@ io.open(WEB+'/_shot.html','w',encoding='utf-8').write(h.replace('</body>',extra+
 PY
 google-chrome $CHROME_FLAGS --headless=new --disable-gpu --no-sandbox --virtual-time-budget=6000 --hide-scrollbars \
   --screenshot="$OUT" --window-size="$W,$H" \
-  "$URL/_shot.html" >/dev/null 2>&1
+  "$URL/_shot.html$HASH" >/dev/null 2>&1
 rm -f $WEB/_shot.html $WEB/_shot.js

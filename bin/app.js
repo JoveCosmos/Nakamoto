@@ -1118,38 +1118,34 @@ rememberGridH();
    selected one is stamped on <html> by a script in the head, so the right pane
    is up before the first paint rather than after this file runs. */
 (function(){
-  var bs = [].slice.call(document.querySelectorAll(".tabs .tabb[data-t]"));
-  if(!bs.length) return;
+  /* The tabs themselves - both levels, their clicks, keys, routes and aria - belong to the
+     navigation shell (shell.js, from shell.json). This module keeps what only it knows: how
+     the window swaps panes (pick), the fall between sections (goSection) and the frame. */
   var ttl = document.getElementById("tsfx");
+  /* the open view, as the shell names it (html[data-sv] = section/view) - not the pane,
+     since a view with nothing built shares the shell's empty pane with others */
+  function openView(){
+    var C = window.__SHELL, k = (document.documentElement.getAttribute("data-sv") || "").split("/");
+    if(!C) return null;
+    for(var i = 0; i < C.sections.length; i++) if(C.sections[i].id === k[0])
+      for(var j = 0; j < C.sections[i].sub.length; j++) if(C.sections[i].sub[j].id === k[1]) return C.sections[i].sub[j];
+    return null;
+  }
   function pick(k){
     document.documentElement.setAttribute("data-tab", k);
-    /* the logo stays put; only the words beside it change */
-    var b = bs.filter(function(x){ return x.dataset.t === k; })[0];
-    if(ttl && b && b.dataset.title){
-      ttl.textContent = b.dataset.title;
-      if(b.dataset.acc) ttl.style.color = b.dataset.acc;
-    }
-    bs.forEach(function(b){
-      var on = b.dataset.t === k;
-      b.classList.toggle("on", on);
-      b.setAttribute("aria-selected", on ? "true" : "false");
-    });
+    title();
     try{ localStorage.setItem("th_tab", k); }catch(e){}
   }
-  bs.forEach(function(b){ b.addEventListener("click", function(){ pick(b.dataset.t); }); });
   /* Sections live on the index row: Staking, Governance, and My wallet -
      the reader's own wallet, delegations and strategy - which loads the whole
      window like any other section. Changing section: the window's content
      lifts away and the next falls in. The accent and the light travel. */
   var calc = document.getElementById("calc");
-  var TITLES = { dele: ["Manage", "#9ed6f7"], gov: ["Governance", "#2bc8bd"], intro: ["AtomOne", "#e9eff7"] };
-  var HOME = { home: 1, eta: 1, pays: 1 };
   var root = document.documentElement;
+  /* the logo stays put; only the word beside it changes - the open view's own */
   function title(){
-    var k = root.getAttribute("data-tab") || "home";
-    if(TITLES[k] && ttl){ ttl.textContent = TITLES[k][0]; ttl.style.color = TITLES[k][1]; return; }
-    var b = bs.filter(function(x){ return x.dataset.t === k; })[0];
-    if(ttl && b && b.dataset.title){ ttl.textContent = b.dataset.title; if(b.dataset.acc) ttl.style.color = b.dataset.acc; }
+    var v = openView();
+    if(ttl && v){ ttl.textContent = v.label; ttl.style.color = v.accent || ""; }
   }
   function state(){
     var k = root.getAttribute("data-tab") || "home";
@@ -1158,20 +1154,10 @@ rememberGridH();
     var fb = document.getElementById("flipbox");
     if(fb && fb.offsetHeight > 100){ root.style.setProperty("--calc-top", fb.offsetTop + "px"); root.style.setProperty("--calc-h", fb.offsetHeight + "px");
       try{ localStorage.setItem("th_calcbox", fb.offsetTop + "/" + fb.offsetHeight + "/" + innerWidth); }catch(e){} }
-    var acc = "#ffb02e", well = document.getElementById("well");
-    Array.prototype.forEach.call(document.querySelectorAll(".ftab[data-go]"), function(b){
-      var g = b.dataset.go, on = g === "home" ? !!HOME[k] : g === k;
-      b.classList.toggle("on", on); b.setAttribute("aria-selected", on ? "true" : "false");
-      if(on) acc = b.style.getPropertyValue("--acc") || acc; });
+    /* the window takes the open section's accent (the shell marks which one is open) */
+    var acc = "#ffb02e", well = document.getElementById("well"), onb = document.querySelector(".l1tab[aria-selected=true]");
+    if(onb) acc = onb.style.getPropertyValue("--acc") || acc;
     if(well){ well.style.setProperty("--acc", acc); well.style.borderColor = acc + "66"; }
-    /* the light glides under the open word */
-    var ind = document.getElementById("ind"), onb = document.querySelector(".fnav .ftab.on");
-    if(ind && !onb) ind.style.width = "0px";          /* the intro: no word is open */
-    if(ind && onb){
-      var fr = onb.parentNode.getBoundingClientRect(), br = onb.getBoundingClientRect();
-      ind.style.left = (br.left - fr.left) + "px"; ind.style.width = br.width + "px";
-      ind.style.setProperty("--acc", acc);
-    }
     title();
   }
   function goSection(k){
@@ -1187,21 +1173,11 @@ rememberGridH();
     calc.addEventListener("transitionend", finish); setTimeout(finish, 260);
     calc.classList.add("fade");
   }
-  /* Staking always opens on Bonus - the word is the section's front door, not
-     a way back to whichever tab was open last */
-  Array.prototype.forEach.call(document.querySelectorAll(".ftab[data-go]"), function(b){
-    b.addEventListener("click", function(){ goSection(b.dataset.go); }); });
-  /* the mark and the name: home */
-  var brand = document.querySelector(".brand");
-  if(brand){ brand.addEventListener("click", function(){ goSection("intro"); });
-    brand.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); goSection("intro"); } }); }
-  Array.prototype.forEach.call(document.querySelectorAll(".intro [data-go]"), function(b){
-    b.addEventListener("click", function(){ goSection(b.dataset.go); }); });
-  bs.forEach(function(b){ b.addEventListener("click", state); });
   state();
   window.addEventListener("resize", state);
   window.__flipTo = goSection;
   window.__pick = pick;
+  window.__state = state;
   /* One content box for every page, sized to what Home needs. Home is the only
      pane whose height is fixed by its own contents (a 10x10 map); the rest then
      render inside exactly that area, so switching tabs never resizes anything. */
@@ -2741,7 +2717,6 @@ rememberGridH();
     var gate = E("wgate"), acct = E("wk-acct"); if(gate) gate.hidden = true; if(acct) acct.hidden = false;
     var wn = E("wname"); if(wn) wn.textContent = "Wallet";
     var wm = E("wmark"); if(wm) wm.hidden = true;
-    var fwn = E("fwn"); if(fwn) fwn.textContent = "Dashboard";
     if(window.__redraw) window.__redraw();
     if(window.__planDraw) window.__planDraw();
   }
@@ -2825,7 +2800,6 @@ rememberGridH();
         try{ localStorage.setItem("th_wallet", w.name); }catch(e){}
         document.documentElement.setAttribute("data-wallet", w.name);
         if(dis) dis.hidden = false; var blk1 = E("wblk"); if(blk1) blk1.hidden = false; var rf1 = E("wrefresh"); if(rf1) rf1.hidden = false; box.hidden = true;
-        var fwn = E("fwn"); if(fwn) fwn.textContent = "Dashboard";
         var gate = E("wgate"), acct = E("wk-acct"); if(gate) gate.hidden = true;
         if(acct) acct.hidden = false;
         /* the name whole, and an eight-letter form with two dots for a phone */

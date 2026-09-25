@@ -125,7 +125,7 @@
       (pos ? '<span class=sv-sep>|</span><span>' + (window.__POSAT ? "read " + ago(window.__POSAT) : "") + '</span>' : "") +
       '<div class=sv-rt>' +
         (pos ? '<button class="sv-btn sml" type=button data-act=refresh>Refresh</button>' : "") +
-        '<button class="sv-btn sml" type=button data-s=auto>Autopilot</button>' +
+        '<button class="sv-btn sml" type=button data-route="dashboard/autopilot">Autopilot</button>' +
       '</div>';
   }
   /* Pricing the plan runs the whole optimiser and two quiet redraws of the
@@ -355,39 +355,36 @@
     if(t.dataset.act === "disconnect"){ closeMenu(); if(window.__wdisconnect) window.__wdisconnect(); setTimeout(render, 0); }
   });
 
-  /* ── one draw, only for the screen on show ── */
+  /* ── one draw: the wallet in the header on every section; a screen only for the
+     one on show (html[data-svs], which the navigation shell sets) ── */
   var pending = false;
+  function screen(){ return root.getAttribute("data-svs") || "over"; }
   function render(){
-    if(root.getAttribute("data-tab") !== "dele") return;
     drawHead();
-    if(root.getAttribute("data-ui") !== "simple") return;
-    var s = sv.getAttribute("data-s");
+    if(root.getAttribute("data-tab") !== "dele" || root.getAttribute("data-ui") !== "simple") return;
+    var s = screen();
     if(s === "over") drawOver();
     else if(s === "auto") drawAuto();
     else drawNet();
   }
   function schedule(){
-    if(pending || root.getAttribute("data-tab") !== "dele") return;
+    if(pending) return;
     pending = true; requestAnimationFrame(function(){ pending = false; render(); });
   }
 
-  /* ── screens ── */
-  function go(s){
-    if(!s || sv.getAttribute("data-s") === s){ render(); return; }
-    sv.setAttribute("data-s", s);
-    Array.prototype.forEach.call(document.querySelectorAll(".sv-nav .sv-tab"), function(b){
-      var on = b.dataset.s === s; b.classList.toggle("on", on); b.setAttribute("aria-selected", on ? "true" : "false"); });
-    try{ localStorage.setItem("th_svs", s); }catch(e){}
+  /* The shell (shell.js) owns which dashboard view is open - it is a level-2 tab with its
+     own route - and calls this to show it: the simple view on one of its screens, or the
+     advanced one. th_ui / th_svs keep the choice for a visit that arrives with no route. */
+  window.__dashView = function(ui, scr){
+    if(ui === "simple"){ root.setAttribute("data-ui", "simple"); if(scr) root.setAttribute("data-svs", scr); }
+    else root.removeAttribute("data-ui");
+    try{ localStorage.setItem("th_ui", ui === "simple" ? "simple" : "pro"); if(scr) localStorage.setItem("th_svs", scr); }catch(e){}
     render();
-  }
-  try{ var s0 = localStorage.getItem("th_svs"); if(s0 === "over" || s0 === "auto" || s0 === "net") go(s0); }catch(e){}
+  };
 
-  /* the bar lives outside #sv (it is the window's own row), so both roots listen */
-  var svbar = E("svbar");
   function onClick(ev){
-    var t = ev.target.closest ? ev.target.closest("[data-s],[data-act],[data-w],[data-f],[data-v]") : null;
+    var t = ev.target.closest ? ev.target.closest("[data-act],[data-w],[data-f],[data-v]") : null;
     if(!t) return;
-    if(t.dataset.s){ go(t.dataset.s); return; }
     if(t.dataset.w){ if(window.__wconnect) window.__wconnect(t.dataset.w); return; }
     if(t.dataset.f){ FILTER = t.dataset.f; render(); return; }
     var act = t.dataset.act;
@@ -413,37 +410,16 @@
   }
   sv.addEventListener("click", onClick);
   sv.addEventListener("keydown", onKey);
-  if(svbar) svbar.addEventListener("click", onClick);
   var find = E("sv-find");
-  if(find) find.addEventListener("input", function(){ FIND = find.value.trim(); if(sv.getAttribute("data-s") === "net") drawNet(); });
+  if(find) find.addEventListener("input", function(){ FIND = find.value.trim(); if(screen() === "net") drawNet(); });
 
   var acct = E("svacct");
   if(acct) acct.addEventListener("click", function(ev){ ev.stopPropagation();
     if(menu && !menu.hidden){ closeMenu(); return; } openMenu(acctMenu(), acct); });
 
-  /* ── the view switch, in the wallet's corner of the sub-header ── */
-  var seg = E("uiseg");
-  function setUI(mode, remember){
-    var on = mode === "simple";
-    if(on) root.setAttribute("data-ui", "simple"); else root.removeAttribute("data-ui");
-    if(remember) try{ localStorage.setItem("th_ui", on ? "simple" : "pro"); }catch(e){}
-    if(seg) Array.prototype.forEach.call(seg.querySelectorAll("button[data-ui]"), function(b){
-      b.setAttribute("aria-pressed", (b.dataset.ui === "simple") === on ? "true" : "false"); });
-    render();
-  }
-  if(seg) seg.addEventListener("click", function(ev){
-    var b = ev.target.closest ? ev.target.closest("button[data-ui]") : null;
-    if(b) setUI(b.dataset.ui, true); });
-  setUI(root.getAttribute("data-ui") === "simple" ? "simple" : "pro", false);
-
-  /* opening the dashboard draws the bar, whichever view is on */
-  Array.prototype.forEach.call(document.querySelectorAll(".ftab[data-go]"), function(b){
-    b.addEventListener("click", function(){ setTimeout(render, 300); });
-  });
-
   /* every figure follows the dashboard's own redraw, and the height ticks on its own */
   window.addEventListener("thermo:draw", schedule);
   window.addEventListener("thermo:live", schedule);
-  setInterval(function(){ if(root.getAttribute("data-ui") === "simple" && sv.getAttribute("data-s") === "over") schedule(); }, 15000);
+  setInterval(function(){ if(root.getAttribute("data-ui") === "simple" && screen() === "over") schedule(); }, 15000);
   render();
 })();

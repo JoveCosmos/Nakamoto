@@ -1,16 +1,19 @@
 var fails=[], log=[];
 function t(name, fn){ try{ var r=fn(); if(r!==true) fails.push(name+':'+r); }catch(e){ fails.push(name+':THREW '+e.message); } }
 window.dispatchEvent(new Event("resize"));
+/* no animation: a change of section (the window's fall) then completes on the spot */
+(function(){ var s=document.createElement('style'); s.textContent='*{transition:none!important;animation:none!important}'; document.head.appendChild(s); })();
+function go(r){ window.__shellGo(r); }
 
-/* tabs */
-['home','eta','pays'].forEach(function(k){
+/* the staking views, through their level-2 tabs */
+['bonus','trend','picks'].forEach(function(k){
   t('tab-'+k, function(){
-    document.querySelector('[data-t='+k+']').click();
-    var p=document.getElementById({home:'p-home',eta:'p-eta',pays:'p-pays'}[k]);
+    document.getElementById('l2-staking-'+k).click();
+    var p=document.getElementById({bonus:'p-home',trend:'p-eta',picks:'p-pays'}[k]);
     return p.getBoundingClientRect().height>100 || 'pane '+p.getBoundingClientRect().height;
   });
 });
-document.querySelector('[data-t=home]').click();
+go('staking/bonus');
 
 /* map modes */
 ['color','apr','stake','rank','logo','graph'].forEach(function(m){
@@ -70,17 +73,17 @@ t('whatif-reset', function(){
 
 /* tables */
 t('picks-tables', function(){
-  document.querySelector('[data-t=pays]').click();
+  go('staking/picks');
   var r=document.querySelectorAll('#p-pays .ptab tbody tr').length;
   var l=document.querySelectorAll('#p-pays .ptab .tlg').length;
   return (r===15 && l===15) || 'rows='+r+' logos='+l;   /* three lists of five */
 });
 t('trend-charts', function(){
-  document.querySelector('[data-t=eta]').click();
+  go('staking/trend');
   return (document.querySelectorAll('#etacurve *').length>10
        && document.querySelectorAll('#trend *').length>10) || 'a chart is empty';
 });
-document.querySelector('[data-t=home]').click();
+go('staking/bonus');
 
 /* the three discs draw their glyph in the middle: a stray rule on a shared
    class name once turned the C disc into a flex column and lifted its glyph */
@@ -96,38 +99,35 @@ document.querySelector('[data-t=home]').click();
 /* the wallet section: no gate of its own any more - the sub-header is the only door,
    and the pane stands with its structure (a skeleton) until a wallet fills it */
 t('wallet-door', function(){
-  var root=document.documentElement; root.setAttribute('data-tab','dele');   /* the flip is animated; the attribute is the state */
+  var root=document.documentElement; go('dashboard/advanced');
   var g=document.getElementById('wgate'), a=document.getElementById('wk-acct');
   var skel=document.querySelectorAll('#dmy tr.skel').length;
   var rows=document.querySelectorAll('#dpicks tbody tr').length, cap=!document.getElementById('dcap');   /* the count line is gone from the page */
-  var conn=document.getElementById('svconn'), bar=document.getElementById('svbar');
-  var barShown=getComputedStyle(bar).display!=='none';
+  var conn=document.getElementById('svconn'), bar=document.querySelector('.folder .hdr-r');
+  var barShown=!!bar && getComputedStyle(bar).display!=='none' && bar.contains(conn);
   conn.click();
   var menu=document.getElementById('svmenu'), tiles=menu.querySelectorAll('[data-w]').length;
   var ok=g.hidden && !a.hidden && skel===5 && rows>=90 && cap && barShown && !conn.hidden && !menu.hidden && tiles===2;
   menu.hidden=true; menu.innerHTML='';
-  root.setAttribute('data-tab','home');
+  go('staking/bonus');
   return ok || 'gate '+g.hidden+' acct '+a.hidden+' skel '+skel+' rows '+rows+' cap '+cap+' bar '+barShown+' conn '+conn.hidden+' tiles '+tiles;
 });
 
 /* the dashboard's two views share one window: the same box, one at a time */
 t('simple-view', function(){
-  var root=document.documentElement, was=root.getAttribute('data-ui');
-  root.setAttribute('data-tab','dele');
+  go('dashboard/advanced');
   var pane=document.getElementById('p-dele'), sv=document.getElementById('sv');
   var advBox=pane.getBoundingClientRect();
-  root.setAttribute('data-ui','simple');
+  go('dashboard/overview');
   var svBox=sv.getBoundingClientRect(), paneGone=getComputedStyle(pane).display==='none';
-  /* the three screens, one shown at a time */
+  /* the three screens, one shown at a time, each its own level-2 view */
   var seen=[];
-  ['over','auto','net'].forEach(function(k){
-    sv.setAttribute('data-s',k);
-    seen.push(document.querySelectorAll('.sv-screen').length===3 &&
-      getComputedStyle(document.querySelector('.sv-screen[data-sc='+k+']')).display!=='none');
+  ['overview','autopilot','network'].forEach(function(k){
+    go('dashboard/'+k);
+    var id={overview:'sv-over',autopilot:'sv-auto',network:'sv-net'}[k];
+    seen.push([].filter.call(document.querySelectorAll('.sv-screen'),function(x){ return getComputedStyle(x).display!=='none'; }).map(function(x){ return x.id; }).join()===id);
   });
-  sv.setAttribute('data-s','over');
-  if(was) root.setAttribute('data-ui',was); else root.removeAttribute('data-ui');
-  root.setAttribute('data-tab','home');
+  go('staking/bonus');
   /* the fixed frame is the desktop's; below 901 both views are content-height and
      the page scrolls, so only the switch itself is asserted there */
   var same=innerWidth<901 || (Math.abs(advBox.left-svBox.left)<1 && Math.abs(advBox.top-svBox.top)<1 &&
@@ -136,6 +136,63 @@ t('simple-view', function(){
     'box '+[advBox.left,advBox.top,advBox.width,advBox.height].map(Math.round)+' vs '+
     [svBox.left,svBox.top,svBox.width,svBox.height].map(Math.round)+' paneGone '+paneGone+' screens '+seen;
 });
+
+/* ── the navigation shell (shell.json): the spec's acceptance, checked from the config ── */
+var CFG=window.__SHELL, SECS=CFG.sections;
+t('shell-from-config', function(){
+  var l1=[].map.call(document.querySelectorAll('.l1tab .l1lbl'),function(x){ return x.textContent; }).join('|');
+  var want1=SECS.map(function(s){ return s.label; }).join('|');
+  var bad=[];
+  SECS.forEach(function(s){
+    var got=[].map.call(document.querySelectorAll('.l2[data-for="'+s.id+'"] .l2tab'),function(b){ return b.textContent; }).join('|');
+    var want=s.sub.map(function(v){ return v.label; }).join('|');
+    if(got!==want) bad.push(s.id+':'+got);
+  });
+  return (l1===want1 && !bad.length) || 'l1 '+l1+' l2 '+bad.join(' ');
+});
+t('shell-one-strip', function(){
+  var bad=[];
+  function shown(){ return [].filter.call(document.querySelectorAll('.l2'),function(l){ return getComputedStyle(l).display!=='none'; }).map(function(l){ return l.dataset.for; }); }
+  SECS.forEach(function(s){ go(s.route+'/'+s.sub[0].route); var v=shown(); if(v.join()!==s.id) bad.push(s.id+'->'+v.join()); });
+  go('intro'); if(shown().length) bad.push('intro->'+shown().join());
+  go('staking/bonus');
+  return !bad.length || bad.join(' ');
+});
+t('shell-every-view-renders', function(){
+  var bad=[];
+  SECS.forEach(function(s){ s.sub.forEach(function(v){
+    go(s.route+'/'+v.route);
+    var R=document.documentElement, ok=location.hash==='#/'+s.route+'/'+v.route && R.getAttribute('data-sv')===s.id+'/'+v.id;
+    var p=document.getElementById(v.panel||'p-empty'), r=p&&p.getBoundingClientRect();
+    if(!ok || !p || r.height<60 || !p.textContent.trim()) bad.push(s.id+'/'+v.id+(ok?'':' (route)')+(p?' h'+Math.round(r.height):' (no panel)'));
+    if(!v.tab && document.getElementById('shellempty').textContent.indexOf(v.empty.title)<0) bad.push(s.id+'/'+v.id+' (empty state)');
+  }); });
+  go('staking/bonus');
+  return !bad.length || bad.join(', ');
+});
+t('shell-aria', function(){
+  var bad=[];
+  document.querySelectorAll('[role=tablist]').forEach(function(l){
+    var tabs=l.querySelectorAll('[role=tab]'), zero=[].filter.call(tabs,function(b){ return b.tabIndex===0; }).length;
+    if(zero!==1) bad.push((l.dataset.for||'l1')+' has '+zero+' Tab stops');
+    tabs.forEach(function(b){
+      var c=b.getAttribute('aria-controls');
+      if(!c || !document.getElementById(c)) bad.push(b.id+' controls '+c);
+      if(!/^(true|false)$/.test(b.getAttribute('aria-selected'))) bad.push(b.id+' aria-selected');
+      if(!b.textContent.trim()) bad.push(b.id+' has no text');
+      var h=parseFloat(getComputedStyle(b,'::after').height), w=b.getBoundingClientRect().width;
+      if(b.offsetParent && (!(h>=44) || w<44)) bad.push(b.id+' target '+h+'x'+Math.round(w));   /* strips on screen; a hidden one has no box */
+    });
+  });
+  document.querySelectorAll('[role=tabpanel]').forEach(function(p){
+    var lb=p.getAttribute('aria-labelledby'); if(lb && !document.getElementById(lb)) bad.push(p.id+' labelledby '+lb);
+  });
+  return !bad.length || bad.join(', ');
+});
+t('shell-no-sideways-page', function(){
+  return document.documentElement.scrollWidth<=innerWidth+1 || 'page is '+document.documentElement.scrollWidth+' wide in '+innerWidth;
+});
+go('staking/bonus');
 
 document.title='RES '+(fails.length? 'FAIL '+fails.length+' :: '+fails.join(' | ')
                                    : 'all pass')+' :: jsErr='+(window.__e||'none');

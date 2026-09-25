@@ -205,9 +205,7 @@
   html[data-theme=light]:not([data-mono]) .monod{border:1.5px solid var(--line-strong);background:var(--line-strong)}
   html[data-theme=light]:not([data-mono]) .monob:hover .monod{border-color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .folder{background:var(--surface)}
-  html[data-theme=light]:not([data-mono]) .ftab{background:transparent}
-  html[data-theme=light]:not([data-mono]) .ftab b{color:inherit}
-  html[data-theme=light]:not([data-mono]) .ind{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .brand{text-decoration:none;color:inherit}
   html[data-theme=light]:not([data-mono]) .intro::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .intro h1 em{background:var(--amber-bar);color:transparent}
   html[data-theme=light]:not([data-mono]) .i3{text-decoration:none;box-shadow:inset 0 0 0 1px var(--edge2)}
@@ -215,10 +213,6 @@
   html[data-theme=light]:not([data-mono]) .i3:disabled{box-shadow:inset 0 0 0 1px var(--edge)}
   html[data-theme=light]:not([data-mono]) .i3:disabled:hover{box-shadow:inset 0 0 0 1px var(--edge)}
   html[data-theme=light]:not([data-mono]) .fsoon{border:1px solid var(--amber-bar);background:transparent}
-  html[data-theme=light]:not([data-mono]) .ftab.acct{box-shadow:inset 0 0 0 1px var(--edge2)}
-  html[data-theme=light]:not([data-mono]) .ftab.acct svg{fill:none;stroke:currentColor}
-  html[data-theme=light]:not([data-mono]) .ftab.acct:hover{box-shadow:inset 0 0 0 1px var(--ink3)}
-  html[data-theme=light]:not([data-mono]) .ftab.acct.on{box-shadow:inset 0 0 0 1px var(--accent)}
   @media(min-width:1100px){
     html[data-theme=light]:not([data-mono]) .panes{background:transparent;box-shadow:none}
     html[data-theme=light]:not([data-mono]) .w#calc{background:transparent;box-shadow:none}
@@ -234,7 +228,7 @@
   html[data-theme=light]:not([data-mono]) .mbtn[aria-pressed=true]{background:var(--amber-bar);color:#FFFFFF;box-shadow:none}
   html[data-theme=light]:not([data-mono]) .modes .etabox.monob{background:transparent}
   html[data-theme=light]:not([data-mono]) .modes .etabox.monob:hover{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) #svbar,html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard,html[data-theme=light]:not([data-mono]) #wpick .txcard{--wsolid:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) .hdr-r,html[data-theme=light]:not([data-mono]) .brandbar,html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard,html[data-theme=light]:not([data-mono]) #wpick .txcard{--wsolid:var(--ink)}
   html[data-theme=light]:not([data-mono]) .wk-mark{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-addr::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-tab{background:transparent}
@@ -264,11 +258,9 @@
   html[data-theme=light]:not([data-mono]) .wk-lgx{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .wk-soon{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .pop .card.txcard{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) #svbar,html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard,html[data-theme=light]:not([data-mono]) #wpick .txcard{--wsolid:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) .hdr-r,html[data-theme=light]:not([data-mono]) .brandbar,html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard,html[data-theme=light]:not([data-mono]) #wpick .txcard{--wsolid:var(--ink)}
   html[data-theme=light]:not([data-mono]) body{background-image:transparent}
   html[data-theme=light]:not([data-mono]) .folder{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .ftab.acct{box-shadow:inset 0 0 0 1px var(--edge2)}
-  html[data-theme=light]:not([data-mono]) .ftab.acct.on{background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--accent)}
   html[data-theme=light]:not([data-mono]) .sec,html[data-theme=light]:not([data-mono]) .sec.tight,html[data-theme=light]:not([data-mono]) .duo .sec,html[data-theme=light]:not([data-mono]) .duo .sec:nth-child(n){background:var(--surface);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .modes{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .mbtn[aria-pressed=true]{box-shadow:none}
@@ -317,7 +309,7 @@
   html[data-theme=light]:not([data-mono]) .tabs .tabb.on{color:#FFFFFF;box-shadow:none}
   html[data-theme=light]:not([data-mono]) .tabs .tabb.on[style*="2bc8bd"]{color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .tabs .tabb.on[style*="2ee06a"]{color:#FFFFFF}
-  html[data-theme=light]:not([data-mono]) .w#calc>.brandbar,html[data-theme=light]:not([data-mono]) #p-gov>.w>.brandbar{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .w#calc>.brandbar{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) #wk-mine{--a:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-plan{--a:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-moves{--a:var(--accent)}
@@ -325,8 +317,6 @@
   html[data-theme=light]:not([data-mono]) .wk-btn.wk-go{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-btn.wk-go:disabled{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-plan{--a:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .ftab.acct{background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--edge2)}
-  html[data-theme=light]:not([data-mono]) .ftab.acct:hover{box-shadow:inset 0 0 0 1px var(--hot)}
   html[data-theme=light]:not([data-mono]) .wk-gate{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .wk-gatecard{background:var(--surface);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .introby{text-decoration:none}
@@ -371,8 +361,6 @@
   html[data-theme=light]:not([data-mono]) .wk-tbl2 th{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td.ck input{border-color:var(--line-strong);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) #p-dele .wk-disc svg.wk-out{fill:none;stroke:currentColor}
-  html[data-theme=light]:not([data-mono]) .ftab.acct,html[data-theme=light]:not([data-mono]) .ftab.acct:hover,html[data-theme=light]:not([data-mono]) .ftab.acct.on{background:transparent;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .ftab.acct.on::after{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh h3{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 b.pho{color:var(--accent)}
@@ -496,7 +484,6 @@
   html[data-theme=light]:not([data-mono]) #dpicks tbody tr.on td:first-child{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #dmy tbody tr[data-v]:hover td:first-child{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #dmy tbody tr[data-v]:hover td.nm span{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .fnav .fsoon{background:transparent;box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh h3{color:var(--ink);text-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5::before{background:transparent}
@@ -507,9 +494,6 @@
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(5){--c:var(--warn)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 b#ds-apr{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) .wk-rule{background:transparent}
-  html[data-theme=light]:not([data-mono]) .fnav .ftab.acct{background:transparent;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .fnav .ftab.acct b{color:inherit}
-  html[data-theme=light]:not([data-mono]) .fnav .ftab.acct:hover,html[data-theme=light]:not([data-mono]) .fnav .ftab.acct.on{background:transparent;box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5{background:transparent;box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 b::after{background:var(--c,var(--accent))}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(1){--c:var(--accent)}
@@ -601,8 +585,6 @@
   html[data-theme=light]:not([data-mono]) .atcard .atuntil b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .thbtn{background:transparent}
   html[data-theme=light]:not([data-mono]) .thbtn svg{fill:none;stroke:currentColor}
-  html[data-theme=light]:not([data-mono]) .fnav .ftab,html[data-theme=light]:not([data-mono]) .fnav .ftab.acct{background:transparent}
-  html[data-theme=light]:not([data-mono]) .fnav .ftab.on,html[data-theme=light]:not([data-mono]) .fnav .ftab.acct.on{background:color-mix(in srgb,var(--acc,var(--amber-bar)) 9%,transparent)}
   html[data-theme=light]:not([data-mono]) .atcard .txsum .atclosed{border:1px solid var(--amber-bar);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-ap{border:1px solid var(--accent);background:var(--surface-2);box-shadow:0 0 0 1px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-ap::before{background:transparent}
@@ -618,8 +600,6 @@
   html[data-theme=light]:not([data-mono]) .wk-note .x:focus-visible{outline:2px solid var(--accent)}
   html[data-theme=light]:not([data-mono]) .wk-btn.busy{color:transparent!important;text-shadow:none!important}
   html[data-theme=light]:not([data-mono]) .wk-btn.busy::after{border:2px solid var(--surface-2);border-top-color:var(--accent)}
-  html[data-theme=light]:not([data-mono])[data-tab=dele] .w#calc>.sv-head{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .sv-tab{background:transparent}
   html[data-theme=light]:not([data-mono]) .sv-menu{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-menu .mi{background:transparent}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addr{background:transparent}
@@ -647,10 +627,12 @@
   html[data-theme=light]:not([data-mono]) .sv-nm img,html[data-theme=light]:not([data-mono]) .sv-nm span.lg{box-shadow:0 0 0 1px var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sv-nm span.lg{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .sv-can u{text-decoration:none}
-  html[data-theme=light]:not([data-mono]) .sv-mode button{background:transparent}
-  html[data-theme=light]:not([data-mono]) .sv-mode button[aria-pressed=true]{box-shadow:inset 0 0 0 1px var(--wbd2)}
+  html[data-theme=light]:not([data-mono]) .l1tab{background:transparent}
+  html[data-theme=light]:not([data-mono]) .l2tab{background:transparent}
+  html[data-theme=light]:not([data-mono]) .shell-act{background:transparent;text-decoration:none}
+  html[data-theme=light]:not([data-mono]) [role=tabpanel]:focus{outline:none}
   html[data-theme=light]:not([data-mono]){--void:var(--bg);--edge:var(--line);--edge2:var(--line-strong);--ink2:var(--muted);--ink3:var(--faint);--hot:var(--warn);--burn:var(--danger);--cold:var(--accent);--lit:var(--ink);--card:var(--surface);--card2:var(--surface-2);--inset:var(--surface-sunk);--blue:var(--accent);--cyan:var(--accent);--green:var(--accent);--amber:var(--warn);--cv:var(--bg);--ce:var(--line);--ce2:var(--line-strong);--ci:var(--ink);--ci2:var(--muted);--ci3:var(--faint);--cf:var(--faint);--ch:var(--warn);--cb:var(--danger);--cc:var(--accent);--cl:var(--ink);--mono:var(--day-mono);--sans:var(--day-sans)}
-  html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-dele *,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) .pop,html[data-theme=light]:not([data-mono]) .pop *,html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) #sv *,html[data-theme=light]:not([data-mono]) #svbar,html[data-theme=light]:not([data-mono]) #svbar *{--wc:var(--surface);--wh:var(--surface-2);--wbd:var(--line);--wbd2:var(--line-strong);--wi:var(--surface-sunk);--wchip:var(--surface-2);--wt:var(--ink);--ws:var(--muted);--wf:var(--faint);--wblue:var(--accent);--wcyan:var(--accent);--wgreen:var(--accent);--wamber:var(--warn);--wburn:var(--danger);--wgold:var(--warn);--wsans:var(--day-sans);--wmono:var(--day-mono)}
+  html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-dele *,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) .pop,html[data-theme=light]:not([data-mono]) .pop *,html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) #sv *,html[data-theme=light]:not([data-mono]) .hdr-r,html[data-theme=light]:not([data-mono]) .hdr-r *,html[data-theme=light]:not([data-mono]) .brandbar,html[data-theme=light]:not([data-mono]) .brandbar *{--wc:var(--surface);--wh:var(--surface-2);--wbd:var(--line);--wbd2:var(--line-strong);--wi:var(--surface-sunk);--wchip:var(--surface-2);--wt:var(--ink);--ws:var(--muted);--wf:var(--faint);--wblue:var(--accent);--wcyan:var(--accent);--wgreen:var(--accent);--wamber:var(--warn);--wburn:var(--danger);--wgold:var(--warn);--wsans:var(--day-sans);--wmono:var(--day-mono)}
   /* ── the hand layer: the day spec's typography, shape, spacing and components ── */
   /* ════════════════════════════════════════════════════════════════════════════════════
      DAY - the hand layer, colours and typefaces ONLY. Geometry (heights, paddings, radii,
@@ -740,9 +722,12 @@
 
   /* the dashboard's sub-header sits outside #sv (it is the window's own row), so the
      same floors are named for it: colour only, the sizes are the night sheet's */
-  html[data-theme=light]:not([data-mono]) #svbar .sv-bw i,
-  html[data-theme=light]:not([data-mono]) #svbar .sv-tab,html[data-theme=light]:not([data-mono]) #svbar .sv-menu .mh,
-  html[data-theme=light]:not([data-mono]) #svbar .sv-menu .ma,html[data-theme=light]:not([data-mono]) #svbar .sv-menu .mi i,
-  html[data-theme=light]:not([data-mono]) #svbar .sv-menu .mi:disabled,html[data-theme=light]:not([data-mono]) #svbar .sv-mode button{color:var(--muted)}
-  html[data-theme=light]:not([data-mono]) #svbar .sv-mode button[aria-pressed=true]{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .brandbar .sv-bw i,
+  html[data-theme=light]:not([data-mono]) .hdr-r .sv-tab,html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mh,
+  html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .ma,html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mi i,
+  html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mi:disabled,html[data-theme=light]:not([data-mono]) .hdr-r .sv-mode button{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .hdr-r .sv-mode button[aria-pressed=true]{color:var(--ink)}
+
+  /* the navigation shell's "soon" badge: on a lit level-1 tab the tint lowers its ground */
+  html[data-theme=light]:not([data-mono]) .l1badge{color:var(--warn-ink)}
 

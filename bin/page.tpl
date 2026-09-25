@@ -2,6 +2,7 @@
 <meta name=viewport content="width=device-width,initial-scale=1">
 <title>AtomOne Nakamoto Bonus</title>
 <link rel=icon href="assets/favicon.ico" sizes="any"><link rel=icon type="image/png" sizes="32x32" href="assets/favicon-32.png"><link rel=icon type="image/png" sizes="192x192" href="assets/favicon-192.png"><link rel=apple-touch-icon href="assets/apple-touch-icon.png"><meta name=theme-color content="#06060c">
+<script id=shellcfg type=application/json>{{SHELL_CFG}}</script>
 <script src="boot.js"></script>
 <meta name=description content="AtomOne's Nakamoto Bonus, live: what it pays, what would reverse it, and ten million blocks of evidence.">
 <style>
@@ -1177,7 +1178,7 @@ color:var(--ink3);pointer-events:none}
    before the body is parsed; the .on class stays for the buttons */
 html:not([data-tab]) #p-home,
 html[data-tab=home] #p-home,html[data-tab=eta] #p-eta,
-html[data-tab=pays] #p-pays,html[data-tab=gov] #p-gov,html[data-tab=dele] #p-dele,html[data-ui=simple][data-tab=dele] #sv,html[data-tab=intro] #p-intro{display:flex;
+html[data-tab=pays] #p-pays,html[data-tab=empty] #p-empty,html[data-tab=connect] #p-connect,html[data-tab=dele] #p-dele,html[data-ui=simple][data-tab=dele] #sv,html[data-tab=intro] #p-intro{display:flex;
 flex-direction:column;justify-content:flex-start;flex:0 0 auto;
 height:var(--paneh,auto);min-height:0;
 animation:panein .22s ease}
@@ -1185,7 +1186,7 @@ animation:panein .22s ease}
 /* Home is sized to what it needs; every other screen takes the room the window
    really has (frame() measures it as --roomh), so Picks, Manage and the
    placeholders never leave a dead band under clipped content */
-html[data-tab=eta] #p-eta,html[data-tab=pays] #p-pays,html[data-tab=gov] #p-gov,
+html[data-tab=eta] #p-eta,html[data-tab=pays] #p-pays,html[data-tab=empty] #p-empty,html[data-tab=connect] #p-connect,
 html[data-tab=dele] #p-dele,html[data-tab=dele] #sv,html[data-tab=intro] #p-intro{height:var(--roomh,var(--paneh,auto))}
 .pane>.pw{height:100%;min-height:0;display:flex;flex-direction:column}
 .pane>.pw>.duo2{flex:1 1 auto;min-height:0}
@@ -1393,7 +1394,7 @@ margin:16px 0 -6px}
    resize when you switch tabs - and scroll within it. Home never scrolls: it is
    the thing every other page is measured against. */
 @media(max-width:620px){
-  #p-eta,#p-pays,#p-gov,#p-dele{overflow-y:auto;overscroll-behavior:contain}
+  #p-eta,#p-pays,#p-empty,#p-connect,#p-dele{overflow-y:auto;overscroll-behavior:contain}
   #p-eta>.pw,#p-pays>.pw{height:auto;min-height:100%}
   .duo2{grid-template-rows:auto auto;height:auto;gap:10px}
   #p-eta>.pw>.duo2,#p-pays>.pw>.duotab{flex:0 0 auto}
@@ -1411,7 +1412,7 @@ margin:16px 0 -6px}
    black, panels a hair above black, hairline greys, soft white type that does
    not vibrate, and the accents pulled to greys - rather than a line drawing.
    Two inks stay: green for good, red for bad. The map keeps magnitude in grey. */
-html[data-mono]:not([data-tab=dele]):not([data-tab=gov]) #calc,html[data-mono] .pop .card:not(.txcard){
+html[data-mono]:not([data-tab=dele]):not([data-tab=empty]):not([data-tab=connect]) #calc,html[data-mono] .pop .card:not(.txcard){
   --void:#000;--edge:#202024;--edge2:#34343a;--ink:#e8e8ea;--ink2:#9a9aa1;--ink3:#6a6a71;
   --faint:#4a4a50;--hot:#d1d1d1;--burn:#ff6a4a;--cold:#9d9d9d;--lit:#f2f2f4}
 html[data-mono] #calc .grid:not(.flat){filter:grayscale(1)}
@@ -1491,23 +1492,15 @@ html[data-mono] .monod{border:0;background:conic-gradient(#ff4d1f,#ffb02e,#2ee06
    open one joined to it - same fill, no seam - and the window itself filling
    the rest of the screen edge to edge. Nothing floats, nothing is centred in
    empty space; sections are what you flip to, not where you go. */
-.folder{display:flex;align-items:center;gap:0;padding:0 28px;flex:0 0 auto;position:relative;z-index:2;height:64px;
+.folder{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-areas:"brand nav right";align-items:center;gap:16px;padding:0 28px;flex:0 0 auto;position:relative;z-index:2;height:46px;
 border-bottom:1px solid var(--edge);background:linear-gradient(180deg,#0b111b,var(--void))}
 /* the brand: mark and wordmark on one optical centre line */
-.brand{display:flex;align-items:center;gap:12px;flex:0 0 auto;margin-right:40px}
-.brand .mark{width:36px;height:36px;display:block;flex:0 0 auto}
-.wordmark{font-size:22px;font-weight:800;letter-spacing:-.03em;color:var(--ink);line-height:1;display:block;padding-top:1px}
+.brand{display:flex;align-items:center;gap:10px;flex:0 0 auto;margin:0;grid-area:brand;justify-self:start;text-decoration:none;color:inherit}
+.brand .mark{width:28px;height:28px;display:block;flex:0 0 auto}
+.wordmark{font-size:18px;font-weight:800;letter-spacing:-.03em;color:var(--ink);line-height:1;display:block;padding-top:1px}
 /* the sections as words in the bar, the open one underlined by a light that
    glides to the next (#ind, one element moved by state()) */
-.fnav{position:relative;display:flex;align-items:stretch;gap:0;height:64px}
-.ftab{position:relative;z-index:1;display:flex;align-items:center;gap:7px;height:64px;padding:0 4px;margin-right:22px;cursor:pointer;border:0;background:transparent;
-color:var(--ink2);font:inherit;transition:color .2s}
-.ftab b{font-size:16px;font-weight:700;letter-spacing:-.015em;color:inherit;line-height:1}
-.ftab:hover{color:var(--ink)}
-.ftab.on{color:var(--ink)}
-.ftab:focus-visible{outline:2px solid var(--acc);outline-offset:-6px;border-radius:6px}
-.ind{position:absolute;bottom:-1px;left:0;width:0;height:2px;border-radius:2px 2px 0 0;background:var(--acc,var(--hot));box-shadow:0 0 12px var(--acc,var(--hot));
-transition:left .38s cubic-bezier(.2,.7,.25,1),width .38s cubic-bezier(.2,.7,.25,1),background .3s,box-shadow .3s;z-index:0}
+
 /* the brand is the way home */
 .brand{cursor:pointer;border-radius:8px;transition:opacity .2s}
 .brand:hover{opacity:.85}
@@ -1534,24 +1527,15 @@ font:inherit;color:var(--ink);background:var(--card);box-shadow:inset 0 0 0 1px 
 .i3:disabled:hover{box-shadow:inset 0 0 0 1px var(--edge)}
 @media(max-width:700px){.intro3{flex-direction:column;align-items:stretch}.i3{justify-content:space-between}}
 /* a section that is not built yet is a word with a tag, not a door */
-.ftab:disabled{cursor:default;color:var(--ink3)}
-.ftab:disabled:hover{color:var(--ink3)}
+
 .fsoon{position:absolute;top:15px;right:-14px;font-style:normal;font-family:var(--mono);font-size:6.5px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);
 border:1px solid rgba(255,176,46,.35);border-radius:2px;padding:1px 3px;line-height:1.2;margin:0;background:transparent}
-.ftab:disabled{padding-right:8px}
 .i3{position:relative}
 .i3 .fsoon{top:6px;right:8px}
 /* My wallet: a chip in the bar - a mark and a word, framed; lit in cyan once you are in */
-.ftab.acct{margin:0 0 0 auto;height:40px;padding:0 16px 0 13px;border-radius:10px;gap:9px;color:var(--ink);background:var(--card);
-box-shadow:inset 0 0 0 1px var(--edge2),inset 0 1px 0 rgba(255,255,255,.04);transition:box-shadow .2s,color .2s,background .2s}
-.ftab.acct svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin:0;max-height:none;color:var(--ink2);transition:color .2s}
-.ftab.acct b{font-size:14px;font-weight:600;letter-spacing:0}
-.ftab.acct:hover{color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink3),inset 0 1px 0 rgba(255,255,255,.04)}
-.ftab.acct:hover svg{color:var(--ink)}
-.ftab.acct.on{color:var(--ink);background:var(--card2);box-shadow:inset 0 0 0 1px rgba(98,217,255,.45),0 0 16px -6px rgba(98,217,255,.6)}
-.ftab.acct.on svg{color:var(--cyan)}
+
 @media(max-width:620px){.folder{height:52px;padding:0 14px}.brand{margin-right:16px;gap:8px}.brand .mark{width:28px;height:28px}
-.wordmark{display:none}.fnav,.ftab{height:52px}.ftab{margin-right:14px}.ftab b{font-size:14px}.ftab.acct{height:36px;padding:0 12px 0 10px}.ftab.acct b{font-size:12.5px}}
+.wordmark{display:none}}
 @media(min-width:1100px){
   .below{border-top:0;padding:0;background:var(--void)}
   /* no window: the bar on top, the section straight on the page ground */
@@ -1561,10 +1545,10 @@ box-shadow:inset 0 0 0 1px var(--edge2),inset 0 1px 0 rgba(255,255,255,.04);tran
   /* the window's inner column fills the window, so a section that hides the
      calculator's title row gets that row's height back instead of a dead band */
   .w#calc{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
-  html[data-tab=gov] #p-gov,html[data-tab=dele] #p-dele,html[data-tab=dele] #sv,html[data-tab=intro] #p-intro{height:auto;flex:1 1 auto}
+  html[data-tab=empty] #p-empty,html[data-tab=connect] #p-connect,html[data-tab=dele] #p-dele,html[data-tab=dele] #sv,html[data-tab=intro] #p-intro{height:auto;flex:1 1 auto}
   .w#calc>.brandbar{padding:0 0 4px}
   .w#calc>.flipbox,.w#calc>#p-dele{padding:0}
-  .w#calc>#p-gov,.w#calc>#p-intro{padding:0}
+  .w#calc>#p-empty,.w#calc>#p-connect,.w#calc>#p-intro{padding:0}
   .calclab{display:none}
   /* the window is full width now, so the map is taller than a short screen
      allows: let the fit loop's --maph govern it, as it does on a phone, with
@@ -1579,11 +1563,10 @@ box-shadow:inset 0 0 0 1px var(--edge2),inset 0 1px 0 rgba(255,255,255,.04);tran
 
 /* Governance is Staking's twin: the calculator's own title row and pill tabs
    (disabled until built), in the calculator's tokens, then one box saying soon */
-#p-gov>.w>.brandbar{padding:0 0 4px}
 .tabs .tabb[disabled]{opacity:.55;cursor:default}
 /* the calculator's own title row belongs to Staking; the other sections bring theirs */
-html[data-tab=gov] .w#calc>.brandbar,html[data-tab=dele] .w#calc>.brandbar,html[data-tab=intro] .w#calc>.brandbar,html[data-tab=gov] .flipbox,html[data-tab=intro] .flipbox{display:none}
-html[data-tab=dele] .flipbox{position:absolute;left:0;right:0;top:70px;visibility:hidden;pointer-events:none}
+html[data-tab=intro] .w#calc>.brandbar,html[data-tab=intro] .flipbox{display:none}
+html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect] .flipbox{position:absolute;left:0;right:0;top:70px;visibility:hidden;pointer-events:none}
 .tabs .tabb[disabled]{cursor:default}
 /* ── the button families, renewed to the prism language: a glass group with
    one hairline, pills inside, the pressed one lit in its accent with a light
@@ -1630,7 +1613,7 @@ html[data-mono] .mbtn[aria-pressed=true]{background:#fff;color:#000;box-shadow:n
    top edge), Inter at 600-800, solid gradient buttons, tinted tag pills, inset
    tracks. Every class here is prefixed wk- or scoped under #p-dele, so nothing
    the calculator names can reach in - and nothing here reaches out. */
-#sv,#svbar,#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{
+#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{
   --wc:#0E1622;--wh:#121C2B;--wbd:#1B2738;--wbd2:#2A3C54;--wi:#0A1320;--wchip:#0E1826;--wsolid:rgba(14,24,38,.97);
   --wt:#E9EFF7;--ws:#8595AB;--wf:#566679;
   --wblue:#3B9EFF;--wcyan:#62D9FF;--wgreen:#36D399;--wamber:#FFB155;--wburn:#FF7A45;--wgold:#F5C66B;
@@ -1776,11 +1759,8 @@ box-shadow:0 0 12px -4px color-mix(in srgb,var(--a) 85%,transparent)}
 
 /* governance, not built yet */
 
-#p-gov>.w{padding:0;max-width:none;display:flex;flex-direction:column;gap:12px;height:100%;min-height:0}
 .wk-tab:disabled{cursor:default}
 .wk-soon{flex:1 1 auto;min-height:220px;display:grid;place-items:center;border:1px dashed var(--wbd2);border-radius:16px;background:rgba(255,255,255,.012)}
-#p-gov .wk-soon{border-color:var(--edge2);border-radius:12px;margin:0 0 18px}
-#p-gov .wk-soon span{color:var(--ink3)}
 .wk-soon span{font-size:11px;font-weight:800;letter-spacing:.34em;text-transform:uppercase;color:var(--wf)}
 
 /* the signing card, in the same language */
@@ -1828,7 +1808,7 @@ html[data-mono] #txpop .txcard,html[data-mono] #unpop .txcard,html[data-mono] #s
   .wk-foot .wk-pl{font-size:9.5px}
   
   
-  html[data-tab=dele] .calclab{display:none}
+  html[data-tab=dele] .calclab,html[data-tab=empty] .calclab,html[data-tab=connect] .calclab{display:none}
   
   .wk-mv{grid-template-columns:minmax(0,1fr) 96px 90px;grid-template-areas:"f f f" "a r g" "s s s"}.wk-mv .a{align-items:flex-start}
   .wk-mv .sub{padding-left:0;overflow-x:auto;scrollbar-width:none}
@@ -1843,16 +1823,12 @@ html[data-mono] #txpop .txcard,html[data-mono] #unpop .txcard,html[data-mono] #s
 :root{--void:#06060c;--edge:#232342;--edge2:#34345c;--ink:#e6e4f0;--ink2:#a5a3c4;--ink3:#6f6d94;--faint:#3a3a54;
 --hot:#ffb02e;--burn:#ff4d1f;--cold:#6f66c8;--lit:#fff8dc;--card:#0b0b16;--card2:#111124;--inset:#0a0a14;
 --blue:#6f66c8;--cyan:#2bc8bd;--green:#2ee06a;--amber:#ffb02e}
-#sv,#svbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
+#sv,.hdr-r,.brandbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
 --wt:#e6e4f0;--ws:#a5a3c4;--wf:#6f6d94;--wblue:#6f66c8;--wcyan:#2bc8bd;--wgreen:#2ee06a;--wamber:#ffb02e;--wburn:#ff4d1f;--wgold:#ffb02e;
 --wsans:"Helvetica Neue",Helvetica,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--wmono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
 body{background:var(--void);background-image:radial-gradient(130% 62% at 50% 0%,#16162e 0%,#0a0a16 42%,var(--void) 74%)}
 /* the bar: words in caps, the chip in caps */
 .folder{background:linear-gradient(180deg,#0f0f20,rgba(6,6,12,0));border-bottom-color:var(--edge)}
-.ftab b{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-weight:400}
-.ftab.acct{background:var(--card);box-shadow:inset 0 0 0 1px var(--edge2);color:var(--ink)}
-.ftab.acct b{font-size:9.5px;letter-spacing:.18em}
-.ftab.acct.on{background:#14142c;box-shadow:inset 0 0 0 1px rgba(43,200,189,.5),0 0 14px -6px rgba(43,200,189,.6)}
 .fsoon{font-family:var(--mono);font-weight:400}
 /* the calculator: title, tabs, the view row, the stages, flat tiles */
 .bt{font-size:clamp(16px,1.7vw,20px);font-weight:600;letter-spacing:-.015em}
@@ -2041,12 +2017,12 @@ html[data-mono] .duotab>div,html[data-mono] .ptab td{background:#000;border-colo
 /* three layers, told apart: the bar is the site; the section head is a band
    of its own (a framed strip with the title and its tabs); the content below
    is stages on the ground */
-.w#calc>.brandbar,#p-gov>.w>.brandbar{padding:0 16px 0 18px;height:50px;border:1px solid var(--edge);border-radius:8px;background:linear-gradient(180deg,#0e0e1e,#09090f);margin-bottom:12px;box-sizing:border-box}
+.w#calc>.brandbar{padding:0 16px 0 18px;height:50px;border:1px solid var(--edge);border-radius:8px;background:linear-gradient(180deg,#0e0e1e,#09090f);margin-bottom:12px;box-sizing:border-box}
 
 .wk-tabs,.wk-tab{height:48px}
 .wk-tab.on::after{bottom:0}
 .tabs .tabb{height:28px}
-@media(max-width:620px){.w#calc>.brandbar,#p-gov>.w>.brandbar{height:auto;padding:8px 12px}.wk-tabs,.wk-tab{height:40px}}
+@media(max-width:620px){.w#calc>.brandbar{height:auto;padding:8px 12px}.wk-tabs,.wk-tab{height:40px}}
 /* ── My wallet, uplifted: three stages, each in its colour; short labels;
    the figures as coloured cards; one distribution bar; the answer where the
    choice is made; the gain where the signature is ── */
@@ -2097,13 +2073,7 @@ html[data-mono] .duotab>div,html[data-mono] .ptab td{background:#000;border-colo
 .wk-gate{min-height:320px}
 
 /* the bar's wallet button: a lit chip, and the account's name once connected */
-.ftab.acct{background:linear-gradient(180deg,#14142c,#0b0b16);box-shadow:inset 0 0 0 1px var(--edge2),inset 0 1px 0 rgba(255,255,255,.06),0 6px 16px -10px #000}
-.ftab.acct:hover{box-shadow:inset 0 0 0 1px var(--hot),inset 0 1px 0 rgba(255,255,255,.06),0 0 16px -6px rgba(255,176,46,.5)}
-.ftab.acct:hover svg{color:var(--hot)}
-.ftab.acct .wm{display:none;width:18px;height:18px;border-radius:5px}
-html[data-wallet] .ftab.acct .wm{display:block}
-html[data-wallet] .ftab.acct>svg{display:none}
-.ftab.acct b{max-width:140px;overflow:hidden;text-overflow:ellipsis}
+
 
 /* the list's record as columns in colour: fee, 90-day uptime, jailed */
 
@@ -2134,12 +2104,9 @@ border:1px solid var(--edge)}
 .wk-gatecard .wk-state{position:static;padding:0 22px 4px;justify-content:flex-start;text-align:left;font-family:var(--wmono);font-size:9px;letter-spacing:.06em;color:var(--ws)}
 .wk-gatecard .wk-state:empty{display:none}
 /* the section words sit in the middle of the bar, between the mark and the wallet */
-.fnav{position:absolute;left:50%;top:0;transform:translateX(-50%)}
-.ftab{margin-right:0}.fnav .ftab+.ftab{margin-left:30px}
-@media(max-width:620px){.fnav{position:static;transform:none;margin-left:auto;margin-right:auto}.fnav .ftab+.ftab{margin-left:16px}}
+
 /* the soon tag: a small badge after the word, on its line */
-.fnav .fsoon{position:static;margin-left:8px;align-self:center;font-size:6.5px;padding:2px 4px;line-height:1;transform:translateY(-1px)}
-.ftab:disabled{padding-right:4px}
+
 /* home: the muscle, then the name */
 .introby{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:inline-flex;align-items:center;gap:8px;margin:0;text-decoration:none;color:var(--ink3);transition:color .2s}
 #p-intro .introby img{width:18px;height:18px;border-radius:5px;display:block;opacity:.85;transform:translateY(-1px);margin-left:-2px}
@@ -2165,8 +2132,7 @@ background:linear-gradient(180deg,#10101f,#0a0a14);box-shadow:inset 0 1px 0 rgba
 @media(max-width:620px){.wk-gatecard .wopts{grid-template-columns:1fr}}
 /* the bar's wallet door is constant; the disconnect is the GATA app's: a ghost
    button, the wallet's mark at its left, the provider small over the word */
-.ftab.acct .wm,html[data-wallet] .ftab.acct .wm{display:none}
-html[data-wallet] .ftab.acct>svg{display:block}
+
 
 .wk-disc{display:inline-flex;align-items:center;gap:10px;height:38px;padding:0 14px 0 9px;border-radius:9px;cursor:pointer;
 border:1px solid var(--wbd2);background:linear-gradient(180deg,var(--wh),rgba(255,255,255,.02));color:var(--wt);
@@ -2339,7 +2305,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 #wk-plan .wk-moves{flex:0 0 auto;max-height:150px}
 /* the wallet, lifted out of the dark: lighter grounds, brighter hairlines and
    type, so the figures read without leaning in */
-#sv,#svbar,#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
+#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
 
 .wk-pane{background:linear-gradient(180deg,#10101f,#0d0d1b)}
 .wk-tbl2 td{border-bottom-color:#22223c}
@@ -2380,15 +2346,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 #wk-mine .wk-pf .wk-pg:empty{display:none}
 /* the wallet's door: a word and an arrow, in the tab's own type; the arrow
    travels on hover, the word is lit and underlined while you are inside */
-.ftab.acct,.ftab.acct:hover,.ftab.acct.on{background:transparent;box-shadow:none;border:0;padding:0 4px;height:64px;gap:8px;color:var(--ink2);border-radius:0}
-.ftab.acct b{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-weight:400}
-.ftab.acct .sgoarr{color:var(--hot);font-size:13px;line-height:1;transition:transform .2s}
-.ftab.acct:hover{color:var(--ink)}
-.ftab.acct:hover .sgoarr{transform:translateX(4px)}
-.ftab.acct.on{color:var(--ink)}
-.ftab.acct.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px 2px 0 0;background:var(--hot);box-shadow:0 0 12px var(--hot)}
-.ftab.acct svg,.ftab.acct .wm{display:none}
-@media(max-width:620px){.ftab.acct{height:52px;padding:0 2px}.ftab.acct b{display:inline;font-size:9px}}
+
 /* the delegations pane at the width of a Picks table; the rest is the redelegation */
 @media(min-width:901px){.wk-two{grid-template-columns:440px minmax(0,1fr)}}
 /* the delegations head in two lines: title, count and the held tag; then the balances */
@@ -2738,9 +2696,6 @@ border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0d0d1c);
    they are filled, so nothing below them moves */
 #txpop .txfee,#unpop .txfee,#stpop .txfee{height:23px;min-height:23px;line-height:13px;overflow:hidden;white-space:nowrap}
 #txpop .txstep,#unpop .txstep,#stpop .txstep{min-height:20px}
-/* ── the phone: the tabs centred in the bar itself, the badge centred on its word; the
-   three panes size to their content (no fixed height, no spill), lists capped ── */
-@media(max-width:620px){.fnav{position:absolute;left:50%;top:0;transform:translateX(-50%);margin:0}.fnav .ftab:last-child{margin-right:0}.fnav .fsoon{right:auto;top:calc(50% - 6px)}}
 @media(max-width:900px){
   .wk-two{align-content:start;grid-auto-rows:max-content}
   #wk-mine,#wk-plan,#wk-mv{height:auto;max-height:none;overflow:hidden}
@@ -2911,9 +2866,7 @@ transition:color .16s,border-color .16s,box-shadow .16s,transform .12s}
 @media(max-width:700px){#wk-mine .wk-bh h3{max-width:none}}
 /* the soon badge sits over the Governance word: centred on it, its lower half
    across the word's upper half */
-.fnav .ftab:disabled{padding-right:4px}
-.fnav .fsoon{position:absolute;left:50%;top:calc(50% - 6px);margin:0;transform:translate(-50%,-100%);align-self:auto;font-size:6px;letter-spacing:.22em;padding:0;line-height:1;
-background:transparent;border:0;box-shadow:none;pointer-events:none}
+
 /* Balance: the account's own name stands as the heading, its address after it;
    then five centred figures on a lit ground */
 #wk-mine .wk-bh{display:flex;align-items:baseline;gap:10px;min-height:30px;padding-bottom:2px}
@@ -2945,10 +2898,9 @@ background:linear-gradient(180deg,#12122a,#0b0b18);border-color:var(--wbd2);box-
 #wk-mine .wk-tbl2 thead th{position:sticky;top:0;background:var(--wc);z-index:1}
 #wk-mine .wk-pf{display:none}
 .wk-soon span{font-family:var(--wmono);font-weight:400}
-.ftab.acct b{white-space:nowrap}
 
 /* the phone bar: the mark, two words, the wallet as its glyph alone */
-@media(max-width:620px){.ftab.acct b{display:none}.ftab.acct{padding:0 10px;gap:0}.ftab{margin-right:10px}.ftab b{font-size:9px;letter-spacing:.16em}.fsoon{top:10px;right:-12px}}
+@media(max-width:620px){.fsoon{top:10px;right:-12px}}
 /* ── the section fills the calculator's frame: the wallet down the left to the floor,
    Redelegate over Outcome on the right (rows named, not equal - 1.35 : 1) ── */
 @media(min-width:901px){
@@ -2969,13 +2921,7 @@ background:linear-gradient(180deg,#12122a,#0b0b18);border-color:var(--wbd2);box-
   #wk-mv .wk-mvempty{flex:1 1 auto}
 }
 /* ── Dashboard: the third word in the bar, beside Governance, one of the nav ── */
-.fnav .ftab.acct{margin:0 0 0 30px;height:64px;padding:0 4px;border-radius:0;background:transparent;box-shadow:none;color:var(--ink2);filter:none;transition:color .2s}
-.fnav .ftab.acct b{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-weight:400;color:inherit}
-.fnav .ftab.acct:hover,.fnav .ftab.acct.on{color:var(--ink);background:transparent;box-shadow:none}
-.fnav .ftab.acct.on .sgoarr,.fnav .ftab.acct .sgoarr{display:none}
-.fnav .ftab:last-of-type{margin-right:0}
-html[data-wallet] .fnav .ftab.acct b::before{width:5px;height:5px;margin:0 6px 1px 0}
-@media(max-width:620px){.fnav .ftab.acct{height:52px;padding:0 4px;margin:0 0 0 16px}.fnav .ftab.acct b{display:inline;font-size:9px;letter-spacing:.16em}}
+
 /* ── the tagline in the Redelegate head, between the clock and the cooldown note; the
    Outcome head carries its three figures as small chips at the right ── */
 
@@ -3063,7 +3009,7 @@ background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;colo
   .w#calc{position:relative}
   /* the sub-header stands in the row the brandbar had, so the pane starts where the
      calculator's content starts: the same top, the same height, on both tabs */
-  html[data-tab=dele] .w#calc>#p-dele,html[data-tab=dele] .w#calc>#sv{flex:0 0 auto;margin-top:0;height:var(--calc-h,499px);max-height:var(--calc-h,499px)}
+  html[data-tab=dele] .w#calc>#p-dele,html[data-tab=dele] .w#calc>#sv,html[data-tab=empty] .w#calc>#p-empty,html[data-tab=connect] .w#calc>#p-connect{flex:0 0 auto;margin-top:0;height:var(--calc-h,499px);max-height:var(--calc-h,499px)}
   html[data-tab=dele] .w#calc>#p-dele>.pw{padding-bottom:0}
 }
 /* the copy glyph as a real button in the address row: a bordered square, lit on hover */
@@ -3409,15 +3355,7 @@ html[data-theme=light] .thbtn .moon{display:block}
 /* ── the three words in the bar as boxes: a hairline box a little wider than the word, the open
    one in its own colour, Governance boxed too but dim while it is closed; the keyboard ring
    sits outside the box ── */
-.fnav .ftab,.fnav .ftab.acct{height:36px;align-self:center;padding:0 14px;border:1px solid var(--edge2);border-radius:9px;background:transparent;transition:color .15s,border-color .15s,background .15s}
-.fnav .ftab+.ftab{margin-left:10px}
-.fnav .ftab:hover:not([disabled]){border-color:var(--ink3)}
-.fnav .ftab.on,.fnav .ftab.acct.on{border-color:var(--acc,var(--hot));background:color-mix(in srgb,var(--acc,#ffb02e) 9%,transparent)}
-.fnav .ftab[disabled]{opacity:.55;cursor:default}
-.fnav .ftab:focus-visible{outline:2px solid var(--acc,var(--hot));outline-offset:2px;border-radius:9px}
-.fnav .ind,.ftab.acct.on::after{display:none}
-.fnav .fsoon{top:-1px;transform:translate(-50%,-50%);background:var(--void);padding:0 4px}
-@media(max-width:620px){.fnav .ftab,.fnav .ftab.acct{height:32px;padding:0 10px}.fnav .ftab+.ftab{margin-left:6px}.fnav .ftab.acct{padding:0 10px}}
+
 .atcard .txsum .atclosed{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:5px;border:1px solid rgba(255,176,46,.4);background:rgba(255,176,46,.08);font-family:var(--wmono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--wamber);white-space:nowrap}
 /* ── Autopilot's line in the wallet: its state at a glance, and the door to set it up,
    manage it or revoke it ── */
@@ -3470,7 +3408,7 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
   /* the frame itself lets go: .below is the viewport-height window on every other tab,
      here it is simply the page (the bar stays sticky on its own) */
   html[data-tab=dele] .below{height:auto;min-height:100svh;overflow:visible}
-  html[data-tab=dele] #p-dele,html[data-tab=dele] .w#calc>#p-dele,html[data-tab=dele] #sv,html[data-tab=dele] .w#calc>#sv{height:auto;max-height:none;margin-top:0;flex:1 1 auto;overflow:visible;overscroll-behavior:auto}
+  html[data-tab=dele] #p-dele,html[data-tab=dele] .w#calc>#p-dele,html[data-tab=dele] #sv,html[data-tab=dele] .w#calc>#sv,html[data-tab=empty] .w#calc>#p-empty,html[data-tab=connect] .w#calc>#p-connect{height:auto;max-height:none;margin-top:0;flex:1 1 auto;overflow:visible;overscroll-behavior:auto}
   html[data-tab=dele] .panes{overflow:visible;height:auto}
   html[data-tab=dele] .w#calc{overflow:visible}
   html[data-tab=dele] #p-dele>.pw,html[data-tab=dele] #sv>.sv-main{height:auto;min-height:0}
@@ -3508,13 +3446,6 @@ html[data-ui=simple][data-tab=dele] .w#calc>#p-dele{display:none}
 /* the switch is the dashboard's; elsewhere it keeps its slot and says nothing */
 /* the sub-header: the row the calculator gives its brandbar, on the dashboard.
    It carries who is connected in both views, and the screens in the simple one. */
-.sv-head{display:none;align-items:center;gap:16px;height:50px;flex:0 0 auto;min-width:0;
-font-family:var(--wsans);color:var(--wt)}
-/* the bar takes the brandbar's own slot, and gives back exactly the gap the
-   calculator leaves under it, so both tabs put their content on the same line */
-/* and it is the same bar the calculator draws in that slot: one box, one border */
-html[data-tab=dele] .w#calc>.sv-head{display:flex;margin-bottom:12px;padding:0 16px 0 18px;
-border:1px solid var(--edge);border-radius:8px;background:linear-gradient(180deg,#0e0e1e,#09090f)}
 /* three columns: the lockup, the screens centred, the wallet pinned right - so the
    wallet still sits at the end when the screens are not there (the advanced view) */
 .sv-brand{display:flex;align-items:center;gap:10px;flex:1 1 0;min-width:0}
@@ -3522,13 +3453,7 @@ border:1px solid var(--edge);border-radius:8px;background:linear-gradient(180deg
 .sv-bw{display:flex;flex-direction:column;gap:2px;line-height:1}
 .sv-bw b{font-size:15px;font-weight:800;color:var(--wt)}
 .sv-bw i{font-style:normal;font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
-.sv-nav{display:none;align-items:center;gap:6px;margin:0;flex:0 0 auto}
-html[data-ui=simple] .sv-nav{display:flex}
-.sv-tab{border:1px solid transparent;background:transparent;color:var(--ws);font-family:var(--wmono);font-size:10px;letter-spacing:.16em;
-text-transform:uppercase;padding:8px 15px;border-radius:8px;cursor:pointer;transition:color .16s,border-color .16s,background .16s}
-.sv-tab:hover{color:var(--wt);border-color:var(--wbd2)}
-.sv-tab.on{color:var(--wt);background:var(--wh);border-color:var(--wbd2)}
-.sv-tab:focus-visible,.sv-acct:focus-visible{outline:2px solid var(--wcyan);outline-offset:2px}
+.sv-acct:focus-visible{outline:2px solid var(--wcyan);outline-offset:2px}
 .sv-who{display:flex;align-items:center;gap:9px;flex:1 1 0;justify-content:flex-end;min-width:0}
 .sv-acct{width:34px;height:34px;border-radius:50%;border:1px solid var(--wbd2);background:var(--wchip);color:var(--ws);display:grid;place-items:center;cursor:pointer;padding:0;flex:0 0 auto}
 .sv-acct:hover{color:var(--wt);border-color:var(--wcyan)}
@@ -3578,7 +3503,6 @@ border:1px solid var(--wbd);border-radius:8px;background:var(--wc)}
 .sv-screen .sv-card{border:0;border-radius:0;background:transparent;padding:2px 18px}
 .sv-screen .sv-card:first-child{padding-left:0}
 .sv-screen .sv-card+.sv-card{border-left:1px solid var(--wbd)}
-#sv[data-s=over] .sv-screen[data-sc=over],#sv[data-s=auto] .sv-screen[data-sc=auto],#sv[data-s=net] .sv-screen[data-sc=net]{display:flex}
 /* the parts every screen is built from */
 .sv-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .sv-cards.four{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -3714,28 +3638,14 @@ text-align:right;padding:9px 10px;background:var(--wi);border-top:1px solid var(
 .sv-can p{margin:0;display:flex;gap:14px;flex-wrap:wrap}
 .sv-can p span{display:inline-flex;align-items:center;gap:6px}
 .sv-can p span::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;flex:0 0 auto}
-/* the view switch: in the wallet's corner of the sub-header, both states named, the
-   one on show pressed - it works before a wallet is connected too */
-.sv-mode{display:inline-flex;align-items:center;gap:2px;padding:2px;border:1px solid var(--wbd);border-radius:8px;background:var(--wi);flex:0 0 auto}
-.sv-mode button{border:0;background:transparent;color:var(--wf);font-family:var(--wmono);font-size:9px;letter-spacing:.14em;
-text-transform:uppercase;padding:7px 11px;border-radius:6px;cursor:pointer;line-height:1;transition:color .16s,background .16s}
-.sv-mode button:hover{color:var(--ws)}
-.sv-mode button[aria-pressed=true]{color:var(--wt);background:var(--wh);box-shadow:inset 0 0 0 1px var(--wbd2)}
-.sv-mode button:focus-visible{outline:2px solid var(--wcyan);outline-offset:1px}
 @media(max-width:900px){
   .sv-cards,.sv-cards.four{grid-template-columns:repeat(2,minmax(0,1fr))}
   .sv-screen .sv-cards{gap:10px}
   .sv-screen .sv-card,.sv-screen .sv-card:first-child,.sv-screen .sv-card+.sv-card{border:1px solid var(--wbd);border-radius:9px;padding:10px 12px}
   .sv-figs{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .sv-head{flex-wrap:wrap;gap:12px}
-  .sv-nav{order:3;width:100%;margin:0;justify-content:flex-start;overflow-x:auto}
   .sv-who{margin-left:auto;flex:0 0 auto}
 }
 @media(max-width:620px){
-  .sv-head{margin-bottom:10px}
-  /* the bar wraps on a phone: its box grows with it rather than letting the
-     screens' words fall out of it */
-  html[data-tab=dele] .w#calc>.sv-head{margin-bottom:10px;height:auto;min-height:44px;padding:8px 12px;flex-wrap:wrap;row-gap:8px}
   .sv-main{padding:0 0 24px}
   /* no window to fill on a phone: the parts simply stack */
   .sv-screen{justify-content:flex-start}
@@ -3743,11 +3653,80 @@ text-transform:uppercase;padding:7px 11px;border-radius:6px;cursor:pointer;line-
   .sv-big{font-size:28px}
   .sv-bw i{display:none}
   .sv-list .sv-wrap{max-height:62svh}
-  .sv-mode button{padding:7px 9px}
   .sv-chips{grid-template-columns:minmax(0,1fr)}
+}
+/* ══ the navigation shell ═══════════════════════════════════════════════════════════
+   Two levels that must never look alike. Level 1 - the sections - is chrome: words in
+   the 46px header, the open one a 6px-cornered tint of its own accent. Level 2 - one
+   section's views - is an in-page control on the window's title line: a pill track, the
+   open view a filled pill, one size smaller. Which tabs exist, their labels, routes,
+   order and groups all come from shell.json (the rules keyed on them are generated and
+   follow this block); nothing here names a tab. */
+:root{--l1-on:var(--ink);--l2-on:var(--ink);--l2-on-ink:var(--void)}
+.folder>.l1{grid-area:nav}
+.folder>.hdr-r{grid-area:right;justify-self:end;display:flex;align-items:center;gap:8px;min-width:0}
+.hdr-r .thbtn{margin-left:0;width:32px;height:32px;border-radius:8px}
+.hdr-r .sv-who{flex:0 0 auto}
+.hdr-r .sv-btn.sml{height:32px}
+.hdr-r .sv-acct{width:32px;height:32px}
+.l1{display:flex;align-items:center;gap:4px;min-width:0}
+.l1tab{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 13px;border:0;border-radius:6px;
+background:transparent;color:var(--ink2);font:inherit;font-family:var(--sans);font-size:13px;font-weight:400;line-height:1;white-space:nowrap;cursor:pointer;
+transition:color .15s,background .15s}
+/* every tab is a 44px target, whatever its drawn height */
+.l1tab::after,.l2tab::after{content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
+.l1tab:hover,.l2tab:hover{color:var(--ink)}
+.l1tab:focus-visible,.l2tab:focus-visible{outline:2px solid var(--acc,var(--hot));outline-offset:2px}
+.l1badge{font-style:normal;font-family:var(--mono);font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--hot);border:1px solid;border-radius:99px;
+padding:2px 5px;line-height:1;opacity:.85}
+.brandbar [data-title-for]{display:none}
+.brandbar .sv-brand{flex:0 1 auto}
+.l2host{margin-left:auto;display:flex;align-items:center;min-width:0;max-width:100%}
+.l2{display:none;align-items:center;min-width:0;max-width:100%}
+.l2trk{display:inline-flex;align-items:center;gap:2px;padding:3px;border-radius:999px;border:1px solid var(--edge2);background:var(--inset);max-width:100%}
+.l2tab{position:relative;flex:0 0 auto;display:inline-flex;align-items:center;height:28px;padding:0 14px;border:0;border-radius:999px;background:transparent;
+color:var(--ink2);font:inherit;font-family:var(--sans);font-size:12px;font-weight:400;line-height:1;white-space:nowrap;cursor:pointer;transition:color .15s,background .15s}
+/* a section with twice the usual views: named groups on one line, a hairline between */
+.l2.split{align-items:flex-end;gap:12px}
+.l2g{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}
+.l2gl{font-family:var(--mono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);padding-left:10px;line-height:1}
+.l2div{align-self:stretch;width:.5px;background:var(--edge2)}
+/* label and track share the 50px title line: the pills there run a little smaller */
+.l2.split .l2trk{padding:2px}
+.l2.split .l2tab{height:25px;padding:0 12px}
+/* the shell's own panes: a view with nothing built yet, or the one connect screen */
+.shell-box{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;border:1px solid var(--edge);border-radius:8px;background:var(--card)}
+.shell-empty{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;max-width:46ch;padding:24px}
+.shell-empty h2{margin:0;font-size:18px;font-weight:700;color:var(--ink)}
+.shell-empty p{margin:0;font-size:13px;line-height:1.5;color:var(--ink2)}
+.shell-act{margin-top:4px;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:1px solid var(--edge2);border-radius:8px;
+background:transparent;color:var(--ink);font:inherit;font-size:12.5px;text-decoration:none;cursor:pointer}
+.shell-act:hover{border-color:var(--ink3)}
+.shell-act:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
+[role=tabpanel]:focus{outline:none}
+[role=tabpanel]:focus-visible{outline:2px solid var(--hot);outline-offset:-2px}
+html[data-tab=connect] .l2host{display:none}
+@media(max-width:620px){
+  /* level 1: the mark and the controls on one line, the sections spread across the next */
+  .folder{height:auto;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand right" "nav nav";padding:6px 12px 4px;row-gap:2px}
+  .l1{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;width:100%}
+  .l1tab{height:36px;padding:0 6px}
+  /* level 2: under the title, a chip row that scrolls sideways with no bar showing; a
+     split row becomes two, each keeping its label */
+  .w#calc>.brandbar{flex-wrap:wrap;row-gap:8px}
+  .l2host,.l2{flex:1 1 100%;margin-left:0}
+  .l2trk{overflow-x:auto;scrollbar-width:none;padding:5px}
+  .l2trk::-webkit-scrollbar{display:none}
+  .l2tab{height:34px}
+  .l2.split{flex-direction:column;align-items:stretch;gap:8px}
+  .l2g{align-items:stretch}
+  .l2div{display:none}
 }
 </style>
 <link rel=stylesheet href="assets/theme-day.css">
+<!-- the shell's generated rules come last: they only name theme tokens, so they are right in
+     day and night alike, and the day sheet's shadows must not unlight the open tab -->
+<style>{{SHELL_CSS}}</style>
 </head><body>
 <svg width=0 height=0 style="position:absolute" aria-hidden=true><defs>
   <symbol id=g-eta viewBox="0 0 20 20"><path d="M6.6 4.6V14.6M6.6 8.2C7.6 5.8 13.4 5.4 13.4 9.4V15.6" fill=none stroke=currentColor stroke-width=2.2 stroke-linecap=round stroke-linejoin=round/></symbol>
@@ -3757,43 +3736,26 @@ text-transform:uppercase;padding:7px 11px;border-radius:6px;cursor:pointer;line-
 
 
 <div class=below id=below>
-  <div class=folder role=tablist>
-    <span class=brand role=button tabindex=0 title="AtomOne"><img class=mark src="assets/atomone.svg" alt=""><span class=bw><span class=wordmark>AtomOne</span><span class=bheight id=dlive title="the chain's height, live"><i></i><b>{{HEIGHT}}</b></span></span></span>
-    <nav class=fnav>
-      <button class="ftab on" data-go=home type=button style="--acc:#ffb02e" role=tab aria-selected=true title="{{N}} validators, the Nakamoto bonus"><b>Staking</b></button>
-      <button class=ftab type=button style="--acc:#2bc8bd" disabled title="proposals, the constitution, the core DAOs"><b>Governance</b><i class=fsoon>soon</i></button>
-      <button class="ftab acct" data-go=dele type=button style="--acc:#ffb02e" role=tab aria-selected=false title="your stake, your redelegation"><b id=fwn>Dashboard</b></button>
-      <i class=ind id=ind aria-hidden=true></i>
-    </nav>
+  <header class=folder>
+    <a class=brand href="#/intro" title="AtomOne"><img class=mark src="assets/atomone.svg" alt=""><span class=bw><span class=wordmark>AtomOne</span><span class=bheight id=dlive title="the chain's height, live"><i></i><b>{{HEIGHT}}</b></span></span></a>
+    <div class=hdr-r>
     <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
-  </div>
+    <div class=sv-who>
+      <button class="sv-btn sml pri" id=svconn type=button aria-haspopup=true aria-expanded=false>Connect wallet</button>
+      <button class=sv-acct id=svacct type=button hidden title="This wallet" aria-label="This wallet" aria-haspopup=true aria-expanded=false><img alt=""></button>
+      <div class=sv-menu id=svmenu hidden></div>
+    </div>
+    </div>
+    {{SHELL_L1}}
+  </header>
   <div class=panes id=well>
   <div class=w id=calc>
       <span class=calclab>Nakamoto</span>
     <header class=brandbar>
-      <div class=bwrap><div class=bt><span class=btx><i class=nk>Nakamoto </i><i class=tsfx id=tsfx>Bonus</i></span></div></div>
-      <nav class=tabs role=tablist>
-        <button class="etabox tabb on" data-t=home data-title="Bonus" data-acc="#ffb02e" style="--acc:#ffb02e" type=button role=tab aria-selected=true>Bonus</button>
-        <button class="etabox tabb" data-t=eta data-title="Trend" data-acc="#2bc8bd" style="--acc:#2bc8bd" type=button
-          role=tab aria-selected=false>Trend</button>
-        <button class="etabox tabb" data-t=pays data-title="Picks" data-acc="#2ee06a" style="--acc:#2ee06a" type=button role=tab aria-selected=false>Picks</button>
-      </nav>
-    </header>
-    <header class=sv-head id=svbar>
-<!-- the dashboard's sub-header: who is connected, and in the simple view its screens.
-     It stands in the row the calculator gives its brandbar, so both tabs share one grid. -->
-      <span class=sv-brand><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><b>GATA</b><i>non-custodial staking</i></span></span>
-      <nav class=sv-nav role=tablist aria-label="Simple view">
-        <button class="sv-tab on" data-s=over type=button role=tab aria-selected=true>Overview</button>
-        <button class=sv-tab data-s=auto type=button role=tab aria-selected=false>Autopilot</button>
-        <button class=sv-tab data-s=net type=button role=tab aria-selected=false>Network</button>
-      </nav>
-      <div class=sv-who>
-        <div class=sv-mode id=uiseg role=group aria-label="Dashboard view"><button type=button data-ui=pro aria-pressed=true>Advanced</button><button type=button data-ui=simple aria-pressed=false>Simple</button></div>
-        <button class="sv-btn sml pri" id=svconn type=button aria-haspopup=true aria-expanded=false>Connect wallet</button>
-        <button class=sv-acct id=svacct type=button hidden title="This wallet" aria-label="This wallet" aria-haspopup=true aria-expanded=false><img alt=""></button>
-        <div class=sv-menu id=svmenu hidden></div>
-      </div>
+      <div class=bwrap data-title-for=staking><div class=bt><span class=btx><i class=nk>Nakamoto </i><i class=tsfx id=tsfx>Bonus</i></span></div></div>
+      <div class=bwrap data-title-for=governance><div class=bt><span class=btx><i class=nk>Governance</i></span></div></div>
+      <span class=sv-brand data-title-for=dashboard><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><b>GATA</b><i>non-custodial staking</i></span></span>
+      <div class=l2host>{{SHELL_L2}}</div>
     </header>
   <div class=flipbox id=flipbox>
   <section class="pane on" id=p-home>
@@ -3923,24 +3885,17 @@ text-transform:uppercase;padding:7px 11px;border-radius:6px;cursor:pointer;line-
     <div class=intro>
       <h1>The chain that <em>rewards decentralization</em></h1>
       <nav class=intro3>
-        <button class=i3 data-go=home type=button style="--acc:#ffb02e"><b>Nakamoto APR</b><span class=sgoarr>&rarr;</span></button>
-        <button class=i3 type=button style="--acc:#2bc8bd" disabled><b>Governance</b><i class=fsoon>soon</i></button>
+        <a class=i3 href="#/staking" style="--acc:#ffb02e"><b>Nakamoto APR</b><span class=sgoarr>&rarr;</span></a>
+        <a class=i3 href="#/governance" style="--acc:#2bc8bd"><b>Governance</b><i class=fsoon>soon</i></a>
         <a class=i3 href="https://github.com/atomone-hub/genesis/blob/main/CONSTITUTION.md" target=_blank rel="noopener noreferrer" style="--acc:#b9b0ff"><b>Constitution</b><span class=sgoarr>&nearr;</span></a>
       </nav>
       <a class=introby href="https://gatahub.zone/" target=_blank rel="noopener noreferrer" title="GATA HUB"><span>powered by</span><img src="assets/gata.png" alt="GATA HUB"></a>
     </div>
   </div></section>
-  <section class=pane id=p-gov><div class=w>
-    <header class=brandbar>
-      <div class=bwrap><div class=bt><span class=btx><i class=nk>Governance</i></span></div></div>
-      <nav class=tabs role=tablist>
-        <button class="etabox tabb on" style="--acc:#2bc8bd" type=button role=tab aria-selected=true disabled>Proposals</button>
-        <button class="etabox tabb" type=button role=tab aria-selected=false disabled>Constitution</button>
-        <button class="etabox tabb" type=button role=tab aria-selected=false disabled>Core DAOs</button>
-      </nav>
-    </header>
-    <div class=wk-soon><span>soon</span></div>
-  </div></section>
+  <!-- the shell's own panes: a sub-view with nothing built yet shows its empty state here,
+       and a section that needs a wallet shows one connect screen while there is none -->
+  <section class=pane id=p-empty role=tabpanel tabindex=0><div class=shell-box><div class=shell-empty id=shellempty></div></div></section>
+  <section class=pane id=p-connect role=tabpanel tabindex=0><div class=shell-box><div class=shell-empty id=shellconnect></div></div></section>
   <section class=pane id=p-dele><div class=pw>
     <div class=wk-body id=wbody>
       <div class=wk-two>
@@ -3990,9 +3945,9 @@ text-transform:uppercase;padding:7px 11px;border-radius:6px;cursor:pointer;line-
     </div>
   </div></section>
   <!-- Simple: the dashboard's other face. Same window, same frame as the pane above. -->
-  <div id=sv data-s=over>
+  <div id=sv>
     <main class=sv-main>
-      <section class=sv-screen data-sc=over aria-label=Overview>
+      <section class=sv-screen id=sv-over data-sc=over aria-label=Overview>
         <div class=sv-cards>
           <div class=sv-card><span class=sv-kr><span class=sv-k>Staked balance</span><span class="sv-tag g">Self-custody</span></span>
             <span class=sv-big id=sv-staked>&mdash;<em>ATONE</em></span><span class=sv-sub id=sv-stsub></span></div>
@@ -4005,12 +3960,12 @@ text-transform:uppercase;padding:7px 11px;border-radius:6px;cursor:pointer;line-
         <div class=sv-panel id=sv-allocp></div>
         <div class=sv-strip id=sv-foot></div>
       </section>
-      <section class=sv-screen data-sc=auto aria-label=Autopilot>
+      <section class=sv-screen id=sv-auto data-sc=auto aria-label=Autopilot>
         <div class=sv-panel id=sv-atp></div>
         <div class=sv-panel id=sv-atalloc></div>
         <div class=sv-panel id=sv-atauth></div>
       </section>
-      <section class=sv-screen data-sc=net aria-label=Network>
+      <section class=sv-screen id=sv-net data-sc=net aria-label=Network>
         <div class=sv-panel id=sv-nethead></div>
         <div class="sv-cards four" id=sv-netcards></div>
         <div class="sv-panel sv-list">
@@ -4282,4 +4237,5 @@ text-transform:uppercase;padding:7px 11px;border-radius:6px;cursor:pointer;line-
 <script src="tx.js"></script>
 <script src="app.js"></script>
 <script src="simple.js"></script>
+<script src="shell.js"></script>
 </body></html>

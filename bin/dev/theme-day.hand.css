@@ -86,8 +86,11 @@
 
   /* the dashboard's sub-header sits outside #sv (it is the window's own row), so the
      same floors are named for it: colour only, the sizes are the night sheet's */
-  html[data-theme=light]:not([data-mono]) #svbar .sv-bw i,
-  html[data-theme=light]:not([data-mono]) #svbar .sv-tab,html[data-theme=light]:not([data-mono]) #svbar .sv-menu .mh,
-  html[data-theme=light]:not([data-mono]) #svbar .sv-menu .ma,html[data-theme=light]:not([data-mono]) #svbar .sv-menu .mi i,
-  html[data-theme=light]:not([data-mono]) #svbar .sv-menu .mi:disabled,html[data-theme=light]:not([data-mono]) #svbar .sv-mode button{color:var(--muted)}
-  html[data-theme=light]:not([data-mono]) #svbar .sv-mode button[aria-pressed=true]{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .brandbar .sv-bw i,
+  html[data-theme=light]:not([data-mono]) .hdr-r .sv-tab,html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mh,
+  html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .ma,html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mi i,
+  html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mi:disabled,html[data-theme=light]:not([data-mono]) .hdr-r .sv-mode button{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .hdr-r .sv-mode button[aria-pressed=true]{color:var(--ink)}
+
+  /* the navigation shell's "soon" badge: on a lit level-1 tab the tint lowers its ground */
+  html[data-theme=light]:not([data-mono]) .l1badge{color:var(--warn-ink)}

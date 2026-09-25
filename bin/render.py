@@ -161,6 +161,14 @@ payload = json.dumps({"generated": D["generated"], "thresh": th["threshold"],
                       "trend": D["trend"], "eta": e, "set": s}, separators=(",", ":"))
 
 TPL = open(os.path.join(os.path.dirname(__file__), "page.tpl")).read()
+# the navigation shell: both tab strips, their pre-paint CSS and the embedded config all come
+# from shell.json (see shellgen.py) - no tab label is written anywhere else
+import shellgen
+SHELL = shellgen.build(json.load(open(os.path.join(os.path.dirname(__file__), "shell.json"))), TPL)
+for _k, _v in SHELL.items():
+    if TPL.count("{{%s}}" % _k) != 1:
+        sys.exit("atomone-app: FATAL page.tpl must carry {{%s}} exactly once" % _k)
+    TPL = TPL.replace("{{%s}}" % _k, _v)
 page = (TPL
   .replace("{{GENERATED}}", D["generated"]).replace("{{HEIGHT}}", f(D["height"]))
   .replace("{{CHAIN}}", esc(D["chain"]))
@@ -232,12 +240,12 @@ page = (TPL
 import shutil, subprocess
 # A save re-renders within a second (atomone-app-render.path), so a script that
 # does not parse must never reach web/: the last good page keeps serving instead.
-for _js in ("app.js", "boot.js", "tx.js", "simple.js"):
+for _js in ("app.js", "boot.js", "tx.js", "simple.js", "shell.js"):
     _chk = subprocess.run(["/usr/bin/node", "--check", os.path.join(os.path.dirname(__file__), _js)],
                           capture_output=True, text=True)
     if _chk.returncode != 0:
         sys.exit("atomone-app: FATAL %s does not parse:\n%s" % (_js, _chk.stderr.strip()[-600:]))
-for _js in ("app.js", "boot.js", "tx.js", "simple.js"):
+for _js in ("app.js", "boot.js", "tx.js", "simple.js", "shell.js"):
     shutil.copyfile(os.path.join(os.path.dirname(__file__), _js),
                     os.path.join(OUT, "." + _js + ".tmp"))
     os.chmod(os.path.join(OUT, "." + _js + ".tmp"), 0o640)
@@ -304,7 +312,7 @@ if _depth != 0:
 # button "did nothing" that way on 2026-09-19). Versioning the script URLs by
 # content makes a fresh page always fetch its own scripts.
 import hashlib
-for _js in ("app.js", "boot.js", "tx.js", "simple.js"):
+for _js in ("app.js", "boot.js", "tx.js", "simple.js", "shell.js"):
     _h = hashlib.sha256(open(os.path.join(OUT, _js), "rb").read()).hexdigest()[:10]
     page = page.replace(f'src="{_js}"', f'src="{_js}?v={_h}"')
 tmp = os.path.join(OUT, ".index.html.tmp")
