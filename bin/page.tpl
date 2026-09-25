@@ -6,15 +6,15 @@
 <script src="boot.js"></script>
 <meta name=description content="AtomOne's Nakamoto Bonus, live: what it pays, what would reverse it, and ten million blocks of evidence.">
 <style>
-:root{--void:#070a10;--edge:#1b2738;--edge2:#2a3c54;--ink:#e9eff7;--ink2:#8595ab;--ink3:#566679;
---faint:#3b4756;--hot:#ffb155;--burn:#ff7a45;--cold:#3b9eff;--lit:#f4f7fb;color-scheme:dark;
---card:#0e1622;--card2:#121c2b;--inset:#0a1320;--blue:#3b9eff;--cyan:#62d9ff;--green:#36d399;--amber:#ffb155;
+:root{
+color-scheme:dark;
+
 /* the calculator's own palette, the page's first design: applied inside #p-home and its cards */
 --cv:#06060c;--ce:#232342;--ce2:#34345c;--ci:#e6e4f0;--ci2:#a5a3c4;--ci3:#6f6d94;--cf:#4a4a68;--ch:#ffb02e;--cb:#ff4d1f;--cc:#6f66c8;--cl:#fff8dc;
 --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
 --sans:"Helvetica Neue",Helvetica,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
 *{box-sizing:border-box}
-body{background:var(--void);color:var(--ink);font-family:var(--sans);margin:0;line-height:1.5;
+body{color:var(--ink);font-family:var(--sans);margin:0;line-height:1.5;
 -webkit-font-smoothing:antialiased;overflow-x:hidden}
 body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
 background:radial-gradient(60% 50% at 80% -10%,rgba(59,158,255,.10),transparent 60%),
@@ -34,7 +34,7 @@ html:not([data-tab=dele]) #calc,.pop .card:not(.txcard){--void:var(--cv);--edge:
 
 .lead{width:38px;height:38px;border-radius:50%;flex:0 0 auto}
 .bwrap{display:flex;flex-direction:column;gap:2px;min-width:0}
-.bt{font-size:var(--tfs);font-weight:800;letter-spacing:-.03em;display:flex;
+.bt{font-size:var(--tfs);display:flex;
 align-items:center;flex-wrap:wrap;line-height:1.1;gap:5px 9px}
 /* the name never breaks mid-phrase - if space runs out the pill wraps instead */
 .btx{white-space:nowrap}
@@ -48,7 +48,7 @@ align-items:center;flex-wrap:wrap;line-height:1.1;gap:5px 9px}
 /* centre, not baseline: the coefficient button is boxed and the mode buttons are
    a different height, so aligning their text baselines left the row lopsided
    against the panel edge above and the grid below */
-.frow{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+.frow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
 min-height:24px;margin-bottom:4px}
 
 /* uppercasing η yields Η - indistinguishable from a Latin H. Opt the symbol out. */
@@ -56,12 +56,12 @@ min-height:24px;margin-bottom:4px}
 /* how many times the smallest out-earns the largest, written over the span it
    measures rather than as a footnote nobody ties back to the two figures */
 
-.modes{display:flex;gap:5px;margin-left:auto}
-.mbtn{background:transparent;border:1px solid var(--edge2);color:var(--ink3);border-radius:3px;
-padding:4px 9px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+.modes{display:flex;margin-left:auto}
+.mbtn{color:var(--ink3);
+font-family:var(--mono);text-transform:uppercase;
 cursor:pointer}
-.mbtn:hover{color:var(--ink);border-color:var(--ink3)}
-.mbtn[aria-pressed=true]{background:var(--hot);border-color:var(--hot);color:#140c00}
+.mbtn:hover{border-color:var(--ink3)}
+.mbtn[aria-pressed=true]{border-color:var(--hot);}
 .mbtn:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
 /* APR printed into the cell — third attempt, and the first that does not fight
    the map. Per-cell ink flipped colour mid-ramp and left a seam; a flat scrim
@@ -148,8 +148,8 @@ letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
 .aplab{font-family:var(--mono);font-size:8px;letter-spacing:.13em;text-transform:uppercase;
 color:var(--ink3);white-space:nowrap}
 .apmid{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
-.apx{font-family:var(--mono);font-size:13.5px;color:var(--hot);line-height:1;
-letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.apx{line-height:1;
+font-variant-numeric:tabular-nums}
 /* a measured span, not a glyph floating in the gap: the arrow reaches from one
    figure to the other, which is the distance the multiplier describes */
 .apspan{position:relative;width:100%;height:1px;background:#8d8ab8}
@@ -212,12 +212,12 @@ tr.wk{cursor:pointer}tr.wk:hover td{background:#ff4d1f10;color:var(--ink)}
 footer{padding:42px 0 64px;font-family:var(--mono);font-size:11px;color:var(--ink3);border-top:1px solid var(--edge)}
 
 /* ── popups ── */
-.pop{position:fixed;inset:0;background:#06060cdd;display:none;align-items:center;justify-content:center;
-z-index:50;padding:20px}
+.pop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+z-index:50;}
 .pop.on{display:flex}
-.pop .card{background:#0b0b16;border:1px solid var(--edge2);border-radius:6px;max-width:470px;width:100%;
-padding:26px 28px 0;position:relative;box-shadow:0 24px 70px -20px #000;
-max-height:92vh;max-height:92svh;overflow-y:auto;scrollbar-color:var(--edge2) #0b0b16;scrollbar-width:thin}
+.pop .card{max-width:470px;width:100%;
+padding:26px 28px 0;position:relative;
+overflow-y:auto;scrollbar-color:var(--edge2) #0b0b16;scrollbar-width:thin}
 .pop .card::-webkit-scrollbar{width:10px}
 .pop .card::-webkit-scrollbar-track{background:#0b0b16}
 .pop .card::-webkit-scrollbar-thumb{background:var(--edge2);border-radius:5px}
@@ -263,7 +263,6 @@ border-radius:50%;display:grid;place-items:center;background:#ff6a3d14;
 border:1px solid #ff6a3d40;box-shadow:0 0 14px -6px #ff4d1f88}
 .cbx svg{width:15px;height:15px;fill:currentColor}
 
-#cpop .vgrid{margin-top:16px}
 #cpop .vhead,#spop .vhead{justify-content:center;position:relative}
 /* only shown when the panel was reached from the coefficient card, so it is a
    way back rather than a dead control for anyone who opened C directly */
@@ -287,41 +286,41 @@ font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:5px 11px;cur
 .hdt .tag-n,.hdt .tag-x{margin-left:6px}
 .hc{font-variant-numeric:tabular-nums;color:var(--ink2)}
 .hscroll{overflow-x:auto}
-.vhead{display:flex;gap:16px;align-items:center;padding:26px 28px 20px;
-background:linear-gradient(180deg,#141426 0,#0b0b16 100%);border-bottom:1px solid var(--edge)}
+.vhead{display:flex;
+}
 .vlogo{width:54px;height:54px;border-radius:50%;flex:0 0 auto;background:#1a1a30;object-fit:cover}
 /* Not every validator sets an identity on-chain, and three on this set do not.
    A blank disc reads as a broken image; an initial reads as a validator without
    a logo, which is what it is. */
 .vmono{width:54px;height:54px;border-radius:50%;flex:0 0 auto;display:none;
-align-items:center;justify-content:center;font-weight:800;font-size:23px;color:#0b0b16}
+align-items:center;justify-content:center;font-weight:800;color:#0b0b16}
 .cell .mono{position:absolute;inset:11%;width:78%;height:78%;border-radius:50%;
 display:flex;align-items:center;justify-content:center;font-weight:800;
 font-size:clamp(11px,1.1vw,17px);color:#0b0b16;pointer-events:none;
 box-shadow:0 0 0 1px #00000055}
 .vhid{min-width:0}
-.vname{font-size:23px;font-weight:800;letter-spacing:-.02em;line-height:1.15;overflow-wrap:anywhere}
+.vname{font-weight:800;overflow-wrap:anywhere}
 
-.vbadges{display:flex;gap:7px;flex-wrap:wrap;padding:16px 28px 0}
-.badge{font-family:var(--mono);font-size:10px;letter-spacing:.12em;padding:3px 9px;border-radius:2px;
+.vbadges{display:flex;flex-wrap:wrap;}
+.badge{font-family:var(--mono);font-size:10px;
 border:1px solid var(--edge2);color:var(--ink3)}
 .badge.up{border-color:#ffb02e66;color:var(--hot)}
 .badge.dn{border-color:#6f66c866;color:var(--cold)}
 .badge.warn{border-color:#ff4d1f66;color:var(--burn)}
 .badge.ok{border-color:#2ee06a55;color:#2ee06a}
-.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--edge);
-margin-top:18px;border-top:1px solid var(--edge)}
-.vstat{background:#0b0b16;padding:13px 28px;display:flex;flex-direction:column;gap:5px;
+.vgrid{display:grid;grid-template-columns:1fr 1fr;
+}
+.vstat{display:flex;flex-direction:column;
 align-items:center;text-align:center}
-.vstat.hot .vv{color:var(--hot)}
-.vk{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
-.vv{font-family:var(--mono);font-size:15px;font-variant-numeric:tabular-nums;color:var(--ink)}
-.vnote{font-size:12.5px;color:var(--ink3);line-height:1.6;padding:18px 28px 0}
+
+.vk{text-transform:uppercase;}
+.vv{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+
 /* rank rides with the name rather than spending a whole stat cell on one number */
 /* its own column before the name, so the name and the description below it
    start at the same left edge instead of the name being pushed in by the rank */
-.vrk{font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.04em;
-border:1px solid var(--edge2);border-radius:99px;padding:2px 8px;margin-left:9px;
+.vrk{font-family:var(--mono);
+border:1px solid var(--edge2);border-radius:99px;
 vertical-align:middle;white-space:nowrap}
 /* uptime strips. The 10k bar is the chain's own signing window - real uptime.
    The 30D/3M strips are days the validator proposed at all; a red column is a
@@ -340,15 +339,14 @@ letter-spacing:-.02em;line-height:1}
 /* newest column at the right, lit and beating, so the strip reads as live
    even when every block is signed and the bars are otherwise identical */
 .upbars b{transition:background .25s}
-.upbars b.tip{background:#7dffb0;box-shadow:0 0 8px #2ee06acc;animation:tipbeat 1.6s ease-out infinite}
+.upbars b.tip{background:#7dffb0;animation:tipbeat 1.6s ease-out infinite}
 @keyframes tipbeat{0%,100%{opacity:1}50%{opacity:.45}}
 @media(prefers-reduced-motion:reduce){.upbars b.tip{animation:none}}
 
 /* the one number a delegator came for, given a band of its own */
-.pinghead{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+
 .pinghead .pingttl{justify-self:start}
-.pinghead .pingh{justify-self:end}
-@media(max-width:620px){.aprband{padding:14px 18px 12px}}
+
 .aprx{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;
 color:#8d86c9;display:flex;flex-direction:column;align-items:flex-end;gap:2px;
 margin-left:auto;padding-left:18px}
@@ -371,7 +369,7 @@ justify-content:flex-end;gap:1px;align-self:flex-end;margin-bottom:2px}
 .aprnet{flex-direction:row;align-items:baseline;gap:3px;padding-left:0;margin-left:0;
 text-transform:none;letter-spacing:.03em;font-style:italic;color:#7fd0a5;font-size:8px;
 position:relative;top:6px;left:-2px}
-.aprnet b{font-size:10.5px;font-style:italic;color:#7fd0a5}
+.aprnet b{font-size:10.5px;}
 @media(max-width:620px){
   .aprband .aprnet{font-size:7.5px;top:5px;left:-2px}
   .aprstack .aprlab{left:-6px}
@@ -406,7 +404,7 @@ transition:background .15s,border-color .15s,color .15s}
 fill:none;stroke:#9ed6f7;stroke-width:1.2;stroke-dasharray:5 4;animation:march .9s linear infinite}
 @keyframes march{to{stroke-dashoffset:-9}}
 @media(prefers-reduced-motion:reduce){.notify .march rect{animation:none}}
-.notify:hover{background:#5bb3e826;border-color:#5bb3e8;color:#d7efff}
+
 /* the alert chooser */
 .acard{max-width:430px}
 
@@ -462,27 +460,18 @@ min-width:11ch;text-align:right;flex:0 0 auto}
    and shrinking the cells to make them fit destroys the heat map - which is
    the whole page. Let it flow and scroll instead. */
 @media(max-width:620px){
-  .fold{min-height:auto;padding:16px 0 24px;gap:14px}
+  .fold{min-height:auto;}
   
   .lead{width:30px;height:30px}
-    .grid{gap:3px}
-  .aprbar{gap:10px}
-  .apnum{font-size:20px}
-  .aplab{font-size:8px;letter-spacing:.1em}
-  
-  
-  /* control panel: value, then the slider on its own full-width line, then
+
+.aplab{font-size:8px;letter-spacing:.1em}
+
+/* control panel: value, then the slider on its own full-width line, then
      chips stretched to thumb width */
-  
-  
-  
-  
-  
-  .chip{flex:1 1 auto;text-align:center;padding:9px 8px;font-size:11px}
-  
-  
-  
-  input[type=range]::-webkit-slider-thumb{width:24px;height:24px}
+
+.chip{flex:1 1 auto;text-align:center;padding:9px 8px;font-size:11px}
+
+input[type=range]::-webkit-slider-thumb{width:24px;height:24px}
   input[type=range]::-moz-range-thumb{width:24px;height:24px}
 
   /* below the fold */
@@ -490,14 +479,8 @@ min-width:11ch;text-align:right;flex:0 0 auto}
   .sub{font-size:15px;margin:12px 0 22px}
   .sbox>*{padding:15px 16px}
   .sbox .v{font-size:25px}
-  
-  
-  
-  
-  
-  
-  
-  table{font-size:12px}
+
+table{font-size:12px}
   th{padding:0 9px 10px 0;font-size:9px}
   td{padding:10px 9px 10px 0}
   .nm{font-size:13px}
@@ -505,31 +488,18 @@ min-width:11ch;text-align:right;flex:0 0 auto}
   footer{padding:32px 0 48px}
 
   /* popups - every one of them, not just the validator card */
-  .pop{padding:10px}
-  .pop .card{padding:20px 18px 0;max-height:94vh;max-height:94svh}
+  
+  .pop .card{padding:20px 18px 0;}
   .pop .e{font-size:42px}
   .pop dl{font-size:12px;gap:8px 14px}
+
+.vlogo{width:44px;height:44px}
+
+.upbars{gap:1px;}
   
-  .vhead{padding:18px 18px 16px;gap:12px}
-  .vlogo{width:44px;height:44px}
-  .vname{font-size:19px}
-  
-  
-  .vbadges{padding:14px 18px 0}
-  .vstat{padding:11px 18px}
-  .vv{font-size:13.5px}
-  .vk{font-size:9px}
-  .vnote{padding:15px 18px 0}
-  .upsec{padding:15px 18px 17px;gap:9px}
-  
-  .upbars{gap:1px;height:17px}
-  .upn{font-size:15px}
   .upl{font-size:7.5px;letter-spacing:.08em}
-  .upcell{padding:9px 8px}
-  
-  
-  
-  .hscroll{padding:0 14px}
+
+.hscroll{padding:0 14px}
   .hcard .vnote{padding:13px 18px 20px}
   .cband{padding:12px 14px 14px}
   .cbrow{gap:7px}
@@ -543,10 +513,7 @@ min-width:11ch;text-align:right;flex:0 0 auto}
 }
 @media(max-width:400px){
   .w{padding:0 14px}
-  
-  .tag{font-size:6px;padding:2px 4px}
-  
-  
+
 }
 
 /* ── fold, rebuilt as stacked sections ─────────────────────────────────────── */
@@ -630,7 +597,7 @@ text-underline-offset:3px;text-decoration-thickness:1px}
 font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin-bottom:8px}
 .wrow .rlab{margin:8px 0 0}   /* the track above, the title under it: the LIVE labels hang between them */
 .wrow .trackwrap{margin-top:14px}   /* room over the track for the trip label; the same in all three rows */
-.rval{font-size:14px;font-weight:400;color:var(--ink);letter-spacing:0;text-transform:none;
+.rval{font-size:14px;color:var(--ink);letter-spacing:0;text-transform:none;
 font-variant-numeric:tabular-nums;transition:color .2s}
 .wrow.dirty .rval{color:var(--hot)}
 .wrow{padding-bottom:22px}
@@ -675,7 +642,7 @@ input[type=range].gradrange{box-shadow:inset 0 1px 0 #ffffff40,inset 0 -2px 3px 
 .trackwrap::before{content:"";position:absolute;left:0;right:0;top:50%;height:10px;margin-top:-5px;
 border-radius:3px;pointer-events:none;z-index:1;
 background:linear-gradient(180deg,#ffffff2e 0,#ffffff0a 45%,#00000000 55%,#00000040 100%)}
-.knob{background:linear-gradient(180deg,#fbf9ff 0,#d8d2ea 100%)}
+
 /* the staked track runs a cool ramp so it is never mistaken for the coefficient
    track above it; its handle and its button follow the same colour */
 /* the three handles are one plain selector: the row's title already carries
@@ -817,10 +784,7 @@ color:var(--burn);opacity:.8;font-family:var(--mono)}
 .etabox.eta.fall b,.etabox.eta.fall::after{color:#ff8a5c}
 .etabox.eta.fall:hover{border-color:#ff8a5c;background:#ff4d1f1f}
 .etabox.eta.fall:focus-visible{outline-color:#ff8a5c}
-.echips.rise .chip[aria-pressed=true]{background:#2ee06a;border-color:#2ee06a;color:#04170b}
-.echips.rise .chip[aria-pressed=true] span{color:#04170bcc}
-.echips.rise .chip[aria-pressed=true] b{color:#04170b}
-.echips.fall .chip[aria-pressed=true]{background:var(--burn);border-color:var(--burn);color:#fff}
+
 .etabox.conc{border-color:#ff6a3d55;background:#ff6a3d0f}
 .etabox.conc b,.etabox.conc::after{color:#ff8a5c}
 .etabox.conc:hover{border-color:#ff8a5c;background:#ff6a3d1f}
@@ -870,7 +834,7 @@ pointer-events:none;box-shadow:0 0 0 1px #ffffff55,0 1px 2px #0008;z-index:2}
 text-transform:uppercase;color:var(--ink3);border:1px solid #ffb02e55;background:#ffb02e0f;
 border-radius:3px;padding:4px 17px 4px 9px;display:inline-flex;align-items:center;gap:6px;
 cursor:pointer;font-variant-numeric:tabular-nums}
-.etabox b{color:var(--hot);font-size:11px;font-weight:400;letter-spacing:-.02em}
+
 /* the three readouts wear the tiles' prism material: a light catch top-left,
    a rim, shade toward the bottom-right, a shallow drop off the frame */
 .frow .etabox.eta,.frow .etabox.conc,.frow .etabox.cool{
@@ -905,9 +869,9 @@ color:var(--ink2);margin-top:-2px}
   .tag{font-size:6.5px;padding:2px 5px;letter-spacing:.03em;gap:4px;min-width:0}
   /* the two readouts sit together on the left rather than being pushed apart by
      space-between, and the six view buttons share one row across the section */
-  .frow{justify-content:flex-start;gap:7px;margin-bottom:6px}
-  .modes{margin-left:0;flex:1 0 100%;gap:4px}
-  .mbtn{flex:1 1 0;min-width:0;padding:5px 2px;font-size:8px;letter-spacing:.02em;
+  .frow{gap:7px;}
+  .modes{margin-left:0;flex:1 0 100%;}
+  .mbtn{flex:1 1 0;min-width:0;
   text-align:center;white-space:nowrap}
   .etabox{font-size:9px;padding:3px 17px 3px 7px}
   .etabox b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
@@ -921,10 +885,8 @@ color:var(--ink2);margin-top:-2px}
   
   .bt .tag{flex:0 0 auto}
   .sec{padding:13px 13px 12px;gap:9px}
-    
-  
-  
-  .apx{font-size:8px;white-space:normal;text-align:center}
+
+.apx{font-size:8px;white-space:normal;text-align:center}
   .apx b{font-size:12px}
   }
 
@@ -946,10 +908,10 @@ color:var(--ink2);margin-top:-2px}
 @media(prefers-reduced-motion:reduce){.pop.on .card{animation:none}}
 
 /* header: more air, clearer hierarchy */
-.vhead{padding:24px 28px 20px;gap:17px;
+.vhead{padding:24px 28px 20px;
 background:linear-gradient(180deg,#191930 0,#0d0d18 100%);
 border-bottom:1px solid #2b2b4a}
-.vname{font-size:21px;letter-spacing:-.025em}
+.vname{letter-spacing:-.025em}
 
 .vlogo,.vmono{box-shadow:0 0 0 1px #ffffff1a,0 6px 18px -8px #000}
 
@@ -969,7 +931,7 @@ border-bottom:1px solid #2b2b4a}
 #qpop .vstat,#cpop .vstat{padding:10px 20px 11px;gap:5px}
 #qpop .bul,#cpop .bul{padding:10px 24px 12px}
 #qpop .vgrid.gbelow{margin-top:8px}
-#qpop .vhead{min-height:56px}
+
 #cpop .cband{padding-top:10px;padding-bottom:10px}
 #qpop .card,#cpop .card{max-height:96vh;max-height:96svh}
 
@@ -986,10 +948,8 @@ border-top:1px solid var(--edge);margin-top:0;text-align:center}
 
 @media(max-width:620px){
   .pop .card{border-radius:10px}
-  .vhead{padding:18px 18px 16px;gap:13px}
-  .vname{font-size:18px}
-  .vstat{padding:12px 18px 13px}
-  .vnote{padding:15px 18px 19px}
+
+.vnote{padding:15px 18px 19px}
   
 }
 
@@ -1038,15 +998,10 @@ border-top:1px solid var(--edge);margin-top:0;text-align:center}
   .frow{margin-bottom:3px}
   .trackwrap{height:22px}
   .knob{width:15px;height:15px}
-  
-  
-  
-  
-  .aprbar{gap:8px}
+
+.aprbar{gap:8px}
   .apnum{font-size:16px}
-  
-  
-  
+
 }
 
 /* ── popup header, made identical for every validator ──────────────────────
@@ -1059,7 +1014,7 @@ border-top:1px solid var(--edge);margin-top:0;text-align:center}
 /* top-alignment exists so a two-line description lines up with the mark; this
    card has no description, so a single line must centre against it instead */
 #spop .vhead,#cpop .vhead,#qpop .vhead{align-items:center}
-#qpop .vhead{position:relative;min-height:66px}
+#qpop .vhead{position:relative;}
 #qpop .vhead .disc{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
 width:24px;height:24px;font-size:13px}
 #spop .vname,#cpop .vname,#qpop .vname{min-height:0}
@@ -1104,9 +1059,7 @@ html.popon,html.popon body{overflow:hidden}
   .vmono{font-size:17px}
   .vname{font-size:16.5px;min-height:20px}
   .vrk{font-size:9px;padding:1px 7px}
-  
-  .aprband{padding:12px 18px}
-  .aprbig{font-size:27px}
+
 }
 
 /* the card measured 507px against a 488px cap at 360x700, so the last row was
@@ -1114,7 +1067,7 @@ html.popon,html.popon body{overflow:hidden}
    than raise the cap, which exists to leave somewhere to tap */
 @media(max-width:620px){
   .vhead{padding:14px 16px 13px}
-  #qpop .vhead{min-height:52px}
+  
   .aprband{padding:10px 16px}
   .aprbig{font-size:24px}
   .vstat{padding:9px 16px 10px}
@@ -1153,22 +1106,13 @@ border-top:1px solid var(--edge);overflow:hidden}
 /* auto side margins cancel stretch in a column flex container, so the wrapper
    was sizing to its content and squeezing the title row */
 .panes>.w{width:100%}
-.tabs{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
-.brandbar .tabb{flex:0 0 auto}
-.tabb{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
-color:var(--ink3);border:1px solid var(--edge2);background:transparent;border-radius:3px;
-padding:6px 13px;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s,background .15s}
-.tabb:hover{color:var(--ink);border-color:var(--ink3)}
-.tabb.on{color:var(--acc,var(--hot));
-border-color:color-mix(in srgb,var(--acc,#ffb02e) 48%,transparent);
-background:color-mix(in srgb,var(--acc,#ffb02e) 9%,transparent)}
-.tabb .lc{font-size:12px;letter-spacing:0}
-.tabb:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
+.tabs{display:flex;margin-left:auto;}
+
 @media(max-width:620px){
   .brandbar{gap:9px;padding:2px 0 0}
   .brandbar .lead{width:29px;height:29px}
-  .tabs{width:100%;margin:2px 0 0;gap:0;height:36px}
-  .brandbar .tabb{flex:1 1 0;padding:0 4px;font-size:13.5px;display:flex;align-items:center;justify-content:center;text-align:center}
+  .tabs{width:100%;margin:2px 0 0;}
+  
 }
 /* One fixed frame for every tab: the header sits on top, the pane below fills
    whatever is left and centres its own content. Switching tabs swaps what is in
@@ -1237,21 +1181,20 @@ margin-bottom:4px;line-height:1.2}
 @media(max-width:620px){
   /* A grid row's automatic minimum is min-content, so "auto 1fr" rows refused to
      shrink and .panel's overflow:hidden ate the boxes at the bottom. */
-  .duo2{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) minmax(0,1fr);
-    gap:8px;height:100%}
+  .duo2{grid-template-columns:1fr;
+    }
   /* The chart takes whatever is left after the text and the boxes, instead of
      holding a fixed share of the panel and pushing the boxes out of it. */
-  .panel svg[viewBox]{flex:1 1 auto;height:auto;min-height:56px;margin:4px 0 2px}
+  
   .panel{padding:9px 11px 10px}
   /* the small line now carries which period the box is, so it stays */
-  .panel .sbox .s{font-size:9px;margin-top:2px}
+  
   .panel .sbox>*{padding:7px 9px}
   .panel .sbox .v{font-size:16px}
   .panel .sbox .k{font-size:8.5px;margin-top:4px}
   .panel .note{display:none}
   .panel .sub{font-size:10.5px}
-  
-  
+
 }
 /* one disc, three treatments - the same handles the range bars carry, reused on
    the button that opens a panel and again in that panel's corner, so the letter
@@ -1305,29 +1248,29 @@ text-align:left;margin:0;display:block;width:100%}
 /* the weeks box in the coefficient card is the same kind of door as the
    schedule pane's today box: the whole box is the button, the arrow the hint */
 #qpop .vstat.sgo{display:flex;text-align:center;font:inherit;width:auto}
-#qpop .vstat.sgo .sgoarr{color:var(--hot);margin-left:4px}
+#qpop .vstat.sgo .sgoarr{margin-left:4px}
 #qpop .vstat.sgo:hover .vv{color:var(--hot)}
 /* the page's table defaults right-align everything and left-align the first
    column; with a rank column in front, the moniker inherited the right edge and
    opened a gap next to its own number. The pays table states its own alignment. */
 .ptw{border:1px solid var(--edge2);border-radius:9px;overflow:hidden;margin-top:16px;
 background:#0b0b16}
-.ptab{width:100%;border-collapse:collapse;margin:0}
+.ptab{margin:0}
 .ptab th{background:#0f0f1c;border-bottom:1px solid var(--edge2);padding:9px 13px;
 text-align:right;font-size:9px;letter-spacing:.14em;color:var(--ink3)}
 .ptab td{padding:10px 13px;text-align:right;border-bottom:1px solid #23234255}
-.ptab tbody tr:last-child td{border-bottom:0}
+
 .ptab th:first-child,.ptab td:first-child{text-align:left;width:1%;white-space:nowrap;
 padding-right:4px}
 .ptab th:nth-child(2),.ptab td:nth-child(2){text-align:left;padding-left:9px}
-.ptab .rkc{color:#5c5a80;font-variant-numeric:tabular-nums;font-size:11px}
+.ptab .rkc{color:#5c5a80;font-variant-numeric:tabular-nums;}
 .ptab tr.vrow{cursor:pointer;transition:background .13s}
-.ptab tr.vrow:hover td{background:#ffffff08;color:var(--ink)}
+.ptab tr.vrow:hover td{color:var(--ink)}
 .ptab tr.vrow:hover .nm{color:#fff}
 .ptab tr.vrow:focus-visible{outline:2px solid var(--hot);outline-offset:-2px}
 .ptab .nm{color:var(--lit);max-width:15ch;display:flex;align-items:center;gap:6px}
 .ptab .nm span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.ptab .tlg{width:15px;height:15px;border-radius:50%;flex:0 0 auto;object-fit:cover;
+.ptab .tlg{border-radius:50%;flex:0 0 auto;object-fit:cover;
 background:#1b1b33;border:1px solid #ffffff14}
 .ptab .tlgx{background:#16162c}
 /* the last column was landing on the frame: the page's own td rule sets a zero
@@ -1343,8 +1286,8 @@ background:#0b0b16;border-top:1px solid var(--edge);border-bottom:1px solid var(
 .gcard .vnote{padding:11px 22px 16px}
 
 .ptab .ok{color:#5cf08f}
-.ptab .warn{color:var(--burn)}
-.duotab{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:stretch;
+
+.duotab{display:grid;grid-template-columns:repeat(3,1fr);
 height:100%;min-height:0}
 .pane>.pw>.duotab{flex:1 1 auto}
 .duotab>div{display:flex;flex-direction:column;min-height:0}
@@ -1353,21 +1296,18 @@ scrollbar-color:var(--edge2) #0b0b16;scrollbar-width:thin}
 .duotab .ptw::-webkit-scrollbar{width:7px}
 .duotab .ptw::-webkit-scrollbar-thumb{background:var(--edge2);border-radius:4px}
 .ptab thead th{position:sticky;top:0;background:#0f0f1c;z-index:1}
-.tcap.earn{color:#cdbcff}
-.tcap.hot{color:var(--hot)}
-.tcap.cool{color:#8fe8e0}
-.tcap i{font-style:normal;color:var(--ink3);letter-spacing:.1em;opacity:.8}
+
+.tcap i{font-style:normal;color:var(--ink3);opacity:.8}
 .tcap{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);
 margin:16px 0 -6px}
 .tcap.good{color:#5cf08f}
 @media(max-width:620px){
-  .duotab{grid-template-columns:1fr;grid-auto-rows:minmax(0,1fr);gap:5px}
-  .tcap{margin:7px 0 -6px}
-  #p-pays .note{display:none}
+
+#p-pays .note{display:none}
   .tcap{margin:10px 0 -6px}
   .ptab th:last-child,.ptab td:last-child{padding-right:10px}
   .ptab .nm{max-width:11ch}
-  .ptab .tlg{width:13px;height:13px}
+  
 }
 @media(max-width:620px){
   .ptw{margin-top:12px}
@@ -1381,7 +1321,6 @@ margin:16px 0 -6px}
 
 .pane .sub{font-size:clamp(12px,1.05vw,14px);margin:7px 0 0;max-width:72ch}
 
-.pane .note{font-size:clamp(10.5px,.92vw,12.5px);margin-top:8px;max-width:88ch}
 .pane .sbox{margin-top:12px}
 .pane .sbox .v{font-size:clamp(22px,2.4vw,30px)}
 
@@ -1389,12 +1328,12 @@ margin:16px 0 -6px}
    the whole point is before against after, read in one glance */
 
 @media(max-height:820px){
-  .pane svg[viewBox]{max-height:31vh}
+  
   .pane .sbox{margin-top:9px}
   .panes{padding:14px 34px}
 }
 @media(max-height:700px){
-  .pane svg[viewBox]{max-height:29vh}
+  
   .pane .note{display:none}
   
 }
@@ -1421,7 +1360,7 @@ margin:16px 0 -6px}
   .panel{overflow:visible}
   .panel svg[viewBox]{flex:0 0 auto;height:auto;min-height:0;margin:6px 0 4px}
   .panel .sbox .s{display:block;font-size:9px;margin-top:2px}
-  .duotab{grid-template-columns:1fr;grid-auto-rows:auto;height:auto;gap:14px}
+  .duotab{grid-template-columns:1fr;grid-auto-rows:auto;height:auto;}
   .duotab>div{min-height:0}
   .duotab .ptw{flex:0 0 auto;overflow-y:auto;max-height:200px}
 }
@@ -1456,18 +1395,17 @@ margin:16px 0 -6px}
 /* the switch shows what a press would give: a grey dot while the calculator is
    in colour, a coloured dot while it is grey */
 
-
 /* ── the folder. Above 1100px the page is one document: a lip with the mark
    and the live line, then three folder tabs on the top edge of the window, the
    open one joined to it - same fill, no seam - and the window itself filling
    the rest of the screen edge to edge. Nothing floats, nothing is centred in
    empty space; sections are what you flip to, not where you go. */
 .folder{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-areas:"brand nav right";align-items:center;gap:16px;padding:0 28px;flex:0 0 auto;position:relative;z-index:2;height:46px;
-border-bottom:1px solid var(--edge);background:linear-gradient(180deg,#0b111b,var(--void))}
+border-bottom:1px solid var(--edge);}
 /* the brand: mark and wordmark on one optical centre line */
 .brand{display:flex;align-items:center;gap:10px;flex:0 0 auto;margin:0;grid-area:brand;justify-self:start;text-decoration:none;color:inherit}
 .brand .mark{width:28px;height:28px;display:block;flex:0 0 auto}
-.wordmark{font-size:18px;font-weight:800;letter-spacing:-.03em;color:var(--ink);line-height:1;display:block;padding-top:1px}
+.wordmark{font-size:18px;font-weight:800;letter-spacing:-.03em;color:var(--ink);line-height:1;display:block;}
 /* the sections as words in the bar, the open one underlined by a light that
    glides to the next (#ind, one element moved by state()) */
 
@@ -1498,13 +1436,13 @@ font:inherit;color:var(--ink);background:var(--card);box-shadow:inset 0 0 0 1px 
 @media(max-width:700px){.intro3{flex-direction:column;align-items:stretch}.i3{justify-content:space-between}}
 /* a section that is not built yet is a word with a tag, not a door */
 
-.fsoon{position:absolute;top:15px;right:-14px;font-style:normal;font-family:var(--mono);font-size:6.5px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);
+.fsoon{position:absolute;top:15px;right:-14px;font-style:normal;font-size:6.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);
 border:1px solid rgba(255,176,46,.35);border-radius:2px;padding:1px 3px;line-height:1.2;margin:0;background:transparent}
 .i3{position:relative}
 .i3 .fsoon{top:6px;right:8px}
 /* My wallet: a chip in the bar - a mark and a word, framed; lit in cyan once you are in */
 
-@media(max-width:620px){.folder{height:52px;padding:0 14px}.brand{margin-right:16px;gap:8px}.brand .mark{width:28px;height:28px}
+@media(max-width:620px){.brand{margin-right:16px;gap:8px}.brand .mark{width:28px;height:28px}
 .wordmark{display:none}}
 @media(min-width:1100px){
   .below{border-top:0;padding:0;background:var(--void)}
@@ -1516,7 +1454,7 @@ border:1px solid rgba(255,176,46,.35);border-radius:2px;padding:1px 3px;line-hei
      calculator's title row gets that row's height back instead of a dead band */
   .w#calc{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
   html[data-tab=empty] #p-empty,html[data-tab=connect] #p-connect,html[data-tab=dele] #p-dele,html[data-tab=dele] #sv,html[data-tab=intro] #p-intro{height:auto;flex:1 1 auto}
-  .w#calc>.brandbar{padding:0 0 4px}
+  
   .w#calc>.flipbox,.w#calc>#p-dele{padding:0}
   .w#calc>#p-empty,.w#calc>#p-connect,.w#calc>#p-intro{padding:0}
   .calclab{display:none}
@@ -1533,11 +1471,11 @@ border:1px solid rgba(255,176,46,.35);border-radius:2px;padding:1px 3px;line-hei
 
 /* Governance is Staking's twin: the calculator's own title row and pill tabs
    (disabled until built), in the calculator's tokens, then one box saying soon */
-.tabs .tabb[disabled]{opacity:.55;cursor:default}
+
 /* the calculator's own title row belongs to Staking; the other sections bring theirs */
 html[data-tab=intro] .w#calc>.brandbar,html[data-tab=intro] .flipbox{display:none}
 html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect] .flipbox{position:absolute;left:0;right:0;top:70px;visibility:hidden;pointer-events:none}
-.tabs .tabb[disabled]{cursor:default}
+
 /* ── the button families, renewed to the prism language: a glass group with
    one hairline, pills inside, the pressed one lit in its accent with a light
    catch and a soft glow - the same on the calculator tabs and the view row */
@@ -1546,19 +1484,15 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
    not part of the black-and-white mode: the mode is for the map and the cards,
    these three stay in colour whatever the switch says. */
 .tabs{background:transparent;border:0;border-radius:0;padding:0;gap:26px;box-shadow:none;height:38px;align-items:stretch;flex-wrap:nowrap}
-.tabs .tabb{position:relative;border:0;border-radius:0;padding:0 2px;background:transparent;font-family:var(--sans);font-size:14.5px;font-weight:700;
-letter-spacing:-.01em;text-transform:none;color:var(--ink2);transition:color .18s}
-.tabs .tabb:hover{background:transparent;color:var(--ink)}
-.tabs .tabb.on{background:transparent;color:var(--ink);box-shadow:none;border:0}
-.tabs .tabb::after{content:none}                 /* the etabox arrow does not belong on a tab */
-.tabs .tabb.on::before{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;border-radius:2px 2px 0 0;
-background:var(--acc,var(--hot));box-shadow:0 0 12px var(--acc,var(--hot))}
-.modes{background:#0b0b16;border:1px solid var(--edge2);border-radius:99px;padding:3px;gap:2px;
-box-shadow:inset 0 1px 0 #ffffff0a,0 2px 6px #0008}
-.mbtn{border:0;border-radius:99px;padding:6px 13px;background:transparent;font-size:10.5px}
+
+/* the etabox arrow does not belong on a tab */
+
+.modes{background:#0b0b16;border:1px solid var(--edge2);gap:2px;
+}
+.mbtn{border:0;background:transparent;}
 .mbtn:hover{background:#ffffff0a;color:var(--ink)}
 .mbtn[aria-pressed=true]{background:linear-gradient(180deg,#ffd07a,#ffb02e);color:#140c00;
-box-shadow:inset 0 1px 0 #ffffff55,0 0 12px #ffb02e66}
+}
 .nk{font-style:normal;color:var(--ink)}
 /* Staking is a card with two faces: the chain's stake on the front, the
    reader's own on the back. Manage my stake turns it over; the header stays.
@@ -1579,113 +1513,74 @@ box-shadow:inset 0 1px 0 #ffffff55,0 0 12px #ffb02e66}
    top edge), Inter at 600-800, solid gradient buttons, tinted tag pills, inset
    tracks. Every class here is prefixed wk- or scoped under #p-dele, so nothing
    the calculator names can reach in - and nothing here reaches out. */
-#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{
-  --wc:#0E1622;--wh:#121C2B;--wbd:#1B2738;--wbd2:#2A3C54;--wi:#0A1320;--wchip:#0E1826;--wsolid:rgba(14,24,38,.97);
-  --wt:#E9EFF7;--ws:#8595AB;--wf:#566679;
+#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard{
+  --wsolid:rgba(14,24,38,.97);
+  
   --wblue:#3B9EFF;--wcyan:#62D9FF;--wgreen:#36D399;--wamber:#FFB155;--wburn:#FF7A45;--wgold:#F5C66B;
   --wsans:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --wmono:ui-monospace,"SF Mono","Roboto Mono",Menlo,Consolas,monospace;
   font-family:var(--wsans);color:var(--wt)}
-#p-dele{overflow:hidden}
-#p-dele>.pw{height:100%;min-height:0;display:flex;flex-direction:column;gap:12px;width:100%;padding:0 0 16px}
+
+#p-dele>.pw{gap:12px;width:100%;padding:0 0 16px}
 #p-dele button{font-family:inherit}
 #p-dele b{font-weight:700}
 
 /* the head: who is connected, the two tabs, two icon buttons */
 
-.wk-mark{width:40px;height:40px;border-radius:11px;overflow:hidden;flex:0 0 auto;border:1px solid var(--wbd2);background:var(--wi);box-shadow:0 8px 20px -12px #000}
-.wk-mark img{width:100%;height:100%;display:block;object-fit:cover}
-
-.wk-addr{display:inline-flex;align-items:center;gap:6px;font-family:var(--wmono);font-size:11px;font-weight:600;color:var(--wcyan);letter-spacing:.01em}
+.wk-addr{display:inline-flex;align-items:center;gap:6px;font-family:var(--wmono);}
 .wk-addr::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--wgreen);box-shadow:0 0 8px var(--wgreen)}
 
-.wk-tab{position:relative;border:0;background:transparent;color:var(--ws);font-size:15px;font-weight:700;padding:0 2px;height:48px;line-height:1;cursor:pointer;
-display:inline-flex;align-items:center;gap:8px;transition:color .18s;white-space:nowrap}
-.wk-tab:hover{color:var(--wt)}
-.wk-tab.on{color:var(--wt)}
-.wk-tab.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px 2px 0 0;background:var(--wcyan);box-shadow:0 0 12px var(--wcyan)}
-.wk-tab i{font-style:normal;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--wgold);
-background:rgba(245,198,107,.08);border:1px solid rgba(245,198,107,.25);border-radius:99px;padding:1px 7px}
-.wk-tab:focus-visible,.wk-ib:focus-visible,.wk-btn:focus-visible{outline:2px solid var(--wcyan);outline-offset:2px}
+.wk-ib:focus-visible,.wk-btn:focus-visible{outline:2px solid var(--wcyan);outline-offset:2px}
 
-.wk-ib{width:38px;height:38px;border-radius:50%;border:1px solid var(--wbd2);background:rgba(255,255,255,.03);color:var(--ws);
+.wk-ib{border:1px solid var(--wbd2);background:rgba(255,255,255,.03);
 display:grid;place-items:center;cursor:pointer;padding:0;transition:color .16s,border-color .16s,box-shadow .16s,transform .16s,background .16s;
-box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
-#p-dele .wk-ib svg,#txpop .wk-ib svg,#wpick .wk-ib svg{width:17px;height:17px;margin:0;max-height:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+}
+#p-dele .wk-ib svg,#txpop .wk-ib svg{width:17px;height:17px;margin:0;max-height:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .wk-ib:hover{color:var(--wcyan);border-color:var(--wcyan);box-shadow:0 0 14px -4px var(--wcyan),0 6px 16px -8px rgba(0,0,0,.9);transform:scale(1.06)}
-.wk-ib.wk-out:hover{color:var(--wburn);border-color:var(--wburn);box-shadow:0 0 14px -4px var(--wburn),0 6px 16px -8px rgba(0,0,0,.9)}
+
 .wk-ib.busy svg{animation:wkspin .8s linear infinite}
 @keyframes wkspin{to{transform:rotate(360deg)}}
 
 /* buttons: GATA's solid gradient on dark ink, or a ghost */
-.wk-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--wbd2);border-radius:11px;padding:10px 18px;
-font-size:14px;font-weight:600;line-height:1;color:var(--wt);background:transparent;cursor:pointer;white-space:nowrap;
+.wk-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--wbd2);
+line-height:1;color:var(--wt);background:transparent;cursor:pointer;white-space:nowrap;
 transition:filter .12s,transform .12s,box-shadow .2s,opacity .2s}
-#p-dele .wk-btn svg,#txpop .wk-btn svg,#wpick .wk-btn svg{width:16px;height:16px;margin:0;max-height:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#p-dele .wk-btn svg,#txpop .wk-btn svg{width:16px;height:16px;margin:0;max-height:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .wk-btn:hover{filter:brightness(1.08)}
 .wk-btn:active{transform:translateY(1px)}
 .wk-btn:disabled{opacity:.4;cursor:default;filter:none;transform:none;box-shadow:none}
-.wk-primary{border:0;color:#04121F;background:linear-gradient(180deg,#3B9EFF,#2C76C9);box-shadow:0 8px 26px -10px rgba(59,158,255,.55),inset 0 1px 0 rgba(255,255,255,.25)}
+
 .wk-go{border:0;color:#03130C;background:linear-gradient(180deg,#36D399,#1FA877);box-shadow:0 8px 26px -10px rgba(54,211,153,.6),inset 0 1px 0 rgba(255,255,255,.25)}
-.wk-big{padding:14px 26px;font-size:15px;border-radius:13px}
 
 /* disconnected: one button in the middle of the room, the chooser under it */
-.wk-gate{flex:1 1 auto;min-height:0;display:grid;place-items:center;position:relative}
-
-.wopts{display:grid;grid-template-columns:1fr;gap:8px;padding:14px 22px 0}
-
-.wopt{display:grid;grid-template-columns:40px minmax(0,1fr) auto;grid-template-areas:"lg nm ar" "lg st ar";align-items:center;gap:2px 12px;padding:12px 12px 12px 12px;border:1px solid var(--wbd);border-radius:7px;background:var(--wchip);color:var(--wt);text-align:left;
-font-size:13.5px;font-weight:600;cursor:pointer;transition:border-color .15s,background .15s;text-align:left}
-.wopt:hover{border-color:rgba(98,217,255,.4);background:rgba(98,217,255,.08)}
-.wopt img{grid-area:lg;width:40px;height:40px;border-radius:10px;align-self:center}
-.wopt b{grid-area:nm;font-size:14px;font-weight:400;color:#fff8dc;line-height:1.1}
-.wopt small{grid-area:sm;font-family:var(--wmono);font-size:8px;letter-spacing:.06em;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wopt em{grid-area:ar;font-style:normal;color:var(--wf);font-size:14px;transition:transform .2s,color .2s}
-.wopt:hover em{transform:translateX(3px);color:var(--wcyan)}
-.wopt.off{opacity:.55}
-.wopt i{grid-area:st;margin:3px 0 0;font-style:normal;font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap;justify-self:start}
-.wopt i.on{color:var(--wgreen)}
-.wopt i.on::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--wgreen);margin:0 5px 1px 0}
-.wk-state{position:absolute;bottom:22px;left:0;right:0;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--ws);text-align:center;padding:0 24px}
-.wk-state s{text-decoration:none}
-.wk-state b,.wk-state u{color:var(--wt);text-decoration:none}
 
 /* connected: the four figures, then the ledger beside the plan and the moves */
-.wk-body{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:12px}
-
-#wk-mine{flex:1 1 auto;min-height:0}
-
-#wk-plan{flex:0 0 auto}
 
 #wk-moves{min-height:0}
 
 /* the chain's height, live: the plan is solved on this block */
 
-@keyframes wklive{0%{box-shadow:0 0 0 0 rgba(54,211,153,.6)}70%{box-shadow:0 0 0 6px rgba(54,211,153,0)}100%{box-shadow:0 0 0 0 rgba(54,211,153,0)}}
-
 /* the reader's four figures, in the head of the ledger they describe */
 
 /* amount presets: plain small buttons, the chosen one lit */
 .wk-pre{display:inline-flex;gap:5px}
-.wk-pre button{height:34px;padding:0 9px;border-radius:8px;border:1px solid var(--wbd2);background:transparent;color:var(--ws);font-size:11.5px;font-weight:700;cursor:pointer;transition:color .14s,border-color .14s,background .14s}
+.wk-pre button{padding:0 9px;border:1px solid var(--wbd2);background:transparent;cursor:pointer;transition:color .14s,border-color .14s,background .14s}
 .wk-pre button:hover{color:var(--wt);border-color:var(--ws)}
-.wk-pre button[aria-pressed=true]{color:var(--wcyan);border-color:var(--wcyan);background:rgba(98,217,255,.08);box-shadow:0 0 12px -4px rgba(98,217,255,.8)}
 
 .wk-empty{font-size:12.5px;font-weight:600;color:var(--wf);padding:14px 4px}
 
 /* tag pills: an accent, tinted */
-.wk-pl{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:10.5px;font-weight:800;white-space:nowrap;
---a:var(--ws);color:var(--a);background:color-mix(in srgb,var(--a) 8%,transparent);border:1px solid color-mix(in srgb,var(--a) 25%,transparent);
-box-shadow:0 0 12px -4px color-mix(in srgb,var(--a) 85%,transparent)}
+.wk-pl{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;white-space:nowrap;
+--a:var(--ws);color:var(--a);border:1px solid color-mix(in srgb,var(--a) 25%,transparent);
+}
 .wk-pl.ok{--a:var(--wgreen)}.wk-pl.warn{--a:var(--wamber)}.wk-pl.dim{--a:var(--wf);box-shadow:none}
 /* bars: an inset track, a gradient fill */
-.wk-hb{display:block;height:8px;border-radius:99px;background:var(--wi);border:1px solid var(--wbd);overflow:hidden;min-width:56px;width:100%}
-.wk-hb i{display:block;height:100%;min-width:3px;border-radius:99px;background:linear-gradient(90deg,#3B9EFF,#62D9FF)}
+.wk-hb{display:block;border-radius:99px;overflow:hidden;min-width:56px;width:100%}
+.wk-hb i{display:block;height:100%;min-width:3px;border-radius:99px;}
 .wk-hb.hld i{background:repeating-linear-gradient(135deg,#FFB155 0 3px,rgba(255,177,85,.35) 3px 6px)}
-.wk-hb.mv i{background:linear-gradient(90deg,#36D399,#8EF0C8)}
 
-.wk-lg{display:inline-block;width:24px;height:24px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:10px;background:var(--wi);box-shadow:0 0 0 1px var(--wbd2);flex:0 0 auto}
-.wk-lgx{text-align:center;line-height:24px;font-size:10.5px;font-weight:800;color:#fff;font-family:var(--wsans)}
+.wk-lg{display:inline-block;border-radius:50%;object-fit:cover;vertical-align:middle;background:var(--wi);flex:0 0 auto}
+.wk-lgx{text-align:center;font-weight:800;color:#fff;font-family:var(--wsans)}
 
 .wk-foot{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0 0;flex:0 0 auto}
 .wk-foot:empty{display:none}
@@ -1696,51 +1591,47 @@ box-shadow:0 0 12px -4px color-mix(in srgb,var(--a) 85%,transparent)}
    would get, the rate before and after */
 
 /* the moves: one line per message, source → destination, the amount */
-.wk-mv{display:grid;grid-template-columns:minmax(0,1fr) 96px 104px 78px;grid-template-areas:"f a r g" "s s s s";align-items:center;gap:1px 10px;padding:6px 2px;border-bottom:1px solid var(--wbd)}
+.wk-mv{border-bottom:1px solid var(--wbd)}
 .wk-mv:last-child{border-bottom:0}
 .wk-mv .wk-lg{margin:0;width:20px;height:20px;line-height:20px;font-size:9px}
 .wk-mv .f{grid-area:f;display:flex;align-items:center;gap:7px;min-width:0}
 .wk-mv .f b{font-size:13px;font-weight:700;color:var(--wt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .wk-mv .f i{font-style:normal;color:var(--wf);font-size:12px;flex:0 0 auto}
 .wk-mv.stay .f i{font-size:10.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.wk-mv .a{grid-area:a;display:flex;flex-direction:column;align-items:flex-end;gap:3px;font-family:var(--wmono);font-size:12.5px;font-weight:700;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}
+.wk-mv .a{grid-area:a;display:flex;flex-direction:column;align-items:flex-end;gap:3px;font-family:var(--wmono);font-variant-numeric:tabular-nums;white-space:nowrap}
 .wk-mv .a .wk-hb{width:80px;min-width:0;height:5px}
-.wk-mv .r{grid-area:r;text-align:right;font-family:var(--wmono);font-size:12px;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.wk-mv .r{grid-area:r;text-align:right;font-family:var(--wmono);white-space:nowrap;font-variant-numeric:tabular-nums}
 .wk-mv .r s{color:var(--wf);margin-right:5px}
-.wk-mv .r b{color:var(--wgreen);font-weight:700}
+.wk-mv .r b{color:var(--wgreen);}
 .wk-mv .r .dr{font-size:9.5px;font-weight:700;margin-left:4px}.wk-mv .r .dr.dn{color:var(--wburn)}.wk-mv .r .dr.up{color:var(--wgreen)}
-.wk-mv .g{grid-area:g;display:flex;flex-direction:column;align-items:flex-end;gap:1px;font-family:var(--wmono);font-size:12.5px;font-weight:700;color:var(--wgreen);font-variant-numeric:tabular-nums;white-space:nowrap}
+.wk-mv .g{grid-area:g;display:flex;flex-direction:column;align-items:flex-end;gap:1px;font-family:var(--wmono);color:var(--wgreen);font-variant-numeric:tabular-nums;white-space:nowrap}
 .wk-mv .g.dim{color:var(--wf)}
-.wk-mv .g em{font-style:normal;font-family:var(--wsans);font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--wf)}
+.wk-mv .g em{font-style:normal;font-family:var(--wsans);text-transform:uppercase;color:var(--wf)}
 /* the destination: who the reader is being sent to, in figures */
-.wk-mv .f .from,.wk-mv .f .dest{display:inline-flex;align-items:center;gap:7px;min-width:0}
-.wk-mv .f .from b{font-size:12px;font-weight:600;color:var(--ws);max-width:9ch}
+.wk-mv .f .from{display:inline-flex;align-items:center;gap:7px;min-width:0}
+.wk-mv .f .from b{color:var(--ws);max-width:9ch}
 .wk-mv .f .from .wk-lg{width:18px;height:18px;line-height:18px;opacity:.8}
 
-.wk-mv .sub{grid-area:s;display:flex;flex-wrap:nowrap;align-items:center;gap:0 10px;overflow:hidden;padding:3px 0 0 0}
+.wk-mv .sub{display:flex;flex-wrap:nowrap;align-items:center;overflow:hidden;}
 .wk-mv .st{display:inline-flex;flex-direction:column;gap:1px;flex:0 0 auto}
-.wk-mv .st b{font-family:var(--wmono);font-size:10.5px;font-weight:700;color:var(--ws);font-variant-numeric:tabular-nums;white-space:nowrap}
-.wk-mv .st i{font-style:normal;font-size:7.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
+.wk-mv .st b{font-family:var(--wmono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.wk-mv .st i{font-style:normal;letter-spacing:.07em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
 .wk-mv .st.ok b{color:var(--wgreen)}.wk-mv .st.warn b{color:var(--wamber)}
 
 /* governance, not built yet */
 
-.wk-tab:disabled{cursor:default}
-.wk-soon{flex:1 1 auto;min-height:220px;display:grid;place-items:center;border:1px dashed var(--wbd2);border-radius:16px;background:rgba(255,255,255,.012)}
-.wk-soon span{font-size:11px;font-weight:800;letter-spacing:.34em;text-transform:uppercase;color:var(--wf)}
-
 /* the signing card, in the same language */
-.pop .card.txcard{max-width:460px;background:var(--wc);border:1px solid var(--wbd2);border-radius:16px;box-shadow:0 30px 80px -30px #000}
+.pop .card.txcard{background:var(--wc);border:1px solid var(--wbd2);}
 .wk-txh{display:flex;align-items:center;gap:11px;padding:18px 22px 14px;border-bottom:1px solid var(--wbd)}
 
-.wk-txh b{display:block;font-size:16px;font-weight:800;letter-spacing:-.01em;color:var(--wt)}
-.wk-txh span{display:block;font-size:11.5px;font-weight:600;color:var(--wf);margin-top:1px}
+.wk-txh b{display:block;letter-spacing:-.01em;color:var(--wt)}
+.wk-txh span{display:block;font-weight:600;color:var(--wf);margin-top:1px}
 /* one grid for every row, so the arrows line up whatever the amounts are */
 .txlist{padding:14px 22px 0;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto;align-items:center;gap:7px 8px;font-size:13px;font-weight:600;color:var(--wt)}
 .txrow{display:contents}
 .txrow span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .txrow i{font-style:normal;color:var(--wf)}
-.txrow b{font-family:var(--wmono);font-size:12px;font-weight:700;color:var(--wcyan);white-space:nowrap}
+.txrow b{font-family:var(--wmono);font-size:12px;white-space:nowrap}
 .txfee{padding:12px 22px 0;font-size:11.5px;font-weight:600;color:var(--wf)}
 .txstep{padding:8px 22px 0;font-size:12.5px;font-weight:600;color:var(--ws);min-height:16px}
 .txstep.ok{color:var(--wgreen)}.txstep.err{color:var(--wburn);white-space:pre-wrap;word-break:break-word}
@@ -1749,33 +1640,20 @@ box-shadow:0 0 12px -4px color-mix(in srgb,var(--a) 85%,transparent)}
 
 /* the view row on a phone: the buttons keep the calculator's new scale on a
    wide screen; at 390px the row must still hold seven of them */
-@media(max-width:620px){.mbtn{padding:5px 7px;font-size:9px;letter-spacing:.05em}}
 
 @media(max-width:700px){
-  #p-dele{overflow-y:auto;overscroll-behavior:contain}
-  #p-dele>.pw{height:auto;min-height:100%}
-  /* on a phone the column is a document: blocks in order, nothing scrolls inside
+
+/* on a phone the column is a document: blocks in order, nothing scrolls inside
      anything (a nested flex chain with min-height:0 collapsed the ledger to 0px) */
-  .wk-body,.wk-grid,.wk-col{display:block}
+  .wk-body{display:block}
+
+/* columns: rank · validator · bar · ATONE · share · APR · a year · status - the phone keeps rank, name, ATONE, APR, status */
+
+.wk-foot .wk-pl{font-size:9.5px}
+
+html[data-tab=dele] .calclab,html[data-tab=empty] .calclab,html[data-tab=connect] .calclab{display:none}
   
-  
-  
-  
-  
-  .wk-tab{height:40px;font-size:14px}
-  
-  /* columns: rank · validator · bar · ATONE · share · APR · a year · status - the phone keeps rank, name, ATONE, APR, status */
-  
-  
-  
-  
-  
-  .wk-foot .wk-pl{font-size:9.5px}
-  
-  
-  html[data-tab=dele] .calclab,html[data-tab=empty] .calclab,html[data-tab=connect] .calclab{display:none}
-  
-  .wk-mv{grid-template-columns:minmax(0,1fr) 96px 90px;grid-template-areas:"f f f" "a r g" "s s s"}.wk-mv .a{align-items:flex-start}
+  .wk-mv .a{align-items:flex-start}
   .wk-mv .sub{padding-left:0;overflow-x:auto;scrollbar-width:none}
   
 }
@@ -1788,7 +1666,7 @@ box-shadow:0 0 12px -4px color-mix(in srgb,var(--a) 85%,transparent)}
 :root{--void:#06060c;--edge:#232342;--edge2:#34345c;--ink:#e6e4f0;--ink2:#a5a3c4;--ink3:#6f6d94;--faint:#3a3a54;
 --hot:#ffb02e;--burn:#ff4d1f;--cold:#6f66c8;--lit:#fff8dc;--card:#0b0b16;--card2:#111124;--inset:#0a0a14;
 --blue:#6f66c8;--cyan:#2bc8bd;--green:#2ee06a;--amber:#ffb02e}
-#sv,.hdr-r,.brandbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
+#sv,.hdr-r,.brandbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
 --wt:#e6e4f0;--ws:#a5a3c4;--wf:#6f6d94;--wblue:#6f66c8;--wcyan:#2bc8bd;--wgreen:#2ee06a;--wamber:#ffb02e;--wburn:#ff4d1f;--wgold:#ffb02e;
 --wsans:"Helvetica Neue",Helvetica,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--wmono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
 body{background:var(--void);background-image:radial-gradient(130% 62% at 50% 0%,#16162e 0%,#0a0a16 42%,var(--void) 74%)}
@@ -1797,7 +1675,7 @@ body{background:var(--void);background-image:radial-gradient(130% 62% at 50% 0%,
 .fsoon{font-family:var(--mono);font-weight:400}
 /* the calculator: title, tabs, the view row, the stages, flat tiles */
 .bt{font-size:clamp(16px,1.7vw,20px);font-weight:600;letter-spacing:-.015em}
-.tabs .tabb{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;font-weight:400}
+
 .sec,.sec.tight,.duo .sec,.duo .sec:nth-child(n){border-radius:8px;background:#09090f;border-color:var(--edge);box-shadow:none}
 .modes{border-radius:5px;padding:2px;background:var(--inset);border-color:var(--edge);box-shadow:none}
 .mbtn{border-radius:3px;font-size:8px;letter-spacing:.16em;padding:4px 9px}
@@ -1805,45 +1683,38 @@ body{background:var(--void);background-image:radial-gradient(130% 62% at 50% 0%,
 .rval{font-weight:400}
 /* home: the hero in the same tokens, the doors as outlined caps */
 /* the wallet: a lip, a figure strip, stages, rows */
-.wk-mark{border-radius:9px;border:0;background:transparent;width:34px;height:34px;box-shadow:none;overflow:visible}
-.wk-mark img{border-radius:9px}
 
 .wk-addr{font-size:10px;letter-spacing:.06em;text-transform:none;color:var(--wf);font-weight:400}
 .wk-addr::before{display:none}
-.wk-tab{font-family:var(--wmono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;font-weight:400;color:var(--wf)}
-.wk-tab.on{color:var(--wt)}.wk-tab.on::after{background:var(--hot);box-shadow:0 0 12px var(--hot)}
-.wk-tab i{font-family:var(--wmono);font-weight:400;color:var(--hot);background:transparent;border-color:rgba(255,176,46,.35)}
+
 .wk-ib{border-radius:6px;background:var(--wchip);border-color:var(--wbd2);color:var(--ws);box-shadow:none;width:30px;height:30px}
 
-.wk-lg{width:15px;height:15px;box-shadow:0 0 0 1px #ffffff18;margin-right:8px}
-.wk-lgx{line-height:15px;font-size:7px}
+.wk-lg{box-shadow:0 0 0 1px #ffffff18;margin-right:8px}
+
 .wk-hb{height:4px;border:0;background:#16162c}
 .wk-hb i{background:linear-gradient(90deg,#6f66c8,#b9b0ff)}.wk-hb.mv i{background:linear-gradient(90deg,#2ee06a,#8ef0c8)}
 
 .wk-pl{font-family:var(--wmono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;border-radius:3px;box-shadow:none;background:transparent}
 
-.wk-pre button{height:30px;border-radius:4px;font-family:var(--wmono);font-size:8.5px;letter-spacing:.12em;font-weight:400;border-color:var(--wbd);color:var(--wf)}
+.wk-pre button{border-radius:4px;font-family:var(--wmono);letter-spacing:.12em;font-weight:400;border-color:var(--wbd);color:var(--wf)}
 .wk-pre button[aria-pressed=true]{color:#1b1440;background:#b9b0ff;border-color:#b9b0ff;box-shadow:none}
 
-.wk-mv{border:1px solid var(--wbd);border-radius:6px;background:var(--wchip);margin-bottom:5px;padding:6px 9px}
+.wk-mv{border:1px solid var(--wbd);border-radius:6px;margin-bottom:5px;}
 
 .wk-mv .f .from b{font-size:11px;font-weight:400}
 .wk-mv .a{font-size:11.5px;font-weight:400;color:#fff8dc}
 .wk-mv .r{font-size:11px;font-weight:400}.wk-mv .r b{font-weight:400}
 .wk-mv .g{font-size:12px;font-weight:400}
 .wk-mv .g em{font-size:7.5px;letter-spacing:.12em;font-weight:400}
-.wk-mv .st b{font-size:9.5px;font-weight:400;color:var(--ws)}
-.wk-mv .st i{font-size:7px;font-weight:400}
-.wk-btn{font-family:var(--wmono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:400;border-radius:6px;height:34px;padding:0 16px}
-.wk-btn.wk-go,.wk-btn.wk-primary{background:rgba(46,224,106,.05);border:1px solid rgba(46,224,106,.27);color:var(--wgreen);box-shadow:none}
-.wk-btn.wk-primary{background:rgba(255,176,46,.07);border-color:rgba(255,176,46,.35);color:var(--hot)}
-.wk-big{height:44px;padding:0 24px;font-size:10.5px}
+.wk-mv .st b{font-weight:400;color:var(--ws)}
+.wk-mv .st i{font-weight:400}
+.wk-btn{font-family:var(--wmono);letter-spacing:.16em;text-transform:uppercase;font-weight:400;border-radius:6px;padding:0 16px}
+.wk-btn.wk-go{background:rgba(46,224,106,.05);border:1px solid rgba(46,224,106,.27);color:var(--wgreen);box-shadow:none}
 
 .wk-txh b{font-size:14px;font-weight:400}.wk-txh span{font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase}
 .txrow{font-weight:400;font-size:12px}.txrow b{font-weight:400;color:var(--wcyan)}
 .txfee,.txstep{font-family:var(--wmono);font-size:9px;letter-spacing:.06em;font-weight:400}
 .pop .card.txcard{border-radius:8px;box-shadow:none}
-.wopt{font-weight:400;font-size:12.5px;border-radius:5px}.wopt i{font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;font-weight:400}
 
 /* ── the η, C and S cards in the same language: a stage for a card, figure
    cards for the numbers, a stage inside for the two-figure bands, caps for
@@ -1923,12 +1794,7 @@ background:transparent;border:0;box-shadow:none;padding:0;color:var(--ink2)}
 .pane .note{font-family:var(--mono);font-size:9px;letter-spacing:.04em;line-height:1.6;color:var(--ink3);max-width:none;margin-top:12px}
 /* ── the wallet, at a readable scale; a move as a comparison ── */
 
-.wk-mark{width:30px;height:30px}
-.wk-tab{font-size:9.5px;letter-spacing:.18em;position:relative;padding-right:0}
-.wk-tabs,.wk-tab{height:44px}
 /* the soon tag on the wallet's tab: the bar's small superscript, not a pill */
-.wk-tab i{position:absolute;top:8px;right:-16px;font-size:6.5px;letter-spacing:.14em;border-radius:2px;padding:1px 3px;line-height:1.2;margin:0;border:1px solid rgba(255,176,46,.35);background:transparent}
-.wk-tab:has(i){margin-right:14px}
 
 #p-dele .wk-ib svg{width:14px;height:14px}
 
@@ -1970,36 +1836,28 @@ background:transparent;border:0;box-shadow:none;padding:0;color:var(--ink2)}
    its accent - so they never read as the bar's underlined words */
 
 .brandbar .tabs{margin-left:auto;gap:6px;height:auto}
-.tabs .tabb{height:30px;padding:0 13px;border:1px solid var(--edge2);border-radius:5px;font-size:9px;letter-spacing:.18em;color:var(--ink3);background:transparent;transition:color .15s,border-color .15s,background .15s}
-.tabs .tabb::before,.tabs .tabb.on::before{content:none}   /* the underline was the word-tab's; a chip has its fill */
-.tabs .tabb:hover{color:var(--ink);border-color:var(--ink3)}
-.tabs .tabb.on{color:#140c00;background:var(--acc,var(--hot));border-color:var(--acc,var(--hot));box-shadow:0 0 14px -4px var(--acc,var(--hot))}
-.tabs .tabb.on[style*="2bc8bd"]{color:#062422}.tabs .tabb.on[style*="2ee06a"]{color:#062012}
-.tabs .tabb[disabled]{opacity:.55}
-@media(max-width:620px){.tabs .tabb{height:28px;padding:0 6px;font-size:8.5px;letter-spacing:.12em}}
+
+   /* the underline was the word-tab's; a chip has its fill */
+
 /* three layers, told apart: the bar is the site; the section head is a band
    of its own (a framed strip with the title and its tabs); the content below
    is stages on the ground */
 .w#calc>.brandbar{padding:0 16px 0 18px;height:50px;border:1px solid var(--edge);border-radius:8px;background:linear-gradient(180deg,#0e0e1e,#09090f);margin-bottom:12px;box-sizing:border-box}
 
-.wk-tabs,.wk-tab{height:48px}
-.wk-tab.on::after{bottom:0}
-.tabs .tabb{height:28px}
-@media(max-width:620px){.w#calc>.brandbar{height:auto;padding:8px 12px}.wk-tabs,.wk-tab{height:40px}}
+@media(max-width:620px){.w#calc>.brandbar{height:auto;padding:8px 12px}}
 /* ── My wallet, uplifted: three stages, each in its colour; short labels;
    the figures as coloured cards; one distribution bar; the answer where the
    choice is made; the gain where the signature is ── */
 
-#wk-mine{--a:#6f66c8}#wk-plan{--a:#b9b0ff}#wk-moves{--a:#2ee06a}
+#wk-moves{--a:#2ee06a}
 
 /* the distribution: one bar, a segment per validator, its share as its width */
 
 /* the left column: My stake keeps its figures, its bar and three rows in view
    (the ledger scrolls for the rest); Strategy takes what is left and its list
    scrolls inside - the screen itself never does */
-#wk-mine{flex:0 0 auto;min-height:0}
 
-#wk-plan{flex:1 1 auto;min-height:220px}
+#wk-plan{flex:1 1 auto;}
 
 /* strategy: the answer as the big figure between the amount and the list */
 
@@ -2014,38 +1872,32 @@ background:transparent;border:0;box-shadow:none;padding:0;color:var(--ink2)}
    more than the stake earns now (the reader ticks; nothing is pre-ticked and
    nothing is called best), then what moves, then the signature ── */
 
-#wk-mine{flex:1 1 auto;min-height:0}
+#wk-mine{flex:1 1 auto;}
 
-#wk-plan{--a:#2ee06a;min-height:0}
+#wk-plan{min-height:0}
 
-.wk-moves{flex:0 0 auto}
-
-.wk-moves{flex:0 0 auto;min-height:0;max-height:118px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
+.wk-moves{flex:0 0 auto;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .wk-moves:empty{display:none}
 /* a move, in one line: from → to, the amount, the difference a year */
 
-.wk-gainbig,#wk-moves{display:none}
+#wk-moves{display:none}
 
 /* the identity in the card's head, small; the gate keeps the room */
 #p-dele>.pw{padding-top:0}
 
 #wk-mine .wk-addr{font-size:8.5px;white-space:nowrap}
 
-#wk-mine .wk-mark{width:22px;height:22px}#wk-mine .wk-mark img{border-radius:6px}
 #wk-mine .wk-ib{width:26px;height:26px}#wk-mine .wk-ib svg{width:12px;height:12px}
-.wk-gate{min-height:320px}
 
 /* the bar's wallet button: a lit chip, and the account's name once connected */
-
 
 /* the list's record as columns in colour: fee, 90-day uptime, jailed */
 
 /* ── one section, one column, the pane scrolls as a document: the wallet,
    the delegations, then the redelegation list under its announcement ── */
 #p-dele{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--edge2) transparent}
-#p-dele>.pw{height:auto;min-height:100%}
-.wk-body{display:block}
-#wk-mine{display:block;min-height:0;overflow:visible}
+
+#wk-mine{min-height:0;overflow:visible}
 #wk-mine .wk-foot{padding:8px 0 0}
 
 .wk-moves{max-height:none;overflow:visible}
@@ -2053,19 +1905,7 @@ background:transparent;border:0;box-shadow:none;padding:0;color:var(--ink2)}
 /* ── the gate: the wallet choice is the screen. A framed card on a lit ground,
    the two wallets as tiles, the chain and its live dot, one line of what is
    read. No popup, no lone button. ── */
-.wk-gate{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wt:#e6e4f0;--ws:#a5a3c4;--wf:#6f6d94;--wcyan:#2bc8bd;--wgreen:#2ee06a;
---wmono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
-min-height:0;padding:0 0 18px;border-radius:10px;
-background:radial-gradient(70% 90% at 20% 0%,rgba(255,176,46,.09),transparent 60%),radial-gradient(70% 90% at 85% 100%,rgba(43,200,189,.09),transparent 60%),
-repeating-linear-gradient(0deg,transparent 0 23px,rgba(255,255,255,.018) 23px 24px),repeating-linear-gradient(90deg,transparent 0 23px,rgba(255,255,255,.018) 23px 24px),#07070e;
-border:1px solid var(--edge)}
-.wk-gatecard{width:min(460px,92%);border:1px solid var(--wbd2);border-radius:10px;background:rgba(11,11,22,.92);box-shadow:0 40px 90px -40px #000,inset 0 1px 0 rgba(255,255,255,.04);backdrop-filter:blur(6px)}
-.wk-gatecard .wk-txh{padding:18px 22px 14px}
-.wk-gatecard .wk-txh b{font-size:16px;font-weight:400;color:var(--wt);display:block}
-.wk-gatecard .wk-txh span{display:block;font-family:var(--wmono);font-size:8.5px;letter-spacing:.04em;color:var(--wf);margin-top:2px;text-transform:none}
 
-.wk-gatecard .wk-state{position:static;padding:0 22px 4px;justify-content:flex-start;text-align:left;font-family:var(--wmono);font-size:9px;letter-spacing:.06em;color:var(--ws)}
-.wk-gatecard .wk-state:empty{display:none}
 /* the section words sit in the middle of the bar, between the mark and the wallet */
 
 /* the soon tag: a small badge after the word, on its line */
@@ -2077,33 +1917,9 @@ border:1px solid var(--edge)}
 .introby:hover{color:var(--ink)}
 /* ── the connect section: the whole section is the screen. No card inside a
    frame - the ground is the section, the words and the two wallets sit on it ── */
-.wk-gate{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;padding:24px;border-radius:8px}
-.wk-gatecard{width:min(640px,100%);border:0;background:transparent;box-shadow:none;backdrop-filter:none;display:flex;flex-direction:column;align-items:center;text-align:center}
-.wk-gatecard .wk-txh{border:0;padding:0 0 22px;flex-direction:column;align-items:center;gap:6px}
-.wk-gatecard .wk-txh b{font-size:clamp(22px,2.6vw,30px);font-weight:600;letter-spacing:-.025em;color:var(--ink)}
-.wk-gatecard .wk-txh span{font-size:9.5px;letter-spacing:.14em;color:var(--ink3);margin:0}
-.wk-gatecard .wopts{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0;width:min(520px,100%)}
-.wk-gatecard .wopt{grid-template-columns:1fr;grid-template-areas:"lg" "nm" "st";justify-items:center;text-align:center;gap:10px 0;padding:24px 16px 18px;border-radius:10px;border:1px solid var(--edge2);
-background:linear-gradient(180deg,#10101f,#0a0a14);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 20px 40px -30px #000;transition:border-color .2s,transform .15s,box-shadow .2s}
-.wk-gatecard .wopt img{width:56px;height:56px;border-radius:14px}
-.wk-gatecard .wopt b{font-size:16px}
-.wk-gatecard .wopt i{margin:0;justify-self:center}
-.wk-gatecard .wopt em{display:none}
-.wk-gatecard .wopt:hover{border-color:var(--hot);transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 0 24px -8px rgba(255,176,46,.5),0 20px 40px -30px #000}
-.wk-gatecard .wopt.off{opacity:.5}
-.wk-gatecard .wk-state{padding:16px 0 0;justify-content:center;text-align:center}
-@media(max-width:620px){.wk-gatecard .wopts{grid-template-columns:1fr}}
+
 /* the bar's wallet door is constant; the disconnect is the GATA app's: a ghost
    button, the wallet's mark at its left, the provider small over the word */
-
-
-.wk-disc{display:inline-flex;align-items:center;gap:10px;height:38px;padding:0 14px 0 9px;border-radius:9px;cursor:pointer;
-border:1px solid var(--wbd2);background:linear-gradient(180deg,var(--wh),rgba(255,255,255,.02));color:var(--wt);
-box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -6px 14px -8px rgba(0,0,0,.6);transition:border-color .16s,box-shadow .16s,color .16s}
-.wk-disc:hover{border-color:var(--wburn);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 14px -6px var(--wburn)}
-
-#wk-mine .wk-disc .wk-mark{width:22px;height:22px;display:block}
-#wk-mine .wk-disc .wk-mark[hidden]{display:none}
 
 /* ── My wallet, dense. One strip for the wallet; two fixed panes side by
    side, both paged, rows of 30px, figures inline; nothing scrolls the page ── */
@@ -2112,11 +1928,11 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -6px 14px -8px rgba(0,0,0
 .wk-body{display:flex;flex-direction:column;gap:10px;flex:1 1 auto;min-height:0}
 
 .wk-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:10px;flex:1 1 auto;min-height:0}
-.wk-pane{display:flex;flex-direction:column;min-height:0;border:1px solid var(--wbd);border-radius:8px;background:var(--wc);padding:8px 12px 8px;position:relative;overflow:hidden}
+.wk-pane{display:flex;flex-direction:column;border:1px solid var(--wbd);border-radius:8px;padding:8px 12px 8px;position:relative;overflow:hidden}
 .wk-pane::before{content:"";position:absolute;left:14px;right:14px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--a),transparent);opacity:.9}
 #wk-mine{--a:#6f66c8}#wk-plan{--a:#2ee06a}
 .wk-ph{display:flex;align-items:center;gap:10px;height:30px;flex:0 0 auto}
-.wk-ph h3{margin:0;font-family:var(--wmono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;font-weight:400;color:var(--a)}
+.wk-ph h3{margin:0;font-family:var(--wmono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;font-weight:400;}
 .wk-pn{font-family:var(--wmono);font-size:9px;letter-spacing:.1em;color:var(--wf)}
 .wk-pg{margin-left:auto;display:inline-flex;align-items:center;gap:2px;font-family:var(--wmono);font-size:9px;letter-spacing:.08em;color:var(--wf)}
 .wk-pg button{width:22px;height:22px;border-radius:4px;border:1px solid var(--wbd);background:transparent;color:var(--ws);cursor:pointer;font:inherit;font-size:11px;line-height:1;padding:0}
@@ -2126,9 +1942,9 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -6px 14px -8px rgba(0,0,0
 /* the tables: fixed rows, a page at a time */
 .wk-tbl2{flex:0 0 auto}
 .wk-tbl2 table{width:100%;border-collapse:collapse;table-layout:fixed}
-.wk-tbl2 th{font-family:var(--wmono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);font-weight:400;text-align:right;padding:0 6px 4px;border-bottom:1px solid var(--wbd);white-space:nowrap}
+.wk-tbl2 th{font-family:var(--wmono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:400;text-align:right;padding:0 6px 4px;border-bottom:1px solid var(--wbd);white-space:nowrap}
 .wk-tbl2 td{height:30px;padding:0 6px;text-align:right;border-bottom:1px solid #16162a;font-family:var(--wmono);font-size:11px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
-.wk-tbl2 tr:hover td{background:#0e0e1c}
+
 .wk-tbl2 th.l,.wk-tbl2 td.l{text-align:left}
 .wk-tbl2 th.c,.wk-tbl2 td.c{text-align:center}
 .wk-tbl2 td.nm{font-family:var(--wsans);font-size:12px;color:#fff8dc}
@@ -2138,17 +1954,17 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -6px 14px -8px rgba(0,0,0
 .wk-tbl2 td.amt{color:#fff8dc}
 .wk-tbl2 td.amt .lk{margin-left:5px;color:var(--wamber)}
 .wk-tbl2 td.amt .lk svg{width:9px;height:9px;fill:none;stroke:currentColor;stroke-width:2.2;margin:0;display:inline;vertical-align:-1px}
-.wk-tbl2 td .sb{display:inline-block;width:38px;height:4px;border-radius:2px;background:#16162c;vertical-align:middle;margin-left:6px;overflow:hidden}
+.wk-tbl2 td .sb{width:38px;height:4px;border-radius:2px;background:#16162c;vertical-align:middle;margin-left:6px;overflow:hidden}
 .wk-tbl2 td .sb i{display:block;height:100%;background:#b9b0ff}
 .wk-tbl2 td .sb.hld i{background:var(--wamber)}
 .wk-tbl2 td.rk{color:var(--wf);font-size:10px}
 .wk-tbl2 td.rw{color:var(--wgreen)}
 .wk-tbl2 .ok{color:var(--wgreen)}.wk-tbl2 .warn{color:var(--wamber)}.wk-tbl2 .bad{color:var(--wburn)}.wk-tbl2 .dim{color:var(--wf)}
-.wk-tbl2 tr.on td{background:rgba(46,224,106,.06)}
+
 .wk-tbl2 td.ck{width:22px;padding:0 0 0 4px}
-.wk-tbl2 td.ck input{appearance:none;-webkit-appearance:none;width:14px;height:14px;margin:0;border-radius:3px;border:1px solid var(--wbd2);background:var(--wi);cursor:pointer;position:relative;vertical-align:middle}
-.wk-tbl2 td.ck input:checked{background:var(--wgreen);border-color:var(--wgreen)}
-.wk-tbl2 td.ck input:checked::after{content:"";position:absolute;left:4px;top:1px;width:4px;height:8px;border:solid #062012;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.wk-tbl2 td.ck input{appearance:none;-webkit-appearance:none;margin:0;border:1px solid var(--wbd2);cursor:pointer;position:relative;vertical-align:middle}
+
+.wk-tbl2 td.ck input:checked::after{content:"";position:absolute;border:solid #062012;border-width:0 2px 2px 0;transform:rotate(45deg)}
 .wk-tbl2 tr.pad td{border-bottom-color:transparent;background:transparent}
 .wk-tbl2 td.r2 s{text-decoration:none;color:var(--wf)}.wk-tbl2 td.r2 b{font-weight:400;color:var(--wgreen)}.wk-tbl2 td.r2 em{font-style:normal;color:var(--wf);margin:0 4px}
 .wk-pf{margin-top:auto;padding-top:8px;display:flex;align-items:center;gap:12px;flex:0 0 auto}
@@ -2157,8 +1973,6 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -6px 14px -8px rgba(0,0,0
 /* redelegation: the announcement inline, the controls in one row, the answer as a strip with the button */
 
 .wk-ph .wk-ib{width:26px;height:26px;margin-left:6px}
-
-#wk-plan .wk-moves{margin-top:6px;max-height:none;flex:1 1 auto;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 
 @media(max-width:900px){.wk-two{grid-template-columns:1fr}#p-dele{overflow-y:auto}#p-dele>.pw{height:auto;min-height:100%}.wk-pane{overflow:visible}}
 /* the strip's pairs: label, value, unit on one centre line, in their colours */
@@ -2175,7 +1989,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -6px 14px -8px rgba(0,0,0
 #p-home .tapnote svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin:0;max-height:none;color:var(--hot);opacity:.85}
 .frow{justify-content:space-between}
 /* the refresh: small, symmetric, turns green and a quarter turn on hover, spins while reading */
-.wk-ph .wk-ib,#wk-plan .wk-ph .wk-ib{width:22px;height:22px;border-radius:5px;margin-left:8px;border-color:var(--wbd2);background:var(--wi);color:var(--ws);box-shadow:none;transform:none;transition:color .16s,border-color .16s,background .16s}
+.wk-ph .wk-ib,#wk-plan .wk-ph .wk-ib{width:22px;height:22px;border-radius:5px;border-color:var(--wbd2);background:var(--wi);color:var(--ws);box-shadow:none;transform:none;transition:color .16s,border-color .16s,background .16s}
 #p-dele .wk-ph .wk-ib svg{width:12px;height:12px;stroke-width:2.2;transition:transform .3s cubic-bezier(.2,.7,.25,1)}
 .wk-ph .wk-ib:hover{color:var(--wgreen);border-color:rgba(46,224,106,.45);background:rgba(46,224,106,.06);transform:none;box-shadow:none}
 .wk-ph .wk-ib:hover svg{transform:rotate(90deg)}
@@ -2217,7 +2031,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 .bheight i{width:4px;height:4px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green)}
 .bheight b{font-weight:400}
 .wordmark{padding-top:0}
-.wk-ph .wk-ib,#wk-plan .wk-ph .wk-ib{margin-left:auto}
+
 @media(max-width:620px){.bw{display:none}}
 /* how fresh: seconds since the last read, counting on its own */
 .wk-ago{margin-left:auto;font-family:var(--wmono);font-size:8.5px;letter-spacing:.06em;text-transform:none;color:var(--wf);white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -2235,24 +2049,15 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
   .mbtn{flex:1 1 0;padding:6px 0;font-size:7.5px;letter-spacing:.06em;text-align:center}
   .duotab{grid-template-columns:1fr}
   /* the wallet */
-  
-  
-  
-  
-  
-  
-  .wk-two{grid-template-columns:1fr;gap:10px}
+
+.wk-two{grid-template-columns:1fr;gap:10px}
   .wk-pane{overflow:hidden;padding:8px 10px}
   .wk-tbl2 table{table-layout:auto}
   .wk-tbl2 th,.wk-tbl2 td{padding:0 4px}
   .wk-tbl2 td.nm{max-width:0;width:40%}
   #dmy th:nth-child(5),#dmy td:nth-child(5){display:none}
-  
-  
-  
-  
-  
-  .wk-pf{justify-content:flex-start}
+
+.wk-pf{justify-content:flex-start}
   .txcard .txrow{grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr);grid-template-areas:"f ar t" "a a a"}
   .txcard .txrow .f:first-child{grid-area:f}.txcard .txrow i{grid-area:ar}.txcard .txrow .f.to{grid-area:t}.txcard .txrow .a{grid-area:a;text-align:left}
   .txans{flex-wrap:wrap;gap:10px 14px}
@@ -2262,12 +2067,12 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 .wk-max{height:28px;padding:0 9px;border-radius:4px;border:1px solid var(--wbd);background:transparent;color:var(--wf);font-family:var(--wmono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
 .wk-max b{font-weight:400;color:var(--ws);letter-spacing:.04em;font-size:9px}
 .wk-max:hover{color:var(--wt);border-color:var(--ws)}
-#wk-plan .wk-tbl2{flex:1 1 auto;min-height:120px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
+#wk-plan .wk-tbl2{min-height:120px;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 #wk-plan .wk-tbl2 thead th{position:sticky;top:0;background:var(--wc);z-index:1}
-#wk-plan .wk-moves{flex:0 0 auto;max-height:150px}
+
 /* the wallet, lifted out of the dark: lighter grounds, brighter hairlines and
    type, so the figures read without leaning in */
-#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
+#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
 
 .wk-pane{background:linear-gradient(180deg,#10101f,#0d0d1b)}
 .wk-tbl2 td{border-bottom-color:#22223c}
@@ -2277,15 +2082,10 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 
 .wk-ph h3{color:var(--a)}
 
-.wk-max,.wk-bar2 .wk-amt{border-color:var(--wbd2)}
-.wk-tbl2 td.ck input{border-color:#5a5a88;background:#12122a}
+.wk-max{border-color:var(--wbd2)}
+.wk-tbl2 td.ck input{border-color:#5a5a88;}
 .wk-tbl2 td .sb{display:none}
 /* the account is the disconnect: mark, name and address, the leave glyph */
-
-.wk-disc{gap:10px;padding:0 10px 0 8px;height:38px}
-
-#p-dele .wk-disc svg.wk-out{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin:0 0 0 4px;max-height:none;color:var(--wf);transition:color .16s}
-.wk-disc:hover svg.wk-out{color:var(--wburn)}
 
 /* no strip: the balances in the Delegations head, the account in the
    Redelegation head; both panes hug their tables like the Picks stages */
@@ -2293,11 +2093,9 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 .wk-pane{flex:0 0 auto;min-height:0}
 
 #wk-plan .wk-ph{height:auto;min-height:38px;flex-wrap:nowrap}
-#wk-plan .wk-ph .wk-disc{height:32px;margin-left:12px}
 
-#wk-plan .wk-ph .wk-disc .wk-mark{width:20px;height:20px}
 #wk-plan .wk-tbl2{flex:0 0 auto;height:262px;overflow-y:auto}
-#wk-mine .wk-ph{flex-wrap:nowrap;gap:8px}
+#wk-mine .wk-ph{gap:8px}
 #wk-mine .wk-ph .wk-pn{white-space:nowrap}
 
 #wk-mine .wk-ph .wk-pg{flex:0 0 auto}
@@ -2310,7 +2108,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
    travels on hover, the word is lit and underlined while you are inside */
 
 /* the delegations pane at the width of a Picks table; the rest is the redelegation */
-@media(min-width:901px){.wk-two{grid-template-columns:440px minmax(0,1fr)}}
+
 /* the delegations head in two lines: title, count and the held tag; then the balances */
 #wk-mine .wk-ph{flex-wrap:wrap;height:auto;min-height:30px;row-gap:2px;padding-bottom:4px}
 #wk-mine .wk-ph .wk-foot{order:2}
@@ -2318,102 +2116,88 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 /* the left column: a small Balance pane (with the account), then the delegations */
 
 /* one pane, two headings: Balance (with the account) above a rule, then Delegations */
-#wk-mine .wk-bh{height:auto;min-height:32px;flex-wrap:nowrap}
-#wk-mine .wk-bh h3{color:#ffb02e}
-#wk-mine .wk-bh .wk-disc{margin-left:auto;height:32px}
 
-#wk-mine .wk-bh .wk-disc .wk-mark{width:20px;height:20px}
 /* Balance: five equal boxes across the pane - ATONE, PHOTON, staked, rewards, APR */
-#wk-mine .wk-bal5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:2px 0 0;padding:0 0 10px}
-#wk-mine .wk-b5{display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0;height:46px;padding:0 8px;border:1px solid var(--wbd);border-radius:6px;background:var(--wi);font-family:var(--wmono)}
-#wk-mine .wk-b5 i{display:flex;align-items:center;gap:4px;font-style:normal;font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
-#wk-mine .wk-b5 i img{width:11px;height:11px;border-radius:50%;flex:0 0 auto;margin:0;max-height:none}
-#wk-mine .wk-b5 b{font-size:13px;font-weight:400;letter-spacing:-.02em;line-height:1;color:#fff8dc;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+#wk-mine .wk-b5{font-family:var(--wmono)}
+#wk-mine .wk-b5 i{display:flex;align-items:center;font-style:normal;text-transform:uppercase;white-space:nowrap}
+#wk-mine .wk-b5 i img{border-radius:50%;flex:0 0 auto;margin:0;max-height:none}
+#wk-mine .wk-b5 b{font-weight:400;color:#fff8dc;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #wk-mine .wk-b5 b.pho{color:#2bc8bd;margin:0}
 #wk-mine .wk-b5 b.warn{color:#ff4d1f}
 #wk-mine .wk-b5 b.ok{color:#2ee06a}
 #wk-mine .wk-b5 b#ds-rew{color:#2ee06a}
-#wk-mine .wk-b5 b#ds-apr{color:#b9b0ff}
+
 /* the stake row: one field under the title, max riding inside its right edge; the
    placeholder is set in the sans face and dimmed so it reads as a hint, not a value;
    the page's amber focus halo does not belong here */
 
-#wk-plan .wk-field{display:inline-flex;align-items:center;height:28px;width:200px;max-width:100%;padding:0 4px 0 0;border-radius:6px;border:1px solid var(--wbd2);
+#wk-plan .wk-field{display:inline-flex;align-items:center;height:28px;padding:0 4px 0 0;border-radius:6px;border:1px solid var(--wbd2);
 background:linear-gradient(180deg,#0b0b18,#0e0e1d);box-shadow:inset 0 1px 0 #ffffff06;transition:border-color .15s,box-shadow .15s}
 #wk-plan .wk-field:hover{border-color:var(--ws)}
 #wk-plan .wk-field:focus-within{border-color:#b9b0ff;box-shadow:0 0 0 3px rgba(185,176,255,.13),inset 0 1px 0 #ffffff06}
-#wk-plan input.wk-amt2{flex:1 1 auto;min-width:0;height:100%;width:auto;padding:0 10px;margin:0;border:0;border-radius:6px 0 0 6px;background:transparent;color:#fff8dc;
-font-family:var(--wmono);font-size:12.5px;letter-spacing:-.01em;font-variant-numeric:tabular-nums;outline:none;box-shadow:none;-webkit-appearance:none;appearance:none}
+#wk-plan input.wk-amt2{flex:1 1 auto;min-width:0;height:100%;width:auto;margin:0;border:0;border-radius:6px 0 0 6px;background:transparent;
+font-family:var(--wmono);font-variant-numeric:tabular-nums;outline:none;box-shadow:none;-webkit-appearance:none;appearance:none}
 #wk-plan input.wk-amt2:focus,#wk-plan input.wk-amt2:focus-visible{box-shadow:none;outline:none}
-#wk-plan input.wk-amt2::placeholder{font-family:var(--wmono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);opacity:.8;font-style:normal}
-#wk-plan .wk-field .wk-max{height:20px;padding:0 7px;border-radius:4px;border:1px solid var(--wbd2);background:#13132a;color:var(--wf);font-size:7.5px;letter-spacing:.14em;gap:5px;flex:0 0 auto}
-#wk-plan .wk-field .wk-max b{font-size:9.5px;color:var(--ws)}
-#wk-plan .wk-field .wk-max:hover{color:var(--wt);border-color:var(--ws);background:#181834}
+#wk-plan input.wk-amt2::placeholder{font-family:var(--wmono);text-transform:uppercase;font-style:normal}
+#wk-plan .wk-field .wk-max{border:1px solid var(--wbd2);gap:5px;flex:0 0 auto}
+
+#wk-plan .wk-field .wk-max:hover{color:var(--wt);}
 #wk-plan .wk-field .wk-max:hover b{color:#fff8dc}
 /* validators ticked but no stake yet: the field asks for it without a word */
-#wk-plan .wk-field.need{border-color:#ffb02e;box-shadow:0 0 0 3px rgba(255,176,46,.14),0 0 16px -4px rgba(255,176,46,.6),inset 0 1px 0 #ffffff06;animation:wkneed 1.5s ease-in-out infinite}
+#wk-plan .wk-field.need{animation:wkneed 1.5s ease-in-out infinite}
 #wk-plan .wk-field.need input.wk-amt2::placeholder{color:#ffb02e;opacity:.9}
 #wk-plan .wk-field.need:focus-within{animation:none}
 @keyframes wkneed{0%,100%{box-shadow:0 0 0 3px rgba(255,176,46,.14),0 0 16px -4px rgba(255,176,46,.6),inset 0 1px 0 #ffffff06}50%{box-shadow:0 0 0 5px rgba(255,176,46,.05),0 0 22px -4px rgba(255,176,46,.35),inset 0 1px 0 #ffffff06}}
 @media(prefers-reduced-motion:reduce){#wk-plan .wk-field.need{animation:none}}
 /* the heading as one line of three: the name, the address as a lit chip (its prefix in
    the accent, the copy glyph behind a hairline), the wallet's button - all 22px, centred */
-#wk-mine .wk-bh{min-height:32px;gap:10px;align-items:center}
-#wk-mine .wk-bh h3{line-height:22px;padding-top:3px}
+
+#wk-mine .wk-bh h3{padding-top:3px}
 #wk-mine .wk-bh .wk-addrw{margin-top:1px}
-#wk-mine .wk-bh .wk-addrw{height:22px;gap:0;padding:0 3px 0 8px;border-radius:5px;border:1px solid var(--wbd2);
-background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 1px 2px rgba(0,0,0,.4)}
-#wk-mine .wk-bh .wk-addr{font-size:9px;letter-spacing:.03em;color:var(--ws);line-height:1;gap:1px}
-#wk-mine .wk-bh .wk-addr em{font-style:normal;color:#b9b0ff}
-#wk-mine .wk-bh .wk-disc{align-self:center}
-@media(max-width:700px){#wk-mine .wk-bh .wk-addrw{flex:0 1 auto;max-width:100%}#wk-mine .wk-bh .wk-addr{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+
+@media(max-width:700px){#wk-mine .wk-bh .wk-addrw{flex:0 1 auto;}}
 /* a delegation row opens its validator's card */
 #dmy tbody tr[data-v]{cursor:pointer}
 #dmy tbody tr[data-v]:focus-visible{outline:1px solid var(--wcyan);outline-offset:-1px}
 /* disconnect: back at the right of the Redelegation header - the wallet's mark and the
    leave glyph in one small square-cornered button the size of refresh */
-#wk-mine .wk-bh .wk-disc{margin-left:auto;height:22px;padding:0 5px;gap:4px;border-radius:5px;border:1px solid var(--wbd2);background:var(--wi);box-shadow:none;flex:0 0 auto}
-#wk-mine .wk-bh .wk-disc:hover{border-color:var(--wburn);box-shadow:none}
-#wk-mine .wk-bh .wk-disc .wk-mark{width:13px;height:13px;border-radius:3px;display:block}
-#wk-mine .wk-bh .wk-disc .wk-mark img{width:13px;height:13px;border-radius:3px;display:block}
-#p-dele #wk-mine .wk-bh .wk-disc svg.wk-out{width:11px;height:11px;margin:0}
+
 /* the pane titles at a readable size; the account name stands at the same scale */
 #wk-mine .wk-ph h3,#wk-plan .wk-ph h3{font-size:10.5px;letter-spacing:.2em}
 /* Redelegate stands at the end of the stake row, the field at its left */
 
-#wk-plan .wk-field{flex:0 1 200px;min-width:120px}
-
 /* the answer rides in the stake row as three boxes: now -> after, ATONE/year, moves;
    Redelegate is grey until it can be signed; on a phone the boxes take the next line */
 
-#wk-mv .wk-ans{display:flex;align-items:center;gap:6px;min-width:0}
-#wk-mv .wk-ans .p{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 9px;border-radius:5px;border:1px solid var(--wbd2);
+#wk-mv .wk-ans{align-items:center;min-width:0}
+#wk-mv .wk-ans .p{display:inline-flex;align-items:center;border-radius:5px;border:1px solid var(--wbd2);
 background:linear-gradient(180deg,#12122a,#0b0b18);box-shadow:inset 0 1px 0 #ffffff08;white-space:nowrap;position:relative;overflow:hidden}
 #wk-mv .wk-ans .p::before{content:"";position:absolute;left:8px;right:8px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--c,#6f66c8),transparent);opacity:.9}
-#wk-mv .wk-ans .p i{font-style:normal;font-family:var(--wmono);font-size:7px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
-#wk-mv .wk-ans .p b{font-family:var(--wmono);font-size:12px;font-weight:400;letter-spacing:-.02em;color:#fff8dc;font-variant-numeric:tabular-nums}
+#wk-mv .wk-ans .p i{font-style:normal;font-family:var(--wmono);text-transform:uppercase;color:var(--wf)}
+#wk-mv .wk-ans .p b{font-family:var(--wmono);font-weight:400;color:#fff8dc;font-variant-numeric:tabular-nums}
 #wk-mv .wk-ans .p b.dim{color:var(--wf)}
-#wk-mv .wk-ans .p .arr{color:var(--wf);font-size:11px;margin:0 1px}
+#wk-mv .wk-ans .p .arr{color:var(--wf);}
 #wk-mv .wk-ans .p.rate{--c:#b9b0ff}#wk-mv .wk-ans .p.rate b.aft{color:var(--wgreen)}
 #wk-mv .wk-ans .p.gain{--c:#2ee06a}#wk-mv .wk-ans .p.gain b{color:var(--wgreen)}
 #wk-mv .wk-ans .p.mv{--c:#2bc8bd}
-@media(max-width:700px){#wk-mv .wk-ans{order:3;flex:1 1 100%}#wk-mv .wk-ans .p{flex:1 1 0;justify-content:center;padding:0 6px}}
+
 /* the move as a live comparison: each side carries its figures, the better of each pair lit */
 
 /* ── the gate lives in the left pane: one Connect button in the centre, the two tiles
    in its place once tapped; the right pane shows the chain's numbers meanwhile ── */
-html:not([data-wallet]) .wk-two{align-content:start}
-html:not([data-wallet]) #wk-mine{display:flex;flex-direction:column;align-self:stretch}
-#wk-mine .wk-gate{flex:1 1 auto;min-height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;border-radius:0;background:transparent;border:0;box-shadow:none;margin:0}
+
+html:not([data-wallet]) #wk-mine{display:flex;flex-direction:column;}
+
 /* nothing to refresh and no clock without a wallet; the chain's list may run long */
 html:not([data-wallet]) #wrefresh,html:not([data-wallet]) #dago{display:none}
 html:not([data-wallet]) #wk-plan .wk-tbl2{height:calc(16px + 14 * 30px)}
 /* ── the plan pane narrower, the pair centred; the moves as their own stage under a rule ── */
-@media(min-width:901px){.wk-two{grid-template-columns:440px minmax(0,690px);justify-content:center}}
+
 #wk-plan .wk-mvh{margin-top:12px;padding-top:10px;border-top:1px solid var(--wbd2);position:relative}
-#wk-plan .wk-mvh::before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;background:linear-gradient(90deg,var(--wgreen),transparent 60%);opacity:.6}
+#wk-plan .wk-mvh::before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;opacity:.6}
 #wk-plan .wk-mvh h3{color:var(--wgreen)}
-#wk-plan .wk-moves{margin-top:2px;max-height:none;overflow:visible}
+#wk-plan .wk-moves{margin-top:2px;overflow:visible}
 #wk-plan .wk-moves table{width:100%;border-collapse:collapse;table-layout:fixed;font-family:var(--wmono);font-size:10.5px;font-variant-numeric:tabular-nums}
 #wk-plan .wk-moves th{font-size:7px;letter-spacing:.16em;text-transform:uppercase;font-weight:400;color:var(--wf);text-align:right;padding:4px 6px 5px;border-bottom:1px solid var(--wbd);white-space:nowrap}
 #wk-plan .wk-moves th.l{text-align:left}
@@ -2430,7 +2214,7 @@ html:not([data-wallet]) #wk-plan .wk-tbl2{height:calc(16px + 14 * 30px)}
 #wk-plan .wk-moves td.gn i{display:block;font-style:normal;font-size:7px;letter-spacing:.1em;color:var(--wamber)}
 #wk-plan .wk-moves tr.stay td{color:var(--wf)}
 /* the gain rides beside a ticked validator's name */
-#dpicks td.nm .gtag{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.02em;color:var(--wgreen);margin-left:8px;padding:1px 5px;border:1px solid rgba(46,224,106,.3);border-radius:3px;background:rgba(46,224,106,.06);vertical-align:middle;white-space:nowrap}
+#dpicks td.nm .gtag{font-style:normal;font-family:var(--wmono);letter-spacing:.02em;color:var(--wgreen);border:1px solid rgba(46,224,106,.3);border-radius:3px;background:rgba(46,224,106,.06);vertical-align:middle;}
 #dpicks td.nm .gtag.dim{color:var(--wf);border-color:var(--wbd2);background:transparent}
 @media(max-width:700px){#wk-plan .wk-moves th:nth-child(3),#wk-plan .wk-moves td:nth-child(3),#wk-plan .wk-moves th:nth-child(4),#wk-plan .wk-moves td:nth-child(4),
 #wk-plan .wk-moves th:nth-child(8),#wk-plan .wk-moves td:nth-child(8),#wk-plan .wk-moves th:nth-child(9),#wk-plan .wk-moves td:nth-child(9),
@@ -2445,42 +2229,20 @@ html:not([data-wallet]) #wk-plan .wk-tbl2{height:calc(16px + 14 * 30px)}
 #wk-mine,#wk-plan{height:var(--wk-h);max-height:var(--wk-h);box-sizing:border-box;overflow:hidden}
 #wk-mine{display:flex;flex-direction:column}
 #wk-mine #wk-acct{display:flex;flex-direction:column;min-height:0;flex:1 1 auto}
-#wk-mine .wk-gate{min-height:0}
+
 #wk-plan{display:flex;flex-direction:column}
-#wk-plan>.wk-ph,#wk-plan>.wk-bar2,#wk-plan>.wk-news,#wk-plan>.wk-mvh{flex:0 0 auto}
-#wk-plan .wk-tbl2,html:not([data-wallet]) #wk-plan .wk-tbl2{flex:1 1 0;height:auto;min-height:calc(16px + 4 * 30px);max-height:none}
+#wk-plan>.wk-ph,#wk-plan>.wk-mvh{flex:0 0 auto}
+#wk-plan .wk-tbl2,html:not([data-wallet]) #wk-plan .wk-tbl2{height:auto;max-height:none}
 #wk-plan .wk-moves{flex:0 0 auto;min-height:0;max-height:170px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 #wk-plan .wk-moves thead th{position:sticky;top:0;background:var(--wc);z-index:1}
 html:not([data-wallet]) .wk-two{align-content:normal}
 html:not([data-wallet]) #wk-mine{align-self:auto}
-#wk-mine .wk-gate .wk-btn.wk-big{height:38px;padding:0 22px;border-radius:7px;display:inline-flex;align-items:center;gap:8px;font-family:var(--wmono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;font-weight:400;
-background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;color:#04150a;box-shadow:0 10px 24px -12px rgba(46,224,106,.75),inset 0 1px 0 rgba(255,255,255,.3);transition:filter .15s,transform .12s}
-#wk-mine .wk-gate .wk-btn.wk-big:hover{filter:brightness(1.08);transform:translateY(-1px)}
-#wk-mine .wk-gate .wk-btn.wk-big .sgoarr{font-style:normal;font-size:12px;transition:transform .2s}
-#wk-mine .wk-gate .wk-btn.wk-big:hover .sgoarr{transform:translateX(3px)}
-#wk-mine .wk-gate .wk-btn.wk-big:disabled{filter:none;transform:none;opacity:.7}
+
 /* the button and the two wallet squares share one box, both hanging from the same top
    edge, so the tap replaces one with the other and nothing above it moves */
-#wk-mine .wk-gin{height:188px;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:69px}
-#wk-mine .wk-gatecard{width:auto;max-width:none;display:flex;flex-direction:column;align-items:center;gap:8px;margin:0}
-#wk-mine .wk-gatecard .wopts{display:flex;flex-direction:row;gap:10px;width:auto;padding:0}
-#wk-mine .wk-gatecard .wopt{width:104px;height:104px;display:grid;grid-template-columns:1fr;grid-template-areas:"lg" "nm" "st";align-content:center;justify-items:center;text-align:center;gap:6px 0;padding:0;border-radius:8px;position:relative;overflow:hidden;
-border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0d0d1c);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 24px -18px #000;transition:border-color .16s,box-shadow .16s,transform .14s}
-#wk-mine .wk-gatecard .wopt::before{content:"";position:absolute;left:14px;right:14px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);opacity:.9}
-#wk-mine .wk-gatecard .wopt img{grid-area:lg;width:36px;height:36px;border-radius:10px;align-self:center;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 0 18px -6px var(--c);margin-bottom:2px}
-#wk-mine .wk-gatecard .wopt b{grid-area:nm;font-size:12.5px;font-weight:500;line-height:1;color:#fff8dc;align-self:auto}
-#wk-mine .wk-gatecard .wopt i{grid-area:st;margin:0;justify-self:center;align-self:auto;font-size:6.5px;letter-spacing:.16em;line-height:1;padding:0}
-#wk-mine .wk-gatecard .wopt i.on{color:var(--wgreen)}
-#wk-mine .wk-gatecard .wopt em{display:none}
-#wk-mine .wk-gatecard .wopt:hover{border-color:var(--c);transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 20px -6px var(--c),0 14px 24px -16px #000}
-#wk-mine .wk-gatecard .wopt:active{transform:translateY(0) scale(.98)}
-#wk-mine .wk-gatecard .wopt.off{opacity:.5}
-#wk-mine .wk-gatecard .wopt.off:hover{transform:none;border-color:var(--wbd2);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
-#wk-mine .wk-gatecard .wk-chain{font-family:var(--wmono);font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--wf)}
-#wk-mine .wk-gate .wk-state{padding:2px 0 0;text-align:center;justify-content:center}
+
 @keyframes wkrise{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-#wk-mine .wk-gatecard:not([hidden]){animation:wkrise .22s ease-out}
-@media(prefers-reduced-motion:reduce){#wk-mine .wk-gatecard:not([hidden]){animation:none}}
+
 /* ── the three titles: the wallet's sans face, a short bar of their own colour before
    each - cyan for your validators, green for the move, violet for what moves ── */
 #wk-mine .wk-t1 h3,#wk-plan .wk-t2 h3,#wk-plan .wk-t3 h3,#wk-mv .wk-t3 h3{display:inline-flex;align-items:center;gap:8px;font-family:var(--wsans);font-size:13px;font-weight:600;letter-spacing:-.01em;text-transform:none;line-height:1}
@@ -2492,7 +2254,7 @@ border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0d0d1c);
 #wk-mine .wk-t1 .wk-pn,#wk-plan .wk-t3 .wk-pn,#wk-mv .wk-t3 .wk-pn{font-family:var(--wmono);font-size:9px;letter-spacing:.06em;color:var(--wf);margin-left:2px}
 /* ── the list's column names as a band of their own: lit ground, hairlines above and
    below, a breath of space from the line above ── */
-#dpicks{margin-top:8px}
+
 #dpicks thead th,#dstrat thead th{font-size:7.5px;letter-spacing:.14em;color:#c1bfdc;padding:8px 6px 7px;background:linear-gradient(180deg,#151530,#0f0f22);border-top:1px solid var(--wbd2);border-bottom:1px solid var(--wbd2);position:sticky;top:0;z-index:1}
 #dpicks thead th:first-child,#dstrat thead th:first-child{border-left:1px solid var(--wbd2);border-radius:5px 0 0 5px}
 #dpicks thead th:last-child,#dstrat thead th:last-child{border-right:1px solid var(--wbd2);border-radius:0 5px 5px 0;padding-right:8px}
@@ -2500,8 +2262,8 @@ border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0d0d1c);
 #dpicks thead th .lc{text-transform:none}   /* 90d, not 90D */
 #dpicks tbody tr:first-child td,#dstrat tbody tr:first-child td{border-top:0}
 /* the head's own box: tick everyone; its word beside it */
-#dpicks thead th.ck{text-align:left;padding:0 0 0 3px;white-space:nowrap}
-#dpicks thead th.ck label{margin-left:3px}
+#dpicks thead th.ck{text-align:left;white-space:nowrap}
+
 #dpicks thead th.ck input{appearance:none;-webkit-appearance:none;width:15px;height:15px;margin:0;border-radius:4px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);cursor:pointer;position:relative;vertical-align:middle;transition:border-color .12s,box-shadow .12s,background .12s}
 #dpicks thead th.ck input:hover{border-color:var(--ws)}
 #dpicks thead th.ck input:checked{background:linear-gradient(180deg,#3cf07a,#22c65c);border-color:#2ee06a;box-shadow:0 0 0 3px rgba(46,224,106,.14)}
@@ -2511,16 +2273,16 @@ border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0d0d1c);
 #dpicks thead th.ck label{font-family:var(--wmono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:#c1bfdc;margin-left:5px;vertical-align:middle;cursor:pointer}
 /* ── three panes in one row, all the wallet pane's height, pushed to the left:
    the wallet, Redelegate, What moves ── */
-@media(min-width:901px){.wk-two{grid-template-columns:360px minmax(0,1fr) 360px;justify-content:start;gap:10px}}
+
 #wk-mv{height:var(--wk-h);max-height:var(--wk-h);box-sizing:border-box;overflow:hidden;display:flex;flex-direction:column;--a:#b9b0ff}
 #wk-mv .wk-mvh{margin:0;padding:0;border:0;flex:0 0 auto}
 #wk-mv .wk-mvh::before{display:none}
-#wk-mv .wk-moves{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;margin-top:6px;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
+#wk-mv .wk-moves{min-height:0;max-height:none;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 #wk-mv .wk-moves:empty{display:none}
-#wk-mv .wk-mvempty{flex:1 1 auto;display:flex;align-items:center;justify-content:center;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);text-align:center;padding:0 20px}
+#wk-mv .wk-mvempty{display:flex;align-items:center;justify-content:center;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);text-align:center;padding:0 20px}
 #wk-mv .wk-mvempty[hidden]{display:none}
 /* the moves as a list like the one beside it: from, to, the stake that moves, the gain */
-#wk-mv .wk-moves{margin-top:4px}
+
 #wk-mv .wk-moves table{width:100%;border-collapse:collapse;table-layout:fixed}
 #wk-mv .wk-moves th{font-family:var(--wmono);text-transform:uppercase;font-weight:400;text-align:right;white-space:nowrap;padding:8px 5px 7px}
 #wk-mv .wk-moves td{padding:0 5px;height:30px;border-bottom:1px solid #22223c;text-align:right;font-family:var(--wmono);font-size:10.5px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums;vertical-align:middle}
@@ -2540,59 +2302,48 @@ border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0d0d1c);
 #wk-mv .wk-moves thead th{position:sticky;top:0;z-index:1}
 /* the Redelegate pane no longer holds the moves: its list takes the rest */
 #wk-plan .wk-tbl2,html:not([data-wallet]) #wk-plan .wk-tbl2{flex:1 1 0;min-height:0}
-@media(max-width:900px){#wk-mv{height:auto;max-height:none}#wk-mv .wk-moves{max-height:300px}#wk-mv .wk-mvempty{min-height:80px}}
+@media(max-width:900px){#wk-mv{height:auto;max-height:none}}
 /* ── the three heads on one line: 32px each, the wallet's name and address centred on
    the disconnect button, the Redelegate and What moves heads at the same height, and
    the first row of each pane starting at the same top ── */
 #wk-mine .wk-bh,#wk-plan>.wk-ph,#wk-mv .wk-mvh{height:32px;min-height:32px;max-height:32px;padding:0;margin:0;display:flex;align-items:center;flex-wrap:nowrap;box-sizing:border-box}
-#wk-mine .wk-bh .wk-addrw{margin:0;align-self:center}
-#wk-mine .wk-bh .wk-disc{align-self:center}
-#wk-mine .wk-bal5{margin:6px 0 0;padding:0 0 10px}
+#wk-mine .wk-bh .wk-addrw{margin:0;}
 
-#wk-mv .wk-moves{margin-top:4px}
 #wk-mv .wk-mvh h3,#wk-plan>.wk-ph h3{align-self:center}
 /* the stake row in a narrower pane: field and button on the first line, the two
    figure boxes on their own line beneath, sharing the width */
 
 #wk-plan .wk-field{flex:0 1 180px;width:180px;max-width:100%;min-width:120px}
 
-#wk-mv .wk-ans{order:3;flex:1 1 100%;display:flex;gap:6px}
-#wk-mv .wk-ans .p{flex:1 1 0;justify-content:center;min-width:0;padding:0 6px}
-#wk-mv .wk-ans .p b{font-size:11.5px}
-@media(max-width:700px){#wk-mv .wk-ans{order:3}}
 /* the name cell: a flex wrapper INSIDE the cell (never the cell itself), so the name
    gives way and the gain tag keeps its place */
 #dpicks td.nm .nmw{display:flex;align-items:center;gap:6px;min-width:0}
-#dpicks td.nm .nmw>span{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#dpicks td.nm .nmw>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #dpicks td.nm .nmw .wk-lg,#dpicks td.nm .nmw .wk-lgx{flex:0 0 auto;margin:0}
-#dpicks td.nm .gtag{flex:0 0 auto;margin-left:0;font-size:8px;padding:1px 4px}
+
 /* rows that would not beat your rate stay in the list, quieter, their "there" in grey */
-#dpicks tbody tr.lt td{color:var(--wf)}
-#dpicks tbody tr.lt td.nm .nmw>span{color:var(--ws)}
-#dpicks tbody tr.lt td.r2 b{color:var(--wf)}
+
 #dpicks tbody tr.lt.on td{color:var(--ws)}
 /* the line lives in the title row, at its right end, as one quiet phrase */
 
 /* the line sits right under the title; the stake row follows it */
 
 /* the two figure boxes open the What moves pane, on the same top as the stake row */
-#wk-mv .wk-ans{order:0;flex:0 0 auto;display:flex;gap:6px;margin:4px 0 0}
+#wk-mv .wk-ans{order:0;flex:0 0 auto;display:flex;}
 #wk-mv .wk-ans .p{flex:2 1 0;justify-content:center;min-width:0;padding:0 5px;height:28px;gap:4px}
-#wk-mv .wk-ans .p.rate{flex:3 1 0}
-#wk-mv .wk-ans .p i{font-size:6.5px;letter-spacing:.12em}
-#wk-mv .wk-ans .p .arr{margin:0}
+
 /* three boxes over the moves: the rate pair takes its own line, the gain and the
    21-day cooldown share the next */
-#wk-mv .wk-ans{flex-wrap:wrap;row-gap:6px}
-#wk-mv .wk-ans .p.rate{flex:1 1 100%}
+#wk-mv .wk-ans{row-gap:6px}
+
 #wk-mv .wk-ans .p.gain,#wk-mv .wk-ans .p.lock{flex:1 1 0}
 #wk-mv .wk-ans .p.lock{--c:#ffb02e}
 #wk-mv .wk-ans .p.lock b{color:#ffb02e}
-#p-dele #wk-mv .wk-ans .p.lock svg{width:10px;height:10px;margin:0 1px 0 0;max-height:none;fill:none;stroke:#ffb02e;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+#p-dele #wk-mv .wk-ans .p.lock svg{max-height:none;fill:none;stroke:#ffb02e;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
 /* the stake row as three columns: the phrase, the field, the button */
 
 /* stake under cooldown: an amber note at the end of the Redelegate title row */
-#wk-plan>.wk-ph .wk-lockn{margin-left:auto;height:22px;display:inline-flex;align-items:center;gap:4px;padding:0 6px;border-radius:5px;border:1px solid rgba(255,176,46,.35);background:rgba(255,176,46,.06);font-family:var(--wmono);font-size:7px;letter-spacing:.06em;text-transform:uppercase;color:var(--wamber);white-space:nowrap;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+#wk-plan>.wk-ph .wk-lockn{height:22px;display:inline-flex;align-items:center;gap:4px;padding:0 6px;border-radius:5px;border:1px solid rgba(255,176,46,.35);background:rgba(255,176,46,.06);font-family:var(--wmono);font-size:7px;letter-spacing:.06em;text-transform:uppercase;color:var(--wamber);white-space:nowrap;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
 #wk-plan>.wk-ph .wk-lockn b{font-size:9.5px;font-weight:400;letter-spacing:0;color:#ffd58a}
 #wk-plan>.wk-ph .wk-lockn[hidden]{display:none}
 /* max with nothing to move: grey, inert */
@@ -2601,17 +2352,16 @@ border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0d0d1c);
 #wk-plan .wk-field .wk-max:disabled:hover{border-color:var(--wbd);background:transparent;color:var(--wf)}
 /* room for the decimal: the balance figures a touch tighter; the clock yields to the
    cooldown note in the title row */
-#wk-mine .wk-b5 b{font-size:11px;letter-spacing:-.03em}
-#wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-ago{display:none}
+
 /* the empty delegations line: small, plain, a little in from the edge */
-#dmy .wk-empty{font-family:var(--wmono);font-size:9px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--wf);padding:16px 0 0 14px}
+#dmy .wk-empty{font-family:var(--wmono);font-size:9px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--wf);}
 /* the pane's line at the right end of its title row: one chip in the "would earn you
    more" shape, in the pane's own colours */
 
 /* ── unstake: a door in the Delegations head, a card of its own ── */
-#wk-mine .wk-t1 .wk-unb{margin-left:auto;height:22px;padding:0 9px;border-radius:5px;border:1px solid rgba(255,176,46,.4);background:linear-gradient(180deg,#1a1730,#12101f);color:var(--wamber);font-family:var(--wmono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;flex:0 0 auto;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);transition:border-color .15s,box-shadow .15s,transform .12s}
-#wk-mine .wk-t1 .wk-unb:hover{border-color:var(--wamber);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 12px -3px rgba(255,176,46,.6)}
-#wk-mine .wk-t1 .wk-unb:active{transform:scale(.96)}
+#wk-mine .wk-t1 .wk-unb{margin-left:auto;border:1px solid rgba(255,176,46,.4);background:linear-gradient(180deg,#1a1730,#12101f);color:var(--wamber);flex:0 0 auto;}
+#wk-mine .wk-t1 .wk-unb:hover{border-color:var(--wamber);}
+
 #wk-mine .wk-t1 .wk-unb[hidden]{display:none}
 #wk-mine .wk-t1 .wk-foot:empty{display:none}
 #wk-mine .wk-t1 .wk-foot:not(:empty){margin-left:auto}
@@ -2650,10 +2400,7 @@ border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0d0d1c);
 .uncard .unrow.all .wk-lgx{background:#3a2a10;color:var(--wamber)}
 /* the two ends the same 360px, Redelegate the room between; the wallet's table and boxes
    sized for 336px inside */
-#wk-mine .wk-bal5{gap:5px}
-#wk-mine .wk-b5{padding:0 4px}
-#wk-mine .wk-b5 i{font-size:7px;letter-spacing:.12em}
-#wk-mine .wk-bh .wk-addr{font-size:8.5px}
+
 /* the cards keep their height: the fee line and the step line have their room before
    they are filled, so nothing below them moves */
 #txpop .txfee,#unpop .txfee,#stpop .txfee{height:23px;min-height:23px;line-height:13px;overflow:hidden;white-space:nowrap}
@@ -2662,27 +2409,23 @@ border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0d0d1c);
   .wk-two{align-content:start;grid-auto-rows:max-content}
   #wk-mine,#wk-plan,#wk-mv{height:auto;max-height:none;overflow:hidden}
   html:not([data-wallet]) #wk-mine{align-self:auto}
-  #wk-mine .wk-gate{min-height:220px}
+  
   #wk-plan .wk-tbl2,html:not([data-wallet]) #wk-plan .wk-tbl2{flex:0 0 auto;height:calc(16px + 8 * 30px)}
   #wk-mv .wk-moves{max-height:calc(16px + 6 * 30px)}
   #wk-mv .wk-mvempty{min-height:70px}
-  #wk-mine .wk-b5 b{font-size:10px;letter-spacing:-.04em}
-  #wk-mine .wk-b5{height:44px}
-  /* the address chip stays on the name line (it fits) instead of a hidden second line */
-  #wk-mine .wk-bh{height:auto;min-height:32px;max-height:none;flex-wrap:nowrap}
-  #wk-mine .wk-bh .wk-addrw{order:0;flex:0 1 auto;max-width:180px}
+
+/* the address chip stays on the name line (it fits) instead of a hidden second line */
+  
+  #wk-mine .wk-bh .wk-addrw{order:0;flex:0 1 auto;}
   #wname .nf{display:none}#wname .ns{display:inline!important}
   #waddr .af{display:none}#waddr .ap{display:inline!important}
-  #wk-mine .wk-bh{gap:6px}
-  #wk-mine .wk-bh .wk-addrw{max-width:none;padding-left:6px}
+  
+  #wk-mine .wk-bh .wk-addrw{padding-left:6px}
 }
 #wname .ns{display:none}
 #waddr .ap{display:none}
 /* the word beside the glyph, so the button reads at a glance; the phone keeps it short */
-#wk-mine .wk-bh .wk-disc{padding:0 8px 0 5px}
-#wk-mine .wk-bh .wk-disc .wk-dword{font-family:var(--wmono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ws);margin-right:5px;transition:color .16s}
-#wk-mine .wk-bh .wk-disc:hover .wk-dword{color:var(--wburn)}
-@media(max-width:700px){#wk-mine .wk-bh .wk-disc .wk-dword{display:none}#wk-mine .wk-bh .wk-disc{padding:0 6px 0 5px}}
+
 /* ── alerts from the stake and redelegate cards: the bell at the left of the button
    row; the chooser lists the validators it covers ── */
 .txbtns .wk-bell{margin-right:auto;display:inline-flex;align-items:center;gap:6px;color:var(--wamber);border-color:rgba(255,176,46,.35);background:transparent}
@@ -2702,23 +2445,23 @@ border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0d0d1c);
 /* ── the unstake card, composed: an amber line along its top, a summary strip under the
    head (what leaves, from where, when it is back), the rows, the field row, the note ── */
 .pop .card.uncard{position:relative;overflow:hidden;border-radius:10px;background:linear-gradient(180deg,#11111f,#0c0c19);box-shadow:0 40px 90px -40px #000,inset 0 1px 0 rgba(255,255,255,.04)}
-.pop .card.stcard::before{content:"";position:absolute;left:24px;right:24px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--wamber),transparent);opacity:.9}
+.pop .card.stcard::before{content:"";position:absolute;left:24px;right:24px;top:0;height:1px;opacity:.9}
 .uncard .wk-txh{padding:16px 20px 10px}
 .uncard .wk-txh b{color:#fff8dc}
 .uncard .txsum{color:var(--wamber)}
 
 .uncard .unpick{padding-top:12px}
 .uncard .unamt{padding-top:10px}
-.stcard .txlock{margin:12px 20px 0;padding:9px 12px;border:1px solid rgba(255,176,46,.28);border-radius:6px;background:rgba(255,176,46,.05);display:flex;align-items:center;gap:8px}
+.stcard .txlock{margin:12px 20px 0;padding:9px 12px;border:1px solid rgba(255,176,46,.28);border-radius:6px;display:flex;align-items:center;gap:8px}
 .stcard .txlock span{font-family:var(--wmono);font-size:8.5px;letter-spacing:.04em;color:var(--ws);line-height:1.4}
-.stcard .txlock span b{color:var(--wamber);font-weight:400}
-#p-dele .stcard .txlock svg,.stcard .txlock svg{width:12px;height:12px;flex:0 0 auto;fill:none;stroke:var(--wamber);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin:0}
+.stcard .txlock span b{font-weight:400}
+#p-dele .stcard .txlock svg,.stcard .txlock svg{width:12px;height:12px;flex:0 0 auto;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin:0}
 .uncard .txfee{padding:10px 20px 0;color:var(--wf)}
 .uncard .txbtns{padding:14px 20px 18px;border-top:1px solid var(--wbd);margin-top:12px}
 .uncard .wk-btn{height:32px;border-radius:6px;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;font-weight:400}
 /* ── stake: the green door before Unstake, its card in green ── */
-#wk-mine .wk-t1 .wk-unb.wk-stb{margin-left:auto;border-color:rgba(46,224,106,.4);color:var(--wgreen);background:linear-gradient(180deg,#14201a,#0f1a14)}
-#wk-mine .wk-t1 .wk-unb.wk-stb:hover{border-color:var(--wgreen);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 12px -3px rgba(46,224,106,.6)}
+#wk-mine .wk-t1 .wk-unb.wk-stb{margin-left:auto;}
+
 #wk-mine .wk-t1 .wk-stb+.wk-unb{margin-left:6px}
 #wk-mine .wk-t1 .wk-foot:not(:empty)+.wk-stb{margin-left:8px}
 #wk-mine .wk-t1 .wk-stb[hidden]{display:none}
@@ -2759,9 +2502,9 @@ border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0d0d1c);
 #wk-mine,#wk-plan,#wk-mv{padding-bottom:14px}
 #wk-mine::after,#wk-plan::after,#wk-mv::after{content:"";position:absolute;left:12px;right:12px;bottom:9px;height:1px;background:linear-gradient(90deg,transparent,var(--wbd2) 10%,var(--wbd2) 90%,transparent);pointer-events:none}
 #dmy,#dpicks,#dstrat{-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 14px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 14px),transparent)}
-#wk-mine .wk-tbl2{height:calc(16px + 8 * 30px + 4px)}
+
 /* the name carries the titles' bar too (positioned, so ::first-letter still capitalises) */
-#wk-mine .wk-bh h3::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:12px;border-radius:2px;background:currentColor;box-shadow:0 0 8px currentColor;opacity:.9}
+#wk-mine .wk-bh h3::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;border-radius:2px;background:currentColor;box-shadow:0 0 8px currentColor;opacity:.9}
 
 /* the three figures as one row of stacked boxes, the balance boxes' shape */
 #wk-mv .wk-ans{flex-wrap:nowrap;gap:6px;margin:4px 0 0}
@@ -2779,34 +2522,27 @@ border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0d0d1c);
 #wk-mv .wk-ans .p.rate i:not(:first-child){display:none}
 #p-dele #wk-mv .wk-ans .p.lock svg{width:9px;height:9px;margin:0 2px 0 0}
 #wk-mv .wk-ans .p.lock i{display:inline-flex;align-items:center}
-#wk-mv .wk-moves{margin-top:8px}
-#wk-mv .wk-moves{margin-top:8px}
-#wk-mv .wk-mvempty{flex:1 1 auto}
-#dpicks{margin-top:2px}
-#dpicks td.nm .nmw>span{font-size:11px}
-#dpicks td.r2{font-size:9.5px;letter-spacing:-.02em}#dpicks td.r2 em{margin:0 2px}
+
+#dpicks td.r2{letter-spacing:-.02em}#dpicks td.r2 em{margin:0 2px}
 #dpicks thead th,#dpicks td{padding-left:5px;padding-right:5px}
-#wk-mine .wk-bh .wk-addr{font-size:9px}
+
 /* ── detailing: the wallet's controls share one ground (a lit gradient, an inset
    highlight, a hairline), one hover (the pane's accent), one press (a 4% shrink) ── */
-#wk-plan .wk-ph .wk-ib,#wk-mine .wk-bh .wk-disc,#wk-plan .wk-field .wk-max{
+#wk-plan .wk-ph .wk-ib,#wk-plan .wk-field .wk-max{
 background:linear-gradient(180deg,#17172f,#0e0e1d);border:1px solid var(--wbd2);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 1px 2px rgba(0,0,0,.4);
 transition:color .16s,border-color .16s,box-shadow .16s,transform .12s}
-#wk-plan .wk-ph .wk-ib:active,#wk-mine .wk-bh .wk-disc:active,#wk-plan .wk-field .wk-max:active{transform:scale(.94)}
+#wk-plan .wk-ph .wk-ib:active,#wk-plan .wk-field .wk-max:active{transform:scale(.94)}
 /* refresh: smaller than disconnect, the arc turns once on every tap and keeps
    turning while the chain is being read */
-#wk-plan .wk-ph .wk-ib{width:18px;height:18px;border-radius:4px;margin-left:10px;color:var(--ws)}
+#wk-plan .wk-ph .wk-ib{width:18px;height:18px;border-radius:4px;color:var(--ws)}
 #p-dele #wk-plan .wk-ph .wk-ib svg{width:10px;height:10px;stroke-width:2.4}
 #wk-plan .wk-ph .wk-ib:hover{color:#fff8dc;border-color:var(--a);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 12px -3px var(--a)}
 #wk-plan .wk-ph .wk-ib.spun svg{animation:wkspin .55s cubic-bezier(.3,.6,.3,1) 1}
 #wk-plan .wk-ph .wk-ib.busy{color:var(--wgreen);border-color:rgba(46,224,106,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 12px -3px rgba(46,224,106,.8)}
 #wk-plan .wk-ph .wk-ib.busy svg{animation:wkspin .8s linear infinite}
-#wk-plan .wk-ph .wk-ago{margin-left:7px;color:var(--wgreen);opacity:.95}
+#wk-plan .wk-ph .wk-ago{color:var(--wgreen);opacity:.95}
 /* disconnect: the mark, a hairline, the leave glyph */
-#wk-mine .wk-bh .wk-disc{margin-left:auto;height:22px;padding:0 6px 0 5px;gap:0;border-radius:5px;flex:0 0 auto;align-self:center}
-#wk-mine .wk-bh .wk-disc .wk-mark{margin-right:6px;padding-right:6px;border-right:1px solid var(--wbd2);width:auto;box-sizing:content-box}
-#wk-mine .wk-bh .wk-disc:hover{border-color:var(--wburn);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 12px -3px rgba(255,77,31,.7)}
-#wk-mine .wk-bh .wk-disc:hover svg.wk-out{color:var(--wburn)}
+
 /* the tick: a lit square, a green one when on, the row it sits in warmed */
 .wk-tbl2 td.ck input{width:15px;height:15px;border-radius:4px;border-color:var(--wbd2);background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);transition:border-color .12s,box-shadow .12s,background .12s}
 .wk-tbl2 td.ck input:hover{border-color:var(--ws)}
@@ -2822,45 +2558,41 @@ transition:color .16s,border-color .16s,box-shadow .16s,transform .12s}
 @media(prefers-reduced-motion:reduce){#wk-plan .wk-ph .wk-ib.spun svg,#wk-plan .wk-ph .wk-ib.busy svg{animation:none}}
 /* the heading: name, the whole address with a copy glyph after it, the wallet's
    button at the opposite edge; on a phone the address takes its own line */
-#wk-mine .wk-bh{align-items:center;flex-wrap:wrap;row-gap:2px}
-#wk-mine .wk-bh .wk-addrw{display:inline-flex;align-items:center;gap:5px;min-width:0}
+#wk-mine .wk-bh{flex-wrap:wrap;row-gap:2px}
+
 #wk-mine .wk-bh h3::first-letter{text-transform:uppercase}
-#wk-mine .wk-bh .wk-addr{font-size:9px;letter-spacing:.02em;overflow:hidden;text-overflow:ellipsis}
-@media(max-width:700px){#wk-mine .wk-bh h3{max-width:none}}
+#wk-mine .wk-bh .wk-addr{overflow:hidden;text-overflow:ellipsis}
+
 /* the soon badge sits over the Governance word: centred on it, its lower half
    across the word's upper half */
 
 /* Balance: the account's own name stands as the heading, its address after it;
    then five centred figures on a lit ground */
-#wk-mine .wk-bh{display:flex;align-items:baseline;gap:10px;min-height:30px;padding-bottom:2px}
+#wk-mine .wk-bh{display:flex;gap:10px;padding-bottom:2px}
 /* the account name: the sans face, larger, amber with a soft glow - the pane's own heading */
-#wk-mine .wk-bh h3{font-family:var(--wsans);font-size:13px;font-weight:600;letter-spacing:-.01em;text-transform:none;color:#f0eef8;text-shadow:none;line-height:1;padding:0 0 0 11px;position:relative;align-self:center;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#wk-mine .wk-bh .wk-addr{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.04em;text-transform:none;color:var(--wf);white-space:nowrap}
-#wk-mine .wk-bh .wk-addr::before{display:none}
-#wk-mine .wk-bal5{gap:7px;margin:4px 0 0;padding:0 0 12px}
-#wk-mine .wk-b5{align-items:center;text-align:center;gap:5px;height:50px;padding:0 6px;position:relative;overflow:hidden;
-background:linear-gradient(180deg,#12122a,#0b0b18);border-color:var(--wbd2);box-shadow:inset 0 1px 0 #ffffff08}
-#wk-mine .wk-b5::before{content:"";position:absolute;left:10px;right:10px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--c,#6f66c8),transparent);opacity:.9}
-#wk-mine .wk-b5 i{justify-content:center;font-size:7.5px;letter-spacing:.16em}
-#wk-mine .wk-b5 b{font-size:14px;letter-spacing:-.025em}
-#wk-mine .wk-b5:nth-child(1){--c:#b9b0ff}#wk-mine .wk-b5:nth-child(2){--c:#2bc8bd}#wk-mine .wk-b5:nth-child(3){--c:#6f66c8}#wk-mine .wk-b5:nth-child(4){--c:#2ee06a}#wk-mine .wk-b5:nth-child(5){--c:#ffb02e}
+#wk-mine .wk-bh h3{font-family:var(--wsans);font-weight:600;text-transform:none;color:#f0eef8;text-shadow:none;line-height:1;padding:0 0 0 11px;position:relative;align-self:center;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#wk-mine .wk-bh .wk-addr{font-style:normal;text-transform:none;}
+
+#wk-mine .wk-b5{text-align:center;
+border-color:var(--wbd2);}
+
+#wk-mine .wk-b5 i{justify-content:center;}
+
 #wk-mine .wk-b5 b#ds-apr{color:#ffb02e}
-@media(max-width:700px){#wk-mine .wk-bal5{gap:4px}#wk-mine .wk-b5{padding:0 4px;height:44px}#wk-mine .wk-b5 b{font-size:11px}#wk-mine .wk-bh h3{max-width:120px}}
-@media(max-width:700px){#wk-mine .wk-bal5{gap:4px}#wk-mine .wk-b5{padding:0 6px;height:42px}#wk-mine .wk-b5 b{font-size:11px}}
+@media(max-width:700px){#wk-mine .wk-bh h3{max-width:120px}}
+
 .wk-rule{height:1px;margin:0 -12px 8px;background:linear-gradient(90deg,transparent,var(--wbd2) 12%,var(--wbd2) 88%,transparent)}
 /* the account, small, at the top right of the section - under the Wallet word in the bar */
 
 /* redelegation head: title, refresh, seconds ago; the account at the right */
 #wk-plan .wk-ph .wk-ib{margin-left:10px}
 #wk-plan .wk-ph .wk-ago{margin-left:8px}
-#p-dele #wk-plan .wk-disc svg.wk-out{width:12px;height:12px;margin-left:2px}
 
 /* delegations: eight rows in view, the rest by scrolling inside; the header stays */
 /* eight rows tall always (head 16 + 8 x 30) - fewer delegations leave the room, more scroll inside */
 #wk-mine .wk-tbl2{flex:0 0 auto;height:calc(16px + 8 * 30px);max-height:none;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 #wk-mine .wk-tbl2 thead th{position:sticky;top:0;background:var(--wc);z-index:1}
 #wk-mine .wk-pf{display:none}
-.wk-soon span{font-family:var(--wmono);font-weight:400}
 
 /* the phone bar: the mark, two words, the wallet as its glyph alone */
 @media(max-width:620px){.fsoon{top:10px;right:-12px}}
@@ -2869,26 +2601,25 @@ background:linear-gradient(180deg,#12122a,#0b0b18);border-color:var(--wbd2);box-
 @media(min-width:901px){
   /* absolutely placed in the body so its height is definite and the fr rows fill it */
   #wbody{position:relative;flex:1 1 auto;min-height:0}
-  .wk-two{position:absolute;left:0;right:0;top:0;bottom:0;height:auto;grid-template-columns:360px minmax(0,1fr);grid-template-rows:minmax(0,1.35fr) minmax(0,1fr);align-content:stretch;align-items:stretch;justify-content:stretch;gap:10px}
-  #wk-mine{grid-column:1;grid-row:1/3;height:auto;max-height:none;align-self:stretch}
-  #wk-plan{grid-column:2;grid-row:1;height:auto;max-height:none;min-height:0}
-  #wk-mv{grid-column:2;grid-row:2;height:auto;max-height:none;min-height:0}
+  .wk-two{position:absolute;left:0;right:0;top:0;bottom:0;height:auto;grid-template-columns:360px minmax(0,1fr);align-content:stretch;align-items:stretch;justify-content:stretch;gap:10px}
+  #wk-mine{height:auto;max-height:none;align-self:stretch}
+  #wk-plan{height:auto;max-height:none;min-height:0}
+  #wk-mv{height:auto;max-height:none;min-height:0}
   html:not([data-wallet]) .wk-two{align-content:stretch}
   html:not([data-wallet]) #wk-mine{align-self:stretch}
-  #wk-mine .wk-gate{min-height:0}
+  
   /* the delegations take the wallet's extra room, eight rows at the least */
   #wk-mine #wk-acct{flex:1 1 auto;min-height:0}
-  #wk-mine .wk-tbl2{flex:1 1 auto;height:auto;min-height:calc(16px + 5 * 30px);max-height:none}
+  #wk-mine .wk-tbl2{flex:1 1 auto;height:auto;max-height:none}
   #wk-plan .wk-tbl2,html:not([data-wallet]) #wk-plan .wk-tbl2{flex:1 1 0;height:auto;min-height:calc(16px + 4 * 30px)}
-  #wk-mv .wk-moves{flex:1 1 auto;max-height:none;min-height:0}
-  #wk-mv .wk-mvempty{flex:1 1 auto}
+  #wk-mv .wk-moves{max-height:none;min-height:0}
+  
 }
 /* ── Dashboard: the third word in the bar, beside Governance, one of the nav ── */
 
 /* ── the tagline in the Redelegate head, between the clock and the cooldown note; the
    Outcome head carries its three figures as small chips at the right ── */
 
-#wk-plan>.wk-ph .wk-lockn{margin-left:auto}
 #wk-mv .wk-mvh .wk-ans{margin:0 0 0 auto;flex:0 1 auto;min-width:0;display:flex;flex-wrap:nowrap;gap:5px;order:0}
 #wk-mv .wk-mvh .wk-ans .p,#wk-mv .wk-mvh .wk-ans .p.rate,#wk-mv .wk-mvh .wk-ans .p.gain,#wk-mv .wk-mvh .wk-ans .p.lock{flex:0 0 auto;height:22px;padding:0 7px;flex-direction:row;flex-flow:row nowrap;align-items:center;gap:4px;min-width:0}
 #wk-mv .wk-mvh .wk-ans .p i{font-size:6.5px;letter-spacing:.12em;display:inline-flex;align-items:center}
@@ -2898,40 +2629,30 @@ background:linear-gradient(180deg,#12122a,#0b0b18);border-color:var(--wbd2);box-
 #wk-mv .wk-mvh .wk-ans .p b{font-size:11px;letter-spacing:-.02em}
 #wk-mv .wk-mvh .wk-ans .p .arr{font-size:10px;margin:0 1px}
 #wk-mv .wk-moves{margin-top:4px}
-@media(max-width:700px){#wk-mv .wk-mvh{height:auto;max-height:none;flex-wrap:wrap}#wk-mv .wk-mvh .wk-ans{flex:1 1 100%;order:3;margin:4px 0 0}}
+@media(max-width:700px){#wk-mv .wk-mvh{flex-wrap:wrap}#wk-mv .wk-mvh .wk-ans{flex:1 1 100%;order:3;margin:4px 0 0}}
 /* ── the wallet head: the name large with DISCONNECT tall beside it, the address on its
    own line beneath, then the five figures as one ruled strip instead of boxes ── */
-#wk-mine .wk-bh{height:auto;min-height:36px;max-height:none}
-#wk-mine .wk-bh h3{font-size:17px;letter-spacing:-.015em;padding-left:13px}
-#wk-mine .wk-bh h3::before{height:15px}
-#wk-mine .wk-bh .wk-disc{height:30px;padding:0 10px 0 7px;border-radius:6px}
-#wk-mine .wk-bh .wk-disc .wk-mark{width:16px;height:16px;margin-right:8px;padding-right:8px}
-#wk-mine .wk-bh .wk-disc .wk-mark img{width:16px;height:16px}
-#wk-mine .wk-bh .wk-disc .wk-dword{font-size:8px}
-#p-dele #wk-mine .wk-bh .wk-disc svg.wk-out{width:12px;height:12px}
 
 /* the figures: one strip, hairlines above and below, thin dividers between, value over label */
-#wk-mine .wk-bal5{display:flex;gap:0;margin:10px 0 0;padding:7px 0;border-top:1px solid var(--wbd2);border-bottom:1px solid var(--wbd2)}
-#wk-mine .wk-b5{flex:1 1 0;min-width:0;height:auto;padding:2px 4px;border:0;border-radius:0;background:transparent;box-shadow:none;display:flex;flex-direction:column-reverse;align-items:center;justify-content:center;gap:4px;position:relative;overflow:visible}
-#wk-mine .wk-b5::before{content:none}
-#wk-mine .wk-b5+.wk-b5{border-left:1px solid var(--wbd)}
-#wk-mine .wk-b5 b{font-size:13px;letter-spacing:-.03em;line-height:1}
-#wk-mine .wk-b5 i{font-size:6.5px;letter-spacing:.14em;color:var(--wf)}
-#wk-mine .wk-b5 i img{width:10px;height:10px}
-#wk-mine .wk-b5 b::after{content:"";display:block;width:14px;height:2px;border-radius:1px;margin:5px auto 0;background:var(--c,#6f66c8);opacity:.9}
+#wk-mine .wk-bal5{border-top:1px solid var(--wbd2);border-bottom:1px solid var(--wbd2)}
+#wk-mine .wk-b5{flex:1 1 0;min-width:0;display:flex;align-items:center;position:relative;}
+
+#wk-mine .wk-b5 b{line-height:1}
+
+#wk-mine .wk-b5 b::after{display:block;width:14px;height:2px;border-radius:1px;margin:5px auto 0;background:var(--c,#6f66c8);opacity:.9}
 #wk-mine .wk-b5:nth-child(1){--c:#b9b0ff}#wk-mine .wk-b5:nth-child(2){--c:#2bc8bd}#wk-mine .wk-b5:nth-child(3){--c:#6f66c8}#wk-mine .wk-b5:nth-child(4){--c:#2ee06a}#wk-mine .wk-b5:nth-child(5){--c:#ffb02e}
-#wk-mine .wk-rule{margin-top:10px}
-@media(max-width:700px){#wk-mine .wk-bh h3{font-size:15px}#wk-mine .wk-b5 b{font-size:11px}#wk-mine .wk-bal5{margin-top:8px}}
+
+@media(max-width:700px){#wk-mine .wk-bal5{margin-top:8px}}
 /* ── the two lines of the stake row, one style: 28px chips, the sans face, a number or
    a lead in colour, the rest in the pane's ink; the green one grows, the violet one holds ── */
 
 /* ── the stake row: the two lines, the field, then the three figure chips (they wrap to a
    second line when the row is short); Redelegate stands at the Outcome head's right ── */
 
-#wk-mv .wk-mvh .wk-btn.wk-go{margin-left:auto;height:26px;padding:0 14px;min-width:100px;border-radius:6px;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;
-background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;color:#04150a;font-weight:600;box-shadow:0 10px 24px -12px rgba(46,224,106,.75),inset 0 1px 0 rgba(255,255,255,.3);transition:filter .15s,transform .12s}
-#wk-mv .wk-mvh .wk-btn.wk-go:hover{filter:brightness(1.08);transform:translateY(-1px)}
-#wk-mv .wk-mvh .wk-btn.wk-go:disabled{background:linear-gradient(180deg,#1d1d36,#15152a);border-color:#2f2f52;color:#66648c;box-shadow:inset 0 1px 0 #ffffff06;transform:none;filter:none;font-weight:400;opacity:1;cursor:default}
+#wk-mv .wk-mvh .wk-btn.wk-go{font-family:var(--wmono);text-transform:uppercase;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;
+transition:filter .15s,transform .12s}
+
+#wk-mv .wk-mvh .wk-btn.wk-go:disabled{transform:none;filter:none;opacity:1;cursor:default}
 
 /* ── the Redelegate list at its new width: taller rows, larger figures, clearer names ── */
 #dpicks thead th{font-size:8px;letter-spacing:.16em;padding:9px 7px 8px;color:#d0cee6}
@@ -2946,26 +2667,22 @@ background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;colo
 #dpicks td.nm .gtag{font-size:8.5px;padding:1px 5px}
 /* the line in the Outcome head, before the button, in the stake row's style */
 
-#wk-mv .wk-mvh .wk-btn.wk-go{margin-left:10px}
-
 /* ── the account block: one framed block at the head's right, two rows - DISCONNECT over
    the address with its copy glyph - the address as wide as the button; the name at the
    left stands on the block's centre line. The balances are five readable tiles ── */
-#wk-mine .wk-bh{min-height:56px;align-items:center}
-#wk-mine .wk-bh h3{font-size:18px}
+#wk-mine .wk-bh{align-items:center}
 
 /* five tiles, larger figures, in two rows: the wallet's tokens, then what is staked, earned, paid */
-#wk-mine .wk-bal5{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:10px 0 0;padding:0;border:0}
-#wk-mine .wk-b5{grid-column:span 2;flex-direction:column;height:54px;padding:0 6px;gap:5px;border:1px solid var(--wbd2);border-radius:6px;background:linear-gradient(180deg,#12122a,#0b0b18);box-shadow:inset 0 1px 0 #ffffff08;overflow:hidden}
+#wk-mine .wk-bal5{display:grid;gap:6px;margin:10px 0 0;padding:0;border:0}
+#wk-mine .wk-b5{grid-column:span 2;flex-direction:column;border:1px solid var(--wbd2);border-radius:6px;background:linear-gradient(180deg,#12122a,#0b0b18);box-shadow:inset 0 1px 0 #ffffff08;overflow:hidden}
 #wk-mine .wk-b5::before{content:"";position:absolute;left:10px;right:10px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--c,#6f66c8),transparent);opacity:.9}
 #wk-mine .wk-b5+.wk-b5{border-left:1px solid var(--wbd2)}
 #wk-mine .wk-b5:nth-child(4){grid-column:1/4}#wk-mine .wk-b5:nth-child(5){grid-column:4/7}
-#wk-mine .wk-b5 b{font-size:16px;letter-spacing:-.02em}
+
 #wk-mine .wk-b5 b::after{content:none}
-#wk-mine .wk-b5 i{font-size:7.5px;letter-spacing:.14em;color:var(--ws)}
-#wk-mine .wk-b5 i img{width:11px;height:11px}
+
 #wk-mine .wk-rule{margin-top:10px}
-@media(max-width:700px){#wk-mine .wk-bh h3{font-size:15px}#wk-mine .wk-b5 b{font-size:14px}#wk-mine .wk-b5{height:48px}}
+
 /* ── the Dashboard sits exactly where the calculator pane sits: the same top under the
    title band, the same height - the flipbox's own box, measured by state() ── */
 @media(min-width:901px){
@@ -2978,8 +2695,6 @@ background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;colo
 /* the copy glyph as a real button in the address row: a bordered square, lit on hover */
 
 /* reverted: the button alone at the head's right, the address chip on its own line */
-#wk-mine .wk-bh{min-height:36px}
-#wk-mine .wk-bh h3{font-size:17px}
 
 /* ── the head: the name at the titles' size, the address chip at the row's right; the
    DISCONNECT button runs the full width along the wallet pane's floor ── */
@@ -2990,34 +2705,26 @@ background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;colo
 #wk-mine .wk-bh .wk-addr{font-family:var(--wmono);font-size:9.5px;letter-spacing:.03em;color:var(--ws);line-height:1;gap:1px;display:inline-flex;align-items:center;white-space:nowrap}
 #wk-mine .wk-bh .wk-addr em{font-style:normal;color:#b9b0ff}
 #wk-mine .wk-bh .wk-addr::before{display:none}
-#wk-mine #wk-acct .wk-disc{margin:8px 0 0;width:100%;height:32px;flex:0 0 auto;justify-content:center;gap:0;padding:0 10px;border-radius:6px;border:1px solid var(--wbd2);
-background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 1px 2px rgba(0,0,0,.4);transition:color .16s,border-color .16s,box-shadow .16s,transform .12s}
-#wk-mine #wk-acct .wk-disc:hover{border-color:var(--wburn);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 12px -3px rgba(255,77,31,.7)}
-#wk-mine #wk-acct .wk-disc:active{transform:scale(.99)}
-#wk-mine #wk-acct .wk-disc .wk-mark{width:16px;height:16px;margin-right:8px;padding-right:8px;border-right:1px solid var(--wbd2);box-sizing:content-box;display:block;border-radius:0}   /* a radius on a one-sided border drew an arc behind the mark */
-#wk-mine #wk-acct .wk-disc .wk-mark img{width:16px;height:16px;border-radius:4px;display:block}
-#wk-mine #wk-acct .wk-disc .wk-dword{font-family:var(--wmono);font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ws);margin-right:8px;display:inline}
-#wk-mine #wk-acct .wk-disc:hover .wk-dword,#wk-mine #wk-acct .wk-disc:hover svg.wk-out{color:var(--wburn)}
-#p-dele #wk-mine #wk-acct .wk-disc svg.wk-out{width:12px;height:12px;margin:0;color:var(--wf)}
+
+/* a radius on a one-sided border drew an arc behind the mark */
+
 #wk-mine .wk-tbl2{min-height:calc(16px + 6 * 30px)}
-@media(max-width:700px){#wk-mine #wk-acct .wk-disc .wk-dword{display:inline}#wk-mine .wk-bh .wk-addrw{max-width:60%}}
+@media(max-width:700px){#wk-mine .wk-bh .wk-addrw{max-width:60%}}
 /* the gain tag follows the name, not the cell's far edge; the unit rides with it */
 #dpicks td.nm .nmw>span{flex:0 1 auto}
-#dpicks td.nm .gtag{margin-left:2px}
+
 #dpicks td.nm .gtag i{font-style:normal;color:var(--wf);margin-left:1px;letter-spacing:0}
 #dpicks td.nm .gtag.dim i{color:var(--wf)}
 /* the tiles: the whole figure at a quieter size */
-#wk-mine .wk-b5 b{font-size:12px;letter-spacing:-.02em}
-#wk-mine .wk-b5{padding:0 4px}
-@media(max-width:700px){#wk-mine .wk-b5 b{font-size:11px;letter-spacing:-.03em}}
+
 /* the tiles: the wallet's two tokens on the first row, the three staking figures beneath */
 #wk-mine .wk-bal5{grid-template-columns:repeat(6,minmax(0,1fr))}
 #wk-mine .wk-b5:nth-child(1){grid-column:1/4}#wk-mine .wk-b5:nth-child(2){grid-column:4/7}
 #wk-mine .wk-b5:nth-child(3),#wk-mine .wk-b5:nth-child(4),#wk-mine .wk-b5:nth-child(5){grid-column:span 2}
 /* refresh and the clock at the title row's far right, the cooldown note before them */
-#wk-plan>.wk-ph .wk-lockn{order:1;margin-left:auto}
+
 #wk-plan>.wk-ph .wk-ago{order:2;margin-left:auto}
-#wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-ago{display:inline;margin-left:10px}
+#wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-ago{display:inline;}
 #wk-plan>.wk-ph .wk-ib{order:3;margin-left:8px}
 @media(max-width:700px){#wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-ago{display:none}}
 /* a row that would pay less is not greyed: it reads like every other row, and only its
@@ -3031,23 +2738,19 @@ background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba
 
 #wk-mv .wk-mvh .wk-btn.wk-go{margin-left:auto}
 /* the gain tag keeps a clear distance from the name */
-#dpicks td.nm .gtag{margin-left:16px}
+
 /* ── the actions, unmistakable: the field carries a lit STAKE label, a brighter frame and
    a readable placeholder; Redelegate is tall, bold and lit; the doors a size up ── */
 
-#wk-plan input.wk-amt2{font-size:14px;padding:0 10px}
-#wk-plan input.wk-amt2::placeholder{font-size:9.5px;letter-spacing:.18em;color:var(--ws);opacity:.9}
-#wk-plan .wk-field .wk-max{height:24px;padding:0 9px;font-size:8px}
-#wk-plan .wk-field .wk-max b{font-size:10px;color:#fff8dc}
+#wk-plan input.wk-amt2::placeholder{opacity:.9}
 
 #wk-mv .wk-mvh .wk-btn.wk-go{height:34px;min-width:150px;padding:0 20px;font-size:10.5px;letter-spacing:.2em;font-weight:700;border-radius:7px;color:#03120a;
 background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-shadow:0 0 0 1px rgba(46,224,106,.25),0 12px 28px -12px rgba(46,224,106,.9),inset 0 1px 0 rgba(255,255,255,.35)}
 #wk-mv .wk-mvh .wk-btn.wk-go:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 0 0 1px rgba(46,224,106,.35),0 16px 32px -12px rgba(46,224,106,1),inset 0 1px 0 rgba(255,255,255,.35)}
 #wk-mv .wk-mvh .wk-btn.wk-go:disabled{background:linear-gradient(180deg,#232345,#191933);border-color:#3a3a62;color:#8a88b0;box-shadow:inset 0 1px 0 #ffffff08;font-weight:600}
 #wk-mv .wk-mvh{height:auto;min-height:40px;max-height:none}
-#wk-mine .wk-t1 .wk-unb{height:20px;padding:0 9px;font-size:8.5px;letter-spacing:.18em;font-weight:600;line-height:1;align-self:center;border-radius:5px}   /* the doors sit on the title's line, no taller than it */
-#wk-mine .wk-t1 .wk-unb.wk-stb{color:#4cf28a;border-color:rgba(46,224,106,.55)}
-#wk-mine .wk-t1 .wk-unb:not(.wk-stb){color:#ffc453;border-color:rgba(255,176,46,.55)}
+#wk-mine .wk-t1 .wk-unb{line-height:1;align-self:center;}   /* the doors sit on the title's line, no taller than it */
+
 @media(max-width:700px){#wk-mv .wk-mvh .wk-btn.wk-go{min-width:120px}}
 /* the list at half the frame: the two lifetime columns step aside until the frame is wide */
 /* the count, large */
@@ -3080,11 +2783,6 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
 
 #dpicks td.nm .nmw>span.wk-lgx{min-width:0;flex:0 0 17px;width:17px}
 
-#wk-plan>.wk-ph .wk-lockn{order:1;margin-left:auto}
-
-
-
-
 /* ── three columns again, in the calculator's frame: the wallet down the left,
    Redelegate in the middle taking what is left, Outcome on the right ── */
 @media(min-width:901px){
@@ -3106,9 +2804,8 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
   #wk-mv .wk-ans .p.rate{flex:1.7 1 0;row-gap:7px;column-gap:4px}
   #p-dele #wk-mv .wk-ans .p.lock svg{width:11px;height:11px;margin:0 3px 0 0}
   /* the amount field alone on its line: a set width on the left, not the whole line */
-  
-  
-  #wk-plan input.wk-amt2{font-size:16px;padding:0 10px}
+
+#wk-plan input.wk-amt2{font-size:16px;padding:0 10px}
   #wk-plan .wk-field .wk-max{height:26px;padding:0 10px;font-size:8px}
   #wk-plan .wk-field .wk-max b{font-size:10.5px}
 }
@@ -3158,14 +2855,7 @@ background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba
 }
 @media(max-width:700px){#wk-plan>.wk-ph{flex-wrap:wrap;row-gap:6px;height:auto;max-height:none;min-height:32px}#wk-plan>.wk-ph .wk-field{order:5;flex:1 1 100%;width:auto;margin:0}}
 /* ── Disconnect as a filled bar, the wallet's amber, the mirror of the green Redelegate bar ── */
-#wk-mine #wk-acct .wk-disc{height:40px;border-radius:8px;border:1px solid #2c3258;background:linear-gradient(180deg,#181c33,#101327);
-box-shadow:0 10px 24px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);transition:filter .15s,transform .12s,box-shadow .15s,border-color .15s}
-#wk-mine #wk-acct .wk-disc:hover{border-color:#4a5290;filter:brightness(1.18);transform:translateY(-1px);box-shadow:0 12px 26px -14px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,.1)}
-#wk-mine #wk-acct .wk-disc:active{transform:translateY(0) scale(.99)}
-#wk-mine #wk-acct .wk-disc .wk-dword{font-size:11px;letter-spacing:.24em;font-weight:600;color:#e6e4f0}
-#wk-mine #wk-acct .wk-disc:hover .wk-dword,#wk-mine #wk-acct .wk-disc:hover svg.wk-out{color:#fff}
-#p-dele #wk-mine #wk-acct .wk-disc svg.wk-out{color:#c9c2ff;width:13px;height:13px}
-#wk-mine #wk-acct .wk-disc .wk-mark{border-right-color:rgba(255,255,255,.18)}
+
 /* the stake column is the validator's own figure; what the plan adds is a tag at the right
    end of the name cell, against that column - its left edge moves with its size, nothing else does */
 #dpicks td.stk{white-space:nowrap;font-variant-numeric:tabular-nums;color:#fff8dc}
@@ -3204,7 +2894,6 @@ box-shadow:0 10px 24px -14px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.08);
 #dmy tbody td.nm{padding-left:8px}
 #dmy tbody tr:first-child td{border-top:0}
 @media(max-width:700px){#dmy thead th{padding:7px 5px 6px}#dmy tbody td{padding:0 5px;height:30px}}
-
 
 /* ── day or night: a switch at the bar's end; the choice is stamped on <html data-theme>
    by boot.js before the first paint (the reader's own, else the browser's preference) ── */
@@ -3290,8 +2979,7 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
   #dpicks td.stk{padding:0 4px}
   #dpicks td.ck{text-overflow:clip;padding:0 2px 0 4px}
   /* the connect gate sits in the middle of its section; the squares with it */
-  html[data-tab=dele] #wk-mine .wk-gate{min-height:300px;display:flex;align-items:center;justify-content:center}
-  #wk-mine .wk-gin{height:auto;min-height:0;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+
 }
 /* the head line never wraps for want of a few px: the count is the one that yields */
 #wk-mine .wk-t1{flex-wrap:nowrap}
@@ -3354,11 +3042,10 @@ background:transparent;color:var(--wt);font-family:var(--wsans);font-size:13px;t
 .sv-menu .mi img{width:18px;height:18px;flex:0 0 auto}
 .sv-menu .mi i{font-style:normal;margin-left:auto;font-family:var(--wmono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--wf)}
 .sv-menu .mi.out{color:var(--wburn)}
-.sv-menu .ma{padding:2px 10px 8px;font-family:var(--wmono);font-size:10px;color:var(--ws);word-break:break-all}
+
 /* the wallet pane keeps its structure but not its door: connect and disconnect
    are the sub-header's now, and the pane shows the shape of what will fill it */
-#wgate{display:none}
-#p-dele #wk-mine .wk-disc{display:none}
+
 html:not([data-wallet]) #wk-mine .wk-addrw{display:none}
 /* the address IS the copy control now: one chip, the glyph riding with the figure */
 #wk-mine .wk-bh .wk-addr{border:0;background:transparent;padding:0;margin:0;cursor:pointer;min-width:0}
@@ -3375,31 +3062,31 @@ html:not([data-wallet]) #wk-mine .wk-addrw{display:none}
 .sv-main{height:100%;min-height:0;width:100%;display:flex;flex-direction:column;padding:0;font-family:var(--wsans);color:var(--wt)}
 .sv-main b{font-weight:700}
 /* the page's own section rule (70px and a rule above) is not for these */
-.sv-screen{display:none;flex-direction:column;gap:0;padding:14px 16px;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
-border:1px solid var(--wbd);border-radius:8px;background:var(--wc)}
+.sv-screen{display:none;flex-direction:column;gap:0;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
+border:1px solid var(--wbd);border-radius:8px;}
 /* ONE section per screen, on the calculator's own edges (its four sections span the same
    box, 8px corners): the parts inside are flat and parted by hairlines rather than
    floating as separate cards; spare room is shared out between the parts, so the box
    has no dead band anywhere - on Network the list grows into the room instead */
-.sv-screen>.sv-panel,.sv-screen>.sv-strip{border:0;border-radius:0;background:transparent;padding:0}
-.sv-screen>:not(:first-child){border-top:1px solid var(--wbd);margin-top:12px;padding-top:12px}
+.sv-screen>.sv-panel,.sv-screen>.sv-strip{background:transparent;}
+
 .sv-screen{justify-content:space-between}
-.sv-screen .sv-cards{gap:0}
+
 .sv-screen .sv-card{border:0;border-radius:0;background:transparent;padding:2px 18px}
 .sv-screen .sv-card:first-child{padding-left:0}
-.sv-screen .sv-card+.sv-card{border-left:1px solid var(--wbd)}
+
 /* the parts every screen is built from */
 .sv-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .sv-cards.four{grid-template-columns:repeat(4,minmax(0,1fr))}
 .sv-card{border:1px solid var(--wbd);border-radius:12px;background:var(--wc);padding:12px 14px 13px;display:flex;flex-direction:column;gap:5px;position:relative;min-width:0}
-.sv-k{font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sv-big{font-size:28px;font-weight:800;letter-spacing:-.022em;line-height:1.05;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:8px;min-width:0}
-.sv-big em{font-style:normal;font-family:var(--wmono);font-size:12px;font-weight:400;letter-spacing:.06em;color:var(--ws)}
+.sv-k{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-big{font-weight:800;letter-spacing:-.022em;line-height:1.05;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:8px;min-width:0}
+.sv-big em{font-style:normal;}
 .sv-big.sm{font-size:22px}
-.sv-sub{font-size:11.5px;color:var(--ws);min-height:16px}
+.sv-sub{color:var(--ws);min-height:16px}
 .sv-sub s{text-decoration:none;color:var(--wf)}
-.sv-tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;
-border-radius:99px;padding:4px 9px;border:1px solid var(--wbd2);color:var(--ws);white-space:nowrap}
+.sv-tag{display:inline-flex;align-items:center;gap:5px;
+border-radius:99px;border:1px solid var(--wbd2);color:var(--ws);white-space:nowrap}
 .sv-tag.g{color:var(--wgreen);border-color:rgba(46,224,106,.38);background:rgba(46,224,106,.06)}
 .sv-tag.a{color:var(--wamber);border-color:rgba(255,176,46,.38);background:rgba(255,176,46,.06)}
 .sv-tag.r{color:var(--wburn);border-color:rgba(255,77,31,.38);background:rgba(255,77,31,.06)}
@@ -3407,32 +3094,29 @@ border-radius:99px;padding:4px 9px;border:1px solid var(--wbd2);color:var(--ws);
 .sv-kr{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
 .sv-panel{border:1px solid var(--wbd);border-radius:12px;background:var(--wc);padding:13px 15px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
 .sv-ph{display:flex;align-items:center;gap:11px;flex-wrap:wrap;min-width:0}
-.sv-ph h3{margin:0;font-size:16px;font-weight:800;letter-spacing:-.01em}
+.sv-ph h3{margin:0;letter-spacing:-.01em}
 .sv-ph .sv-rt{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:9px;min-width:0}
-.sv-note{font-size:11.5px;color:var(--ws);line-height:1.5}
+.sv-note{color:var(--ws);line-height:1.5}
 .sv-note b{color:var(--wt)}
 /* the four figures of the opportunity, and the button that signs it */
 .sv-figs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;min-width:0}
-.sv-fig{border:1px solid var(--wbd);border-radius:9px;background:var(--wi);padding:8px 11px 9px;display:flex;flex-direction:column;gap:4px;min-width:0}
-.sv-fig span{font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sv-fig b{font-size:18px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
-.sv-fig b i{font-style:normal;font-family:var(--wmono);font-size:10px;font-weight:400;color:var(--ws);margin-left:5px}
+.sv-fig{border:1px solid var(--wbd);border-radius:9px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.sv-fig span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-fig b{font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+.sv-fig b i{font-style:normal;color:var(--ws);margin-left:5px}
 .sv-fig.up b{color:var(--wgreen)}
 .sv-fig.dn b{color:var(--wburn)}
 .sv-fig.dim b{color:var(--wf)}
-.sv-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--wbd2);border-radius:10px;height:42px;padding:0 20px;
-font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--wt);background:var(--wchip);cursor:pointer;
+.sv-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--wbd2);padding:0 20px;
+color:var(--wt);background:var(--wchip);cursor:pointer;
 white-space:nowrap;transition:color .16s,border-color .16s,background .16s;position:relative}
 .sv-btn:hover:not(:disabled){border-color:var(--wcyan);color:var(--wcyan)}
 .sv-btn:focus-visible{outline:2px solid var(--wcyan);outline-offset:2px}
 .sv-btn:disabled{color:var(--wf);cursor:default}
-.sv-btn.go{background:rgba(46,224,106,.06);border-color:rgba(46,224,106,.32);color:var(--wgreen)}
-.sv-btn.go:hover:not(:disabled){background:rgba(46,224,106,.12);border-color:var(--wgreen);color:var(--wgreen)}
-.sv-btn.pri{background:rgba(255,176,46,.07);border-color:rgba(255,176,46,.35);color:var(--wamber)}
-.sv-btn.pri:hover:not(:disabled){background:rgba(255,176,46,.13);border-color:var(--wamber);color:var(--wamber)}
+
 .sv-btn.red{color:var(--wburn);border-color:rgba(255,77,31,.32)}
 .sv-btn.red:hover:not(:disabled){border-color:var(--wburn);color:var(--wburn);background:rgba(255,77,31,.09)}
-.sv-btn.sml{height:32px;padding:0 13px;font-size:9px;border-radius:8px}
+.sv-btn.sml{border-radius:8px}
 /* the wallet doors read as names, not as shouted labels */
 .sv-btn.w{text-transform:none;letter-spacing:.01em;font-family:var(--wsans);font-size:13px;gap:9px}
 .sv-btn.w img{width:16px;height:16px}
@@ -3441,17 +3125,17 @@ white-space:nowrap;transition:color .16s,border-color .16s,background .16s;posit
 .sv-btn.busy::after{content:"";position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;
 border:2px solid rgba(255,255,255,.25);border-top-color:var(--wt);animation:wkspin .8s linear infinite}
 /* the allocation: one bar, then the validators that make it */
-.sv-bar{display:flex;height:9px;border-radius:99px;overflow:hidden;background:var(--wi);border:1px solid var(--wbd)}
+.sv-bar{display:flex;}
 .sv-bar i{display:block;height:100%}
 .sv-bar i.hld{opacity:.45}
 .sv-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
 .sv-chip{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:3px 10px;border:1px solid var(--wbd);border-radius:10px;
-background:var(--wi);padding:8px 11px;min-width:0}
+padding:8px 11px;min-width:0}
 .sv-chip .sv-dot{width:8px;height:8px;border-radius:50%;grid-row:span 2}
 .sv-chip b{font-size:13px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sv-chip em{font-style:normal;font-family:var(--wmono);font-size:11px;color:var(--wt);justify-self:end}
+.sv-chip em{font-style:normal;color:var(--wt);justify-self:end}
 .sv-chip s{grid-column:2;text-decoration:none;font-size:11px;color:var(--ws);font-variant-numeric:tabular-nums}
-.sv-chip u{grid-column:3;text-decoration:none;font-family:var(--wmono);font-size:9.5px;color:var(--wf);justify-self:end}
+.sv-chip u{grid-column:3;text-decoration:none;color:var(--wf);justify-self:end}
 .sv-chip.skel b,.sv-chip.skel em,.sv-chip.skel s,.sv-chip.skel u{height:7px;border-radius:4px;background:var(--wbd2);opacity:.5}
 .sv-chip.skel b{width:64%}.sv-chip.skel em{width:22px}.sv-chip.skel s{width:52%}.sv-chip.skel u{width:26px}
 .sv-chip.skel .sv-dot{background:var(--wbd2)}
@@ -3461,8 +3145,7 @@ background:var(--wi);padding:8px 11px;min-width:0}
 .sv-strip{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--wbd);border-radius:12px;background:var(--wc);padding:9px 15px;font-size:12px;color:var(--ws)}
 .sv-strip .sv-sep{color:var(--wf)}
 .sv-strip .sv-rt{margin-left:auto;display:flex;align-items:center;gap:9px}
-.sv-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:26px 10px;color:var(--ws);font-size:12.5px}
-.sv-empty b{display:block;color:var(--wt);font-size:15px;font-weight:700;margin-bottom:2px}
+
 /* the set, as a table */
 .sv-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .sv-find{flex:1 1 220px;min-width:0;height:36px;border-radius:9px;border:1px solid var(--wbd);background:var(--wi);color:var(--wt);
@@ -3470,8 +3153,8 @@ padding:0 12px;font-family:var(--wsans);font-size:12.5px}
 .sv-find::placeholder{color:var(--wf)}
 .sv-find:focus{outline:none;border-color:var(--wbd2)}
 .sv-segs{display:flex;gap:5px;flex-wrap:wrap}
-.sv-seg{border:1px solid var(--wbd);background:transparent;color:var(--wf);font-family:var(--wmono);font-size:9px;letter-spacing:.12em;
-text-transform:uppercase;padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.sv-seg{border:1px solid var(--wbd);background:transparent;color:var(--wf);
+padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
 .sv-seg:hover{color:var(--ws);border-color:var(--wbd2)}
 .sv-seg[aria-pressed=true]{color:var(--wt);background:var(--wh);border-color:var(--wbd2)}
 .sv-wrap{overflow-x:auto}
@@ -3494,7 +3177,7 @@ text-transform:uppercase;padding:8px 12px;border-radius:8px;cursor:pointer;white
 .sv-tbl.ph th:last-child,.sv-tbl.ph td:last-child{padding-right:8px}
 .sv-tbl.ph td.l{overflow:hidden}
 .sv-tbl.ph .sv-nm .tx i{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sv-tbl th{font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);font-weight:400;
+.sv-tbl th{color:var(--wf);
 text-align:right;padding:9px 10px;background:var(--wi);border-top:1px solid var(--wbd);border-bottom:1px solid var(--wbd);white-space:nowrap}
 .sv-tbl th:first-child,.sv-tbl th.l{text-align:left}
 .sv-tbl th:first-child{border-radius:8px 0 0 8px;padding-left:12px}
@@ -3504,7 +3187,7 @@ text-align:right;padding:9px 10px;background:var(--wi);border-top:1px solid var(
 .sv-tbl td:first-child{padding-left:12px;color:var(--wf);font-family:var(--wmono);font-size:10px}
 .sv-tbl td:last-child{padding-right:12px}
 .sv-tbl tbody tr{cursor:pointer}
-.sv-tbl tbody tr:hover{background:var(--wi)}
+
 .sv-tbl tbody tr.mine{background:rgba(111,102,200,.08)}
 .sv-nm{display:flex;align-items:center;gap:9px;min-width:0}
 .sv-nm img,.sv-nm span.lg{width:22px;height:22px;border-radius:7px;flex:0 0 auto;object-fit:cover;box-shadow:0 0 0 1px #ffffff14}
@@ -3522,11 +3205,10 @@ text-align:right;padding:9px 10px;background:var(--wi);border-top:1px solid var(
 .sv-foot2{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-family:var(--wmono);font-size:9.5px;letter-spacing:.06em;color:var(--wf);padding:2px 2px 0}
 .sv-foot2 .sv-rt{margin-left:auto}
 /* the autopilot screen: what stands, what it may do, what it may never do */
-.sv-rows{display:flex;flex-direction:column;gap:9px}
-.sv-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;border:1px solid var(--wbd);border-radius:10px;background:var(--wi);padding:9px 13px}
+
 .sv-can{display:flex;gap:18px;flex-wrap:wrap;font-size:11.5px}
 .sv-can div{display:flex;flex-direction:column;gap:5px;min-width:0}
-.sv-can u{text-decoration:none;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
+.sv-can u{text-decoration:none;color:var(--wf)}
 .sv-can p{margin:0;display:flex;gap:14px;flex-wrap:wrap}
 .sv-can p span{display:inline-flex;align-items:center;gap:6px}
 /* ══ Simple view, second pass (2026-09-25): depth, colour with meaning, one hero ══════════

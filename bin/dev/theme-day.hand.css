@@ -11,23 +11,19 @@
   /* the bar: same 64px bar, ivory; the open word keeps its box, in the accent */
   html[data-theme=light]:not([data-mono]) .folder{background:rgba(244,241,234,.93);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wordmark{font-family:var(--day-display);color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .fnav .ftab{border-color:var(--line);background:var(--surface);color:var(--muted)}
-  html[data-theme=light]:not([data-mono]) .fnav .ftab:hover:not([disabled]){border-color:var(--line-strong);color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .fnav .ftab.on,html[data-theme=light]:not([data-mono]) .fnav .ftab.acct.on{border-color:var(--accent);background:var(--accent-tint);color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .fnav .fsoon{background:var(--bg);color:var(--warn)}
+
   html[data-theme=light]:not([data-mono]) .bheight,html[data-theme=light]:not([data-mono]) .bheight b{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .bheight i{background:var(--accent);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .thbtn{border-color:var(--line-strong);background:var(--surface);color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .thbtn:hover{color:var(--ink);background:#ECE8DF}
   html[data-theme=light]:not([data-mono]) .tsfx{color:var(--accent)!important}
   html[data-theme=light]:not([data-mono]) .bt,html[data-theme=light]:not([data-mono]) .btx{font-family:var(--day-display);color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .tabb.on,html[data-theme=light]:not([data-mono]) .tabs .tabb.on,html[data-theme=light]:not([data-mono]) .tabs .tabb.on[style*="2bc8bd"],html[data-theme=light]:not([data-mono]) .tabs .tabb.on[style*="2ee06a"]{color:var(--accent);background:var(--accent-tint);border-color:var(--accent);box-shadow:none}
 
   /* contrast floors: tertiary text reads at 4.5:1 (muted, not faint) */
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td.rk,html[data-theme=light]:not([data-mono]) .wk-tbl2 td.c.rk,html[data-theme=light]:not([data-mono]) #dpicks td.r2 s,html[data-theme=light]:not([data-mono]) #dpicks td.r2 em,
   html[data-theme=light]:not([data-mono]) .wk-pn,html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p .arr,html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p b.dim,
   html[data-theme=light]:not([data-mono]) .tapnote,html[data-theme=light]:not([data-mono]) .wk-txh span,html[data-theme=light]:not([data-mono]) .txsum,html[data-theme=light]:not([data-mono]) .cbs,
-  html[data-theme=light]:not([data-mono]) .vsubn,html[data-theme=light]:not([data-mono]) #wk-mine .wk-gatecard .wk-chain,html[data-theme=light]:not([data-mono]) .sub,html[data-theme=light]:not([data-mono]) .rkc,
+  html[data-theme=light]:not([data-mono]) .vsubn,html[data-theme=light]:not([data-mono]) .sub,html[data-theme=light]:not([data-mono]) .rkc,
   html[data-theme=light]:not([data-mono]) .ptab .rkc,html[data-theme=light]:not([data-mono]) .pingttl,html[data-theme=light]:not([data-mono]) .unhint,html[data-theme=light]:not([data-mono]) .aplab,
   html[data-theme=light]:not([data-mono]) .wk-max,html[data-theme=light]:not([data-mono]) #stmax,html[data-theme=light]:not([data-mono]) #unmax,html[data-theme=light]:not([data-mono]) #atmax,html[data-theme=light]:not([data-mono]) #amtmax,
   html[data-theme=light]:not([data-mono]) .atcard .atrow .unhint{color:var(--muted)}
@@ -57,7 +53,7 @@
   html[data-theme=light]:not([data-mono]) ::-webkit-scrollbar-thumb{background:#D8D2C5;border-color:var(--surface)}
 
   /* second pass of contrast floors after the slim: idle controls and small labels at muted */
-  html[data-theme=light]:not([data-mono]) .etabox,html[data-theme=light]:not([data-mono]) .tabs .tabb,html[data-theme=light]:not([data-mono]) .mbtn,
+  html[data-theme=light]:not([data-mono]) .etabox,html[data-theme=light]:not([data-mono]) .mbtn,
   html[data-theme=light]:not([data-mono]) #wkaps,html[data-theme=light]:not([data-mono]) #dmyn,html[data-theme=light]:not([data-mono]) #dmvn,
   html[data-theme=light]:not([data-mono]) #dmvempty,html[data-theme=light]:not([data-mono]) .atcard .atlab,html[data-theme=light]:not([data-mono]) .wk-aps{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .mbtn[aria-pressed=true]{background:var(--accent-tint);color:var(--accent)}
@@ -80,17 +76,14 @@
   html[data-theme=light]:not([data-mono]) #sv .sv-foot2,html[data-theme=light]:not([data-mono]) #sv .sv-tbl th,
   html[data-theme=light]:not([data-mono]) #sv .sv-tbl td:first-child,html[data-theme=light]:not([data-mono]) #sv .sv-seg,
   html[data-theme=light]:not([data-mono]) #sv .sv-strip,html[data-theme=light]:not([data-mono]) #sv .sv-btn:disabled,
-  html[data-theme=light]:not([data-mono]) #sv .sv-btn.w i,html[data-theme=light]:not([data-mono]) #sv .sv-empty,html[data-theme=light]:not([data-mono]) #sv .sv-sep{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) #sv .sv-btn.w i,html[data-theme=light]:not([data-mono]) #sv .sv-sep{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) #sv .sv-find::placeholder{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) #sv .sv-nm span.lg{color:#fff}
 
   /* the dashboard's sub-header sits outside #sv (it is the window's own row), so the
      same floors are named for it: colour only, the sizes are the night sheet's */
-  html[data-theme=light]:not([data-mono]) .brandbar .sv-bw i,
-  html[data-theme=light]:not([data-mono]) .hdr-r .sv-tab,html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mh,
-  html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .ma,html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mi i,
-  html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mi:disabled,html[data-theme=light]:not([data-mono]) .hdr-r .sv-mode button{color:var(--muted)}
-  html[data-theme=light]:not([data-mono]) .hdr-r .sv-mode button[aria-pressed=true]{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .brandbar .sv-bw i,html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mh,html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mi i,
+  html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mi:disabled{color:var(--muted)}
 
   /* the navigation shell's "soon" badge: on a lit level-1 tab the tint lowers its ground */
   html[data-theme=light]:not([data-mono]) .l1badge{color:var(--warn-ink)}
