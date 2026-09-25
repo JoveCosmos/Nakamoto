@@ -2690,12 +2690,16 @@ rememberGridH();
      it the way they close every other card, and nothing else has to know */
   var pick = E("wpick"), dis = E("wdisc");
   /* the copy glyph: the clipboard, with the old selection route as the fallback;
-     the check shows for a moment */
-  var wcopy = E("wcopy"), wcopyT = 0;
-  if(wcopy) wcopy.addEventListener("click", function(){
+     the check shows for a moment. It rides inside the address itself - the whole
+     chip is the control, there is no second button beside it. */
+  var COPYG = '<svg class=cp viewBox="0 0 24 24" aria-hidden=true><rect x="9" y="9" width="12" height="12" rx="2"/>' +
+    '<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+    '<svg class=ok viewBox="0 0 24 24" aria-hidden=true><path d="M4 12.5l5 5L20 6.5"/></svg>';
+  var wcp = E("waddr"), wcpT = 0;
+  if(wcp) wcp.addEventListener("click", function(){
     var a = window.__ADDR; if(!a) return;
-    var ok = function(){ wcopy.classList.add("done"); wcopy.title = "Copied"; clearTimeout(wcopyT);
-      wcopyT = setTimeout(function(){ wcopy.classList.remove("done"); wcopy.title = "Copy address"; }, 1400); };
+    var ok = function(){ wcp.classList.add("done"); wcp.title = "Copied"; clearTimeout(wcpT);
+      wcpT = setTimeout(function(){ wcp.classList.remove("done"); wcp.title = "Copy address"; }, 1400); };
     var old = function(){ try{ var t = document.createElement("textarea"); t.value = a; t.setAttribute("readonly", ""); t.style.position = "fixed"; t.style.opacity = "0";
       document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t); ok(); }catch(e){} };
     if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(a).then(ok, old); else old();
@@ -2730,8 +2734,7 @@ rememberGridH();
     CHOSEN = null;
     try{ localStorage.removeItem("th_wallet"); }catch(e){}
     document.documentElement.removeAttribute("data-wallet");
-    var wa = E("waddr"); if(wa) wa.hidden = true;
-    var wc0 = E("wcopy"); if(wc0){ wc0.hidden = true; wc0.classList.remove("done"); }
+    var wa = E("waddr"); if(wa){ wa.hidden = true; wa.classList.remove("done"); }
     var ab0 = E("atbtn"); if(ab0) ab0.classList.remove("on"); var ap0 = E("wkap"); if(ap0) ap0.hidden = true;
     box.hidden = true; if(dis) dis.hidden = true; var blk0 = E("wblk"); if(blk0) blk0.hidden = true; var rf0 = E("wrefresh"); if(rf0) rf0.hidden = true;
     btn.disabled = false; btn.querySelector("span").textContent = "Connect wallet"; btn.hidden = false; if(pick) pick.hidden = true; chooser(true);
@@ -2846,9 +2849,8 @@ rememberGridH();
           var pre = /^[a-z]+1/.exec(window.__ADDR); pre = pre ? pre[0] : "";
           /* the short form; a phone gets the prefix and the last four only */
           wa.innerHTML = "<em>" + att(pre) + "</em><span class=af>" + att(window.__ADDR.slice(pre.length, pre.length + 5)) + "\u2026" + att(window.__ADDR.slice(-6)) + "</span>" +
-                         "<span class=ap>\u2026" + att(window.__ADDR.slice(-4)) + "</span>";
-          wa.title = window.__ADDR; }
-        var wc = E("wcopy"); if(wc) wc.hidden = false;
+                         "<span class=ap>\u2026" + att(window.__ADDR.slice(-4)) + "</span>" + COPYG;
+          wa.title = "Copy address"; }
         if(amt && p.free > 0){
           /* the field starts empty behind its placeholder; max fills it on demand */
           amt.value = "";

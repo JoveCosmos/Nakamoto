@@ -391,7 +391,6 @@
   html[data-theme=light]:not([data-mono]) #wk-plan .wk-field.need input.wk-amt2::placeholder{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addrw{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addr em{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-copy:hover{background:transparent;color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-disc{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-disc:hover{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p{background:var(--surface-2);box-shadow:none}
@@ -497,9 +496,6 @@
   html[data-theme=light]:not([data-mono]) #dpicks tbody tr.on td:first-child{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #dmy tbody tr[data-v]:hover td:first-child{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #dmy tbody tr[data-v]:hover td.nm span{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-copy{background:transparent}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-copy:hover{color:var(--ink);background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) #p-dele #wk-mine .wk-bh .wk-copy svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .fnav .fsoon{background:transparent;box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh h3{color:var(--ink);text-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5{background:var(--surface-2);box-shadow:none}
@@ -528,10 +524,6 @@
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5::before{background:transparent}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addrw{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addr em{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-copy{background:var(--surface-2);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-copy:hover{color:var(--ink);background:var(--surface-2);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-copy.done{border-color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) #p-dele #wk-mine .wk-bh .wk-copy svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) #wk-mine #wk-acct .wk-disc{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine #wk-acct .wk-disc:hover{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #dpicks tbody tr.lt td,html[data-theme=light]:not([data-mono]) #dpicks tbody tr.lt td.nm .nmw>span,html[data-theme=light]:not([data-mono]) #dpicks tbody tr.lt.on td{color:inherit}
@@ -628,10 +620,11 @@
   html[data-theme=light]:not([data-mono]) .wk-btn.busy::after{border:2px solid var(--surface-2);border-top-color:var(--accent)}
   html[data-theme=light]:not([data-mono])[data-tab=dele] .w#calc>.sv-head{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sv-tab{background:transparent}
-  html[data-theme=light]:not([data-mono]) .sv-addr svg{fill:none;stroke:currentColor}
-  html[data-theme=light]:not([data-mono]) .sv-acct svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .sv-menu{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-menu .mi{background:transparent}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addr{background:transparent}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addr:hover{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #p-dele #wk-mine .wk-bh .wk-addr svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .sv-sub s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sv-tag.g{border-color:var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .sv-tag.a{border-color:var(--amber-bar);background:var(--warn-bg)}

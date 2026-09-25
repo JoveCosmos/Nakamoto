@@ -2445,10 +2445,6 @@ font-family:var(--wmono);font-size:12.5px;letter-spacing:-.01em;font-variant-num
 background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 1px 2px rgba(0,0,0,.4)}
 #wk-mine .wk-bh .wk-addr{font-size:9px;letter-spacing:.03em;color:var(--ws);line-height:1;gap:1px}
 #wk-mine .wk-bh .wk-addr em{font-style:normal;color:#b9b0ff}
-#wk-mine .wk-bh .wk-copy{margin-left:6px;padding-left:6px;border-left:1px solid var(--wbd2);border-radius:0;width:auto;height:14px;color:var(--wf)}
-#wk-mine .wk-bh .wk-copy:hover{background:transparent;color:#fff8dc}
-#wk-mine .wk-bh .wk-copy.done{color:var(--wgreen)}
-#p-dele #wk-mine .wk-bh .wk-copy svg{width:11px;height:11px;margin:0 3px 0 1px}
 #wk-mine .wk-bh .wk-disc{align-self:center}
 @media(max-width:700px){#wk-mine .wk-bh .wk-addrw{flex:0 1 auto;max-width:100%}#wk-mine .wk-bh .wk-addr{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 /* a delegation row opens its validator's card */
@@ -2912,12 +2908,6 @@ transition:color .16s,border-color .16s,box-shadow .16s,transform .12s}
 #wk-mine .wk-bh .wk-addrw{display:inline-flex;align-items:center;gap:5px;min-width:0}
 #wk-mine .wk-bh h3::first-letter{text-transform:uppercase}
 #wk-mine .wk-bh .wk-addr{font-size:9px;letter-spacing:.02em;overflow:hidden;text-overflow:ellipsis}
-#wk-mine .wk-bh .wk-copy{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;padding:0;border:0;border-radius:3px;background:transparent;color:var(--wf);cursor:pointer;position:relative;transition:color .15s,background .15s}
-#wk-mine .wk-bh .wk-copy:hover{color:#fff8dc;background:rgba(255,255,255,.06)}
-#p-dele #wk-mine .wk-bh .wk-copy svg{width:11px;height:11px;margin:0;max-height:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#p-dele #wk-mine .wk-bh .wk-copy svg.ok{display:none;stroke-width:2.6}
-#wk-mine .wk-bh .wk-copy.done{color:var(--wgreen)}
-#p-dele #wk-mine .wk-bh .wk-copy.done svg.cp{display:none}#p-dele #wk-mine .wk-bh .wk-copy.done svg.ok{display:block}
 @media(max-width:700px){#wk-mine .wk-bh h3{max-width:none}}
 /* the soon badge sits over the Governance word: centred on it, its lower half
    across the word's upper half */
@@ -3091,12 +3081,6 @@ background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;colo
 #wk-mine .wk-bh .wk-addr{font-family:var(--wmono);font-size:9.5px;letter-spacing:.03em;color:var(--ws);line-height:1;gap:1px;display:inline-flex;align-items:center;white-space:nowrap}
 #wk-mine .wk-bh .wk-addr em{font-style:normal;color:#b9b0ff}
 #wk-mine .wk-bh .wk-addr::before{display:none}
-#wk-mine .wk-bh .wk-copy{margin-left:8px;width:18px;height:18px;padding:0;border:1px solid var(--wbd2);border-radius:4px;background:linear-gradient(180deg,#1d1d38,#12122a);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);color:var(--ws);display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;cursor:pointer;transition:color .15s,border-color .15s,box-shadow .15s}
-#wk-mine .wk-bh .wk-copy:hover{color:#fff8dc;border-color:var(--ws);background:linear-gradient(180deg,#1d1d38,#12122a);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 10px -3px rgba(185,176,255,.6)}
-#wk-mine .wk-bh .wk-copy.done{color:var(--wgreen);border-color:rgba(46,224,106,.5)}
-#p-dele #wk-mine .wk-bh .wk-copy svg{width:11px;height:11px;margin:0;max-height:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#p-dele #wk-mine .wk-bh .wk-copy svg.ok{display:none;stroke-width:2.6}
-#p-dele #wk-mine .wk-bh .wk-copy.done svg.cp{display:none}#p-dele #wk-mine .wk-bh .wk-copy.done svg.ok{display:block}
 #wk-mine #wk-acct .wk-disc{margin:8px 0 0;width:100%;height:32px;flex:0 0 auto;justify-content:center;gap:0;padding:0 10px;border-radius:6px;border:1px solid var(--wbd2);
 background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 1px 2px rgba(0,0,0,.4);transition:color .16s,border-color .16s,box-shadow .16s,transform .12s}
 #wk-mine #wk-acct .wk-disc:hover{border-color:var(--wburn);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 12px -3px rgba(255,77,31,.7)}
@@ -3545,16 +3529,11 @@ html[data-ui=simple] .sv-nav{display:flex}
 text-transform:uppercase;padding:8px 15px;border-radius:8px;cursor:pointer;transition:color .16s,border-color .16s,background .16s}
 .sv-tab:hover{color:var(--wt);border-color:var(--wbd2)}
 .sv-tab.on{color:var(--wt);background:var(--wh);border-color:var(--wbd2)}
-.sv-tab:focus-visible,.sv-acct:focus-visible,.sv-addr:focus-visible{outline:2px solid var(--wcyan);outline-offset:2px}
+.sv-tab:focus-visible,.sv-acct:focus-visible{outline:2px solid var(--wcyan);outline-offset:2px}
 .sv-who{display:flex;align-items:center;gap:9px;flex:1 1 0;justify-content:flex-end;min-width:0}
-.sv-addr{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--wbd);background:var(--wchip);border-radius:99px;padding:6px 12px;
-font-family:var(--wmono);font-size:11px;color:var(--wt);cursor:pointer;transition:border-color .16s,color .16s}
-.sv-addr:hover{border-color:var(--wbd2);color:var(--wcyan)}
-.sv-addr svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.7}
-.sv-addr.done svg{stroke:var(--wgreen);opacity:1}
 .sv-acct{width:34px;height:34px;border-radius:50%;border:1px solid var(--wbd2);background:var(--wchip);color:var(--ws);display:grid;place-items:center;cursor:pointer;padding:0;flex:0 0 auto}
 .sv-acct:hover{color:var(--wt);border-color:var(--wcyan)}
-.sv-acct svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.sv-acct img{width:19px;height:19px;display:block}
 .sv-who{position:relative}
 .sv-menu{position:absolute;right:0;top:calc(100% + 9px);z-index:60;min-width:232px;padding:7px;border:1px solid var(--wbd2);
 border-radius:12px;background:var(--wsolid);box-shadow:0 30px 70px -30px #000;display:flex;flex-direction:column;gap:4px}
@@ -3572,6 +3551,15 @@ background:transparent;color:var(--wt);font-family:var(--wsans);font-size:13px;t
 #wgate{display:none}
 #p-dele #wk-mine .wk-disc{display:none}
 html:not([data-wallet]) #wk-mine .wk-addrw{display:none}
+/* the address IS the copy control now: one chip, the glyph riding with the figure */
+#wk-mine .wk-bh .wk-addr{border:0;background:transparent;padding:0;margin:0;cursor:pointer;min-width:0}
+#wk-mine .wk-bh .wk-addr:hover{color:#fff8dc}
+#p-dele #wk-mine .wk-bh .wk-addr svg{width:11px;height:11px;margin:0 0 0 7px;flex:0 0 auto;max-height:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.65}
+#p-dele #wk-mine .wk-bh .wk-addr svg.ok{display:none;stroke-width:2.6}
+#wk-mine .wk-bh .wk-addr.done{color:var(--wgreen)}
+#p-dele #wk-mine .wk-bh .wk-addr.done svg{opacity:1}
+#p-dele #wk-mine .wk-bh .wk-addr.done svg.cp{display:none}
+#p-dele #wk-mine .wk-bh .wk-addr.done svg.ok{display:block}
 .wk-tbl2 tr.skel td{opacity:.55}
 .wk-tbl2 tr.skel td b{display:block;height:7px;border-radius:4px;background:var(--wbd2);opacity:.6}
 /* the pane's own inner column: the same box .pw gives the advanced view */
@@ -3781,9 +3769,8 @@ html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
         <button class=sv-tab data-s=net type=button role=tab aria-selected=false>Network</button>
       </nav>
       <div class=sv-who>
-        <button class=sv-addr id=svaddr type=button hidden title="Copy address"><span></span><svg viewBox="0 0 24 24" aria-hidden=true><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
         <button class="sv-btn sml pri" id=svconn type=button aria-haspopup=true aria-expanded=false>Connect wallet</button>
-        <button class=sv-acct id=svacct type=button hidden title="This wallet" aria-label="This wallet" aria-haspopup=true aria-expanded=false><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="8" r="3.4"/><path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"/></svg></button>
+        <button class=sv-acct id=svacct type=button hidden title="This wallet" aria-label="This wallet" aria-haspopup=true aria-expanded=false><img alt=""></button>
         <div class=sv-menu id=svmenu hidden></div>
       </div>
     </header>
@@ -3951,7 +3938,7 @@ html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
       </div>
     </div>
           <div id=wk-acct>
-          <header class="wk-ph wk-bh"><h3 id=wname>Wallet</h3><span class=wk-addrw><i class=wk-addr id=waddr hidden></i><button class=wk-copy id=wcopy type=button hidden title="Copy address" aria-label="Copy address"><svg class=cp viewBox="0 0 24 24" aria-hidden=true><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class=ok viewBox="0 0 24 24" aria-hidden=true><path d="M4 12.5l5 5L20 6.5"/></svg></button></span></header>
+          <header class="wk-ph wk-bh"><h3 id=wname>Wallet</h3><span class=wk-addrw><button class=wk-addr id=waddr type=button hidden title="Copy address" aria-label="Copy address"></button></span></header>
           <div class=wk-bal5><div class=wk-b5><i><img src="assets/atomone.svg" alt="">ATONE</i><b id=ds-bal>&mdash;</b></div><div class=wk-b5><i><img src="assets/photon.svg" alt="">PHOTON</i><b id=ds-photon class=pho>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">staked</i><b id=ds-staked>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">rewards</i><b id=ds-rew>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">APR</i><b id=ds-apr>&mdash;</b></div></div>
           <div class=wk-ap id=wkap hidden><span class=wk-apk>Autopilot</span><span class=wk-aps id=wkaps>inactive</span><button class=wk-apb id=atbtn type=button title="Let GATA keep this stake where it earns most, inside limits you set">Set up</button></div>
           <div class=wk-rule></div>

@@ -286,10 +286,13 @@
   /* ── the head: chain, address, the way out ── */
   var WAS = null;
   function drawHead(){
-    var a = window.__ADDR, ad = E("svaddr"), ac = E("svacct"), cn = E("svconn");
-    if(a){ ad.hidden = false; ad.querySelector("span").textContent = a.slice(0, 9) + "…" + a.slice(-4); ad.title = a;
-           ac.hidden = false; if(cn) cn.hidden = true; }
-    else { ad.hidden = true; ac.hidden = true; if(cn) cn.hidden = false; }
+    var a = window.__ADDR, ac = E("svacct"), cn = E("svconn"), w = window.__WALLET;
+    if(a){ ac.hidden = false; if(cn) cn.hidden = true;
+           /* the button wears the wallet that is connected, not a generic head */
+           var im = ac.querySelector("img"), src = "assets/wallet-" + String((w && w.name) || "keplr").toLowerCase() + ".svg";
+           if(im && im.getAttribute("src") !== src) im.setAttribute("src", src);
+           ac.title = ((w && w.label) || (w && w.name) || "Wallet") + " \u2014 " + a; }
+    else { ac.hidden = true; if(cn) cn.hidden = false; }
     /* a redraw every block must not shut a menu the reader just opened: only a
        change of state - connected, or no longer - closes it */
     if(WAS !== !!a){ WAS = !!a; closeMenu(); }
@@ -323,11 +326,17 @@
       '<button class="mi out" type=button data-act=disconnect>Disconnect</button>';
   }
   var adT;
-  function copyAddr(){
-    var a = window.__ADDR, ad = E("svaddr"); if(!a || !ad) return;
-    var ok = function(){ ad.classList.add("done"); clearTimeout(adT); adT = setTimeout(function(){ ad.classList.remove("done"); }, 1400); };
-    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(a).then(ok, function(){});
-    else ok();
+  /* the menu's own copy: the row says so for a moment, then goes back */
+  function copyAddr(row){
+    var a = window.__ADDR; if(!a) return;
+    var ok = function(){ if(!row) return; var t = row.textContent; row.textContent = "Copied";
+      clearTimeout(adT); adT = setTimeout(function(){ row.textContent = t; }, 1200); };
+    /* the same fallback the wallet pane uses where the clipboard API is refused */
+    var old = function(){ try{ var e = document.createElement("textarea"); e.value = a; e.setAttribute("readonly", "");
+      e.style.position = "fixed"; e.style.opacity = "0"; document.body.appendChild(e); e.select();
+      document.execCommand("copy"); document.body.removeChild(e); ok(); }catch(err){} };
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(a).then(ok, old);
+    else old();
   }
   var conn = E("svconn");
   if(conn) conn.addEventListener("click", function(ev){ ev.stopPropagation();
@@ -342,7 +351,7 @@
     if(!t) return;
     /* the bar answers the click itself, without waiting for the next redraw */
     if(t.dataset.w){ closeMenu(); if(window.__wconnect) window.__wconnect(t.dataset.w); setTimeout(render, 0); return; }
-    if(t.dataset.act === "copy"){ copyAddr(); closeMenu(); return; }
+    if(t.dataset.act === "copy"){ copyAddr(t); return; }
     if(t.dataset.act === "disconnect"){ closeMenu(); if(window.__wdisconnect) window.__wdisconnect(); setTimeout(render, 0); }
   });
 
@@ -408,8 +417,6 @@
   var find = E("sv-find");
   if(find) find.addEventListener("input", function(){ FIND = find.value.trim(); if(sv.getAttribute("data-s") === "net") drawNet(); });
 
-  var ad0 = E("svaddr");
-  if(ad0) ad0.addEventListener("click", function(){ copyAddr(); });
   var acct = E("svacct");
   if(acct) acct.addEventListener("click", function(ev){ ev.stopPropagation();
     if(menu && !menu.hidden){ closeMenu(); return; } openMenu(acctMenu(), acct); });
