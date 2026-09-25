@@ -234,7 +234,7 @@
   html[data-theme=light]:not([data-mono]) .mbtn[aria-pressed=true]{background:var(--amber-bar);color:#FFFFFF;box-shadow:none}
   html[data-theme=light]:not([data-mono]) .modes .etabox.monob{background:transparent}
   html[data-theme=light]:not([data-mono]) .modes .etabox.monob:hover{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard,html[data-theme=light]:not([data-mono]) #wpick .txcard{--wsolid:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard,html[data-theme=light]:not([data-mono]) #wpick .txcard{--wsolid:var(--ink)}
   html[data-theme=light]:not([data-mono]) .wk-mark{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-addr::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-tab{background:transparent}
@@ -264,7 +264,7 @@
   html[data-theme=light]:not([data-mono]) .wk-lgx{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .wk-soon{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .pop .card.txcard{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard,html[data-theme=light]:not([data-mono]) #wpick .txcard{--wsolid:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard,html[data-theme=light]:not([data-mono]) #wpick .txcard{--wsolid:var(--ink)}
   html[data-theme=light]:not([data-mono]) body{background-image:transparent}
   html[data-theme=light]:not([data-mono]) .folder{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .ftab.acct{box-shadow:inset 0 0 0 1px var(--edge2)}
@@ -626,8 +626,32 @@
   html[data-theme=light]:not([data-mono]) .wk-note .x:focus-visible{outline:2px solid var(--accent)}
   html[data-theme=light]:not([data-mono]) .wk-btn.busy{color:transparent!important;text-shadow:none!important}
   html[data-theme=light]:not([data-mono]) .wk-btn.busy::after{border:2px solid var(--surface-2);border-top-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-tab{background:transparent}
+  html[data-theme=light]:not([data-mono]) .sv-chain i{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-addr svg{fill:none;stroke:currentColor}
+  html[data-theme=light]:not([data-mono]) .sv-acct svg{fill:none;stroke:currentColor}
+  html[data-theme=light]:not([data-mono]) .sv-sub s{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .sv-tag.g{border-color:var(--accent);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sv-tag.a{border-color:var(--amber-bar);background:var(--warn-bg)}
+  html[data-theme=light]:not([data-mono]) .sv-tag.r{border-color:var(--danger-bar);background:var(--danger-bg)}
+  html[data-theme=light]:not([data-mono]) .sv-btn.go{background:var(--accent-soft);border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-btn.go:hover:not(:disabled){background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sv-btn.pri{background:var(--warn-bg);border-color:var(--amber-bar)}
+  html[data-theme=light]:not([data-mono]) .sv-btn.pri:hover:not(:disabled){background:var(--warn-bg)}
+  html[data-theme=light]:not([data-mono]) .sv-btn.red{border-color:var(--danger-bar)}
+  html[data-theme=light]:not([data-mono]) .sv-btn.red:hover:not(:disabled){background:var(--danger-bg)}
+  html[data-theme=light]:not([data-mono]) .sv-btn.busy{color:transparent!important}
+  html[data-theme=light]:not([data-mono]) .sv-btn.busy::after{border:2px solid var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sv-chip s{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .sv-chip u{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .sv-find:focus{outline:none}
+  html[data-theme=light]:not([data-mono]) .sv-seg{background:transparent}
+  html[data-theme=light]:not([data-mono]) .sv-tbl tbody tr.mine{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sv-nm img,html[data-theme=light]:not([data-mono]) .sv-nm span.lg{box-shadow:0 0 0 1px var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sv-nm span.lg{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .sv-can u{text-decoration:none}
   html[data-theme=light]:not([data-mono]){--void:var(--bg);--edge:var(--line);--edge2:var(--line-strong);--ink2:var(--muted);--ink3:var(--faint);--hot:var(--warn);--burn:var(--danger);--cold:var(--accent);--lit:var(--ink);--card:var(--surface);--card2:var(--surface-2);--inset:var(--surface-sunk);--blue:var(--accent);--cyan:var(--accent);--green:var(--accent);--amber:var(--warn);--cv:var(--bg);--ce:var(--line);--ce2:var(--line-strong);--ci:var(--ink);--ci2:var(--muted);--ci3:var(--faint);--cf:var(--faint);--ch:var(--warn);--cb:var(--danger);--cc:var(--accent);--cl:var(--ink);--mono:var(--day-mono);--sans:var(--day-sans)}
-  html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-dele *,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) .pop,html[data-theme=light]:not([data-mono]) .pop *{--wc:var(--surface);--wh:var(--surface-2);--wbd:var(--line);--wbd2:var(--line-strong);--wi:var(--surface-sunk);--wchip:var(--surface-2);--wt:var(--ink);--ws:var(--muted);--wf:var(--faint);--wblue:var(--accent);--wcyan:var(--accent);--wgreen:var(--accent);--wamber:var(--warn);--wburn:var(--danger);--wgold:var(--warn);--wsans:var(--day-sans);--wmono:var(--day-mono)}
+  html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-dele *,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) .pop,html[data-theme=light]:not([data-mono]) .pop *,html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) #sv *{--wc:var(--surface);--wh:var(--surface-2);--wbd:var(--line);--wbd2:var(--line-strong);--wi:var(--surface-sunk);--wchip:var(--surface-2);--wt:var(--ink);--ws:var(--muted);--wf:var(--faint);--wblue:var(--accent);--wcyan:var(--accent);--wgreen:var(--accent);--wamber:var(--warn);--wburn:var(--danger);--wgold:var(--warn);--wsans:var(--day-sans);--wmono:var(--day-mono)}
   /* ── the hand layer: the day spec's typography, shape, spacing and components ── */
   /* ════════════════════════════════════════════════════════════════════════════════════
      DAY - the hand layer, colours and typefaces ONLY. Geometry (heights, paddings, radii,
@@ -700,4 +724,18 @@
   html[data-theme=light]:not([data-mono]) .vweb.none{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .upl,html[data-theme=light]:not([data-mono]) .pinghead .pingh{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .stcard .stlist td.nm .nmw>span.wk-lgx{color:#fff}
+
+  /* the simple view: its small labels ride on --wf, which is a day paper's faint
+     grey - under 4.5:1 at these sizes. Colour only; the sizes are the night sheet's. */
+  html[data-theme=light]:not([data-mono]) #sv .sv-k,html[data-theme=light]:not([data-mono]) #sv .sv-bw i,
+  html[data-theme=light]:not([data-mono]) #sv .sv-fig span,html[data-theme=light]:not([data-mono]) #sv .sv-tag,
+  html[data-theme=light]:not([data-mono]) #sv .sv-sub s,html[data-theme=light]:not([data-mono]) #sv .sv-chip u,
+  html[data-theme=light]:not([data-mono]) #sv .sv-nm .tx i,html[data-theme=light]:not([data-mono]) #sv .sv-sm,
+  html[data-theme=light]:not([data-mono]) #sv .sv-dim,html[data-theme=light]:not([data-mono]) #sv .sv-can u,
+  html[data-theme=light]:not([data-mono]) #sv .sv-foot2,html[data-theme=light]:not([data-mono]) #sv .sv-tbl th,
+  html[data-theme=light]:not([data-mono]) #sv .sv-tbl td:first-child,html[data-theme=light]:not([data-mono]) #sv .sv-seg,
+  html[data-theme=light]:not([data-mono]) #sv .sv-strip,html[data-theme=light]:not([data-mono]) #sv .sv-btn:disabled,
+  html[data-theme=light]:not([data-mono]) #sv .sv-btn.w i,html[data-theme=light]:not([data-mono]) #sv .sv-empty,html[data-theme=light]:not([data-mono]) #sv .sv-sep{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) #sv .sv-find::placeholder{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) #sv .sv-nm span.lg{color:#fff}
 

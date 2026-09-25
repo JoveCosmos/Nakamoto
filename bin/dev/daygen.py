@@ -356,7 +356,8 @@ def main():
                     "--cv:var(--bg);--ce:var(--line);--ce2:var(--line-strong);--ci:var(--ink);--ci2:var(--muted);--ci3:var(--faint);--cf:var(--faint);"
                     "--ch:var(--warn);--cb:var(--danger);--cc:var(--accent);--cl:var(--ink);"
                     "--mono:var(--day-mono);--sans:var(--day-sans)}\n"
-                    "  " + SCOPE + " #p-dele," + SCOPE + " #p-dele *," + SCOPE + " #p-intro," + SCOPE + " .pop," + SCOPE + " .pop *{"
+                    "  " + SCOPE + " #p-dele," + SCOPE + " #p-dele *," + SCOPE + " #p-intro," + SCOPE + " .pop," + SCOPE + " .pop *,"
+                    + SCOPE + " #sv," + SCOPE + " #sv *{"
                     "--wc:var(--surface);--wh:var(--surface-2);--wbd:var(--line);--wbd2:var(--line-strong);--wi:var(--surface-sunk);--wchip:var(--surface-2);"
                     "--wt:var(--ink);--ws:var(--muted);--wf:var(--faint);--wblue:var(--accent);--wcyan:var(--accent);--wgreen:var(--accent);"
                     "--wamber:var(--warn);--wburn:var(--danger);--wgold:var(--warn);--wsans:var(--day-sans);--wmono:var(--day-mono)}\n")

@@ -692,6 +692,9 @@ window.__ETA = function(){ return D.eta.now; };      /* the live coefficient, fo
 window.__N = function(){ return N; };
 window.__R = function(){ return R; };
 window.__VALS = function(){ return VALS; };
+window.__D = D;
+window.__ratio = function(){ return ratioOf(VALS.map(function(v){ return v[1]; })); };   /* largest third against smallest */
+window.__thresh = function(){ return +D.thresh || 3; };                                        /* the page's own vector: set, eta, trend, detail */
 window.__LIVEH = function(){ return LIVE_H; };
 window.__LIVEAT = function(){ return LIVE_AT; };
 /* the height under the name, on every tick */
@@ -1773,6 +1776,7 @@ rememberGridH();
      does not want; the plan re-solves on what is ticked, and the growth figure
      follows every tick. */
   var SEL = {};                                    /* ids the reader has ticked */
+  var QUIET = false;                               /* a redraw made to be read, not to be announced */
   /* both tables are paged, never scrolled: a fixed number of rows a page */
   var LPS = 6, PPS = 6, PG = { l: 0, p: 0 };
   function pager(el, page, n, per, key){
@@ -2048,7 +2052,8 @@ rememberGridH();
     result(pos, r, B, sel.n);
 
     statusFoot(pos, V);
-
+    /* the simple view draws from what this just wrote - never from its own arithmetic */
+    if(!QUIET){ try{ window.dispatchEvent(new Event("thermo:draw")); }catch(e){} }
   }
 
   /* att() is the file-level escaper (defined beside POP) */
@@ -2488,6 +2493,33 @@ rememberGridH();
   var stbell = E("stbell"); if(stbell) stbell.addEventListener("click", function(){ if(window.__alertMany) window.__alertMany(alertList(Object.keys(STSEL))); });
   if(!window.__BOT){ if(txbell) txbell.hidden = true; if(stbell) stbell.hidden = true; }
 
+  /* The simple view's one question: what would the best placement of everything
+     that can move be worth? Answered by the same machinery the pane uses - the
+     optimiser picks, the ticks split the amount, the moves panel prices each
+     chunk from the rate it leaves to the rate it lands on. With apply=false the
+     reader's own selection and amount are put back untouched. */
+  window.__optPlan = function(apply){
+    var pos = window.__POS, B = pos ? pos.free : 0, k;
+    if(!pos || !(B > 0)) return null;
+    var keep = null, kamt = amt.value;
+    if(!apply){ keep = {}; for(k in SEL) keep[k] = 1; }
+    var r = window.__planWith(B, { cleanRecord: CLEAN, maxVals: 4 });
+    if(!r.moves.length) return null;
+    for(k in SEL) delete SEL[k];
+    r.moves.forEach(function(m){ SEL[m.id] = 1; });
+    amt.value = exact(B);
+    QUIET = true; draw(); QUIET = false;
+    var an = window.__ANS || {};
+    var out = { now: an.now || 0, after: an.after, gain: an.gain || 0, moves: MSGS.length,
+                picks: r.moves.map(function(m){ return { id: m.id, m: m.m, x: m.x }; }) };
+    if(!apply){ for(k in SEL) delete SEL[k]; for(k in keep) SEL[k] = 1; amt.value = kamt;
+                QUIET = true; draw(); QUIET = false; }
+    return out;
+  };
+  /* what stands between this reader and the keeper, for the simple view to state */
+  window.__atInfo = function(){ return { addr: AT.addr, dry: AT.dry, grant: AT.grant, grants: AT.grants || [],
+    days: AT.days, split_pct: AT.split_pct || 0, report: AT.report,
+    restake: (AT.grants || []).some(function(x){ return grantType(x) === DELEG; }) }; };
   window.__planDraw = draw;
   draw();
   /* the wallet's two tabs: my stake, my governance (empty for now) */
@@ -2701,6 +2733,10 @@ rememberGridH();
     if(window.__planDraw) window.__planDraw();
   }
   if(dis) dis.addEventListener("click", disconnect);
+  /* the simple view connects and disconnects through the same path, never its own */
+  window.__wconnect = function(name){ CHOSEN = name; chooser(false); connect(true); };
+  window.__wdisconnect = disconnect;
+  window.__wproviders = providers;
   /* Refresh: read the chain again for this address, on request only */
   window.__refreshPos = function(){
     if(!window.__ADDR || !window.__POS) return Promise.resolve();

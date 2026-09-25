@@ -1630,7 +1630,7 @@ html[data-mono] .mbtn[aria-pressed=true]{background:#fff;color:#000;box-shadow:n
    top edge), Inter at 600-800, solid gradient buttons, tinted tag pills, inset
    tracks. Every class here is prefixed wk- or scoped under #p-dele, so nothing
    the calculator names can reach in - and nothing here reaches out. */
-#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{
+#sv,#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{
   --wc:#0E1622;--wh:#121C2B;--wbd:#1B2738;--wbd2:#2A3C54;--wi:#0A1320;--wchip:#0E1826;--wsolid:rgba(14,24,38,.97);
   --wt:#E9EFF7;--ws:#8595AB;--wf:#566679;
   --wblue:#3B9EFF;--wcyan:#62D9FF;--wgreen:#36D399;--wamber:#FFB155;--wburn:#FF7A45;--wgold:#F5C66B;
@@ -1843,7 +1843,7 @@ html[data-mono] #txpop .txcard,html[data-mono] #unpop .txcard,html[data-mono] #s
 :root{--void:#06060c;--edge:#232342;--edge2:#34345c;--ink:#e6e4f0;--ink2:#a5a3c4;--ink3:#6f6d94;--faint:#3a3a54;
 --hot:#ffb02e;--burn:#ff4d1f;--cold:#6f66c8;--lit:#fff8dc;--card:#0b0b16;--card2:#111124;--inset:#0a0a14;
 --blue:#6f66c8;--cyan:#2bc8bd;--green:#2ee06a;--amber:#ffb02e}
-#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
+#sv,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
 --wt:#e6e4f0;--ws:#a5a3c4;--wf:#6f6d94;--wblue:#6f66c8;--wcyan:#2bc8bd;--wgreen:#2ee06a;--wamber:#ffb02e;--wburn:#ff4d1f;--wgold:#ffb02e;
 --wsans:"Helvetica Neue",Helvetica,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--wmono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
 body{background:var(--void);background-image:radial-gradient(130% 62% at 50% 0%,#16162e 0%,#0a0a16 42%,var(--void) 74%)}
@@ -2339,7 +2339,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 #wk-plan .wk-moves{flex:0 0 auto;max-height:150px}
 /* the wallet, lifted out of the dark: lighter grounds, brighter hairlines and
    type, so the figures read without leaning in */
-#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
+#sv,#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard,#wpick .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
 
 .wk-pane{background:linear-gradient(180deg,#10101f,#0d0d1b)}
 .wk-tbl2 td{border-bottom-color:#22223c}
@@ -3509,6 +3509,197 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
 /* the head line never wraps for want of a few px: the count is the one that yields */
 #wk-mine .wk-t1{flex-wrap:nowrap}
 #wk-mine .wk-t1 .wk-pn{min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ── Simple: the same engine, one screen at a time ───────────────────────────
+   A second header under the app's own - product nav, chain, address - and three
+   screens: what the reader holds, what the keeper would do, what the set looks
+   like. Every figure is read from the state the advanced dashboard already
+   draws, so the two views can never disagree. Classes are sv-, scoped to #sv. */
+#sv{display:none}
+html[data-ui=simple] #sv{display:block}
+html[data-ui=simple] .panes{display:none}
+html[data-ui=simple] .below{height:auto;min-height:100svh;overflow:visible}
+html[data-ui=simple] .folder{position:sticky;top:0;z-index:20;background:var(--void)}
+/* the second header: the product's own row, under the app's */
+.sv-head{display:flex;align-items:center;gap:18px;min-height:58px;padding:9px 28px;border-bottom:1px solid var(--wbd);background:var(--wc)}
+.sv-brand{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+.sv-brand img{width:28px;height:28px;border-radius:8px;display:block}
+.sv-bw{display:flex;flex-direction:column;gap:2px;line-height:1}
+.sv-bw b{font-size:15px;font-weight:800;color:var(--wt)}
+.sv-bw i{font-style:normal;font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
+.sv-nav{display:flex;align-items:center;gap:6px;margin:0 auto}
+.sv-tab{border:1px solid transparent;background:transparent;color:var(--ws);font-family:var(--wmono);font-size:10px;letter-spacing:.16em;
+text-transform:uppercase;padding:8px 15px;border-radius:8px;cursor:pointer;transition:color .16s,border-color .16s,background .16s}
+.sv-tab:hover{color:var(--wt);border-color:var(--wbd2)}
+.sv-tab.on{color:var(--wt);background:var(--wh);border-color:var(--wbd2)}
+.sv-tab:focus-visible,.sv-acct:focus-visible,.sv-addr:focus-visible{outline:2px solid var(--wcyan);outline-offset:2px}
+.sv-who{display:flex;align-items:center;gap:9px;flex:0 0 auto}
+.sv-chain{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--wbd);background:var(--wchip);border-radius:99px;
+padding:6px 12px;font-size:11.5px;color:var(--ws);white-space:nowrap}
+.sv-chain i{width:6px;height:6px;border-radius:50%;background:var(--wgreen);box-shadow:0 0 8px var(--wgreen);flex:0 0 auto}
+.sv-addr{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--wbd);background:var(--wchip);border-radius:99px;padding:6px 12px;
+font-family:var(--wmono);font-size:11px;color:var(--wt);cursor:pointer;transition:border-color .16s,color .16s}
+.sv-addr:hover{border-color:var(--wbd2);color:var(--wcyan)}
+.sv-addr svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.7}
+.sv-addr.done svg{stroke:var(--wgreen);opacity:1}
+.sv-acct{width:34px;height:34px;border-radius:50%;border:1px solid var(--wbd2);background:var(--wchip);color:var(--ws);display:grid;place-items:center;cursor:pointer;padding:0;flex:0 0 auto}
+.sv-acct:hover{color:var(--wt);border-color:var(--wcyan)}
+.sv-acct svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.sv-main{max-width:1280px;margin:0 auto;padding:18px 28px 44px;font-family:var(--wsans);color:var(--wt)}
+.sv-main b{font-weight:700}
+/* the page's own section rule (70px and a rule above) is not for these */
+.sv-screen{display:none;flex-direction:column;gap:14px;padding:0;border-top:0}
+#sv[data-s=over] .sv-screen[data-sc=over],#sv[data-s=auto] .sv-screen[data-sc=auto],#sv[data-s=net] .sv-screen[data-sc=net]{display:flex}
+/* the parts every screen is built from */
+.sv-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.sv-cards.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.sv-card{border:1px solid var(--wbd);border-radius:14px;background:var(--wc);padding:15px 17px 17px;display:flex;flex-direction:column;gap:7px;position:relative;min-width:0}
+.sv-k{font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-big{font-size:32px;font-weight:800;letter-spacing:-.022em;line-height:1.05;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:8px;min-width:0}
+.sv-big em{font-style:normal;font-family:var(--wmono);font-size:12px;font-weight:400;letter-spacing:.06em;color:var(--ws)}
+.sv-big.sm{font-size:22px}
+.sv-sub{font-size:11.5px;color:var(--ws);min-height:16px}
+.sv-sub s{text-decoration:none;color:var(--wf)}
+.sv-tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;
+border-radius:99px;padding:4px 9px;border:1px solid var(--wbd2);color:var(--ws);white-space:nowrap}
+.sv-tag.g{color:var(--wgreen);border-color:rgba(46,224,106,.38);background:rgba(46,224,106,.06)}
+.sv-tag.a{color:var(--wamber);border-color:rgba(255,176,46,.38);background:rgba(255,176,46,.06)}
+.sv-tag.r{color:var(--wburn);border-color:rgba(255,77,31,.38);background:rgba(255,77,31,.06)}
+.sv-tag.q{color:var(--wf)}
+.sv-kr{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.sv-panel{border:1px solid var(--wbd);border-radius:14px;background:var(--wc);padding:16px 18px 18px;display:flex;flex-direction:column;gap:13px;min-width:0}
+.sv-ph{display:flex;align-items:center;gap:11px;flex-wrap:wrap;min-width:0}
+.sv-ph h3{margin:0;font-size:17px;font-weight:800;letter-spacing:-.01em}
+.sv-ph .sv-rt{margin-left:auto;display:flex;align-items:center;gap:9px}
+.sv-note{font-size:11.5px;color:var(--ws);line-height:1.5}
+.sv-note b{color:var(--wt)}
+/* the four figures of the opportunity, and the button that signs it */
+.sv-figs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;min-width:0}
+.sv-fig{border:1px solid var(--wbd);border-radius:10px;background:var(--wi);padding:10px 12px 11px;display:flex;flex-direction:column;gap:5px;min-width:0}
+.sv-fig span{font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-fig b{font-size:20px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+.sv-fig b i{font-style:normal;font-family:var(--wmono);font-size:10px;font-weight:400;color:var(--ws);margin-left:5px}
+.sv-fig.up b{color:var(--wgreen)}
+.sv-fig.dn b{color:var(--wburn)}
+.sv-fig.dim b{color:var(--wf)}
+.sv-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--wbd2);border-radius:10px;height:42px;padding:0 20px;
+font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--wt);background:var(--wchip);cursor:pointer;
+white-space:nowrap;transition:color .16s,border-color .16s,background .16s;position:relative}
+.sv-btn:hover:not(:disabled){border-color:var(--wcyan);color:var(--wcyan)}
+.sv-btn:focus-visible{outline:2px solid var(--wcyan);outline-offset:2px}
+.sv-btn:disabled{color:var(--wf);cursor:default}
+.sv-btn.go{background:rgba(46,224,106,.06);border-color:rgba(46,224,106,.32);color:var(--wgreen)}
+.sv-btn.go:hover:not(:disabled){background:rgba(46,224,106,.12);border-color:var(--wgreen);color:var(--wgreen)}
+.sv-btn.pri{background:rgba(255,176,46,.07);border-color:rgba(255,176,46,.35);color:var(--wamber)}
+.sv-btn.pri:hover:not(:disabled){background:rgba(255,176,46,.13);border-color:var(--wamber);color:var(--wamber)}
+.sv-btn.red{color:var(--wburn);border-color:rgba(255,77,31,.32)}
+.sv-btn.red:hover:not(:disabled){border-color:var(--wburn);color:var(--wburn);background:rgba(255,77,31,.09)}
+.sv-btn.sml{height:32px;padding:0 13px;font-size:9px;border-radius:8px}
+/* the wallet doors read as names, not as shouted labels */
+.sv-btn.w{text-transform:none;letter-spacing:.01em;font-family:var(--wsans);font-size:13px;gap:9px}
+.sv-btn.w img{width:16px;height:16px}
+.sv-btn.w i{font-style:normal;color:var(--wf)}
+.sv-btn.busy{color:transparent!important}
+.sv-btn.busy::after{content:"";position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;
+border:2px solid rgba(255,255,255,.25);border-top-color:var(--wt);animation:wkspin .8s linear infinite}
+/* the allocation: one bar, then the validators that make it */
+.sv-bar{display:flex;height:9px;border-radius:99px;overflow:hidden;background:var(--wi);border:1px solid var(--wbd)}
+.sv-bar i{display:block;height:100%}
+.sv-bar i.hld{opacity:.45}
+.sv-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.sv-chip{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:3px 10px;border:1px solid var(--wbd);border-radius:10px;
+background:var(--wi);padding:10px 12px;min-width:0}
+.sv-chip .sv-dot{width:8px;height:8px;border-radius:50%;grid-row:span 2}
+.sv-chip b{font-size:13px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sv-chip em{font-style:normal;font-family:var(--wmono);font-size:11px;color:var(--wt);justify-self:end}
+.sv-chip s{grid-column:2;text-decoration:none;font-size:11px;color:var(--ws);font-variant-numeric:tabular-nums}
+.sv-chip u{grid-column:3;text-decoration:none;font-family:var(--wmono);font-size:9.5px;color:var(--wf);justify-self:end}
+.sv-chip.click{cursor:pointer;transition:border-color .16s}
+.sv-chip.click:hover{border-color:var(--wbd2)}
+/* the line under a screen: state, then what to do about it */
+.sv-strip{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--wbd);border-radius:12px;background:var(--wc);padding:12px 16px;font-size:12px;color:var(--ws)}
+.sv-strip .sv-sep{color:var(--wf)}
+.sv-strip .sv-rt{margin-left:auto;display:flex;align-items:center;gap:9px}
+.sv-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:26px 10px;color:var(--ws);font-size:12.5px}
+.sv-empty b{display:block;color:var(--wt);font-size:15px;font-weight:700;margin-bottom:2px}
+/* the set, as a table */
+.sv-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sv-find{flex:1 1 220px;min-width:0;height:36px;border-radius:9px;border:1px solid var(--wbd);background:var(--wi);color:var(--wt);
+padding:0 12px;font-family:var(--wsans);font-size:12.5px}
+.sv-find::placeholder{color:var(--wf)}
+.sv-find:focus{outline:none;border-color:var(--wbd2)}
+.sv-segs{display:flex;gap:5px;flex-wrap:wrap}
+.sv-seg{border:1px solid var(--wbd);background:transparent;color:var(--wf);font-family:var(--wmono);font-size:9px;letter-spacing:.12em;
+text-transform:uppercase;padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.sv-seg:hover{color:var(--ws);border-color:var(--wbd2)}
+.sv-seg[aria-pressed=true]{color:var(--wt);background:var(--wh);border-color:var(--wbd2)}
+.sv-wrap{overflow-x:auto}
+.sv-tbl{width:100%;border-collapse:collapse;font-size:12.5px;min-width:760px}
+.sv-tbl th{font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);font-weight:400;
+text-align:right;padding:9px 10px;background:var(--wi);border-top:1px solid var(--wbd);border-bottom:1px solid var(--wbd);white-space:nowrap}
+.sv-tbl th:first-child,.sv-tbl th.l{text-align:left}
+.sv-tbl th:first-child{border-radius:8px 0 0 8px;padding-left:12px}
+.sv-tbl th:last-child{border-radius:0 8px 8px 0;padding-right:12px}
+.sv-tbl td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--wbd);vertical-align:middle;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sv-tbl td.l{text-align:left}
+.sv-tbl td:first-child{padding-left:12px;color:var(--wf);font-family:var(--wmono);font-size:10px}
+.sv-tbl td:last-child{padding-right:12px}
+.sv-tbl tbody tr{cursor:pointer}
+.sv-tbl tbody tr:hover{background:var(--wi)}
+.sv-tbl tbody tr.mine{background:rgba(111,102,200,.08)}
+.sv-nm{display:flex;align-items:center;gap:9px;min-width:0}
+.sv-nm img,.sv-nm span.lg{width:22px;height:22px;border-radius:7px;flex:0 0 auto;object-fit:cover;box-shadow:0 0 0 1px #ffffff14}
+.sv-nm span.lg{display:grid;place-items:center;font-size:9px;font-weight:700;color:#fff}
+.sv-nm .tx{display:flex;flex-direction:column;gap:1px;min-width:0}
+.sv-nm .tx b{font-size:12.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sv-nm .tx i{font-style:normal;font-family:var(--wmono);font-size:9px;color:var(--wf);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sv-sm{display:block;font-family:var(--wmono);font-size:9px;color:var(--wf);margin-top:1px}
+.sv-ok{color:var(--wgreen)}
+.sv-warn{color:var(--wamber)}
+.sv-bad{color:var(--wburn)}
+.sv-dim{color:var(--wf)}
+.sv-apr{font-size:13.5px;font-weight:700;color:var(--wamber)}
+.sv-apr.q{color:var(--ws);font-weight:400}
+.sv-foot2{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-family:var(--wmono);font-size:9.5px;letter-spacing:.06em;color:var(--wf);padding:2px 2px 0}
+.sv-foot2 .sv-rt{margin-left:auto}
+/* the autopilot screen: what stands, what it may do, what it may never do */
+.sv-rows{display:flex;flex-direction:column;gap:9px}
+.sv-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;border:1px solid var(--wbd);border-radius:10px;background:var(--wi);padding:11px 14px}
+.sv-can{display:flex;gap:18px;flex-wrap:wrap;font-size:11.5px}
+.sv-can div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.sv-can u{text-decoration:none;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
+.sv-can p{margin:0;display:flex;gap:14px;flex-wrap:wrap}
+.sv-can p span{display:inline-flex;align-items:center;gap:6px}
+.sv-can p span::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;flex:0 0 auto}
+/* the mode switch lives beside the day/night one */
+.uibtn{width:auto;padding:0 11px;gap:7px;font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;margin-left:8px}
+.uibtn .uiw{line-height:1}
+.uibtn .uig{display:none}
+html[data-ui=simple] .uibtn{color:var(--hot);border-color:var(--hot)}
+@media(max-width:900px){
+  .sv-cards,.sv-cards.four{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sv-figs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sv-head{flex-wrap:wrap;gap:12px}
+  .sv-nav{order:3;width:100%;margin:0;justify-content:flex-start;overflow-x:auto}
+  .sv-who{margin-left:auto}
+}
+@media(max-width:620px){
+  .sv-head{padding:9px 16px}
+  .sv-main{padding:14px 16px 34px}
+  .sv-cards,.sv-cards.four{grid-template-columns:minmax(0,1fr)}
+  .sv-big{font-size:28px}
+  .sv-bw i,.sv-chain{display:none}
+  .uibtn{width:30px;height:30px;padding:0;margin-left:2px}
+  .uibtn .uiw{display:none}
+  .uibtn .uig{display:block}
+  /* two buttons where the bar was drawn for one - in both views, since the switch
+     stands in both: the bar gives back its side room and the words close up */
+  .folder{padding:0 10px}
+  .thbtn{width:30px;height:30px}
+  .fnav .ftab+.ftab{margin-left:6px}
+  .fnav .ftab{padding:0 4px}
+  .fnav .ftab b{font-size:8.5px;letter-spacing:.12em}
+  .sv-chips{grid-template-columns:minmax(0,1fr)}
+}
 </style>
 <link rel=stylesheet href="assets/theme-day.css">
 </head><body>
@@ -3529,6 +3720,7 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
       <i class=ind id=ind aria-hidden=true></i>
     </nav>
     <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
+    <button class="thbtn uibtn" id=uibtn type=button role=switch aria-checked=false aria-label="Simple or advanced view" title="The simple view"><svg class=uig viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/></svg><span class=uiw>Simple</span></button>
   </div>
   <div class=panes id=well>
   <div class=w id=calc>
@@ -3737,6 +3929,56 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
     </div>
   </div></section>
   </div>
+  </div>
+  <!-- ── Simple: its own header under the app's, three screens, one engine ──
+       Nothing here holds state: simple.js fills every figure from the same
+       position, set and plan the advanced dashboard draws from. -->
+  <div id=sv data-s=over>
+    <header class=sv-head>
+      <span class=sv-brand><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><b>GATA</b><i>non-custodial staking</i></span></span>
+      <nav class=sv-nav role=tablist aria-label="Simple view">
+        <button class="sv-tab on" data-s=over type=button role=tab aria-selected=true>Overview</button>
+        <button class=sv-tab data-s=auto type=button role=tab aria-selected=false>Autopilot</button>
+        <button class=sv-tab data-s=net type=button role=tab aria-selected=false>Network</button>
+      </nav>
+      <div class=sv-who>
+        <span class=sv-chain><i></i>AtomOne Mainnet</span>
+        <button class=sv-addr id=svaddr type=button hidden title="Copy address"><span></span><svg viewBox="0 0 24 24" aria-hidden=true><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        <button class=sv-acct id=svacct type=button hidden title="Disconnect this wallet" aria-label="Disconnect this wallet"><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="8" r="3.4"/><path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"/></svg></button>
+      </div>
+    </header>
+    <main class=sv-main>
+      <section class=sv-screen data-sc=over aria-label=Overview>
+        <div class=sv-cards>
+          <div class=sv-card><span class=sv-kr><span class=sv-k>Staked balance</span><span class="sv-tag g">Self-custody</span></span>
+            <span class=sv-big id=sv-staked>&mdash;<em>ATONE</em></span><span class=sv-sub id=sv-stsub></span></div>
+          <div class=sv-card><span class=sv-k>Your APR</span>
+            <span class=sv-big id=sv-apr>&mdash;</span><span class=sv-sub id=sv-aprsub></span></div>
+          <div class=sv-card><span class=sv-k>Rewards waiting</span>
+            <span class=sv-big id=sv-rew>&mdash;<em>ATONE</em></span><span class=sv-sub id=sv-rewsub></span></div>
+        </div>
+        <div class=sv-panel id=sv-optp></div>
+        <div class=sv-panel id=sv-allocp></div>
+        <div class=sv-strip id=sv-foot></div>
+      </section>
+      <section class=sv-screen data-sc=auto aria-label=Autopilot>
+        <div class=sv-panel id=sv-atp></div>
+        <div class=sv-panel id=sv-atalloc></div>
+        <div class=sv-panel id=sv-atauth></div>
+      </section>
+      <section class=sv-screen data-sc=net aria-label=Network>
+        <div class=sv-panel id=sv-nethead></div>
+        <div class="sv-cards four" id=sv-netcards></div>
+        <div class=sv-panel>
+          <div class=sv-tools>
+            <input class=sv-find id=sv-find type=search placeholder="Filter by name or operator key" aria-label="Filter validators" autocomplete=off spellcheck=false>
+            <div class=sv-segs id=sv-segs></div>
+          </div>
+          <div class=sv-wrap id=sv-nettbl></div>
+          <div class=sv-foot2 id=sv-netfoot></div>
+        </div>
+      </section>
+    </main>
   </div>
 </div>
 
@@ -3993,4 +4235,5 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
 <script id=payload type=application/json>{{DATA}}</script>
 <script src="tx.js"></script>
 <script src="app.js"></script>
+<script src="simple.js"></script>
 </body></html>

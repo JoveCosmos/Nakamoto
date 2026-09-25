@@ -6,6 +6,8 @@ try{var _t=localStorage.getItem("th_tab");
  var _th=localStorage.getItem("th_theme");
  if(_th!=="light"&&_th!=="dark") _th=(window.matchMedia&&matchMedia("(prefers-color-scheme: light)").matches)?"light":"dark";
  document.documentElement.setAttribute("data-theme",_th);
+ /* simple or advanced: the reader's own choice, stamped before the first paint */
+ if(localStorage.getItem("th_ui")==="simple") document.documentElement.setAttribute("data-ui","simple");
 }catch(e){}
 
 /* the calculator pane's box, remembered from the last visit, so a page that opens on the
