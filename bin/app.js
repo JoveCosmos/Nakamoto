@@ -1803,7 +1803,11 @@ rememberGridH();
   /* ── the stat strip ── */
   function stats(pos){
     var st = E("ds-staked"), mv = E("ds-mov"), ph = E("ds-photon"), bl = E("ds-bal"), rw = E("ds-rew");
-    if(!pos){ var mx0 = E("amtmax"); if(mx0) mx0.disabled = true; if(mv){ mv.textContent = "\u2014"; mv.className = ""; } var ln0 = E("dlockn"); if(ln0) ln0.hidden = true; return; }
+    if(!pos){ var mx0 = E("amtmax"); if(mx0) mx0.disabled = true; if(mv){ mv.textContent = "\u2014"; mv.className = ""; } var ln0 = E("dlockn"); if(ln0) ln0.hidden = true;
+      /* no wallet: the figures go back to a dash - a disconnect must not leave the last
+         wallet's numbers standing, which read as still connected */
+      [bl, ph, st, rw, E("ds-apr")].forEach(function(x){ if(x){ x.textContent = "\u2014"; x.className = x === ph ? "pho" : ""; } });
+      return; }
     var b = window.__BAL;
     /* the tiles carry the whole figure, to the micro-ATONE */
     if(bl) bl.textContent = b ? exact(b.uatone) : "—";
@@ -2532,8 +2536,12 @@ rememberGridH();
    the plan still answers the question for whatever amount is typed. */
 (function(){
   var E = function(id){ return document.getElementById(id); };
-  var btn = E("wconn"), box = E("wstate");
-  if(!btn) return;
+  /* One door: the header's Connect button and its wallet list (simple.js draws them). This
+     module connects, disconnects and reads the position. While it connects the header
+     button says so; a failure is said once, in the page's failure notice. */
+  var btn = E("svconn");
+  function busy(on, name){ if(!btn) return; btn.disabled = !!on; btn.textContent = on ? "Connecting " + name + "\u2026" : "Connect wallet"; }
+  function failed(why){ if(window.__notify) window.__notify().fail(why); }
   var API = "https://atomone-api.gatadao.com";
   var CHAIN = "atomone-1";
   window.__API = API;
@@ -2597,7 +2605,6 @@ rememberGridH();
 
   function fmt(u){ return (Math.floor(u / 1e5) / 10).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
 
-  function show(html){ box.hidden = false; box.innerHTML = html; }
 
   function get(path){
     return new Promise(function(res, rej){
@@ -2659,12 +2666,6 @@ rememberGridH();
     return day(ms) + " (" + d + "d)";
   }
 
-  /* one Connect button opens the chooser: the two wallets with their marks,
-     "installed" under the ones that are, Keplr only on a phone. Connected, the
-     chooser and the button go and one Disconnect remains. */
-  /* the chooser is a card on the popup stack: Escape and a tap outside close
-     it the way they close every other card, and nothing else has to know */
-  var pick = E("wpick"), dis = E("wdisc");
   /* the copy glyph: the clipboard, with the old selection route as the fallback;
      the check shows for a moment. It rides inside the address itself - the whole
      chip is the control, there is no second button beside it. */
@@ -2680,29 +2681,6 @@ rememberGridH();
       document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t); ok(); }catch(e){} };
     if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(a).then(ok, old); else old();
   });
-  /* Connect turns into the two tiles in place; each tile carries its state */
-  btn.addEventListener("click", function(){ btn.hidden = true; if(pick) pick.hidden = false; chooser(true); });
-  function chooser(open){
-    if(!pick || !open) return;
-    var have = {}; providers().forEach(function(p){ have[p.name] = 1; });
-    Array.prototype.forEach.call(pick.querySelectorAll(".wopt"), function(b){
-      var n = b.dataset.w, tag = b.querySelector("i");
-      b.hidden = PHONE && n !== "Keplr";
-      tag.textContent = have[n] ? "installed" : (PHONE ? "open in the Keplr app" : "not installed");
-      tag.className = have[n] ? "on" : "";
-      b.classList.toggle("off", !have[n]);
-    });
-    /* a "not installed" line from an earlier attempt is wrong once it is here */
-    if(!box.hidden && /not installed/.test(box.textContent) && Object.keys(have).some(function(n){ return box.textContent.indexOf(n) === 0; })) box.hidden = true;
-  }
-  /* extensions inject after the page has loaded, and not all at once: read
-     the tiles' state again a few times, and whenever the tab comes back */
-  chooser(true);
-  [400, 1200, 3000, 6000].forEach(function(ms){ setTimeout(function(){ chooser(true); }, ms); });
-  document.addEventListener("visibilitychange", function(){ if(!document.hidden) chooser(true); });
-  window.addEventListener("focus", function(){ chooser(true); });
-  if(pick) Array.prototype.forEach.call(pick.querySelectorAll(".wopt"), function(b){
-    b.addEventListener("click", function(){ CHOSEN = b.dataset.w; chooser(false); connect(true); }); });
   function disconnect(){
     window.__ADDR = null; window.__POS = null; window.__REDS = null; window.__MINE = null; window.__LOCKNOTE = "";
     window.__DELS = null; window.__WALLET = null; window.__BAL = null;
@@ -2712,17 +2690,14 @@ rememberGridH();
     document.documentElement.removeAttribute("data-wallet");
     var wa = E("waddr"); if(wa){ wa.hidden = true; wa.classList.remove("done"); }
     var ab0 = E("atbtn"); if(ab0) ab0.classList.remove("on"); var ap0 = E("wkap"); if(ap0) ap0.hidden = true;
-    box.hidden = true; if(dis) dis.hidden = true; var blk0 = E("wblk"); if(blk0) blk0.hidden = true; var rf0 = E("wrefresh"); if(rf0) rf0.hidden = true;
-    btn.disabled = false; btn.querySelector("span").textContent = "Connect wallet"; btn.hidden = false; if(pick) pick.hidden = true; chooser(true);
-    var gate = E("wgate"), acct = E("wk-acct"); if(gate) gate.hidden = true; if(acct) acct.hidden = false;
+    var blk0 = E("wblk"); if(blk0) blk0.hidden = true; var rf0 = E("wrefresh"); if(rf0) rf0.hidden = true;
+    busy(false);
     var wn = E("wname"); if(wn) wn.textContent = "Wallet";
-    var wm = E("wmark"); if(wm) wm.hidden = true;
     if(window.__redraw) window.__redraw();
     if(window.__planDraw) window.__planDraw();
   }
-  if(dis) dis.addEventListener("click", disconnect);
-  /* the simple view connects and disconnects through the same path, never its own */
-  window.__wconnect = function(name){ CHOSEN = name; chooser(false); connect(true); };
+  /* the header connects and disconnects through these, and nothing else does */
+  window.__wconnect = function(name){ CHOSEN = name; connect(true); };
   window.__wdisconnect = disconnect;
   window.__wproviders = providers;
   /* Refresh: read the chain again for this address, on request only */
@@ -2734,14 +2709,13 @@ rememberGridH();
   function connect(chosen){
     var ps = providers(), w = null;
     if(CHOSEN){ for(var i = 0; i < ps.length; i++) if(ps[i].name === CHOSEN) w = ps[i]; }
-    if(!chosen && !w){ chooser(true); return; }
+    if(!chosen && !w) return;
     if(!w){
-      show(PHONE ? '<s>Open this page inside the Keplr app (Keplr → Browser).</s>' : '<s>' + att(CHOSEN || "That wallet") + ' is not installed in this browser.</s>');
+      failed(PHONE ? "Open this page inside the Keplr app (Keplr, then Browser)." : (CHOSEN || "That wallet") + " is not installed in this browser.");
       CHOSEN = null;
       return;
     }
-    btn.disabled = true; btn.querySelector("span").textContent = "Connecting " + w.name + "…";
-    show('<s>Connecting ' + att(w.name) + '…</s>');
+    busy(true, w.name);
     w.enable()
       .then(function(){ return w.getKey(); })
       .then(function(k){
@@ -2799,23 +2773,15 @@ rememberGridH();
         if(window.__redraw) window.__redraw();
         try{ localStorage.setItem("th_wallet", w.name); }catch(e){}
         document.documentElement.setAttribute("data-wallet", w.name);
-        if(dis) dis.hidden = false; var blk1 = E("wblk"); if(blk1) blk1.hidden = false; var rf1 = E("wrefresh"); if(rf1) rf1.hidden = false; box.hidden = true;
-        var gate = E("wgate"), acct = E("wk-acct"); if(gate) gate.hidden = true;
+        var blk1 = E("wblk"); if(blk1) blk1.hidden = false; var rf1 = E("wrefresh"); if(rf1) rf1.hidden = false; busy(false);
+        var acct = E("wk-acct");
         if(acct) acct.hidden = false;
         /* the name whole, and an eight-letter form with two dots for a phone */
         if(window.__atDoor) setTimeout(window.__atDoor, 0);
         var wn = E("wname"); if(wn){ var nm0 = String(window.__WALLET.label || ""), sh = nm0.length > 8 && nm0 !== "My wallet" ? nm0.slice(0, 8) + ".." : nm0;
           wn.innerHTML = '<span class=nf>' + att(nm0) + '</span><span class=ns>' + att(sh) + '</span>'; wn.title = nm0; }
-        var wm = E("wmark"); if(wm){ wm.querySelector("img").src = "assets/wallet-" + w.name.toLowerCase() + ".svg"; wm.hidden = false; }
 
 
-        show('<b>' + fmt(p.total) + '</b> staked ' +
-             '<s>across ' + p.rows.length + '</s> ' +
-             'earning <u>' + (p.rate * 100).toFixed(1) + '%</u> ' +
-             (p.locked > 0
-               ? '<span class=lockb>' + fmt(p.locked) + ' locked, ' + when(p.until) + '</span>'
-               : '<s>all free to move</s>') +
-             '<s>' + window.__ADDR.slice(0, 9) + '…' + window.__ADDR.slice(-4) + '</s>');
         /* the plan runs on what can actually be signed, never on the total */
         var amt = E("amt");
         var wa = E("waddr"); if(wa){ wa.hidden = false;
@@ -2844,9 +2810,9 @@ rememberGridH();
       .catch(function(e){
         if(window.__onPos){ var f2 = window.__onPos; window.__onPos = null; f2(); }
         if(!window.__POS){ window.__ADDR = null; window.__DELS = null; window.__REDS = null; }
-        btn.disabled = false; btn.querySelector("span").textContent = "Connect wallet";
-        show('<s>' + (e && e.message === "Request rejected" ? "Rejected in the wallet."
-                     : "Could not read the position (" + att(e && e.message || "error") + ").") + '</s>');
+        busy(false);
+        failed(e && e.message === "Request rejected" ? "Rejected in the wallet."
+               : "Could not read the position (" + (e && e.message || "error") + ").");
       });
   }
 

@@ -595,6 +595,10 @@
   html[data-theme=light]:not([data-mono]) .wk-note .x:focus-visible{outline:2px solid var(--accent)}
   html[data-theme=light]:not([data-mono]) .wk-btn.busy{color:transparent!important;text-shadow:none!important}
   html[data-theme=light]:not([data-mono]) .wk-btn.busy::after{border:2px solid var(--surface-2);border-top-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .wpcopy{background:transparent}
+  html[data-theme=light]:not([data-mono]) .wpcopy svg,html[data-theme=light]:not([data-mono]) .wpout svg{fill:none;stroke:currentColor}
+  html[data-theme=light]:not([data-mono]) .wpout{background:transparent}
+  html[data-theme=light]:not([data-mono]) .wpout:hover{background:var(--danger-bg)}
   html[data-theme=light]:not([data-mono]) .sv-menu{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-menu .mi{background:transparent}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addr{background:transparent}

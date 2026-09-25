@@ -287,12 +287,15 @@
   var WAS = null;
   function drawHead(){
     var a = window.__ADDR, ac = E("svacct"), cn = E("svconn"), w = window.__WALLET;
+    var wl = E("svwelc"), name = w && w.label && w.label !== "My wallet" && w.label !== w.name ? w.label : "";
     if(a){ ac.hidden = false; if(cn) cn.hidden = true;
-           /* the button wears the wallet that is connected, not a generic head */
-           var im = ac.querySelector("img"), src = "assets/wallet-" + String((w && w.name) || "keplr").toLowerCase() + ".svg";
+           /* the pill: the connected wallet's mark, its address as the box allows, copy, disconnect */
+           var im = ac.querySelector(".wpl"), src = "assets/wallet-" + String((w && w.name) || "keplr").toLowerCase() + ".svg";
            if(im && im.getAttribute("src") !== src) im.setAttribute("src", src);
-           ac.title = ((w && w.label) || (w && w.name) || "Wallet") + " \u2014 " + a; }
+           var pa = ac.querySelector(".wpa"); if(pa) pa.textContent = a.slice(0, 7) + "\u2026" + a.slice(-4);
+           ac.title = ((w && w.label) || (w && w.name) || "Wallet") + ", " + a; }
     else { ac.hidden = true; if(cn) cn.hidden = false; }
+    if(wl){ wl.hidden = !a; wl.innerHTML = a ? "Welcome" + (name ? ", <b>" + esc(name) + "</b>" : "") : ""; }
     /* a redraw every block must not shut a menu the reader just opened: only a
        change of state - connected, or no longer - closes it */
     if(WAS !== !!a){ WAS = !!a; closeMenu(); }
@@ -318,18 +321,11 @@
           '<img src="assets/wallet-' + n.toLowerCase() + '.svg" alt="">' + n +
           (have[n] ? "" : '<i>not installed</i>') + '</button>'; }).join("");
   }
-  function acctMenu(){
-    var w = window.__WALLET || {}, a = window.__ADDR || "";
-    return '<div class=mh>' + esc(w.label || w.name || "Wallet") + '</div>' +
-      '<div class=ma>' + esc(a) + '</div>' +
-      '<button class=mi type=button data-act=copy>Copy address</button>' +
-      '<button class="mi out" type=button data-act=disconnect>Disconnect</button>';
-  }
   var adT;
   /* the menu's own copy: the row says so for a moment, then goes back */
-  function copyAddr(row){
+  function copyAddr(row, done){
     var a = window.__ADDR; if(!a) return;
-    var ok = function(){ if(!row) return; var t = row.textContent; row.textContent = "Copied";
+    var ok = function(){ if(done){ done(); return; } if(!row) return; var t = row.textContent; row.textContent = "Copied";
       clearTimeout(adT); adT = setTimeout(function(){ row.textContent = t; }, 1200); };
     /* the same fallback the wallet pane uses where the clipboard API is refused */
     var old = function(){ try{ var e = document.createElement("textarea"); e.value = a; e.setAttribute("readonly", "");
@@ -413,9 +409,12 @@
   var find = E("sv-find");
   if(find) find.addEventListener("input", function(){ FIND = find.value.trim(); if(screen() === "net") drawNet(); });
 
-  var acct = E("svacct");
-  if(acct) acct.addEventListener("click", function(ev){ ev.stopPropagation();
-    if(menu && !menu.hidden){ closeMenu(); return; } openMenu(acctMenu(), acct); });
+  /* the pill's two controls: the address copies, the icon disconnects - no menu */
+  var cp = E("svcopy"), out = E("svout"), cpT = 0;
+  if(cp) cp.addEventListener("click", function(){ copyAddr(null, function(){
+    cp.classList.add("done"); cp.title = "Copied"; clearTimeout(cpT);
+    cpT = setTimeout(function(){ cp.classList.remove("done"); cp.title = "Copy address"; }, 1400); }); });
+  if(out) out.addEventListener("click", function(){ if(window.__wdisconnect) window.__wdisconnect(); setTimeout(render, 0); });
 
   /* every figure follows the dashboard's own redraw, and the height ticks on its own */
   window.addEventListener("thermo:draw", schedule);

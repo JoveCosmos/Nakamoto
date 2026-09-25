@@ -3410,11 +3410,26 @@ html[data-ui=simple][data-tab=dele] .w#calc>#p-dele{display:none}
 .sv-bw{display:flex;flex-direction:column;gap:2px;line-height:1}
 .sv-bw b{font-size:15px;font-weight:800;color:var(--wt)}
 .sv-bw i{font-style:normal;font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
-.sv-acct:focus-visible{outline:2px solid var(--wcyan);outline-offset:2px}
 .sv-who{display:flex;align-items:center;gap:9px;flex:1 1 0;justify-content:flex-end;min-width:0}
-.sv-acct{width:34px;height:34px;border-radius:50%;border:1px solid var(--wbd2);background:var(--wchip);color:var(--ws);display:grid;place-items:center;cursor:pointer;padding:0;flex:0 0 auto}
-.sv-acct:hover{color:var(--wt);border-color:var(--wcyan)}
-.sv-acct img{width:19px;height:19px;display:block}
+/* connected: one pill the size of the Connect button - the wallet's mark, its address with a
+   small copy glyph (one control), and a disconnect icon behind a hairline. No menu. */
+.hdr-r #svconn,.wpill{width:178px;height:32px}
+.hdr-r #svconn{justify-content:center}
+.wpill{display:inline-flex;align-items:center;border:1px solid var(--wbd2);border-radius:10px;background:var(--wchip);overflow:hidden;flex:0 0 auto}
+.wpl{width:16px;height:16px;margin:0 1px 0 9px;flex:0 0 auto}
+.wpcopy{flex:1 1 auto;min-width:0;height:100%;display:inline-flex;align-items:center;gap:6px;padding:0 6px;border:0;background:transparent;
+color:var(--wt);font-family:var(--wmono);font-size:10.5px;cursor:pointer}
+.wpcopy .wpa{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wpcopy svg,.wpout svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.wpcopy svg{color:var(--wf)}.wpcopy svg.ok{display:none;color:var(--wgreen)}
+.wpcopy.done svg.cp{display:none}.wpcopy.done svg.ok{display:block}
+.wpcopy:hover{color:var(--wcyan)}.wpcopy:hover svg.cp{color:var(--wcyan)}
+.wpout{flex:0 0 auto;width:34px;height:100%;display:grid;place-items:center;border:0;border-left:1px solid var(--wbd);background:transparent;color:var(--ws);cursor:pointer}
+.wpout:hover{color:var(--wburn);background:rgba(255,77,31,.08)}
+.wpcopy:focus-visible,.wpout:focus-visible{outline:2px solid var(--wcyan);outline-offset:-2px}
+/* the dashboard's title greets the connected wallet by the name it gave itself */
+.welc{margin-left:14px;padding-left:14px;border-left:1px solid var(--wbd2);font-size:13px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.welc b{color:var(--wt);font-weight:700}
 .sv-who{position:relative}
 .sv-menu{position:absolute;right:0;top:calc(100% + 9px);z-index:60;min-width:232px;padding:7px;border:1px solid var(--wbd2);
 border-radius:12px;background:var(--wsolid);box-shadow:0 30px 70px -30px #000;display:flex;flex-direction:column;gap:4px}
@@ -3625,7 +3640,6 @@ text-align:right;padding:9px 10px;background:var(--wi);border-top:1px solid var(
 .hdr-r .thbtn{margin-left:0;width:32px;height:32px;border-radius:8px}
 .hdr-r .sv-who{flex:0 0 auto}
 .hdr-r .sv-btn.sml{height:32px}
-.hdr-r .sv-acct{width:32px;height:32px}
 .l1{display:flex;align-items:center;gap:4px;min-width:0}
 .l1tab{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 13px;border:0;border-radius:6px;
 background:transparent;color:var(--ink2);font:inherit;font-family:var(--sans);font-size:13px;font-weight:400;line-height:1;white-space:nowrap;cursor:pointer;
@@ -3699,7 +3713,11 @@ html[data-tab=connect] .l2host{display:none}
     <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
     <div class=sv-who>
       <button class="sv-btn sml pri" id=svconn type=button aria-haspopup=true aria-expanded=false>Connect wallet</button>
-      <button class=sv-acct id=svacct type=button hidden title="This wallet" aria-label="This wallet" aria-haspopup=true aria-expanded=false><img alt=""></button>
+      <div class=wpill id=svacct hidden>
+        <img class=wpl alt="">
+        <button class=wpcopy id=svcopy type=button title="Copy address" aria-label="Copy address"><span class=wpa></span><svg class=cp viewBox="0 0 24 24" aria-hidden=true><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><svg class=ok viewBox="0 0 24 24" aria-hidden=true><path d="M4 12.5l5 5L20 6.5"/></svg></button>
+        <button class=wpout id=svout type=button title="Disconnect" aria-label="Disconnect"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
+      </div>
       <div class=sv-menu id=svmenu hidden></div>
     </div>
     </div>
@@ -3711,7 +3729,7 @@ html[data-tab=connect] .l2host{display:none}
     <header class=brandbar>
       <div class=bwrap data-title-for=staking><div class=bt><span class=btx><i class=nk>Nakamoto </i><i class=tsfx id=tsfx>Bonus</i></span></div></div>
       <div class=bwrap data-title-for=governance><div class=bt><span class=btx><i class=nk>Governance </i><i class="tsfx tsub">Proposals</i></span></div></div>
-      <span class=sv-brand data-title-for=dashboard><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><b>GATA</b><i>non-custodial staking</i></span></span>
+      <span class=sv-brand data-title-for=dashboard><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><b>GATA</b><i>non-custodial staking</i></span><span class=welc id=svwelc hidden></span></span>
       <div class=l2host>{{SHELL_L2}}</div>
     </header>
   <div class=flipbox id=flipbox>
@@ -3857,19 +3875,6 @@ html[data-tab=connect] .l2host{display:none}
     <div class=wk-body id=wbody>
       <div class=wk-two>
         <section class=wk-pane id=wk-mine>
-    <div class="wk-gate" id=wgate hidden>
-      <div class=wk-gin>
-      <button class="wk-btn wk-primary wk-big" id=wconn type=button aria-haspopup=true><span>Connect wallet</span><em class=sgoarr>&rarr;</em></button>
-      <div class=wk-gatecard id=wpick role=group aria-label="Choose a wallet" hidden>
-        <div class=wopts>
-          <button class=wopt data-w=Keplr type=button style="--c:#3B9EFF"><img src="assets/wallet-keplr.svg" alt=""><b>Keplr</b><i></i><em>&rarr;</em></button>
-          <button class=wopt data-w=Adena type=button style="--c:#8f7bff"><img src="assets/wallet-adena.svg" alt=""><b>Adena</b><i></i><em>&rarr;</em></button>
-        </div>
-        <div class=wk-chain>atomone-1</div>
-        <div class=wk-state id=wstate hidden></div>
-      </div>
-      </div>
-    </div>
           <div id=wk-acct>
           <header class="wk-ph wk-bh"><h3 id=wname>Wallet</h3><span class=wk-addrw><button class=wk-addr id=waddr type=button hidden title="Copy address" aria-label="Copy address"></button></span></header>
           <div class=wk-bal5><div class=wk-b5><i><img src="assets/atomone.svg" alt="">ATONE</i><b id=ds-bal>&mdash;</b></div><div class=wk-b5><i><img src="assets/photon.svg" alt="">PHOTON</i><b id=ds-photon class=pho>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">staked</i><b id=ds-staked>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">rewards</i><b id=ds-rew>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">APR</i><b id=ds-apr>&mdash;</b></div></div>
@@ -3881,7 +3886,6 @@ html[data-tab=connect] .l2host{display:none}
             <button class=wk-unb id=unbtn type=button hidden title="Unstake from a validator">Unstake</button></header>
           <div class=wk-tbl2 id=dmy></div>
           <footer class=wk-pf><nav class=wk-pg id=dmypg></nav></footer>
-          <button class=wk-disc id=wdisc type=button hidden title="Disconnect" aria-label="Disconnect"><span class=wk-mark id=wmark hidden><img alt="" src="assets/wallet-keplr.svg"></span><span class=wk-dword>Disconnect</span><svg class=wk-out viewBox="0 0 24 24" aria-hidden=true><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
           </div>
         </section>
         <section class=wk-pane id=wk-plan>

@@ -107,10 +107,10 @@ t('wallet-door', function(){
   var barShown=!!bar && getComputedStyle(bar).display!=='none' && bar.contains(conn);
   conn.click();
   var menu=document.getElementById('svmenu'), tiles=menu.querySelectorAll('[data-w]').length;
-  var ok=g.hidden && !a.hidden && skel===5 && rows>=90 && cap && barShown && !conn.hidden && !menu.hidden && tiles===2;
+  var ok=!g && !document.getElementById('wdisc') && !a.hidden && skel===5 && rows>=90 && cap && barShown && !conn.hidden && !menu.hidden && tiles===2;
   menu.hidden=true; menu.innerHTML='';
   go('staking/bonus');
-  return ok || 'gate '+g.hidden+' acct '+a.hidden+' skel '+skel+' rows '+rows+' cap '+cap+' bar '+barShown+' conn '+conn.hidden+' tiles '+tiles;
+  return ok || 'gate '+!!g+' acct '+a.hidden+' skel '+skel+' rows '+rows+' cap '+cap+' bar '+barShown+' conn '+conn.hidden+' tiles '+tiles;
 });
 
 /* the dashboard's two views share one window: the same box, one at a time */
