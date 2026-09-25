@@ -93,6 +93,7 @@
   html[data-theme=light]:not([data-mono]) .duo .sec:nth-child(1){border-color:var(--warn-bg);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .duo .sec:nth-child(2){border-color:var(--danger-bg);background:var(--surface)}
   html[data-theme=light]:not([data-mono]) .duo .sec:nth-child(3){border-color:var(--accent-soft);background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .wifall{background:transparent}
   html[data-theme=light]:not([data-mono]) .rlab .etabox,html[data-theme=light]:not([data-mono]) .rlab .etabox:hover,html[data-theme=light]:not([data-mono]) .rlab .etabox.eta.rise,html[data-theme=light]:not([data-mono]) .rlab .etabox.eta.fall,html[data-theme=light]:not([data-mono]) .rlab .etabox.conc,html[data-theme=light]:not([data-mono]) .rlab .etabox.conc.low,html[data-theme=light]:not([data-mono]) .rlab .etabox.cool,html[data-theme=light]:not([data-mono]) .rlab .etabox.eta.rise:hover,html[data-theme=light]:not([data-mono]) .rlab .etabox.eta.fall:hover,html[data-theme=light]:not([data-mono]) .rlab .etabox.conc:hover,html[data-theme=light]:not([data-mono]) .rlab .etabox.conc.low:hover,html[data-theme=light]:not([data-mono]) .rlab .etabox.cool:hover{background:transparent;box-shadow:none}
   html[data-theme=light]:not([data-mono]) .rlab .etabox{text-decoration-color:currentColor}
   html[data-theme=light]:not([data-mono]) .rlab .etabox.eta{--h:var(--warn)}

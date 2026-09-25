@@ -739,15 +739,24 @@ function liveOf(k){
        : k === "c" ? Math.round(LIVE_C * 100) : Math.round(LIVE_BONDED);
 }
 function whatif(){
-  var rows = { e: sl, c: cr, s: br }, dirty = false;
+  var rows = { e: sl, c: cr, s: br }, dirty = false, moved = 0;
   Object.keys(rows).forEach(function(k){
     var inp = rows[k]; if(!inp) return;
     var live = liveOf(k), d = k === "c" ? CTARGET !== null : +inp.value !== live;
     if(k === "s") d = +bd.value !== 0;
-    dirty = dirty || d;
-    var row = inp.closest(".wrow"); if(row) row.classList.toggle("dirty", d);
+    dirty = dirty || d; if(d) moved++;
+    var row = inp.closest(".wrow"); if(!row) return;
+    row.classList.toggle("dirty", d);
+    /* the reset names the live value it returns to: read off the readout while it shows live -
+       a frame later, since a reset rewrites the readout after this runs */
+    var rv = row.querySelector(".rval"), rl = row.querySelector(".rlive");
+    if(!d && rv && rl) requestAnimationFrame(function(){ if(!row.classList.contains("dirty")) rl.textContent = rv.textContent; });
   });
   document.documentElement.toggleAttribute("data-dirty", dirty);
+  var wn = E("wifnote"), tn = E("tapnote"), wc = E("wifn");
+  if(wn) wn.hidden = !dirty;
+  if(tn) tn.hidden = dirty;
+  if(wc) wc.textContent = moved + (moved === 1 ? " slider" : " sliders") + " moved from live";
   tickAt(sl, E("tke"), liveOf("e"));
   tickAt(cr, E("tkc"), liveOf("c"));
   tickAt(cr, E("tkt"), +(E("tkt") || {dataset:{}}).dataset.v || 0);
@@ -777,6 +786,16 @@ snap(sl, "e"); snap(cr, "c"); snap(br, "s");
 /* the S track writes the hidden field as a hypothetical; landing on live means 0 */
 Array.prototype.forEach.call(document.querySelectorAll(".rreset"), function(b){
   b.addEventListener("click", function(){ resetLive(b.dataset.r); }); });
+/* one way back for everything moved, and Esc on a moved slider sends that one home */
+var wifall = E("wifall"); if(wifall) wifall.addEventListener("click", function(){ resetLive(); });
+[[sl, "e"], [cr, "c"], [br, "s"]].forEach(function(p){
+  if(!p[0]) return;
+  p[0].addEventListener("keydown", function(ev){
+    if(ev.key !== "Escape") return;
+    var row = p[0].closest(".wrow"); if(!row || !row.classList.contains("dirty")) return;
+    ev.preventDefault(); ev.stopPropagation(); resetLive(p[1]);
+  });
+});
 window.addEventListener("resize", whatif);
 render();
 rememberGridH();

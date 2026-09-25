@@ -581,13 +581,28 @@ display:flex;flex-direction:column;gap:6px}
    the row's handle is away from live */
 .rv{display:inline-flex;align-items:center;gap:6px}
 /* the reset keeps its place whether shown or not, so the value never shifts */
-/* a moved slider's way back: a labelled chip in plain ink on its own fill - never the
-   amber the moved value turns - named after the LIVE marks on the track it returns to */
-.rreset{height:22px;padding:0 9px 0 7px;border:1px solid var(--edge2);border-radius:99px;background:var(--card2);
-color:var(--ink);font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;line-height:1;cursor:pointer;
+/* A moved slider's way back, the way simulators say it: a verb and its target - "Reset to
+   0.12" - in plain ink on its own fill (the moved value is amber; the action is not). It
+   floats into the empty middle of the title row, just left of the value, so every value
+   stays flush right and nothing shifts when it appears or goes. */
+.rreset{height:24px;padding:0 10px 0 8px;border:1px solid var(--edge2);border-radius:99px;background:var(--card2);
+color:var(--ink);font-family:var(--sans);font-size:11.5px;letter-spacing:0;text-transform:none;line-height:1;cursor:pointer;white-space:nowrap;
 display:inline-flex;align-items:center;justify-content:center;gap:5px;visibility:hidden;opacity:0;transition:opacity .15s,border-color .15s,background .15s}
-.rreset span{font-size:12px;letter-spacing:0}
+.rv{position:relative}
+.rv .rreset{position:absolute;right:calc(100% + 8px);top:50%;transform:translateY(-50%)}
+.rreset .ri,.wifall .ri{font-size:13px;line-height:1}
+.rreset .rlive{font-family:var(--mono);font-weight:600;font-size:11px}
 .rreset:hover{border-color:var(--ink2);background:var(--inset)}
+/* the page says when it is showing a hypothetical, in the moved values' amber, with one
+   way back for all of them - it stands where the tap hint does while anything is moved */
+.wifnote{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:11.5px;color:var(--ink2);min-width:0}
+.wiftag{font-style:normal;font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--hot);
+border:1px solid var(--hot);border-radius:99px;padding:3px 8px;line-height:1;white-space:nowrap}
+.wifall{height:24px;padding:0 10px 0 8px;border:1px solid var(--hot);border-radius:99px;background:transparent;color:var(--hot);
+font-family:var(--sans);font-size:11.5px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.wifall:hover{background:var(--card2)}
+.wifall:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
+@media(max-width:620px){#wifn{display:none}}
 .rreset:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
 .wrow.dirty .rreset{visibility:visible;opacity:1}
 /* the row's label IS the readout button: the disc, the name, the arrow that
@@ -3704,7 +3719,8 @@ html[data-tab=connect] .l2host{display:none}
 <div class=w><div class=fold>
   <div class="sec tight fw">
     <div class=frow>
-      <span class=tapnote>tap any box<svg viewBox="0 0 24 24" aria-hidden=true><path d="M9 11V6a2 2 0 0 1 4 0v5M13 10V8a2 2 0 0 1 4 0v3M17 11a2 2 0 0 1 4 0v3a7 7 0 0 1-7 7h-1a7 7 0 0 1-5.6-2.8L4 13.8a2 2 0 0 1 3.2-2.4L9 13.5V11"/></svg></span>
+      <span class=wifnote id=wifnote role=status hidden><i class=wiftag>What-if view</i><span id=wifn>1 slider moved from live</span><button class=wifall id=wifall type=button><span class=ri aria-hidden=true>&#8635;</span>Reset all</button></span>
+      <span class=tapnote id=tapnote>tap any box<svg viewBox="0 0 24 24" aria-hidden=true><path d="M9 11V6a2 2 0 0 1 4 0v5M13 10V8a2 2 0 0 1 4 0v3M17 11a2 2 0 0 1 4 0v3a7 7 0 0 1-7 7h-1a7 7 0 0 1-5.6-2.8L4 13.8a2 2 0 0 1 3.2-2.4L9 13.5V11"/></svg></span>
       <div class=modes>
         <button class=mbtn data-m=color aria-pressed=true>Map</button>
         <button class=mbtn data-m=apr aria-pressed=false>APR</button>
@@ -3735,7 +3751,7 @@ html[data-tab=connect] .l2host{display:none}
       <span class="tick live" id=tke data-l="live"></span>
     </div>
     <div class=rlab><button class="etabox eta" id=qbtn type=button aria-label="How the coefficient works"><span
-        class="disc de eb"><svg class=kg aria-hidden=true><use href="#g-eta"/></svg></span>bonus share <span class=sgoarr>&rarr;</span></button><span class=rv><b class=rval id=etatop>{{ETA}}</b><button class=rreset data-r=e type=button title="Back to the chain as it is" aria-label="Reset to live"><span aria-hidden=true>&#8635;</span>live</button></span></div>
+        class="disc de eb"><svg class=kg aria-hidden=true><use href="#g-eta"/></svg></span>bonus share <span class=sgoarr>&rarr;</span></button><span class=rv><b class=rval id=etatop>{{ETA}}</b><button class=rreset data-r=e type=button title="Back to the chain as it is (Esc on the slider does the same)"><span class=ri aria-hidden=true>&#8635;</span>Reset to <b class=rlive>{{ETA}}</b></button></span></div>
   </div>
 
   <div class="sec tight wrow" data-w=c>
@@ -3747,7 +3763,7 @@ html[data-tab=connect] .l2host{display:none}
       <span class="tick live" id=tkc data-l="live"></span>
     </div>
     <div class=rlab><button class="etabox conc" id=cbtn type=button aria-label="How concentration steers the coefficient"><span
-        class="disc dc eb"><svg class=kg aria-hidden=true><use href="#g-c"/></svg></span>concentration <span class=sgoarr>&rarr;</span></button><span class=rv><b class=rval id=ctop>{{RATIO}}&times;</b><button class=rreset data-r=c type=button title="Back to the chain as it is" aria-label="Reset to live"><span aria-hidden=true>&#8635;</span>live</button></span></div>
+        class="disc dc eb"><svg class=kg aria-hidden=true><use href="#g-c"/></svg></span>concentration <span class=sgoarr>&rarr;</span></button><span class=rv><b class=rval id=ctop>{{RATIO}}&times;</b><button class=rreset data-r=c type=button title="Back to the chain as it is (Esc on the slider does the same)"><span class=ri aria-hidden=true>&#8635;</span>Reset to <b class=rlive>{{RATIO}}&times;</b></button></span></div>
   </div>
   <div class="sec tight wrow" data-w=s>
     <div class=trackwrap>
@@ -3757,7 +3773,7 @@ html[data-tab=connect] .l2host{display:none}
       <span class="tick live" id=tks data-l="live"></span>
     </div>
     <div class=rlab><button class="etabox cool" id=sbtn type=button aria-label="Staking figures"><span
-        class="disc ds eb"><svg class=kg aria-hidden=true><use href="#g-s"/></svg></span>ATONE staked <span class=sgoarr>&rarr;</span></button><span class=rv><b class=rval id=bstake>{{BONDED_C}}</b><button class=rreset data-r=s type=button title="Back to the chain as it is" aria-label="Reset to live"><span aria-hidden=true>&#8635;</span>live</button></span></div>
+        class="disc ds eb"><svg class=kg aria-hidden=true><use href="#g-s"/></svg></span>ATONE staked <span class=sgoarr>&rarr;</span></button><span class=rv><b class=rval id=bstake>{{BONDED_C}}</b><button class=rreset data-r=s type=button title="Back to the chain as it is (Esc on the slider does the same)"><span class=ri aria-hidden=true>&#8635;</span>Reset to <b class=rlive>{{BONDED_C}}</b></button></span></div>
     <input type=hidden id=bond value=0>
   </div>
   </div>
