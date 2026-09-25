@@ -3407,9 +3407,12 @@ html[data-ui=simple][data-tab=dele] .w#calc>#p-dele{display:none}
    wallet still sits at the end when the screens are not there (the advanced view) */
 .sv-brand{display:flex;align-items:center;gap:10px;flex:1 1 0;min-width:0}
 .sv-brand img{width:28px;height:28px;border-radius:8px;display:block}
-.sv-bw{display:flex;flex-direction:column;gap:2px;line-height:1}
-.sv-bw b{font-size:15px;font-weight:800;color:var(--wt)}
-.sv-bw i{font-style:normal;font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
+/* the lockup on one line: the mark, the name at title size on the mark's centre line, and the
+   tagline beside it - the simple views' and the advanced view's own */
+.sv-bw{display:flex;align-items:baseline;gap:10px;line-height:1;min-width:0}
+.sv-bw b{font-size:19px;font-weight:800;letter-spacing:-.01em;color:var(--wt)}
+.sv-bw i{font-style:normal;font-family:var(--wsans);font-size:13px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+html[data-ui=simple] .svtag.a,html:not([data-ui=simple]) .svtag.s{display:none}
 .sv-who{display:flex;align-items:center;gap:9px;flex:1 1 0;justify-content:flex-end;min-width:0}
 /* connected: one pill the size of the Connect button - the wallet's mark, its address with a
    small copy glyph (one control), and a disconnect icon behind a hairline. No menu. */
@@ -3623,7 +3626,11 @@ text-align:right;padding:9px 10px;background:var(--wi);border-top:1px solid var(
   .sv-screen{justify-content:flex-start}
   .sv-cards,.sv-cards.four{grid-template-columns:minmax(0,1fr)}
   .sv-big{font-size:28px}
-  .sv-bw i{display:none}
+  .sv-bw b{font-size:17px}
+  .sv-bw i{font-size:12px}
+  /* a phone: the lockup keeps its whole tagline; the greeting takes the line under it */
+  .brandbar .sv-brand{flex-wrap:wrap;row-gap:6px}
+  .welc{flex:1 1 100%;margin-left:0;padding-left:0;border-left:0}
   .sv-list .sv-wrap{max-height:62svh}
   .sv-chips{grid-template-columns:minmax(0,1fr)}
 }
@@ -3729,7 +3736,7 @@ html[data-tab=connect] .l2host{display:none}
     <header class=brandbar>
       <div class=bwrap data-title-for=staking><div class=bt><span class=btx><i class=nk>Nakamoto </i><i class=tsfx id=tsfx>Bonus</i></span></div></div>
       <div class=bwrap data-title-for=governance><div class=bt><span class=btx><i class=nk>Governance </i><i class="tsfx tsub">Proposals</i></span></div></div>
-      <span class=sv-brand data-title-for=dashboard><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><b>GATA</b><i>non-custodial staking</i></span><span class=welc id=svwelc hidden></span></span>
+      <span class=sv-brand data-title-for=dashboard><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><b>GATA</b><i class="svtag s">Non-custodial staking</i><i class="svtag a">Decentralize the chain and earn more</i></span><span class=welc id=svwelc hidden></span></span>
       <div class=l2host>{{SHELL_L2}}</div>
     </header>
   <div class=flipbox id=flipbox>
