@@ -8,7 +8,8 @@
     "",
     "Section: id, label, route, account ('none' | 'uses': renders without a wallet, resets to its first",
     "sub-view when the wallet changes | 'required': a single connect screen while disconnected),",
-    "accent, optional hint (tooltip) and badge.",
+    "accent, optional hint (tooltip) and badge, and optional entry: 'first' opens the section on its first",
+    "view every time - from its level-1 tab and on a reload - instead of the view last open.",
     "Sub-view: id, label, route, optional group (sub-views sharing a group sit together under its",
     "label), and either what it shows - tab (the window's pane, html[data-tab]), panel (its element",
     "id), ui/screen for the dashboard's two views - or an empty state {title, text, action?}."
@@ -16,7 +17,7 @@
   "home": "staking/bonus",
   "sections": [
     {
-      "id": "staking", "label": "Staking", "route": "staking", "account": "none", "accent": "#ffb02e",
+      "id": "staking", "label": "Staking", "route": "staking", "account": "none", "accent": "#ffb02e", "entry": "first",
       "hint": "the validators, the Nakamoto bonus",
       "sub": [
         {"id": "bonus", "label": "Bonus", "route": "bonus", "tab": "home", "panel": "p-home", "accent": "#ffb02e"},

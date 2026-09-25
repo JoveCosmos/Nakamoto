@@ -52,6 +52,8 @@ def validate(cfg, tpl):
             errs.append(f"section {sid}: account must be one of {ACCOUNT}")
         if s.get("accent") and not HEX.match(s["accent"]):
             errs.append(f"section {sid}: accent must be #rrggbb")
+        if s.get("entry") not in (None, "first"):
+            errs.append(f"section {sid}: entry, when given, is 'first'")
         subs = s.get("sub") or []
         if not subs:
             errs.append(f"section {sid}: needs at least one sub-view")

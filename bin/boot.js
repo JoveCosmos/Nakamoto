@@ -22,7 +22,7 @@ try{(function(){
   var mem = {}; try{ mem = JSON.parse(sessionStorage.getItem("shell_last") || "{}"); }catch(e){}
   var h = (location.hash || "").replace(/^#\/?/, "").split("/"), s = null, v = null, f;
   if(h[0] === "intro"){ R.setAttribute("data-tab", "intro"); return; }
-  if(h[0] && (s = sec("route", h[0]))) v = (h[1] && sub(s, "route", h[1])) || sub(s, "id", mem[s.id]) || s.sub[0];
+  if(h[0] && (s = sec("route", h[0]))) v = s.entry === "first" ? s.sub[0] : (h[1] && sub(s, "route", h[1])) || sub(s, "id", mem[s.id]) || s.sub[0];
   if(!s){
     var t = localStorage.getItem("th_tab");
     if(t === "intro"){ R.setAttribute("data-tab", "intro"); return; }
@@ -31,7 +31,7 @@ try{(function(){
       f = ui === "simple" ? (bytab(t, function(x){ return x.screen === sc; }) || bytab(t, function(x){ return x.ui === "simple"; }))
                           : bytab(t, function(x){ return x.ui !== "simple"; });
     } else if(t) f = bytab(t);
-    if(f){ s = f[0]; v = f[1]; }
+    if(f){ s = f[0]; v = f[0].entry === "first" ? f[0].sub[0] : f[1]; }
     else { var hm = (C.home || "").split("/"); s = sec("route", hm[0]); v = s && sub(s, "route", hm[1]); }
   }
   if(!s || !v) return;

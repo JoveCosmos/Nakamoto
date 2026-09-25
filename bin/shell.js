@@ -29,7 +29,9 @@
   function mem(){ try{ return JSON.parse(sessionStorage.getItem(MEM) || "{}") || {}; }catch(e){ return {}; } }
   function keep(m){ try{ sessionStorage.setItem(MEM, JSON.stringify(m)); }catch(e){} }
   function remember(s, v){ var m = mem(); m[s.id] = v.id; keep(m); }
-  function last(s){ return sub(s, "id", mem()[s.id]) || s.sub[0]; }
+  /* a section with entry "first" always opens on its first view (Staking on Bonus); the
+     others come back to the view last open this session */
+  function last(s){ return s.entry === "first" ? s.sub[0] : sub(s, "id", mem()[s.id]) || s.sub[0]; }
 
   /* ── routes ── */
   function hashOf(s, v){ return s ? "#/" + s.route + "/" + v.route : "#/intro"; }
@@ -155,7 +157,7 @@
 
   function activate(b){
     var s = sec("id", b.dataset.section); if(!s) return;
-    if(b.classList.contains("l1tab")) go(s, cur.s === s ? cur.v : last(s), "push");
+    if(b.classList.contains("l1tab")) go(s, cur.s === s && s.entry !== "first" ? cur.v : last(s), "push");
     else { var v = sub(s, "id", b.dataset.sub); if(v) go(s, v, "push"); }
   }
 
