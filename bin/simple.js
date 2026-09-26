@@ -236,7 +236,7 @@
           fig("A year", '<span class=sd-gain>+' + one(plan.gain) + '</span><em class=u>ATONE</em>', "more, at today\'s rates", "var(--sv-green)") +
         '</div>' +
         '<button class="sv-btn go sd-go" type=button data-act=opt>Redelegate</button>' +
-        '<div class=sd-fine>' + plan.moves + ' move' + (plan.moves === 1 ? "" : "s") + ' in one signature, then 21 days in place.</div>';
+        '<div class=sd-fine>' + plan.moves + ' move' + (plan.moves === 1 ? "" : "s") + ' in one signature</div>';
     }
     var op = put("sd-move", h); op.classList.toggle("fill", h.indexOf("sv-none") >= 0);
 
