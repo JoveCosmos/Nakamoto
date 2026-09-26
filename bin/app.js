@@ -3022,8 +3022,12 @@ rememberGridH();
         if(window.__onPos){ var f2 = window.__onPos; window.__onPos = null; f2(); }
         if(!window.__POS){ window.__ADDR = null; window.__DELS = null; window.__REDS = null; }
         busy(false);
+        /* a failure inside the page's own drawing surfaces here too: the console keeps the whole
+           trace, and dev names the frame in the notice itself so it can be reported as seen */
+        if(window.console) console.error("position read failed", e);
+        var at = /^(dev-|127\.|localhost)/.test(location.hostname) && e && e.stack ? " at " + String(e.stack).split("\n").slice(1, 2).join("").trim().replace(/^at /, "").slice(0, 120) : "";
         failed(e && e.message === "Request rejected" ? "Rejected in the wallet."
-               : "Could not read the position (" + (e && e.message || "error") + ").");
+               : "Could not read the position (" + (e && e.message || "error") + ")" + at + ".");
       });
   }
 
