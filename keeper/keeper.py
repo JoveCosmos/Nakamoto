@@ -140,6 +140,12 @@ def grants():
     return out
 
 # ── restake ────────────────────────────────────────────────────────────────
+LEDGER = os.environ.get("KEEPER_LEDGER", "/srv/atomone-app/state/grants-mainnet.json")
+def paused():
+    """delegators the operator paused in the admin console (grantwatch's ledger)"""
+    try: return {k for k, v in json.load(open(LEDGER)).get("grants", {}).items() if v.get("paused")}
+    except Exception: return set()
+
 def restake_grants():
     """granter -> what they let us do with rewards: claim (a GenericAuthorization for
     MsgWithdrawDelegatorReward), stake (StakeAuthorization DELEGATE: allow-list, what is left
@@ -437,6 +443,8 @@ def once(c, only=None, live=None, force=False):
     log("grants=%d dry=%s eta=%.3f%s" % (len(gs), dry, eta, " only=" + only if only else ""))
     for g in gs:
         try:
+            if g["granter"] in paused():
+                log("granter=%s paused in the admin console: skipped" % g["granter"]); continue
             name = preset_of(g["granter"]); P = PRESETS[name]
             last = c.execute("SELECT max(at) FROM run_g WHERE granter=?", (g["granter"],)).fetchone()[0] or 0
             if not force and time.time() - last < P["every"]:
