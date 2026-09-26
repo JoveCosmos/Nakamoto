@@ -103,19 +103,24 @@
 
   /* ── the set, once: the figures every screen quotes ── */
   function setStats(){
-    var V = VALS(), D = DD(), rs = [], i, up = 0, upn = 0, u9 = 0, u9n = 0, lf = 0, lfn = 0, clean = 0;
+    var V = VALS(), D = DD(), rs = [], i, up = 0, upn = 0, u9 = 0, u9n = 0, lf = 0, lfn = 0, clean = 0, c30 = 0, c90 = 0;
+    /* never jailed within a span: the validator's latest jailing (last_slash, a date) is older */
+    var ago = function(n){ return new Date(Date.now() - n * 86400000).toISOString().slice(0, 10); }, a30 = ago(30), a90 = ago(90);
     for(i = 0; i < V.length; i++){
       rs.push(rate0(V[i][1], V[i][2]));
       var d = window.__VDBY && window.__VDBY[V[i][3]];
       if(d && d.d30 != null){ up += +d.d30; upn++; }
       if(d && d.d90 != null){ u9 += +d.d90; u9n++; }
       if(d && d.life_up != null){ lf += +d.life_up; lfn++; }
+      var ls = (d && d.last_slash) || "";
+      if(!V[i][4] || ls < a30) c30++;
+      if(!V[i][4] || ls < a90) c90++;
       if(!V[i][4]) clean++;
     }
     var s = rs.slice().sort(function(a, b){ return a - b; });
     return { lo: s[0] || 0, hi: s[s.length - 1] || 0, mid: s.length ? s[(s.length - 1) >> 1] : 0,
              n: V.length, up: upn ? up / upn : null, up90: u9n ? u9 / u9n : null, life: lfn ? lf / lfn : null,
-             clean: clean, set: D.set || {} };
+             clean: clean, clean30: c30, clean90: c90, set: D.set || {} };
   }
 
   /* ── OVERVIEW ───────────────────────────────────────────────────────────── */
@@ -377,12 +382,12 @@
   /* the chain's governance at a glance: how many proposals, what is open or how the last ended
      (read once a visit from the chain's API; a proposal takes weeks) */
   function drawNet(){
-    var S = setStats(), f = function(v){ return v != null ? v.toFixed(2) + "%" : "—"; }, g = (DD().coverage || {}).from_date;
+    var S = setStats(), f = function(v){ return v != null ? v.toFixed(2) + "%" : "—"; };
     /* the set's uptime over three spans: each is the average of the validators' own records */
     put("sv-netcards",
-      card("Uptime, 30 days", f(S.up), "validator set average, " + S.clean + " never jailed") +
-      card("Uptime, 90 days", f(S.up90), "validator set average") +
-      card("Uptime since genesis", f(S.life), "each validator since it joined" + (g ? ", from " + g : "")));
+      card("30 days", f(S.up), "validator set average, " + S.clean30 + " never jailed") +
+      card("90 days", f(S.up90), "validator set average, " + S.clean90 + " never jailed") +
+      card("Since genesis", f(S.life), "validator set average, " + S.clean + " never jailed"));
 
     drawUp(S);
   }
