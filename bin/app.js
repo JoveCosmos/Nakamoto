@@ -328,8 +328,7 @@ function fields(e){
      figure - and a heat fill behind it just repeats Map in a second place. */
   var heat = MODE === "color";
   /* the halt marker is live math, never the slider's hypothetical set */
-  /* testnet: no halting-set outline on the map (the operator's call); the count is in the Bonus card */
-  HALT = (D.net || {}).net === "testnet" ? 0 : haltCount(VALS.map(function(v){ return v[1]; }));
+  HALT = haltCount(VALS.map(function(v){ return v[1]; }));
   /* In graph mode the 100-cell grid is display:none, and rebuilding its markup
      anyway is what made the Graph button feel slow - a hundred cells parsed on
      every switch for something nobody can see. The APR band below it is still
@@ -343,8 +342,10 @@ function fields(e){
   }
   E("g2").classList.toggle("flat", !heat);
   var g2h = VALS.map(function(v,i){
-    var u = byStake ? Math.pow(T[i]/maxT, .55)
-                    : (rb[1] ? .08 + .92*Math.pow(Math.max(0, Math.min(1, (ys[i]-rb[0])/rb[1])), .55) : .5);
+    var u = byStake ? .93 * Math.pow(T[i]/maxT, .55)
+                    : (rb[1] ? .08 + .85*Math.pow(Math.max(0, Math.min(1, (ys[i]-rb[0])/rb[1])), .55) : .5);
+    /* .93 at most: the ramp's last stretch fades to a near-white cream, and a cell there read as
+       unstyled - most of all a lone outlier (testnet: one validator at 166.7% against ~143%) */
     /* .08 floor: the three largest sit at or under the 2nd-percentile clip and
        were painted the ramp's black end - invisible on the frame */
     var flat = heat ? ((sp < 1e-9) ? EVEN : null) : NEUT;
@@ -857,7 +858,9 @@ rememberGridH();
   if(!SC || !SC.length) return;
   var sm = window.innerWidth < 620;
   var W=sm?460:900, H=300, PL=sm?40:58, PR=sm?14:26, PT=sm?22:30, PB=sm?36:48;
-  var lo=0, hi=Math.max(ES.cap*0.22, Math.max.apply(null,SC.map(function(r){return r.eta;}))*1.9);
+  /* a week whose eta is not known (the rule could not be replayed onto the live value:
+     testnet, or a history this page cannot reproduce) has eta null - no point, no line */
+  var lo=0, hi=Math.max(ES.cap*0.22, Math.max.apply(null,SC.filter(function(r){return r.eta!=null;}).map(function(r){return r.eta;}))*1.9);
   var X=function(i){return PL+i/(SC.length-1)*(W-PL-PR);};
   var Y=function(v){return PT+(1-(v-lo)/(hi-lo))*(H-PT-PB);};
   var nowI=0; SC.forEach(function(r,i){ if(r.now) nowI=i; });
@@ -871,14 +874,18 @@ rememberGridH();
   /* past solid, future dashed - projections must not look like history */
   var dp="",df="";
   SC.forEach(function(r,i){
+    if(r.eta==null) return;
     var pt=X(i).toFixed(1)+" "+Y(r.eta).toFixed(1);
     if(i<=nowI) dp+=(dp?"L":"M")+pt;
     if(i>=nowI) df+=(df?"L":"M")+pt; });
+  if(SC.some(function(r){ return r.eta==null; }))
+    s+='<text x="'+((PL+X(nowI))/2).toFixed(1)+'" y="'+(Y(ES.floor)-40)+'" text-anchor="middle" font-size="12" fill="#8f8db4">past weeks N/A: the step rule cannot be replayed onto the live value here</text>';
   s+='<path d="'+df+'" fill="none" stroke="#6f6d94" stroke-width="2" stroke-dasharray="5 4"/>';
   s+='<path d="'+dp+'" fill="none" stroke="#ffb02e" stroke-width="3"/>';
   s+='<line x1="'+X(nowI)+'" y1="'+PT+'" x2="'+X(nowI)+'" y2="'+(H-PB)+'" stroke="#ff4d1f" stroke-width="1.5"/>';
   s+='<text x="'+(X(nowI)+9)+'" y="'+(PT+15)+'" font-size="11.5" fill="#ff4d1f">TODAY</text>';
   SC.forEach(function(r,i){
+    if(r.eta==null){ if(i%2===0) s+='<text x="'+X(i).toFixed(1)+'" y="'+(H-PB+21)+'" text-anchor="middle" font-size="10" fill="#6f6d94">'+r.date.split(" ")[0]+'</text>'; return; }
     s+='<circle class="etapt" data-i="'+i+'" cx="'+X(i).toFixed(1)+'" cy="'+Y(r.eta).toFixed(1)+
        '" r="'+(r.now?6:4)+'" fill="'+(r.now?"#ff4d1f":i<nowI?"#ffb02e":"#6f6d94")+
        '" stroke="#06060c" stroke-width="1.5" style="cursor:pointer"><title>week '+r.week+
@@ -893,11 +900,12 @@ rememberGridH();
   function show(i){
     var r=SC[i];
     E("popw").textContent=r.week;
-    E("pope").textContent=r.eta.toFixed(2);
+    var k=r.eta!=null;
+    E("pope").textContent=k?r.eta.toFixed(2):"N/A";
     E("popd").textContent=r.date;
-    E("popp").textContent=(r.eta*100).toFixed(0)+"%";
-    E("popb").textContent=((1-r.eta)*100).toFixed(0)+"%";
-    E("popf").textContent=f(R*r.eta/N/1e6)+" ATONE / yr";
+    E("popp").textContent=k?(r.eta*100).toFixed(0)+"%":"N/A";
+    E("popb").textContent=k?((1-r.eta)*100).toFixed(0)+"%":"N/A";
+    E("popf").textContent=k?f(R*r.eta/N/1e6)+" ATONE / yr":"N/A";
     /* the exact block the epoch opened on, from our own index - blank for the
        weeks the chain has not reached yet */
     E("popbk").textContent = r.height ? f(r.height) : "\u2014";

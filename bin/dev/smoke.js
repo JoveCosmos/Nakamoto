@@ -63,7 +63,6 @@ t('halt-fixed', function(){
   var cr=document.getElementById('concr'), n=[];
   [299,100].forEach(function(c){ cr.value=c; cr.dispatchEvent(new Event('input',{bubbles:true})); n.push(document.querySelectorAll('#g2 .cell.halt').length); });
   window.__resetLive(); n.push(document.querySelectorAll('#g2 .cell.halt').length);
-  if(TESTNET) return (n[0]===0 && n[1]===0 && n[2]===0) || 'testnet shows a halting outline: '+n.join('/');   /* none there, by the operator's call */
   return (n[0]>0 && n[0]===n[1] && n[1]===n[2]) || 'halt moved with the set: '+n.join('/');
 });
 t('whatif-reset', function(){

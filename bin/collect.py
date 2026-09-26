@@ -270,10 +270,43 @@ _tmp = CHIST + ".tmp"
 json.dump(chist, open(_tmp, "w"))
 os.replace(_tmp, CHIST)
 
-# the reconstruction must land on the live coefficient, or the anchor has drifted
-recon = next((s["eta"] for s in sched if s["now"]), None)
-if not TESTNET and (recon is None or abs(recon - coef) > 1e-9):
-    die(f"schedule reconstruction {recon} != live coefficient {coef} - epoch anchor drifted")
+# ── eta by the chain's rule, not by an assumption that it only rises ─────────
+# Each weekly epoch the coefficient steps UP one step if the bonded concentration measured at
+# that epoch is at least 3x, DOWN one step below it, held between the floor and the cap.
+#  past:   replayed from the floor at week 1 through each week's measured concentration; kept
+#          only if the replay lands exactly on the live coefficient - otherwise the past is not
+#          known (None, the page says N/A) and only today stands. The straight climb (every week
+#          up) is tried when a week's concentration is missing, under the same check.
+#  today:  the live coefficient.
+#  future: from today, in today's direction (rising = ratio >= 3), to the floor or the cap -
+#          a projection that holds while concentration stays on its side of 3x.
+_lo, _hi, _st = float(nb["minimum_coefficient"]), float(nb["maximum_coefficient"]), float(nb["step"])
+_clamp = lambda x: round(min(_hi, max(_lo, x)), 4)
+_past = [r for r in sched if r["past"]]
+def _replay(use_c):
+    e, out = _lo, []
+    for i, r in enumerate(_past + [next(r for r in sched if r["now"])]):
+        if i:
+            c = r["c"] if use_c else 9.9
+            if c is None: return None
+            e = _clamp(e + (_st if c >= 3.0 else -_st))
+        out.append(e)
+    return out
+past_known = False
+for _use_c in (True, False):
+    _seq = _replay(_use_c)
+    if _seq and abs(_seq[-1] - coef) < 1e-9:
+        for r, e in zip(_past, _seq[:-1]): r["eta"], r["pct"] = e, round(e * 100, 1)
+        past_known = True
+        break
+if not past_known:
+    for r in _past: r["eta"], r["pct"] = None, None
+    print(f"atomone-app: eta history not reproducible from the rule (live {coef}); past shown as N/A", file=sys.stderr)
+_e = coef
+for r in sched:
+    if r["now"]: r["eta"], r["pct"] = coef, round(coef * 100, 1)
+    elif not r["past"]:
+        _e = _clamp(_e + (_st if ratio >= 3.0 else -_st)); r["eta"], r["pct"] = _e, round(_e * 100, 1)
 
 # ── decentralisation, from OUR index (proposals, not stake) ───────────────────
 rows = sql(f"""
@@ -756,12 +789,16 @@ out = {
   # assumption baked into the page.
   "eta_stats": {"floor": float(nb["minimum_coefficient"]),
                 "cap": float(nb["maximum_coefficient"]),
-                "highest": max(r["eta"] for r in sched if not (r["next"] or r["week"] > week)),
+                "highest": max(r["eta"] for r in sched if r["eta"] is not None and not (r["next"] or r["week"] > week)),
                 "highest_week": week,
                 "today": datetime.now(timezone.utc).strftime("%b %-d"),
-                "weeks_to_cap": int(round((float(nb["maximum_coefficient"]) - coef)
-                                          / float(nb["step"]))) if float(nb["step"]) else None,
-                "monotonic_so_far": True},
+                # only while rising: below 3x the coefficient heads for the floor, not the cap
+                "weeks_to_cap": (int(round((float(nb["maximum_coefficient"]) - coef) / float(nb["step"])))
+                                 if float(nb["step"]) and ratio >= 3.0 else None),
+                "weeks_to_floor": (int(round((coef - float(nb["minimum_coefficient"])) / float(nb["step"])))
+                                   if float(nb["step"]) and ratio < 3.0 else None),
+                "rising": ratio >= 3.0, "past_known": past_known,
+                "monotonic_so_far": past_known},
   "p24": p24, "act7": act7, "txday": txday, "b10k": b10k, "econ": econ, "prices": prices,
   # every block the index holds a proposer for, and how many validators ever proposed one
   "prop_all": {"blocks": sum(prop.values()), "proposers": len(prop)},

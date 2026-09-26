@@ -4273,7 +4273,7 @@ html[data-tab=connect] .l2host{display:none}
   <section class=pane id=p-eta><div class=pw>
     <div class=duo2>
       <div class=panel><div class=ptitle>Projection</div>
-<p class=sub>&eta; steps +{{STEP}} every week: up while the BONDED ATONE <b class=hotc>concentration</b> stays &ge; {{THRESH}}&times;.</p>
+<p class=sub>&eta; steps {{STEP}} every week: up while the BONDED ATONE <b class=hotc>concentration</b> is &ge; {{THRESH}}&times;, down below it. {{STEPLINE}}.</p>
     <svg id=etacurve viewBox="0 0 900 300" role=img
       aria-label="&eta; from the floor to today and projected forward"></svg>
     <div class=sbox>
@@ -4281,12 +4281,12 @@ html[data-tab=connect] .l2host{display:none}
       <button class=sgo id=sgohist type=button aria-label="Every weekly step so far"><div class=k>today</div><div
         class=v style="color:var(--hot)">{{ETA}}</div>
         <div class=s>{{WEEK}} weeks <span class=sgoarr>&rarr;</span></div></button>
-      <div><div class=k>cap</div><div class=v>{{CAP}}</div><div class=s>{{W2CAP}} weeks, ~{{Y2CAP}} yr</div></div>
+      <div><div class=k>cap</div><div class=v>{{CAP}}</div><div class=s>{{CAPSUB}}</div></div>
       <div><div class=k>next</div><div class=v>{{ETA_NEXT}}</div><div class=s>{{NEXT_DATE}}</div></div>
     </div>
-    <p class=note>Dates are the chain's own weekly epoch. &eta; values are the step rule applied to
-    the floor &mdash; and the collector refuses to publish unless that lands exactly on the live
-    coefficient, so a drifted anchor stops the page rather than inventing a history.</p>
+    <p class=note>Dates are the chain's own weekly epoch. Past &eta; is the step rule replayed from the floor through
+    each week's measured concentration, shown only when it lands exactly on the live coefficient; the projection
+    follows today's concentration, up while it is &ge; 3&times; and down below, until the cap or the floor.</p>
       </div>
       <div class=panel><div class=ptitle>Effect</div>
 <p class=sub>{{T10LINE}}</p>
@@ -4486,7 +4486,7 @@ html[data-tab=connect] .l2host{display:none}
   </div>
   <div class=vgrid>
     <div class="vstat hot"><span class=vk>concentration</span><span class=vv>{{RATIO}}&times;</span></div>
-    <div class=vstat><span class=vk><span class=lc>&eta;</span> reverses when</span><span class=vv>&lt; {{THRESH}}&times;</span></div>
+    <div class=vstat><span class=vk><span class=lc>&eta;</span> reverses when</span><span class=vv>{{REV_WHEN}}</span></div>
     <div class=vstat><span class=vk>validators</span><span class=vv>{{N}}</span></div>
     <div class=vstat><span class=vk>could halt chain</span><span class=vv><b class=haltn>{{NK}}</b></span></div>
     <div class="vstat vfull rdg">
@@ -4526,7 +4526,7 @@ html[data-tab=connect] .l2host{display:none}
     <div class=vstat><span class=vk>step / week</span><span class=vv>&plusmn; {{STEP}}</span></div>
     <button class="vstat sgo" id=histgo type=button aria-label="Every weekly step so far"><span class=vk>weeks</span><span class=vv>{{WEEK}} <span class=sgoarr>&rarr;</span></span></button>
     <div class=vstat><span class=vk>floor</span><span class=vv>{{FLOOR}}<i class=pdate>started here</i></span></div>
-    <div class=vstat><span class=vk>cap</span><span class=vv>{{CAP}}<i class=pdate>{{W2CAP}} weeks</i></span></div>
+    <div class=vstat><span class=vk>cap</span><span class=vv>{{CAP}}<i class=pdate>{{CAPSUB2}}</i></span></div>
     <div class=cgate id=cgate role=button tabindex=0
       aria-label="What concentration is, and where it stands">
       <div class="vstat {{RISE_ON}}"><span class=vk><span class=lc>&eta;</span> rises when</span><span class=vv>C &ge; {{THRESH}}&times;</span></div>

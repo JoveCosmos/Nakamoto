@@ -72,15 +72,26 @@ if TESTNET:
     speedup, speedup_sub = "N/A", "not indexed on testnet"
     mv_top = mv_small = mv_new = mv_grew = mv_wk = "N/A"
 
+def _eta_attr(r): return f"{r['eta']:.2f}" if r["eta"] is not None else ""
+def _eta_cell(r): return f"{r['eta']:.2f}" if r["eta"] is not None else "<span class=dim>N/A</span>"
+def _pct_cell(r): return f"{r['pct']:.0f}%" if r["pct"] is not None else "<span class=dim>N/A</span>"
 es = D["eta_stats"]
+# the direction today's concentration sets: toward the cap while C >= 3x, toward the floor below
+_w2c, _w2f = es.get("weeks_to_cap"), es.get("weeks_to_floor")
+if _w2c is not None:
+    CAPSUB, CAPSUB2 = f"{_w2c} weeks, ~{_w2c/52:.1f} yr", f"{_w2c} weeks"
+else:
+    CAPSUB = "not while it falls" if _w2f else "at the floor: not while C &lt; 3&times;"
+    CAPSUB2 = "not while falling"
+STEPLINE = ("Rising now" if th["rising"] else "Falling now" if (_w2f or 0) > 0 else "Held at the floor now") + f" ({th['ratio']:.2f}&times;)"
 sched = "".join(
     f"<tr class='wk {'now' if r['now'] else 'next' if r['next'] else 'past' if r['past'] else 'fut'}'"
-    f" tabindex=0 role=button data-w='{r['week']}' data-d='{esc(r['iso'])}' data-e='{r['eta']:.2f}'"
+    f" tabindex=0 role=button data-w='{r['week']}' data-d='{esc(r['iso'])}' data-e='{_eta_attr(r)}'"
     f" data-s='{'now' if r['now'] else 'next' if r['next'] else 'past' if r['past'] else 'projected'}'>"
     f"<td>{r['week']}</td><td class=hdt>{esc(r['date'])}"
     f"{'<span class=tag-n>NOW</span>' if r['now'] else '<span class=tag-x>NEXT</span>' if r['next'] else ''}"
-    f"</td><td>{r['eta']:.2f}</td><td>{r['pct']:.0f}%</td>"
-    f"<td class=hc>{f'{r[chr(99)]:.2f}&times;' if r['c'] is not None else '&mdash;'}</td>"
+    f"</td><td>{_eta_cell(r)}</td><td>{_pct_cell(r)}</td>"
+    f"<td class=hc>{f'{r[chr(99)]:.2f}&times;' if r['c'] is not None else ('N/A' if TESTNET and r['past'] else '&mdash;')}</td>"
     f"</tr>" for r in D["schedule"])
 
 trend_rows = "".join(
@@ -198,7 +209,7 @@ page = (TPL
   .replace("{{GENERATED}}", D["generated"]).replace("{{HEIGHT}}", f(D["height"]))
   .replace("{{CHAIN}}", esc(D["chain"]))
   .replace("{{ETA}}", f"{e['now']:.2f}").replace("{{ETA_PCT}}", f"{e['now']*100:.0f}")
-  .replace("{{ETA_NEXT}}", f"{min(e['now']+e['step'], e['max']):.2f}")
+  .replace("{{ETA_NEXT}}", f"{next((r['eta'] for r in D['schedule'] if r['next']), e['now']):.2f}")
   .replace("{{NOW_DATE}}", next((r["date"] for r in D["schedule"] if r["now"]), "—"))
   .replace("{{RATE_AFTER}}", f"{nk['rate_after']:+.2f}" if nk["rate_after"] is not None else ("N/A" if TESTNET else "—"))
   .replace("{{N_AFTER}}", str(nk["n_after"]))
@@ -241,9 +252,11 @@ page = (TPL
   .replace("{{AFTER_BLOCK}}", after).replace("{{RATE_LINE}}", rate_line)
   .replace("{{FLOOR}}", f"{es['floor']:.2f}").replace("{{CAP}}", f"{es['cap']:.2f}")
   .replace("{{HIGHEST}}", f"{es['highest']:.2f}").replace("{{HIGHEST_WK}}", str(es['highest_week']))
+  .replace("{{CAPSUB}}", CAPSUB).replace("{{CAPSUB2}}", CAPSUB2).replace("{{STEPLINE}}", STEPLINE)
+  .replace("{{REV_WHEN}}", ("&lt; " if th["rising"] else "&ge; ") + f"{th['threshold']:.2f}&times;")
   .replace("{{W2CAP}}", str(es['weeks_to_cap'])).replace("{{TODAY}}", esc(es["today"]))
   .replace("{{START_DATE}}", esc(D["schedule"][0]["date"]) if D.get("schedule") else "\u2014")
-  .replace("{{Y2CAP}}", f"{es['weeks_to_cap']/52:.1f}")
+  .replace("{{Y2CAP}}", f"{es['weeks_to_cap']/52:.1f}" if es.get("weeks_to_cap") is not None else "N/A")
   .replace("{{T10LINE}}", esc(t10_line))
   .replace("{{SPEEDUP}}", speedup).replace("{{SPEEDUP_K}}", speedup_k)
   .replace("{{SPEEDUP_SUB}}", esc(speedup_sub))
