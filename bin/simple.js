@@ -165,7 +165,7 @@
           '<div class="sv-boxes two">' + box("now", "Your APR", '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>', "what your stake earns now", "--bc:" + heat(pos.rate).fill) +
             box("hi", "Best in the set", '<span style="color:' + heat(S.hi).ink + '">' + pct(S.hi) + '</span>', "the highest APR any validator pays", "--bc:" + heat(S.hi).fill) +
             box("stk", "Can move", fmt(pos.free), "ATONE free to redelegate") + box("tot", "Validators", String(pos.rows.length), "holding your stake") + '</div>' +
-          '<div class=sv-note>Your stake already earns as much as the set can pay it today. This screen re-reads the chain every block and will say so when that changes.</div>';
+          '<div class=sv-note>Your stake already earns as much as the set can pay it today. This window re-reads the chain every block and will say so when that changes.</div>';
     } else {
       /* now -> after -> a year: the stake as it earns today, where the plan puts it, and what
          that is worth - each side drawn in the colours the map gives it */
