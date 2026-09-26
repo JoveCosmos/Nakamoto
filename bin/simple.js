@@ -548,7 +548,7 @@
       st("Total blocks", Number(src[src.length - 1][0] + 1).toLocaleString(), (DD().coverage || {}).from_date ? "since " + DD().coverage.from_date : "since genesis") +
     '</div></div>' +
     '<div class=sv-pace><span class=sv-pavg style="bottom:' + (avg / top * 100).toFixed(1) + '%"><b>' + avg.toFixed(1) + ' s</b></span>' +
-      iv.map(function(x){ return '<i class="' + (x.s > avg * 1.5 ? "slow" : "") + '" style="--h:' + Math.max(4, x.s / top * 100).toFixed(1) + '%" title="block ' + x.h.toLocaleString() + ': ' + x.s.toFixed(2) + ' s"></i>'; }).join("") +
+      iv.map(function(x){ return '<i class="' + (x.s > avg * 1.5 ? "slow" : "") + '" style="--h:' + Math.max(4, x.s / top * 100).toFixed(1) + '%" data-t="block ' + x.h.toLocaleString() + ': ' + x.s.toFixed(2) + ' s"></i>'; }).join("") +
     '</div>';
     put("sv-pace", h);
   }
@@ -645,55 +645,133 @@
           '<u>' + (got ? (x.c / got * 100).toFixed(2) + "%" : "—") + '</u></div>'; }).join("") + '</div>');
   }
 
-  /* ── Activity: transactions per hour for a week (the indexer), and per block, live ── */
+  /* ── Activity: transactions per hour over the last 24 hours, or per day since genesis (a line),
+     from the indexer; and per block, live ── */
+  var AW = (function(){ try{ return localStorage.getItem("th_aw") === "all" ? "all" : "24h"; }catch(e){ return "24h"; } })();
+  var BW = (function(){ try{ var v = localStorage.getItem("th_bw"); return v === "24h" || v === "all" ? v : "100"; }catch(e){ return "100"; } })();
   function drawAct(){
-    var D = DD(), a7 = D.act7 || null, rows = upRows().filter(live), tx = 0, fee = 0, gas = 0;
+    var D = DD(), a24 = D.act7 ? D.act7.slice(-24) : null, td = D.txday || null, rows = upRows().filter(live), tx = 0, fee = 0, gas = 0;
     rows.forEach(function(r){ tx += r[6]; if(r[8] > 0) fee += r[8]; if(r[7] > 0) gas += r[7]; });
-    var wk = 0, hrs = a7 ? a7.length : 0, top = null;
-    if(a7) a7.forEach(function(x){ wk += x[1]; if(!top || x[1] > top[1]) top = x; });
     var when = function(ts){ var d = new Date(ts * 1000); return DAYN[d.getDay()] + " " + String(d.getHours()).padStart(2, "0") + ":00"; };
-    var bl7 = 0; if(a7) a7.forEach(function(x){ bl7 += x[2]; });
-    var s7 = '<div class=sv-rt>' + st("Transactions", a7 ? wk.toLocaleString() : "—", a7 ? "about " + Math.round(wk / Math.max(1, hrs)) + " an hour" : "") +
-      st("Busiest hour", top ? top[1].toLocaleString() : "—", top ? when(top[0]) : "") +
-      st("Per block", a7 && bl7 ? (wk / bl7).toFixed(2) : "—", a7 ? "average over " + bl7.toLocaleString() + " blocks" : "") + '</div>';
-    var sl = '<div class=sv-rt>' + st("Transactions", rows.length ? tx.toLocaleString() : "—", rows.length ? "last " + rows.length + " blocks" : "", "var(--sv-violet)") +
-      st("Gas used", rows.length ? (gas / 1e6).toFixed(1) + "M" : "—", rows.length ? "of " + (rows.length * 100).toLocaleString() + "M the blocks could hold" : "", "var(--sv-violet)") +
-      st("Fees paid", rows.length ? (fee / 1e6).toFixed(2) + " PHOTON" : "—", rows.length ? "last " + rows.length + " blocks" : "", "var(--sv-pho)") + '</div>';
-    if(a7 && a7.length){
-      var m7 = Math.max(1, Math.max.apply(null, a7.map(function(x){ return x[1]; }))), days = "";
-      a7.forEach(function(x, i){ var d = new Date(x[0] * 1000); if(d.getHours() === 0) days += '<span style="left:' + (i / a7.length * 100).toFixed(2) + '%">' + DAYN[d.getDay()] + " " + d.getDate() + '</span>'; });
-      put("sv-act7", '<div class=sv-ph><h3>Transactions per hour</h3><span class=sv-gkey>last 7 days</span>' + s7 + '</div>' +
-        '<div class=sv-bars>' + a7.map(function(x){ return '<i style="--h:' + Math.max(1.5, x[1] / m7 * 100).toFixed(1) + '%" title="' + when(x[0]) + ": " + x[1] + ' transactions"></i>'; }).join("") + '</div>' +
-        '<div class=sv-bx>' + days + '</div>');
-    } else put("sv-act7", '<div class=sv-ph><h3>Transactions per hour</h3>' + s7 + '</div><div class=sv-upwait>Reading the last 7 days…</div>');
-    if(rows.length){
-      var mb = Math.max(1, Math.max.apply(null, rows.map(function(r){ return r[6]; })));
-      put("sv-actlive", '<div class=sv-ph><h3>Transactions per block</h3><span class=sv-gkey>last ' + rows.length + ' blocks</span>' + sl + '</div>' +
-        '<div class="sv-bars live">' + rows.map(function(r){ return '<i class="' + (r[6] ? "" : "z") + '" style="--h:' + (r[6] ? Math.max(6, r[6] / mb * 100) : 3).toFixed(1) + '%" title="block ' + Number(r[0] + 1).toLocaleString() + ": " + r[6] + " transaction" + (r[6] === 1 ? "" : "s") +
-          (r[6] ? ", " + (r[7] >= 0 ? r[7].toLocaleString() + " gas, " + (r[8] / 1e6).toFixed(3) + " PHOTON" : "gas unknown") : "") + '"></i>'; }).join("") + '</div>' +
-        '<div class=sv-gx><span>&larr; older, block ' + Number(rows[0][0] + 1).toLocaleString() + '</span><span>now, block ' + Number(rows[rows.length - 1][0] + 1).toLocaleString() + ' &rarr;</span></div>');
-    } else put("sv-actlive", '<div class=sv-ph><h3>Transactions per block</h3>' + sl + '</div><div class=sv-upwait>Waiting for the live feed…</div>');
+    var dl = function(s){ return new Date(s + "T00:00:00Z").toLocaleDateString("en", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }); };
+    var all = AW === "all", tot = 0, bl = 0, top = null, stats, body;
+    var sw = '<span class=sv-sw role=group aria-label="Period">' +
+      '<button type=button data-act=awin data-w=24h aria-pressed=' + !all + '>24 hours</button><button type=button data-act=awin data-w=all aria-pressed=' + all + '>Since genesis</button></span>';
+    if(all){
+      if(td) td.forEach(function(x){ tot += x[1]; bl += x[2]; if(!top || x[1] > top[1]) top = x; });
+      var since = (D.coverage || {}).from_date;
+      stats = '<div class=sv-rt>' + st("Transactions", td ? tot.toLocaleString() : "—", since ? "since " + since : "since genesis") +
+        st("Busiest day", top ? top[1].toLocaleString() : "—", top ? dl(top[0]) : "") +
+        st("Per block", td && bl ? (tot / bl).toFixed(2) : "—", td ? "average over " + bl.toLocaleString() + " blocks" : "") + '</div>';
+      body = td && td.length > 1 ? chart("txday", td.map(function(x){ return { d: x[0], tx: x[1] }; }), [{ k: "tx", cls: "txl", area: true, name: "" }],
+          function(v){ return v <= 0 ? "0" : v >= 1000 ? Math.round(v / 1000) + "k" : String(Math.round(v)); },
+          function(v){ return Math.round(v).toLocaleString() + " transactions"; })
+        : '<div class=sv-upwait>Reading the history…</div>';
+    } else {
+      if(a24) a24.forEach(function(x){ tot += x[1]; bl += x[2]; if(!top || x[1] > top[1]) top = x; });
+      stats = '<div class=sv-rt>' + st("Transactions", a24 ? tot.toLocaleString() : "—", a24 ? "about " + Math.round(tot / Math.max(1, a24.length)) + " an hour" : "") +
+        st("Busiest hour", top ? top[1].toLocaleString() : "—", top ? when(top[0]) : "") +
+        st("Per block", a24 && bl ? (tot / bl).toFixed(2) : "—", a24 ? "average over " + bl.toLocaleString() + " blocks" : "") + '</div>';
+      if(a24 && a24.length){
+        var m = Math.max(1, Math.max.apply(null, a24.map(function(x){ return x[1]; }))), ticks = "";
+        a24.forEach(function(x, i){ var d = new Date(x[0] * 1000); if(d.getHours() % 6 === 0) ticks += '<span style="left:' + (i / a24.length * 100).toFixed(2) + '%">' + (d.getHours() ? String(d.getHours()).padStart(2, "0") + ":00" : DAYN[d.getDay()] + " " + d.getDate()) + '</span>'; });
+        body = '<div class="sv-bars hr">' + bscale(m, function(v){ return String(Math.round(v)); }) + a24.map(function(x){ return '<i style="--h:' + Math.max(1.5, x[1] / m * 100).toFixed(1) + '%" data-t="' + when(x[0]) + ": " + x[1] + ' transactions"></i>'; }).join("") + '</div><div class=sv-bx>' + ticks + '</div>';
+      } else body = '<div class=sv-upwait>Reading the last 24 hours…</div>';
+    }
+    put("sv-act7", '<div class=sv-ph><h3>Transactions</h3>' + sw + '<span class=sv-gkey>' + (all ? "per day" : "per hour") + '</span>' + stats + '</div>' + body);
+    /* per block: the last 100 blocks live (with gas and fees), or the average per hour over 24 hours,
+       or per day since genesis (a line) - the indexer keeps transactions, not gas or fees */
+    var bw = BW, sb = '<span class=sv-sw role=group aria-label="Period">' + [["100", "Last 100 blocks"], ["24h", "24 hours"], ["all", "Since genesis"]].map(function(o){
+      return '<button type=button data-act=bwin data-w=' + o[0] + ' aria-pressed=' + (bw === o[0]) + '>' + o[1] + '</button>'; }).join("") + '</span>';
+    var hb = function(k){ return '<div class=sv-ph><h3>Transactions per block</h3>' + sb + k + '</div>'; }, sl, lb;
+    if(bw === "100"){
+      sl = '<div class=sv-rt>' + st("Transactions", rows.length ? tx.toLocaleString() : "—", rows.length ? "last " + rows.length + " blocks" : "", "var(--sv-violet)") +
+        st("Gas used", rows.length ? (gas / 1e6).toFixed(1) + "M" : "—", rows.length ? "of " + (rows.length * 100).toLocaleString() + "M capacity" : "", "var(--sv-violet)") +
+        st("Fees paid", rows.length ? (fee / 1e6).toFixed(2) + " PHOTON" : "—", rows.length ? "last " + rows.length + " blocks" : "", "var(--sv-pho)") + '</div>';
+      if(rows.length){
+        var mb = Math.max(1, Math.max.apply(null, rows.map(function(r){ return r[6]; })));
+        lb = '<div class="sv-bars live">' + bscale(mb, function(v){ return String(Math.round(v)); }) + rows.map(function(r){ return '<i class="' + (r[6] ? "" : "z") + '" style="--h:' + (r[6] ? Math.max(6, r[6] / mb * 100) : 3).toFixed(1) + '%" data-t="block ' + Number(r[0] + 1).toLocaleString() + ": " + r[6] + " transaction" + (r[6] === 1 ? "" : "s") +
+            (r[6] ? ", " + (r[7] >= 0 ? r[7].toLocaleString() + " gas, " + (r[8] / 1e6).toFixed(3) + " PHOTON" : "gas unknown") : "") + '"></i>'; }).join("") + '</div>' +
+          '<div class=sv-gx><span>&larr; older, block ' + Number(rows[0][0] + 1).toLocaleString() + '</span><span>now, block ' + Number(rows[rows.length - 1][0] + 1).toLocaleString() + ' &rarr;</span></div>';
+      } else lb = '<div class=sv-upwait>Waiting for the live feed…</div>';
+    } else {
+      var src = bw === "24h" ? (a24 || []).map(function(x){ return { k: x[0], t: x[1], b: x[2] }; }) : (td || []).map(function(x){ return { k: x[0], t: x[1], b: x[2] }; });
+      var T = 0, B = 0, pk = null; src.forEach(function(x){ T += x.t; B += x.b; var r = x.b ? x.t / x.b : 0; if(!pk || r > pk.r) pk = { k: x.k, r: r }; });
+      sl = '<div class=sv-rt>' + st("Per block", B ? (T / B).toFixed(2) : "—", bw === "24h" ? "last 24 hours" : "since genesis", "var(--sv-violet)") +
+        st(bw === "24h" ? "Busiest hour" : "Busiest day", pk ? pk.r.toFixed(2) : "—", pk ? (bw === "24h" ? when(pk.k) : dl(pk.k)) + ", per block" : "", "var(--sv-violet)") +
+        st("Blocks", B ? B.toLocaleString() : "—", bw === "24h" ? "last 24 hours" : "since genesis") + '</div>';
+      if(!src.length) lb = '<div class=sv-upwait>Reading the history…</div>';
+      else if(bw === "24h"){
+        var m2 = Math.max(.01, Math.max.apply(null, src.map(function(x){ return x.b ? x.t / x.b : 0; }))), tk = "";
+        src.forEach(function(x, i){ var d = new Date(x.k * 1000); if(d.getHours() % 6 === 0) tk += '<span style="left:' + (i / src.length * 100).toFixed(2) + '%">' + (d.getHours() ? String(d.getHours()).padStart(2, "0") + ":00" : DAYN[d.getDay()] + " " + d.getDate()) + '</span>'; });
+        lb = '<div class="sv-bars live hr">' + bscale(m2, function(v){ return v.toFixed(2); }) + src.map(function(x){ var r = x.b ? x.t / x.b : 0;
+          return '<i style="--h:' + Math.max(1.5, r / m2 * 100).toFixed(1) + '%" data-t="' + when(x.k) + ": " + r.toFixed(2) + ' per block"></i>'; }).join("") + '</div><div class=sv-bx>' + tk + '</div>';
+      } else lb = chart("tpb", src.map(function(x){ return { d: x.k, r: x.b ? x.t / x.b : 0 }; }), [{ k: "r", cls: "tpb", area: true }], function(v){ return v <= 0 ? "0" : v.toFixed(v < 10 ? 1 : 0); },
+          function(v){ return v.toFixed(2) + " per block"; });
+    }
+    put("sv-actlive", hb(sl) + lb);
   }
 
   /* ── Economics: today's supply, stake and pools, and their history (weekly from genesis,
      daily since 2026-09-26) as lines ── */
-  function chart(pts, lines, fmtY){
-    /* pts: [{d, ...}]; lines: [{k, cls, area}] - one SVG in a stretched viewBox for the shapes,
-       the labels in HTML so they keep their size */
+  /* a line chart: one SVG in a stretched viewBox for the shapes, the scale and the reading in
+     HTML so they keep their size. Four labelled levels up the side (0, a third, two thirds, the
+     top) with their gridlines; hovering reads the point under the cursor - a line down the plot,
+     a dot on each series, the date and each value. key names the chart for the hover's lookup. */
+  var CH = {};
+  function chart(key, pts, lines, fmtY, fmtV){
     var n = pts.length; if(n < 2) return '<div class=sv-upwait>Not enough history yet</div>';
     var lo = Infinity, hi = -Infinity;
     lines.forEach(function(l){ pts.forEach(function(p){ var v = p[l.k]; if(v < lo) lo = v; if(v > hi) hi = v; }); });
     if(lines.some(function(l){ return l.area; })) lo = Math.min(lo, 0);
     var pad = (hi - lo) * .06 || 1; hi += pad; if(lo > 0) lo = Math.max(0, lo - pad);
+    CH[key] = { pts: pts, lines: lines, lo: lo, hi: hi, fmt: fmtV || fmtY };
     var X = function(i){ return (i / (n - 1) * 1000).toFixed(1); }, Y = function(v){ return (300 - (v - lo) / (hi - lo) * 300).toFixed(1); };
+    var lv = [0, 1 / 3, 2 / 3, 1];
     var svg = '<svg viewBox="0 0 1000 300" preserveAspectRatio=none aria-hidden=true>' +
-      [.25, .5, .75].map(function(f){ return '<line class=gl x1=0 x2=1000 y1=' + (300 * f) + ' y2=' + (300 * f) + '></line>'; }).join("") +
+      lv.slice(1).map(function(f){ var y = (300 * (1 - f)).toFixed(1); return '<line class=gl x1=0 x2=1000 y1=' + y + ' y2=' + y + '></line>'; }).join("") +
       lines.map(function(l){ var d = pts.map(function(p, i){ return (i ? "L" : "M") + X(i) + " " + Y(p[l.k]); }).join("");
         return (l.area ? '<path class="ar ' + l.cls + '" d="' + d + 'L1000 300L0 300Z"></path>' : '') + '<path class="ln ' + l.cls + '" d="' + d + '"></path>'; }).join("") + '</svg>';
     var dl = function(s){ var d = new Date(s + "T00:00:00Z"); return d.toLocaleDateString("en", { month: "short", year: "numeric", timeZone: "UTC" }); };
-    return '<div class=sv-lc>' + svg + '<span class=sv-ly style="top:0">' + fmtY(hi) + '</span><span class=sv-ly style="bottom:0">' + fmtY(lo) + '</span></div>' +
+    return '<div class=sv-lc data-ch="' + key + '">' + svg +
+      lv.map(function(f){ return '<span class=sv-ly style="bottom:' + (f * 100).toFixed(2) + '%">' + fmtY(lo + (hi - lo) * f) + '</span>'; }).join("") +
+      '<i class=sv-lcur></i><span class=sv-lcdots></span><span class=sv-lctip></span></div>' +
       '<div class=sv-gx><span>' + dl(pts[0].d) + '</span><span>' + dl(pts[Math.floor(n / 2)].d) + '</span><span>' + dl(pts[n - 1].d) + '</span></div>';
   }
+  function lcHover(ev){
+    var box = ev.target.closest ? ev.target.closest(".sv-lc[data-ch]") : null;
+    Array.prototype.forEach.call(document.querySelectorAll(".sv-lc.on"), function(x){ if(x !== box) x.classList.remove("on"); });
+    if(!box) return;
+    var c = CH[box.dataset.ch]; if(!c) return;
+    var r = box.getBoundingClientRect(), n = c.pts.length, i = Math.max(0, Math.min(n - 1, Math.round((ev.clientX - r.left) / r.width * (n - 1))));
+    var p = c.pts[i], x = i / (n - 1) * 100, dd = new Date(p.d + "T00:00:00Z").toLocaleDateString("en", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+    box.classList.add("on");
+    box.querySelector(".sv-lcur").style.left = x + "%";
+    box.querySelector(".sv-lcdots").innerHTML = c.lines.map(function(l){
+      return '<i class="' + l.cls + '" style="left:' + x + '%;top:' + ((1 - (p[l.k] - c.lo) / (c.hi - c.lo)) * 100).toFixed(2) + '%"></i>'; }).join("");
+    var t = box.querySelector(".sv-lctip");
+    t.innerHTML = '<b>' + dd + '</b>' + c.lines.map(function(l){ return '<span><i class="' + l.cls + '"></i>' + (l.name ? l.name + " " : "") + '<em>' + c.fmt(p[l.k]) + '</em></span>'; }).join("");
+    t.style.left = x + "%"; t.classList.toggle("flip", x > 60);
+  }
+  /* a bar chart's scale, the line charts' own: labelled levels at a third, two thirds and the
+     top, each with its gridline across the bars */
+  function bscale(mx, f){
+    var seen = {};
+    return [1 / 3, 2 / 3, 1].map(function(k){ var t = f(mx * k); if(seen[t] || t === "0") return ""; seen[t] = 1;
+      return '<span class=sv-bl2 style="bottom:' + (k * 100).toFixed(2) + '%"><b>' + t + '</b></span>'; }).join("");
+  }
+  /* a bar's reading, at once (the native title waits a second): the bar's data-t, above it */
+  function barHover(ev){
+    var b = ev.target.closest ? ev.target.closest(".sv-bars i[data-t],.sv-pace i[data-t]") : null;
+    Array.prototype.forEach.call(document.querySelectorAll(".sv-btip.on"), function(x){ if(!b || x.parentNode !== b.parentNode) x.classList.remove("on"); });
+    if(!b) return;
+    var box = b.parentNode, t = box.querySelector(".sv-btip");
+    if(!t){ t = document.createElement("span"); t.className = "sv-btip"; box.appendChild(t); }
+    t.textContent = b.dataset.t; t.classList.add("on");
+    var x = (b.offsetLeft + b.offsetWidth / 2) / box.clientWidth * 100;
+    t.style.left = x + "%"; t.classList.toggle("flip", x > 70); t.classList.toggle("rt", x < 12);
+  }
+
   function drawEco(){
     var E0 = DD().econ, hist = E0 && E0.hist || [];
     if(!hist.length){ put("sv-ecoa", '<div class=sv-ph><h3>ATONE supply and stake</h3></div><div class=sv-upwait>Reading the chain…</div>'); put("sv-ecop", '<div class=sv-ph><h3>PHOTON supply</h3></div><div class=sv-upwait>Reading the chain…</div>'); return; }
@@ -707,12 +785,12 @@
       st("Bonded", (now.bonded / now.atone * 100).toFixed(1) + "%", big(now.bonded) + " staked", "var(--sv-amber)") +
       st("Inflation", DD().set && DD().set.inflation != null ? (DD().set.inflation * 100).toFixed(0) + "%" : "—", "a year, minted to stakers", "var(--sv-amber)") +
       st("Community pool", big(now.pool), "ATONE", "var(--sv-green)") + '</div></div>' +
-      chart(hist, [{ k: "bonded", cls: "bon", area: true }, { k: "atone", cls: "sup" }], M));
+      chart("ecoa", hist, [{ k: "atone", cls: "sup", name: "Supply" }, { k: "bonded", cls: "bon", area: true, name: "Bonded" }], M, function(v){ return big(v); }));
     put("sv-ecop", '<div class=sv-ph><h3>PHOTON</h3><span class=sv-gkey><i class=pho></i>supply</span><div class=sv-rt>' +
       st("Supply", big(now.photon), sg(ch("photon")), "var(--sv-pho)") +
-      st("Mint rate", E0.conv ? E0.conv.toFixed(2) : "—", "PHOTON for each ATONE burned", "var(--sv-pho)") +
+      st("Mint rate", E0.conv ? E0.conv.toFixed(2) : "—", "PHOTON per ATONE burned", "var(--sv-pho)") +
       st("Community pool", big(now.pool_ph), "PHOTON", "var(--sv-green)") + '</div></div>' +
-      chart(hist, [{ k: "photon", cls: "pho", area: true }], M));
+      chart("ecop", hist, [{ k: "photon", cls: "pho", area: true, name: "Supply" }], M, function(v){ return big(v); }));
   }
 
   /* hovering the plot names a block: its height, how many signed, who did not */
@@ -727,6 +805,9 @@
   window.addEventListener("thermo:up", function(){ var sc = screen(); if(root.getAttribute("data-ui") !== "simple") return;
     if(sc === "net") drawUp(setStats()); else if(sc === "sign") drawSign(); else if(sc === "prop") drawProp(); else if(sc === "act") drawAct(); });
   sv.addEventListener("mousemove", signTip);
+  sv.addEventListener("mousemove", lcHover);
+  sv.addEventListener("mousemove", barHover);
+  sv.addEventListener("mouseleave", function(){ lcHover({ target: sv }); barHover({ target: sv }); });
   window.addEventListener("resize", function(){ if(screen() === "sign") paintSign(); });
   window.addEventListener("thermo:live", function(){ if(!window.__UP && screen() === "net") fbRows(); });
 
@@ -829,6 +910,8 @@
     }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
+    if(act === "bwin"){ BW = t.dataset.w === "24h" || t.dataset.w === "all" ? t.dataset.w : "100"; try{ localStorage.setItem("th_bw", BW); }catch(e){} drawAct(); return; }
+    if(act === "awin"){ AW = t.dataset.w === "all" ? "all" : "24h"; try{ localStorage.setItem("th_aw", AW); }catch(e){} drawAct(); return; }
     if(act === "pwin"){ PW = t.dataset.w === "all" ? "all" : "24h"; try{ localStorage.setItem("th_pw", PW); }catch(e){} drawProp(); return; }
     if(act === "refresh"){
       if(window.__refreshPos){ t.classList.add("busy"); window.__refreshPos().then(function(){ t.classList.remove("busy"); render(); }); }

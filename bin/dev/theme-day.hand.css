@@ -134,3 +134,7 @@
   html[data-theme=light]:not([data-mono]) #sv .sv-lc .ar.pho{fill:rgba(31,111,154,.13)}
   html[data-theme=light]:not([data-mono]) #sv .sv-lc .ln.pho{stroke:#1f6f9a}
   html[data-theme=light]:not([data-mono]) #sv .sv-gkey i.bon{background:rgba(155,90,10,.3)}
+  html[data-theme=light]:not([data-mono]) #sv .sv-lc .ar.txl{fill:rgba(15,94,80,.13)}
+  html[data-theme=light]:not([data-mono]) #sv .sv-lc .ln.txl{stroke:#0f5e50}
+  html[data-theme=light]:not([data-mono]) #sv .sv-lc .ar.tpb{fill:rgba(107,95,208,.13)}
+  html[data-theme=light]:not([data-mono]) #sv .sv-lc .ln.tpb{stroke:#6b5fd0}

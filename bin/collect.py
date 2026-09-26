@@ -657,6 +657,20 @@ p24 = {r[0]: int(r[1]) for r in sql(f"""SELECT proposer_cons, count(*)::int FROM
 act7 = [[int(r[0]), int(r[1]), int(r[2])] for r in sql(f"""SELECT extract(epoch FROM date_trunc('hour', time))::bigint,
           coalesce(sum(tx_count), 0)::int, count(*)::int FROM block
           WHERE chain_id='{CHAIN}' AND time > now() - interval '7 days' GROUP BY 1 ORDER BY 1;""")]
+# Activity since genesis: transactions and blocks per day, kept in state/txdaily.json - the whole
+# history once (a ~7 s scan), then only the last two days on each build
+TXD = "/srv/atomone-app/state/txdaily.json"
+txday = None
+try:
+    txd = json.load(open(TXD)) if os.path.exists(TXD) else {}
+    recent = "AND time >= date_trunc('day', now()) - interval '2 days'" if txd else ""
+    for r in sql(f"""SELECT to_char(date_trunc('day', time), 'YYYY-MM-DD'), coalesce(sum(tx_count), 0)::int, count(*)::int
+                     FROM block WHERE chain_id='{CHAIN}' {recent} GROUP BY 1;"""):
+        txd[r[0]] = [int(r[1]), int(r[2])]
+    _t = TXD + ".tmp"; json.dump(txd, open(_t, "w")); os.replace(_t, TXD)
+    txday = [[d] + txd[d] for d in sorted(txd)]
+except Exception as e:
+    print(f"atomone-app: daily activity skipped ({e})", file=sys.stderr)
 # Economics: today's supply, stake and pools, kept one point a day in state/econ.json (weekly
 # before 2026-09-26, backfilled from the archive by dev/econ_backfill.py). A failure here
 # costs the tab, never the build.
@@ -708,7 +722,7 @@ out = {
                 "weeks_to_cap": int(round((float(nb["maximum_coefficient"]) - coef)
                                           / float(nb["step"]))) if float(nb["step"]) else None,
                 "monotonic_so_far": True},
-  "p24": p24, "act7": act7, "econ": econ,
+  "p24": p24, "act7": act7, "txday": txday, "econ": econ,
   # every block the index holds a proposer for, and how many validators ever proposed one
   "prop_all": {"blocks": sum(prop.values()), "proposers": len(prop)},
   "set": {"n": N, "bonded": S, "supply": supply, "bonded_pct": round(S/supply*100, 2),
