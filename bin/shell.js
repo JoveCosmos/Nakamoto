@@ -189,6 +189,8 @@
   function activate(b){
     if(b.getAttribute("aria-disabled") === "true") return;
     var s = sec("id", b.dataset.section); if(!s) return;
+    /* the Staking tab always opens on the map, whichever view (APR, rank, graph...) was last used */
+    if(b.classList.contains("l1tab") && s.id === "staking" && window.__mapMode) window.__mapMode("color");
     if(b.classList.contains("l1tab")) go(s, cur.s === s && s.entry !== "first" ? cur.v : last(s), "push");
     else { var v = sub(s, "id", b.dataset.sub); if(v) go(s, v, "push"); }
   }

@@ -65,7 +65,7 @@
         {"id": "votes",     "label": "Votes",     "route": "votes",     "group": "Governance",
          "empty": {"title": "Votes", "text": "Your votes on AtomOne proposals will be listed here."}},
         {"id": "governors", "label": "Governors", "route": "governors", "group": "Governance",
-         "empty": {"title": "Governors", "text": "AtomOne governors will be listed here."}}
+         "empty": {"title": "Governors", "text": "Your AtomOne governors will be listed here."}}
       ]
     }
   ]

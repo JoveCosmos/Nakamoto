@@ -407,6 +407,15 @@ Array.prototype.forEach.call(document.querySelectorAll(".mbtn"), function(b){
   });
 });
 
+/* The map is what the Staking tab opens on: a click on the tab, or a page the browser brings
+   back from its back/forward cache, returns to Map from whichever view was last used (a fresh
+   load already starts there) */
+window.__mapMode = function(m){
+  var b = document.querySelector('.mbtn[data-m="' + m + '"]');
+  if(b && MODE !== m) b.click();
+};
+window.addEventListener("pageshow", function(ev){ if(ev.persisted) window.__mapMode("color"); });
+
 /* trend */
 (function(){
   /* Weekly on both sides of the bonus. Months could not resolve eight weeks of
