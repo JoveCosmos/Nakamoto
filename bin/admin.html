@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang=en>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=robots content="noindex,nofollow">
+<title>Autopilot Admin</title>
+<link rel=icon href="favicon.ico">
+<style>
+:root{--bg:#09090f;--c1:#131329;--c2:#0c0c1a;--bd:#232342;--bd2:#34345c;--t:#f0eef8;--s:#c1bfdc;--f:#8f8db4;
+--teal:#2bc8bd;--amber:#ffb02e;--green:#2ee06a;--violet:#b9b0ff;--red:#ff4d1f;--mono:ui-monospace,"JetBrains Mono",Menlo,monospace;
+--sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme:light){:root{--bg:#f4f2ec;--c1:#fffdf8;--c2:#f7f4ec;--bd:#e3ddd0;--bd2:#d2cabb;--t:#17161c;--s:#4d4a57;--f:#7a7686;
+--teal:#0f5e50;--amber:#9b5a0a;--green:#16733a;--violet:#5b4fc4;--red:#b3261e}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--t);font:14px/1.45 var(--sans)}
+button{font:inherit;cursor:pointer}
+.wrap{max-width:1400px;margin:0 auto;padding:20px 24px 40px;display:flex;flex-direction:column;gap:14px}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em}
+header h1 span{color:var(--violet)}
+.sp{flex:1}
+.sw{display:inline-flex;padding:2px;border-radius:9px;border:1px solid var(--bd2);gap:2px}
+.sw button{height:28px;padding:0 13px;border:0;border-radius:7px;background:transparent;color:var(--s);font-size:12.5px}
+.sw button[aria-pressed=true]{background:color-mix(in srgb,var(--teal) 22%,transparent);color:var(--t);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--teal) 55%,transparent)}
+.who{font-family:var(--mono);font-size:11.5px;color:var(--f)}
+.btn{height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--bd2);background:transparent;color:var(--t);font-size:12.5px}
+.btn:hover{border-color:var(--s)}
+.btn.pri{background:var(--violet);border-color:var(--violet);color:#161038;font-weight:600}
+.btn.sm{height:26px;padding:0 10px;font-size:11.5px}
+.btn:focus-visible,.sw button:focus-visible,.tab:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+.panel{background:linear-gradient(180deg,var(--c1),var(--c2));border:1px solid var(--bd2);border-radius:12px;padding:14px 16px;position:relative}
+.panel::before{content:"";position:absolute;left:16px;right:16px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--tc,var(--violet)),transparent)}
+.ph{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.ph h2{margin:0;font-size:15px;font-weight:700;display:inline-flex;align-items:center;gap:9px}
+.ph h2::before{content:"";width:3px;height:14px;border-radius:2px;background:var(--tc,var(--violet))}
+.strip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));padding:0;overflow:hidden}
+.ro{--rc:var(--teal);padding:13px 16px;border-left:1px solid var(--bd);position:relative;min-width:0}
+.ro:first-child{border-left:0}
+.ro::before{content:"";position:absolute;left:16px;right:16px;top:0;height:2px;background:var(--rc);box-shadow:0 0 10px var(--rc);opacity:.85}
+.ro em{display:block;font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--f)}
+.ro b{display:block;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px}
+.ro small{display:block;font-size:11px;color:var(--s);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grid{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr);gap:14px;align-items:start}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{height:28px;padding:0 12px;border-radius:7px;border:1px solid var(--bd);background:transparent;color:var(--s);font-size:12px}
+.tab[aria-pressed=true]{border-color:var(--violet);color:var(--t);background:color-mix(in srgb,var(--violet) 12%,transparent)}
+.tab i{font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--f);margin-left:5px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{font-family:var(--mono);font-size:9px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--f);text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd2)}
+td{padding:8px;border-bottom:1px solid var(--bd);vertical-align:top}
+td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.addr{font-family:var(--mono);font-size:11.5px}
+.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:10.5px;font-family:var(--mono);border:1px solid currentColor}
+.st-new{color:var(--teal)}.st-active{color:var(--green)}.st-expiring{color:var(--amber)}.st-expired,.st-used{color:var(--f)}.st-revoked{color:var(--red)}
+.paused{color:var(--amber);font-family:var(--mono);font-size:10px;margin-left:6px}
+.sub{font-size:11px;color:var(--f)}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.notes{margin-top:6px;font-size:11.5px;color:var(--s)}
+.notes div{padding-left:8px;border-left:2px solid var(--violet);margin-top:3px}
+.ev{display:flex;flex-direction:column;gap:6px;max-height:520px;overflow:auto}
+.ev div{display:grid;grid-template-columns:8px minmax(0,1fr);gap:9px;font-size:12px;align-items:baseline}
+.ev i{width:8px;height:8px;border-radius:50%;background:var(--teal)}
+.ev i.warn{background:var(--amber)}.ev i.crit{background:var(--red)}.ev i.ok{background:var(--green)}
+.ev small{display:block;color:var(--f);font-family:var(--mono);font-size:10.5px}
+.empty{color:var(--f);font-size:12.5px;padding:16px 4px}
+.gate{min-height:70vh;display:grid;place-items:center}
+.gate .panel{max-width:440px;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center;padding:28px}
+.err{color:var(--red);font-size:12.5px;min-height:18px}
+@media (max-width:900px){.strip{grid-template-columns:repeat(2,minmax(0,1fr))}.ro{border-top:1px solid var(--bd)}.grid{grid-template-columns:minmax(0,1fr)}
+.wrap{padding:14px 12px}.tbl{overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class=wrap>
+  <header>
+    <h1>Autopilot <span>Admin</span></h1>
+    <div class=sw role=group aria-label=Network id=net><button type=button data-net=mainnet aria-pressed=true>Mainnet</button><button type=button data-net=testnet aria-pressed=false>Testnet</button></div>
+    <span class=sp></span>
+    <span class=who id=who></span>
+    <button class="btn sm" type=button id=test hidden>Send test alert</button>
+    <button class="btn sm" type=button id=out hidden>Sign out</button>
+  </header>
+  <div id=gate class=gate>
+    <div class=panel>
+      <h2 style="margin:0">Operators only</h2>
+      <div class=sub>Sign a one-time message with Keplr. Nothing is sent on chain.</div>
+      <button class="btn pri" type=button id=signin>Sign in with Keplr</button>
+      <div class=err id=err></div>
+    </div>
+  </div>
+  <div id=app hidden>
+    <div class="panel strip" id=strip></div>
+    <div class=grid>
+      <div class=panel style="--tc:var(--violet)">
+        <div class=ph><h2>Grants</h2><div class=tabs id=tabs role=group aria-label="Grant state"></div><span class=sp></span><span class=sub id=checked></span></div>
+        <div class=tbl id=grants></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class=panel style="--tc:var(--red)"><div class=ph><h2>Validators</h2><span class=sub id=vwsub></span></div><div id=vw></div></div>
+        <div class=panel style="--tc:var(--teal)"><div class=ph><h2>Events</h2></div><div class=ev id=ev></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

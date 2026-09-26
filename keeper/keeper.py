@@ -140,10 +140,10 @@ def grants():
     return out
 
 # ── restake ────────────────────────────────────────────────────────────────
-LEDGER = os.environ.get("KEEPER_LEDGER", "/srv/atomone-app/state/grants-mainnet.json")
+ADMIN = os.environ.get("KEEPER_ADMIN", "/srv/atomone-app/state/admin-mainnet.json")
 def paused():
-    """delegators the operator paused in the admin console (grantwatch's ledger)"""
-    try: return {k for k, v in json.load(open(LEDGER)).get("grants", {}).items() if v.get("paused")}
+    """delegators the operator paused in the admin console"""
+    try: return set(json.load(open(ADMIN)).get("paused", {}))
     except Exception: return set()
 
 def restake_grants():

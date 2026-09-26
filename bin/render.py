@@ -245,7 +245,7 @@ page = (TPL
 
 # app.js is static but published from bin/ so /srv/atomone-app/web is entirely
 # reproducible - nothing in it is hand-edited, and a stale copy cannot linger.
-import shutil, subprocess
+import shutil, subprocess, hashlib
 # A save re-renders within a second (atomone-app-render.path), so a script that
 # does not parse must never reach web/: the last good page keeps serving instead.
 for _js in ("app.js", "boot.js", "tx.js", "simple.js", "shell.js"):
@@ -258,6 +258,14 @@ for _js in ("app.js", "boot.js", "tx.js", "simple.js", "shell.js"):
                     os.path.join(OUT, "." + _js + ".tmp"))
     os.chmod(os.path.join(OUT, "." + _js + ".tmp"), 0o640)
     os.replace(os.path.join(OUT, "." + _js + ".tmp"), os.path.join(OUT, _js))
+# the operator console: its own page and script (versioned by content), never linked publicly
+_chk = subprocess.run(["/usr/bin/node", "--check", os.path.join(os.path.dirname(__file__), "admin.js")], capture_output=True, text=True)
+if _chk.returncode != 0:
+    sys.exit("atomone-app: FATAL admin.js does not parse:\n%s" % _chk.stderr.strip()[-600:])
+_ajs = open(os.path.join(os.path.dirname(__file__), "admin.js"), "rb").read()
+_ah = open(os.path.join(os.path.dirname(__file__), "admin.html")).read().replace('src="admin.js"', 'src="admin.js?v=%s"' % hashlib.sha256(_ajs).hexdigest()[:10])
+for _fn, _body in (("admin.js", _ajs), ("admin.html", _ah.encode())):
+    _t = os.path.join(OUT, "." + _fn + ".tmp"); open(_t, "wb").write(_body); os.chmod(_t, 0o640); os.replace(_t, os.path.join(OUT, _fn))
 # Brand marks: AtomOne and PHOTON are the official chain-registry SVGs, GATA is the
 # same mark the snapshot pages use. Published from bin/ like everything else.
 src_a = os.path.join(os.path.dirname(__file__), "assets")
