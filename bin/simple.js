@@ -511,7 +511,7 @@
         '<div class=sv-upmarks>' + marks + '</div>' +
         '<div class=sv-upplot>' +
           '<span class=sv-upy style="bottom:100%">100%</span><span class=sv-upy style="bottom:0">' + lo + '%</span>' +
-          (ref != null ? '<span class=sv-upref style="bottom:' + H(ref) + '%"></span>' : '') +
+          (ref != null ? '<span class=sv-upref style="bottom:' + H(ref) + '%"><b>30-day ' + ref.toFixed(2) + '%</b></span>' : '') +
           '<div class=sv-upbars>' + bars + '</div>' +
           (hv ? '<div class=sv-uptip style="left:' + Math.min(76, Math.max(0, (UPHOVER + .5) / n * 100 - 12)).toFixed(1) + '%"><b>block ' + Number(hv[0]).toLocaleString() + '</b>' +
             hv[1] + ' of ' + hv[2] + ' signed' + (hv[3] ? '<br>missed by ' + esc(hv[3].split(",").map(function(a){ return who(a).m; }).join(", ")) : '') + '</div>' : '') +

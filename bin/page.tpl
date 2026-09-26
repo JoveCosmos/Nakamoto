@@ -3293,7 +3293,12 @@ background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opac
 .sv-upbars i.tip::before{background:linear-gradient(180deg,#7ff0e6,rgba(43,200,189,.5));box-shadow:0 0 12px rgba(43,200,189,.6)}
 .sv-upbars i.on{outline:1px solid var(--wt);outline-offset:1px}
 .sv-upy{position:absolute;left:4px;transform:translateY(50%);z-index:1;font-family:var(--wmono);font-size:9px;color:var(--wt);background:rgba(9,9,15,.7);padding:1px 4px;border-radius:3px;pointer-events:none}
-.sv-upref{position:absolute;left:0;right:0;height:0;border-top:1.5px dashed var(--wt);opacity:.6;z-index:1;pointer-events:none}
+/* the set's 30-day average: long dashes, full strength, a dark edge so it reads over any bar,
+   and its value at the right end */
+.sv-upref{position:absolute;left:0;right:0;height:2px;margin-bottom:-1px;z-index:2;pointer-events:none;
+background:repeating-linear-gradient(90deg,var(--wt) 0 9px,transparent 9px 14px);filter:drop-shadow(0 0 1.5px rgba(0,0,0,.9))}
+.sv-upref b,.sv-pavg b{position:absolute;right:0;bottom:5px;font-family:var(--wmono);font-size:10px;font-weight:600;color:var(--wt);
+background:var(--wc);border:1px solid var(--wbd2);padding:1px 6px;border-radius:4px;white-space:nowrap}
 .sv-uptip{position:absolute;top:8px;width:24%;min-width:180px;padding:7px 10px;border:1px solid var(--wbd2);border-radius:8px;background:#15152c;font-size:11px;line-height:1.45;color:var(--ws);pointer-events:none;z-index:3}
 .sv-uptip b{display:block;color:var(--wt);font-weight:700}
 .sv-upx{display:flex;justify-content:space-between;font-family:var(--wmono);font-size:9px;letter-spacing:.06em;color:var(--wf)}
@@ -3572,8 +3577,8 @@ position:relative;overflow:hidden;min-width:0;min-height:0}
 .sv-pace{flex:1 1 auto;min-height:18px;position:relative;display:flex;align-items:flex-end;gap:2px;border-bottom:1px solid var(--wbd2)}
 .sv-pace i{flex:1 1 0;min-width:1px;height:var(--h);border-radius:2px 2px 0 0;background:linear-gradient(180deg,rgba(43,200,189,.9),rgba(43,200,189,.3))}
 .sv-pace i.slow{background:linear-gradient(180deg,#ffb02e,rgba(255,176,46,.35))}
-.sv-pavg{position:absolute;left:0;right:0;border-top:1px dashed rgba(240,238,248,.45);pointer-events:none;z-index:1}
-.sv-pavg b{position:absolute;right:0;bottom:2px;font-family:var(--wmono);font-size:9.5px;font-weight:400;color:var(--ws);background:var(--wc);padding:0 4px;border-radius:3px}
+.sv-pavg{position:absolute;left:0;right:0;height:2px;margin-bottom:-1px;pointer-events:none;z-index:2;
+background:repeating-linear-gradient(90deg,var(--wt) 0 9px,transparent 9px 14px);filter:drop-shadow(0 0 1.5px rgba(0,0,0,.9))}
 @media(min-width:901px) and (max-height:820px){
   #sv-net,#sv-netrow{gap:10px}
   #sv-pace .sv-bv{font-size:16px}

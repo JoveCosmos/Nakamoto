@@ -122,3 +122,7 @@
   html[data-theme=light]:not([data-mono]) .sv-wbar i.rew,html[data-theme=light]:not([data-mono]) .sv-wleg i.rew{background:#1f8a4c}
   /* Plex runs wider than the night face: the strategy names keep whole beside their "?" */
   html[data-theme=light]:not([data-mono]) .at3 .atpc b{font-size:11px;letter-spacing:-.01em}
+  /* the average lines: white dashes with a dark edge, so they read over the dark bars and the
+     cream ground alike (night's text colour is dark here) */
+  html[data-theme=light]:not([data-mono]) #sv .sv-upref,html[data-theme=light]:not([data-mono]) #sv .sv-pavg{
+    background:repeating-linear-gradient(90deg,#fff 0 9px,transparent 9px 14px);filter:drop-shadow(0 0 1px #0b2a22) drop-shadow(0 0 1px #0b2a22)}
