@@ -233,7 +233,7 @@
         '<div class=sd-figs>' +
           fig("Now", '<span style="color:' + hn.ink + '">' + pct(plan.now) + '</span>', "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s"), hn.fill) +
           fig("After", '<span style="color:' + ha.ink + '">' + pct(plan.after) + '</span>', "on " + plan.picks.length + " validator" + (plan.picks.length === 1 ? "" : "s"), ha.fill) +
-          fig("A year", '<span class=sd-gain>+' + one(plan.gain) + '</span><em class=u>ATONE</em>', "more, at today\'s rates", "var(--sv-green)") +
+          fig("ATONE", '<span class=sd-gain>+' + one(plan.gain) + '</span>', "a year at today\'s rates", "var(--sv-green)") +
         '</div>' +
         '<button class="sv-btn go sd-go" type=button data-act=opt>Redelegate</button>' +
         '<div class=sd-fine>' + plan.moves + ' move' + (plan.moves === 1 ? "" : "s") + ' in one signature</div>';
