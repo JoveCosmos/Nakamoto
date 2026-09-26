@@ -191,6 +191,8 @@ background:var(--edge);border:1px solid var(--edge2);margin-bottom:26px}
 .sbox .v{font-family:var(--mono);font-size:30px;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
 .sbox .k{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);margin-top:8px}
 .sbox .s{font-size:12px;color:var(--ink2);margin-top:5px}
+/* the Projection's figures read label first: started at, today, cap, next - then the value */
+#p-eta .sbox>*>.k:first-child{margin:0 0 7px}
 
 table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13.5px;font-variant-numeric:tabular-nums}
 th{text-align:right;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);
@@ -4131,12 +4133,12 @@ html[data-tab=connect] .l2host{display:none}
     <svg id=etacurve viewBox="0 0 900 300" role=img
       aria-label="&eta; from the floor to today and projected forward"></svg>
     <div class=sbox>
-      <div><div class=v style="color:var(--cold)">{{FLOOR}}</div><div class=k>started at</div><div class=s>{{START_DATE}}</div></div>
-      <button class=sgo id=sgohist type=button aria-label="Every weekly step so far"><div
-        class=v style="color:var(--hot)">{{ETA}}</div><div class=k>today</div>
+      <div><div class=k>started at</div><div class=v style="color:var(--cold)">{{FLOOR}}</div><div class=s>{{START_DATE}}</div></div>
+      <button class=sgo id=sgohist type=button aria-label="Every weekly step so far"><div class=k>today</div><div
+        class=v style="color:var(--hot)">{{ETA}}</div>
         <div class=s>{{WEEK}} weeks <span class=sgoarr>&rarr;</span></div></button>
-      <div><div class=v>{{CAP}}</div><div class=k>cap</div><div class=s>{{W2CAP}} weeks, ~{{Y2CAP}} yr</div></div>
-      <div><div class=v>{{ETA_NEXT}}</div><div class=k>next</div><div class=s>{{NEXT_DATE}}</div></div>
+      <div><div class=k>cap</div><div class=v>{{CAP}}</div><div class=s>{{W2CAP}} weeks, ~{{Y2CAP}} yr</div></div>
+      <div><div class=k>next</div><div class=v>{{ETA_NEXT}}</div><div class=s>{{NEXT_DATE}}</div></div>
     </div>
     <p class=note>Dates are the chain's own weekly epoch. &eta; values are the step rule applied to
     the floor &mdash; and the collector refuses to publish unless that lands exactly on the live
