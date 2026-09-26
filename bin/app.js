@@ -772,11 +772,13 @@ if(bd.addEventListener) bd.addEventListener("input", soon);
    strip, the readouts and the Reset button turn amber while any handle is away
    from live, so a hypothetical is never mistaken for the chain. Each row's
    reset, or a release within a step of live, brings it home. */
+/* a tick on a slider's track, placed as the knobs are (render.py's knob_left): a share of the
+   track in percent, so it holds while the calculator is hidden. Measured in pixels it could not
+   be placed then (width 0) and stayed at the start of the range until a reload. */
 function tickAt(inp, tick, v){
   if(!inp || !tick) return;
-  var w = inp.offsetWidth; if(!w) return;
-  var t = (v - +inp.min) / (+inp.max - +inp.min || 1);
-  tick.style.left = (KNOB_W / 2 + t * (w - KNOB_W)) + "px";
+  var t = Math.min(1, Math.max(0, (v - +inp.min) / (+inp.max - +inp.min || 1)));
+  tick.style.left = "calc(" + (KNOB_W / 2) + "px + " + t.toFixed(5) + " * (100% - " + KNOB_W + "px))";
 }
 function liveOf(k){
   return k === "e" ? Math.round(D.eta.now * 100)
