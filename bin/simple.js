@@ -403,7 +403,7 @@
            PROPS.voting ? '<b class=sv-on>' + PROPS.voting + ' in voting now</b>'
              : PROPS.by ? (PROPS.by.passed || 0) + " passed, " + (PROPS.by.rejected || 0) + " rejected" + (PROPS.by.failed ? ", " + PROPS.by.failed + " failed" : "") + ", none in voting" : "") +
       card("Uptime", (S.up != null ? S.up.toFixed(2) + "%" : "—"),
-           "30-day average across the set, " + S.clean + " never jailed") +
+           "30-day validator set average, " + S.clean + " never jailed") +
       /* what 1,000 staked ATONE earns in a day at the set's stake-weighted rate - what an ATONE
          picked at random earns - and the spread from the largest validator to the smallest */
       card("Per 1,000 ATONE", S.avg != null ? one(1000 * S.avg / 365) + '<small>ATONE a day</small>' : "—",
