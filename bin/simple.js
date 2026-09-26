@@ -124,7 +124,7 @@
       (window.__POSAT ? '<span class=sv-ago> · read ' + ago(window.__POSAT) + '</span>' : "") : "connect a wallet to read it");
     var rf = E("sv-rf"); if(rf) rf.hidden = !pos;
     put("sv-staked", (pos ? whole(pos.total) : "—") + '<em>ATONE</em>');
-    put("sv-stsub", pos && !pos.rows.length ? "nothing staked yet" : pos ? ("on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s") +
+    put("sv-stsub", pos && !pos.rows.length ? "nothing staked" : pos ? ("on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s") +
       (pos.locked > 0 ? ', <s>' + fmt(pos.locked) + " under cooldown</s>" : "")) : "connect a wallet to read your position");
     var mine = pos && pos.rows.length, hr = mine ? heat(pos.rate) : null;
     var ap = put("sv-apr", mine ? pct(pos.rate) : "—"); if(ap) ap.style.color = hr ? hr.ink : "";
