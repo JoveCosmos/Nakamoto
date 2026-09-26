@@ -3382,6 +3382,8 @@ background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opac
 .sv-wtot .sv-kr{justify-content:flex-start;gap:10px}
 .sv-wbig{display:flex;align-items:baseline;gap:9px;font-size:38px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--wt);font-variant-numeric:tabular-nums}
 .sv-wbig em{font-style:normal;font-family:var(--wmono);font-size:11px;font-weight:400;letter-spacing:.14em;color:var(--wf)}
+.sv-wbal{display:flex;align-items:center;gap:16px;flex-wrap:wrap;min-width:0}
+.sv-wread{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;color:var(--wf);white-space:nowrap}
 .sv-wapr{font-size:13px;color:var(--ws)}
 .sv-wapr b{font-size:15px;font-weight:800}
 .sv-wbrk{display:flex;flex-direction:column;gap:9px;min-width:0;padding-left:28px;border-left:1px solid var(--wbd)}
@@ -3399,7 +3401,6 @@ background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opac
 .sv-wleg s{grid-column:1/-1;text-decoration:none;font-size:11px;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:14px}
 .sv-wfoot{display:flex;align-items:center;gap:14px;font-size:11.5px;color:var(--ws)}
 .sv-wfoot span+span{color:var(--wf)}
-.sv-wfoot .sv-rf{margin-left:auto}
 /* the move: three columns divided by hairlines, no boxes inside the panel; the gain carries the green */
 .sv-flow .sv-side{border:0;background:none;border-radius:0;padding:4px 20px}
 .sv-flow .sv-side.now{padding-left:0}

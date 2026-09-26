@@ -122,7 +122,11 @@
     var seg = function(cls, v){ return v > 0 ? '<i class=' + cls + ' style="flex:' + Math.max(v / (tot || 1), .006).toFixed(4) + ' 1 0"></i>' : ''; };
     put("sv-wal",
       '<div class=sv-wtot><span class=sv-kr><span class=sv-k>Your wallet</span><span class="sv-tag g">Self-custody</span></span>' +
-        '<b class=sv-wbig>' + (pos ? fmt(tot) : "—") + '<em>ATONE</em></b>' +
+        /* the balance says how fresh it is, and the one control that reads it again sits beside it */
+        '<span class=sv-wbal><b class=sv-wbig>' + (pos ? fmt(tot) : "—") + '<em>ATONE</em></b>' +
+          (pos ? '<span class=sv-wread>' + (window.__POSAT ? 'read ' + ago(window.__POSAT) : '') +
+            '<button class=sv-rf type=button data-act=refresh title="Read the wallet again" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button></span>' : '') +
+        '</span>' +
         '<span class=sv-wapr>' + (mine ? 'staked ATONE earns <b style="color:' + hr.ink + '">' + pct(pos.rate) + '</b> a year'
           : pos ? 'nothing staked' : 'connect a wallet to read it') + '</span></div>' +
       '<div class=sv-wbrk>' +
@@ -133,10 +137,7 @@
           '<span><i class=bal></i><em>Available</em><b>' + (bal ? fmt(liq) : "—") + '</b><s>in the wallet</s></span>' +
           '<span><i class=rew></i><em>Rewards</em><b>' + (window.__REW != null ? fmt(rew) : "—") + '</b><s>' + (rew > 0 ? "ready to claim" : "") + '</s></span>' +
         '</div>' +
-        '<div class=sv-wfoot><span><b class=sv-pho>' + (bal ? fmt(bal.uphoton) : "—") + '</b> PHOTON for fees</span>' +
-          (window.__POSAT ? '<span>read ' + ago(window.__POSAT) + '</span>' : '') +
-          (pos ? '<button class=sv-rf type=button data-act=refresh title="Read the wallet again" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button>' : '') +
-        '</div>' +
+        '<div class=sv-wfoot><span><b class=sv-pho>' + (bal ? fmt(bal.uphoton) : "—") + '</b> PHOTON for fees</span></div>' +
       '</div>');
 
     /* the opportunity: the same plan the advanced view would sign */
