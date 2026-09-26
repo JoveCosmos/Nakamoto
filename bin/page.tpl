@@ -3291,6 +3291,9 @@ border-color:rgba(46,224,106,.3)}
   .sv-fig{padding:5px 11px 6px}
   .sv-fig b{font-size:16px}
   .sv-chip{padding-top:5px;padding-bottom:5px}
+  /* Network at 720px tall: its head and four cards leave the list 238px, and a 240px floor
+     pushed the screen 2px past its box */
+  .sv-list{min-height:200px}
 }
 @media(max-width:900px){.sv-screen .sv-card+.sv-card{border-left:1px solid var(--wbd)}}
 .sv-can p span::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;flex:0 0 auto}
@@ -3558,6 +3561,18 @@ background:transparent;color:var(--ink);font:inherit;font-size:12.5px;text-decor
 [role=tabpanel]:focus{outline:none}
 [role=tabpanel]:focus-visible{outline:2px solid var(--hot);outline-offset:-2px}
 html[data-tab=connect] .l2host{display:none}
+/* level 1 between phone and desktop: three equal columns stop fitting under ~870px (the
+   controls need 218px), so the sections centre in what the mark and the controls leave;
+   under 760px not even that fits, and the header takes the phone's two lines */
+@media(min-width:621px) and (max-width:900px){
+  .folder{grid-template-columns:auto minmax(0,1fr) auto}
+  .folder>.l1{justify-self:center}
+}
+@media(min-width:621px) and (max-width:759px){
+  .folder{height:auto;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand right" "nav nav";padding:6px 20px 4px;row-gap:2px}
+  .folder>.l1{justify-self:stretch;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;width:100%}
+  .l1tab{height:36px}
+}
 @media(max-width:620px){
   /* level 1: the mark and the controls on one line, the sections spread across the next */
   .folder{height:auto;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand right" "nav nav";padding:6px 12px 4px;row-gap:2px}
