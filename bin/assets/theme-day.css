@@ -514,6 +514,12 @@
   html[data-theme=light]:not([data-mono]) .sv-upbars i.tip::before{background:var(--accent);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-upy{background:var(--surface)}
   html[data-theme=light]:not([data-mono]) .sv-uptip{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sv-wbar i.stk,html[data-theme=light]:not([data-mono]) .sv-wleg i.stk{background:var(--amber-bar)}
+  html[data-theme=light]:not([data-mono]) .sv-wbar i.bal,html[data-theme=light]:not([data-mono]) .sv-wleg i.bal{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-wbar i.rew,html[data-theme=light]:not([data-mono]) .sv-wleg i.rew{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-wleg s{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .sv-flow .sv-side{background:none}
+  html[data-theme=light]:not([data-mono]) .sv-flow .sv-side.gain{background:none;border-left:1px solid var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .sv-ph h3::before{background:var(--tc,var(--accent));box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-heat>i{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-heat>s{background:var(--surface-2);text-decoration:none}
@@ -718,6 +724,12 @@
      plum into a hollow ring) */
   html[data-theme=light]:not([data-mono]) .sv-hint i.lo{background:#572179;box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-hint i.hi{background:#e0a21e;box-shadow:none}
+  /* the move's three columns are columns on paper too, not boxes; and the wallet split keeps three
+     colours (the shadow maps violet and green to the one accent) */
+  html[data-theme=light]:not([data-mono]) .sv-flow .sv-side{background:none;border-color:transparent;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-flow .sv-side.gain{border-left-color:var(--line)}
+  html[data-theme=light]:not([data-mono]) .sv-wbar i.bal,html[data-theme=light]:not([data-mono]) .sv-wleg i.bal{background:#6b5fd0}
+  html[data-theme=light]:not([data-mono]) .sv-wbar i.rew,html[data-theme=light]:not([data-mono]) .sv-wleg i.rew{background:#1f8a4c}
   /* Plex runs wider than the night face: the strategy names keep whole beside their "?" */
   html[data-theme=light]:not([data-mono]) .at3 .atpc b{font-size:11px;letter-spacing:-.01em}
 

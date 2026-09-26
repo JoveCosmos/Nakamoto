@@ -3374,6 +3374,45 @@ background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opac
   .sv-upst{padding:5px 8px;column-gap:6px}.sv-upst em{font-size:7.5px;letter-spacing:.06em;white-space:normal}.sv-upst b{font-size:15px}
   .sv-upx .bn{display:none}
 }
+/* the wallet header: the total on the left, large; on the right one bar that splits it (staked amber,
+   available violet, rewards green) with the three figures under it; the fee token and freshness
+   along the foot. One panel where there were four tiles, so the page has a first thing to read */
+#sv-wal{--tc:var(--sv-violet);display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.4fr);column-gap:28px;align-items:center}
+.sv-wtot{display:flex;flex-direction:column;gap:6px;min-width:0}
+.sv-wtot .sv-kr{justify-content:flex-start;gap:10px}
+.sv-wbig{display:flex;align-items:baseline;gap:9px;font-size:38px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--wt);font-variant-numeric:tabular-nums}
+.sv-wbig em{font-style:normal;font-family:var(--wmono);font-size:11px;font-weight:400;letter-spacing:.14em;color:var(--wf)}
+.sv-wapr{font-size:13px;color:var(--ws)}
+.sv-wapr b{font-size:15px;font-weight:800}
+.sv-wbrk{display:flex;flex-direction:column;gap:9px;min-width:0;padding-left:28px;border-left:1px solid var(--wbd)}
+.sv-wbar{display:flex;gap:3px;height:10px}
+.sv-wbar i{display:block;min-width:3px;border-radius:3px}
+.sv-wbar i.none{flex:1;background:var(--wbd)}
+.sv-wbar i.stk,.sv-wleg i.stk{background:linear-gradient(90deg,#ffb02e,#ffc861)}
+.sv-wbar i.bal,.sv-wleg i.bal{background:#b9b0ff}
+.sv-wbar i.rew,.sv-wleg i.rew{background:#2ee06a}
+.sv-wleg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.sv-wleg span{display:grid;grid-template-columns:auto 1fr;column-gap:7px;row-gap:1px;align-items:baseline;min-width:0}
+.sv-wleg i{width:8px;height:8px;border-radius:2px;grid-row:1}
+.sv-wleg em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ws)}
+.sv-wleg b{grid-column:1/-1;font-size:19px;font-weight:800;letter-spacing:-.02em;color:var(--wt);font-variant-numeric:tabular-nums}
+.sv-wleg s{grid-column:1/-1;text-decoration:none;font-size:11px;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:14px}
+.sv-wfoot{display:flex;align-items:center;gap:14px;font-size:11.5px;color:var(--ws)}
+.sv-wfoot span+span{color:var(--wf)}
+.sv-wfoot .sv-rf{margin-left:auto}
+/* the move: three columns divided by hairlines, no boxes inside the panel; the gain carries the green */
+.sv-flow .sv-side{border:0;background:none;border-radius:0;padding:4px 20px}
+.sv-flow .sv-side.now{padding-left:0}
+.sv-flow .sv-side.gain{background:none;border-left:1px solid rgba(46,224,106,.3)}
+.sv-flow .sv-side.gain b{font-size:28px}
+.sv-flow{grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr) minmax(0,1fr);gap:0}
+.sv-flow .sv-side b{font-size:26px}
+.sv-flow .sv-mbar{height:auto;padding-top:8px}.sv-flow .sv-mbar em{height:8px}
+#sv-optp .sv-hmeta{font-family:var(--wsans);font-size:11.5px;letter-spacing:0;text-transform:none;color:var(--ws)}
+@media(max-width:900px){#sv-wal{grid-template-columns:minmax(0,1fr);row-gap:14px}.sv-wbrk{padding-left:0;border-left:0}
+  .sv-flow{grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr)}.sv-flow .sv-side.gain{border-left:0;padding-left:0}}
+@media(max-width:620px){.sv-wbig{font-size:32px}.sv-wleg{gap:8px}.sv-wleg b{font-size:16px}.sv-wleg s{font-size:10px;white-space:normal}
+  .sv-flow{grid-template-columns:minmax(0,1fr)}.sv-flow .sv-side{padding:6px 0}}
 /* a wallet with nothing staked: the message and Stake ATONE in the middle of the space below the tiles */
 #sv-optp.fill{flex:1 1 auto;justify-content:center;align-items:center}
 .sv-none{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
@@ -4004,16 +4043,7 @@ html[data-tab=connect] .l2host{display:none}
   <div id=sv>
     <main class=sv-main>
       <section class=sv-screen id=sv-over data-sc=over aria-label=Wallet>
-        <div class="sv-cards four">
-          <div class="sv-card t-bal"><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#b9b0ff;--icb:rgba(185,176,255,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4z"/><path d="M4 7V6a2 2 0 0 1 2-2h10v3"/><path d="M16 13.5h.01"/></svg></span><span class=sv-k>Available</span></span><button class=sv-rf type=button data-act=refresh id=sv-rf title="Read the wallet again" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button></span>
-            <span class=sv-big id=sv-bal>&mdash;<em>ATONE</em></span><span class=sv-sub id=sv-balsub></span></div>
-          <div class="sv-card t-stk"><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#ffb02e;--icb:rgba(255,176,46,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l8 4.5-8 4.5-8-4.5z"/><path d="M4 12l8 4.5 8-4.5"/><path d="M4 16.5l8 4.5 8-4.5"/></svg></span><span class=sv-k>Staked</span></span><span class="sv-tag g">Self-custody</span></span>
-            <span class=sv-big id=sv-staked>&mdash;<em>ATONE</em></span><span class=sv-sub id=sv-stsub></span></div>
-          <div class="sv-card t-rew"><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#2ee06a;--icb:rgba(46,224,106,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 21V7"/><path d="M12 7C10 3 6 4 7 6.5 7.8 8 12 7 12 7zM12 7c2-4 6-3 5-.5C16.2 8 12 7 12 7z"/></svg></span><span class=sv-k>Rewards</span></span></span>
-            <span class=sv-big id=sv-rew>&mdash;<em>ATONE</em></span><span class=sv-sub id=sv-rewsub></span></div>
-          <div class="sv-card t-apr"><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#f07a3c;--icb:rgba(240,122,60,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span><span class=sv-k>Your APR</span></span></span>
-            <span class=sv-big id=sv-apr>&mdash;</span><div class="sv-sub sv-scl" id=sv-aprsub></div></div>
-        </div>
+        <div class="sv-panel sv-wal" id=sv-wal></div>
         <div class=sv-panel id=sv-optp></div>
         <div class=sv-panel id=sv-allocp></div>
       </section>

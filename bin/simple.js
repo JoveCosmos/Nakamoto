@@ -86,8 +86,7 @@
   /* where a rate sits on the map, as a bar with pins: the reader's validators (sized by their
      share), a faint tick for every validator in the set, the set's median */
   function scale(pins, S, mini){
-    var V = VALS(), ticks = "", i;
-    if(!mini) for(i = 0; i < V.length; i++) ticks += '<s style="left:' + (heat(rate0(V[i][1], V[i][2])).p * 100).toFixed(2) + '%"></s>';
+    var ticks = "";
     var md = heat(S.mid);
     /* one line: the lowest rate the set pays, the ramp, the highest */
     return '<div class="sv-hrow' + (mini ? " mini" : "") + '"><span class=sv-hl>' + pct(S.lo) + '</span>' +
@@ -116,21 +115,29 @@
 
   function drawOver(){
     var pos = window.__POS, S = setStats(), bal = window.__BAL;
-    /* what the wallet holds right now: liquid ATONE, the PHOTON that pays fees, when it was read */
-    /* one decimal: a wallet holding 0.65 ATONE is not a wallet holding none */
-    put("sv-bal", (bal ? fmt(bal.uatone) : "—") + '<em>ATONE</em>');
-    put("sv-balsub", bal ? '<b class=sv-pho>' + fmt(bal.uphoton) + '</b> PHOTON for fees' +
-      (window.__POSAT ? '<span class=sv-ago> · read ' + ago(window.__POSAT) + '</span>' : "") : "connect a wallet to read it");
-    var rf = E("sv-rf"); if(rf) rf.hidden = !pos;
-    put("sv-staked", (pos ? whole(pos.total) : "—") + '<em>ATONE</em>');
-    put("sv-stsub", pos && !pos.rows.length ? "nothing staked" : pos ? ("on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s") +
-      (pos.locked > 0 ? ', <s>' + fmt(pos.locked) + " under cooldown</s>" : "")) : "connect a wallet to read your position");
-    var mine = pos && pos.rows.length, hr = mine ? heat(pos.rate) : null;
-    var ap = put("sv-apr", mine ? pct(pos.rate) : "—"); if(ap) ap.style.color = hr ? hr.ink : "";
-    /* your APR where the map would paint it, between what the set pays least and most */
-    put("sv-aprsub", scale(mine ? [{ r: pos.rate, s: 12, t: "your APR, " + pct(pos.rate) }] : [], S, true));
-    put("sv-rew", (window.__REW != null ? fmt(window.__REW) : "—") + '<em>ATONE</em>');
-    put("sv-rewsub", window.__REW > 0 ? "earned, ready to claim" : pos ? "nothing waiting" : "");
+    /* the wallet, as one thing: what it holds in all, how that splits (staked, available, rewards
+       waiting), what the staked part earns - then the PHOTON that pays fees and when it was read */
+    var mine = pos && pos.rows.length, hr = mine ? heat(pos.rate) : null, rew = window.__REW || 0;
+    var liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0, tot = liq + stk + rew;
+    var seg = function(cls, v){ return v > 0 ? '<i class=' + cls + ' style="flex:' + Math.max(v / (tot || 1), .006).toFixed(4) + ' 1 0"></i>' : ''; };
+    put("sv-wal",
+      '<div class=sv-wtot><span class=sv-kr><span class=sv-k>Your wallet</span><span class="sv-tag g">Self-custody</span></span>' +
+        '<b class=sv-wbig>' + (pos ? fmt(tot) : "—") + '<em>ATONE</em></b>' +
+        '<span class=sv-wapr>' + (mine ? 'staked ATONE earns <b style="color:' + hr.ink + '">' + pct(pos.rate) + '</b> a year'
+          : pos ? 'nothing staked' : 'connect a wallet to read it') + '</span></div>' +
+      '<div class=sv-wbrk>' +
+        '<div class=sv-wbar>' + (pos ? seg("stk", stk) + seg("bal", liq) + seg("rew", rew) : '<i class=none></i>') + '</div>' +
+        '<div class=sv-wleg>' +
+          '<span><i class=stk></i><em>Staked</em><b>' + (pos ? fmt(stk) : "—") + '</b><s>' + (mine ? "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s") : "") +
+            (pos && pos.locked > 0 ? ", " + fmt(pos.locked) + " under cooldown" : "") + '</s></span>' +
+          '<span><i class=bal></i><em>Available</em><b>' + (bal ? fmt(liq) : "—") + '</b><s>in the wallet</s></span>' +
+          '<span><i class=rew></i><em>Rewards</em><b>' + (window.__REW != null ? fmt(rew) : "—") + '</b><s>' + (rew > 0 ? "ready to claim" : "") + '</s></span>' +
+        '</div>' +
+        '<div class=sv-wfoot><span><b class=sv-pho>' + (bal ? fmt(bal.uphoton) : "—") + '</b> PHOTON for fees</span>' +
+          (window.__POSAT ? '<span>read ' + ago(window.__POSAT) + '</span>' : '') +
+          (pos ? '<button class=sv-rf type=button data-act=refresh title="Read the wallet again" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button>' : '') +
+        '</div>' +
+      '</div>');
 
     /* the opportunity: the same plan the advanced view would sign */
     var plan = planNow(pos);
@@ -167,8 +174,8 @@
         return { w: q.x, r: v && window.__rateAfter ? window.__rateAfter(v[1], v[2], q.x) : plan.after, t: q.m }; });
       if(pos.locked > 0) aftSegs.push({ w: pos.locked, r: plan.now, t: "stays: under cooldown" });
       h = '<div class=sv-ph><h3>Move your stake, earn more</h3>' + tag("g", pp(lift) + " APR") +
-          '<div class=sv-rt><span class=sv-hmeta title="Redelegated stake cannot move again for 21 days">' + fmt(pos.free) + ' ATONE · ' + plan.moves + ' move' + (plan.moves === 1 ? "" : "s") +
-            ' · one signature · then 21 days in place</span><button class="sv-btn go" type=button data-act=opt>Redelegate</button></div></div>' +
+          '<div class=sv-rt><span class=sv-hmeta title="Redelegated stake cannot move again for 21 days">' + plan.moves + ' move' + (plan.moves === 1 ? "" : "s") +
+            ' in one signature, then 21 days in place</span><button class="sv-btn go" type=button data-act=opt>Redelegate</button></div></div>' +
           '<div class=sv-flow>' +
             side("now", "Now", pct(plan.now), hn.ink, "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s"), nowSegs) +
             '<div class=sv-arw aria-hidden=true><svg viewBox="0 0 40 16"><path d="M1 8h36M31 2l6 6-6 6"/></svg></div>' +
