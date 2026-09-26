@@ -3542,6 +3542,50 @@ position:relative;overflow:hidden;min-width:0;min-height:0}
   .sv-vr .sv-vs{display:none}
   .sv-vlist{grid-auto-rows:40px}
 }
+/* ══ Network: four cards, the uptime plot at half height, then who misses blocks beside the
+   chain's pace - the same boxes and rows as the wallet ══ */
+#sv-net{justify-content:flex-start;gap:12px}
+#sv-net>*,#sv-net>*:not(:first-child){margin-top:0}
+#sv-netcards{grid-template-columns:repeat(4,minmax(0,1fr))}
+#sv-netcards .sv-big small{font-size:11px;font-weight:500;color:var(--wf);margin-left:6px;letter-spacing:0}
+#sv-net>.sv-up{flex:1 1 0;min-height:0}
+#sv-net .sv-upst{padding-top:4px;padding-bottom:5px}
+#sv-net .sv-upchart{min-height:0}
+#sv-netrow{flex:1 1 0;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+#sv-miss{--tc:#ff4d1f}#sv-pace{--tc:var(--sv-teal)}
+.sv-mlist .sv-vr u{font-size:11px}
+.sv-vr u.ok{color:var(--sv-green)}.sv-vr u.warn{color:var(--sv-amber)}.sv-vr u.bad{color:#ff6a3d}
+.sv-mlist .sv-va em{margin-left:4px}
+.sv-mfoot{margin-top:auto;font-size:11px;color:var(--wf)}
+.sv-allok{font-family:var(--wmono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
+#sv-pace .sv-box{padding:6px 12px 7px;gap:1px}
+#sv-pace{gap:9px}
+#sv-pace .sv-bv{font-size:19px}
+#sv-pace .sv-bm{font-size:10.5px}
+#sv-pace,#sv-miss{overflow:hidden}
+.sv-pace{flex:1 1 auto;min-height:18px;position:relative;display:flex;align-items:flex-end;gap:2px;border-bottom:1px solid var(--wbd2)}
+.sv-pace i{flex:1 1 0;min-width:1px;height:var(--h);border-radius:2px 2px 0 0;background:linear-gradient(180deg,rgba(43,200,189,.9),rgba(43,200,189,.3))}
+.sv-pace i.slow{background:linear-gradient(180deg,#ffb02e,rgba(255,176,46,.35))}
+.sv-pavg{position:absolute;left:0;right:0;border-top:1px dashed rgba(240,238,248,.45);pointer-events:none;z-index:1}
+.sv-pavg b{position:absolute;right:0;bottom:2px;font-family:var(--wmono);font-size:9.5px;font-weight:400;color:var(--ws);background:var(--wc);padding:0 4px;border-radius:3px}
+@media(min-width:901px) and (max-height:820px){
+  #sv-net,#sv-netrow{gap:10px}
+  #sv-pace .sv-bv{font-size:16px}
+  #sv-pace .sv-bm{display:none}
+  #sv-net .sv-upst small{display:none}
+  #sv-net .sv-upst .sw{height:20px}
+}
+@media(max-width:900px){
+  #sv-netcards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #sv-netrow{grid-template-columns:minmax(0,1fr);flex:0 0 auto}
+  #sv-net>.sv-up{flex:0 0 auto}
+  #sv-net .sv-upchart{min-height:150px}
+}
+@media(max-width:620px){
+  #sv-up .sv-rt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:8px}
+  #sv-up .sv-upst{justify-content:start}
+  .sv-pace{height:90px;flex:0 0 auto}
+}
 /* ══ Autopilot: one screen to set it up ═══════════════════════════════════════════════
    The terms on the left (strategy, which validators, stake, time, restake), the validator set
    on the right to choose from - search it, narrow it, select one by one or by a rule - and one
@@ -4063,6 +4107,10 @@ html[data-tab=connect] .l2host{display:none}
       <section class=sv-screen id=sv-net data-sc=net aria-label=Network>
         <div class=sv-cards id=sv-netcards></div>
         <div class="sv-panel sv-up" id=sv-up></div>
+        <div class=sv-row2 id=sv-netrow>
+          <div class=sv-panel id=sv-miss></div>
+          <div class=sv-panel id=sv-pace></div>
+        </div>
       </section>
     </main>
   </div>

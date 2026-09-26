@@ -17,7 +17,7 @@ gzips to 1.4KB, against a 5.8s block time.
 
 This process holds NO database credential and talks only to our own node.
 """
-import json, os, sys, time, urllib.parse, urllib.request
+import datetime, json, os, sys, time, urllib.parse, urllib.request
 
 RPC = os.environ["ATOMONE_RPC"]
 API = os.environ["ATOMONE_API"]
@@ -72,8 +72,15 @@ def snapshot():
 # Network uptime, block by block: who signed each commit. A block never changes once made, so
 # each height is read once (one /block from our own node per new block; 120 once at start)
 # and kept. Published as "up": [[height, signed, validators, "HEX,HEX" of those who did not
-# sign], ...], oldest first - every visitor reads it from this file instead of asking the node.
+# sign], block time in epoch ms], oldest first - every visitor reads it from this file instead
+# of asking the node. The time is block h's own header time: consecutive rows give the block time.
 _up = {}
+
+
+def ms(t):
+    """RFC 3339 with nanoseconds (2026-09-26T08:05:45.123456789Z) -> epoch milliseconds"""
+    d, _, f = t.rstrip("Z").partition(".")
+    return int(datetime.datetime.strptime(d, "%Y-%m-%dT%H:%M:%S").replace(tzinfo=datetime.timezone.utc).timestamp() * 1000) + int((f + "000")[:3])
 
 
 def uptime(head):
@@ -89,7 +96,7 @@ def uptime(head):
             continue
         miss = [x.get("validator_address", "") for x in sigs if x.get("block_id_flag") != 2]
         # the commit in block h is the vote on block h-1: that is the height it describes
-        _up[h] = [h - 1, len(sigs) - len(miss), len(sigs), ",".join(a for a in miss if a)]
+        _up[h] = [h - 1, len(sigs) - len(miss), len(sigs), ",".join(a for a in miss if a), ms(b["header"]["time"])]
     for k in [k for k in _up if k <= head - UP_N]:
         del _up[k]
     return [_up[k] for k in sorted(_up)]

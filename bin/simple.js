@@ -103,16 +103,17 @@
 
   /* ── the set, once: the figures every screen quotes ── */
   function setStats(){
-    var V = VALS(), D = DD(), rs = [], i, up = 0, upn = 0, clean = 0;
+    var V = VALS(), D = DD(), rs = [], i, up = 0, upn = 0, clean = 0, wt = 0, ws = 0;
     for(i = 0; i < V.length; i++){
       rs.push(rate0(V[i][1], V[i][2]));
+      wt += rs[i] * V[i][1]; ws += +V[i][1];
       var d = window.__VDBY && window.__VDBY[V[i][3]];
       if(d && d.d30 != null){ up += +d.d30; upn++; }
       if(!V[i][4]) clean++;
     }
     var s = rs.slice().sort(function(a, b){ return a - b; });
     return { lo: s[0] || 0, hi: s[s.length - 1] || 0, mid: s.length ? s[(s.length - 1) >> 1] : 0,
-             n: V.length, up: upn ? up / upn : null, clean: clean, set: D.set || {} };
+             n: V.length, up: upn ? up / upn : null, clean: clean, set: D.set || {}, avg: ws > 0 ? wt / ws : null };
   }
 
   /* ── OVERVIEW ───────────────────────────────────────────────────────────── */
@@ -123,12 +124,10 @@
        waiting), what the staked part earns - then the PHOTON that pays fees and when it was read */
     var mine = pos && pos.rows.length, hr = mine ? heat(pos.rate) : null, rew = window.__REW || 0;
     var liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0, tot = liq + stk + rew;
-    var seg = function(cls, v){ return v > 0 ? '<i class=' + cls + ' style="flex:' + Math.max(v / (tot || 1), .006).toFixed(4) + ' 1 0"></i>' : ''; };
     var read = pos ? '<span class=sv-wread>' + (window.__POSAT ? 'read ' + ago(window.__POSAT) : '') +
       '<button class=sv-rf type=button data-act=refresh title="Read the wallet again" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button></span>' : '';
     put("sv-wal",
       '<div class=sv-ph><h3>Your wallet</h3><span class="sv-tag g">Self-custody</span><div class=sv-rt>' + read + '</div></div>' +
-      '<div class=sv-wbar>' + (pos ? seg("stk", stk) + seg("bal", liq) + seg("rew", rew) : '<i class=none></i>') + '</div>' +
       '<div class="sv-boxes four">' +
         box("tot", "Total", (pos ? fmt(tot) : "—") + '<em>ATONE</em>',
             mine ? 'staked ATONE earns <b style="color:' + hr.ink + '">' + pct(pos.rate) + '</b> a year' : pos ? "nothing staked" : "connect a wallet to read it") +
@@ -389,7 +388,11 @@
            PROPS.voting ? '<b class=sv-on>' + PROPS.voting + ' in voting now</b>'
              : PROPS.by ? (PROPS.by.passed || 0) + " passed · " + (PROPS.by.rejected || 0) + " rejected" + (PROPS.by.failed ? " · " + PROPS.by.failed + " failed" : "") + " · none in voting" : "") +
       card("Uptime", (S.up != null ? S.up.toFixed(2) + "%" : "—"),
-           "30-day average across the set, " + S.clean + " never jailed"));
+           "30-day average across the set, " + S.clean + " never jailed") +
+      /* what 1,000 staked ATONE earns in a day at the set's stake-weighted rate - what an ATONE
+         picked at random earns - and the spread from the largest validator to the smallest */
+      card("Per 1,000 ATONE", S.avg != null ? one(1000 * S.avg / 365) + '<small>ATONE a day</small>' : "—",
+           S.avg != null ? one(1000 * S.lo / 365) + " to " + one(1000 * S.hi / 365) + " depending on the validator" : ""));
 
     drawUp(S);
   }
@@ -412,7 +415,7 @@
         return fetch("/rpc/block?height=" + hh, { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(b){
           var sigs = b.result.block.last_commit.signatures || [], miss = [];
           sigs.forEach(function(x){ if(x.block_id_flag !== 2 && x.validator_address) miss.push(x.validator_address); });
-          if(sigs.length) FB.rows[hh] = [hh - 1, sigs.length - miss.length, sigs.length, miss.join(",")];
+          if(sigs.length) FB.rows[hh] = [hh - 1, sigs.length - miss.length, sigs.length, miss.join(","), Date.parse(b.result.block.header.time)];
         }).catch(function(){}).then(next);
       };
       return Promise.all([next(), next(), next(), next()]);
@@ -433,7 +436,9 @@
   }
   function drawUp(S){
     var rows = upRows();
-    if(!window.__UP) fbRows();
+    /* an older live.json has no block times: the fallback reads them for Chain pace */
+    if(!window.__UP || !timed(window.__UP)) fbRows();
+    drawMiss(rows, S); drawPace();
     var head = '<div class=sv-ph><h3>Network uptime</h3><span class="sv-tag q"><i class=sv-livedot></i>live</span>';
     if(!rows.length){
       put("sv-up", head + '</div><div class=sv-upwait>Reading the latest blocks…</div>');
@@ -482,6 +487,73 @@
         '<div class=sv-upx><span>&larr; older<i class=bn> · block ' + Number(rows[0][0]).toLocaleString() + '</i></span><span>now<i class=bn> · block ' + Number(last[0]).toLocaleString() + '</i> &rarr;</span></div>' +
       '</div>');
   }
+  function timed(r){ return r && r.length > 1 && r[r.length - 1][4] > 0; }
+
+  /* ── who is missing blocks: every validator that missed one in the window, most first,
+     with its 30-day uptime - the names behind the red on the plot ── */
+  function drawMiss(rows, S){
+    var n = rows.length, ix = consIndex(), cnt = {}, VD = window.__VDBY || {};
+    rows.forEach(function(r){ if(r[3]) r[3].split(",").forEach(function(a){ if(a) cnt[a.toUpperCase()] = (cnt[a.toUpperCase()] || 0) + 1; }); });
+    var list = Object.keys(cnt).map(function(a){ var w = ix[a] || { id: null, m: a.slice(0, 8) + "…" }; return { id: w.id, m: w.m, k: cnt[a] }; })
+      .sort(function(a, b){ return b.k - a.k || (a.m < b.m ? -1 : 1); });
+    var set = n ? rows[n - 1][2] : S.n, clean = Math.max(0, set - list.length);
+    var h = '<div class=sv-ph><h3>Who is missing blocks</h3>';
+    if(!n){ h += tag("q", "last " + n + " blocks") + '</div>'; put("sv-miss", h + '<div class=sv-upwait>Reading the latest blocks…</div>'); return; }
+    /* nobody missed one: say so, and name the lowest 30-day records instead - the ones to watch */
+    var low = !list.length;
+    if(low) list = Object.keys(VD).filter(function(k){ return VD[k].d30 != null && VD[k].m; })
+      .sort(function(a, b){ return VD[a].d30 - VD[b].d30; }).slice(0, 3).map(function(k){ return { id: k, m: VD[k].m, k: 0 }; });
+    var shown = list.slice(0, low ? 3 : 4);
+    h += low ? tag("g", "all " + set + " signed the last " + n) + '<div class=sv-rt><span class=sv-allok>lowest 30-day uptime</span></div></div>'
+             : tag("q", "last " + n + " blocks") + '</div>';
+    h += '<div class="sv-vlist sv-mlist">' + shown.map(function(v){ var d = (v.id && VD[v.id]) || {}, u = d.d30 != null ? +d.d30 : null;
+      return '<div class="sv-vr' + (v.id ? ' click" data-v="' + esc(v.id) + '" tabindex=0 title="Open this validator"' : '"') + ' style="--c:#ff4d1f">' +
+        '<span class=sv-lgo>' + logo(v.id, v.m) + '</span><b class=sv-vn>' + esc(v.m) + '</b>' +
+        (low ? '<s class=sv-va>0<em>missed</em></s><span class=sv-vs><span class=sv-vt><i style="width:' + Math.max(3, u || 0).toFixed(1) + '%;background:var(--sv-teal)"></i></span></span>'
+             : '<s class=sv-va>' + v.k + '<em>of ' + n + '</em></s>' +
+        '<span class=sv-vs><span class=sv-vt><i style="width:' + Math.max(3, v.k / n * 100).toFixed(1) + '%"></i></span></span>') +
+        '<u class="' + (u == null ? "" : u >= 95 ? "ok" : u >= 85 ? "warn" : "bad") + '" title="30-day uptime">' + (u == null ? "—" : u.toFixed(1) + "%") + '</u></div>'; }).join("") + '</div>' +
+      (low ? '' : '<div class=sv-mfoot>' + (list.length > shown.length ? '+' + (list.length - shown.length) + ' more missed · ' : '') + clean + ' of ' + set + ' signed every block · right: 30-day uptime</div>');
+    put("sv-miss", h);
+  }
+
+  /* ── chain pace: the block time over the window (from the block times live.json carries, or
+     the fallback's own reads), blocks a day measured over the last 24 hours (one read of the
+     block ~14,400 back, every ten minutes), the height, and each interval as a bar ── */
+  var DAY = { at: 0, head: 0, avg: null };
+  function readDay(){
+    if(DAY.at && Date.now() - DAY.at < 600000) return;
+    DAY.at = Date.now();
+    fetch("/rpc/status", { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(j){
+      var head = +j.result.sync_info.latest_block_height, t1 = Date.parse(j.result.sync_info.latest_block_time), back = 14400;
+      return fetch("/rpc/block?height=" + (head - back), { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(b){
+        var t0 = Date.parse(b.result.block.header.time);
+        if(t1 > t0){ DAY.avg = (t1 - t0) / 1000 / back; DAY.head = head; }
+        if(screen() === "net") drawPace();
+      });
+    }).catch(function(){ DAY.at = 0; });
+  }
+  function drawPace(){
+    readDay();
+    var src = timed(window.__UP) ? window.__UP : Object.keys(FB.rows).map(Number).sort(function(a, b){ return a - b; }).map(function(k){ return FB.rows[k]; });
+    var iv = [], i;
+    for(i = 1; i < src.length; i++) if(src[i][4] && src[i - 1][4] && src[i][0] === src[i - 1][0] + 1) iv.push({ h: src[i][0] + 1, s: (src[i][4] - src[i - 1][4]) / 1000 });
+    if(innerWidth <= 620 && iv.length > 40) iv = iv.slice(-40);
+    var h = '<div class=sv-ph><h3>Chain pace</h3>' + tag("q", "block time") + '</div>';
+    if(iv.length < 2){ put("sv-pace", h + '<div class=sv-upwait>Reading block times…</div>'); return; }
+    var sum = 0, mx = 0, slow = iv[0]; iv.forEach(function(x){ sum += x.s; if(x.s > mx){ mx = x.s; slow = x; } });
+    var avg = sum / iv.length, top = Math.max(mx, avg * 1.6), head = DAY.head || (src[src.length - 1][0] + 1);
+    h += '<div class="sv-boxes three">' +
+      box("up", "Block time", avg.toFixed(2) + '<em>s</em>', "average, last " + (iv.length + 1) + " blocks", "--bc:var(--sv-teal)") +
+      box("up", "Blocks a day", DAY.avg ? Math.round(86400 / DAY.avg).toLocaleString() : "—", DAY.avg ? "last 24 hours, " + DAY.avg.toFixed(2) + " s each" : "measuring…", "--bc:var(--sv-teal)") +
+      box("up", "Height", Number(head).toLocaleString(), "slowest here " + slow.s.toFixed(1) + " s", "--bc:var(--sv-violet)") +
+    '</div>' +
+    '<div class=sv-pace><span class=sv-pavg style="bottom:' + (avg / top * 100).toFixed(1) + '%"><b>' + avg.toFixed(1) + ' s</b></span>' +
+      iv.map(function(x){ return '<i class="' + (x.s > avg * 1.5 ? "slow" : "") + '" style="--h:' + Math.max(4, x.s / top * 100).toFixed(1) + '%" title="block ' + x.h.toLocaleString() + ': ' + x.s.toFixed(2) + ' s"></i>'; }).join("") +
+    '</div>';
+    put("sv-pace", h);
+  }
+
   /* hovering the plot names a block: its height, how many signed, who did not */
   sv.addEventListener("mousemove", function(ev){
     var p = ev.target.closest ? ev.target.closest(".sv-upplot") : null;
