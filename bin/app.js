@@ -130,6 +130,8 @@ function lum(u){ u=Math.max(0,Math.min(1,u));
       return "rgb("+Math.round(a[1]+(b[1]-a[1])*k)+","+Math.round(a[2]+(b[2]-a[2])*k)+","+
              Math.round(a[3]+(b[3]-a[3])*k)+")"; } }
   return "rgb(255,248,220)"; }
+/* the simple view paints validators in the map's own colours */
+window.lum = lum;
 (function(){
   var g=[]; for(var i=0;i<26;i++) g.push(lum(i/25));
   var hot="linear-gradient(90deg,"+g.join(",")+")";
@@ -312,6 +314,7 @@ function ramp(a){
   if(!(hi > lo)){ lo = s[0]; hi = s[s.length - 1]; }
   return [lo, hi - lo];
 }
+window.ramp = ramp;
 function fields(e){
   var T = shaped();
   var ys = T.map(function(t){ return apr(t,e); });

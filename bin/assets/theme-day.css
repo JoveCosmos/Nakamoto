@@ -497,6 +497,38 @@
   html[data-theme=light]:not([data-mono]) .sv-stat i{box-shadow:0 0 0 3px var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sv-stat.on i{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .sv-tbl tbody tr:hover{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) #sv{--sv-amber:var(--warn);--sv-green:var(--accent);--sv-violet:var(--accent);--sv-teal:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-screen{background:var(--surface-2);border-color:var(--line)}
+  html[data-theme=light]:not([data-mono]) .sv-screen>.sv-panel,html[data-theme=light]:not([data-mono]) .sv-screen>.sv-strip,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card:first-child,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card+.sv-card{background:var(--surface-2);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-screen>.sv-panel::before,html[data-theme=light]:not([data-mono]) .sv-screen>.sv-strip::before,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card::before{background:transparent}
+  html[data-theme=light]:not([data-mono]) .t-apr{--tc:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .sv-ph h3::before{background:var(--tc,var(--accent));box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-heat>i{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-heat>s{background:var(--surface-2);text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .sv-heat>b{border:2px solid var(--surface);box-shadow:0 0 0 1.5px var(--wt)}
+  html[data-theme=light]:not([data-mono]) .sv-hint i.lo{background:var(--surface-2);box-shadow:0 0 0 1px var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-hint i.hi{background:var(--amber-bar);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-side{border:1px solid var(--surface-2);background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sv-side.aft{border-color:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sv-side.gain{background:var(--accent-soft);border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-arw svg{fill:none}
+  html[data-theme=light]:not([data-mono]) .sv-steps li{border:1px solid var(--surface-2);background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sv-steps li::before{color:var(--ink);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-chip{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sv-chip .sv-lgo img,html[data-theme=light]:not([data-mono]) .sv-chip .sv-lgo .lg{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .sv-screen>#sv-foot{background:none;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #sv-foot .sv-btn[data-route]{border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #sv-foot .sv-btn[data-route]:hover{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sv-stat i{box-shadow:0 0 0 3px var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sv-btn.vio{color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .sv-btn.vio:hover:not(:disabled){background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .sv-can>div{border:1px solid var(--accent-soft);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sv-can>div+div{border-color:var(--danger-bg);background:var(--danger-bg)}
+  html[data-theme=light]:not([data-mono]) .sv-can>div+div u{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .sv-tbl tbody tr.mine{background:var(--warn-bg)}
+  html[data-theme=light]:not([data-mono]) .sv-tbl tbody tr.mine td:first-child{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-seg[aria-pressed=true]{color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .sv-bw i em{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) .pop .card.atcard{--av:var(--accent)}
   html[data-theme=light]:not([data-mono]) .pop .card.atcard::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .atcard .txsum{color:var(--muted)}
@@ -670,4 +702,8 @@
   html[data-theme=light]:not([data-mono]) .atlist .wk-lgx{color:#fff}
   html[data-theme=light]:not([data-mono]) .atlist td.dim,html[data-theme=light]:not([data-mono]) .atcard .atfoot .txfee,
   html[data-theme=light]:not([data-mono]) .l2gl{color:var(--muted)}
+  /* Simple, third pass: the scale's hint keeps the map's two ends (the shadow would turn the
+     plum into a hollow ring) */
+  html[data-theme=light]:not([data-mono]) .sv-hint i.lo{background:#572179;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-hint i.hi{background:#e0a21e;box-shadow:none}
 

@@ -44,6 +44,61 @@
            '<span class="sv-big ' + (cls || "") + '">' + v + '</span><span class=sv-sub>' + (sub || "") + '</span></div>';
   }
 
+  /* ── heat: the calculator's own colour for an APR ─────────────────────────
+     The map paints each validator by its APR on one ramp - indigo for the big ones that
+     pay least, through rose and amber to cream for the small ones that pay most - and this
+     view speaks the same language: a validator, a stake, a plan is drawn in the colour it
+     has on the map, so "brighter earns more" reads before any figure does. Same bounds as
+     the map (ramp(): 2nd-98th percentile, outliers saturate), same curve. fill is for bars
+     and dots, ink for type (lifted off the dark end, which would vanish on the window);
+     day darkens both so cream never lands on ivory. */
+  var HB = { key: null, rb: null };
+  function heatBounds(){
+    var k = (window.__LIVEV ? window.__LIVEV() : 0) + "/" + VALS().length;
+    if(HB.key !== k){ var V = VALS(), rs = [], i;
+      for(i = 0; i < V.length; i++) rs.push(rate0(V[i][1], V[i][2]));
+      HB.key = k; HB.rb = rs.length && window.ramp ? window.ramp(rs) : null; }
+    return HB.rb;
+  }
+  function heatU(r){
+    var rb = heatBounds();
+    if(!rb || !rb[1] || !(r > 0)) return .5;
+    return .08 + .92 * Math.pow(Math.max(0, Math.min(1, (r - rb[0]) / rb[1])), .55);
+  }
+  function mix(c, to, k){ var m = /(\d+),\s*(\d+),\s*(\d+)/.exec(c); if(!m) return c;
+    return "rgb(" + [m[1], m[2], m[3]].map(function(x){ return Math.round(+x + (to - x) * k); }).join(",") + ")"; }
+  function heat(r){
+    var u = heatU(r), day = root.getAttribute("data-theme") === "light", L = window.lum || function(){ return "rgb(255,176,46)"; };
+    /* type keeps the fill's hue, lifted toward white: the low end reads as a cool lavender,
+       not as the rose of a warning, and the top stops at gold short of plain white */
+    var fill = L(.16 + .84 * u), ink = mix(L(.16 + .84 * Math.min(u, .9)), 255, .34);
+    /* day: ivory under everything, so the ramp's cream end would vanish - fills stop at gold,
+       type runs from plum through rust to a deep amber */
+    if(day){ fill = mix(L(.16 + .84 * Math.min(u, .8)), 0, .08); ink = mix(L(.16 + .84 * Math.max(.3, Math.min(u, .7))), 0, .4); }
+    return { u: u, p: (u - .08) / .92, fill: fill, ink: ink };
+  }
+  /* the ramp itself, as a gradient, for the scale bars */
+  function rampCss(){
+    var day = root.getAttribute("data-theme") === "light", L = window.lum, g = [], i;
+    if(!L) return "linear-gradient(90deg,#572179,#ffd662)";
+    for(i = 0; i <= 12; i++){ var t = .08 + .92 * i / 12; g.push(day ? mix(L(.16 + .84 * Math.min(t, .8)), 0, .08) : L(.16 + .84 * t)); }
+    return "linear-gradient(90deg," + g.join(",") + ")";
+  }
+  /* where a rate sits on the map, as a bar with pins: the reader's validators (sized by their
+     share), a faint tick for every validator in the set, the set's median */
+  function scale(pins, S, mini){
+    var V = VALS(), ticks = "", i;
+    if(!mini) for(i = 0; i < V.length; i++) ticks += '<s style="left:' + (heat(rate0(V[i][1], V[i][2])).p * 100).toFixed(2) + '%"></s>';
+    var md = heat(S.mid);
+    /* one line: the lowest rate the set pays, the ramp, the highest */
+    return '<div class="sv-hrow' + (mini ? " mini" : "") + '"><span class=sv-hl>' + pct(S.lo) + '</span>' +
+      '<div class=sv-heat><i style="background:' + rampCss() + '"></i>' + ticks +
+      '<u style="left:' + (md.p * 100).toFixed(2) + '%" title="the set\'s median, ' + pct(S.mid) + '"></u>' +
+      pins.map(function(q){ var h = heat(q.r);
+        return '<b style="left:' + (h.p * 100).toFixed(2) + '%;--c:' + h.fill + ';--s:' + (q.s || 12) + 'px"' + (q.t ? ' title="' + esc(q.t) + '"' : "") + '></b>'; }).join("") +
+      '</div><span class=sv-hl>' + pct(S.hi) + '</span></div>';
+  }
+
   /* ── the set, once: the figures every screen quotes ── */
   function setStats(){
     var V = VALS(), D = DD(), rs = [], i, up = 0, upn = 0, clean = 0;
@@ -65,8 +120,10 @@
     put("sv-staked", (pos ? whole(pos.total) : "—") + '<em>ATONE</em>');
     put("sv-stsub", pos ? (pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s") +
       (pos.locked > 0 ? ', <s>' + fmt(pos.locked) + " under cooldown</s>" : "")) : "connect a wallet to read your position");
-    put("sv-apr", pos && pos.rows.length ? pct(pos.rate) : "—");
-    put("sv-aprsub", "the set pays <b>" + pct(S.lo) + "</b> to <b>" + pct(S.hi) + "</b>");
+    var mine = pos && pos.rows.length, hr = mine ? heat(pos.rate) : null;
+    var ap = put("sv-apr", mine ? pct(pos.rate) : "—"); if(ap) ap.style.color = hr ? hr.ink : "";
+    /* your APR where the map would paint it, between what the set pays least and most */
+    put("sv-aprsub", scale(mine ? [{ r: pos.rate, s: 12, t: "your APR, " + pct(pos.rate) }] : [], S, true));
     put("sv-rew", (window.__REW != null ? fmt(window.__REW) : "—") + '<em>ATONE</em>');
     put("sv-rewsub", window.__REW > 0 ? "earned and not yet claimed" : pos ? "nothing waiting" : "");
 
@@ -74,13 +131,18 @@
     var plan = planNow(pos);
     var h = "";
     if(!pos){
-      h = '<div class=sv-ph><h3>Your stake, in one screen</h3></div>' +
-          '<div class=sv-note>Connect a wallet in the bar above to see what your stake earns, and what it would earn better ' +
-          'placed. Nothing leaves your wallet: every move is a transaction you sign yourself.</div>';
+      /* a first visit: the three steps this screen is for, in the colours they carry below */
+      h = '<div class=sv-ph><h3>See what your stake could earn</h3>' +
+            '<div class=sv-rt><button class="sv-btn pri" type=button data-act=connect>Connect wallet</button></div></div>' +
+          '<ol class=sv-steps>' +
+            '<li style="--sc:#ffb02e"><b>Connect</b><span>your wallet reads your stake; nothing leaves it</span></li>' +
+            '<li style="--sc:' + heat(S.mid).fill + '"><b>See where it sits</b><span>on the map: brighter validators pay more</span></li>' +
+            '<li style="--sc:#2ee06a"><b>Redelegate</b><span>to the best-paying place, in one signature</span></li>' +
+          '</ol>';
     } else if(!pos.rows.length){
-      h = '<div class=sv-ph><h3>No stake on AtomOne yet</h3></div>' +
-          '<div class=sv-note>Stake ATONE with a validator and this screen fills in: what it earns, what it could earn, and where it sits.</div>' +
-          '<div class=sv-tools><button class="sv-btn go" type=button data-act=stake>Stake ATONE</button></div>';
+      h = '<div class=sv-ph><h3>No stake on AtomOne yet</h3>' +
+            '<div class=sv-rt><button class="sv-btn go" type=button data-act=stake>Stake ATONE</button></div></div>' +
+          '<div class=sv-note>Stake ATONE with a validator and this screen fills in: what it earns, what it could earn, and where it sits.</div>';
     } else if(!(pos.free > 0)){
       h = '<div class=sv-ph><h3>Everything is under cooldown</h3>' + tag("a", "21 days") + '</div>' +
           '<div class=sv-note>All <b>' + fmt(pos.total) + ' ATONE</b> was redelegated recently, so the chain will not move it again until <b>' +
@@ -91,18 +153,23 @@
           '<div class=sv-figs>' + fig("", "your APR", pct(pos.rate)) + fig("dim", "best in set", pct(S.hi)) +
           fig("dim", "can move", fmt(pos.free) + '<i>ATONE</i>') + fig("dim", "validators", String(pos.rows.length)) + '</div>';
     } else {
-      var lift = plan.after - plan.now;
-      h = '<div class=sv-ph><h3>Better placed, this earns more</h3>' + tag("g", pp(lift) + " APR") +
-          '<div class=sv-rt><button class="sv-btn go" type=button data-act=opt>Redelegate</button></div></div>' +
-          '<div class=sv-figs>' +
-            fig("", "APR now", pct(plan.now)) +
-            fig("up", "APR after", pct(plan.after)) +
-            fig(lift >= 0 ? "up" : "dn", "net lift", pp(lift)) +
-            fig("up", "a year", "+" + one(plan.gain) + '<i>ATONE</i>') +
-          '</div>' +
-          '<div class=sv-note><b>' + fmt(pos.free) + ' ATONE</b> moved onto <b>' + plan.picks.length +
-          '</b> validator' + (plan.picks.length === 1 ? "" : "s") + ' in <b>' + plan.moves + '</b> move' + (plan.moves === 1 ? "" : "s") +
-          ', all in one signature. Redelegated stake cannot move again for 21 days.</div>';
+      /* now -> after -> a year: the stake as it earns today, where the plan puts it, and what
+         that is worth - each side drawn in the colours the map gives it */
+      var lift = plan.after - plan.now, hn = heat(plan.now), ha = heat(plan.after);
+      var nowSegs = pos.rows.slice().sort(function(a, b){ return b.x - a.x; }).map(function(r){ return { w: r.x, r: r.rate, t: r.m }; });
+      var V = VALS(), byId = {}; V.forEach(function(v){ byId[v[3]] = v; });
+      var aftSegs = plan.picks.map(function(q){ var v = byId[q.id];
+        return { w: q.x, r: v && window.__rateAfter ? window.__rateAfter(v[1], v[2], q.x) : plan.after, t: q.m }; });
+      if(pos.locked > 0) aftSegs.push({ w: pos.locked, r: plan.now, t: "stays: under cooldown" });
+      h = '<div class=sv-ph><h3>Move your stake, earn more</h3>' + tag("g", pp(lift) + " APR") +
+          '<div class=sv-rt><span class=sv-hmeta title="Redelegated stake cannot move again for 21 days">' + fmt(pos.free) + ' ATONE · ' + plan.moves + ' move' + (plan.moves === 1 ? "" : "s") +
+            ' · one signature · then 21 days in place</span><button class="sv-btn go" type=button data-act=opt>Redelegate</button></div></div>' +
+          '<div class=sv-flow>' +
+            side("now", "Now", pct(plan.now), hn.ink, "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s"), nowSegs) +
+            '<div class=sv-arw aria-hidden=true><svg viewBox="0 0 40 16"><path d="M1 8h36M31 2l6 6-6 6"/></svg></div>' +
+            side("aft", "After", pct(plan.after), ha.ink, "on " + plan.picks.length + " validator" + (plan.picks.length === 1 ? "" : "s"), aftSegs) +
+            '<div class="sv-side gain"><span class=sv-lab>A year</span><b>+' + one(plan.gain) + '</b><i>ATONE more, at today\'s rates</i></div>' +
+          '</div>';
     }
     /* the hero wash only when there is a move to make - the page's one call to action */
     put("sv-optp", h).classList.toggle("hero", h.indexOf("data-act=opt") >= 0);
@@ -112,14 +179,14 @@
     if(!pos){
       /* no wallet: the section keeps its shape, like the wallet pane in the other view */
       al.hidden = false;
-      put("sv-allocp", '<div class=sv-ph><h3>Where your stake sits</h3></div>' + skelAlloc());
+      put("sv-allocp", '<div class=sv-ph><h3>Where stake can sit</h3>' + tag("q", S.n + " validators") + '<div class=sv-rt>' + hint() + '</div></div>' + scale([], S) + skelAlloc());
     }
     else if(!pos.rows.length){ al.hidden = true; }
     else {
       al.hidden = false;
       put("sv-allocp", '<div class=sv-ph><h3>Where your stake sits</h3>' +
         tag("q", pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s")) +
-        '<div class=sv-rt>' + tag("g", "APR " + pct(pos.rate)) + '</div></div>' + allocation(pos));
+        '<div class=sv-rt>' + hint() + '</div></div>' + allocation(pos, S));
     }
 
     /* the line under it: autopilot, freshness, the two plain controls */
@@ -143,23 +210,35 @@
     if(PC.key !== key){ PC.key = key; PC.val = window.__optPlan(false); }
     return PC.val;
   }
+  /* one side of the plan: its APR in its own heat, and the stake as a bar of heat segments */
+  function side(cls, lab, big, ink, sub, segs){
+    var tot = 0; segs.forEach(function(q){ tot += q.w; });
+    return '<div class="sv-side ' + cls + '"><span class=sv-lab>' + lab + '</span><b style="color:' + ink + '">' + big + '</b><i>' + sub + '</i>' +
+      '<div class=sv-mbar>' + segs.map(function(q){
+        return '<em style="flex:' + (tot ? (q.w / tot * 100).toFixed(2) : 1) + ' 1 0;background:' + heat(q.r).fill + '" title="' + esc(q.t) + '"></em>'; }).join("") +
+      '</div></div>';
+  }
   /* the same shape, waiting for a wallet */
   function skelAlloc(){
-    var h = '<div class=sv-bar></div><div class=sv-chips>', i;
-    for(i = 0; i < 5; i++) h += '<div class="sv-chip skel"><span class=sv-dot></span><b></b><em></em><s></s><u></u></div>';
+    var h = '<div class=sv-chips>', i;
+    for(i = 0; i < 5; i++) h += '<div class="sv-chip skel"><span class=sv-lgo></span><b></b><em></em><s></s><u></u></div>';
     return h + '</div>';
   }
-  /* the bar and the chips: the stake as it stands, largest first */
-  function allocation(pos){
+  /* The stake on the map, then validator by validator, largest first. Each validator is
+     pinned where the map paints it (the pin's size is its share of the stake), and its card
+     carries the same colour: a reader sees at a glance whether the stake sits at the dim,
+     low-paying end or the bright one. */
+  /* how to read the scale, said once, in its own colours */
+  function hint(){ return '<span class=sv-hint><i class=lo></i>the largest pay least<i class=hi></i>the smallest pay most</span>'; }
+  function allocation(pos, S, noScale){
     var rows = pos.rows.slice().sort(function(a, b){ return b.x - a.x; });
-    return '<div class=sv-bar>' + rows.map(function(r){
-        return '<i class="' + (r.locked > 0 ? "hld" : "") + '" style="width:' + (r.x / pos.total * 100).toFixed(2) +
-               '%;background:hsl(' + hueOf(r.m) + ',48%,52%)" title="' + esc(r.m) + ', ' + fmt(r.x) + ' ATONE"></i>'; }).join("") + '</div>' +
-      '<div class=sv-chips>' + rows.map(function(r){
-        return '<div class="sv-chip click" data-v="' + esc(r.id) + '" tabindex=0 title="Open this validator">' +
-          '<span class=sv-dot style="background:hsl(' + hueOf(r.m) + ',48%,52%)"></span>' +
-          '<b>' + esc(r.m) + '</b><em>' + Math.round(r.x / pos.total * 100) + '%</em>' +
-          '<s>' + fmt(r.x) + ' ATONE</s><u>' + (r.inactive ? "inactive" : pct(r.rate)) + '</u></div>'; }).join("") + '</div>';
+    var pins = rows.map(function(r){ return { r: r.inactive ? 0 : r.rate, s: Math.round(9 + 11 * Math.sqrt(r.x / pos.total)), t: r.m + ", " + pct(r.rate) }; });
+    return (noScale ? "" : scale(pins, S || setStats())) +
+      '<div class=sv-chips>' + rows.map(function(r){ var h = heat(r.inactive ? 0 : r.rate);
+        return '<div class="sv-chip click' + (r.locked > 0 ? " hld" : "") + '" data-v="' + esc(r.id) + '" tabindex=0 title="Open this validator" style="--c:' + h.fill + '">' +
+          '<span class=sv-lgo>' + logo(r.id, r.m) + '</span>' +
+          '<b>' + esc(r.m) + '</b><em>' + Math.round(r.x / pos.total * 100) + '<small>%</small></em>' +
+          '<s>' + fmt(r.x) + ' ATONE' + (r.locked > 0 ? ' · cooldown' : '') + '</s><u style="color:' + h.ink + '">' + (r.inactive ? "inactive" : pct(r.rate)) + '</u></div>'; }).join("") + '</div>';
   }
   function ago(at){ var s = Math.max(0, Math.round((Date.now() - at) / 1000)); return s < 60 ? s + "s ago" : Math.floor(s / 60) + "m ago"; }
   function autopilotWord(at){
@@ -178,7 +257,7 @@
        nothing staked, a stake with no grant, a grant standing */
     var door = !pos ? '<button class="sv-btn pri" type=button data-act=connect>Connect wallet</button>'
       : !pos.rows.length ? '<button class="sv-btn pri" type=button data-act=stake>Stake ATONE</button>'
-      : '<button class="sv-btn ' + (g ? "" : "pri") + '" type=button data-act=autopilot>' + (g ? "Manage" : "Set up") + '</button>';
+      : '<button class="sv-btn ' + (g ? "" : "vio") + '" type=button data-act=autopilot>' + (g ? "Manage" : "Set up") + '</button>';
 
     put("sv-atp",
       '<div class=sv-ph><h3>Autopilot</h3>' + state + '<div class=sv-rt>' + door + '</div></div>' +
@@ -202,7 +281,7 @@
       put("sv-atalloc", '<div class=sv-ph><h3>' + (g ? "What it manages" : "What it would manage") + '</h3>' +
           tag("q", pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s")) +
           '<div class=sv-rt>' + tag(g ? "g" : "q", g ? (last ? "last check " + last : "not checked yet") : "your stake as it stands") + '</div></div>' +
-        allocation(pos) +
+        allocation(pos, null, true) +
         (g ? '<div class=sv-note>' + (rp && rp.history && rp.history.length
           ? '<b>' + rp.history.length + '</b> move' + (rp.history.length === 1 ? "" : "s") + ' made, the last on <b>' + window.__dayFull(rp.history[0].at * 1000) + '</b>.'
           : "No move yet. The keeper only moves stake when the gain is worth the 21-day cooldown it costs.") + '</div>' : ""));
@@ -235,6 +314,8 @@
   }
 
   /* ── NETWORK ────────────────────────────────────────────────────────────── */
+  /* a validator's APR as the map paints it: a dot of its fill, the figure in its ink */
+  function aprCell(r){ var h = heat(r); return '<span class=sv-apr style="color:' + h.ink + '"><i style="background:' + h.fill + '"></i>' + pct(r) + '</span>'; }
   var FILTER = "all", FIND = "";
   function drawNet(){
     var D = DD(), S = setStats(), s = S.set, V = VALS(), mine = window.__MINE || {};
@@ -256,7 +337,8 @@
     put("sv-netcards",
       card("Bonus coefficient", 'η ' + (e.now != null ? e.now.toFixed(2) : "—"),
            e.now != null ? Math.round(e.now * 100) + "% of the reward pool, shared equally" : "") +
-      card("APR across the set", pct(S.lo) + '<em>to</em>' + pct(S.hi), "median " + pct(S.mid)) +
+      card("APR across the set", '<span style="color:' + heat(S.lo).ink + '">' + pct(S.lo) + '</span><em>to</em><span style="color:' + heat(S.hi).ink + '">' + pct(S.hi) + '</span>',
+           "median " + pct(S.mid) + ", brighter pays more") +
       card("Concentration", (isFinite(ratio) ? ratio.toFixed(1) : "—") + '<em>×</em>',
            "largest third against smallest, top ten hold " + top10.toFixed(0) + "%") +
       card("Record", (S.up != null ? S.up.toFixed(2) + "%" : "—"),
@@ -289,7 +371,7 @@
           '<td class=l><span class=sv-nm>' + logo(v[3], v[0]) + '<span class=tx><b>' + esc(v[0]) + '</b><i>' + big(v[1]) + ' ATONE, ' +
             '<span class="' + (up == null ? "sv-dim" : up >= 95 ? "sv-ok" : up >= 85 ? "sv-warn" : "sv-bad") + '">' + (up == null ? "—" : up.toFixed(1) + "%") + '</span>' +
             (j ? ', <span class="' + (j === 1 ? "sv-warn" : "sv-bad") + '">jailed ' + j + '×</span>' : '') + '</i></span></span></td>' +
-          '<td><span class=sv-apr>' + pct(rate0(v[1], v[2])) + '</span></td>' +
+          '<td>' + aprCell(rate0(v[1], v[2])) + '</td>' +
           '<td>' + (held[v[3]] ? '<b>' + big(held[v[3]]) + '</b>' : '<span class=sv-dim>—</span>') + '</td></tr>';
       });
       put("sv-nettbl", hp + '</tbody></table>');
@@ -308,7 +390,7 @@
         '<td class="' + (up == null ? "sv-dim" : up >= 95 ? "sv-ok" : up >= 85 ? "sv-warn" : "sv-bad") + '">' + (up == null ? "—" : up.toFixed(2) + "%") + '</td>' +
         '<td class="' + (!j ? "sv-dim" : j === 1 ? "sv-warn" : "sv-bad") + '">' + (j ? j + "×" : "never") + '</td>' +
         '<td>' + Math.round(v[2] * 100) + '%</td>' +
-        '<td><span class=sv-apr>' + pct(rate0(v[1], v[2])) + '</span></td>' +
+        '<td>' + aprCell(rate0(v[1], v[2])) + '</td>' +
         '<td>' + (held[v[3]] ? '<b>' + fmt(held[v[3]]) + '</b>' : '<span class=sv-dim>—</span>') + '</td></tr>';
     });
     put("sv-nettbl", h + '</tbody></table>');

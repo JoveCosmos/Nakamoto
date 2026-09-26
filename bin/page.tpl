@@ -3026,7 +3026,7 @@ color:var(--wt);font-family:var(--wmono);font-size:10.5px;cursor:pointer}
 /* the lockup owns the title line's first column, beside the centred views: the greeting
    only where there is room to read it, then each tagline while it still fits whole */
 @media(min-width:621px) and (max-width:1599px){.brandbar .welc{display:none}}
-@media(min-width:621px) and (max-width:1239px){.brandbar .svtag.a{display:none}}
+@media(min-width:621px) and (max-width:1439px){.brandbar .svtag.a{display:none}}
 @media(min-width:621px) and (max-width:1079px){.brandbar .svtag.s{display:none}}
 .sv-who{position:relative}
 .sv-menu{position:absolute;right:0;top:calc(100% + 9px);z-index:60;min-width:232px;padding:7px;border:1px solid var(--wbd2);
@@ -3317,6 +3317,144 @@ border-color:rgba(46,224,106,.3)}
   .welc{flex:1 1 100%;margin-left:0;padding-left:0;border-left:0}
   .sv-list .sv-wrap{max-height:62svh}
   .sv-chips{grid-template-columns:minmax(0,1fr)}
+}
+/* ══ Simple view, third pass (2026-09-26): the theme's own surfaces, heat as the colour of meaning ══
+   The operator: the simple view read "too dull ... away from theme", harder than Advanced.
+   So it takes back the window's violet-navy surfaces (the slate of the second pass is gone),
+   the calculator's type for labels (mono, uppercase, spaced), and colour means one thing each:
+     heat    the map's own ramp: where a validator, a stake, a plan sits - brighter pays more
+     amber   yours: the stake, the wallet, the first step
+     green   what you gain, and the one move that gains it
+     violet  Autopilot            teal   the set, the network
+   Every tile and panel wears its meaning the way Advanced's tiles do: a gradient hairline on
+   its top edge, and a heading behind a short bar of the same colour (--tc). */
+#sv{--wc:#0e0e1d;--wh:#12122a;--wi:#0a0a16;--wchip:#101024;--wbd:#232342;--wbd2:#34345c;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4;
+--sv-amber:#ffb02e;--sv-green:#2ee06a;--sv-violet:#b9b0ff;--sv-teal:#2bc8bd}
+.sv-screen{background:linear-gradient(180deg,#0d0d1c,#09090f);border-color:#232342}
+.sv-screen>.sv-panel,.sv-screen>.sv-strip,.sv-screen .sv-card,.sv-screen .sv-card:first-child,.sv-screen .sv-card+.sv-card{
+background:linear-gradient(180deg,#131329,#0c0c1a);border:1px solid var(--wbd2);box-shadow:inset 0 1px 0 #ffffff08;position:relative}
+.sv-screen>.sv-panel::before,.sv-screen>.sv-strip::before,.sv-screen .sv-card::before{content:"";position:absolute;left:16px;right:16px;top:0;height:1px;
+background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opacity:.95;pointer-events:none}
+.t-stk{--tc:var(--sv-amber)}.t-apr{--tc:#f07a3c}.t-rew{--tc:var(--sv-green)}
+#sv-optp{--tc:var(--sv-green)}#sv-allocp,#sv-atalloc{--tc:var(--sv-amber)}#sv-foot,#sv-atp,#sv-atp .sv-card,#sv-atauth{--tc:var(--sv-violet)}
+#sv-nethead,#sv-netcards .sv-card,.sv-screen>.sv-list{--tc:var(--sv-teal)}
+/* labels in the calculator's voice; figures in the colour of what they are */
+.sv-k{font-family:var(--wmono);font-size:9.5px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--ws)}
+.sv-big em{font-family:var(--wmono);font-size:10px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
+.t-stk .sv-big{color:var(--sv-amber)}.t-rew .sv-big{color:var(--sv-green)}
+.sv-ph h3{display:inline-flex;align-items:center;gap:9px}
+.sv-ph h3::before{content:"";width:3px;height:15px;border-radius:2px;background:var(--tc,#6f66c8);box-shadow:0 0 10px -1px var(--tc,#6f66c8)}
+.sv-tag.q{font-family:var(--wmono);font-size:9px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--ws);border-color:var(--wbd2)}
+/* the heat scale, on one line: the lowest rate the set pays, the map's ramp with a rug of
+   every validator above it, the median, the reader's validators as pins; the highest rate */
+.sv-hrow{display:flex;align-items:center;gap:12px;min-width:0}
+.sv-hl{font-family:var(--wmono);font-size:10px;letter-spacing:.04em;color:var(--ws);white-space:nowrap;flex:0 0 auto}
+.sv-heat{position:relative;flex:1 1 auto;min-width:0;height:26px}
+.sv-heat>i{position:absolute;left:0;right:0;top:12px;height:6px;border-radius:3px;box-shadow:0 0 14px -3px rgba(250,167,34,.45)}
+.sv-heat>s{position:absolute;top:4px;width:1px;height:5px;background:rgba(255,255,255,.3);transform:translateX(-.5px);text-decoration:none}
+.sv-heat>u{position:absolute;top:8px;width:2px;height:14px;border-radius:1px;background:var(--wt);opacity:.8;transform:translateX(-1px)}
+.sv-heat>b{position:absolute;top:15px;width:var(--s);height:var(--s);border-radius:50%;background:var(--c);border:2px solid #0b0b18;
+box-shadow:0 0 0 1.5px var(--wt),0 0 14px var(--c);transform:translate(-50%,-50%)}
+.sv-hrow.mini{gap:8px;margin-top:6px}
+.sv-hrow.mini .sv-hl{font-size:9px;color:var(--wf)}
+.sv-hrow.mini .sv-heat{height:16px}
+.sv-hrow.mini .sv-heat>i{top:5px;height:5px}
+.sv-hrow.mini .sv-heat>u{top:1px;height:13px}
+.sv-hrow.mini .sv-heat>b{top:7.5px}
+.sv-scl{display:block;min-height:0}
+.sv-hint{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ws);white-space:nowrap}
+.sv-hint i{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+.sv-hint i.lo{background:#572179;box-shadow:0 0 0 1px #8a5bb8}
+.sv-hint i.hi{background:#ffd662;margin-left:9px;box-shadow:0 0 8px #ffd66288}
+/* the plan: now -> after -> a year */
+.sv-flow{display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr) minmax(0,.95fr);gap:10px;align-items:stretch;min-width:0}
+.sv-side{display:flex;flex-direction:column;gap:2px;padding:8px 14px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.07);background:rgba(8,8,18,.55);min-width:0}
+.sv-lab{font-family:var(--wmono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--wf)}
+.sv-side b{font-size:23px;font-weight:800;letter-spacing:-.022em;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sv-side i{font-style:normal;font-size:11.5px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-mbar{display:flex;gap:2px;height:7px;margin-top:auto;padding-top:5px}
+.sv-mbar em{display:block;border-radius:3px;min-width:4px;height:7px}
+.sv-side.aft{border-color:rgba(46,224,106,.28)}
+.sv-side.gain{justify-content:center;background:linear-gradient(135deg,rgba(46,224,106,.17),rgba(46,224,106,.04));border-color:rgba(46,224,106,.38)}
+.sv-side.gain b{color:var(--sv-green);font-size:25px}
+.sv-arw{display:grid;place-items:center}
+.sv-arw svg{width:38px;height:16px;fill:none;stroke:var(--sv-green);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+/* a first visit: three steps, in the colours they carry on the screen */
+.sv-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;counter-reset:st}
+.sv-steps li{counter-increment:st;display:flex;flex-direction:column;gap:3px;padding:11px 14px 12px 46px;position:relative;border:1px solid rgba(255,255,255,.07);
+border-radius:10px;background:rgba(8,8,18,.55);min-width:0}
+.sv-steps li::before{content:counter(st);position:absolute;left:13px;top:11px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+font-family:var(--wmono);font-size:11px;font-weight:700;color:#0b0b18;background:var(--sc);box-shadow:0 0 14px -2px var(--sc)}
+.sv-steps b{font-size:13.5px;color:var(--wt)}
+.sv-steps span{font-size:11.5px;color:var(--ws);line-height:1.4}
+/* a validator the stake sits on: its heat along the left edge and in its APR */
+.sv-chips{gap:8px}
+.sv-chip{grid-template-columns:auto minmax(0,1fr) auto;gap:1px 10px;padding:8px 12px 8px 13px;border-radius:10px;background:rgba(8,8,18,.55);border:1px solid var(--wbd);position:relative;overflow:hidden}
+.sv-chip::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c,var(--wbd2))}
+.sv-chip .sv-lgo{grid-row:span 2;width:26px;height:26px;border-radius:8px;overflow:hidden;display:block;flex:0 0 auto}
+.sv-chip .sv-lgo img,.sv-chip .sv-lgo .lg{width:26px;height:26px;display:grid;place-items:center;object-fit:cover;font-size:10px;font-weight:700;color:#fff}
+.sv-chip em{font-size:15px;font-weight:800;color:var(--wt);font-variant-numeric:tabular-nums}
+.sv-chip em small{font-size:10px;font-weight:500;color:var(--wf);margin-left:1px}
+.sv-chip s{font-family:var(--wmono);font-size:9.5px;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-chip u{font-family:var(--wmono);font-size:11px;font-weight:700}
+.sv-chip.hld{opacity:.78}
+.sv-chip.click:hover{border-color:var(--c,var(--wbd2))}
+.sv-chip.skel .sv-lgo{background:var(--wbd2);opacity:.5}
+/* the screen's parts keep their size: shrinking to fit only hid an overflow (the parts squeezed,
+   their content spilled over the next one, and scrollHeight still matched). Only the network
+   list gives way, and it scrolls inside itself */
+.sv-screen>*{flex-shrink:0}
+.sv-screen>.sv-list{flex-shrink:1}
+.sv-screen .sv-card,.sv-screen .sv-card:first-child,.sv-screen .sv-card+.sv-card{padding-top:12px;padding-bottom:12px}
+.sv-big{font-size:28px;margin-top:4px}
+.sv-hmeta{font-family:var(--wmono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ws);white-space:nowrap}
+/* the footer: a line, not a box - status, freshness, the two plain controls */
+.sv-screen>#sv-foot{background:none;border:0;box-shadow:none;padding:0 2px}
+.sv-screen>#sv-foot::before{content:none}
+/* Autopilot's own colour */
+#sv-foot .sv-btn[data-route]{color:var(--sv-violet);border-color:rgba(185,176,255,.38)}
+#sv-foot .sv-btn[data-route]:hover{background:rgba(185,176,255,.1);color:var(--sv-violet);border-color:var(--sv-violet)}
+.sv-stat i{background:var(--sv-violet);box-shadow:0 0 0 3px rgba(185,176,255,.18)}
+.sv-btn.vio{background:var(--sv-violet);border-color:var(--sv-violet);color:#161038}
+.sv-btn.vio:hover:not(:disabled){background:#cfc8ff;border-color:#cfc8ff;color:#161038}
+/* what the grant allows: two boxes, green and red, so "may" and "may never" cannot be misread */
+.sv-can{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;font-size:12px}
+.sv-can>div{padding:10px 14px 11px;border-radius:10px;border:1px solid rgba(46,224,106,.3);background:rgba(46,224,106,.05);gap:7px}
+.sv-can>div+div{border-color:rgba(255,77,31,.3);background:rgba(255,77,31,.05)}
+.sv-can u{font-family:var(--wmono);font-size:9px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--sv-green)}
+.sv-can>div+div u{color:#ff7a57}
+/* the set: APR in the map's colour, the reader's rows marked in amber */
+.sv-tbl tbody tr.mine{background:rgba(255,176,46,.06)}
+.sv-tbl tbody tr.mine td:first-child{box-shadow:inset 3px 0 0 var(--sv-amber)}
+.sv-tbl th{font-family:var(--wmono);font-size:9px;font-weight:400;letter-spacing:.14em;text-transform:uppercase}
+.sv-apr i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;vertical-align:1px}
+.sv-seg[aria-pressed=true]{color:#062522;background:var(--sv-teal);border-color:var(--sv-teal)}
+/* the lockup: the mark and one line beside it (the word GATA is gone, the mark says it) */
+.sv-bw{align-items:center}
+/* set like the calculator's own title ("Nakamoto Bonus"): the line in ink, its last words in the
+   section's amber */
+.sv-bw i{font-family:var(--wsans);font-size:clamp(16px,1.35vw,20px);font-weight:700;letter-spacing:-.012em;color:var(--wt)}
+.sv-bw i em{font-style:normal;color:#ffb02e}
+.sv-brand{gap:12px}
+@media(max-width:900px){
+  .sv-hmeta{flex:1 1 100%;white-space:normal;line-height:1.6}
+  .sv-flow{grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr)}
+  .sv-side.gain{grid-column:1/-1}
+  .sv-steps{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:620px){
+  .sv-flow{grid-template-columns:minmax(0,1fr)}
+  .sv-arw{display:none}
+  .sv-can{grid-template-columns:minmax(0,1fr)}
+  .sv-heatl span:nth-child(2){display:none}
+}
+@media(min-width:901px) and (max-height:820px){
+  .sv-side,.sv-steps li{padding-top:7px;padding-bottom:8px}
+  .sv-side b{font-size:21px}
+  .sv-side.gain b{font-size:22px}
+  .sv-heat{height:20px}
+  .sv-heat>i{top:7px}.sv-heat>s{top:4px}.sv-heat>u{top:1px}.sv-heat>b{top:10px}
+  .sv-chip{padding-top:5px;padding-bottom:5px}
 }
 /* ══ Autopilot: one screen to set it up ═══════════════════════════════════════════════
    The terms on the left (strategy, which validators, stake, time, restake), the validator set
@@ -3630,7 +3768,7 @@ html[data-tab=connect] .l2host{display:none}
     <header class=brandbar>
       <div class=bwrap data-title-for=staking><div class=bt><span class=btx><i class=nk>Nakamoto </i><i class=tsfx id=tsfx>Bonus</i></span></div></div>
       <div class=bwrap data-title-for=governance><div class=bt><span class=btx><i class=nk>Governance </i><i class="tsfx tsub">Proposals</i></span></div></div>
-      <span class=sv-brand data-title-for=dashboard><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><b>GATA</b><i class="svtag s">Non-custodial staking</i><i class="svtag a">Decentralize the chain and earn more</i></span><span class=welc id=svwelc hidden></span></span>
+      <span class=sv-brand data-title-for=dashboard><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><i class="svtag s">Non-custodial <em>staking</em></i><i class="svtag a">Decentralize the chain and <em>earn more</em></i></span><span class=welc id=svwelc hidden></span></span>
       <div class=l2host>{{SHELL_L2}}</div>
     </header>
   <div class=flipbox id=flipbox>
@@ -3811,11 +3949,11 @@ html[data-tab=connect] .l2host{display:none}
     <main class=sv-main>
       <section class=sv-screen id=sv-over data-sc=over aria-label=Overview>
         <div class=sv-cards>
-          <div class=sv-card><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#ffb02e;--icb:rgba(255,176,46,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l8 4.5-8 4.5-8-4.5z"/><path d="M4 12l8 4.5 8-4.5"/><path d="M4 16.5l8 4.5 8-4.5"/></svg></span><span class=sv-k>Staked balance</span></span><span class="sv-tag g">Self-custody</span></span>
+          <div class="sv-card t-stk"><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#ffb02e;--icb:rgba(255,176,46,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l8 4.5-8 4.5-8-4.5z"/><path d="M4 12l8 4.5 8-4.5"/><path d="M4 16.5l8 4.5 8-4.5"/></svg></span><span class=sv-k>Staked balance</span></span><span class="sv-tag g">Self-custody</span></span>
             <span class=sv-big id=sv-staked>&mdash;<em>ATONE</em></span><span class=sv-sub id=sv-stsub></span></div>
-          <div class=sv-card><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#2bc8bd;--icb:rgba(43,200,189,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span><span class=sv-k>Your APR</span></span></span>
-            <span class=sv-big id=sv-apr>&mdash;</span><span class=sv-sub id=sv-aprsub></span></div>
-          <div class=sv-card><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#2ee06a;--icb:rgba(46,224,106,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 21V7"/><path d="M12 7C10 3 6 4 7 6.5 7.8 8 12 7 12 7zM12 7c2-4 6-3 5-.5C16.2 8 12 7 12 7z"/></svg></span><span class=sv-k>Rewards waiting</span></span></span>
+          <div class="sv-card t-apr"><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#f07a3c;--icb:rgba(240,122,60,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span><span class=sv-k>Your APR</span></span></span>
+            <span class=sv-big id=sv-apr>&mdash;</span><div class="sv-sub sv-scl" id=sv-aprsub></div></div>
+          <div class="sv-card t-rew"><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#2ee06a;--icb:rgba(46,224,106,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 21V7"/><path d="M12 7C10 3 6 4 7 6.5 7.8 8 12 7 12 7zM12 7c2-4 6-3 5-.5C16.2 8 12 7 12 7z"/></svg></span><span class=sv-k>Rewards waiting</span></span></span>
             <span class=sv-big id=sv-rew>&mdash;<em>ATONE</em></span><span class=sv-sub id=sv-rewsub></span></div>
         </div>
         <div class=sv-panel id=sv-optp></div>

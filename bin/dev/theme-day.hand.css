@@ -110,3 +110,7 @@
   html[data-theme=light]:not([data-mono]) .atlist .wk-lgx{color:#fff}
   html[data-theme=light]:not([data-mono]) .atlist td.dim,html[data-theme=light]:not([data-mono]) .atcard .atfoot .txfee,
   html[data-theme=light]:not([data-mono]) .l2gl{color:var(--muted)}
+  /* Simple, third pass: the scale's hint keeps the map's two ends (the shadow would turn the
+     plum into a hollow ring) */
+  html[data-theme=light]:not([data-mono]) .sv-hint i.lo{background:#572179;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-hint i.hi{background:#e0a21e;box-shadow:none}

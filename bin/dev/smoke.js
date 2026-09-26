@@ -222,7 +222,7 @@ t('shell-version', function(){
   ap.click(); if(location.hash!=='#/dashboard/overview') bad.push('autopilot opened in pro '+location.hash);
   go('dashboard/network'); if(location.hash!=='#/dashboard/overview') bad.push('network route in pro '+location.hash);
   var tg=[].filter.call(document.querySelectorAll('.brandbar .svtag'),function(x){ return x.offsetParent!==null; });
-  if(innerWidth>1239 && (tg.length!==1 || !tg[0].classList.contains('a'))) bad.push('pro tagline');
+  if(innerWidth>1439 && (tg.length!==1 || !tg[0].classList.contains('a'))) bad.push('pro tagline');
   [].forEach.call(document.querySelectorAll('.l2vb'),function(b){ var h=parseFloat(getComputedStyle(b,'::after').height); if(!(h>=44) && b.getBoundingClientRect().height<44) bad.push('switch target '+h); });
   document.querySelector('.l2vb[data-ver=simple]').click();
   if(!vis('sv-over') || off()!=='votes,governors') bad.push('back to simple off '+off());
