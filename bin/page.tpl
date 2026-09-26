@@ -3560,7 +3560,7 @@ position:relative;overflow:hidden;min-width:0;min-height:0}
    chain's pace - the same boxes and rows as the wallet ══ */
 #sv-net{justify-content:flex-start;gap:12px}
 #sv-net>*,#sv-net>*:not(:first-child){margin-top:0}
-#sv-netcards{grid-template-columns:repeat(2,minmax(0,1fr))}
+#sv-netcards{grid-template-columns:repeat(3,minmax(0,1fr))}
 #sv-net>.sv-up{flex:1 1 0;min-height:0}
 #sv-net .sv-upst{padding-top:4px;padding-bottom:5px}
 #sv-net .sv-upchart{min-height:0}

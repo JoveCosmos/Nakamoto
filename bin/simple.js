@@ -103,16 +103,19 @@
 
   /* ── the set, once: the figures every screen quotes ── */
   function setStats(){
-    var V = VALS(), D = DD(), rs = [], i, up = 0, upn = 0, clean = 0;
+    var V = VALS(), D = DD(), rs = [], i, up = 0, upn = 0, u9 = 0, u9n = 0, lf = 0, lfn = 0, clean = 0;
     for(i = 0; i < V.length; i++){
       rs.push(rate0(V[i][1], V[i][2]));
       var d = window.__VDBY && window.__VDBY[V[i][3]];
       if(d && d.d30 != null){ up += +d.d30; upn++; }
+      if(d && d.d90 != null){ u9 += +d.d90; u9n++; }
+      if(d && d.life_up != null){ lf += +d.life_up; lfn++; }
       if(!V[i][4]) clean++;
     }
     var s = rs.slice().sort(function(a, b){ return a - b; });
     return { lo: s[0] || 0, hi: s[s.length - 1] || 0, mid: s.length ? s[(s.length - 1) >> 1] : 0,
-             n: V.length, up: upn ? up / upn : null, clean: clean, set: D.set || {} };
+             n: V.length, up: upn ? up / upn : null, up90: u9n ? u9 / u9n : null, life: lfn ? lf / lfn : null,
+             clean: clean, set: D.set || {} };
   }
 
   /* ── OVERVIEW ───────────────────────────────────────────────────────────── */
@@ -374,11 +377,12 @@
   /* the chain's governance at a glance: how many proposals, what is open or how the last ended
      (read once a visit from the chain's API; a proposal takes weeks) */
   function drawNet(){
-    var S = setStats(), last = (upRows().slice(-1)[0] || [])[2];
+    var S = setStats(), f = function(v){ return v != null ? v.toFixed(2) + "%" : "—"; }, g = (DD().coverage || {}).from_date;
+    /* the set's uptime over three spans: each is the average of the validators' own records */
     put("sv-netcards",
-      card("Validators active", String(last || S.n), "in the active set, signing every block") +
-      card("Uptime", (S.up != null ? S.up.toFixed(2) + "%" : "—"),
-           "30-day validator set average, " + S.clean + " never jailed"));
+      card("Uptime, 30 days", f(S.up), "validator set average, " + S.clean + " never jailed") +
+      card("Uptime, 90 days", f(S.up90), "validator set average") +
+      card("Uptime since genesis", f(S.life), "each validator since it joined" + (g ? ", from " + g : "")));
 
     drawUp(S);
   }
