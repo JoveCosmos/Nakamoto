@@ -3481,7 +3481,7 @@ display:flex;flex-direction:column;overflow:hidden}
 .atrow{display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:10px 0;border-top:1px solid var(--wbd)}
 .atrow:first-child{border-top:0}
 .atlab{font-family:var(--wmono);font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--wf)}
-.atpre{display:grid;gap:6px}
+.atpre{display:grid;gap:6px;position:relative}
 .atpre.at3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .atpre.at2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .atpc{display:grid;grid-template-columns:14px minmax(0,1fr);grid-template-areas:"r b" "r e";column-gap:8px;row-gap:2px;align-items:center;padding:7px 9px;
@@ -3495,6 +3495,19 @@ border:1px solid var(--wbd2);border-radius:6px;background:linear-gradient(180deg
 .atpc b{grid-area:b;font-family:var(--wsans);font-size:11.5px;font-weight:600;color:#fff8dc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .atpc em{grid-area:e;font-style:normal;font-family:var(--wmono);font-size:8px;letter-spacing:.1em;color:var(--av);white-space:nowrap}
 .at3 .atpc:nth-child(1) b{color:#8ef0c8}.at3 .atpc:nth-child(2) b{color:#c9c2ff}.at3 .atpc:nth-child(3) b{color:#ffc453}
+/* a strategy's risk in its own colour, and a "?" that explains it: the note opens under the row
+   (hover, or a tap on a phone, which focuses it) and a tap on the "?" never changes the choice */
+.at3 .atpc{grid-template-columns:14px minmax(0,1fr) auto;grid-template-areas:"r b h" "r e h";column-gap:6px;padding-right:7px}
+.at3 .atpc em{font-family:var(--wsans);font-size:10px;letter-spacing:0;font-weight:600}
+.at3 .atpc:nth-child(1) em{color:#2ee06a}.at3 .atpc:nth-child(2) em{color:#c9c2ff}.at3 .atpc:nth-child(3) em{color:#ff9a3c}
+.athelp{grid-area:h;align-self:center;width:15px;height:15px;border-radius:50%;border:1px solid var(--wbd2);display:grid;place-items:center;
+font-style:normal;font-family:var(--wsans);font-size:10px;font-weight:700;line-height:1;color:var(--ws);cursor:help;position:relative}
+.athelp::after{content:"";position:absolute;inset:-12px}
+.athelp:hover,.athelp:focus-visible{border-color:var(--av);color:var(--av);outline:none}
+.attip{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:6;padding:9px 12px 10px;border:1px solid var(--wbd2);border-radius:8px;
+background:#15152c;box-shadow:0 14px 30px -12px rgba(0,0,0,.8);font-family:var(--wsans);font-size:11.5px;line-height:1.5;color:var(--ws);white-space:normal;pointer-events:none}
+.attip b{color:#fff8dc;font-weight:600}
+.athelp:hover+.attip,.athelp:focus+.attip{display:block}
 .atrow:has(.atfield){flex-direction:row;flex-wrap:wrap;align-items:center;column-gap:12px}
 .atrow:has(.atfield) .atlab{flex:0 0 100%}
 .atcard .unfield.atfield{width:240px;height:30px}
@@ -3509,16 +3522,11 @@ white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .atseg button{height:24px;padding:0 12px;border:0;border-radius:4px;background:transparent;color:var(--ws);font-family:var(--wmono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
 .atseg button[aria-pressed=true]{background:var(--av);color:#1b1440}
 .atseg button:focus-visible{outline:2px solid var(--av);outline-offset:2px}
+/* the restake pair sits on its own in the row: as wide as its buttons, like the months */
+#atrsk{align-self:flex-start}
+#atrsk button{min-width:52px}
 .atuntil{font-family:var(--wmono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ws)}
 .atuntil b{font-family:var(--wsans);font-size:11.5px;font-weight:600;letter-spacing:0;text-transform:none;color:#fff8dc;margin-left:4px}
-.atsw{display:grid;grid-template-columns:34px minmax(0,1fr);column-gap:10px;align-items:center;cursor:pointer;padding:2px 0;position:relative}
-.atsw input{position:absolute;opacity:0;width:0;height:0}
-.atswk{position:relative;width:34px;height:20px;border-radius:999px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#0b0b18,#0e0e1d);transition:background .15s,border-color .15s}
-.atswk::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--wf);transition:transform .15s,background .15s}
-.atsw input:checked+.atswk{background:rgba(46,224,106,.22);border-color:#2ee06a}
-.atsw input:checked+.atswk::after{transform:translateX(14px);background:#2ee06a}
-.atsw input:focus-visible+.atswk{outline:2px solid var(--av);outline-offset:2px}
-.atswt{font-family:var(--wsans);font-size:11px;line-height:1.35;color:var(--ws)}
 .atfee{margin:8px 0 0;padding:9px 12px;border:1px solid rgba(255,176,46,.28);border-radius:6px;background:rgba(255,176,46,.05);font-family:var(--wmono);font-size:9px;letter-spacing:.04em;color:var(--ws);line-height:1.5}
 .atfee b{color:var(--wamber);font-weight:400}
 .atnote{display:flex;align-items:center;gap:9px;margin:12px 0 0;padding:8px 11px;border-radius:6px;border:1px solid rgba(46,224,106,.28);background:rgba(46,224,106,.06);font-family:var(--wsans);font-size:11.5px;color:#d9f7e4}
@@ -4171,9 +4179,9 @@ html[data-tab=connect] .l2host{display:none}
       <div class=atform id=atform>
         <div class=atrow><span class=atlab>Strategy</span>
           <div class="atpre at3">
-            <label class=atpc><input type=radio name=atstrat value=passive><b>Passive</b><em id=atn0></em></label>
-            <label class=atpc><input type=radio name=atstrat value=below checked><b>Moderate</b><em id=atn1></em></label>
-            <label class=atpc><input type=radio name=atstrat value=aggressive><b>Aggressive</b><em id=atn3></em></label>
+            <label class=atpc><input type=radio name=atstrat value=passive><b>Passive</b><em id=atn0>Safe</em><i class=athelp tabindex=0 role=button aria-label="What Passive means" aria-describedby=attip-passive>?</i><span class=attip role=tooltip id=attip-passive><b>Passive, safe.</b> Only the larger half of the set: validators never jailed, with at least 99% uptime over 90 days and over their whole life. The steadiest record, and the lowest APR.</span></label>
+            <label class=atpc><input type=radio name=atstrat value=below checked><b>Moderate</b><em id=atn1>Less risky</em><i class=athelp tabindex=0 role=button aria-label="What Moderate means" aria-describedby=attip-below>?</i><span class=attip role=tooltip id=attip-below><b>Moderate, less risky.</b> Validators with less stake than the average, never jailed, with at least 95% uptime over 90 days. Smaller validators pay more under the Nakamoto bonus; the clean record keeps the risk low.</span></label>
+            <label class=atpc><input type=radio name=atstrat value=aggressive><b>Aggressive</b><em id=atn3>Riskier</em><i class=athelp tabindex=0 role=button aria-label="What Aggressive means" aria-describedby=attip-aggressive>?</i><span class=attip role=tooltip id=attip-aggressive><b>Aggressive, riskier.</b> Any validator with at least 50% uptime over 90 days, jailed before or not. It goes where the APR is highest, and accepts a higher chance of downtime or a slash on your stake.</span></label>
           </div></div>
         <div class=atrow><span class=atlab>Validators</span>
           <div class="atpre at2">
@@ -4186,7 +4194,7 @@ html[data-tab=connect] .l2host{display:none}
         <div class=atrow><span class=atlab>Time</span>
           <div class=attime><div class=atseg id=atseg><button type=button data-d=90 aria-pressed=true>3 months</button><button type=button data-d=180 aria-pressed=false>6 months</button></div><span class=atuntil id=atuntil></span></div></div>
         <div class=atrow><span class=atlab>Restake</span>
-          <label class=atsw><input type=checkbox id=atrestake><span class=atswk aria-hidden=true></span><span class=atswt>Restake rewards regularly; growing stake and yielding higher APR.</span></label></div>
+          <div class=atseg id=atrsk role=group aria-label="Restake rewards"><button type=button data-r=1 aria-pressed=false>Yes</button><button type=button data-r=0 aria-pressed=true>No</button></div><input type=checkbox id=atrestake hidden></div>
         <div class=atfee id=atfee hidden></div>
       </div>
       <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. You can revoke authz at any time.</span></div>

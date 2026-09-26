@@ -543,13 +543,16 @@
   html[data-theme=light]:not([data-mono]) .at3 .atpc:nth-child(1) b{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .at3 .atpc:nth-child(2) b{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .at3 .atpc:nth-child(3) b{color:var(--warn)}
+  html[data-theme=light]:not([data-mono]) .at3 .atpc:nth-child(1) em{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .at3 .atpc:nth-child(2) em{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .at3 .atpc:nth-child(3) em{color:var(--warn)}
+  html[data-theme=light]:not([data-mono]) .athelp:hover,html[data-theme=light]:not([data-mono]) .athelp:focus-visible{outline:none}
+  html[data-theme=light]:not([data-mono]) .attip{background:var(--surface-2);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .attip b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .atcard .unfield.atfield:focus-within{box-shadow:0 0 0 3px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .atseg button{background:transparent}
   html[data-theme=light]:not([data-mono]) .atseg button[aria-pressed=true]{color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .atuntil b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .atswk{background:var(--surface)}
-  html[data-theme=light]:not([data-mono]) .atsw input:checked+.atswk{background:var(--accent-soft);border-color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .atsw input:checked+.atswk::after{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .atfee{border:1px solid var(--warn-bg);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) .atnote{border:1px solid var(--accent-soft);background:var(--accent-soft);color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .atnote svg{fill:none;stroke:var(--accent)}
@@ -710,4 +713,6 @@
   /* the lockup's line in full ink, its last words in a deep amber */
   html[data-theme=light]:not([data-mono]) .sv-bw i{color:#16141f}
   html[data-theme=light]:not([data-mono]) .sv-bw i em{color:#b8690a;text-shadow:none}
+  /* Plex runs wider than the night face: the strategy names keep whole beside their "?" */
+  html[data-theme=light]:not([data-mono]) .at3 .atpc b{font-size:11px;letter-spacing:-.01em}
 

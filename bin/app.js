@@ -2392,7 +2392,6 @@ rememberGridH();
   /* the counts: on the strategy and validator cards, over the list, on the phone's tab */
   function atCounts(){
     var set = atIdsFor("all").length, sel = atSelIds().length, view = atViewing();
-    [["atn0", "passive"], ["atn1", "below"], ["atn3", "aggressive"]].forEach(function(x){ var e = E(x[0]); if(e) e.textContent = atIdsFor(x[1]).length + " fit"; });
     var na = E("atna"); if(na) na.textContent = set + " validators";
     var n2 = E("atn2"); if(n2) n2.textContent = sel ? sel + " selected" : "none yet";
     var n = view ? Object.keys(atGrantIds()).length : atPick() === "all" ? set : sel;
@@ -2470,7 +2469,11 @@ rememberGridH();
     ATSEL = ids; atSetPick(Object.keys(ids).length >= atIdsFor("all").length ? "all" : "selected");
     if(cap) cap.value = a.max_tokens ? exact(+a.max_tokens.amount) : "";
     if(rs) rs.checked = (AT.grants || []).some(function(x){ return grantType(x) === DELEG; });
+    atRsSync();
   }
+  /* restake is a Yes | No pair like the months; the hidden box underneath is what the rest reads */
+  function atRsSync(){ var on = atRestake();
+    Array.prototype.forEach.call(document.querySelectorAll("#atrsk button"), function(o){ o.setAttribute("aria-pressed", (o.dataset.r === "1") === on ? "true" : "false"); }); }
   function atShow(){
     var g = AT.grant, view = atViewing(), st = E("atstate");
     st.hidden = !g;
@@ -2513,6 +2516,8 @@ rememberGridH();
   var atmax = E("atmax"); if(atmax) atmax.addEventListener("click", function(){ var pos = window.__POS; if(!pos || !(pos.free > 0)) return; E("atcap").value = exact(pos.free); atState(); });
   Array.prototype.forEach.call(document.querySelectorAll("#atpop input[name=atstrat],#atpop input[name=atpick]"), function(r){ r.addEventListener("change", atRefresh); });
   var atrs = E("atrestake"); if(atrs) atrs.addEventListener("change", atState);
+  Array.prototype.forEach.call(document.querySelectorAll("#atrsk button"), function(b){ b.addEventListener("click", function(){
+    if(!atrs || atViewing()) return; atrs.checked = b.dataset.r === "1"; atRsSync(); atState(); }); });
   Array.prototype.forEach.call(document.querySelectorAll("#atseg button"), function(b){ b.addEventListener("click", function(){
     AT.days = +b.dataset.d; Array.prototype.forEach.call(document.querySelectorAll("#atseg button"), function(o){ o.setAttribute("aria-pressed", o === b ? "true" : "false"); }); atState(); }); });
   /* the list: a tap anywhere on a row selects it or lets it go; from "All", the first tap
@@ -2536,6 +2541,11 @@ rememberGridH();
     if(atPick() === "all"){ ATSEL = {}; atIdsFor("all").forEach(function(x){ ATSEL[x] = 1; }); atSetPick("selected"); }
     if(on) ATSEL[tr.dataset.id] = 1; else delete ATSEL[tr.dataset.id];
     atRefresh();
+  });
+  /* the "?" beside a strategy: it opens its note (hover or focus) and never selects the option */
+  Array.prototype.forEach.call(document.querySelectorAll("#atpop .athelp"), function(h){
+    h.addEventListener("click", function(ev){ ev.preventDefault(); ev.stopPropagation(); h.focus(); });
+    h.addEventListener("keydown", function(ev){ if(ev.key === "Enter" || ev.key === " "){ ev.preventDefault(); ev.stopPropagation(); } });
   });
   var atflt = E("atflt");
   if(atflt) atflt.addEventListener("click", function(ev){ var b = ev.target.closest ? ev.target.closest("[data-f]") : null; if(!b) return; AT_FLT = b.dataset.f; atFltSync(); atRows(); });
