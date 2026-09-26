@@ -3232,7 +3232,7 @@ border-color:rgba(46,224,106,.3)}
    Every tile and panel wears its meaning the way Advanced's tiles do: a gradient hairline on
    its top edge, and a heading behind a short bar of the same colour (--tc). */
 #sv{--wc:#0e0e1d;--wh:#12122a;--wi:#0a0a16;--wchip:#101024;--wbd:#232342;--wbd2:#34345c;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4;
---sv-amber:#ffb02e;--sv-green:#2ee06a;--sv-violet:#b9b0ff;--sv-teal:#2bc8bd}
+--sv-amber:#ffb02e;--sv-green:#2ee06a;--sv-violet:#b9b0ff;--sv-teal:#2bc8bd;--sv-pho:#7fd8ff}
 .sv-screen{background:linear-gradient(180deg,#0d0d1c,#09090f);border-color:#232342}
 .sv-screen>.sv-panel,.sv-screen .sv-card,.sv-screen .sv-card:first-child,.sv-screen .sv-card+.sv-card{
 background:linear-gradient(180deg,#131329,#0c0c1a);border:1px solid var(--wbd2);box-shadow:inset 0 1px 0 #ffffff08;position:relative}
@@ -3560,8 +3560,7 @@ position:relative;overflow:hidden;min-width:0;min-height:0}
    chain's pace - the same boxes and rows as the wallet ══ */
 #sv-net{justify-content:flex-start;gap:12px}
 #sv-net>*,#sv-net>*:not(:first-child){margin-top:0}
-#sv-netcards{grid-template-columns:repeat(4,minmax(0,1fr))}
-#sv-netcards .sv-big small{font-size:11px;font-weight:500;color:var(--wf);margin-left:6px;letter-spacing:0}
+#sv-netcards{grid-template-columns:repeat(2,minmax(0,1fr))}
 #sv-net>.sv-up{flex:1 1 0;min-height:0}
 #sv-net .sv-upst{padding-top:4px;padding-bottom:5px}
 #sv-net .sv-upchart{min-height:0}
@@ -3594,6 +3593,77 @@ background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--wt) 80%,trans
   #sv-up .sv-rt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:8px}
   #sv-up .sv-upst{justify-content:start}
   .sv-pace{height:90px;flex:0 0 auto}
+}
+/* ══ Network tabs: Signing, Proposers, Activity, Economics - the Uptime panel's stats in
+   each heading, a key beside the title, lists that scroll inside their panel ══ */
+#sv-sign,#sv-prop,#sv-act,#sv-eco{justify-content:flex-start;gap:12px}
+#sv-sign>*,#sv-prop>*,#sv-act>*,#sv-eco>*,#sv-sign>*:not(:first-child),#sv-prop>*:not(:first-child),#sv-act>*:not(:first-child),#sv-eco>*:not(:first-child){margin-top:0}
+#sv-signp,#sv-prop24,#sv-act7,#sv-actlive{flex:1 1 0;min-height:0}
+#sv-sign .sv-panel,#sv-prop .sv-panel,#sv-act .sv-panel,#sv-eco .sv-panel{--tc:var(--sv-teal)}
+#sv-sign .sv-upst,#sv-prop .sv-upst,#sv-act .sv-upst,#sv-eco .sv-upst,#sv-pace .sv-upst{padding-top:4px;padding-bottom:5px}
+.sv-gkey{display:inline-flex;align-items:center;gap:6px;font-family:var(--wmono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
+.sv-gkey i{width:9px;height:9px;border-radius:2px;margin-left:6px}
+.sv-gkey i:first-child{margin-left:0}
+.sv-gkey i.ok{background:rgba(43,200,189,.6)}.sv-gkey i.bad{background:#ff4d1f}.sv-gkey i.due{width:2px;height:12px;border-radius:1px;background:var(--wt)}
+.sv-gkey i.sup{background:var(--sv-amber)}.sv-gkey i.bon{background:rgba(255,176,46,.35)}.sv-gkey i.pho{background:var(--sv-pho)}
+.sv-gx{display:flex;justify-content:space-between;gap:10px;font-family:var(--wmono);font-size:9.5px;color:var(--wf);white-space:nowrap}
+.sv-gtip{color:var(--wt);overflow:hidden;text-overflow:ellipsis}
+/* Signing: names on the left, one canvas of cells on the right, scrolling together */
+.sv-grid{flex:1 1 auto;min-height:0;overflow-y:auto;display:grid;grid-template-columns:190px minmax(0,1fr);column-gap:10px;align-content:start;
+scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
+.sv-gnames{display:flex;flex-direction:column;min-width:0}
+.sv-gn{height:16px;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ws);cursor:pointer;min-width:0}
+.sv-gn:hover b{color:var(--wt)}
+.sv-gn .sv-lgo{width:12px;height:12px;border-radius:3px;overflow:hidden;flex:0 0 auto}
+.sv-gn .sv-lgo img,.sv-gn .sv-lgo .lg{width:12px;height:12px;display:grid;place-items:center;object-fit:cover;font-size:7px;font-weight:700;color:#fff}
+.sv-gn b{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto}
+.sv-gn em{font-style:normal;font-family:var(--wmono);font-size:10px;color:#ff6a3d}
+.sv-gn.bad b{color:var(--wt);font-weight:600}
+.sv-gcw{min-width:0}
+.sv-gc{display:block;cursor:crosshair}
+/* Proposers: the latest blocks as logos, newest right; the day's list, due marked */
+.sv-plive{display:grid;grid-template-columns:repeat(24,minmax(0,1fr));gap:6px}
+.sv-pb{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;cursor:pointer}
+.sv-pb .sv-lgo{width:28px;height:28px;border-radius:8px;overflow:hidden}
+.sv-pb .sv-lgo img,.sv-pb .sv-lgo .lg{width:28px;height:28px;display:grid;place-items:center;object-fit:cover;font-size:10px;font-weight:700;color:#fff}
+.sv-pb b{font-size:9.5px;font-weight:500;color:var(--ws);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-pb s{text-decoration:none;font-family:var(--wmono);font-size:8.5px;color:var(--wf)}
+.sv-pb:last-child .sv-lgo{box-shadow:0 0 0 2px var(--sv-teal)}
+.sv-plist{flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:5px;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
+.sv-plist .sv-vr{flex:0 0 34px}
+.sv-plist .sv-vt{position:relative;overflow:visible}
+.sv-plist .sv-vt u{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;border-radius:1px;background:var(--wt)}
+.sv-vr u.ok{color:var(--sv-green)}.sv-vr u.warn{color:var(--sv-amber)}.sv-vr u.bad{color:#ff6a3d}
+/* Activity: bars per hour and per block */
+.sv-bars{flex:1 1 auto;min-height:40px;display:flex;align-items:flex-end;gap:1px;border-bottom:1px solid var(--wbd2)}
+.sv-bars i{flex:1 1 0;min-width:1px;height:var(--h);border-radius:2px 2px 0 0;background:linear-gradient(180deg,rgba(43,200,189,.9),rgba(43,200,189,.3))}
+.sv-bars.live{gap:2px}
+.sv-bars.live i{background:linear-gradient(180deg,#b9b0ff,rgba(185,176,255,.3))}
+.sv-bars i.z,.sv-bars.live i.z{background:var(--wbd2)}
+.sv-bx{position:relative;height:14px;font-family:var(--wmono);font-size:9.5px;color:var(--wf)}
+.sv-bx span{position:absolute;top:0;white-space:nowrap;padding-left:4px;border-left:1px solid var(--wbd2)}
+/* Economics: two line charts */
+#sv-ecorow{flex:1 1 0;min-height:0;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.sv-lc{position:relative;flex:1 1 auto;min-height:60px}
+.sv-lc svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.sv-lc .gl{stroke:var(--wbd);stroke-width:1;vector-effect:non-scaling-stroke}
+.sv-lc .ln{fill:none;stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.sv-lc .ln.sup{stroke:var(--sv-amber)}.sv-lc .ln.bon{stroke:rgba(255,176,46,.55)}.sv-lc .ar.bon{fill:rgba(255,176,46,.16)}
+.sv-lc .ln.pho{stroke:var(--sv-pho)}.sv-lc .ar.pho{fill:rgba(127,216,255,.14)}
+.sv-ly{position:absolute;left:4px;font-family:var(--wmono);font-size:9.5px;color:var(--wf);background:var(--wc);padding:0 4px;border-radius:3px}
+@media(max-width:900px){
+  #sv-signp,#sv-prop24,#sv-act7,#sv-actlive,#sv-ecorow{flex:0 0 auto}
+  #sv-ecorow{grid-template-columns:minmax(0,1fr)}
+  .sv-grid,.sv-plist{max-height:60svh}
+  .sv-bars{height:140px;flex:0 0 auto}
+  .sv-lc{height:180px;flex:0 0 auto}
+  .sv-plive{grid-template-columns:repeat(8,minmax(0,1fr))}
+}
+@media(max-width:620px){
+  .sv-grid{grid-template-columns:120px minmax(0,1fr)}
+  .sv-pb s{display:none}
+  #sv-sign .sv-rt,#sv-prop .sv-rt,#sv-act .sv-rt,#sv-eco .sv-rt,#sv-pace .sv-rt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:8px}
+  #sv-sign .sv-upst,#sv-prop .sv-upst,#sv-act .sv-upst,#sv-eco .sv-upst,#sv-pace .sv-upst{justify-content:start}
 }
 /* ══ Autopilot: one screen to set it up ═══════════════════════════════════════════════
    The terms on the left (strategy, which validators, stake, time, restake), the validator set
@@ -3925,7 +3995,7 @@ html[data-tab=connect] .l2host{display:none}
       <span class=calclab>Nakamoto</span>
     <header class=brandbar>
       <div class=bwrap data-title-for=staking><div class=bt><span class=btx><i class=nk>Nakamoto </i><i class=tsfx id=tsfx>Bonus</i></span></div></div>
-      <div class=bwrap data-title-for=network><div class=bt><span class=btx><i class=nk>AtomOne </i><i class="tsfx net">Network</i></span></div></div>
+      <div class=bwrap data-title-for=network><div class=bt><span class=btx><i class=nk>Network </i><i class="tsfx net tsub">Uptime</i></span></div></div>
       <div class=bwrap data-title-for=governance><div class=bt><span class=btx><i class=nk>Governance </i><i class="tsfx tsub">Proposals</i></span></div></div>
       <span class=sv-brand data-title-for=dashboard><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><span class="bt svtag s"><span class=btx><i class=nk>Non-custodial </i><i class=tsfx>staking</i></span></span><span class="bt svtag a"><span class=btx><i class=nk>Decentralize the chain and </i><i class=tsfx>earn more</i></span></span></span><span class=welc id=svwelc hidden></span></span>
       <div class=l2host>{{SHELL_L2}}</div>
@@ -4118,6 +4188,23 @@ html[data-tab=connect] .l2host{display:none}
         <div class="sv-panel sv-up" id=sv-up></div>
         <div class=sv-row2 id=sv-netrow>
           <div class=sv-panel id=sv-pace></div>
+        </div>
+      </section>
+      <section class=sv-screen id=sv-sign data-sc=sign aria-label=Signing>
+        <div class="sv-panel sv-gridp" id=sv-signp></div>
+      </section>
+      <section class=sv-screen id=sv-prop data-sc=prop aria-label=Proposers>
+        <div class=sv-panel id=sv-proplive></div>
+        <div class="sv-panel sv-gridp" id=sv-prop24></div>
+      </section>
+      <section class=sv-screen id=sv-act data-sc=act aria-label=Activity>
+        <div class=sv-panel id=sv-act7></div>
+        <div class=sv-panel id=sv-actlive></div>
+      </section>
+      <section class=sv-screen id=sv-eco data-sc=eco aria-label=Economics>
+        <div class=sv-row2 id=sv-ecorow>
+          <div class=sv-panel id=sv-ecoa></div>
+          <div class=sv-panel id=sv-ecop></div>
         </div>
       </section>
     </main>

@@ -481,7 +481,7 @@
   html[data-theme=light]:not([data-mono]) .sv-btn.pri{background:var(--amber-bar);border-color:var(--amber-bar);color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .sv-btn.pri:hover:not(:disabled){background:var(--amber-bar);border-color:var(--amber-bar);color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) #sv-optp.hero{background:var(--accent-soft),var(--wh);border-color:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) #sv{--sv-amber:var(--warn);--sv-green:var(--accent);--sv-violet:var(--accent);--sv-teal:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #sv{--sv-amber:var(--warn);--sv-green:var(--accent);--sv-violet:var(--accent);--sv-teal:var(--accent);--sv-pho:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-screen{background:var(--surface-2);border-color:var(--line)}
   html[data-theme=light]:not([data-mono]) .sv-screen>.sv-panel,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card:first-child,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card+.sv-card{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-screen>.sv-panel::before,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card::before{background:transparent}
@@ -549,6 +549,21 @@
   html[data-theme=light]:not([data-mono]) .sv-pace i{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-pace i.slow{background:var(--amber-bar)}
   html[data-theme=light]:not([data-mono]) .sv-pavg{background:transparent;filter:none}
+  html[data-theme=light]:not([data-mono]) .sv-gkey i.ok{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-gkey i.bad{background:var(--danger-bar)}
+  html[data-theme=light]:not([data-mono]) .sv-gkey i.bon{background:var(--amber-bar)}
+  html[data-theme=light]:not([data-mono]) .sv-gn .sv-lgo img,html[data-theme=light]:not([data-mono]) .sv-gn .sv-lgo .lg{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .sv-gn em{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .sv-pb .sv-lgo img,html[data-theme=light]:not([data-mono]) .sv-pb .sv-lgo .lg{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .sv-pb s{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .sv-pb:last-child .sv-lgo{box-shadow:0 0 0 2px var(--sv-teal)}
+  html[data-theme=light]:not([data-mono]) .sv-vr u.bad{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .sv-bars i{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-bars.live i{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-lc .ln{fill:none}
+  html[data-theme=light]:not([data-mono]) .sv-lc .ln.bon{stroke:var(--warn)}
+  html[data-theme=light]:not([data-mono]) .sv-lc .ar.bon{fill:var(--warn)}
+  html[data-theme=light]:not([data-mono]) .sv-lc .ar.pho{fill:var(--accent)}
   html[data-theme=light]:not([data-mono]) .pop .card.atcard{--av:var(--accent)}
   html[data-theme=light]:not([data-mono]) .pop .card.atcard::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .atcard .txsum{color:var(--muted)}
@@ -741,4 +756,12 @@
      cream ground alike (night's text colour is dark here) */
   html[data-theme=light]:not([data-mono]) #sv .sv-upref,html[data-theme=light]:not([data-mono]) #sv .sv-pavg{
     background:repeating-linear-gradient(90deg,rgba(255,255,255,.85) 0 6px,transparent 6px 11px);filter:drop-shadow(0 0 .8px #0b2a22)}
+  /* Network charts: PHOTON is a blue that holds on cream; the areas stay washes, not solids */
+  html[data-theme=light]:not([data-mono]) #sv{--sv-pho:#1f6f9a}
+  html[data-theme=light]:not([data-mono]) #sv .sv-lc .ar.bon{fill:rgba(155,90,10,.14)}
+  html[data-theme=light]:not([data-mono]) #sv .sv-lc .ln.bon{stroke:rgba(155,90,10,.55)}
+  html[data-theme=light]:not([data-mono]) #sv .sv-lc .ln.sup{stroke:#9b5a0a}
+  html[data-theme=light]:not([data-mono]) #sv .sv-lc .ar.pho{fill:rgba(31,111,154,.13)}
+  html[data-theme=light]:not([data-mono]) #sv .sv-lc .ln.pho{stroke:#1f6f9a}
+  html[data-theme=light]:not([data-mono]) #sv .sv-gkey i.bon{background:rgba(155,90,10,.3)}
 

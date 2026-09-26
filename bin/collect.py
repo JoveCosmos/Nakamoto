@@ -646,6 +646,39 @@ for v in V:                                   # rank order, so the first pass re
 _t = VIDS_PATH + ".tmp"
 json.dump(VIDS, open(_t, "w")); os.replace(_t, VIDS_PATH)
 
+# ── Network tabs ─────────────────────────────────────────────────────────────
+# Proposers: the last 24 hours of blocks by proposer (uppercase hex, as the page's validators
+# carry it). CometBFT's weighted round robin gives each validator its share of voting power,
+# so the page sets each count against what that share predicts.
+p24 = {r[0]: int(r[1]) for r in sql(f"""SELECT proposer_cons, count(*)::int FROM block
+          WHERE chain_id='{CHAIN}' AND proposer_cons IS NOT NULL AND time > now() - interval '24 hours'
+          GROUP BY 1;""")}
+# Activity: transactions and blocks per hour over the last 7 days, oldest first
+act7 = [[int(r[0]), int(r[1]), int(r[2])] for r in sql(f"""SELECT extract(epoch FROM date_trunc('hour', time))::bigint,
+          coalesce(sum(tx_count), 0)::int, count(*)::int FROM block
+          WHERE chain_id='{CHAIN}' AND time > now() - interval '7 days' GROUP BY 1 ORDER BY 1;""")]
+# Economics: today's supply, stake and pools, kept one point a day in state/econ.json (weekly
+# before 2026-09-26, backfilled from the archive by dev/econ_backfill.py). A failure here
+# costs the tab, never the build.
+ECON = "/srv/atomone-app/state/econ.json"
+econ = None
+try:
+    phs = int(get(f"{API}/cosmos/bank/v1beta1/supply/by_denom?denom=uphoton")["amount"]["amount"])
+    cpp = 0.0
+    for c in get(f"{API}/cosmos/distribution/v1beta1/community_pool").get("pool", []):
+        if c.get("denom") == "uphoton":
+            cpp = float(c["amount"])
+    conv = float(get(f"{API}/atomone/photon/v1/conversion_rate")["conversion_rate"])
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    hist = json.load(open(ECON)) if os.path.exists(ECON) else []
+    hist = [p for p in hist if p["d"] != today] + [{"d": today, "h": head, "atone": supply, "photon": phs,
+            "bonded": S, "pool": round(cpool), "pool_ph": round(cpp)}]
+    hist.sort(key=lambda p: p["h"])
+    _t = ECON + ".tmp"; json.dump(hist, open(_t, "w")); os.replace(_t, ECON)
+    econ = {"conv": conv, "hist": hist}
+except Exception as e:
+    print(f"atomone-app: economics skipped ({e})", file=sys.stderr)
+
 out = {
   "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
   "chain": CHAIN, "height": head,
@@ -675,6 +708,7 @@ out = {
                 "weeks_to_cap": int(round((float(nb["maximum_coefficient"]) - coef)
                                           / float(nb["step"]))) if float(nb["step"]) else None,
                 "monotonic_so_far": True},
+  "p24": p24, "act7": act7, "econ": econ,
   "set": {"n": N, "bonded": S, "supply": supply, "bonded_pct": round(S/supply*100, 2),
           "mean": MEAN, "base_apr": BASE, "reward_pool": R,
           # how many validators SIT BELOW the average size - the ones a higher

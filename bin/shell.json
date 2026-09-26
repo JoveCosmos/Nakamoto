@@ -51,7 +51,11 @@
       "id": "network", "label": "Network", "route": "network", "account": "none", "accent": "#2bc8bd",
       "hint": "the validator set, and how AtomOne pays it",
       "sub": [
-        {"id": "validators", "label": "Validators", "route": "validators", "tab": "dele", "ui": "simple", "screen": "net", "panel": "sv-net", "accent": "#2bc8bd"}
+        {"id": "uptime",    "label": "Uptime",    "route": "uptime",    "tab": "dele", "ui": "simple", "screen": "net",  "panel": "sv-net", "accent": "#2bc8bd"},
+        {"id": "signing",   "label": "Signing",   "route": "signing",   "tab": "dele", "ui": "simple", "screen": "sign", "panel": "sv-sign", "accent": "#2bc8bd"},
+        {"id": "proposers", "label": "Proposers", "route": "proposers", "tab": "dele", "ui": "simple", "screen": "prop", "panel": "sv-prop", "accent": "#2bc8bd"},
+        {"id": "activity",  "label": "Activity",  "route": "activity",  "tab": "dele", "ui": "simple", "screen": "act",  "panel": "sv-act", "accent": "#2bc8bd"},
+        {"id": "economics", "label": "Economics", "route": "economics", "tab": "dele", "ui": "simple", "screen": "eco",  "panel": "sv-eco", "accent": "#2bc8bd"}
       ]
     },
     {

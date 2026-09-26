@@ -103,17 +103,16 @@
 
   /* ── the set, once: the figures every screen quotes ── */
   function setStats(){
-    var V = VALS(), D = DD(), rs = [], i, up = 0, upn = 0, clean = 0, wt = 0, ws = 0;
+    var V = VALS(), D = DD(), rs = [], i, up = 0, upn = 0, clean = 0;
     for(i = 0; i < V.length; i++){
       rs.push(rate0(V[i][1], V[i][2]));
-      wt += rs[i] * V[i][1]; ws += +V[i][1];
       var d = window.__VDBY && window.__VDBY[V[i][3]];
       if(d && d.d30 != null){ up += +d.d30; upn++; }
       if(!V[i][4]) clean++;
     }
     var s = rs.slice().sort(function(a, b){ return a - b; });
     return { lo: s[0] || 0, hi: s[s.length - 1] || 0, mid: s.length ? s[(s.length - 1) >> 1] : 0,
-             n: V.length, up: upn ? up / upn : null, clean: clean, set: D.set || {}, avg: ws > 0 ? wt / ws : null };
+             n: V.length, up: upn ? up / upn : null, clean: clean, set: D.set || {} };
   }
 
   /* ── OVERVIEW ───────────────────────────────────────────────────────────── */
@@ -374,40 +373,12 @@
   /* ── NETWORK ────────────────────────────────────────────────────────────── */
   /* the chain's governance at a glance: how many proposals, what is open or how the last ended
      (read once a visit from the chain's API; a proposal takes weeks) */
-  var PROPS = { at: 0, total: null, voting: 0, last: null };
-  function readProps(){
-    if(PROPS.at && Date.now() - PROPS.at < 600000) return;
-    PROPS.at = Date.now();
-    var api = (window.__API || "https://atomone-api.gatadao.com") + "/atomone/gov/v1/proposals";
-    Promise.all([
-      fetch(api + "?pagination.limit=500").then(function(r){ return r.json(); }),
-      fetch(api + "?proposal_status=PROPOSAL_STATUS_VOTING_PERIOD&pagination.limit=50").then(function(r){ return r.json(); })
-    ]).then(function(x){
-      /* counted by outcome: ids skip (a proposal that never reached its deposit is pruned), so
-         the latest id is not the count and is not quoted beside it */
-      var all = x[0].proposals || [], by = {};
-      all.forEach(function(p){ var s = String(p.status || "").replace("PROPOSAL_STATUS_", "").toLowerCase(); by[s] = (by[s] || 0) + 1; });
-      PROPS.total = all.length || null; PROPS.by = by;
-      PROPS.voting = (x[1].proposals || []).length;
-      if(screen() === "net") drawNet();
-    }).catch(function(){ PROPS.at = 0; });
-  }
   function drawNet(){
-    var D = DD(), S = setStats(), e = D.eta || {};
-    readProps();
-    var bon = e.enabled ? '<span class=sv-on>Active</span>' : '<span class=sv-off>Off</span>';
+    var S = setStats(), last = (upRows().slice(-1)[0] || [])[2];
     put("sv-netcards",
-      card("Nakamoto Bonus", bon,
-           e.enabled ? (e.week ? "week " + e.week + ", " : "") + (e.now != null ? Math.round(e.now * 100) + "% of the reward pool shared equally" : "") : "the reward pool follows stake alone") +
-      card("Proposals", PROPS.total != null ? String(PROPS.total) : "—",
-           PROPS.voting ? '<b class=sv-on>' + PROPS.voting + ' in voting now</b>'
-             : PROPS.by ? (PROPS.by.passed || 0) + " passed, " + (PROPS.by.rejected || 0) + " rejected" + (PROPS.by.failed ? ", " + PROPS.by.failed + " failed" : "") + ", none in voting" : "") +
+      card("Validators active", String(last || S.n), "in the active set, signing every block") +
       card("Uptime", (S.up != null ? S.up.toFixed(2) + "%" : "—"),
-           "30-day validator set average, " + S.clean + " never jailed") +
-      /* what 1,000 staked ATONE earns in a day at the set's stake-weighted rate - what an ATONE
-         picked at random earns - and the spread from the largest validator to the smallest */
-      card("Per 1,000 ATONE", S.avg != null ? one(1000 * S.avg / 365) + '<small>ATONE a day</small>' : "—",
-           S.avg != null ? one(1000 * S.lo / 365) + " to " + one(1000 * S.hi / 365) + " depending on the validator" : ""));
+           "30-day validator set average, " + S.clean + " never jailed"));
 
     drawUp(S);
   }
@@ -454,7 +425,7 @@
     /* an older live.json has no block times: the fallback reads them for Chain pace */
     if(!window.__UP || !timed(window.__UP)) fbRows();
     drawPace();
-    var head = '<div class=sv-ph><h3>Network uptime</h3>';
+    var head = '<div class=sv-ph><h3>Uptime</h3>';
     if(!rows.length){
       put("sv-up", head + '</div><div class=sv-upwait>Reading the latest blocks…</div>');
       return;
@@ -505,7 +476,6 @@
           '<span class=sv-upst><i class="sw set"></i><em>Active validators</em><b class=wt>' + (last[2] || S.n) + '</b><small>signing each block</small></span>' +
           '<span class=sv-upst><i class=sw></i><em>This block</em><b>' + now.toFixed(0) + '%</b><small>' + last[1] + ' of ' + last[2] + ' signed</small></span>' +
           '<span class=sv-upst><i class="sw av"></i><em>Last ' + n + ' blocks</em><b>' + avg.toFixed(2) + '%</b><small>average</small></span>' +
-          (ref != null ? '<span class=sv-upst><i class="sw ref"></i><em>30-day average</em><b class=wt>' + ref.toFixed(2) + '%</b><small>dashed line</small></span>' : '') +
         '</div></div>' +
       '<div class=sv-upchart>' +
         '<div class=sv-upmarks>' + marks + '</div>' +
@@ -547,14 +517,166 @@
     if(iv.length < 2){ put("sv-pace", h + '<div class=sv-upwait>Reading block times…</div>'); return; }
     var sum = 0, mx = 0, slow = iv[0]; iv.forEach(function(x){ sum += x.s; if(x.s > mx){ mx = x.s; slow = x; } });
     var avg = sum / iv.length, top = Math.max(mx, avg * 1.6);
-    h += '<div class="sv-boxes two">' +
-      box("up", "Block time", avg.toFixed(2) + '<em>s</em>', "average of the last " + (iv.length + 1) + " blocks, slowest " + slow.s.toFixed(1) + " s", "--bc:var(--sv-teal)") +
-      box("up", "Blocks a day", DAY.avg ? Math.round(86400 / DAY.avg).toLocaleString() : "—", DAY.avg ? "last 24 hours, " + DAY.avg.toFixed(2) + " s each" : "measuring…", "--bc:var(--sv-teal)") +
-    '</div>' +
+    h = '<div class=sv-ph><h3>Chain pace</h3><div class=sv-rt>' +
+      st("Block time", avg.toFixed(2) + " s", "last " + (iv.length + 1) + " blocks, slowest " + slow.s.toFixed(1) + " s") +
+      st("Blocks a day", DAY.avg ? Math.round(86400 / DAY.avg).toLocaleString() : "—", DAY.avg ? "last 24 hours, " + DAY.avg.toFixed(2) + " s each" : "measuring…") +
+    '</div></div>' +
     '<div class=sv-pace><span class=sv-pavg style="bottom:' + (avg / top * 100).toFixed(1) + '%"><b>' + avg.toFixed(1) + ' s</b></span>' +
       iv.map(function(x){ return '<i class="' + (x.s > avg * 1.5 ? "slow" : "") + '" style="--h:' + Math.max(4, x.s / top * 100).toFixed(1) + '%" title="block ' + x.h.toLocaleString() + ': ' + x.s.toFixed(2) + ' s"></i>'; }).join("") +
     '</div>';
     put("sv-pace", h);
+  }
+
+  /* ════ the Network tabs past Uptime: Signing, Proposers, Activity, Economics ════ */
+  /* every figure on Network is the Uptime panel's stat: a swatch, a mono label, the value, a line */
+  function st(label, value, meta, sw){
+    return '<span class=sv-upst><i class=sw' + (sw ? ' style="background:' + sw + '"' : '') + '></i><em>' + label + '</em><b class=wt>' + value + '</b><small>' + (meta || "") + '</small></span>';
+  }
+  var DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  function big(u){ var a = u / 1e6; return a >= 1e6 ? (a / 1e6).toFixed(1) + "M" : a >= 1e3 ? (a / 1e3).toFixed(1) + "k" : a.toFixed(1); }
+  function isDay(){ return root.getAttribute("data-theme") === "light"; }
+  /* the proposer a live row points at: its index into live.json's px, then the set */
+  function proposer(r, ix){ var hx = r && r[5] != null && window.__PX ? window.__PX[r[5]] : null;
+    return hx ? (ix[String(hx).toUpperCase()] || { id: null, m: String(hx).slice(0, 8) + "…" }) : null; }
+  function live(r){ return r && r.length > 6; }
+
+  /* ── Signing: every validator by every block of the window, a missed signature red.
+     Missers first (most first), then by stake. One canvas: 100 rows by 120 blocks is
+     12,000 cells, redrawn each block ── */
+  var SG = { list: [], rows: [] };
+  function drawSign(){
+    var rows = upRows(), n = rows.length, V = VALS(), VD = window.__VDBY || {}, miss = {}, tot = 0;
+    if(!window.__UP || !timed(window.__UP)) fbRows();
+    rows.forEach(function(r, i){ if(r[3]) r[3].split(",").forEach(function(a){ if(!a) return; a = a.toUpperCase(); (miss[a] = miss[a] || {})[i] = 1; tot++; }); });
+    var list = V.map(function(v){ var d = VD[v[3]] || {}, hx = String(d.chex || "").toUpperCase(), m = miss[hx] || {};
+      return { id: v[3], m: v[0], t: +v[1], miss: m, k: Object.keys(m).length }; })
+      .sort(function(a, b){ return b.k - a.k || b.t - a.t; });
+    var bad = list.filter(function(x){ return x.k; });
+    SG.list = list; SG.rows = rows;
+    var h = '<div class=sv-ph><h3>Signing</h3><span class=sv-gkey><i class=ok></i>signed<i class=bad></i>missed</span><div class=sv-rt>' +
+      st("Signed every block", (list.length - bad.length) + " of " + list.length, n ? "last " + n + " blocks" : "reading the blocks…") +
+      st("Missed signatures", n ? String(tot) : "—", !n ? "" : tot ? "across " + bad.length + " validator" + (bad.length === 1 ? "" : "s") : "none in the window", "#ff4d1f") +
+      st("Most missed", bad.length ? esc(bad[0].m) : n ? "none" : "—", bad.length ? bad[0].k + " of " + n + " blocks" : n ? "all signed" : "", "#ff4d1f") + '</div></div>';
+    if(!n){ put("sv-signp", h + '<div class=sv-upwait>Reading the latest blocks…</div>'); return; }
+    h += '<div class=sv-grid><div class=sv-gnames>' + list.map(function(x){
+        return '<div class="sv-gn' + (x.k ? ' bad' : '') + '" data-v="' + esc(x.id) + '" title="Open ' + esc(x.m) + '"><span class=sv-lgo>' + logo(x.id, x.m) + '</span><b>' + esc(x.m) + '</b>' + (x.k ? '<em>' + x.k + '</em>' : '') + '</div>'; }).join("") +
+      '</div><div class=sv-gcw><canvas class=sv-gc aria-label="Signatures by block"></canvas></div></div>' +
+      '<div class=sv-gx><span>&larr; older, block ' + Number(rows[0][0]).toLocaleString() + '</span><span class=sv-gtip id=sv-signtip></span><span>now, block ' + Number(rows[n - 1][0]).toLocaleString() + ' &rarr;</span></div>';
+    put("sv-signp", h);
+    paintSign();
+  }
+  function paintSign(){
+    var c = document.querySelector("#sv-signp .sv-gc"); if(!c) return;
+    var list = SG.list, n = SG.rows.length, w = c.parentNode.clientWidth, RH = 16, dpr = window.devicePixelRatio || 1;
+    if(!w || !n) return;
+    c.style.width = w + "px"; c.style.height = list.length * RH + "px";
+    c.width = Math.round(w * dpr); c.height = Math.round(list.length * RH * dpr);
+    var g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, list.length * RH);
+    var cw = w / n, gap = cw > 4 ? 1 : 0, ok = isDay() ? "rgba(15,94,80,.55)" : "rgba(43,200,189,.45)", bad = "#ff4d1f";
+    list.forEach(function(x, ri){
+      var y = ri * RH + 2;
+      for(var i = 0; i < n; i++){ g.fillStyle = x.miss[i] ? bad : ok; g.fillRect(i * cw, y, Math.max(1, cw - gap), RH - 4); }
+    });
+  }
+  function signTip(ev){
+    var c = ev.target; if(!c.classList || !c.classList.contains("sv-gc")) return;
+    var r = c.getBoundingClientRect(), n = SG.rows.length, i = Math.floor((ev.clientX - r.left) / r.width * n), ri = Math.floor((ev.clientY - r.top) / 16);
+    var x = SG.list[ri], t = E("sv-signtip"); if(!t) return;
+    t.textContent = x && SG.rows[i] ? "block " + Number(SG.rows[i][0]).toLocaleString() + ": " + x.m + (x.miss[i] ? " missed" : " signed") : "";
+  }
+
+  /* ── Proposers: who made the latest blocks (live), and the last 24 hours set against what
+     voting power makes due - CometBFT's round robin gives each validator its share of the
+     slots, so a count below it is proposals missed ── */
+  function drawProp(){
+    var rows = upRows(), n = rows.length, ix = consIndex(), V = VALS(), VD = window.__VDBY || {}, D = DD(), p24 = D.p24 || null;
+    var S = 0; V.forEach(function(v){ S += +v[1]; });
+    var got = 0, list = [];
+    if(p24){ for(var k in p24) got += p24[k];
+      list = V.map(function(v){ var d = VD[v[3]] || {}, hx = String(d.chex || "").toUpperCase(), c = p24[hx] || 0, due = got * v[1] / S;
+        return { id: v[3], m: v[0], c: c, due: due, r: due > 0 ? c / due : 1 }; }).sort(function(a, b){ return b.c - a.c; }); }
+    var short = list.filter(function(x){ return x.due >= 1 && x.r < .9; }).sort(function(a, b){ return a.r - b.r; });
+    var stats = '<div class=sv-rt>' +
+      st("Blocks", p24 ? got.toLocaleString() : "—", p24 ? "one every " + (86400 / got).toFixed(1) + " s" : "") +
+      st("Proposed their share", p24 ? (list.length - short.length) + " of " + list.length : "—", "90% or more of blocks due") +
+      st("Furthest behind", short.length ? esc(short[0].m) : p24 ? "none" : "—", short.length ? short[0].c + " of " + Math.round(short[0].due) + " due" : p24 ? "all proposed their share" : "", "#ff4d1f") + '</div>';
+    /* the latest blocks, newest on the right */
+    var lv = rows.filter(live), last = lv.slice(-(innerWidth <= 620 ? 8 : 24));
+    put("sv-proplive", '<div class=sv-ph><h3>Latest blocks</h3></div>' + (last.length ? '<div class=sv-plive>' + last.map(function(r){ var p = proposer(r, ix) || { m: "?" };
+        return '<div class=sv-pb' + (p.id ? ' data-v="' + esc(p.id) + '"' : '') + ' title="block ' + Number(r[0] + 1).toLocaleString() + ' by ' + esc(p.m) + '"><span class=sv-lgo>' + logo(p.id, p.m) + '</span><b>' + esc(p.m) + '</b><s>' + Number(r[0] + 1).toLocaleString() + '</s></div>'; }).join("") + '</div>'
+      : '<div class=sv-upwait>Waiting for the live feed…</div>'));
+    if(!p24){ put("sv-prop24", '<div class=sv-ph><h3>Last 24 hours</h3>' + stats + '</div><div class=sv-upwait>Reading the last 24 hours…</div>'); return; }
+    var mx = list.length ? Math.max.apply(null, list.map(function(x){ return Math.max(x.c, x.due); })) : 1;
+    put("sv-prop24", '<div class=sv-ph><h3>Last 24 hours</h3><span class=sv-gkey><i class=ok></i>proposed<i class=due></i>due by voting power</span>' + stats + '</div>' +
+      '<div class="sv-vlist sv-plist">' + list.map(function(x){ var q = x.r >= .95 ? "ok" : x.r >= .8 ? "warn" : "bad";
+        return '<div class="sv-vr click" data-v="' + esc(x.id) + '" tabindex=0 style="--c:var(--sv-teal)"><span class=sv-lgo>' + logo(x.id, x.m) + '</span><b class=sv-vn>' + esc(x.m) + '</b>' +
+          '<s class=sv-va>' + x.c + '<em>of ' + Math.round(x.due) + '</em></s>' +
+          '<span class=sv-vs><span class=sv-vt><i style="width:' + (x.c / mx * 100).toFixed(1) + '%"></i><u style="left:' + (x.due / mx * 100).toFixed(1) + '%"></u></span></span>' +
+          '<u class=' + q + '>' + (x.due >= 1 ? Math.round(x.r * 100) + "%" : "—") + '</u></div>'; }).join("") + '</div>');
+  }
+
+  /* ── Activity: transactions per hour for a week (the indexer), and per block, live ── */
+  function drawAct(){
+    var D = DD(), a7 = D.act7 || null, rows = upRows().filter(live), tx = 0, fee = 0, gas = 0;
+    rows.forEach(function(r){ tx += r[6]; if(r[8] > 0) fee += r[8]; if(r[7] > 0) gas += r[7]; });
+    var wk = 0, hrs = a7 ? a7.length : 0, top = null;
+    if(a7) a7.forEach(function(x){ wk += x[1]; if(!top || x[1] > top[1]) top = x; });
+    var when = function(ts){ var d = new Date(ts * 1000); return DAYN[d.getDay()] + " " + String(d.getHours()).padStart(2, "0") + ":00"; };
+    var s7 = '<div class=sv-rt>' + st("Transactions", a7 ? wk.toLocaleString() : "—", a7 ? "about " + Math.round(wk / Math.max(1, hrs)) + " an hour" : "") +
+      st("Busiest hour", top ? top[1].toLocaleString() : "—", top ? when(top[0]) : "") + '</div>';
+    var sl = '<div class=sv-rt>' + st("Transactions", rows.length ? tx.toLocaleString() : "—", rows.length ? (gas / 1e6).toFixed(1) + "M gas" : "", "var(--sv-violet)") +
+      st("Fees paid", rows.length ? (fee / 1e6).toFixed(2) + " PHOTON" : "—", rows.length ? "last " + rows.length + " blocks" : "", "var(--sv-pho)") + '</div>';
+    if(a7 && a7.length){
+      var m7 = Math.max(1, Math.max.apply(null, a7.map(function(x){ return x[1]; }))), days = "";
+      a7.forEach(function(x, i){ var d = new Date(x[0] * 1000); if(d.getHours() === 0) days += '<span style="left:' + (i / a7.length * 100).toFixed(2) + '%">' + DAYN[d.getDay()] + " " + d.getDate() + '</span>'; });
+      put("sv-act7", '<div class=sv-ph><h3>Transactions per hour</h3><span class=sv-gkey>last 7 days</span>' + s7 + '</div>' +
+        '<div class=sv-bars>' + a7.map(function(x){ return '<i style="--h:' + Math.max(1.5, x[1] / m7 * 100).toFixed(1) + '%" title="' + when(x[0]) + ": " + x[1] + ' transactions"></i>'; }).join("") + '</div>' +
+        '<div class=sv-bx>' + days + '</div>');
+    } else put("sv-act7", '<div class=sv-ph><h3>Transactions per hour</h3>' + s7 + '</div><div class=sv-upwait>Reading the last 7 days…</div>');
+    if(rows.length){
+      var mb = Math.max(1, Math.max.apply(null, rows.map(function(r){ return r[6]; })));
+      put("sv-actlive", '<div class=sv-ph><h3>Transactions per block</h3><span class=sv-gkey>last ' + rows.length + ' blocks</span>' + sl + '</div>' +
+        '<div class="sv-bars live">' + rows.map(function(r){ return '<i class="' + (r[6] ? "" : "z") + '" style="--h:' + (r[6] ? Math.max(6, r[6] / mb * 100) : 3).toFixed(1) + '%" title="block ' + Number(r[0] + 1).toLocaleString() + ": " + r[6] + " transaction" + (r[6] === 1 ? "" : "s") +
+          (r[6] ? ", " + (r[7] >= 0 ? r[7].toLocaleString() + " gas, " + (r[8] / 1e6).toFixed(3) + " PHOTON" : "gas unknown") : "") + '"></i>'; }).join("") + '</div>' +
+        '<div class=sv-gx><span>&larr; older, block ' + Number(rows[0][0] + 1).toLocaleString() + '</span><span>now, block ' + Number(rows[rows.length - 1][0] + 1).toLocaleString() + ' &rarr;</span></div>');
+    } else put("sv-actlive", '<div class=sv-ph><h3>Transactions per block</h3>' + sl + '</div><div class=sv-upwait>Waiting for the live feed…</div>');
+  }
+
+  /* ── Economics: today's supply, stake and pools, and their history (weekly from genesis,
+     daily since 2026-09-26) as lines ── */
+  function chart(pts, lines, fmtY){
+    /* pts: [{d, ...}]; lines: [{k, cls, area}] - one SVG in a stretched viewBox for the shapes,
+       the labels in HTML so they keep their size */
+    var n = pts.length; if(n < 2) return '<div class=sv-upwait>Not enough history yet</div>';
+    var lo = Infinity, hi = -Infinity;
+    lines.forEach(function(l){ pts.forEach(function(p){ var v = p[l.k]; if(v < lo) lo = v; if(v > hi) hi = v; }); });
+    if(lines.some(function(l){ return l.area; })) lo = Math.min(lo, 0);
+    var pad = (hi - lo) * .06 || 1; hi += pad; if(lo > 0) lo = Math.max(0, lo - pad);
+    var X = function(i){ return (i / (n - 1) * 1000).toFixed(1); }, Y = function(v){ return (300 - (v - lo) / (hi - lo) * 300).toFixed(1); };
+    var svg = '<svg viewBox="0 0 1000 300" preserveAspectRatio=none aria-hidden=true>' +
+      [.25, .5, .75].map(function(f){ return '<line class=gl x1=0 x2=1000 y1=' + (300 * f) + ' y2=' + (300 * f) + '></line>'; }).join("") +
+      lines.map(function(l){ var d = pts.map(function(p, i){ return (i ? "L" : "M") + X(i) + " " + Y(p[l.k]); }).join("");
+        return (l.area ? '<path class="ar ' + l.cls + '" d="' + d + 'L1000 300L0 300Z"></path>' : '') + '<path class="ln ' + l.cls + '" d="' + d + '"></path>'; }).join("") + '</svg>';
+    var dl = function(s){ var d = new Date(s + "T00:00:00Z"); return d.toLocaleDateString("en", { month: "short", year: "numeric", timeZone: "UTC" }); };
+    return '<div class=sv-lc>' + svg + '<span class=sv-ly style="top:0">' + fmtY(hi) + '</span><span class=sv-ly style="bottom:0">' + fmtY(lo) + '</span></div>' +
+      '<div class=sv-gx><span>' + dl(pts[0].d) + '</span><span>' + dl(pts[Math.floor(n / 2)].d) + '</span><span>' + dl(pts[n - 1].d) + '</span></div>';
+  }
+  function drawEco(){
+    var E0 = DD().econ, hist = E0 && E0.hist || [];
+    if(!hist.length){ put("sv-ecoa", '<div class=sv-ph><h3>ATONE supply and stake</h3></div><div class=sv-upwait>Reading the chain…</div>'); put("sv-ecop", '<div class=sv-ph><h3>PHOTON supply</h3></div><div class=sv-upwait>Reading the chain…</div>'); return; }
+    var now = hist[hist.length - 1], cut = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10), was = null;
+    for(var i = hist.length - 1; i >= 0; i--) if(hist[i].d <= cut){ was = hist[i]; break; }
+    var ch = function(k){ return was && was[k] ? ((now[k] / was[k] - 1) * 100) : null; };
+    var sg = function(v){ return v == null ? "" : (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(1) + "% in 30 days"; };
+    var M = function(v){ return v <= 0 ? "0" : (v / 1e12).toFixed(0) + "M"; };
+    put("sv-ecoa", '<div class=sv-ph><h3>ATONE</h3><span class=sv-gkey><i class=sup></i>supply<i class=bon></i>bonded</span><div class=sv-rt>' +
+      st("Supply", big(now.atone), sg(ch("atone")), "var(--sv-amber)") +
+      st("Bonded", (now.bonded / now.atone * 100).toFixed(1) + "%", big(now.bonded) + " staked", "var(--sv-amber)") + '</div></div>' +
+      chart(hist, [{ k: "bonded", cls: "bon", area: true }, { k: "atone", cls: "sup" }], M));
+    put("sv-ecop", '<div class=sv-ph><h3>PHOTON</h3><span class=sv-gkey><i class=pho></i>supply</span><div class=sv-rt>' +
+      st("Supply", big(now.photon), E0.conv ? "1 ATONE mints " + E0.conv.toFixed(2) : sg(ch("photon")), "var(--sv-pho)") +
+      st("Community pool", big(now.pool) + " ATONE", big(now.pool_ph) + " PHOTON", "var(--sv-green)") + '</div></div>' +
+      chart(hist, [{ k: "photon", cls: "pho", area: true }], M));
   }
 
   /* hovering the plot names a block: its height, how many signed, who did not */
@@ -566,7 +688,10 @@
     if(i !== UPHOVER){ UPHOVER = i; drawUp(setStats()); }
   });
   sv.addEventListener("mouseleave", function(){ if(UPHOVER !== -1){ UPHOVER = -1; if(screen() === "net") drawUp(setStats()); } });
-  window.addEventListener("thermo:up", function(){ if(screen() === "net" && root.getAttribute("data-svs") === "net") drawUp(setStats()); });
+  window.addEventListener("thermo:up", function(){ var sc = screen(); if(root.getAttribute("data-ui") !== "simple") return;
+    if(sc === "net") drawUp(setStats()); else if(sc === "sign") drawSign(); else if(sc === "prop") drawProp(); else if(sc === "act") drawAct(); });
+  sv.addEventListener("mousemove", signTip);
+  window.addEventListener("resize", function(){ if(screen() === "sign") paintSign(); });
   window.addEventListener("thermo:live", function(){ if(!window.__UP && screen() === "net") fbRows(); });
 
   /* ── the head: chain, address, the way out ── */
@@ -632,6 +757,10 @@
     var s = screen();
     if(s === "over") drawOver();
     else if(s === "auto") drawAuto();
+    else if(s === "sign") drawSign();
+    else if(s === "prop") drawProp();
+    else if(s === "act") drawAct();
+    else if(s === "eco") drawEco();
     else drawNet();
   }
   function schedule(){

@@ -72,8 +72,10 @@ def snapshot():
 # Network uptime, block by block: who signed each commit. A block never changes once made, so
 # each height is read once (one /block from our own node per new block; 120 once at start)
 # and kept. Published as "up": [[height, signed, validators, "HEX,HEX" of those who did not
-# sign], block time in epoch ms], oldest first - every visitor reads it from this file instead
-# of asking the node. The time is block h's own header time: consecutive rows give the block time.
+# sign], block time in epoch ms, proposer (index into "px"), transactions, gas used, PHOTON fees
+# in uphoton (-1 = unknown)], oldest first - every visitor reads it from this file instead of
+# asking the node. From the time on, the fields are block h's own: consecutive times give the
+# block time, and the proposer, transactions, gas and fees are the block's that carries the commit.
 _up = {}
 
 
@@ -116,10 +118,40 @@ def uptime(head):
             except Exception:
                 pass                    # unnamed stays unnamed; the count is still right
         # the commit in block h is the vote on block h-1: that is the height it describes
-        _up[h] = [h - 1, len(sigs) - len(miss), len(sigs), ",".join(a for a in miss if a), ms(b["header"]["time"])]
+        # and block h itself: who proposed it, its transactions, the gas they used, the PHOTON
+        # they paid (one /block_results, only for a block that has transactions)
+        ntx, gas, fee = len((b.get("data") or {}).get("txs") or []), 0, 0
+        if ntx:
+            try:
+                res = get(f"{RPC}/block_results?height={h}", timeout=8)["result"]
+                for t in res.get("txs_results") or []:
+                    gas += int(t.get("gas_used") or 0)
+                    for e in t.get("events") or []:
+                        if e.get("type") != "tx":
+                            continue
+                        for a in e.get("attributes") or []:
+                            if a.get("key") == "fee":
+                                fee += sum(int(c[:-7]) for c in str(a.get("value") or "").split(",")
+                                           if c.endswith("uphoton") and c[:-7].isdigit())
+            except Exception:
+                gas = fee = -1          # unknown, not zero
+        _up[h] = [h - 1, len(sigs) - len(miss), len(sigs), ",".join(a for a in miss if a), ms(b["header"]["time"]),
+                  b["header"].get("proposer_address", ""), ntx, gas, fee]
     for k in [k for k in _up if k <= head - UP_N]:
         del _up[k]
     return [_up[k] for k in sorted(_up)]
+
+
+def pack(rows):
+    """the proposer as an index into one list of addresses ("px"), so 120 rows do not carry
+    120 forty-character strings to every visitor every block"""
+    px, ix, out = [], {}, []
+    for r in rows:
+        a = r[5]
+        if a not in ix:
+            ix[a] = len(px); px.append(a)
+        out.append(r[:5] + [ix[a]] + r[6:])
+    return out, px
 
 
 def write(obj):
@@ -137,7 +169,7 @@ def main():
         try:
             snap = snapshot()
             try:
-                snap["up"] = uptime(snap["h"])
+                snap["up"], snap["px"] = pack(uptime(snap["h"]))
             except Exception as e:      # the stake vector matters more than the graph
                 print(f"live: uptime: {e}", file=sys.stderr, flush=True)
             write(snap)

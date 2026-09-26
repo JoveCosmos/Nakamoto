@@ -1507,7 +1507,8 @@ rememberGridH();
       try{
         var lj = x.status === 200 ? JSON.parse(x.responseText) : null;
         /* the network-uptime history (live.py): kept as it comes, drawn by the Network screen */
-        if(lj && lj.up){ window.__UP = lj.up; window.dispatchEvent(new Event("thermo:up")); }
+        /* px: the proposers the rows point into (row[5] is an index into it) */
+        if(lj && lj.up){ window.__UP = lj.up; window.__PX = lj.px || []; window.dispatchEvent(new Event("thermo:up")); }
         if(lj && window.__applyLive(lj)){
           /* a block with no stake moving is a height tick: the clock and the height
              follow it, the map and the lists do not rebuild for nothing */

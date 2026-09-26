@@ -122,7 +122,7 @@ t('simple-view', function(){
   var svBox=sv.getBoundingClientRect(), paneGone=getComputedStyle(pane).display==='none';
   /* the three screens, one shown at a time, each its own level-2 view */
   var seen=[];
-  [['dashboard/wallet','sv-over'],['dashboard/autopilot','sv-auto'],['network/validators','sv-net']].forEach(function(k){
+  [['dashboard/wallet','sv-over'],['dashboard/autopilot','sv-auto'],['network/uptime','sv-net']].forEach(function(k){
     go(k[0]);
     var id=k[1];
     seen.push([].filter.call(document.querySelectorAll('.sv-screen'),function(x){ return getComputedStyle(x).display!=='none'; }).map(function(x){ return x.id; }).join()===id);
@@ -226,7 +226,7 @@ t('shell-groups', function(){
   document.querySelector('.l2vb[data-g=Staking]').click();
   if(location.hash!=='#/dashboard/manual') bad.push('staking returns to its last view '+location.hash);
   [].forEach.call(document.querySelectorAll('.l2vb'),function(b){ var h=parseFloat(getComputedStyle(b,'::after').height); if(!(h>=44) && b.getBoundingClientRect().height<44) bad.push('switch target '+h); });
-  go('network/validators'); if(location.hash!=='#/network/validators' || !vis('sv-net')) bad.push('network '+location.hash);
+  go('network/uptime'); if(location.hash!=='#/network/uptime' || !vis('sv-net')) bad.push('network '+location.hash);
   go('staking/bonus');
   return !bad.length || bad.join(', ');
 });

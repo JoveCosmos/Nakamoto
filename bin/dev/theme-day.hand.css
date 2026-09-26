@@ -126,3 +126,11 @@
      cream ground alike (night's text colour is dark here) */
   html[data-theme=light]:not([data-mono]) #sv .sv-upref,html[data-theme=light]:not([data-mono]) #sv .sv-pavg{
     background:repeating-linear-gradient(90deg,rgba(255,255,255,.85) 0 6px,transparent 6px 11px);filter:drop-shadow(0 0 .8px #0b2a22)}
+  /* Network charts: PHOTON is a blue that holds on cream; the areas stay washes, not solids */
+  html[data-theme=light]:not([data-mono]) #sv{--sv-pho:#1f6f9a}
+  html[data-theme=light]:not([data-mono]) #sv .sv-lc .ar.bon{fill:rgba(155,90,10,.14)}
+  html[data-theme=light]:not([data-mono]) #sv .sv-lc .ln.bon{stroke:rgba(155,90,10,.55)}
+  html[data-theme=light]:not([data-mono]) #sv .sv-lc .ln.sup{stroke:#9b5a0a}
+  html[data-theme=light]:not([data-mono]) #sv .sv-lc .ar.pho{fill:rgba(31,111,154,.13)}
+  html[data-theme=light]:not([data-mono]) #sv .sv-lc .ln.pho{stroke:#1f6f9a}
+  html[data-theme=light]:not([data-mono]) #sv .sv-gkey i.bon{background:rgba(155,90,10,.3)}
