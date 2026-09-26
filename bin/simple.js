@@ -499,9 +499,9 @@
     put("sv-up", head +
         '<span class=sv-upwin>last ' + n + ' blocks ~' + mins + ' min</span>' +
         '<div class=sv-rt>' +
-          st("Active validators", String(last[2] || S.n), "signing each block", "var(--sv-violet)") +
-          st("This block", now.toFixed(0) + "%", last[1] + " of " + last[2] + " signed") +
-          st("Last " + n + " blocks", avg.toFixed(2) + "%", "average") +
+          st("Active validators", String(last[2] || S.n), "", "var(--sv-violet)") +
+          st("This block", now.toFixed(0) + "%") +
+          st("Last " + n + " blocks", avg.toFixed(2) + "%") +
         '</div></div>' +
       '<div class=sv-upchart>' +
         '<div class=sv-upmarks>' + marks + '</div>' +
