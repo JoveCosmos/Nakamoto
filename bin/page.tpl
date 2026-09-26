@@ -1457,7 +1457,7 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
 /* ── the button families, renewed to the prism language: a glass group with
    one hairline, pills inside, the pressed one lit in its accent with a light
    catch and a soft glow - the same on the calculator tabs and the view row */
-/* Bonus · Trend · Picks: the page's own tabs, in the bar's idiom - words on the
+/* Bonus, Trend, Picks: the page's own tabs, in the bar's idiom - words on the
    title's baseline, the open one underlined in its own colour. Not a pill, and
    not part of the black-and-white mode: the mode is for the map and the cards,
    these three stay in colour whatever the switch says. */
@@ -1624,7 +1624,7 @@ transition:filter .12s,transform .12s,box-shadow .2s,opacity .2s}
 /* on a phone the column is a document: blocks in order, nothing scrolls inside
      anything (a nested flex chain with min-height:0 collapsed the ledger to 0px) */
 
-/* columns: rank · validator · bar · ATONE · share · APR · a year · status - the phone keeps rank, name, ATONE, APR, status */
+/* columns: rank, validator, bar, ATONE, share, APR, a year, status - the phone keeps rank, name, ATONE, APR, status */
 
 .wk-foot .wk-pl{font-size:9.5px}
 
@@ -3271,8 +3271,6 @@ background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opac
 .sv-upst small{grid-column:2;font-size:10.5px;color:var(--ws);white-space:nowrap}
 .sv-upst{grid-template-areas:"s e" "s b" "s m";grid-template-rows:auto auto auto}
 .sv-upst .sw{grid-area:s}.sv-upst em{grid-area:e}.sv-upst b{grid-area:b}.sv-upst small{grid-area:m}
-.sv-livedot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--sv-teal);margin-right:6px;box-shadow:0 0 0 0 rgba(43,200,189,.6);animation:svlive 1.8s ease-out infinite}
-@keyframes svlive{0%{box-shadow:0 0 0 0 rgba(43,200,189,.6)}80%,100%{box-shadow:0 0 0 7px rgba(43,200,189,0)}}
 .sv-upchart{flex:1 1 auto;min-height:120px;display:flex;flex-direction:column;gap:4px}
 .sv-upmarks{position:relative;height:26px;flex:0 0 auto}
 .sv-upm{position:absolute;bottom:0;display:inline-flex;align-items:center;gap:5px;transform:translateX(-10px);white-space:nowrap;font-size:10.5px;color:#ff9a7a}

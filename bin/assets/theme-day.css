@@ -491,7 +491,6 @@
   html[data-theme=light]:not([data-mono]) .sv-upst{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sv-upst .sw.av{background:var(--sv-teal)}
   html[data-theme=light]:not([data-mono]) .sv-upst .sw.ref{background:none}
-  html[data-theme=light]:not([data-mono]) .sv-livedot{box-shadow:0 0 0 0 var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-upm{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .sv-uplg{box-shadow:0 0 0 1.5px var(--danger-bar)}
   html[data-theme=light]:not([data-mono]) .sv-uplg img,html[data-theme=light]:not([data-mono]) .sv-uplg .lg{color:var(--ink)}

@@ -300,7 +300,7 @@
         return '<div class="sv-chip click' + (r.locked > 0 ? " hld" : "") + '" data-v="' + esc(r.id) + '" tabindex=0 title="Open this validator" style="--c:' + h.fill + '">' +
           '<span class=sv-lgo>' + logo(r.id, r.m) + '</span>' +
           '<b>' + esc(r.m) + '</b><em>' + Math.round(r.x / pos.total * 100) + '<small>%</small></em>' +
-          '<s>' + fmt(r.x) + ' ATONE' + (r.locked > 0 ? ' · cooldown' : '') + '</s><u style="color:' + h.ink + '">' + (r.inactive ? "inactive" : pct(r.rate)) + '</u></div>'; }).join("") + more + '</div>';
+          '<s>' + fmt(r.x) + ' ATONE' + (r.locked > 0 ? ', in cooldown' : '') + '</s><u style="color:' + h.ink + '">' + (r.inactive ? "inactive" : pct(r.rate)) + '</u></div>'; }).join("") + more + '</div>';
   }
   function ago(at){ var s = Math.max(0, Math.round((Date.now() - at) / 1000)); return s < 60 ? s + "s ago" : Math.floor(s / 60) + "m ago"; }
 
@@ -398,10 +398,10 @@
     var bon = e.enabled ? '<span class=sv-on>Active</span>' : '<span class=sv-off>Off</span>';
     put("sv-netcards",
       card("Nakamoto Bonus", bon,
-           e.enabled ? (e.week ? "week " + e.week + " · " : "") + (e.now != null ? Math.round(e.now * 100) + "% of the reward pool shared equally" : "") : "the reward pool follows stake alone") +
+           e.enabled ? (e.week ? "week " + e.week + ", " : "") + (e.now != null ? Math.round(e.now * 100) + "% of the reward pool shared equally" : "") : "the reward pool follows stake alone") +
       card("Proposals", PROPS.total != null ? String(PROPS.total) : "—",
            PROPS.voting ? '<b class=sv-on>' + PROPS.voting + ' in voting now</b>'
-             : PROPS.by ? (PROPS.by.passed || 0) + " passed · " + (PROPS.by.rejected || 0) + " rejected" + (PROPS.by.failed ? " · " + PROPS.by.failed + " failed" : "") + " · none in voting" : "") +
+             : PROPS.by ? (PROPS.by.passed || 0) + " passed, " + (PROPS.by.rejected || 0) + " rejected" + (PROPS.by.failed ? ", " + PROPS.by.failed + " failed" : "") + ", none in voting" : "") +
       card("Uptime", (S.up != null ? S.up.toFixed(2) + "%" : "—"),
            "30-day average across the set, " + S.clean + " never jailed") +
       /* what 1,000 staked ATONE earns in a day at the set's stake-weighted rate - what an ATONE
@@ -454,7 +454,7 @@
     /* an older live.json has no block times: the fallback reads them for Chain pace */
     if(!window.__UP || !timed(window.__UP)) fbRows();
     drawPace();
-    var head = '<div class=sv-ph><h3>Network uptime</h3><span class="sv-tag q"><i class=sv-livedot></i>live</span>';
+    var head = '<div class=sv-ph><h3>Network uptime</h3>';
     if(!rows.length){
       put("sv-up", head + '</div><div class=sv-upwait>Reading the latest blocks…</div>');
       return;
@@ -493,7 +493,7 @@
       if(!rt && lw + txt.length * 6.3 > room) txt = lab(c, false);
       if(!rt && lw + txt.length * 6.3 > room) txt = "";
       return '<span class="sv-upm' + (txt ? "" : " bare") + (rt ? " rt" : "") + '" style="left:' + x.toFixed(2) + '%" title="' +
-        esc("missed by " + c.vs.map(function(v){ return v.m; }).join(", ") + " · block" + (c.blocks.length > 1 ? "s " : " ") +
+        esc(c.vs.map(function(v){ return v.m; }).join(", ") + " missed block" + (c.blocks.length > 1 ? "s " : " ") +
           c.blocks.slice().reverse().map(function(b){ return b.toLocaleString(); }).join(", ")) + '">' +
         '<span class=sv-uplgs>' + c.vs.slice(0, 3).map(function(v){ return '<span class=sv-uplg>' + logo(v.id, v.m) + '</span>'; }).join("") + '</span>' +
         (txt ? '<b>' + esc(txt) + '</b>' : "") + '</span>';
@@ -516,15 +516,15 @@
           (hv ? '<div class=sv-uptip style="left:' + Math.min(76, Math.max(0, (UPHOVER + .5) / n * 100 - 12)).toFixed(1) + '%"><b>block ' + Number(hv[0]).toLocaleString() + '</b>' +
             hv[1] + ' of ' + hv[2] + ' signed' + (hv[3] ? '<br>missed by ' + esc(hv[3].split(",").map(function(a){ return who(a).m; }).join(", ")) : '') + '</div>' : '') +
         '</div>' +
-        '<div class=sv-upx><span>&larr; older<i class=bn> · block ' + Number(rows[0][0]).toLocaleString() + '</i></span><span>now<i class=bn> · block ' + Number(last[0]).toLocaleString() + '</i> &rarr;</span></div>' +
+        '<div class=sv-upx><span>&larr; older<i class=bn>, block ' + Number(rows[0][0]).toLocaleString() + '</i></span><span>now<i class=bn>, block ' + Number(last[0]).toLocaleString() + '</i> &rarr;</span></div>' +
       '</div>');
   }
   function timed(r){ return r && r.length > 1 && r[r.length - 1][4] > 0; }
 
   /* ── chain pace: the block time over the window (from the block times live.json carries, or
      the fallback's own reads), blocks a day measured over the last 24 hours (one read of the
-     block ~14,400 back, every ten minutes), the height, and each interval as a bar ── */
-  var DAY = { at: 0, head: 0, avg: null };
+     block ~14,400 back, every ten minutes), and each interval as a bar ── */
+  var DAY = { at: 0, avg: null };
   function readDay(){
     if(DAY.at && Date.now() - DAY.at < 600000) return;
     DAY.at = Date.now();
@@ -532,7 +532,7 @@
       var head = +j.result.sync_info.latest_block_height, t1 = Date.parse(j.result.sync_info.latest_block_time), back = 14400;
       return fetch("/rpc/block?height=" + (head - back), { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(b){
         var t0 = Date.parse(b.result.block.header.time);
-        if(t1 > t0){ DAY.avg = (t1 - t0) / 1000 / back; DAY.head = head; }
+        if(t1 > t0) DAY.avg = (t1 - t0) / 1000 / back;
         if(screen() === "net") drawPace();
       });
     }).catch(function(){ DAY.at = 0; });
@@ -543,14 +543,13 @@
     var iv = [], i;
     for(i = 1; i < src.length; i++) if(src[i][4] && src[i - 1][4] && src[i][0] === src[i - 1][0] + 1) iv.push({ h: src[i][0] + 1, s: (src[i][4] - src[i - 1][4]) / 1000 });
     if(innerWidth <= 620 && iv.length > 40) iv = iv.slice(-40);
-    var h = '<div class=sv-ph><h3>Chain pace</h3>' + tag("q", "block time") + '</div>';
+    var h = '<div class=sv-ph><h3>Chain pace</h3></div>';
     if(iv.length < 2){ put("sv-pace", h + '<div class=sv-upwait>Reading block times…</div>'); return; }
     var sum = 0, mx = 0, slow = iv[0]; iv.forEach(function(x){ sum += x.s; if(x.s > mx){ mx = x.s; slow = x; } });
-    var avg = sum / iv.length, top = Math.max(mx, avg * 1.6), head = DAY.head || (src[src.length - 1][0] + 1);
-    h += '<div class="sv-boxes three">' +
-      box("up", "Block time", avg.toFixed(2) + '<em>s</em>', "average, last " + (iv.length + 1) + " blocks", "--bc:var(--sv-teal)") +
+    var avg = sum / iv.length, top = Math.max(mx, avg * 1.6);
+    h += '<div class="sv-boxes two">' +
+      box("up", "Block time", avg.toFixed(2) + '<em>s</em>', "average of the last " + (iv.length + 1) + " blocks, slowest " + slow.s.toFixed(1) + " s", "--bc:var(--sv-teal)") +
       box("up", "Blocks a day", DAY.avg ? Math.round(86400 / DAY.avg).toLocaleString() : "—", DAY.avg ? "last 24 hours, " + DAY.avg.toFixed(2) + " s each" : "measuring…", "--bc:var(--sv-teal)") +
-      box("up", "Height", Number(head).toLocaleString(), "slowest here " + slow.s.toFixed(1) + " s", "--bc:var(--sv-violet)") +
     '</div>' +
     '<div class=sv-pace><span class=sv-pavg style="bottom:' + (avg / top * 100).toFixed(1) + '%"><b>' + avg.toFixed(1) + ' s</b></span>' +
       iv.map(function(x){ return '<i class="' + (x.s > avg * 1.5 ? "slow" : "") + '" style="--h:' + Math.max(4, x.s / top * 100).toFixed(1) + '%" title="block ' + x.h.toLocaleString() + ': ' + x.s.toFixed(2) + ' s"></i>'; }).join("") +
