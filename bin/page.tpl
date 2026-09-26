@@ -4038,7 +4038,10 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .netsw a[aria-current=page]{background:rgba(43,200,189,.2);color:var(--wt,#f0eef8);box-shadow:inset 0 0 0 1px rgba(43,200,189,.55)}
 .netsw a#nettest[aria-current=page]{background:rgba(255,176,46,.22);box-shadow:inset 0 0 0 1px rgba(255,176,46,.6)}
 .netsw a:focus-visible{outline:2px solid #2bc8bd;outline-offset:1px}
-html[data-net=testnet] .bheight::after{content:" testnet";color:#ffb02e}
+/* "testnet" hangs to the right of the height line, so the dot and the height keep their
+   mainnet place (the dot under the t of AtomOne) */
+html[data-net=testnet] .bheight{right:auto;left:calc(22% - 2px);justify-content:flex-start;min-width:0}
+html[data-net=testnet] .bheight::after{content:"testnet";color:#ffb02e;position:absolute;left:100%;margin-left:6px;white-space:nowrap}
 @media(max-width:620px){.netsw a{padding:0 7px;font-size:10.5px}}
 .folder>.hdr-r{grid-area:right;justify-self:end;display:flex;align-items:center;gap:8px;min-width:0}
 .hdr-r .thbtn{margin-left:0;width:32px;height:32px;border-radius:8px}

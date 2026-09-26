@@ -14,7 +14,7 @@ NETCFG = ({"net": "testnet", "chain": "atomone-testnet-1", "name": "AtomOne Test
           if TESTNET else
           {"net": "mainnet", "chain": "atomone-1", "name": "AtomOne",
            "api": "https://atomone-api.gatadao.com", "rpc": "https://atomone-rpc.gatadao.com", "other": "testnet/"})
-AVATARS = os.environ.get("AVATAR_DIR", "/srv/atomone-app/state/testnet/avatars" if TESTNET else "/srv/atomone-app/state/avatars")
+AVATARS = os.environ.get("AVATAR_DIR", "/srv/atomone-app/state/avatars")   # one cache for both networks
 
 e, s, th, nk = D["eta"], D["set"], D["rule"], D["nakamoto"]
 M = lambda u: u / 1e6

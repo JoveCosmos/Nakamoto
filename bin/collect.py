@@ -839,7 +839,9 @@ except Exception as e:
 
 # Which identities ended up with a tile on disk. Rendering an <img> for one that
 # does not exist would put a broken-image request on every cell that lacks an avatar.
-AVDIR = os.path.join(STATE, "avatars")
+# one logo cache for both networks: a Keybase identity is the same on testnet, and
+# avatars.py fills /srv/atomone-app/state/avatars whichever network runs it
+AVDIR = "/srv/atomone-app/state/avatars"
 HAVE_AV = {f[:-4] for f in os.listdir(AVDIR)} if os.path.isdir(AVDIR) else set()
 for v in out["validators"]:
     v["av"] = bool(v["id"]) and v["id"] in HAVE_AV
