@@ -165,7 +165,7 @@ payload = json.dumps({"generated": D["generated"], "thresh": th["threshold"],
                       "eta": e, "set": s,
                       # the Network tabs: 24h proposers, 7 days of hourly activity, the economics
                       # history, and where the chain's record starts
-                      "p24": D.get("p24"), "act7": D.get("act7"), "econ": D.get("econ"),
+                      "p24": D.get("p24"), "act7": D.get("act7"), "econ": D.get("econ"), "prop_all": D.get("prop_all"),
                       "coverage": D.get("coverage")}, separators=(",", ":"))
 
 TPL = open(os.path.join(os.path.dirname(__file__), "page.tpl")).read()

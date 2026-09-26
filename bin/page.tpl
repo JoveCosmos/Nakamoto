@@ -3611,11 +3611,17 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .sv-pb b{font-size:9.5px;font-weight:500;color:var(--ws);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sv-pb s{text-decoration:none;font-family:var(--wmono);font-size:8.5px;color:var(--wf)}
 .sv-pb:last-child .sv-lgo{box-shadow:0 0 0 2px var(--sv-teal)}
+@media(max-width:1400px){.sv-pb s{display:none}}
 .sv-plist{flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:5px;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .sv-plist .sv-vr{flex:0 0 34px}
-.sv-plist .sv-vt{position:relative;overflow:visible}
-.sv-plist .sv-vt u{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;border-radius:1px;background:var(--wt)}
 .sv-vr u.ok{color:var(--sv-green)}.sv-vr u.warn{color:var(--sv-amber)}.sv-vr u.bad{color:#ff6a3d}
+.sv-plist .sv-vr u{color:var(--wt);font-weight:600}
+/* a two-way period switch: a groove with the chosen side lit in the section's teal */
+.sv-sw{display:inline-flex;padding:2px;border-radius:9px;border:1px solid var(--wbd2);background:rgba(0,0,0,.25);gap:2px}
+.sv-sw button{height:24px;padding:0 11px;border:0;border-radius:7px;background:transparent;color:var(--ws);font:500 11.5px var(--wsans);cursor:pointer;white-space:nowrap}
+.sv-sw button:hover{color:var(--wt)}
+.sv-sw button[aria-pressed=true]{background:linear-gradient(180deg,rgba(43,200,189,.28),rgba(43,200,189,.12));color:var(--wt);box-shadow:inset 0 0 0 1px rgba(43,200,189,.55)}
+.sv-sw button:focus-visible{outline:2px solid var(--sv-teal);outline-offset:1px}
 /* Activity: bars per hour and per block */
 .sv-bars{flex:1 1 auto;min-height:40px;display:flex;align-items:flex-end;gap:1px;border-bottom:1px solid var(--wbd2)}
 .sv-bars i{flex:1 1 0;min-width:1px;height:var(--h);border-radius:2px 2px 0 0;background:linear-gradient(180deg,rgba(43,200,189,.9),rgba(43,200,189,.3))}

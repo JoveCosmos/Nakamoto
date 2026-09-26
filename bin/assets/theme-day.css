@@ -555,6 +555,9 @@
   html[data-theme=light]:not([data-mono]) .sv-pb s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sv-pb:last-child .sv-lgo{box-shadow:0 0 0 2px var(--sv-teal)}
   html[data-theme=light]:not([data-mono]) .sv-vr u.bad{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .sv-sw{background:var(--bg)}
+  html[data-theme=light]:not([data-mono]) .sv-sw button{background:transparent}
+  html[data-theme=light]:not([data-mono]) .sv-sw button[aria-pressed=true]{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-bars i{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-bars.live i{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-lc .ln{fill:none}

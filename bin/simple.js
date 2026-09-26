@@ -612,34 +612,37 @@
     t.textContent = x && SG.rows[i] ? "block " + Number(SG.rows[i][0]).toLocaleString() + ": " + x.m + (x.miss[i] ? " missed" : " signed") : "";
   }
 
-  /* ── Proposers: who made the latest blocks (live), and the last 24 hours set against what
-     voting power makes due - CometBFT's round robin gives each validator its share of the
-     slots, so a count below it is proposals missed ── */
+  /* ── Proposers: who made the latest blocks (live), and blocks proposed per validator over the
+     last 24 hours or since genesis (a switch), with each one's share of all the blocks ── */
+  var PW = (function(){ try{ return localStorage.getItem("th_pw") === "all" ? "all" : "24h"; }catch(e){ return "24h"; } })();
   function drawProp(){
-    var rows = upRows(), n = rows.length, ix = consIndex(), V = VALS(), VD = window.__VDBY || {}, D = DD(), p24 = D.p24 || null;
-    var S = 0; V.forEach(function(v){ S += +v[1]; });
-    var got = 0, list = [];
-    if(p24){ for(var k in p24) got += p24[k];
-      list = V.map(function(v){ var d = VD[v[3]] || {}, hx = String(d.chex || "").toUpperCase(), c = p24[hx] || 0, due = got * v[1] / S;
-        return { id: v[3], m: v[0], c: c, due: due, r: due > 0 ? c / due : 1 }; }).sort(function(a, b){ return b.c - a.c; }); }
-    var short = list.filter(function(x){ return x.due >= 1 && x.r < .9; }).sort(function(a, b){ return a.r - b.r; });
+    var rows = upRows(), ix = consIndex(), V = VALS(), VD = window.__VDBY || {}, D = DD(), p24 = D.p24 || null, pa = D.prop_all || null;
+    var all = PW === "all", list = [], got = 0, ever = 0;
+    if(all){ V.forEach(function(v){ var c = +((VD[v[3]] || {}).prop || 0); list.push({ id: v[3], m: v[0], c: c }); });
+      got = pa ? pa.blocks : list.reduce(function(a, x){ return a + x.c; }, 0); ever = pa ? pa.proposers : list.length; }
+    else if(p24){ for(var k in p24){ got += p24[k]; ever++; }
+      V.forEach(function(v){ var d = VD[v[3]] || {}; list.push({ id: v[3], m: v[0], c: p24[String(d.chex || "").toUpperCase()] || 0 }); }); }
+    list.sort(function(a, b){ return b.c - a.c; });
+    var top = list[0], since = (D.coverage || {}).from_date, have = all ? list.length : !!p24;
     var stats = '<div class=sv-rt>' +
-      st("Blocks", p24 ? got.toLocaleString() : "—", p24 ? "one every " + (86400 / got).toFixed(1) + " s" : "") +
-      st("Proposed their share", p24 ? (list.length - short.length) + " of " + list.length : "—", "90% or more of blocks due") +
-      st("Furthest behind", short.length ? esc(short[0].m) : p24 ? "none" : "—", short.length ? short[0].c + " of " + Math.round(short[0].due) + " due" : p24 ? "all proposed their share" : "", "#ff4d1f") + '</div>';
+      st("Blocks", have ? got.toLocaleString() : "—", all ? "since genesis" + (since ? ", " + since : "") : "last 24 hours, one every " + (got ? (86400 / got).toFixed(1) : "—") + " s") +
+      st("Proposers", have ? ever.toLocaleString() : "—", all ? "validators that ever proposed" : "validators that proposed", "var(--sv-violet)") +
+      st("Top proposer", top && top.c ? esc(top.m) : "—", top && top.c ? top.c.toLocaleString() + " blocks, " + (top.c / got * 100).toFixed(1) + "%" : "", "var(--sv-amber)") + '</div>';
     /* the latest blocks, newest on the right */
     var lv = rows.filter(live), last = lv.slice(-(innerWidth <= 620 ? 8 : 24));
     put("sv-proplive", '<div class=sv-ph><h3>Latest blocks</h3></div>' + (last.length ? '<div class=sv-plive>' + last.map(function(r){ var p = proposer(r, ix) || { m: "?" };
         return '<div class=sv-pb' + (p.id ? ' data-v="' + esc(p.id) + '"' : '') + ' title="block ' + Number(r[0] + 1).toLocaleString() + ' by ' + esc(p.m) + '"><span class=sv-lgo>' + logo(p.id, p.m) + '</span><b>' + esc(p.m) + '</b><s>' + Number(r[0] + 1).toLocaleString() + '</s></div>'; }).join("") + '</div>'
       : '<div class=sv-upwait>Waiting for the live feed…</div>'));
-    if(!p24){ put("sv-prop24", '<div class=sv-ph><h3>Last 24 hours</h3>' + stats + '</div><div class=sv-upwait>Reading the last 24 hours…</div>'); return; }
-    var mx = list.length ? Math.max.apply(null, list.map(function(x){ return Math.max(x.c, x.due); })) : 1;
-    put("sv-prop24", '<div class=sv-ph><h3>Last 24 hours</h3><span class=sv-gkey><i class=ok></i>proposed<i class=due></i>due by voting power</span>' + stats + '</div>' +
-      '<div class="sv-vlist sv-plist">' + list.map(function(x){ var q = x.r >= .95 ? "ok" : x.r >= .8 ? "warn" : "bad";
+    var sw = '<span class=sv-sw role=group aria-label="Period">' +
+      '<button type=button data-act=pwin data-w=24h aria-pressed=' + !all + '>24 hours</button><button type=button data-act=pwin data-w=all aria-pressed=' + all + '>Since genesis</button></span>';
+    var head = '<div class=sv-ph><h3>Blocks proposed</h3>' + sw + stats + '</div>';
+    if(!have){ put("sv-prop24", head + '<div class=sv-upwait>Reading the last 24 hours…</div>'); return; }
+    var mx = Math.max(1, top ? top.c : 1);
+    put("sv-prop24", head + '<div class="sv-vlist sv-plist">' + list.map(function(x){
         return '<div class="sv-vr click" data-v="' + esc(x.id) + '" tabindex=0 style="--c:var(--sv-teal)"><span class=sv-lgo>' + logo(x.id, x.m) + '</span><b class=sv-vn>' + esc(x.m) + '</b>' +
-          '<s class=sv-va>' + x.c + '<em>of ' + Math.round(x.due) + '</em></s>' +
-          '<span class=sv-vs><span class=sv-vt><i style="width:' + (x.c / mx * 100).toFixed(1) + '%"></i><u style="left:' + (x.due / mx * 100).toFixed(1) + '%"></u></span></span>' +
-          '<u class=' + q + '>' + (x.due >= 1 ? Math.round(x.r * 100) + "%" : "—") + '</u></div>'; }).join("") + '</div>');
+          '<s class=sv-va>' + x.c.toLocaleString() + '<em>blocks</em></s>' +
+          '<span class=sv-vs><span class=sv-vt><i style="width:' + (x.c / mx * 100).toFixed(1) + '%"></i></span></span>' +
+          '<u>' + (got ? (x.c / got * 100).toFixed(2) + "%" : "—") + '</u></div>'; }).join("") + '</div>');
   }
 
   /* ── Activity: transactions per hour for a week (the indexer), and per block, live ── */
@@ -826,6 +829,7 @@
     }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
+    if(act === "pwin"){ PW = t.dataset.w === "all" ? "all" : "24h"; try{ localStorage.setItem("th_pw", PW); }catch(e){} drawProp(); return; }
     if(act === "refresh"){
       if(window.__refreshPos){ t.classList.add("busy"); window.__refreshPos().then(function(){ t.classList.remove("busy"); render(); }); }
       else { var rf = E("wrefresh"); if(rf) rf.click(); }

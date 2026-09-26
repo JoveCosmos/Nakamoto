@@ -709,6 +709,8 @@ out = {
                                           / float(nb["step"]))) if float(nb["step"]) else None,
                 "monotonic_so_far": True},
   "p24": p24, "act7": act7, "econ": econ,
+  # every block the index holds a proposer for, and how many validators ever proposed one
+  "prop_all": {"blocks": sum(prop.values()), "proposers": len(prop)},
   "set": {"n": N, "bonded": S, "supply": supply, "bonded_pct": round(S/supply*100, 2),
           "mean": MEAN, "base_apr": BASE, "reward_pool": R,
           # how many validators SIT BELOW the average size - the ones a higher
