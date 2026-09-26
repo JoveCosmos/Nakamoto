@@ -116,16 +116,22 @@
   /* ── OVERVIEW ───────────────────────────────────────────────────────────── */
 
   function drawOver(){
-    var pos = window.__POS, S = setStats();
+    var pos = window.__POS, S = setStats(), bal = window.__BAL;
+    /* what the wallet holds right now: liquid ATONE, the PHOTON that pays fees, when it was read */
+    /* one decimal: a wallet holding 0.65 ATONE is not a wallet holding none */
+    put("sv-bal", (bal ? fmt(bal.uatone) : "—") + '<em>ATONE</em>');
+    put("sv-balsub", bal ? '<b class=sv-pho>' + fmt(bal.uphoton) + '</b> PHOTON for fees' +
+      (window.__POSAT ? '<span class=sv-ago> · read ' + ago(window.__POSAT) + '</span>' : "") : "connect a wallet to read it");
+    var rf = E("sv-rf"); if(rf) rf.hidden = !pos;
     put("sv-staked", (pos ? whole(pos.total) : "—") + '<em>ATONE</em>');
-    put("sv-stsub", pos ? (pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s") +
+    put("sv-stsub", pos && !pos.rows.length ? "nothing staked yet" : pos ? ("on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s") +
       (pos.locked > 0 ? ', <s>' + fmt(pos.locked) + " under cooldown</s>" : "")) : "connect a wallet to read your position");
     var mine = pos && pos.rows.length, hr = mine ? heat(pos.rate) : null;
     var ap = put("sv-apr", mine ? pct(pos.rate) : "—"); if(ap) ap.style.color = hr ? hr.ink : "";
     /* your APR where the map would paint it, between what the set pays least and most */
     put("sv-aprsub", scale(mine ? [{ r: pos.rate, s: 12, t: "your APR, " + pct(pos.rate) }] : [], S, true));
     put("sv-rew", (window.__REW != null ? fmt(window.__REW) : "—") + '<em>ATONE</em>');
-    put("sv-rewsub", window.__REW > 0 ? "earned and not yet claimed" : pos ? "nothing waiting" : "");
+    put("sv-rewsub", window.__REW > 0 ? "earned, ready to claim" : pos ? "nothing waiting" : "");
 
     /* the opportunity: the same plan the advanced view would sign */
     var plan = planNow(pos);
@@ -140,15 +146,15 @@
             '<li style="--sc:#2ee06a"><b>Redelegate</b><span>to the best-paying place, in one signature</span></li>' +
           '</ol>';
     } else if(!pos.rows.length){
-      h = '<div class=sv-ph><h3>No stake on AtomOne yet</h3>' +
-            '<div class=sv-rt><button class="sv-btn go" type=button data-act=stake>Stake ATONE</button></div></div>' +
-          '<div class=sv-note>Stake ATONE with a validator and this screen fills in: what it earns, what it could earn, and where it sits.</div>';
+      /* nothing below it to show: the message and its one action take the screen's middle */
+      h = '<div class=sv-none><h3>No stake on AtomOne</h3>' +
+            '<button class="sv-btn go" type=button data-act=stake>Stake ATONE</button></div>';
     } else if(!(pos.free > 0)){
       h = '<div class=sv-ph><h3>Everything is under cooldown</h3>' + tag("a", "21 days") + '</div>' +
           '<div class=sv-note>All <b>' + fmt(pos.total) + ' ATONE</b> was redelegated recently, so the chain will not move it again until <b>' +
-          (window.__dayFull ? window.__dayFull(pos.until) : "") + '</b>. It goes on earning where it is.</div>';
+          (window.__dayFull ? window.__dayFull(pos.until) : "") + '</b>.</div>';
     } else if(!plan || !(plan.gain > 0.5) || plan.after == null){
-      h = '<div class=sv-ph><h3>Nothing to gain by moving</h3>' + tag("q", "checked just now") + '</div>' +
+      h = '<div class=sv-ph><h3>Nothing to gain by moving</h3></div>' +
           '<div class=sv-note>Your stake already earns as much as the set can pay it today. This screen re-reads the chain every block, so it will say so when that changes.</div>' +
           '<div class=sv-figs>' + fig("", "your APR", pct(pos.rate)) + fig("dim", "best in set", pct(S.hi)) +
           fig("dim", "can move", fmt(pos.free) + '<i>ATONE</i>') + fig("dim", "validators", String(pos.rows.length)) + '</div>';
@@ -172,31 +178,23 @@
           '</div>';
     }
     /* the hero wash only when there is a move to make - the page's one call to action */
-    put("sv-optp", h).classList.toggle("hero", h.indexOf("data-act=opt") >= 0);
+    var op = put("sv-optp", h); op.classList.toggle("hero", h.indexOf("data-act=opt") >= 0); op.classList.toggle("fill", h.indexOf("sv-none") >= 0);
 
     /* where the stake sits now */
     var al = E("sv-allocp");
     if(!pos){
       /* no wallet: the section keeps its shape, like the wallet pane in the other view */
       al.hidden = false;
-      put("sv-allocp", '<div class=sv-ph><h3>Where stake can sit</h3>' + tag("q", S.n + " validators") + '<div class=sv-rt>' + hint() + '</div></div>' + scale([], S) + skelAlloc());
+      put("sv-allocp", '<div class=sv-ph><h3>The validators</h3>' + tag("q", S.n + " in the set") + '<div class=sv-rt>' + hint() + '</div></div>' + scale([], S) + skelAlloc());
     }
     else if(!pos.rows.length){ al.hidden = true; }
     else {
       al.hidden = false;
-      put("sv-allocp", '<div class=sv-ph><h3>Where your stake sits</h3>' +
+      put("sv-allocp", '<div class=sv-ph><h3>Your validators</h3>' +
         tag("q", pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s")) +
         '<div class=sv-rt>' + hint() + '</div></div>' + allocation(pos, S));
     }
 
-    /* the line under it: autopilot, freshness, the two plain controls */
-    var at = window.__atInfo ? window.__atInfo() : null;
-    put("sv-foot", '<span class="sv-stat' + (at && at.grant ? ' on' : '') + '"><i></i>' + autopilotWord(at) + '</span>' +
-      (pos ? '<span class=sv-sep>|</span><span>' + (window.__POSAT ? "read " + ago(window.__POSAT) : "") + '</span>' : "") +
-      '<div class=sv-rt>' +
-        (pos ? '<button class="sv-btn sml" type=button data-act=refresh>Refresh</button>' : "") +
-        '<button class="sv-btn sml" type=button data-route="dashboard/autopilot">Autopilot</button>' +
-      '</div>');
   }
   /* Pricing the plan runs the whole optimiser and two quiet redraws of the
      advanced pane, so it is done once per change that can move the answer and
@@ -212,6 +210,14 @@
   }
   /* one side of the plan: its APR in its own heat, and the stake as a bar of heat segments */
   function side(cls, lab, big, ink, sub, segs){
+    /* a long list is its eleven largest and one segment for the rest (a hundred validators would
+       not fit the bar), the rest painted at its stake-weighted rate */
+    if(segs.length > 12){
+      segs = segs.slice().sort(function(a, b){ return b.w - a.w; });
+      var rest = segs.slice(11), rw = 0, rr = 0;
+      rest.forEach(function(q){ rw += q.w; rr += q.w * q.r; });
+      segs = segs.slice(0, 11).concat([{ w: rw, r: rw ? rr / rw : 0, t: rest.length + " more validators" }]);
+    }
     var tot = 0; segs.forEach(function(q){ tot += q.w; });
     return '<div class="sv-side ' + cls + '"><span class=sv-lab>' + lab + '</span><b style="color:' + ink + '">' + big + '</b><i>' + sub + '</i>' +
       '<div class=sv-mbar>' + segs.map(function(q){
@@ -233,18 +239,23 @@
   function allocation(pos, S, noScale){
     var rows = pos.rows.slice().sort(function(a, b){ return b.x - a.x; });
     var pins = rows.map(function(r){ return { r: r.inactive ? 0 : r.rate, s: Math.round(9 + 11 * Math.sqrt(r.x / pos.total)), t: r.m + ", " + pct(r.rate) }; });
+    /* one row, however many validators: the four largest and a card for the rest, which
+       opens Manual with the whole list (twenty or fifty cards would push the screen out of
+       its box). The pins still show every one, smaller the more there are. */
+    var shown = rows.length > 5 ? rows.slice(0, 4) : rows, rest = rows.slice(shown.length), restX = 0;
+    rest.forEach(function(r){ restX += r.x; });
+    if(rows.length > 12) pins.forEach(function(q){ q.s = Math.max(7, Math.round(q.s * .7)); });
+    var more = rest.length ? '<div class="sv-chip more click" data-route="dashboard/manual" tabindex=0 title="All your validators, in Manual">' +
+      '<span class=sv-lgo>+' + rest.length + '</span><b>' + rest.length + ' more</b><em>' + Math.round(restX / pos.total * 100) + '<small>%</small></em>' +
+      '<s>' + fmt(restX) + ' ATONE</s><u>see all</u></div>' : "";
     return (noScale ? "" : scale(pins, S || setStats())) +
-      '<div class=sv-chips>' + rows.map(function(r){ var h = heat(r.inactive ? 0 : r.rate);
+      '<div class=sv-chips>' + shown.map(function(r){ var h = heat(r.inactive ? 0 : r.rate);
         return '<div class="sv-chip click' + (r.locked > 0 ? " hld" : "") + '" data-v="' + esc(r.id) + '" tabindex=0 title="Open this validator" style="--c:' + h.fill + '">' +
           '<span class=sv-lgo>' + logo(r.id, r.m) + '</span>' +
           '<b>' + esc(r.m) + '</b><em>' + Math.round(r.x / pos.total * 100) + '<small>%</small></em>' +
-          '<s>' + fmt(r.x) + ' ATONE' + (r.locked > 0 ? ' · cooldown' : '') + '</s><u style="color:' + h.ink + '">' + (r.inactive ? "inactive" : pct(r.rate)) + '</u></div>'; }).join("") + '</div>';
+          '<s>' + fmt(r.x) + ' ATONE' + (r.locked > 0 ? ' · cooldown' : '') + '</s><u style="color:' + h.ink + '">' + (r.inactive ? "inactive" : pct(r.rate)) + '</u></div>'; }).join("") + more + '</div>';
   }
   function ago(at){ var s = Math.max(0, Math.round((Date.now() - at) / 1000)); return s < 60 ? s + "s ago" : Math.floor(s / 60) + "m ago"; }
-  function autopilotWord(at){
-    if(at && at.grant) return "Autopilot is active" + (at.restake ? ", restaking rewards" : "");
-    return "Autopilot is inactive";
-  }
 
   /* ── AUTOPILOT ──────────────────────────────────────────────────────────── */
   function drawAuto(){
@@ -261,8 +272,8 @@
 
     put("sv-atp",
       '<div class=sv-ph><h3>Autopilot</h3>' + state + '<div class=sv-rt>' + door + '</div></div>' +
-      '<div class=sv-note>Autopilot is an <b>authz grant</b>: you allow GATA\'s keeper to redelegate <i>your</i> stake between validators <i>you</i> allow, ' +
-      'for a period <i>you</i> set. Your stake never leaves your wallet, and you can revoke authz at any time.</div>' +
+      '<div class=sv-note>Autopilot moves your stake to better-paying validators for you: only among the validators <i>you</i> pick, ' +
+      'only for as long as <i>you</i> choose. Your ATONE never leaves your wallet, and you can switch it off at any time.</div>' +
       '<div class="sv-cards four">' +
         card("Strategy", g ? esc(strategyWord(g)) : "—", g ? allow + " allowed validators" : "chosen when you set it up") +
         card("Stake it may move", g ? esc(a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "—", g ? "the cap you signed" : "a cap you set") +
@@ -278,13 +289,14 @@
     } else if(pos.rows.length){
       al.hidden = false;
       var rp = at && at.report, last = rp && rp.checked ? window.__dayFull(rp.checked * 1000) : null;
+      /* what the keeper has done, in the header: the moves, and when it last looked */
+      var mv = rp && rp.history && rp.history.length
+        ? tag("q", rp.history.length + " move" + (rp.history.length === 1 ? "" : "s") + ", last " + window.__dayFull(rp.history[0].at * 1000))
+        : tag("q", "no move yet", "The keeper only moves stake when the gain is worth the 21-day cooldown it costs");
       put("sv-atalloc", '<div class=sv-ph><h3>' + (g ? "What it manages" : "What it would manage") + '</h3>' +
           tag("q", pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s")) +
-          '<div class=sv-rt>' + tag(g ? "g" : "q", g ? (last ? "last check " + last : "not checked yet") : "your stake as it stands") + '</div></div>' +
-        allocation(pos, null, true) +
-        (g ? '<div class=sv-note>' + (rp && rp.history && rp.history.length
-          ? '<b>' + rp.history.length + '</b> move' + (rp.history.length === 1 ? "" : "s") + ' made, the last on <b>' + window.__dayFull(rp.history[0].at * 1000) + '</b>.'
-          : "No move yet. The keeper only moves stake when the gain is worth the 21-day cooldown it costs.") + '</div>' : ""));
+          '<div class=sv-rt>' + (g ? mv + tag("g", last ? "checked " + last : "not checked yet") : tag("q", "your stake as it stands")) + '</div></div>' +
+        allocation(pos, null, true));
     } else al.hidden = true;
 
     put("sv-atauth",
@@ -301,10 +313,10 @@
         '</p></div>' +
       '</div>' +
       '<div class=sv-note>' + (at && at.split_pct > 0
-        ? 'GATA takes <b>' + at.split_pct + '%</b> of the rewards a restake claims. Nothing else is charged.'
-        : 'GATA takes <b>no share</b> of your rewards today.') +
-      ' The keeper signs with its own key, off this machine, and the chain rejects anything outside the grant.</div>' +
-      (g ? '<div class=sv-tools><button class="sv-btn red" type=button data-act=autopilot>Revoke authz</button></div>' : ""));
+        ? 'GATA keeps <b>' + at.split_pct + '%</b> of the rewards it restakes for you, and charges nothing else.'
+        : 'Autopilot is <b>free</b>: GATA takes no share of your rewards.') +
+      ' It can only do what you allowed above; AtomOne itself refuses anything else.</div>' +
+      "");
   }
   /* the strategy word lives in the grant's memo, which the chain does not keep:
      what stands on chain is the allow-list, so that is what this states */
@@ -493,13 +505,19 @@
       return;
     }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
-    if(act === "refresh"){ var rf = E("wrefresh"); if(rf) rf.click(); return; }
+    if(act === "refresh"){
+      if(window.__refreshPos){ t.classList.add("busy"); window.__refreshPos().then(function(){ t.classList.remove("busy"); render(); }); }
+      else { var rf = E("wrefresh"); if(rf) rf.click(); }
+      return;
+    }
     if(act === "autopilot"){ var ab = E("atbtn"); if(ab) ab.click(); return; }
     if(act === "connect"){ var cb = E("svconn"); if(cb){ ev.stopPropagation(); cb.click(); } return; }
     if(t.dataset.v && window.__vshow) window.__vshow(t.dataset.v);
   }
   function onKey(ev){
     if(ev.key !== "Enter" && ev.key !== " ") return;
+    var rt = ev.target.closest ? ev.target.closest(".sv-chip[data-route]") : null;
+    if(rt && window.__shellGo){ ev.preventDefault(); window.__shellGo(rt.getAttribute("data-route")); return; }
     var t = ev.target.closest ? ev.target.closest("[data-v]") : null;
     if(!t || !window.__vshow) return;
     ev.preventDefault(); window.__vshow(t.dataset.v);

@@ -114,8 +114,5 @@
      plum into a hollow ring) */
   html[data-theme=light]:not([data-mono]) .sv-hint i.lo{background:#572179;box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-hint i.hi{background:#e0a21e;box-shadow:none}
-  /* the lockup's line in full ink, its last words in a deep amber */
-  html[data-theme=light]:not([data-mono]) .sv-bw i{color:#16141f}
-  html[data-theme=light]:not([data-mono]) .sv-bw i em{color:#b8690a;text-shadow:none}
   /* Plex runs wider than the night face: the strategy names keep whole beside their "?" */
   html[data-theme=light]:not([data-mono]) .at3 .atpc b{font-size:11px;letter-spacing:-.01em}

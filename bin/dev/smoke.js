@@ -99,7 +99,7 @@ go('staking/bonus');
 /* the wallet section: no gate of its own any more - the sub-header is the only door,
    and the pane stands with its structure (a skeleton) until a wallet fills it */
 t('wallet-door', function(){
-  var root=document.documentElement; go('dashboard/self');
+  var root=document.documentElement; go('dashboard/manual');
   var g=document.getElementById('wgate'), a=document.getElementById('wk-acct');
   var skel=document.querySelectorAll('#dmy tr.skel').length;
   var rows=document.querySelectorAll('#dpicks tbody tr').length, cap=!document.getElementById('dcap');   /* the count line is gone from the page */
@@ -115,14 +115,14 @@ t('wallet-door', function(){
 
 /* the dashboard's two views share one window: the same box, one at a time */
 t('simple-view', function(){
-  go('dashboard/self');
+  go('dashboard/manual');
   var pane=document.getElementById('p-dele'), sv=document.getElementById('sv');
   var advBox=pane.getBoundingClientRect();
-  go('dashboard/overview');
+  go('dashboard/wallet');
   var svBox=sv.getBoundingClientRect(), paneGone=getComputedStyle(pane).display==='none';
   /* the three screens, one shown at a time, each its own level-2 view */
   var seen=[];
-  [['dashboard/overview','sv-over'],['dashboard/autopilot','sv-auto'],['network/validators','sv-net']].forEach(function(k){
+  [['dashboard/wallet','sv-over'],['dashboard/autopilot','sv-auto'],['network/validators','sv-net']].forEach(function(k){
     go(k[0]);
     var id=k[1];
     seen.push([].filter.call(document.querySelectorAll('.sv-screen'),function(x){ return getComputedStyle(x).display!=='none'; }).map(function(x){ return x.id; }).join()===id);
@@ -199,24 +199,32 @@ t('shell-groups', function(){
   var R=document.documentElement, bad=[];
   function vis(id){ var e=document.getElementById(id); return !!e && e.offsetParent!==null && e.getBoundingClientRect().height>0; }
   function tabs(){ return [].filter.call(document.querySelectorAll('.l2[data-for=dashboard] .l2tab'),function(b){ return b.offsetParent!==null; }).map(function(b){ return b.dataset.sub; }).join(); }
-  go('dashboard/overview');
+  go('dashboard/wallet');
   var sw=document.querySelector('.l2ver[data-for=dashboard]'), l2=document.querySelector('.l2[data-for=dashboard]');
   if(!sw || sw.offsetParent===null) bad.push('switch not shown');
   if(sw && sw.closest('[role=tablist]')) bad.push('switch inside a tablist');
   if(sw && l2 && innerWidth>620 && sw.getBoundingClientRect().left < l2.getBoundingClientRect().right) bad.push('switch not after the views');
   var bs=[].map.call(document.querySelectorAll('.l2vb'),function(b){ return b.textContent+(b.getAttribute('aria-disabled')==='true'?'(off)':'')+(b.getAttribute('aria-pressed')==='true'?'*':''); }).join();
-  if(bs!=='Staking*,Governance(off)') bad.push('switch '+bs);
+  if(bs!=='Staking*,Governance') bad.push('switch '+bs);
   if(tabs()!=='overview,autopilot,self') bad.push('staking tabs '+tabs());
   if(R.getAttribute('data-grp')!=='Staking') bad.push('grp '+R.getAttribute('data-grp'));
   if(!vis('sv-over') || vis('p-dele')) bad.push('overview is not the simple screen');
   document.getElementById('l2-dashboard-self').click();
-  if(location.hash!=='#/dashboard/self' || !vis('p-dele') || vis('sv')) bad.push('self is not the three panes '+location.hash);
+  if(location.hash!=='#/dashboard/manual' || !vis('p-dele') || vis('sv')) bad.push('manual is not the three panes '+location.hash);
   if(document.getElementById('l2-dashboard-self').getAttribute('aria-controls')!=='p-dele') bad.push('self controls');
   var tg=[].filter.call(document.querySelectorAll('.brandbar .svtag'),function(x){ return x.offsetParent!==null; });
   if(innerWidth>1439 && (tg.length!==1 || !tg[0].classList.contains('a'))) bad.push('self tagline');
+  /* Governance swaps its own tabs in, on their pages (empty states until they are built) */
   document.querySelector('.l2vb[data-g=Governance]').click();
-  if(location.hash!=='#/dashboard/self') bad.push('greyed governance opened '+location.hash);
-  go('dashboard/votes'); if(location.hash!=='#/dashboard/overview') bad.push('votes route '+location.hash);
+  /* it opens on the governance view last used this session (Votes on a first visit) */
+  if(!/^#\/dashboard\/(votes|governors)$/.test(location.hash) || R.getAttribute('data-grp')!=='Governance') bad.push('governance opened '+location.hash);
+  if(tabs()!=='votes,governors') bad.push('governance tabs '+tabs());
+  document.getElementById('l2-dashboard-votes').click();
+  if(!vis('p-empty') || document.getElementById('shellempty').textContent.indexOf('Votes')<0) bad.push('votes page');
+  document.getElementById('l2-dashboard-governors').click();
+  if(location.hash!=='#/dashboard/governors' || document.getElementById('shellempty').textContent.indexOf('Governors')<0) bad.push('governors page');
+  document.querySelector('.l2vb[data-g=Staking]').click();
+  if(location.hash!=='#/dashboard/manual') bad.push('staking returns to its last view '+location.hash);
   [].forEach.call(document.querySelectorAll('.l2vb'),function(b){ var h=parseFloat(getComputedStyle(b,'::after').height); if(!(h>=44) && b.getBoundingClientRect().height<44) bad.push('switch target '+h); });
   go('network/validators'); if(location.hash!=='#/network/validators' || !vis('sv-net')) bad.push('network '+location.hash);
   go('staking/bonus');

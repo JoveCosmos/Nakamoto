@@ -59,12 +59,12 @@
       "hint": "your stake, your votes",
       "switch": "groups",
       "sub": [
-        {"id": "overview",  "label": "Overview",  "route": "overview",  "group": "Staking", "tab": "dele", "ui": "simple", "screen": "over", "panel": "sv-over"},
+        {"id": "overview",  "label": "Wallet",    "route": "wallet",  "group": "Staking", "tab": "dele", "ui": "simple", "screen": "over", "panel": "sv-over"},
         {"id": "autopilot", "label": "Autopilot", "route": "autopilot", "group": "Staking", "tab": "dele", "ui": "simple", "screen": "auto", "panel": "sv-auto"},
-        {"id": "self",      "label": "Self",      "route": "self",      "group": "Staking", "tab": "dele", "panel": "p-dele"},
-        {"id": "votes",     "label": "Votes",     "route": "votes",     "group": "Governance", "off": true, "offnote": "Coming soon",
+        {"id": "self",      "label": "Manual",    "route": "manual",      "group": "Staking", "tab": "dele", "panel": "p-dele"},
+        {"id": "votes",     "label": "Votes",     "route": "votes",     "group": "Governance",
          "empty": {"title": "Votes", "text": "How your wallet voted on AtomOne proposals will be listed here."}},
-        {"id": "governors", "label": "Governors", "route": "governors", "group": "Governance", "off": true, "offnote": "Coming soon",
+        {"id": "governors", "label": "Governors", "route": "governors", "group": "Governance",
          "empty": {"title": "Governors", "text": "The governors your wallet follows will be listed here."}}
       ]
     }

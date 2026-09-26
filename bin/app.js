@@ -2227,7 +2227,7 @@ rememberGridH();
     if(mx) mx.textContent = exact(bal, 2);
     var over = P.u > bal, ok = P.u > 0 && P.n > 0 && !over && P.share > 0;
     if(fld) fld.classList.toggle("bad", !!over);
-    if(hint){ hint.className = "unhint" + (over ? " bad" : ""); hint.textContent = over ? "more than the wallet holds" : (P.u > 0 && !P.n ? "Select a validator" : "of " + exact(bal) + " liquid"); }
+    if(hint){ hint.className = "unhint" + (over ? " bad" : ""); hint.textContent = over ? "more than the wallet holds" : (P.u > 0 && !P.n ? "Select a validator" : ""); }
     if(go) go.disabled = !ok || !window.__WALLET;
     var sb = E("stbell"); if(sb) sb.disabled = !P.n;
     /* the blended rate rides in the summary's second line */
@@ -2246,7 +2246,6 @@ rememberGridH();
   });
   var stamtEl = E("stamt"); if(stamtEl) stamtEl.addEventListener("input", function(){ stRows(); stState(); });
   var stmax = E("stmax"); if(stmax) stmax.addEventListener("click", function(){ if(!(stBal() > 0)) return; E("stamt").value = exact(stBal()); stRows(); stState(); });
-  var stcancel = E("stcancel"); if(stcancel) stcancel.addEventListener("click", function(){ POP.close(stpop); });
   if(stpop) stpop.__onclose = function(){ feeSoon("st"); };
   var stsign = E("stsign");
   if(stsign) stsign.addEventListener("click", function(){
@@ -2489,7 +2488,9 @@ rememberGridH();
     E("atform").hidden = view;
     E("atrevoke").hidden = !view; E("atedit").hidden = !view;
     var go = E("atgrant"); go.hidden = view; go.textContent = g ? "Update" : "Grant";
-    E("atcancel").textContent = view ? "Close" : g ? "Back" : "Cancel";
+    /* no Cancel or Close: a tap outside, or Escape, closes the card. Back stays - it leaves a
+       change of a standing grant without closing */
+    var ac = E("atcancel"); ac.textContent = "Back"; ac.hidden = !(g && AT_EDIT);
     atFltSync(); atRefresh();
   }
   /* the door: the card opens at once on what is known, then re-reads the keeper and the
@@ -2601,7 +2602,10 @@ rememberGridH();
     /* the line shows for every connected wallet; while the keeper has no address yet the
        card reads Inactive and Grant stays disabled */
     row.hidden = false; atLine();
-    atStatus().then(function(){ atLine(); if(AT.addr && AT.who === who) atGrant().then(function(r){ if(AT.who !== who || !atKeep(r)) return; b.classList.toggle("on", !!AT.grant); atLine(); draw(); }); });
+    /* the grant and the keeper's report together: the Autopilot screen shows when it last
+       checked and what it moved without the card having been opened */
+    atStatus().then(function(){ atLine(); if(AT.addr && AT.who === who) Promise.all([atGrant(), atReport()]).then(function(x){
+      if(AT.who !== who || !atKeep(x[0])) return; AT.report = x[1]; b.classList.toggle("on", !!AT.grant); atLine(); draw(); }); });
   };
 
   /* the bells on the two cards: every validator the transaction lands on */

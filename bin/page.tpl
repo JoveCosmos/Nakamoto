@@ -2998,8 +2998,6 @@ html[data-ui=simple][data-tab=dele] .w#calc>#p-dele{display:none}
 /* the lockup on one line: the mark, the name at title size on the mark's centre line, and the
    tagline beside it - the simple views' and the advanced view's own */
 .sv-bw{display:flex;align-items:baseline;gap:10px;line-height:1;min-width:0}
-.sv-bw b{font-size:19px;font-weight:800;letter-spacing:-.01em;color:var(--wt)}
-.sv-bw i{font-style:normal;font-family:var(--wsans);font-size:13px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 /* Overview and Autopilot say what GATA is; Self (the three panes) says what it is for */
 html:not([data-ui=simple]) .svtag.s,html[data-ui=simple] .svtag.a{display:none}
 .sv-who{display:flex;align-items:center;gap:9px;flex:1 1 0;justify-content:flex-end;min-width:0}
@@ -3311,8 +3309,6 @@ border-color:rgba(46,224,106,.3)}
   .sv-screen{justify-content:flex-start}
   .sv-cards,.sv-cards.four{grid-template-columns:minmax(0,1fr)}
   .sv-big{font-size:28px}
-  .sv-bw b{font-size:17px}
-  .sv-bw i{font-size:12px}
   /* a phone: the lockup keeps its whole tagline; the greeting takes the line under it */
   .brandbar .sv-brand{flex-wrap:wrap;row-gap:6px}
   .welc{flex:1 1 100%;margin-left:0;padding-left:0;border-left:0}
@@ -3337,7 +3333,28 @@ background:linear-gradient(180deg,#131329,#0c0c1a);border:1px solid var(--wbd2);
 .sv-screen>.sv-panel::before,.sv-screen>.sv-strip::before,.sv-screen .sv-card::before{content:"";position:absolute;left:16px;right:16px;top:0;height:1px;
 background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opacity:.95;pointer-events:none}
 .t-stk{--tc:var(--sv-amber)}.t-apr{--tc:#f07a3c}.t-rew{--tc:var(--sv-green)}
-#sv-optp{--tc:var(--sv-green)}#sv-allocp,#sv-atalloc{--tc:var(--sv-amber)}#sv-foot,#sv-atp,#sv-atp .sv-card,#sv-atauth{--tc:var(--sv-violet)}
+#sv-optp{--tc:var(--sv-green)}#sv-allocp,#sv-atalloc{--tc:var(--sv-amber)}#sv-atp,#sv-atp .sv-card,#sv-atauth{--tc:var(--sv-violet)}
+.t-bal{--tc:var(--sv-violet)}
+/* the wallet tile: liquid ATONE, the PHOTON that pays fees, when it was read, and the one control
+   that reads it again */
+.sv-pho{color:#7fd8ff;font-weight:600}
+.sv-ago{color:var(--wf)}
+.sv-rf{width:28px;height:28px;border-radius:8px;border:1px solid var(--wbd2);background:transparent;color:var(--ws);display:grid;place-items:center;cursor:pointer;position:relative;flex:0 0 auto}
+.sv-rf::after{content:"";position:absolute;inset:-8px}
+.sv-rf svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sv-rf:hover{color:var(--sv-violet);border-color:var(--sv-violet)}
+.sv-rf:focus-visible{outline:2px solid var(--sv-violet);outline-offset:2px}
+.sv-rf[hidden]{display:none}
+.sv-rf.busy svg{animation:svspin .8s linear infinite}
+@keyframes svspin{to{transform:rotate(360deg)}}
+/* a wallet with nothing staked: the message and Stake ATONE in the middle of the space below the tiles */
+#sv-optp.fill{flex:1 1 auto;justify-content:center;align-items:center}
+.sv-none{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.sv-none h3{margin:0;font-size:18px;font-weight:700}
+.sv-mbar{overflow:hidden}
+/* the rest of a long list, as one card that opens Manual */
+.sv-chip.more .sv-lgo{display:grid;place-items:center;background:var(--wbd);color:var(--ws);font-family:var(--wmono);font-size:10px;font-weight:700}
+.sv-chip.more u{color:var(--sv-violet)}
 #sv-nethead,#sv-netcards .sv-card,.sv-screen>.sv-list{--tc:var(--sv-teal)}
 /* labels in the calculator's voice; figures in the colour of what they are */
 .sv-k{font-family:var(--wmono);font-size:9.5px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--ws)}
@@ -3410,11 +3427,7 @@ font-family:var(--wmono);font-size:11px;font-weight:700;color:#0b0b18;background
 .sv-big{font-size:28px;margin-top:4px}
 .sv-hmeta{font-family:var(--wmono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ws);white-space:nowrap}
 /* the footer: a line, not a box - status, freshness, the two plain controls */
-.sv-screen>#sv-foot{background:none;border:0;box-shadow:none;padding:0 2px}
-.sv-screen>#sv-foot::before{content:none}
 /* Autopilot's own colour */
-#sv-foot .sv-btn[data-route]{color:var(--sv-violet);border-color:rgba(185,176,255,.38)}
-#sv-foot .sv-btn[data-route]:hover{background:rgba(185,176,255,.1);color:var(--sv-violet);border-color:var(--sv-violet)}
 .sv-stat i{background:var(--sv-violet);box-shadow:0 0 0 3px rgba(185,176,255,.18)}
 .sv-btn.vio{background:var(--sv-violet);border-color:var(--sv-violet);color:#161038}
 .sv-btn.vio:hover:not(:disabled){background:#cfc8ff;border-color:#cfc8ff;color:#161038}
@@ -3432,10 +3445,10 @@ font-family:var(--wmono);font-size:11px;font-weight:700;color:#0b0b18;background
 .sv-seg[aria-pressed=true]{color:#062522;background:var(--sv-teal);border-color:var(--sv-teal)}
 /* the lockup: the mark and one line beside it (the word GATA is gone, the mark says it) */
 .sv-bw{align-items:center}
-/* set like the calculator's own title ("Nakamoto Bonus"): the line in ink, its last words in the
-   section's amber */
-.sv-bw i{font-family:var(--wsans);font-size:clamp(17px,1.45vw,21px);font-weight:800;letter-spacing:-.02em;line-height:1;color:#fff}
-.sv-bw i em{font-style:normal;color:#ffb02e;text-shadow:0 0 18px rgba(255,176,46,.45)}
+/* the calculator's own title markup (.bt/.btx/.nk/.tsfx), so the line is "Nakamoto Bonus" to the
+   pixel in both themes: its size, weight, face; the last words in the section's amber */
+.sv-bw .bt{flex-wrap:nowrap}
+.sv-brand .tsfx{color:#ffb02e}
 .sv-brand{gap:12px}
 @media(max-width:900px){
   .sv-hmeta{flex:1 1 100%;white-space:normal;line-height:1.6}
@@ -3529,7 +3542,8 @@ white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .atuntil b{font-family:var(--wsans);font-size:11.5px;font-weight:600;letter-spacing:0;text-transform:none;color:#fff8dc;margin-left:4px}
 .atfee{margin:8px 0 0;padding:9px 12px;border:1px solid rgba(255,176,46,.28);border-radius:6px;background:rgba(255,176,46,.05);font-family:var(--wmono);font-size:9px;letter-spacing:.04em;color:var(--ws);line-height:1.5}
 .atfee b{color:var(--wamber);font-weight:400}
-.atnote{display:flex;align-items:center;gap:9px;margin:12px 0 0;padding:8px 11px;border-radius:6px;border:1px solid rgba(46,224,106,.28);background:rgba(46,224,106,.06);font-family:var(--wsans);font-size:11.5px;color:#d9f7e4}
+.atnote{display:flex;align-items:center;gap:8px;margin:12px 0 0;padding:8px 10px;border-radius:6px;border:1px solid rgba(46,224,106,.28);background:rgba(46,224,106,.06);font-family:var(--wsans);font-size:11px;letter-spacing:-.005em;color:#d9f7e4;white-space:nowrap}
+.atnote span{min-width:0;overflow:hidden;text-overflow:ellipsis}
 .atnote svg{width:15px;height:15px;flex:0 0 auto;fill:none;stroke:#2ee06a;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin:0;max-height:none}
 /* the validators: a head with the count and the quick rules, a search and a filter, the list */
 .atrh{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -3579,7 +3593,11 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .atlist td.r2 b{font-weight:400;color:var(--wgreen)}
 .atlist .atnone{padding:28px 12px;text-align:center;font-family:var(--wsans);font-size:12px;color:var(--wf);cursor:default;white-space:normal}
 /* the footer across both sides: the fee and the step on the left, the buttons on the right */
-.atfoot{flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:12px 20px 14px;border-top:1px solid var(--wbd)}
+/* the footer keeps the card's two columns: the actions centred under the setup, the fee and the
+   signing steps beside them under the list */
+.atfoot{flex:0 0 auto;display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);grid-template-areas:"b f";align-items:center;padding:12px 0 14px;border-top:1px solid var(--wbd)}
+.atcard .atfoot .txbtns{grid-area:b;justify-content:center;padding:0 20px}
+.atfoot .atfs{grid-area:f;padding:0 20px}
 .atfs{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
 .atcard .atfoot .txfee,.atcard .atfoot .txstep{padding:0;min-height:0}
 .atcard .atfoot .txfee{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -3613,9 +3631,10 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
   .atfind{flex:1 1 100%;height:36px}
   .atlist td{height:40px}
   .atcard .unfield.atfield{width:100%;max-width:260px}
-  .atfoot{flex-wrap:wrap;gap:8px;padding:10px 16px 12px}
-  .atfs{flex:1 1 100%}
-  .atcard .atfoot .txbtns{flex:1 1 100%;justify-content:flex-end}
+  .atfoot{grid-template-columns:minmax(0,1fr);grid-template-areas:"f" "b";row-gap:8px;padding:10px 0 12px}
+  .atfoot .atfs{padding:0 16px}
+  .atcard .atfoot .txbtns{padding:0 16px}
+  .atnote{white-space:normal}
 }
 /* ══ the navigation shell ═══════════════════════════════════════════════════════════
    Two levels that must never look alike. Level 1 - the sections - is chrome: words in
@@ -3783,7 +3802,7 @@ html[data-tab=connect] .l2host{display:none}
       <div class=bwrap data-title-for=staking><div class=bt><span class=btx><i class=nk>Nakamoto </i><i class=tsfx id=tsfx>Bonus</i></span></div></div>
       <div class=bwrap data-title-for=network><div class=bt><span class=btx><i class=nk>AtomOne </i><i class="tsfx net">Network</i></span></div></div>
       <div class=bwrap data-title-for=governance><div class=bt><span class=btx><i class=nk>Governance </i><i class="tsfx tsub">Proposals</i></span></div></div>
-      <span class=sv-brand data-title-for=dashboard><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><i class="svtag s">Non-custodial <em>staking</em></i><i class="svtag a">Decentralize the chain and <em>earn more</em></i></span><span class=welc id=svwelc hidden></span></span>
+      <span class=sv-brand data-title-for=dashboard><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><span class="bt svtag s"><span class=btx><i class=nk>Non-custodial </i><i class=tsfx>staking</i></span></span><span class="bt svtag a"><span class=btx><i class=nk>Decentralize the chain and </i><i class=tsfx>earn more</i></span></span></span><span class=welc id=svwelc hidden></span></span>
       <div class=l2host>{{SHELL_L2}}</div>
     </header>
   <div class=flipbox id=flipbox>
@@ -3962,18 +3981,19 @@ html[data-tab=connect] .l2host{display:none}
   <!-- Simple: the dashboard's other face. Same window, same frame as the pane above. -->
   <div id=sv>
     <main class=sv-main>
-      <section class=sv-screen id=sv-over data-sc=over aria-label=Overview>
-        <div class=sv-cards>
-          <div class="sv-card t-stk"><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#ffb02e;--icb:rgba(255,176,46,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l8 4.5-8 4.5-8-4.5z"/><path d="M4 12l8 4.5 8-4.5"/><path d="M4 16.5l8 4.5 8-4.5"/></svg></span><span class=sv-k>Staked balance</span></span><span class="sv-tag g">Self-custody</span></span>
+      <section class=sv-screen id=sv-over data-sc=over aria-label=Wallet>
+        <div class="sv-cards four">
+          <div class="sv-card t-bal"><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#b9b0ff;--icb:rgba(185,176,255,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4z"/><path d="M4 7V6a2 2 0 0 1 2-2h10v3"/><path d="M16 13.5h.01"/></svg></span><span class=sv-k>Available</span></span><button class=sv-rf type=button data-act=refresh id=sv-rf title="Read the wallet again" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button></span>
+            <span class=sv-big id=sv-bal>&mdash;<em>ATONE</em></span><span class=sv-sub id=sv-balsub></span></div>
+          <div class="sv-card t-stk"><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#ffb02e;--icb:rgba(255,176,46,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l8 4.5-8 4.5-8-4.5z"/><path d="M4 12l8 4.5 8-4.5"/><path d="M4 16.5l8 4.5 8-4.5"/></svg></span><span class=sv-k>Staked</span></span><span class="sv-tag g">Self-custody</span></span>
             <span class=sv-big id=sv-staked>&mdash;<em>ATONE</em></span><span class=sv-sub id=sv-stsub></span></div>
+          <div class="sv-card t-rew"><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#2ee06a;--icb:rgba(46,224,106,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 21V7"/><path d="M12 7C10 3 6 4 7 6.5 7.8 8 12 7 12 7zM12 7c2-4 6-3 5-.5C16.2 8 12 7 12 7z"/></svg></span><span class=sv-k>Rewards</span></span></span>
+            <span class=sv-big id=sv-rew>&mdash;<em>ATONE</em></span><span class=sv-sub id=sv-rewsub></span></div>
           <div class="sv-card t-apr"><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#f07a3c;--icb:rgba(240,122,60,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span><span class=sv-k>Your APR</span></span></span>
             <span class=sv-big id=sv-apr>&mdash;</span><div class="sv-sub sv-scl" id=sv-aprsub></div></div>
-          <div class="sv-card t-rew"><span class=sv-kr><span class=sv-kl><span class=sv-ic style="--ic:#2ee06a;--icb:rgba(46,224,106,.14)"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 21V7"/><path d="M12 7C10 3 6 4 7 6.5 7.8 8 12 7 12 7zM12 7c2-4 6-3 5-.5C16.2 8 12 7 12 7z"/></svg></span><span class=sv-k>Rewards waiting</span></span></span>
-            <span class=sv-big id=sv-rew>&mdash;<em>ATONE</em></span><span class=sv-sub id=sv-rewsub></span></div>
         </div>
         <div class=sv-panel id=sv-optp></div>
         <div class=sv-panel id=sv-allocp></div>
-        <div class=sv-strip id=sv-foot></div>
       </section>
       <section class=sv-screen id=sv-auto data-sc=auto aria-label=Autopilot>
         <div class=sv-panel id=sv-atp></div>
@@ -4163,7 +4183,7 @@ html[data-tab=connect] .l2host{display:none}
   <div class=txlock id=stlock></div>
   <div class=txfee id=stfee></div>
   <div class=txstep id=ststep></div>
-  <div class=txbtns><button class="wk-btn wk-bell" id=stbell type=button title="Alerts for these validators"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>Alerts</button><button class=wk-btn id=stcancel type=button>Cancel</button><button class="wk-btn wk-go" id=stsign type=button disabled>Stake</button></div>
+  <div class=txbtns><button class="wk-btn wk-bell" id=stbell type=button title="Alerts for these validators"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>Alerts</button><button class="wk-btn wk-go" id=stsign type=button disabled>Stake</button></div>
 </div></div>
 
 <div class=pop id=atpop><div class="card txcard uncard atcard" role=dialog aria-modal=true aria-labelledby=atttl data-v=setup>
@@ -4197,7 +4217,7 @@ html[data-tab=connect] .l2host{display:none}
           <div class=atseg id=atrsk role=group aria-label="Restake rewards"><button type=button data-r=1 aria-pressed=false>Yes</button><button type=button data-r=0 aria-pressed=true>No</button></div><input type=checkbox id=atrestake hidden></div>
         <div class=atfee id=atfee hidden></div>
       </div>
-      <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. You can revoke authz at any time.</span></div>
+      <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. You can revoke auth at any time.</span></div>
     </section>
     <section class=atR id=atR aria-label="Select your validators">
       <div class=atrh><div class=atrt><b>Select your validators</b><span id=atcount></span></div></div>
@@ -4208,7 +4228,7 @@ html[data-tab=connect] .l2host{display:none}
   </div>
   <div class=atfoot>
     <div class=atfs><div class=txfee id=attxfee></div><div class=txstep id=atstep></div></div>
-    <div class=txbtns><button class=wk-btn id=atcancel type=button>Cancel</button><button class="wk-btn wk-danger" id=atrevoke type=button hidden>Revoke</button><button class=wk-btn id=atedit type=button hidden>Change</button><button class="wk-btn wk-go" id=atgrant type=button disabled>Grant</button></div>
+    <div class=txbtns><button class=wk-btn id=atcancel type=button hidden>Back</button><button class="wk-btn wk-danger" id=atrevoke type=button hidden>Revoke</button><button class=wk-btn id=atedit type=button hidden>Change</button><button class="wk-btn wk-go" id=atgrant type=button disabled>Grant</button></div>
   </div>
 </div></div>
 
