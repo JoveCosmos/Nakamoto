@@ -590,9 +590,11 @@
   html[data-theme=light]:not([data-mono]) .sd-fig::after{background:var(--rc)}
   html[data-theme=light]:not([data-mono]) .sd-ok{border:1px solid var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .sd-plot{background:transparent}
-  html[data-theme=light]:not([data-mono]) .sd-b{background:var(--c);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .sd-b.to{background:var(--accent-soft);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .sd-b.mk{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-hc{--c:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sd-hc s{background:color-mix(in srgb,var(--c) 42%,transparent)}
+  html[data-theme=light]:not([data-mono]) .sd-hc u{background:var(--amber-bar);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-hc.al s{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-gkey i.st2{background:var(--amber-bar);border-top:2px solid var(--danger-bar)}
   html[data-theme=light]:not([data-mono]) .sv-gkey i.sk{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-gkey i.to{background:transparent}
   html[data-theme=light]:not([data-mono]) .sd-vr.click:hover,html[data-theme=light]:not([data-mono]) .sd-vr.more:hover{background:var(--surface-2)}

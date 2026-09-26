@@ -3794,12 +3794,25 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-sky{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
 .sd-plot{position:relative;flex:1 1 auto;min-height:60px;margin:0 14px;
 background:repeating-linear-gradient(0deg,transparent 0 calc(25% - 1px),rgba(255,255,255,.05) calc(25% - 1px) 25%)}
-.sd-plot s{position:absolute;bottom:0;width:1px;height:9px;margin-left:-.5px;background:var(--wf);opacity:.55}
-.sd-b{position:absolute;bottom:0;width:14px;margin-left:-7px;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--c),rgba(0,0,0,0) 180%);
-box-shadow:0 0 16px -3px var(--c);cursor:crosshair}
-.sd-b:hover{filter:brightness(1.25)}
-.sd-b.to{background:rgba(46,224,106,.06);border:1.5px dashed var(--sv-green);border-bottom:0;box-shadow:none}
-.sd-b.mk{box-shadow:inset 0 3px 0 var(--sv-violet),0 0 16px -3px var(--c)}
+/* the band chart: a column per APR band - the set's count as a heat-tinted column with a lit top,
+   your stake as an amber bar inside it - and the markers standing over the plot */
+.sd-plot{display:flex;align-items:stretch;gap:3px;padding-top:26px}
+.sd-hc{--c:#6f66c8;flex:1 1 0;position:relative;min-width:0;cursor:crosshair}
+.sd-hc s{position:absolute;left:0;right:0;bottom:0;border-radius:3px 3px 0 0;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 42%,transparent),color-mix(in srgb,var(--c) 12%,transparent));
+border-top:2px solid var(--c)}
+.sd-hc u{position:absolute;left:22%;right:22%;bottom:0;border-radius:3px 3px 0 0;background:linear-gradient(180deg,#ffc861,#ffb02e 60%,rgba(255,176,46,.55));box-shadow:0 0 14px -2px rgba(255,176,46,.7)}
+.sd-hc.al s{box-shadow:inset 0 3px 0 var(--sv-violet)}
+.sd-hc:hover s{filter:brightness(1.3)}
+.sd-mk{position:absolute;top:0;bottom:0;width:0;border-left:1.5px dashed var(--wf);pointer-events:none;z-index:2}
+.sd-mk b{position:absolute;top:0;left:0;transform:translateX(-50%);white-space:nowrap;font-family:var(--wmono);font-size:9.5px;font-weight:600;padding:1px 6px;border-radius:4px;
+background:var(--wc);border:1px solid currentColor}
+.sd-mk.rt b{transform:translateX(-100%)}
+.sd-mk.md{color:var(--ws);border-color:var(--ws)}
+.sd-mk.you{color:var(--sv-amber);border-left:2px solid var(--sv-amber)}.sd-mk.you b{top:0}
+.sd-mk.aft{color:var(--sv-green);border-left:2px solid var(--sv-green)}.sd-mk.aft b{top:18px}
+.sd-mk.md b{top:36px}
+.sd-off{font-size:11px;color:var(--wf);margin-top:4px}
+.sv-gkey i.st2{background:linear-gradient(180deg,rgba(255,176,46,.35),rgba(111,102,200,.3));border-top:2px solid #b35;border-radius:1px}
 .sd-ax{height:6px;margin:0 14px;border-radius:0 0 3px 3px}
 .sd-axl{position:relative;height:16px;margin:4px 14px 0;font-family:var(--wmono);font-size:9.5px;color:var(--ws)}
 .sd-axl span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}

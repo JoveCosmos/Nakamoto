@@ -141,21 +141,41 @@
   function fig(label, value, meta, color){
     return '<div class=sd-fig' + (color ? ' style="--rc:' + color + '"' : '') + '><em>' + label + '</em><b>' + value + '</b>' + (meta ? '<small>' + meta + '</small>' : '') + '</div>';
   }
-  /* the skyline: the set's APR range left to right on its own heat ramp; each of the wallet's
-     validators a bar at its APR, as tall as the stake there; the plan's targets as outlines; the
-     rest of the set as faint ticks under them. mark: ids to cap in violet (Autopilot's allow-list) */
-  function sky(rows, S, picks, mark){
-    var V = VALS(), mx = 0, i, t = "", b = "";
-    rows.forEach(function(r){ if(r.x > mx) mx = r.x; }); (picks || []).forEach(function(q){ if(q.x > mx) mx = q.x; });
-    for(i = 0; i < V.length; i++) t += '<s style="left:' + (heat(rate0(V[i][1], V[i][2])).p * 100).toFixed(2) + '%"></s>';
-    (picks || []).forEach(function(q){ var h = heat(q.r);
-      b += '<i class="sd-b to" style="left:' + (h.p * 100).toFixed(2) + '%;height:' + Math.max(4, q.x / (mx || 1) * 100).toFixed(1) + '%" data-t="' + esc(q.m) + ": " + fmt(q.x) + ' ATONE would earn ' + pct(q.r) + '"></i>'; });
-    rows.forEach(function(r){ var h = heat(r.inactive ? 0 : r.rate);
-      b += '<i class="sd-b' + (mark && mark[r.id] ? ' mk' : '') + '" style="left:' + (h.p * 100).toFixed(2) + '%;height:' + Math.max(4, r.x / (mx || 1) * 100).toFixed(1) + '%;--c:' + h.fill + '" data-t="' +
-        esc(r.m) + ": " + fmt(r.x) + ' ATONE at ' + (r.inactive ? "0% (inactive)" : pct(r.rate)) + '"></i>'; });
-    var md = heat(S.mid).p * 100;
-    return '<div class=sd-sky><div class=sd-plot>' + t + b + '</div><div class=sd-ax style="background:' + rampCss() + '"></div>' +
-      '<div class=sd-axl><span style="left:0">' + pct(S.lo) + '</span><span class=md style="left:' + md.toFixed(1) + '%">median ' + pct(S.mid) + '</span><span style="left:100%">' + pct(S.hi) + '</span></div></div>';
+  /* Your APR against the set. The set as columns - how many validators pay within each APR band,
+     across the set's robust range (the outer 2% fold into the end bands), each band in its heat -
+     and your stake as amber bars in the bands it sits in, as tall as its share. Markers for You,
+     After the move and the Median. mark: allow-listed ids - their bands carry a violet edge.
+     marks: [{v, label, cls}] */
+  function sky(rows, S, marks, mark){
+    var V = VALS(), rs = [], i;
+    for(i = 0; i < V.length; i++) rs.push({ id: V[i][3], r: rate0(V[i][1], V[i][2]) });
+    var sorted = rs.map(function(x){ return x.r; }).sort(function(a, b){ return a - b; });
+    var lo = sorted[Math.floor(sorted.length * .02)] || 0, hi = sorted[Math.ceil(sorted.length * .98) - 1] || 0;
+    if(!(hi > lo)){ lo = sorted[0] || 0; hi = sorted[sorted.length - 1] || 1; }
+    var NB = 20, w = (hi - lo) / NB || 1, bin = function(r){ return Math.max(0, Math.min(NB - 1, Math.floor((r - lo) / w))); };
+    var cnt = [], own = [], ids = [], allow = [], total = 0;
+    for(i = 0; i < NB; i++){ cnt.push(0); own.push(0); ids.push([]); allow.push(false); }
+    rs.forEach(function(x){ var b = bin(x.r); cnt[b]++; if(mark && mark[x.id]) allow[b] = true; });
+    var off = 0;
+    rows.forEach(function(r){ if(r.inactive){ off += r.x; return; } var b = bin(r.rate); own[b] += r.x; ids[b].push(r.m); total += r.x; });
+    var mc = Math.max.apply(null, cnt) || 1, mo = Math.max.apply(null, own) || 1;
+    var X = function(v){ return Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100)); };
+    var cols = "";
+    for(i = 0; i < NB; i++){
+      var a = lo + i * w, z = a + w, h = heat(a + w / 2);
+      var t = (i === 0 ? "up to " : i === NB - 1 ? "from " : "") + (i === NB - 1 ? pct(a) : i === 0 ? pct(z) : pct(a) + "\u2013" + pct(z)) + ": " + cnt[i] + " validator" + (cnt[i] === 1 ? "" : "s") +
+        (own[i] ? ", " + fmt(own[i]) + " ATONE of yours (" + Math.round(own[i] / (total + off || 1) * 100) + "%)" : "");
+      cols += '<i class="sd-hc' + (allow[i] ? ' al' : '') + '" style="--c:' + h.fill + '" data-t="' + esc(t) + '">' +
+        '<s style="height:' + (cnt[i] / mc * 100).toFixed(1) + '%"></s>' + (own[i] ? '<u style="height:' + Math.max(6, own[i] / mo * 100).toFixed(1) + '%"></u>' : '') + '</i>';
+    }
+    var mk = (marks || []).filter(function(m){ return m.v != null; }).map(function(m){
+      var x = X(m.v);
+      /* past the band range (a lone outlier or the plan's target): at the edge, with an arrow */
+      var out = m.v > hi ? " \u2192" : m.v < lo ? " \u2190" : "";
+      return '<span class="sd-mk ' + m.cls + (x > 78 ? ' rt' : '') + '" style="left:' + x.toFixed(2) + '%"><b>' + m.label + ' ' + pct(m.v) + out + '</b></span>'; }).join("");
+    return '<div class=sd-sky><div class=sd-plot>' + cols + mk + '</div><div class=sd-ax style="background:' + rampCss() + '"></div>' +
+      '<div class=sd-axl><span style="left:0">' + pct(lo) + '</span><span style="left:50%">' + pct((lo + hi) / 2) + '</span><span style="left:100%">' + pct(hi) + '</span></div>' +
+      (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + '</div>';
   }
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake */
   function vlist(rows, total, n, mark){
@@ -242,8 +262,9 @@
 
     /* where it earns */
     var rows = pos ? pos.rows : [];
-    put("sd-sky", '<div class=sv-ph><h3>Where your stake earns</h3><span class=sv-gkey><i class=sk></i>your stake' + (picks.length ? '<i class=to></i>after the move' : '') + '<i class=st></i>the set</span></div>' +
-      sky(rows, S, picks) + (!pos ? '<div class=sd-over>Connect a wallet to see where your stake sits</div>' : ''));
+    put("sd-sky", '<div class=sv-ph><h3>Your APR against the set</h3><span class=sv-gkey><i class=st2></i>validators per band<i class=sk></i>your stake</span></div>' +
+      sky(rows, S, [{ v: S.mid, label: "Median", cls: "md" }, { v: mine ? pos.rate : null, label: "You", cls: "you" },
+                    { v: picks.length && plan ? plan.after : null, label: "After", cls: "aft" }]) + (!pos ? '<div class=sd-over>Connect a wallet to see where your stake sits</div>' : ''));
 
     /* the validators */
     put("sd-list", pos && rows.length
@@ -331,8 +352,8 @@
       '<div class=sd-fine>' + (at && at.split_pct > 0 ? 'GATA keeps <b>' + at.split_pct + '%</b> of the rewards it restakes for you, and charges nothing else.'
         : 'Autopilot is <b>free</b>: GATA takes no share of your rewards.') + ' The chain enforces these limits, not us.</div>');
     var rows = pos ? pos.rows : [];
-    put("sd-asky", '<div class=sv-ph><h3>' + (g ? "What it manages" : "What it would manage") + '</h3><span class=sv-gkey><i class=sk></i>your stake' + (mark ? '<i class=mk></i>in the allow-list' : '') + '<i class=st></i>the set</span></div>' +
-      sky(rows, S, [], mark) + (!pos ? '<div class=sd-over>Connect a wallet to see what it would manage</div>' : !rows.length ? '<div class=sd-over>Nothing staked for it to manage</div>' : ''));
+    put("sd-asky", '<div class=sv-ph><h3>' + (g ? "What it manages" : "What it would manage") + '</h3><span class=sv-gkey><i class=st2></i>validators per band<i class=sk></i>your stake' + (mark ? '<i class=mk></i>allow-list' : '') + '</span></div>' +
+      sky(rows, S, [{ v: S.mid, label: "Median", cls: "md" }, { v: pos && pos.rows.length ? pos.rate : null, label: "You", cls: "you" }], mark) + (!pos ? '<div class=sd-over>Connect a wallet to see what it would manage</div>' : !rows.length ? '<div class=sd-over>Nothing staked for it to manage</div>' : ''));
     put("sd-alist", rows.length ? '<div class=sv-ph><h3>Validators</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total, 7, mark)
       : '<div class=sv-ph><h3>Validators</h3></div>' + (pos ? '<div class=sv-upwait>None yet</div>' : vskel(6)));
     fitList("sd-alist");
