@@ -750,21 +750,29 @@
   }
 
   function drawEco(){
-    var E0 = DD().econ, hist = E0 && E0.hist || [];
+    var E0 = DD().econ, hist = E0 && E0.hist || [], pr = DD().prices || {};
+    /* the price cards, as Uptime's: the price, its day, the market it makes */
+    var usd = function(v){ return v == null ? NA : "$" + (v >= 1 ? v.toFixed(2) : v >= .01 ? v.toFixed(4) : v.toPrecision(3)); };
+    /* market cap from the chain's own supply: CoinGecko's PHOTON circulating figure is far
+       below what the chain holds (1.8M against 77M on 2026-09-26) */
+    var last = hist.length ? hist[hist.length - 1] : null;
+    var pc = function(k, sym, p){ p = p || {};
+      var d = p.change_24h, sup = last ? last[k] / 1e6 : null, cap = p.usd != null && sup ? p.usd * sup : null;
+      return '<div class="sv-card sv-span sv-price"><span class=sv-k>' + sym + ' price</span><span class=sv-big>' + usd(p.usd) + '</span>' +
+        '<span class=sv-sub>' + (d == null ? "24 hours " + NA : Math.abs(d) < .05 ? "0.0% in 24 hours" : '<span class=' + (d >= 0 ? "up" : "dn") + '>' + (d >= 0 ? "+" : "\u2212") + Math.abs(d).toFixed(1) + '%</span> in 24 hours') +
+        (cap ? ', market cap $' + (cap >= 1e9 ? (cap / 1e9).toFixed(2) + "B" : (cap / 1e6).toFixed(1) + "M") : '') + '</span></div>'; };
+    put("sv-ecocards", pc("atone", "ATONE", pr.atone) + pc("photon", "PHOTON", pr.photon));
     if(!hist.length){ put("sv-ecoa", '<div class=sv-ph><h3>ATONE supply and stake</h3></div><div class=sv-upwait>Reading the chain…</div>'); put("sv-ecop", '<div class=sv-ph><h3>PHOTON supply</h3></div><div class=sv-upwait>Reading the chain…</div>'); return; }
-    var now = hist[hist.length - 1], cut = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10), was = null;
-    for(var i = hist.length - 1; i >= 0; i--) if(hist[i].d <= cut){ was = hist[i]; break; }
-    var ch = function(k){ return was && was[k] ? ((now[k] / was[k] - 1) * 100) : null; };
-    var sg = function(v){ return v == null ? "" : (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(1) + "% in 30 days"; };
+    var now = hist[hist.length - 1];
     var M = function(v){ return v <= 0 ? "0" : (v / 1e12).toFixed(0) + "M"; };
     put("sv-ecoa", '<div class=sv-ph><h3>ATONE</h3><span class=sv-gkey><i class=sup></i>supply<i class=bon></i>bonded</span><div class=sv-rt>' +
-      st("Supply", big(now.atone), sg(ch("atone")), "var(--sv-amber)") +
+      st("Supply", big(now.atone), "uncapped supply", "var(--sv-amber)") +
       st("Bonded", (now.bonded / now.atone * 100).toFixed(1) + "%", big(now.bonded) + " staked", "var(--sv-amber)") +
-      st("Inflation", DD().set && DD().set.inflation != null ? (DD().set.inflation * 100).toFixed(0) + "%" : "—", "a year, minted to stakers", "var(--sv-amber)") +
+      st("Inflation", DD().set && DD().set.inflation != null ? (DD().set.inflation * 100).toFixed(0) + "%" : "—", "a year", "var(--sv-amber)") +
       st("Community pool", big(now.pool), "ATONE", "var(--sv-green)") + '</div></div>' +
       chart("ecoa", hist, [{ k: "atone", cls: "sup", name: "Supply" }, { k: "bonded", cls: "bon", area: true, name: "Bonded" }], M, function(v){ return big(v); }));
     put("sv-ecop", '<div class=sv-ph><h3>PHOTON</h3><span class=sv-gkey><i class=pho></i>supply</span><div class=sv-rt>' +
-      st("Supply", big(now.photon), sg(ch("photon")), "var(--sv-pho)") +
+      st("Supply", big(now.photon), "capped supply, 1 billion", "var(--sv-pho)") +
       st("Mint rate", E0.conv ? E0.conv.toFixed(2) : "—", "PHOTON per ATONE burned", "var(--sv-pho)") +
       st("Community pool", big(now.pool_ph), "PHOTON", "var(--sv-green)") + '</div></div>' +
       chart("ecop", hist, [{ k: "photon", cls: "pho", area: true, name: "Supply" }], M, function(v){ return big(v); }));

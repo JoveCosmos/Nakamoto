@@ -3638,7 +3638,11 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .sv-bx{position:relative;height:14px;font-family:var(--wmono);font-size:9.5px;color:var(--wf)}
 .sv-bx span{position:absolute;top:0;white-space:nowrap;padding-left:4px;border-left:1px solid var(--wbd2)}
 /* Economics: two line charts */
-#sv-ecorow{flex:1 1 0;min-height:0;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+/* Economics as Uptime: the price cards, then ATONE and PHOTON as two full-width rows */
+html[data-svs=eco] #sv-eco{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) minmax(0,1fr);align-content:stretch}
+#sv-ecocards{grid-template-columns:repeat(2,minmax(0,1fr))}
+#sv-ecocards .sv-card{--tc:var(--sv-amber)}#sv-ecocards .sv-card+.sv-card{--tc:var(--sv-pho)}
+.sv-price .sv-sub .up{color:var(--sv-green)}.sv-price .sv-sub .dn{color:#ff6a3d}
 .sv-lc{position:relative;flex:1 1 auto;min-height:60px}
 .sv-lc svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .sv-lc .gl{stroke:var(--wbd);stroke-width:1;vector-effect:non-scaling-stroke}
@@ -3678,9 +3682,10 @@ background:var(--wc);padding:0 5px;border-radius:3px}
 font-size:11px;font-weight:600;color:var(--wt);white-space:nowrap;pointer-events:none;z-index:2;transform:translateX(-50%)}
 .sv-btip.on{display:block}.sv-btip.flip{transform:translateX(-100%)}.sv-btip.rt{transform:translateX(0)}
 @media(max-width:900px){
-  #sv-signp,#sv-prop24,#sv-act7,#sv-actlive,#sv-ecorow{flex:0 0 auto}
+  #sv-signp,#sv-prop24,#sv-act7,#sv-actlive,#sv-ecoa,#sv-ecop{flex:0 0 auto}
+  html[data-svs=eco] #sv-eco{grid-template-rows:none}
   html[data-svs=net] #sv-net{grid-template-rows:none}
-  #sv-ecorow{grid-template-columns:minmax(0,1fr)}
+  #sv-ecocards{grid-template-columns:minmax(0,1fr)}
   .sv-grid,.sv-plist{max-height:60svh}
   .sv-bars{height:140px;flex:0 0 auto}
   .sv-lc{height:180px;flex:0 0 auto}
@@ -3698,6 +3703,8 @@ font-size:11px;font-weight:600;color:var(--wt);white-space:nowrap;pointer-events
    what a row of boxes used to cost. ══ */
 .sv-rbody{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:14px}
 .sv-rmain{display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0}
+/* four readouts on a short rail stand 2 x 2, so each keeps its line */
+.sv-rail:has(>.sv-rd:nth-child(4)){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:352px}
 .sv-rail{display:flex;flex-direction:column;gap:6px;margin-right:-17px;min-height:0;width:176px}
 .sv-rd{--rc:var(--sv-teal);position:relative;flex:1 1 0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1px;
 min-width:0;min-height:0;padding:3px 18px 3px 14px;border:1px solid var(--wbd2);border-right:0;border-radius:12px 0 0 12px;overflow:hidden;
@@ -4399,10 +4406,9 @@ html[data-tab=connect] .l2host{display:none}
         <div class=sv-panel id=sv-actlive></div>
       </section>
       <section class=sv-screen id=sv-eco data-sc=eco aria-label=Economics>
-        <div class=sv-row2 id=sv-ecorow>
-          <div class=sv-panel id=sv-ecoa></div>
-          <div class=sv-panel id=sv-ecop></div>
-        </div>
+        <div class=sv-cards id=sv-ecocards></div>
+        <div class=sv-panel id=sv-ecoa></div>
+        <div class=sv-panel id=sv-ecop></div>
       </section>
     </main>
   </div>

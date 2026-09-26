@@ -687,6 +687,30 @@ try:
     txday = [[d] + txd[d] for d in sorted(txd)]
 except Exception as e:
     print(f"atomone-app: daily activity skipped ({e})", file=sys.stderr)
+# Prices (CoinGecko, server-side: the page's CSP reaches no third party). The last good answer
+# is kept in state/prices.json and reused for up to a day when CoinGecko throttles or fails;
+# testnet tokens have no price.
+PRICES = os.path.join(STATE, "prices.json")
+prices = None
+if not TESTNET:
+    try:
+        _pq = ("https://api.coingecko.com/api/v3/simple/price?ids=atomone,photon-2&vs_currencies=usd"
+               "&include_24hr_change=true&include_market_cap=true")
+        _pr = urllib.request.Request(_pq, headers={"accept": "application/json", "user-agent": "gata-atomone-app/1.0"})
+        with urllib.request.urlopen(_pr, timeout=15) as _r:
+            _p = json.load(_r)
+        prices = {k: {"usd": _p.get(cg, {}).get("usd"), "change_24h": _p.get(cg, {}).get("usd_24h_change"),
+                      "market_cap": _p.get(cg, {}).get("usd_market_cap")} for k, cg in (("atone", "atomone"), ("photon", "photon-2"))}
+        prices["at"] = int(time.time())
+        if prices["atone"]["usd"] is None: raise ValueError("no ATONE price in the answer")
+        _t = PRICES + ".tmp"; json.dump(prices, open(_t, "w")); os.replace(_t, PRICES)
+    except Exception as e:
+        print(f"atomone-app: prices skipped ({e})", file=sys.stderr)
+        try:
+            _old = json.load(open(PRICES))
+            if time.time() - _old.get("at", 0) < 86400: prices = _old
+        except Exception:
+            pass
 # Economics: today's supply, stake and pools, kept one point a day in state/econ.json (weekly
 # before 2026-09-26, backfilled from the archive by dev/econ_backfill.py). A failure here
 # costs the tab, never the build.
@@ -738,7 +762,7 @@ out = {
                 "weeks_to_cap": int(round((float(nb["maximum_coefficient"]) - coef)
                                           / float(nb["step"]))) if float(nb["step"]) else None,
                 "monotonic_so_far": True},
-  "p24": p24, "act7": act7, "txday": txday, "b10k": b10k, "econ": econ,
+  "p24": p24, "act7": act7, "txday": txday, "b10k": b10k, "econ": econ, "prices": prices,
   # every block the index holds a proposer for, and how many validators ever proposed one
   "prop_all": {"blocks": sum(prop.values()), "proposers": len(prop)},
   "set": {"n": N, "bonded": S, "supply": supply, "bonded_pct": round(S/supply*100, 2),
