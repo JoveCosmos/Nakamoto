@@ -3546,6 +3546,9 @@ position:relative;overflow:hidden;min-width:0;min-height:0}
 /* ══ Network: four cards, the uptime plot at half height, then who misses blocks beside the
    chain's pace - the same boxes and rows as the wallet ══ */
 #sv-net{justify-content:flex-start;gap:12px}
+/* the cards, then Uptime and Chain pace as two equal rows: a grid, because in a flex column the
+   Uptime panel's own padding came on top of its share and Chain pace ended 26px shorter */
+html[data-svs=net] #sv-net{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) minmax(0,1fr);align-content:stretch}
 #sv-net>*,#sv-net>*:not(:first-child){margin-top:0}
 #sv-netcards{grid-template-columns:repeat(3,minmax(0,1fr))}
 #sv-net>.sv-up{flex:1 1 0;min-height:0}
@@ -3641,6 +3644,7 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .sv-ly{position:absolute;left:4px;font-family:var(--wmono);font-size:9.5px;color:var(--wf);background:var(--wc);padding:0 4px;border-radius:3px}
 @media(max-width:900px){
   #sv-signp,#sv-prop24,#sv-act7,#sv-actlive,#sv-ecorow{flex:0 0 auto}
+  html[data-svs=net] #sv-net{grid-template-rows:none}
   #sv-ecorow{grid-template-columns:minmax(0,1fr)}
   .sv-grid,.sv-plist{max-height:60svh}
   .sv-bars{height:140px;flex:0 0 auto}
@@ -3659,19 +3663,19 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
    what a row of boxes used to cost. ══ */
 .sv-rbody{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:14px}
 .sv-rmain{display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0}
-.sv-rail{display:flex;flex-direction:column;gap:6px;margin-right:-17px;min-height:0}
+.sv-rail{display:flex;flex-direction:column;gap:6px;margin-right:-17px;min-height:0;width:176px}
 .sv-rd{--rc:var(--sv-teal);position:relative;flex:1 1 0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1px;
-min-width:132px;min-height:0;padding:3px 18px 3px 14px;border:1px solid var(--wbd2);border-right:0;border-radius:12px 0 0 12px;overflow:hidden;
+min-width:0;min-height:0;padding:3px 18px 3px 14px;border:1px solid var(--wbd2);border-right:0;border-radius:12px 0 0 12px;overflow:hidden;
 background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.01))}
 .sv-rd::after{content:"";position:absolute;inset:0;background:linear-gradient(270deg,var(--rc),rgba(0,0,0,0) 75%);opacity:.14;pointer-events:none}
 .sv-rd::before{content:"";position:absolute;right:0;top:8px;bottom:8px;width:2px;border-radius:2px 0 0 2px;background:var(--rc);box-shadow:0 0 12px var(--rc)}
 .sv-rd em{font-style:normal;font-family:var(--wmono);font-size:8.5px;line-height:1.2;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
-.sv-rd b{font-size:17px;font-weight:800;letter-spacing:-.015em;line-height:1.15;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}
-.sv-rd small{font-size:10px;line-height:1.2;color:var(--ws);white-space:nowrap}
+.sv-rd b{font-size:17px;font-weight:800;letter-spacing:-.015em;line-height:1.08;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sv-rd small{font-size:10px;line-height:1.2;color:var(--ws);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 @media(min-width:901px) and (max-height:820px){.sv-rd{gap:0;padding-top:2px;padding-bottom:2px}.sv-rd b{font-size:14px;line-height:1.1}.sv-rd small{font-size:9px}.sv-rd em{font-size:8px}.sv-rail{gap:4px;margin-right:-15px}}
 @media(max-width:900px){
   .sv-rbody{grid-template-columns:minmax(0,1fr);row-gap:10px}
-  .sv-rail{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin-right:0}
+  .sv-rail{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin-right:0;width:auto}
   #sv-netcards .sv-span:last-child:nth-child(odd){grid-column:1/-1}
   .sv-rd{border-right:1px solid var(--wbd2);border-radius:10px;min-width:0;padding:7px 10px}
   .sv-rd::before{right:auto;left:10px;top:auto;bottom:0;width:auto;right:10px;height:2px;border-radius:2px 2px 0 0}

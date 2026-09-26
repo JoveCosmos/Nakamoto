@@ -541,11 +541,11 @@
     var h = '<div class=sv-ph><h3>Chain pace</h3></div>';
     if(iv.length < 2){ put("sv-pace", h + '<div class=sv-upwait>Reading block times…</div>'); return; }
     var sum = 0, mx = 0, slow = iv[0]; iv.forEach(function(x){ sum += x.s; if(x.s > mx){ mx = x.s; slow = x; } });
-    var avg = sum / iv.length, top = Math.max(mx, avg * 1.6);
+    var avg = sum / iv.length, top = mx * 1.08;
     h = '<div class=sv-ph><h3>Chain pace</h3><div class=sv-rt>' +
-      st("Block time", avg.toFixed(2) + " s", "last " + (iv.length + 1) + " blocks, slowest " + slow.s.toFixed(1) + " s") +
-      st("Blocks a day", DAY.avg ? Math.round(86400 / DAY.avg).toLocaleString() : "—", DAY.avg ? "last 24 hours, " + DAY.avg.toFixed(2) + " s each" : "measuring…") +
-      st("Total blocks", Number(src[src.length - 1][0] + 1).toLocaleString(), "since genesis" + ((DD().coverage || {}).from_date ? ", " + DD().coverage.from_date : "")) +
+      st("Block time", avg.toFixed(2) + " s", "slowest " + slow.s.toFixed(1) + " s") +
+      st("Blocks a day", DAY.avg ? Math.round(86400 / DAY.avg).toLocaleString() : "—", DAY.avg ? "last 24 hours" : "measuring…") +
+      st("Total blocks", Number(src[src.length - 1][0] + 1).toLocaleString(), (DD().coverage || {}).from_date ? "since " + DD().coverage.from_date : "since genesis") +
     '</div></div>' +
     '<div class=sv-pace><span class=sv-pavg style="bottom:' + (avg / top * 100).toFixed(1) + '%"><b>' + avg.toFixed(1) + ' s</b></span>' +
       iv.map(function(x){ return '<i class="' + (x.s > avg * 1.5 ? "slow" : "") + '" style="--h:' + Math.max(4, x.s / top * 100).toFixed(1) + '%" title="block ' + x.h.toLocaleString() + ': ' + x.s.toFixed(2) + ' s"></i>'; }).join("") +
