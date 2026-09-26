@@ -109,6 +109,7 @@ position:relative;top:.06em}
 
 @media(max-width:620px){.grid{grid-template-columns:repeat(10,1fr)}}
 .cell{aspect-ratio:1;border-radius:3px;position:relative;overflow:hidden;cursor:pointer}
+.cell.pad{visibility:hidden;pointer-events:none}
 /* the heat tiles are lit prisms rather than flat swatches: a light catch along
    the top-left, shade toward the bottom-right, a hairline rim so even the
    darkest tile keeps an edge, and a shallow drop so they lift off the frame */
@@ -3724,6 +3725,7 @@ background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.01))}
 .sv-cells{display:grid;grid-template-columns:repeat(100,minmax(0,1fr));gap:1px;width:min(100%,420px);height:7px}
 .sv-cells i{border-radius:1px;background:color-mix(in srgb,var(--sv-teal) 75%,transparent)}
 .sv-cells i.j{background:var(--sv-amber)}
+.sv-cells i.u{background:var(--wbd2)}
 .sv-span .sv-sub{font-size:12px}
 /* ══ Wallet and Autopilot: one frame. A readout strip lit from its top edge (who, then five
    figures, each in its own colour along the top rim and standing on a meter of its share),
@@ -4020,6 +4022,16 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
    follow this block); nothing here names a tab. */
 :root{--l1-on:var(--ink);--l2-on:var(--ink);--l2-on-ink:var(--void);--l2-off:#4e4c70}
 .folder>.l1{grid-area:nav}
+/* the network switch: two links, the open network lit; testnet lights amber so a page on the
+   test chain can never pass for the real one */
+.netsw{display:inline-flex;padding:2px;gap:2px;border-radius:9px;border:1px solid var(--wbd2,#34345c);flex:0 0 auto}
+.netsw a{height:26px;display:inline-flex;align-items:center;padding:0 10px;border-radius:7px;font-size:11.5px;font-weight:500;color:var(--ws,#c1bfdc);text-decoration:none;white-space:nowrap}
+.netsw a:hover{color:var(--wt,#f0eef8)}
+.netsw a[aria-current=page]{background:rgba(43,200,189,.2);color:var(--wt,#f0eef8);box-shadow:inset 0 0 0 1px rgba(43,200,189,.55)}
+.netsw a#nettest[aria-current=page]{background:rgba(255,176,46,.22);box-shadow:inset 0 0 0 1px rgba(255,176,46,.6)}
+.netsw a:focus-visible{outline:2px solid #2bc8bd;outline-offset:1px}
+html[data-net=testnet] .bheight::after{content:" testnet";color:#ffb02e}
+@media(max-width:620px){.netsw a{padding:0 7px;font-size:10.5px}}
 .folder>.hdr-r{grid-area:right;justify-self:end;display:flex;align-items:center;gap:8px;min-width:0}
 .hdr-r .thbtn{margin-left:0;width:32px;height:32px;border-radius:8px}
 .hdr-r .sv-who{flex:0 0 auto}
@@ -4157,6 +4169,7 @@ html[data-tab=connect] .l2host{display:none}
   <header class=folder>
     <a class=brand href="#/intro" title="AtomOne"><img class=mark src="assets/atomone.svg" alt=""><span class=bw><span class=wordmark>AtomOne</span><span class=bheight id=dlive title="the chain's height, live"><i></i><b>{{HEIGHT}}</b></span></span></a>
     <div class=hdr-r>
+    <div class=netsw id=netsw role=group aria-label=Network><a id=netmain href="./">Mainnet</a><a id=nettest href="testnet/">Testnet</a></div>
     <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
     <div class=sv-who>
       <button class="sv-btn sml pri" id=svconn type=button aria-haspopup=true aria-expanded=false>Connect wallet</button>

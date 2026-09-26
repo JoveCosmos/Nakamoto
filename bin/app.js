@@ -351,7 +351,10 @@ function fields(e){
                 v[0] + ' — ' + (byStake
                   ? (T[i]/D.set.bonded*100).toFixed(2) + '% of stake'
                   : (ys[i]*100).toFixed(1) + '% APR'), flat);
-  }).join("");
+  }).join("") +
+  /* a smaller set (testnet: 43) keeps the map a hundred places tall: the rest are empty,
+     so the calculator - and every frame sized from it - has the same shape on both nets */
+  new Array(Math.max(0, 100 - VALS.length) + 1).join('<div class="cell pad" aria-hidden=true></div>');
   /* a hundred cells are re-parsed only when one of them changed: a tick that moves no
      figure costs nothing, and the cell the keyboard is on keeps its focus */
   var g2 = E("g2"); if(g2.__h !== g2h){ g2.__h = g2h; g2.innerHTML = g2h; }
@@ -995,15 +998,18 @@ rememberGridH();
        we index proposers, not commit signatures, so over longer spans the honest
        signal is whether the validator proposed anything that day. */
     E("uv10").textContent   = v.up.toFixed(2) + "%";
-    E("uv30").textContent   = v.d30.toFixed(1) + "%";
-    E("uv90").textContent   = v.d90.toFixed(1) + "%";
+    /* testnet: the 30/90-day records, first join, last slash and proposals come from our
+       index (mainnet only) - N/A there, never a guess */
+    E("uv30").textContent   = v.d30 != null ? v.d30.toFixed(1) + "%" : "N/A";
+    E("uv90").textContent   = v.d90 != null ? v.d90.toFixed(1) + "%" : "N/A";
     /* Live, not a snapshot: this walks the most recent commits off the node the
        page is served from, the way a status page shows the last N pings. The
        daily series baked into the page cannot move between rebuilds. */
     pingStart(v.chex);
-    E("fjoin").textContent  = v.joined ? dmy(v.joined) : "—";
-    E("flast").textContent  = v.last_slash || "never";
-    E("vprop").textContent  = f(v.prop);
+    var tn = (D.net || {}).net === "testnet";
+    E("fjoin").textContent  = v.joined ? dmy(v.joined) : (tn ? "N/A" : "—");
+    E("flast").textContent  = v.last_slash || (tn ? "N/A" : "never");
+    E("vprop").textContent  = v.prop != null ? f(v.prop) : "N/A";
     /* the note repeated what the map, the graph and the APR band already say */
     POP.open(vpop);
   }
@@ -1057,7 +1063,7 @@ rememberGridH();
     var addr = pingAddr;
     if(!addr || pingBusy) return;
     pingBusy = true;
-    fetch("/rpc/status", { cache: "no-store" })
+    fetch("rpc/status", { cache: "no-store" })
       .then(function(r){ return r.json(); })
       .then(function(j){
         var head = Number(j.result.sync_info.latest_block_height), hs = [], i;
@@ -1065,7 +1071,7 @@ rememberGridH();
         for(var k in PCACHE) if(+k < head - 3 * PING_N) delete PCACHE[k];
         return Promise.all(hs.map(function(h){
           if(PCACHE[h] !== undefined) return PCACHE[h];
-          return fetch("/rpc/block?height=" + h, { cache: "no-store" })
+          return fetch("rpc/block?height=" + h, { cache: "no-store" })
             .then(function(r){ return r.json(); })
             .then(function(b){ var v = signersOf(b); if(v) PCACHE[h] = v; return v; })
             .catch(function(){ return null; });
@@ -1898,7 +1904,7 @@ rememberGridH();
            (wide ? '<td class="' + (lu == null ? 'dim' : lu >= 99.9 ? 'ok' : lu >= 99 ? 'warn' : 'bad') + '">' + (lu == null ? '\u2014' : lu.toFixed(2) + '%') + '</td>' : '') +
            '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '\u2014' : u90.toFixed(1) + '%') + '</td>' +
            (wide ? '<td>' + (pr == null ? '\u2014' : pr >= 1e6 ? (pr / 1e6).toFixed(2) + 'M' : pr >= 1e3 ? (pr / 1e3).toFixed(1) + 'k' : pr) + '</td>' : '') +
-           '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>' +
+           (o.jail == null ? '<td class=dim>N/A</td>' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>') +
            (lay ? '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '\u2014') + '</s><em>→</em><b>' + pct(there) + '</b></td>' : '<td class=r2><b>' + pct(o.rate0) + '</b></td>') + '</tr>';
     });
     var top = el.scrollTop;
@@ -2282,7 +2288,7 @@ rememberGridH();
       h += '<tr' + (on ? ' class=on' : '') + '><td class=ck><input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + '></td>' +
            '<td>' + o.rank + '</td><td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span></div></td>' +
            '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '\u2014' : u90.toFixed(1) + '%') + '</td>' +
-           '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>' +
+           (o.jail == null ? '<td class=dim>N/A</td>' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>') +
            '<td>' + (m ? fmt(m.x) : '\u2014') + '</td><td class=r2><b>' + pct(m ? m.after : o.rate0) + '</b></td></tr>';
     });
     var top = el.scrollTop; el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
@@ -2537,7 +2543,7 @@ rememberGridH();
            '<td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span class=nmt>' + att(o.m) + '</span>' +
              (mine[o.id] ? '<span class="attg y">yours</span>' : '') + (fit[o.id] && !ph ? '<span class="attg f">fits</span>' : '') + '</div></td>' +
            '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '—' : u90.toFixed(1) + '%') + '</td>' +
-           (ph ? '' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail + '×' : 'Never') + '</td>') +
+           (ph ? '' : o.jail == null ? '<td class=dim>N/A</td>' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail + '×' : 'Never') + '</td>') +
            '<td class=r2><b>' + pct(window.__rateAfter(o.t, o.c, 0)) + '</b></td></tr>';
     });
     if(!rows.length) h += '<tr><td class=atnone colspan=' + (ph ? 4 : 6) + '>' +
@@ -2785,9 +2791,19 @@ rememberGridH();
   var btn = E("svconn");
   function busy(on, name){ if(!btn) return; btn.disabled = !!on; btn.textContent = on ? "Connecting " + name + "\u2026" : "Connect wallet"; }
   function failed(why){ if(window.__notify) window.__notify().fail(why); }
-  var API = "https://atomone-api.gatadao.com";
-  var CHAIN = "atomone-1";
-  window.__API = API;
+  var NETC = (window.__D || {}).net || {};
+  /* the network switch: this page's network lit, the other's link keeps the open view */
+  (function(){
+    var here = NETC.net === "testnet" ? "testnet" : "mainnet";
+    document.documentElement.setAttribute("data-net", here);
+    var m = document.getElementById("netmain"), t = document.getElementById("nettest"); if(!m || !t) return;
+    m.href = here === "testnet" ? "../" : "./"; t.href = here === "testnet" ? "./" : "testnet/";
+    (here === "testnet" ? t : m).setAttribute("aria-current", "page");
+    [m, t].forEach(function(a){ a.addEventListener("click", function(){ if(a.getAttribute("aria-current")) return; a.href = a.getAttribute("href").split("#")[0] + location.hash; }); });
+  })();
+  var API = NETC.api || "https://atomone-api.gatadao.com";
+  var CHAIN = NETC.chain || "atomone-1";
+  window.__API = API; window.__NET = NETC;
 
   var PHONE = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
   /* Two wallets, one shape. Keplr resolves values; Adena's cosmos
@@ -2825,8 +2841,8 @@ rememberGridH();
      the chain's real fee tokens (fees are paid in PHOTON; ATONE fees are only
      accepted for minting PHOTON) */
   var CHAIN_INFO = {
-    chainId: CHAIN, chainName: "AtomOne",
-    rpc: "https://atomone-rpc.gatadao.com", rest: API,
+    chainId: CHAIN, chainName: NETC.name || "AtomOne",
+    rpc: NETC.rpc || "https://atomone-rpc.gatadao.com", rest: API,
     bip44: { coinType: 118 },
     bech32Config: { bech32PrefixAccAddr: "atone", bech32PrefixAccPub: "atonepub",
       bech32PrefixValAddr: "atonevaloper", bech32PrefixValPub: "atonevaloperpub",

@@ -7,7 +7,9 @@
    token AtomOne accepts for anything but minting PHOTON. */
 (function(root){
 "use strict";
-var API = "https://atomone-api.gatadao.com", CHAIN = "atomone-1", FEE_DENOM = "uphoton";
+/* the network this page is for (render.py puts it in the payload, which precedes this script) */
+var NET = (function(){ try{ return JSON.parse(document.getElementById("payload").textContent).net || {}; }catch(e){ return {}; } })();
+var API = NET.api || "https://atomone-api.gatadao.com", CHAIN = NET.chain || "atomone-1", FEE_DENOM = "uphoton";
 var GAS_PRICE = 0.25;            /* uphoton per gas: minimum is 0.225, a little above it */
 var GAS_ADJ = 1.35;
 

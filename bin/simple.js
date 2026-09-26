@@ -46,14 +46,18 @@
   function rate0(t, c){ return window.__rateAfter ? window.__rateAfter(t, c, 0) : 0; }
   function VALS(){ return window.__VALS ? window.__VALS() : []; }
   function DD(){ return window.__D || { set: {}, eta: {}, nakamoto: {}, rule: {} }; }
+  /* the testnet page: what only our index knows (history, proposers, jailings, the
+     30/90-day and lifetime records) is not known there - it reads N/A, never a zero */
+  function TN(){ return ((DD().net || {}).net) === "testnet"; }
+  var NA = "N/A", NAMSG = '<div class=sv-upwait>N/A on testnet: this history comes from our index, which covers mainnet only</div>';
   function tag(cls, t, title){ return '<span class="sv-tag ' + cls + '"' + (title ? ' title="' + esc(title) + '"' : '') + '>' + t + '</span>'; }
   /* a span of the set's record: centred, and the set itself as a strip of cells under the figure,
      one a validator, lit if it was never jailed in the span */
   function span(k, v, clean, n){
-    var c = ""; for(var i = 0; i < n; i++) c += '<i' + (i < clean ? '' : ' class=j') + '></i>';
+    var c = ""; for(var i = 0; i < n; i++) c += '<i' + (clean == null ? ' class=u' : i < clean ? '' : ' class=j') + '></i>';
     return '<div class="sv-card sv-span"><span class=sv-k>' + k + '</span><span class=sv-big>' + v + '</span>' +
-      '<span class=sv-cells title="' + clean + ' of ' + n + ' never jailed in this span">' + c + '</span>' +
-      '<span class=sv-sub>validator set average, ' + clean + ' never jailed</span></div>';
+      '<span class=sv-cells title="' + (clean == null ? "N/A on testnet" : clean + ' of ' + n + ' never jailed in this span') + '">' + c + '</span>' +
+      '<span class=sv-sub>validator set average, ' + (clean == null ? NA : clean) + ' never jailed</span></div>';
   }
 
   /* ── heat: the calculator's own colour for an APR ─────────────────────────
@@ -345,8 +349,8 @@
   function drawNet(){
     var S = setStats(), f = function(v){ return v != null ? v.toFixed(2) + "%" : "—"; };
     /* the set's uptime over three spans: each is the average of the validators' own records */
-    put("sv-netcards", span("30 days", f(S.up), S.clean30, S.n) + span("90 days", f(S.up90), S.clean90, S.n) +
-      span("Since genesis", f(S.life), S.clean, S.n));
+    put("sv-netcards", TN() ? span("30 days", NA, null, S.n) + span("90 days", NA, null, S.n) + span("Since genesis", NA, null, S.n)
+      : span("30 days", f(S.up), S.clean30, S.n) + span("90 days", f(S.up90), S.clean90, S.n) + span("Since genesis", f(S.life), S.clean, S.n));
 
     drawUp(S);
   }
@@ -360,13 +364,13 @@
   function fbRows(){
     if(FB.busy) return;
     FB.busy = true;
-    fetch("/rpc/status", { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(j){
+    fetch("rpc/status", { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(j){
       var head = Number(j.result.sync_info.latest_block_height), want = [], h;
       for(h = head - 99; h <= head; h++) if(!FB.rows[h]) want.push(h);
       for(var k in FB.rows) if(+k <= head - 100) delete FB.rows[k];
       var next = function(){
         var hh = want.shift(); if(hh === undefined) return Promise.resolve();
-        return fetch("/rpc/block?height=" + hh, { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(b){
+        return fetch("rpc/block?height=" + hh, { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(b){
           var sigs = b.result.block.last_commit.signatures || [], miss = [];
           sigs.forEach(function(x){ if(x.block_id_flag !== 2 && x.validator_address) miss.push(x.validator_address); });
           if(sigs.length) FB.rows[hh] = [hh - 1, sigs.length - miss.length, sigs.length, miss.join(","), Date.parse(b.result.block.header.time)];
@@ -467,9 +471,9 @@
   function readDay(){
     if(DAY.at && Date.now() - DAY.at < 600000) return;
     DAY.at = Date.now();
-    fetch("/rpc/status", { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(j){
+    fetch("rpc/status", { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(j){
       var head = +j.result.sync_info.latest_block_height, t1 = Date.parse(j.result.sync_info.latest_block_time), back = 14400;
-      return fetch("/rpc/block?height=" + (head - back), { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(b){
+      return fetch("rpc/block?height=" + (head - back), { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(b){
         var t0 = Date.parse(b.result.block.header.time);
         if(t1 > t0) DAY.avg = (t1 - t0) / 1000 / back;
         if(screen() === "net") drawPace();
@@ -578,6 +582,10 @@
       : '<div class=sv-upwait>Waiting for the live feed…</div>'));
     var sw = '<span class=sv-sw role=group aria-label="Period">' +
       '<button type=button data-act=pwin data-w=24h aria-pressed=' + !all + '>24 hours</button><button type=button data-act=pwin data-w=all aria-pressed=' + all + '>Since genesis</button></span>';
+    if(TN()){
+      stats = '<div class=sv-rt>' + st("Blocks", NA, "not indexed on testnet") + st("Proposers", NA, "", "var(--sv-violet)") + st("Top proposer", NA, "", "var(--sv-amber)") + '</div>';
+      put("sv-prop24", '<div class=sv-ph><h3>Blocks proposed</h3>' + stats + '</div>' + NAMSG); return;
+    }
     var head = '<div class=sv-ph><h3>Blocks proposed</h3>' + sw + stats + '</div>';
     if(!have){ put("sv-prop24", head + '<div class=sv-upwait>Reading the last 24 hours…</div>'); return; }
     var mx = Math.max(1, top ? top.c : 1);
@@ -598,6 +606,7 @@
     var when = function(ts){ var d = new Date(ts * 1000); return DAYN[d.getDay()] + " " + String(d.getHours()).padStart(2, "0") + ":00"; };
     var dl = function(s){ return new Date(s + "T00:00:00Z").toLocaleDateString("en", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }); };
     var all = AW === "all", tot = 0, bl = 0, top = null, stats, body;
+    if(TN()){ AW = "24h"; if(BW !== "100") BW = "100"; }
     var sw = '<span class=sv-sw role=group aria-label="Period">' + [["24h", "24 hours"], ["30d", "30 days"], ["all", "Since genesis"]].map(function(o){
       return '<button type=button data-act=awin data-w=' + o[0] + ' aria-pressed=' + (AW === o[0]) + '>' + o[1] + '</button>'; }).join("") + '</span>';
     if(all){
@@ -633,12 +642,14 @@
         body = '<div class="sv-bars hr">' + bscale(m, function(v){ return String(Math.round(v)); }, true) + a24.map(function(x, i){ var so = i === a24.length - 1; return '<i' + (so ? ' class=so' : '') + ' style="--h:' + Math.max(1.5, x[1] / m * 100).toFixed(1) + '%" data-t="' + when(x[0]) + ": " + x[1] + ' transactions' + (so ? ' so far' : '') + '"></i>'; }).join("") + '</div><div class=sv-bx>' + ticks + '</div>';
       } else body = '<div class=sv-upwait>Reading the last 24 hours…</div>';
     }
+    if(TN()){ stats = '<div class=sv-rt>' + st("Transactions", NA, "not indexed on testnet") + st("Busiest hour", NA) + st("Per block", NA) + '</div>'; body = NAMSG; sw = ""; }
     put("sv-act7", '<div class=sv-ph><h3>Transactions</h3>' + sw + '<span class=sv-gkey>' + (AW === "24h" ? "per hour" : "per day") + '</span>' + stats + '</div>' + body);
     /* per block: the last 100 blocks live (with gas and fees), the last 10,000 in stretches of 100
        (the average per block in each), or per day since genesis (a line) - the indexer keeps
        transactions, not gas or fees */
     var bw = BW, sb = '<span class=sv-sw role=group aria-label="Period">' + [["100", "Last 100 blocks"], ["10k", "Last 10k blocks"], ["all", "Since genesis"]].map(function(o){
       return '<button type=button data-act=bwin data-w=' + o[0] + ' aria-pressed=' + (bw === o[0]) + '>' + o[1] + '</button>'; }).join("") + '</span>';
+    if(TN()) sb = "";           /* testnet: only the live 100 blocks are known */
     var hb = function(k){ return '<div class=sv-ph><h3>Transactions per 100 blocks</h3>' + sb + k + '</div>'; }, sl, lb;
     if(bw === "100"){
       sl = '<div class=sv-rt>' + st("Transactions", rows.length ? tx.toLocaleString() : "—", rows.length ? "last " + rows.length + " blocks" : "", "var(--sv-violet)") +
@@ -683,7 +694,7 @@
      a dot on each series, the date and each value. key names the chart for the hover's lookup. */
   var CH = {};
   function chart(key, pts, lines, fmtY, fmtV){
-    var n = pts.length; if(n < 2) return '<div class=sv-upwait>Not enough history yet</div>';
+    var n = pts.length; if(n < 2) return TN() ? '<div class=sv-upwait>History N/A on testnet: only today\'s figures are read</div>' : '<div class=sv-upwait>Not enough history yet</div>';
     var lo = Infinity, hi = -Infinity;
     lines.forEach(function(l){ pts.forEach(function(p){ var v = p[l.k]; if(v < lo) lo = v; if(v > hi) hi = v; }); });
     if(lines.some(function(l){ return l.area; })) lo = Math.min(lo, 0);

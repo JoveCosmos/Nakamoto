@@ -4,6 +4,8 @@ window.dispatchEvent(new Event("resize"));
 /* no animation: a change of section (the window's fall) then completes on the spot */
 (function(){ var s=document.createElement('style'); s.textContent='*{transition:none!important;animation:none!important}'; document.head.appendChild(s); })();
 function go(r){ window.__shellGo(r); }
+/* the testnet page (web/testnet): its set is smaller and what only the index knows is N/A */
+var TESTNET = document.documentElement.getAttribute('data-net') === 'testnet';
 
 /* the staking views, through their level-2 tabs */
 ['bonus','trend','picks'].forEach(function(k){
@@ -76,12 +78,13 @@ t('picks-tables', function(){
   go('staking/picks');
   var r=document.querySelectorAll('#p-pays .ptab tbody tr').length;
   var l=document.querySelectorAll('#p-pays .ptab .tlg').length;
+  if(TESTNET) return (r===7 && l===5 && /N\/A/.test(document.getElementById('p-pays').textContent)) || 'testnet rows='+r+' logos='+l;
   return (r===15 && l===15) || 'rows='+r+' logos='+l;   /* three lists of five */
 });
 t('trend-charts', function(){
   go('staking/trend');
   return (document.querySelectorAll('#etacurve *').length>10
-       && document.querySelectorAll('#trend *').length>10) || 'a chart is empty';
+       && (TESTNET || document.querySelectorAll('#trend *').length>10)) || 'a chart is empty';
 });
 go('staking/bonus');
 
@@ -107,7 +110,7 @@ t('wallet-door', function(){
   var barShown=!!bar && getComputedStyle(bar).display!=='none' && bar.contains(conn);
   conn.click();
   var menu=document.getElementById('svmenu'), tiles=menu.querySelectorAll('[data-w]').length;
-  var ok=!g && !document.getElementById('wdisc') && !a.hidden && skel===5 && rows>=90 && cap && barShown && !conn.hidden && !menu.hidden && tiles===2;
+  var ok=!g && !document.getElementById('wdisc') && !a.hidden && skel===5 && rows>=(TESTNET ? 40 : 90) && cap && barShown && !conn.hidden && !menu.hidden && tiles===2;
   menu.hidden=true; menu.innerHTML='';
   go('staking/bonus');
   return ok || 'gate '+!!g+' acct '+a.hidden+' skel '+skel+' rows '+rows+' cap '+cap+' bar '+barShown+' conn '+conn.hidden+' tiles '+tiles;

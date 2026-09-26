@@ -8,6 +8,13 @@ import html, json, os, re, sys
 
 OUT = os.environ.get("OUT_DIR", "/srv/atomone-app/web")
 D = json.load(open(os.path.join(OUT, "data.json")))
+TESTNET = os.environ.get("NET", "mainnet") == "testnet"
+NETCFG = ({"net": "testnet", "chain": "atomone-testnet-1", "name": "AtomOne Testnet",
+           "api": "https://atomone-testnet-api.gatadao.com", "rpc": "https://atomone-testnet-rpc.gatadao.com", "other": "../"}
+          if TESTNET else
+          {"net": "mainnet", "chain": "atomone-1", "name": "AtomOne",
+           "api": "https://atomone-api.gatadao.com", "rpc": "https://atomone-rpc.gatadao.com", "other": "testnet/"})
+AVATARS = os.environ.get("AVATAR_DIR", "/srv/atomone-app/state/testnet/avatars" if TESTNET else "/srv/atomone-app/state/avatars")
 
 e, s, th, nk = D["eta"], D["set"], D["rule"], D["nakamoto"]
 M = lambda u: u / 1e6
@@ -41,7 +48,7 @@ if t10:
                 f"{'decreased' if t10['pct'] < 0 else 'increased'} by "
                 f"{abs(t10['pct']):.1f}% last {t10['days'] // 7}W")
 else:
-    t10_line = "Share of blocks proposed by the ten largest validators"
+    t10_line = "Share of blocks proposed by the ten largest validators" + (": N/A on testnet, where proposals are not indexed" if TESTNET else "")
 
 # "Is it working?" is answered by the kink at the bonus line, not by two slopes
 # side by side that the reader has to divide in their head. Do the division.
@@ -60,6 +67,10 @@ elif _ra is not None:
     speedup_sub = f"since the bonus, {nk.get('n_after', 0)} weeks"
 else:
     speedup, speedup_k, speedup_sub = "\u2014", "since the bonus", "not enough weeks yet"
+if TESTNET:
+    # what only the index knows: N/A, never a dash that reads as "not yet"
+    speedup, speedup_sub = "N/A", "not indexed on testnet"
+    mv_top = mv_small = mv_new = mv_grew = mv_wk = "N/A"
 
 es = D["eta_stats"]
 sched = "".join(
@@ -98,13 +109,16 @@ def prow(v, extra):
             f"{extra}</tr>")
 
 by_apr = sorted(V, key=lambda v: -v["apr"])
+def _jail(v):
+    """the jail count cell: N/A where the index has no record (testnet)"""
+    if v.get("jail") is None: return "<td class=dim>N/A</td>"
+    return f"<td class='{'warn' if v['jail'] else 'ok'}'>{v['jail'] if v['jail'] else 'Never'}</td>"
 def _up(v):
     return (f"{(1 - v['life_missed']/v['life_n'])*100:.2f}%"
-            if v.get("life_up") is not None and v["life_n"] else "&mdash;")
+            if v.get("life_up") is not None and v["life_n"] else ("N/A" if TESTNET else "&mdash;"))
 tbl_apr = "".join(
     prow(v, f"<td class=ok>{_up(v)}</td>"
-            f"<td class='{'warn' if v['jail'] else 'ok'}'>"
-            f"{v['jail'] if v['jail'] else 'Never'}</td>") for v in by_apr[:5])
+            f"{_jail(v)}") for v in by_apr[:5])
 
 # ── the longest clean signing record we can actually prove ──────────────────
 # Ranked on the ratio, not the miss count: a validator that joined in June has a
@@ -124,8 +138,7 @@ tbl_up = "".join(
     # the window itself, so a record that began five weeks ago reads as five weeks
     f"<td title='{f(v['life_n'] - v['life_missed'])} blocks signed'>{_kf(v['life_n'] - v['life_missed'])}</td>"
     f"<td>{f(v['life_missed'])}</td>"
-    f"<td class='{'warn' if v['jail'] else 'ok'}'>"
-    f"{v['jail'] if v['jail'] else 'Never'}</td></tr>" for v in lv[:5])
+    f"{_jail(v)}</tr>" for v in lv[:5])
 life_win = f"{f(max((v['life_n'] for v in lv), default=0))}"
 
 # ── what each validator actually earned, per epoch, uptime included ─────────
@@ -140,7 +153,8 @@ tbl_earn = "".join(
 earn_weeks = max((v["earn_n"] for v in ev), default=0)
 
 n_clean = sum(1 for v in by_apr
-              if not v["jail"] and not v["slash"] and not v["tomb"] and v["d30"] >= UP_MIN)
+              if not v["jail"] and not v["slash"] and not v["tomb"]
+              and (v["d30"] if v["d30"] is not None else (v.get("up") or 0)) >= UP_MIN)
 
 def knob_left(v, lo, hi):
     t = min(1.0, max(0.0, (v - lo) / (hi - lo)))
@@ -159,14 +173,17 @@ payload = json.dumps({"generated": D["generated"], "thresh": th["threshold"],
                       "bot": D.get("bot"),
                       "weekly": nk["weekly"], "schedule": D["schedule"], "eta_stats": es,
                       "vdetail": [{k: v[k] for k in VD_KEYS if k in v} for v in D["validators"]],
-                      "validators": [[v["m"], v["t"], v["c"], v["op"][-6:], v.get("jail") or 0,
+                      "validators": [[v["m"], v["t"], v["c"], v["op"][-6:], (v.get("jail") if TESTNET else (v.get("jail") or 0)),
                                       round((1 - v["life_missed"]/v["life_n"]) * 100, 3)
                                       if v.get("life_n") else None] for v in V],
                       "eta": e, "set": s,
                       # the Network tabs: 24h proposers, 7 days of hourly activity, the economics
                       # history, and where the chain's record starts
                       "p24": D.get("p24"), "act7": D.get("act7"), "txday": D.get("txday"), "b10k": D.get("b10k"), "econ": D.get("econ"), "prop_all": D.get("prop_all"),
-                      "coverage": D.get("coverage")}, separators=(",", ":"))
+                      "coverage": D.get("coverage"),
+                      # the network this page is for: its endpoints for the scripts, and the other
+                      # network's page for the switch
+                      "net": NETCFG}, separators=(",", ":"))
 
 TPL = open(os.path.join(os.path.dirname(__file__), "page.tpl")).read()
 # the navigation shell: both tab strips, their pre-paint CSS and the embedded config all come
@@ -183,13 +200,13 @@ page = (TPL
   .replace("{{ETA}}", f"{e['now']:.2f}").replace("{{ETA_PCT}}", f"{e['now']*100:.0f}")
   .replace("{{ETA_NEXT}}", f"{min(e['now']+e['step'], e['max']):.2f}")
   .replace("{{NOW_DATE}}", next((r["date"] for r in D["schedule"] if r["now"]), "—"))
-  .replace("{{RATE_AFTER}}", f"{nk['rate_after']:+.2f}" if nk["rate_after"] is not None else "—")
+  .replace("{{RATE_AFTER}}", f"{nk['rate_after']:+.2f}" if nk["rate_after"] is not None else ("N/A" if TESTNET else "—"))
   .replace("{{N_AFTER}}", str(nk["n_after"]))
   .replace("{{NEXT_DATE}}", next((r["date"] for r in D["schedule"] if r["next"]), "—"))
   .replace("{{WEEK}}", str(e["week"])).replace("{{WEEKDAY}}", str(e["week_day"]))
   .replace("{{MIN}}", f"{e['min']:.2f}").replace("{{MAX}}", f"{e['max']:.2f}")
   .replace("{{STEP}}", f"{e['step']:.2f}")
-  .replace("{{NK}}", str(nk["proposals"])).replace("{{NK_STAKE}}", str(nk["stake"]))
+  .replace("{{NK}}", str(nk["proposals"]) if nk["proposals"] is not None else "N/A").replace("{{NK_STAKE}}", str(nk["stake"]))
   .replace("{{RATIO}}", f"{th['ratio']:.2f}").replace("{{THRESH}}", f"{th['threshold']:.2f}")
   .replace("{{TRIPS}}", f"{th['threshold'] - 0.01:.2f}")
   .replace("{{TRIPS_C}}", str(int(round((th['threshold'] - 0.01) * 100))))
@@ -217,8 +234,8 @@ page = (TPL
   .replace("{{RISE_ON}}", "hot" if th["rising"] else "")
   .replace("{{FALL_ON}}", "" if th["rising"] else "hot")
   .replace("{{POOL}}", f(M(s["reward_pool"])))
-  .replace("{{TOP10}}", f"{nk['top10_now']:.1f}").replace("{{TOP10_FIRST}}", f"{nk['top10_first']:.1f}")
-  .replace("{{RATE_BEFORE}}", f"{nk['rate_before']:+.2f}" if nk["rate_before"] is not None else "—")
+  .replace("{{TOP10}}", f"{nk['top10_now']:.1f}" if nk["top10_now"] is not None else "N/A").replace("{{TOP10_FIRST}}", f"{nk['top10_first']:.1f}" if nk["top10_first"] is not None else "N/A")
+  .replace("{{RATE_BEFORE}}", f"{nk['rate_before']:+.2f}" if nk["rate_before"] is not None else ("N/A" if TESTNET else "—"))
   .replace("{{N_BEFORE}}", str(nk["n_before"]))
   .replace("{{AFTER_BLOCK}}", after).replace("{{RATE_LINE}}", rate_line)
   .replace("{{FLOOR}}", f"{es['floor']:.2f}").replace("{{CAP}}", f"{es['cap']:.2f}")
@@ -233,10 +250,10 @@ page = (TPL
   .replace("{{MV_TOP}}", mv_top).replace("{{MV_SMALL}}", mv_small)
   .replace("{{MV_NEW}}", mv_new).replace("{{MV_GREW}}", mv_grew).replace("{{MV_WK}}", mv_wk).replace("{{SCHEDULE}}", sched).replace("{{TRENDROWS}}", trend_rows)
   .replace("{{APRTABLE}}", tbl_apr)
-  .replace("{{NCLEAN}}", str(n_clean)).replace("{{UPMIN}}", f"{UP_MIN:.0f}")
+  .replace("{{NCLEAN}}", "N/A" if TESTNET else str(n_clean)).replace("{{UPMIN}}", f"{UP_MIN:.0f}")
   .replace("{{PICKTABLE}}", "").replace("{{LIFEWIN}}", life_win)
-  .replace("{{UPTABLE}}", tbl_up)
-  .replace("{{EARNTABLE}}", tbl_earn).replace("{{EARNWK}}", str(earn_weeks))
+  .replace("{{UPTABLE}}", tbl_up or ("<tr><td colspan=6 class=dim>N/A on testnet: signing records come from our index (mainnet only)</td></tr>" if TESTNET else ""))
+  .replace("{{EARNTABLE}}", tbl_earn or ("<tr><td colspan=5 class=dim>N/A on testnet: earnings come from our index (mainnet only)</td></tr>" if TESTNET else "")).replace("{{EARNWK}}", "N/A" if TESTNET else str(earn_weeks))
   .replace("{{COVFROM}}", "genesis" if cov["genesis"] else esc(cov["from_date"]))
   .replace("{{DATA}}", payload.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")))
 # ^ the payload sits inside a <script> element: a moniker containing "</script>"
@@ -293,7 +310,7 @@ import glob
 vdir = os.path.join(OUT, "assets", "val")
 os.makedirs(vdir, exist_ok=True)
 have = set()
-for src in glob.glob("/srv/atomone-app/state/avatars/*.jpg"):
+for src in glob.glob(os.path.join(AVATARS, "*.jpg")):
     fn = os.path.basename(src); have.add(fn)
     dst = os.path.join(vdir, fn)
     if not os.path.exists(dst) or os.path.getmtime(src) > os.path.getmtime(dst):
@@ -331,6 +348,8 @@ import hashlib
 for _js in ("app.js", "boot.js", "tx.js", "simple.js", "shell.js"):
     _h = hashlib.sha256(open(os.path.join(OUT, _js), "rb").read()).hexdigest()[:10]
     page = page.replace(f'src="{_js}"', f'src="{_js}?v={_h}"')
+if TESTNET:
+    page = page.replace("N/A%", "N/A")      # a template's "%" after a figure that is not there
 # the day sheet the same way: a versioned URL can be cached for good (nginx says so for any
 # ?v=), and a new sheet is a new URL
 _day = os.path.join(OUT, "assets", "theme-day.css")

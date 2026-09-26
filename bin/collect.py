@@ -17,9 +17,15 @@ RPC   = os.environ["ATOMONE_RPC"]
 # our node is pruned; historical validator sets come from a public archive
 ARCHIVE = os.environ.get("ATOMONE_ARCHIVE_RPC", "https://rpc.atomone-archive.citizenweb3.com")
 API   = os.environ["ATOMONE_API"]
-DSN   = os.environ["ATOMONE_APP_DSN"]
-CHAIN = os.environ.get("CHAIN_ID", "atomone-1")
+# NET=testnet: the same page for atomone-testnet-1 from its own node and API. Our index
+# (gata_indexer) holds mainnet only, so every figure drawn from it is published empty and
+# the page shows N/A; the chain's own figures (validators, stake, pool, params) are real.
+TESTNET = os.environ.get("NET", "mainnet") == "testnet"
+DSN   = os.environ.get("ATOMONE_APP_DSN", "") if TESTNET else os.environ["ATOMONE_APP_DSN"]
+CHAIN = os.environ.get("CHAIN_ID", "atomone-testnet-1" if TESTNET else "atomone-1")
 OUT   = os.environ.get("OUT_DIR", "/srv/atomone-app/web")
+STATE = os.environ.get("STATE_DIR", "/srv/atomone-app/state/testnet" if TESTNET else "/srv/atomone-app/state")
+os.makedirs(STATE, exist_ok=True)
 
 
 # ── bech32, to map slash_event.cons_addr -> validator ────────────────────────
@@ -68,6 +74,8 @@ else:
     DSN_SAFE = DSN
 
 def sql(q, timeout=180):
+    if TESTNET:
+        return []                # no index for testnet: every query reads as empty -> N/A
     p = subprocess.run(["psql", DSN_SAFE, "-tAF", "\x1f", "-c", q],
                        capture_output=True, text=True, timeout=timeout, env=PGENV)
     if p.returncode != 0:
@@ -209,7 +217,7 @@ for w in range(1, week + 9):
 # answers /validators only for recent heights. Both are immutable once the week is
 # past, so a height is fetched exactly once and cached for good; an archive that is
 # down costs a blank cell, never a failed run.
-CHIST = "/srv/atomone-app/state/chist.json"
+CHIST = os.path.join(STATE, "chist.json")
 try:
     chist = json.load(open(CHIST))
 except Exception:
@@ -264,7 +272,7 @@ os.replace(_tmp, CHIST)
 
 # the reconstruction must land on the live coefficient, or the anchor has drifted
 recon = next((s["eta"] for s in sched if s["now"]), None)
-if recon is None or abs(recon - coef) > 1e-9:
+if not TESTNET and (recon is None or abs(recon - coef) > 1e-9):
     die(f"schedule reconstruction {recon} != live coefficient {coef} - epoch anchor drifted")
 
 # ── decentralisation, from OUR index (proposals, not stake) ───────────────────
@@ -281,7 +289,7 @@ SELECT to_char(t.m,'YYYY-MM'), t.c,
 FROM t ORDER BY t.m;""")
 trend = [{"month": r[0], "proposers": int(r[1]), "nakamoto": int(r[2]), "top10": float(r[3])}
          for r in rows if r[2]]
-if len(trend) < 3: die(f"only {len(trend)} months of proposal history - index incomplete")
+if len(trend) < 3 and not TESTNET: die(f"only {len(trend)} months of proposal history - index incomplete")
 
 # ── lifetime signing, over every block whose signatures we have indexed ──────
 # "Expected" starts at the later of our signature coverage and the validator's
@@ -311,7 +319,7 @@ coverage = {"from_height": cov_h, "from_date": _cov[0][1] if _cov else "",
 # carried into the page's wording: uptime only exists above the signature
 # coverage floor, and historical supply is compounded back from today at the
 # fixed inflation rather than queried, because the archive exposes no REST.
-VSETS = "/srv/atomone-app/state/vsets.json"
+VSETS = os.path.join(STATE, "vsets.json")
 try:
     vsets = json.load(open(VSETS))
 except Exception:
@@ -411,7 +419,7 @@ for _ser in daily.values():
     for _i, _n in enumerate(_ser): _tot[_i] += _n
 # A join that matches nothing looks exactly like a chain where nobody proposed.
 # Refuse to publish that rather than paint 100 validators dark.
-if sum(_tot) < UP_DAYS * 1000:
+if sum(_tot) < UP_DAYS * 1000 and not TESTNET:
     die(f"daily rollup saw only {sum(_tot)} blocks across {UP_DAYS} days - "
         "proposer key or date join is broken")
 
@@ -556,7 +564,7 @@ def _deleg(op):
             break
     return out
 
-DELEGF = "/srv/atomone-app/state/delegators.json"
+DELEGF = os.path.join(STATE, "delegators.json")
 delegators = None
 try:
     _cached = json.load(open(DELEGF))
@@ -634,7 +642,7 @@ def apr(t, e): return R*(1-e)/S + R*e/(N*t)
 # links name a set of validators as a bitmap over these numbers (six per character of
 # Telegram's 64-character start payload), so one link carries the whole set. The page and
 # the bot both read the number from data.json, so they cannot disagree.
-VIDS_PATH = "/srv/atomone-app/state/vids.json"
+VIDS_PATH = os.path.join(STATE, "vids.json")
 try:
     VIDS = {k: int(n) for k, n in json.load(open(VIDS_PATH)).items()}
 except Exception:
@@ -667,7 +675,7 @@ b10k = [[int(r[0]), int(r[1]), int(r[2]), int(r[3])] for r in sql(f"""WITH w AS 
    FROM w, top WHERE height > top.h - 10000 GROUP BY (top.h - height) / 100 ORDER BY 1;""")]
 # Activity since genesis: transactions and blocks per day, kept in state/txdaily.json - the whole
 # history once (a ~7 s scan), then only the last two days on each build
-TXD = "/srv/atomone-app/state/txdaily.json"
+TXD = os.path.join(STATE, "txdaily.json")
 txday = None
 try:
     txd = json.load(open(TXD)) if os.path.exists(TXD) else {}
@@ -682,7 +690,7 @@ except Exception as e:
 # Economics: today's supply, stake and pools, kept one point a day in state/econ.json (weekly
 # before 2026-09-26, backfilled from the archive by dev/econ_backfill.py). A failure here
 # costs the tab, never the build.
-ECON = "/srv/atomone-app/state/econ.json"
+ECON = os.path.join(STATE, "econ.json")
 econ = None
 try:
     phs = int(get(f"{API}/cosmos/bank/v1beta1/supply/by_denom?denom=uphoton")["amount"]["amount"])
@@ -715,7 +723,7 @@ out = {
   # the alert bot writes its own username here once it has authenticated, so the
   # page's deep link can never point at a bot that is not actually running
   "bot": (lambda f: (json.load(open(f)).get("username")
-                     if os.path.exists(f) else None))("/srv/atomone-app/state/bot.json"),
+                     if os.path.exists(f) else None))(os.path.join(STATE, "bot.json")),
   "schedule": sched,
   # HIGHEST REACHED is not simply the current value: the ratio can fall as well
   # as rise, and if it ever does, the reconstruction below stops matching the live
@@ -747,8 +755,8 @@ out = {
                  "move_pct_top": move/Hi*100, "move_each": move/g,
                  "low_avg_after": MEAN + _lam*(Lo/gl - MEAN),
                  "move_from": move_from, "move_to": move_to},
-  "nakamoto": {"stake": nk_stake, "proposals": trend[-1]["nakamoto"],
-               "top10_now": trend[-1]["top10"], "top10_first": trend[0]["top10"],
+  "nakamoto": {"stake": nk_stake, "proposals": trend[-1]["nakamoto"] if trend else None,
+               "top10_now": trend[-1]["top10"] if trend else None, "top10_first": trend[0]["top10"] if trend else None,
                "rate_before": slope(wk_pre), "n_before": len(wk_pre),
                # weekly on both sides: two months is one monthly interval
                "rate_after": slope(wk_post), "n_after": len(wk_post),
@@ -807,10 +815,16 @@ except Exception as e:
 
 # Which identities ended up with a tile on disk. Rendering an <img> for one that
 # does not exist would put a broken-image request on every cell that lacks an avatar.
-AVDIR = "/srv/atomone-app/state/avatars"
+AVDIR = os.path.join(STATE, "avatars")
 HAVE_AV = {f[:-4] for f in os.listdir(AVDIR)} if os.path.isdir(AVDIR) else set()
 for v in out["validators"]:
     v["av"] = bool(v["id"]) and v["id"] in HAVE_AV
+# testnet: what only our index knows is not known - None, which the page shows as N/A
+if TESTNET:
+    for v in out["validators"]:
+        for k in ("prop", "prop_pct", "jail", "last_slash", "burned", "bars", "d30", "d90", "joined",
+                  "life_up", "life_n", "life_missed", "earn_avg", "earn_hi", "earn_lo"):
+            if k in v: v[k] = None
 
 os.makedirs(OUT, exist_ok=True)
 tmp = os.path.join(OUT, ".data.json.tmp")
