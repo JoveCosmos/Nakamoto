@@ -725,7 +725,7 @@
       var T = 0, B = 0, pk = null; src.forEach(function(x){ T += x.t; B += x.b; var r = x.b ? x.t / x.b : 0; if(!pk || r > pk.r) pk = { k: x.k, r: r }; });
       sl = '<div class=sv-rt>' + st("Per 100 blocks", B ? (T / B * 100).toFixed(1) : "—", "since genesis", "var(--sv-violet)") +
         st("Busiest day", pk ? (pk.r * 100).toFixed(0) : "—", pk ? dl(pk.k) + ", per 100 blocks" : "", "var(--sv-violet)") +
-        st("Blocks", B ? B.toLocaleString() : "—", "since genesis") + '</div>';
+        st("Transactions", B ? T.toLocaleString() : "—", "since genesis") + '</div>';
       lb = src.length ? chart("tpb", src.map(function(x){ return { d: x.k, r: x.b ? x.t / x.b * 100 : 0 }; }), [{ k: "r", cls: "tpb", area: true }], function(v){ return v <= 0 ? "0" : String(Math.round(v)); },
           function(v){ return v.toFixed(1) + " per 100 blocks"; }) : '<div class=sv-upwait>Reading the history…</div>';
     }
