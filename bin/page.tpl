@@ -3562,18 +3562,13 @@ position:relative;overflow:hidden;min-width:0;min-height:0}
 #sv-net>.sv-up{flex:1 1 0;min-height:0}
 #sv-net .sv-upst{padding-top:4px;padding-bottom:5px}
 #sv-net .sv-upchart{min-height:0}
-#sv-netrow{flex:1 1 0;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-#sv-miss{--tc:#ff4d1f}#sv-pace{--tc:var(--sv-teal)}
-.sv-mlist .sv-vr u{font-size:11px}
-.sv-vr u.ok{color:var(--sv-green)}.sv-vr u.warn{color:var(--sv-amber)}.sv-vr u.bad{color:#ff6a3d}
-.sv-mlist .sv-va em{margin-left:4px}
-.sv-mfoot{margin-top:auto;font-size:11px;color:var(--wf)}
-.sv-allok{font-family:var(--wmono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
+#sv-netrow{flex:1 1 0;grid-template-columns:minmax(0,1fr)}
+#sv-pace{--tc:var(--sv-teal)}
 #sv-pace .sv-box{padding:6px 12px 7px;gap:1px}
 #sv-pace{gap:9px}
 #sv-pace .sv-bv{font-size:19px}
 #sv-pace .sv-bm{font-size:10.5px}
-#sv-pace,#sv-miss{overflow:hidden}
+#sv-pace{overflow:hidden}
 .sv-pace{flex:1 1 auto;min-height:18px;position:relative;display:flex;align-items:flex-end;gap:2px;border-bottom:1px solid var(--wbd2)}
 .sv-pace i{flex:1 1 0;min-width:1px;height:var(--h);border-radius:2px 2px 0 0;background:linear-gradient(180deg,rgba(43,200,189,.9),rgba(43,200,189,.3))}
 .sv-pace i.slow{background:linear-gradient(180deg,#ffb02e,rgba(255,176,46,.35))}
@@ -4119,7 +4114,6 @@ html[data-tab=connect] .l2host{display:none}
         <div class=sv-cards id=sv-netcards></div>
         <div class="sv-panel sv-up" id=sv-up></div>
         <div class=sv-row2 id=sv-netrow>
-          <div class=sv-panel id=sv-miss></div>
           <div class=sv-panel id=sv-pace></div>
         </div>
       </section>

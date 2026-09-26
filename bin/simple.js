@@ -453,7 +453,7 @@
     var rows = upRows();
     /* an older live.json has no block times: the fallback reads them for Chain pace */
     if(!window.__UP || !timed(window.__UP)) fbRows();
-    drawMiss(rows, S); drawPace();
+    drawPace();
     var head = '<div class=sv-ph><h3>Network uptime</h3><span class="sv-tag q"><i class=sv-livedot></i>live</span>';
     if(!rows.length){
       put("sv-up", head + '</div><div class=sv-upwait>Reading the latest blocks…</div>');
@@ -520,34 +520,6 @@
       '</div>');
   }
   function timed(r){ return r && r.length > 1 && r[r.length - 1][4] > 0; }
-
-  /* ── who is missing blocks: every validator that missed one in the window, most first,
-     with its 30-day uptime - the names behind the red on the plot ── */
-  function drawMiss(rows, S){
-    var n = rows.length, ix = consIndex(), cnt = {}, VD = window.__VDBY || {};
-    rows.forEach(function(r){ if(r[3]) r[3].split(",").forEach(function(a){ if(a) cnt[a.toUpperCase()] = (cnt[a.toUpperCase()] || 0) + 1; }); });
-    var list = Object.keys(cnt).map(function(a){ var w = ix[a] || { id: null, m: a.slice(0, 8) + "…" }; return { id: w.id, m: w.m, k: cnt[a] }; })
-      .sort(function(a, b){ return b.k - a.k || (a.m < b.m ? -1 : 1); });
-    var set = n ? rows[n - 1][2] : S.n, clean = Math.max(0, set - list.length);
-    var h = '<div class=sv-ph><h3>Who is missing blocks</h3>';
-    if(!n){ h += tag("q", "last " + n + " blocks") + '</div>'; put("sv-miss", h + '<div class=sv-upwait>Reading the latest blocks…</div>'); return; }
-    /* nobody missed one: say so, and name the lowest 30-day records instead - the ones to watch */
-    var low = !list.length;
-    if(low) list = Object.keys(VD).filter(function(k){ return VD[k].d30 != null && VD[k].m; })
-      .sort(function(a, b){ return VD[a].d30 - VD[b].d30; }).slice(0, 3).map(function(k){ return { id: k, m: VD[k].m, k: 0 }; });
-    var shown = list.slice(0, low ? 3 : 4);
-    h += low ? tag("g", "all " + set + " signed the last " + n) + '<div class=sv-rt><span class=sv-allok>lowest 30-day uptime</span></div></div>'
-             : tag("q", "last " + n + " blocks") + '</div>';
-    h += '<div class="sv-vlist sv-mlist">' + shown.map(function(v){ var d = (v.id && VD[v.id]) || {}, u = d.d30 != null ? +d.d30 : null;
-      return '<div class="sv-vr' + (v.id ? ' click" data-v="' + esc(v.id) + '" tabindex=0 title="Open this validator"' : '"') + ' style="--c:#ff4d1f">' +
-        '<span class=sv-lgo>' + logo(v.id, v.m) + '</span><b class=sv-vn>' + esc(v.m) + '</b>' +
-        (low ? '<s class=sv-va>0<em>missed</em></s><span class=sv-vs><span class=sv-vt><i style="width:' + Math.max(3, u || 0).toFixed(1) + '%;background:var(--sv-teal)"></i></span></span>'
-             : '<s class=sv-va>' + v.k + '<em>of ' + n + '</em></s>' +
-        '<span class=sv-vs><span class=sv-vt><i style="width:' + Math.max(3, v.k / n * 100).toFixed(1) + '%"></i></span></span>') +
-        '<u class="' + (u == null ? "" : u >= 95 ? "ok" : u >= 85 ? "warn" : "bad") + '" title="30-day uptime">' + (u == null ? "—" : u.toFixed(1) + "%") + '</u></div>'; }).join("") + '</div>' +
-      (low ? '' : '<div class=sv-mfoot>' + (list.length > shown.length ? '+' + (list.length - shown.length) + ' more missed · ' : '') + clean + ' of ' + set + ' signed every block · right: 30-day uptime</div>');
-    put("sv-miss", h);
-  }
 
   /* ── chain pace: the block time over the window (from the block times live.json carries, or
      the fallback's own reads), blocks a day measured over the last 24 hours (one read of the

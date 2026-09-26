@@ -546,8 +546,6 @@
   html[data-theme=light]:not([data-mono]) .sv-vr .sv-lgo img,html[data-theme=light]:not([data-mono]) .sv-vr .sv-lgo .lg{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .sv-va{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sv-vr u{text-decoration:none}
-  html[data-theme=light]:not([data-mono]) #sv-miss{--tc:var(--danger)}
-  html[data-theme=light]:not([data-mono]) .sv-vr u.bad{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .sv-pace i{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-pace i.slow{background:var(--amber-bar)}
   html[data-theme=light]:not([data-mono]) .sv-pavg{border-top:1px dashed var(--accent)}

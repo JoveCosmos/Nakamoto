@@ -83,6 +83,17 @@ def ms(t):
     return int(datetime.datetime.strptime(d, "%Y-%m-%dT%H:%M:%S").replace(tzinfo=datetime.timezone.utc).timestamp() * 1000) + int((f + "000")[:3])
 
 
+def valset(h):
+    """the validator set's addresses at height h, in the set's own order"""
+    out, page = [], 1
+    while True:
+        r = get(f"{RPC}/validators?height={h}&per_page=100&page={page}", timeout=8)["result"]
+        out += [v["address"] for v in r["validators"]]
+        if len(out) >= int(r["total"]) or not r["validators"]:
+            return out
+        page += 1
+
+
 def uptime(head):
     for h in range(max(1, head - UP_N + 1), head + 1):
         if h in _up:
@@ -95,6 +106,15 @@ def uptime(head):
         if not sigs:
             continue
         miss = [x.get("validator_address", "") for x in sigs if x.get("block_id_flag") != 2]
+        # an ABSENT vote (flag 1) carries no address: the signatures are in the validator set's
+        # order, so the set at the commit's height names it
+        if any(not a for a in miss):
+            try:
+                vs = valset(int(b["last_commit"]["height"]))
+                miss = [x.get("validator_address") or (vs[i] if i < len(vs) else "")
+                        for i, x in enumerate(sigs) if x.get("block_id_flag") != 2]
+            except Exception:
+                pass                    # unnamed stays unnamed; the count is still right
         # the commit in block h is the vote on block h-1: that is the height it describes
         _up[h] = [h - 1, len(sigs) - len(miss), len(sigs), ",".join(a for a in miss if a), ms(b["header"]["time"])]
     for k in [k for k in _up if k <= head - UP_N]:
