@@ -2410,7 +2410,7 @@ rememberGridH();
       if(AT_FLT === "sel" && !o.on) return false;
       /* a name matches on any letters; an operator key only from five on, or every key matches "at" */
       return !q || String(o.m).toLowerCase().indexOf(q) >= 0 || (q.length >= 5 && String(d.op).toLowerCase().indexOf(q) >= 0); });
-    var h = '<table><colgroup><col style="width:30px">' + (ph ? '' : '<col style="width:34px">') + '<col><col style="width:' + (ph ? 54 : 64) + 'px">' +
+    var h = '<table><colgroup><col style="width:30px">' + (ph ? '' : '<col style="width:34px">') + '<col><col style="width:' + (ph ? 66 : 64) + 'px">' +
             (ph ? '' : '<col style="width:50px">') + '<col style="width:' + (ph ? 56 : 62) + 'px"></colgroup>' +
             '<thead><tr><th></th>' + (ph ? '' : '<th>rank</th>') + '<th class=l>validator</th><th>90<span class=lc>d</span> uptime</th>' + (ph ? '' : '<th>jailed</th>') + '<th>APR</th></tr></thead><tbody>';
     rows.forEach(function(o){
