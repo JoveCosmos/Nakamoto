@@ -25,6 +25,8 @@ OUT = os.environ.get("OUT_DIR", "/srv/atomone-app/web")
 EVERY = float(os.environ.get("LIVE_SECONDS", "6"))      # one block
 CHAIN = os.environ.get("CHAIN_ID", "atomone-1")
 DST = os.path.join(OUT, "live.json")
+# How many recent blocks the network-uptime graph shows (~12 minutes at 6 s a block).
+UP_N = int(os.environ.get("LIVE_UP_BLOCKS", "120"))
 
 
 def get(url, timeout=12):
@@ -67,6 +69,32 @@ def snapshot():
     }
 
 
+# Network uptime, block by block: who signed each commit. A block never changes once made, so
+# each height is read once (one /block from our own node per new block; 120 once at start)
+# and kept. Published as "up": [[height, signed, validators, "HEX,HEX" of those who did not
+# sign], ...], oldest first - every visitor reads it from this file instead of asking the node.
+_up = {}
+
+
+def uptime(head):
+    for h in range(max(1, head - UP_N + 1), head + 1):
+        if h in _up:
+            continue
+        try:
+            b = get(f"{RPC}/block?height={h}", timeout=8)["result"]["block"]
+        except Exception:
+            continue                    # a gap shows as a gap; the next tick tries again
+        sigs = (b.get("last_commit") or {}).get("signatures") or []
+        if not sigs:
+            continue
+        miss = [x.get("validator_address", "") for x in sigs if x.get("block_id_flag") != 2]
+        # the commit in block h is the vote on block h-1: that is the height it describes
+        _up[h] = [h - 1, len(sigs) - len(miss), len(sigs), ",".join(a for a in miss if a)]
+    for k in [k for k in _up if k <= head - UP_N]:
+        del _up[k]
+    return [_up[k] for k in sorted(_up)]
+
+
 def write(obj):
     # atomic, same as every other published file here
     tmp = DST + ".tmp"
@@ -80,7 +108,12 @@ def main():
     while True:
         t0 = time.time()
         try:
-            write(snapshot())
+            snap = snapshot()
+            try:
+                snap["up"] = uptime(snap["h"])
+            except Exception as e:      # the stake vector matters more than the graph
+                print(f"live: uptime: {e}", file=sys.stderr, flush=True)
+            write(snap)
             fails = 0
         except Exception as e:
             fails += 1

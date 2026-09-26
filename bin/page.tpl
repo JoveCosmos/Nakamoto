@@ -3347,6 +3347,36 @@ background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opac
 .sv-rf[hidden]{display:none}
 .sv-rf.busy svg{animation:svspin .8s linear infinite}
 @keyframes svspin{to{transform:rotate(360deg)}}
+/* network uptime, live: the share of the set that signed each of the last blocks, against the
+   set's 30-day average (dashed); the panel takes the rest of the screen and the plot fills it */
+#sv-up{--tc:var(--sv-teal)}
+.sv-screen>.sv-up{flex:1 1 auto;min-height:0}
+.sv-upfig{display:inline-flex;align-items:baseline;gap:7px;margin-left:18px;white-space:nowrap}
+.sv-upfig em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
+.sv-upfig b{font-size:17px;font-weight:800;color:var(--sv-teal);font-variant-numeric:tabular-nums}
+.sv-upfig b.ref{color:var(--wt)}
+.sv-upfig i{font-style:normal;font-size:11.5px;color:var(--ws)}
+.sv-livedot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--sv-teal);margin-right:6px;box-shadow:0 0 0 0 rgba(43,200,189,.6);animation:svlive 1.8s ease-out infinite}
+@keyframes svlive{0%{box-shadow:0 0 0 0 rgba(43,200,189,.6)}80%,100%{box-shadow:0 0 0 7px rgba(43,200,189,0)}}
+.sv-upchart{flex:1 1 auto;min-height:90px;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;column-gap:10px;row-gap:4px}
+.sv-upy{grid-row:1;display:flex;flex-direction:column;justify-content:space-between;font-family:var(--wmono);font-size:9px;color:var(--wf);text-align:right;padding:0 0 0}
+.sv-upplot{grid-row:1;grid-column:2;position:relative;min-height:0;border-left:1px solid var(--wbd2);border-bottom:1px solid var(--wbd2);cursor:crosshair}
+.sv-upplot svg{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible}
+.sv-upplot .area{fill:url(#svupg)}
+.sv-upplot .line{fill:none;stroke:var(--sv-teal);stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.sv-upplot .grid{stroke:var(--wbd);stroke-width:1;vector-effect:non-scaling-stroke}
+.sv-upplot .ref{stroke:var(--wt);stroke-width:1;stroke-dasharray:5 5;opacity:.55;vector-effect:non-scaling-stroke}
+.sv-upplot .cur{stroke:var(--ws);stroke-width:1;vector-effect:non-scaling-stroke}
+.sv-updot{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--sv-teal);border:2px solid #0b0b18;box-shadow:0 0 0 1.5px var(--sv-teal),0 0 12px var(--sv-teal);transform:translate(-50%,-50%);pointer-events:none}
+.sv-uptip{position:absolute;top:6px;width:22%;min-width:170px;padding:7px 10px;border:1px solid var(--wbd2);border-radius:8px;background:#15152c;font-size:11px;line-height:1.45;color:var(--ws);pointer-events:none;z-index:2}
+.sv-uptip b{display:block;color:var(--wt);font-weight:700}
+.sv-upx{grid-row:2;grid-column:2;display:flex;justify-content:space-between;font-family:var(--wmono);font-size:9px;color:var(--wf)}
+.sv-upmiss{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--ws);min-height:22px}
+.sv-upmiss em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);margin-right:4px}
+.sv-upmiss span{padding:2px 8px;border-radius:999px;border:1px solid rgba(255,77,31,.35);color:#ff8a6b;background:rgba(255,77,31,.06)}
+.sv-upwait{flex:1 1 auto;display:grid;place-items:center;color:var(--wf);font-size:12px;min-height:90px}
+@media(max-width:900px){.sv-upfig{margin-left:10px}.sv-upfig i{display:none}}
+@media(max-width:620px){.sv-screen>.sv-up{min-height:320px}.sv-upchart{min-height:170px}.sv-upfig{margin:0 12px 0 0}}
 /* a wallet with nothing staked: the message and Stake ATONE in the middle of the space below the tiles */
 #sv-optp.fill{flex:1 1 auto;justify-content:center;align-items:center}
 .sv-none{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
@@ -4003,14 +4033,7 @@ html[data-tab=connect] .l2host{display:none}
       <section class=sv-screen id=sv-net data-sc=net aria-label=Network>
         <div class=sv-panel id=sv-nethead></div>
         <div class="sv-cards four" id=sv-netcards></div>
-        <div class="sv-panel sv-list">
-          <div class=sv-tools>
-            <input class=sv-find id=sv-find type=search placeholder="Filter by name or operator key" aria-label="Filter validators" autocomplete=off spellcheck=false>
-            <div class=sv-segs id=sv-segs></div>
-          </div>
-          <div class=sv-wrap id=sv-nettbl></div>
-          <div class=sv-foot2 id=sv-netfoot></div>
-        </div>
+        <div class="sv-panel sv-up" id=sv-up></div>
       </section>
     </main>
   </div>

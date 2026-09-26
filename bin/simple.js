@@ -326,9 +326,6 @@
   }
 
   /* ── NETWORK ────────────────────────────────────────────────────────────── */
-  /* a validator's APR as the map paints it: a dot of its fill, the figure in its ink */
-  function aprCell(r){ var h = heat(r); return '<span class=sv-apr style="color:' + h.ink + '"><i style="background:' + h.fill + '"></i>' + pct(r) + '</span>'; }
-  var FILTER = "all", FIND = "";
   function drawNet(){
     var D = DD(), S = setStats(), s = S.set, V = VALS(), mine = window.__MINE || {};
     var e = D.eta || {}, i10 = 0, t10 = 0;
@@ -356,59 +353,98 @@
       card("Record", (S.up != null ? S.up.toFixed(2) + "%" : "—"),
            "average 30-day uptime, " + S.clean + " never jailed"));
 
-    var segs = [["all", "All " + S.n], ["mine", "My stake"], ["clean", "Never jailed"], ["small", "Below average"]];
-    put("sv-segs", segs.map(function(x){
-      return '<button class=sv-seg type=button data-f="' + x[0] + '" aria-pressed="' + (FILTER === x[0] ? "true" : "false") + '">' + x[1] + '</button>'; }).join(""));
+    drawUp(S);
+  }
 
-    var mean = (s.bonded || 0) / (S.n || 1), q = FIND.toLowerCase(), rows = [], i;
-    for(i = 0; i < V.length; i++){
-      var v = V[i], d = (window.__VDBY && window.__VDBY[v[3]]) || {};
-      if(FILTER === "mine" && !mine[v[3]]) continue;
-      if(FILTER === "clean" && v[4]) continue;
-      if(FILTER === "small" && v[1] >= mean) continue;
-      if(q && String(v[0]).toLowerCase().indexOf(q) < 0 && !(q.length >= 5 && String(d.op || "").toLowerCase().indexOf(q) >= 0)) continue;
-      rows.push({ i: i, v: v, d: d });
-    }
-    var pos = window.__POS, held = {};
-    if(pos) pos.rows.forEach(function(r){ held[r.id] = r.x; });
-    /* a phone gets its own four columns - the validator with its power and record beneath
-       the name - rather than a table wider than the screen */
-    if(innerWidth <= 620){
-      var hp = '<table class="sv-tbl ph"><colgroup><col style="width:30px"><col><col style="width:58px"><col style="width:66px"></colgroup>' +
-               '<thead><tr><th>#</th><th class=l>validator</th><th>APR</th><th>yours</th></tr></thead><tbody>';
-      rows.forEach(function(r){
-        var v = r.v, d = r.d, up = d.d30 != null ? +d.d30 : null, j = v[4] || 0;
-        hp += '<tr' + (held[v[3]] ? ' class=mine' : "") + ' data-v="' + esc(v[3]) + '" tabindex=0 title="Open this validator">' +
-          '<td>' + (r.i + 1) + '</td>' +
-          '<td class=l><span class=sv-nm>' + logo(v[3], v[0]) + '<span class=tx><b>' + esc(v[0]) + '</b><i>' + big(v[1]) + ' ATONE, ' +
-            '<span class="' + (up == null ? "sv-dim" : up >= 95 ? "sv-ok" : up >= 85 ? "sv-warn" : "sv-bad") + '">' + (up == null ? "—" : up.toFixed(1) + "%") + '</span>' +
-            (j ? ', <span class="' + (j === 1 ? "sv-warn" : "sv-bad") + '">jailed ' + j + '×</span>' : '') + '</i></span></span></td>' +
-          '<td>' + aprCell(rate0(v[1], v[2])) + '</td>' +
-          '<td>' + (held[v[3]] ? '<b>' + big(held[v[3]]) + '</b>' : '<span class=sv-dim>—</span>') + '</td></tr>';
-      });
-      put("sv-nettbl", hp + '</tbody></table>');
-      put("sv-netfoot", '<span>' + rows.length + " of " + S.n + " validators</span>" +
-        '<div class=sv-rt>' + (window.__LIVEH && window.__LIVEH() ? "block " + window.__LIVEH().toLocaleString() : "") + '</div>');
+  /* ── network uptime, live ────────────────────────────────────────────────
+     Block by block, the share of the set that signed: the last ~120 blocks (live.py publishes
+     them in live.json, which every visitor already reads each block). Until that file carries
+     them - an older live.py, or dev, which reads production's file - the screen reads the last
+     60 blocks itself, four at a time, and then one per new block. */
+  var FB = { rows: {}, busy: false };
+  function fbRows(){
+    if(FB.busy) return;
+    FB.busy = true;
+    fetch("/rpc/status", { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(j){
+      var head = Number(j.result.sync_info.latest_block_height), want = [], h;
+      for(h = head - 59; h <= head; h++) if(!FB.rows[h]) want.push(h);
+      for(var k in FB.rows) if(+k <= head - 60) delete FB.rows[k];
+      var next = function(){
+        var hh = want.shift(); if(hh === undefined) return Promise.resolve();
+        return fetch("/rpc/block?height=" + hh, { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(b){
+          var sigs = b.result.block.last_commit.signatures || [], miss = [];
+          sigs.forEach(function(x){ if(x.block_id_flag !== 2 && x.validator_address) miss.push(x.validator_address); });
+          if(sigs.length) FB.rows[hh] = [hh - 1, sigs.length - miss.length, sigs.length, miss.join(",")];
+        }).catch(function(){}).then(next);
+      };
+      return Promise.all([next(), next(), next(), next()]);
+    }).catch(function(){}).then(function(){ FB.busy = false; if(screen() === "net") drawUp(setStats()); });
+  }
+  function upRows(){
+    if(window.__UP && window.__UP.length) return window.__UP;
+    return Object.keys(FB.rows).map(Number).sort(function(a, b){ return a - b; }).map(function(k){ return FB.rows[k]; });
+  }
+  /* consensus address (hex) -> moniker, for who missed */
+  function byCons(){
+    var VD = window.__VDBY || {}, m = {}, k;
+    for(k in VD) if(VD[k].chex) m[String(VD[k].chex).toUpperCase()] = VD[k].m;
+    return m;
+  }
+  var UPHOVER = -1;
+  function drawUp(S){
+    var rows = upRows();
+    if(!window.__UP) fbRows();
+    if(!rows.length){
+      put("sv-up", '<div class=sv-ph><h3>Network uptime</h3><span class="sv-tag q"><i class=sv-livedot></i>live</span></div><div class=sv-upwait>Reading the latest blocks…</div>');
       return;
     }
-    var h = '<table class=sv-tbl><thead><tr><th>#</th><th class=l>validator</th><th>voting power</th><th>30d uptime</th>' +
-            '<th>jailed</th><th>fee</th><th>APR</th><th>your stake</th></tr></thead><tbody>';
-    rows.forEach(function(r){
-      var v = r.v, d = r.d, up = d.d30 != null ? +d.d30 : null, j = v[4] || 0;
-      h += '<tr' + (held[v[3]] ? ' class=mine' : "") + ' data-v="' + esc(v[3]) + '" tabindex=0 title="Open this validator">' +
-        '<td>' + (r.i + 1) + '</td>' +
-        '<td class=l><span class=sv-nm>' + logo(v[3], v[0]) + '<span class=tx><b>' + esc(v[0]) + '</b><i>' + esc(String(d.op || "").slice(0, 14)) + '…</i></span></span></td>' +
-        '<td>' + big(v[1]) + ' <span class=sv-dim>ATONE</span><span class=sv-sm>' + (d.vp != null ? d.vp.toFixed(2) + "% share" : "") + '</span></td>' +
-        '<td class="' + (up == null ? "sv-dim" : up >= 95 ? "sv-ok" : up >= 85 ? "sv-warn" : "sv-bad") + '">' + (up == null ? "—" : up.toFixed(2) + "%") + '</td>' +
-        '<td class="' + (!j ? "sv-dim" : j === 1 ? "sv-warn" : "sv-bad") + '">' + (j ? j + "×" : "Never") + '</td>' +
-        '<td>' + Math.round(v[2] * 100) + '%</td>' +
-        '<td>' + aprCell(rate0(v[1], v[2])) + '</td>' +
-        '<td>' + (held[v[3]] ? '<b>' + fmt(held[v[3]]) + '</b>' : '<span class=sv-dim>—</span>') + '</td></tr>';
-    });
-    put("sv-nettbl", h + '</tbody></table>');
-    put("sv-netfoot", '<span>' + rows.length + " of " + S.n + " validators</span>" +
-      '<div class=sv-rt>' + (window.__LIVEH && window.__LIVEH() ? "block " + window.__LIVEH().toLocaleString() : "") + '</div>');
+    var pc = rows.map(function(r){ return r[2] ? r[1] / r[2] * 100 : 100; });
+    var last = rows[rows.length - 1], now = pc[pc.length - 1], avg = 0;
+    pc.forEach(function(v){ avg += v; }); avg /= pc.length;
+    var ref = S.up != null ? S.up : null;
+    var lo = Math.min.apply(null, pc.concat(ref != null ? [ref] : []));
+    lo = Math.max(0, Math.min(95, Math.floor(lo - 1)));
+    var W = 1000, H = 200, n = pc.length;
+    var x = function(i){ return n > 1 ? i / (n - 1) * W : W; }, y = function(v){ return H - (v - lo) / (100 - lo) * H; };
+    var line = pc.map(function(v, i){ return (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1); }).join(" ");
+    var area = line + " L" + W + " " + H + " L0 " + H + " Z";
+    var names = byCons(), missNow = last[3] ? last[3].split(",").map(function(a){ return names[a.toUpperCase()] || a.slice(0, 8) + "…"; }) : [];
+    var hv = UPHOVER >= 0 && UPHOVER < n ? UPHOVER : -1, hr = hv >= 0 ? rows[hv] : null;
+    var dotI = hv >= 0 ? hv : n - 1;
+    put("sv-up",
+      '<div class=sv-ph><h3>Network uptime</h3><span class="sv-tag q"><i class=sv-livedot></i>live</span>' +
+        '<div class=sv-rt><span class=sv-upfig><em>this block</em><b>' + now.toFixed(0) + '%</b><i>' + last[1] + ' of ' + last[2] + ' signed</i></span>' +
+        '<span class=sv-upfig><em>last ' + n + ' blocks</em><b>' + avg.toFixed(2) + '%</b></span>' +
+        (ref != null ? '<span class=sv-upfig><em>30-day average</em><b class=ref>' + ref.toFixed(2) + '%</b></span>' : '') + '</div></div>' +
+      '<div class=sv-upchart>' +
+        '<div class=sv-upy><span>100%</span><span>' + ((100 + lo) / 2).toFixed(1) + '%</span><span>' + lo + '%</span></div>' +
+        '<div class=sv-upplot><svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio=none aria-hidden=true>' +
+          '<defs><linearGradient id=svupg x1=0 y1=0 x2=0 y2=1><stop offset=0 stop-color="#2bc8bd" stop-opacity=".45"/><stop offset=1 stop-color="#2bc8bd" stop-opacity="0"/></linearGradient></defs>' +
+          '<line class=grid x1=0 x2=' + W + ' y1=0 y2=0 /><line class=grid x1=0 x2=' + W + ' y1=' + H / 2 + ' y2=' + H / 2 + ' />' +
+          (ref != null ? '<line class=ref x1=0 x2=' + W + ' y1=' + y(ref).toFixed(1) + ' y2=' + y(ref).toFixed(1) + ' />' : '') +
+          '<path class=area d="' + area + '"/><path class=line d="' + line + '"/>' +
+          (hv >= 0 ? '<line class=cur x1=' + x(hv).toFixed(1) + ' x2=' + x(hv).toFixed(1) + ' y1=0 y2=' + H + ' />' : '') +
+        '</svg><i class=sv-updot style="left:' + (x(dotI) / W * 100).toFixed(2) + '%;top:' + (y(pc[dotI]) / H * 100).toFixed(2) + '%"></i>' +
+        (hr ? '<div class=sv-uptip style="left:' + Math.min(78, Math.max(0, x(hv) / W * 100 - 11)).toFixed(1) + '%"><b>block ' + Number(hr[0]).toLocaleString() + '</b>' +
+          hr[1] + ' of ' + hr[2] + ' signed' + (hr[3] ? '<br>missed: ' + esc(hr[3].split(",").map(function(a){ return names[a.toUpperCase()] || a.slice(0, 8) + "…"; }).join(", ")) : '') + '</div>' : '') +
+        '</div>' +
+        '<div class=sv-upx><span>block ' + Number(rows[0][0]).toLocaleString() + '</span><span>block ' + Number(last[0]).toLocaleString() + '</span></div>' +
+      '</div>' +
+      '<div class=sv-upmiss>' + (missNow.length
+        ? '<em>missed the latest block</em>' + missNow.slice(0, 8).map(function(m){ return '<span>' + esc(m) + '</span>'; }).join("") + (missNow.length > 8 ? '<span>+' + (missNow.length - 8) + ' more</span>' : '')
+        : '<em>every validator signed the latest block</em>') + '</div>');
   }
+  /* hovering the plot names a block: its height, how many signed, who did not */
+  sv.addEventListener("mousemove", function(ev){
+    var p = ev.target.closest ? ev.target.closest(".sv-upplot") : null;
+    if(!p){ if(UPHOVER !== -1){ UPHOVER = -1; if(screen() === "net") drawUp(setStats()); } return; }
+    var r = p.getBoundingClientRect(), n = upRows().length, i = Math.round((ev.clientX - r.left) / r.width * (n - 1));
+    i = Math.max(0, Math.min(n - 1, i));
+    if(i !== UPHOVER){ UPHOVER = i; drawUp(setStats()); }
+  });
+  sv.addEventListener("mouseleave", function(){ if(UPHOVER !== -1){ UPHOVER = -1; if(screen() === "net") drawUp(setStats()); } });
+  window.addEventListener("thermo:up", function(){ if(screen() === "net" && root.getAttribute("data-svs") === "net") drawUp(setStats()); });
+  window.addEventListener("thermo:live", function(){ if(!window.__UP && screen() === "net") fbRows(); });
 
   /* ── the head: chain, address, the way out ── */
   var WAS = null;
@@ -494,7 +530,6 @@
   function onClick(ev){
     var t = ev.target.closest ? ev.target.closest("[data-act],[data-f],[data-v]") : null;
     if(!t) return;
-    if(t.dataset.f){ FILTER = t.dataset.f; render(); return; }
     var act = t.dataset.act;
     if(act === "opt"){
       if(!window.__optPlan || !window.__goSign) return;
@@ -524,8 +559,6 @@
   }
   sv.addEventListener("click", onClick);
   sv.addEventListener("keydown", onKey);
-  var find = E("sv-find");
-  if(find) find.addEventListener("input", function(){ FIND = find.value.trim(); if(screen() === "net") drawNet(); });
 
   /* the pill's two controls: the address copies, the icon disconnects - no menu */
   var cp = E("svcopy"), out = E("svout"), cpT = 0;
@@ -534,6 +567,9 @@
     cpT = setTimeout(function(){ cp.classList.remove("done"); cp.title = "Copy address"; }, 1400); }); });
   if(out) out.addEventListener("click", function(){ if(window.__wdisconnect) window.__wdisconnect(); setTimeout(render, 0); });
 
+  /* a theme switch redraws everything: the heat colours are chosen per theme when drawn, so a
+     screen drawn at night kept night's pale inks on day's paper until the next change */
+  new MutationObserver(function(){ LASTH = {}; HB.key = null; render(); }).observe(root, { attributes: true, attributeFilter: ["data-theme"] });
   /* every figure follows the dashboard's own redraw, and the height ticks on its own */
   window.addEventListener("thermo:draw", schedule);
   /* a turned phone gets the other table markup at once, not at the next block */

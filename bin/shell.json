@@ -33,13 +33,6 @@
       ]
     },
     {
-      "id": "network", "label": "Network", "route": "network", "account": "none", "accent": "#2bc8bd",
-      "hint": "the validator set, and how AtomOne pays it",
-      "sub": [
-        {"id": "validators", "label": "Validators", "route": "validators", "tab": "dele", "ui": "simple", "screen": "net", "panel": "sv-net", "accent": "#2bc8bd"}
-      ]
-    },
-    {
       "id": "governance", "label": "Governance", "route": "governance", "account": "none", "accent": "#2bc8bd",
       "hint": "proposals, the constitution, the core DAOs", "badge": "soon",
       "sub": [
@@ -55,6 +48,13 @@
       ]
     },
     {
+      "id": "network", "label": "Network", "route": "network", "account": "none", "accent": "#2bc8bd",
+      "hint": "the validator set, and how AtomOne pays it",
+      "sub": [
+        {"id": "validators", "label": "Validators", "route": "validators", "tab": "dele", "ui": "simple", "screen": "net", "panel": "sv-net", "accent": "#2bc8bd"}
+      ]
+    },
+    {
       "id": "dashboard", "label": "Dashboard", "route": "dashboard", "account": "uses", "accent": "#ffb02e",
       "hint": "your stake, your votes",
       "switch": "groups",
@@ -63,9 +63,9 @@
         {"id": "autopilot", "label": "Autopilot", "route": "autopilot", "group": "Staking", "tab": "dele", "ui": "simple", "screen": "auto", "panel": "sv-auto"},
         {"id": "self",      "label": "Manual",    "route": "manual",      "group": "Staking", "tab": "dele", "panel": "p-dele"},
         {"id": "votes",     "label": "Votes",     "route": "votes",     "group": "Governance",
-         "empty": {"title": "Votes", "text": "How your wallet voted on AtomOne proposals will be listed here."}},
+         "empty": {"title": "Votes", "text": "Your votes on AtomOne proposals will be listed here."}},
         {"id": "governors", "label": "Governors", "route": "governors", "group": "Governance",
-         "empty": {"title": "Governors", "text": "The governors your wallet follows will be listed here."}}
+         "empty": {"title": "Governors", "text": "AtomOne governors will be listed here."}}
       ]
     }
   ]

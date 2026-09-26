@@ -1496,7 +1496,10 @@ rememberGridH();
     x.onload = function(){
       back = 0;
       try{
-        if(x.status === 200 && window.__applyLive(JSON.parse(x.responseText))){
+        var lj = x.status === 200 ? JSON.parse(x.responseText) : null;
+        /* the network-uptime history (live.py): kept as it comes, drawn by the Network screen */
+        if(lj && lj.up){ window.__UP = lj.up; window.dispatchEvent(new Event("thermo:up")); }
+        if(lj && window.__applyLive(lj)){
           /* a block with no stake moving is a height tick: the clock and the height
              follow it, the map and the lists do not rebuild for nothing */
           if(window.__liveMoved()) window.__redraw();
