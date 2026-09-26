@@ -150,7 +150,8 @@
     var V = VALS(), rs = [], i;
     for(i = 0; i < V.length; i++) rs.push({ id: V[i][3], r: rate0(V[i][1], V[i][2]) });
     var sorted = rs.map(function(x){ return x.r; }).sort(function(a, b){ return a - b; });
-    var lo = sorted[Math.floor(sorted.length * .02)] || 0, hi = sorted[Math.ceil(sorted.length * .98) - 1] || 0;
+    var k = sorted.length >= 20 ? Math.max(1, Math.floor(sorted.length * .02)) : 0;   /* as the map's ramp() */
+    var lo = sorted[k] || 0, hi = sorted[sorted.length - 1 - k] || 0;
     if(!(hi > lo)){ lo = sorted[0] || 0; hi = sorted[sorted.length - 1] || 1; }
     var NB = 20, w = (hi - lo) / NB || 1, bin = function(r){ return Math.max(0, Math.min(NB - 1, Math.floor((r - lo) / w))); };
     var cnt = [], own = [], ids = [], allow = [], total = 0;

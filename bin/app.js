@@ -310,7 +310,11 @@ function cell(i, u, aprPct, title, flat){
    the colour scale is. */
 function ramp(a){
   var s = a.slice().sort(function(x, y){ return x - y; });
-  var lo = s[Math.floor(s.length * 0.02)], hi = s[Math.ceil(s.length * 0.98) - 1];
+  /* the colour scale ignores the outer 2% at each end - at least one value each side once the
+     set has 20 or more, or on a small set (testnet: 43) the rounding kept the outlier and one
+     tiny validator set the top of the scale, pressing every other cell into the red */
+  var k = s.length >= 20 ? Math.max(1, Math.floor(s.length * 0.02)) : 0;
+  var lo = s[k], hi = s[s.length - 1 - k];
   if(!(hi > lo)){ lo = s[0]; hi = s[s.length - 1]; }
   return [lo, hi - lo];
 }
