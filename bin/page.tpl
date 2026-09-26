@@ -1418,25 +1418,6 @@ background:radial-gradient(closest-side,rgba(255,176,46,.10),rgba(98,217,255,.05
 .intro h1{position:relative;margin:0;font-size:clamp(30px,4.6vw,58px);font-weight:800;letter-spacing:-.035em;line-height:1.05;color:var(--ink);max-width:16ch;text-wrap:balance}
 .intro h1 em{font-style:normal;background:linear-gradient(92deg,#ffd07a 0%,#ffb02e 35%,#62d9ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .intro p{position:relative;margin:22px 0 0;font-size:clamp(14px,1.35vw,17.5px);line-height:1.55;color:var(--ink2);max-width:52ch;text-wrap:balance}
-.intro3{position:relative;display:flex;gap:14px;margin-top:34px;justify-content:center;flex-wrap:wrap}
-/* three doors: two inside, one out (the constitution, in its own repository) */
-.i3{display:inline-flex;align-items:center;gap:10px;height:44px;padding:0 20px;border-radius:7px;border:0;cursor:pointer;text-decoration:none;
-font:inherit;color:var(--ink);background:var(--card);box-shadow:inset 0 0 0 1px var(--edge2),inset 0 1px 0 rgba(255,255,255,.04);transition:box-shadow .2s,color .2s,transform .12s}
-.i3 b{font-size:15px;font-weight:600;letter-spacing:-.01em}
-.i3 .sgoarr{color:var(--acc);font-size:15px;transition:transform .2s}
-.i3:hover{box-shadow:inset 0 0 0 1px var(--acc),0 0 18px -8px var(--acc)}
-.i3:hover .sgoarr{transform:translateX(3px)}
-.i3:active{transform:translateY(1px)}
-.i3:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-.i3:disabled{cursor:default;color:var(--ink3);box-shadow:inset 0 0 0 1px var(--edge)}
-.i3:disabled:hover{box-shadow:inset 0 0 0 1px var(--edge)}
-@media(max-width:700px){.intro3{flex-direction:column;align-items:stretch}.i3{justify-content:space-between}}
-/* a section that is not built yet is a word with a tag, not a door */
-
-.fsoon{position:absolute;top:15px;right:-14px;font-style:normal;font-size:6.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);
-border:1px solid rgba(255,176,46,.35);border-radius:2px;padding:1px 3px;line-height:1.2;margin:0;background:transparent}
-.i3{position:relative}
-.i3 .fsoon{top:6px;right:8px}
 /* My wallet: a chip in the bar - a mark and a word, framed; lit in cyan once you are in */
 
 @media(max-width:620px){.brand{margin-right:16px;gap:8px}.brand .mark{width:28px;height:28px}
@@ -1668,7 +1649,6 @@ html[data-tab=dele] .calclab,html[data-tab=empty] .calclab,html[data-tab=connect
 body{background:var(--void);background-image:radial-gradient(130% 62% at 50% 0%,#16162e 0%,#0a0a16 42%,var(--void) 74%)}
 /* the bar: words in caps, the chip in caps */
 .folder{background:linear-gradient(180deg,#0f0f20,rgba(6,6,12,0));border-bottom-color:var(--edge)}
-.fsoon{font-family:var(--mono);font-weight:400}
 /* the calculator: title, tabs, the view row, the stages, flat tiles */
 .bt{font-size:clamp(16px,1.7vw,20px);font-weight:600;letter-spacing:-.015em}
 
@@ -2589,7 +2569,6 @@ border-color:var(--wbd2);}
 #wk-mine .wk-pf{display:none}
 
 /* the phone bar: the mark, two words, the wallet as its glyph alone */
-@media(max-width:620px){.fsoon{top:10px;right:-12px}}
 /* ── the section fills the calculator's frame: the wallet down the left to the floor,
    Redelegate over Outcome on the right (rows named, not equal - 1.35 : 1) ── */
 @media(min-width:901px){
@@ -3962,11 +3941,6 @@ html[data-tab=connect] .l2host{display:none}
   <section class=pane id=p-intro><div class=w>
     <div class=intro>
       <h1>The chain that <em>rewards decentralization</em></h1>
-      <nav class=intro3>
-        <a class=i3 href="#/staking" style="--acc:#ffb02e"><b>Nakamoto APR</b><span class=sgoarr>&rarr;</span></a>
-        <a class=i3 href="#/governance" style="--acc:#2bc8bd"><b>Governance</b><i class=fsoon>soon</i></a>
-        <a class=i3 href="https://github.com/atomone-hub/genesis/blob/main/CONSTITUTION.md" target=_blank rel="noopener noreferrer" style="--acc:#b9b0ff"><b>Constitution</b><span class=sgoarr>&nearr;</span></a>
-      </nav>
       <a class=introby href="https://gatahub.zone/" target=_blank rel="noopener noreferrer" title="GATA HUB"><span>powered by</span><img src="assets/gata.png" alt="GATA HUB"></a>
     </div>
   </div></section>
