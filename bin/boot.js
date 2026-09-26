@@ -10,7 +10,7 @@ try{
 /* The navigation shell, before paint. The route in the address - #/{section}/{view} - says
    which section and view are open; with none, the last tab this browser had (th_tab, and for
    the dashboard its view), else the config's home. It stamps html[data-sec], [data-sv],
-   [data-tab], [data-ui], [data-svs], [data-ver]: the attributes every tab and pane rule keys on, so the
+   [data-tab], [data-ui], [data-svs], [data-grp]: the attributes every tab and pane rule keys on, so the
    right tab is lit and the right pane is up before anything paints. shell.js takes over. */
 try{(function(){
   var R = document.documentElement, C = JSON.parse(document.getElementById("shellcfg").textContent), S = C.sections;
@@ -20,17 +20,10 @@ try{(function(){
   function bytab(t, pick){ for(var i = 0; i < S.length; i++) for(var j = 0; j < S[i].sub.length; j++)
     if(S[i].sub[j].tab === t && (!pick || pick(S[i].sub[j]))) return [S[i], S[i].sub[j]]; return null; }
   var mem = {}; try{ mem = JSON.parse(sessionStorage.getItem("shell_last") || "{}"); }catch(e){}
-  /* the version switch (Simple / Advanced) is the reader's, kept per browser; a view that is
-     off - always, or in the open version - cannot be open */
-  var ver = localStorage.getItem("th_ui") === "pro" ? "pro" : "simple";
-  R.setAttribute("data-ver", ver);
-  function eff(s, v){
-    var o = v.pro, r = {}, k;
-    if(v.off) return null;
-    if(ver !== "pro" || !s.version || !o) return v;
-    if(o === "hide" || o === "off") return null;
-    for(k in v) r[k] = v[k]; for(k in o) r[k] = o[k]; return r;
-  }
+  /* a view that is off (announced, not built) cannot be open; the old Simple/Advanced switch
+     is gone, and with it its key */
+  try{ localStorage.removeItem("th_ui"); }catch(e){}
+  function eff(s, v){ return v.off ? null : v; }
   var h = (location.hash || "").replace(/^#\/?/, "").split("/"), s = null, v = null, f;
   if(h[0] === "intro"){ R.setAttribute("data-tab", "intro"); return; }
   if(h[0] && (s = sec("route", h[0]))) v = s.entry === "first" ? s.sub[0] : (h[1] && sub(s, "route", h[1])) || sub(s, "id", mem[s.id]) || s.sub[0];
@@ -43,9 +36,11 @@ try{(function(){
     else { var hm = (C.home || "").split("/"); s = sec("route", hm[0]); v = s && sub(s, "route", hm[1]); }
   }
   if(!s || !v) return;
-  /* a view the open version leaves out opens the section's first one that it keeps */
+  /* a view that is off opens the section's first one that is not */
   if(!eff(s, v)) for(var i = 0; i < s.sub.length; i++) if(eff(s, s.sub[i])){ v = s.sub[i]; break; }
   R.setAttribute("data-sec", s.id); R.setAttribute("data-sv", s.id + "/" + v.id);
+  /* a section with a group switch shows one group's tabs: the open view's */
+  if(s.switch && v.group) R.setAttribute("data-grp", v.group); else R.removeAttribute("data-grp");
   v = eff(s, v);
   R.setAttribute("data-tab", s.account === "required" && !localStorage.getItem("th_wallet") ? "connect" : (v.tab || "empty"));
   if(v.ui === "simple"){ R.setAttribute("data-ui", "simple"); if(v.screen) R.setAttribute("data-svs", v.screen); }

@@ -528,7 +528,8 @@
   html[data-theme=light]:not([data-mono]) .sv-tbl tbody tr.mine{background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) .sv-tbl tbody tr.mine td:first-child{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-seg[aria-pressed=true]{color:#FFFFFF}
-  html[data-theme=light]:not([data-mono]) .sv-bw i em{color:var(--warn)}
+  html[data-theme=light]:not([data-mono]) .sv-bw i{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .sv-bw i em{color:var(--warn);text-shadow:none}
   html[data-theme=light]:not([data-mono]) .pop .card.atcard{--av:var(--accent)}
   html[data-theme=light]:not([data-mono]) .pop .card.atcard::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .atcard .txsum{color:var(--muted)}
@@ -581,6 +582,7 @@
   }
   html[data-theme=light]:not([data-mono]){--l2-off:var(--faint)}
   html[data-theme=light]:not([data-mono]) .l1tab{background:transparent}
+  html[data-theme=light]:not([data-mono]) .brandbar .tsfx.net{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .l2tab{background:transparent}
   html[data-theme=light]:not([data-mono]) .l2gl{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .l2.split .l2trk{background:none}
@@ -660,7 +662,7 @@
 
   /* the simple view: its small labels ride on --wf, which is a day paper's faint
      grey - under 4.5:1 at these sizes. Colour only; the sizes are the night sheet's. */
-  html[data-theme=light]:not([data-mono]) #sv .sv-k,html[data-theme=light]:not([data-mono]) #sv .sv-bw i,
+  html[data-theme=light]:not([data-mono]) #sv .sv-k,
   html[data-theme=light]:not([data-mono]) #sv .sv-fig span,html[data-theme=light]:not([data-mono]) #sv .sv-tag,
   html[data-theme=light]:not([data-mono]) #sv .sv-sub s,html[data-theme=light]:not([data-mono]) #sv .sv-chip u,
   html[data-theme=light]:not([data-mono]) #sv .sv-nm .tx i,html[data-theme=light]:not([data-mono]) #sv .sv-sm,
@@ -674,7 +676,7 @@
 
   /* the dashboard's sub-header sits outside #sv (it is the window's own row), so the
      same floors are named for it: colour only, the sizes are the night sheet's */
-  html[data-theme=light]:not([data-mono]) .brandbar .sv-bw i,html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mh,html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mi i,
+  html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mh,html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mi i,
   html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mi:disabled{color:var(--muted)}
 
   /* the navigation shell's "soon" badge: on a lit level-1 tab the tint lowers its ground */
@@ -706,4 +708,7 @@
      plum into a hollow ring) */
   html[data-theme=light]:not([data-mono]) .sv-hint i.lo{background:#572179;box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-hint i.hi{background:#e0a21e;box-shadow:none}
+  /* the lockup's line in full ink, its last words in a deep amber */
+  html[data-theme=light]:not([data-mono]) .sv-bw i{color:#16141f}
+  html[data-theme=light]:not([data-mono]) .sv-bw i em{color:#b8690a;text-shadow:none}
 

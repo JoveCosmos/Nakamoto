@@ -3000,7 +3000,8 @@ html[data-ui=simple][data-tab=dele] .w#calc>#p-dele{display:none}
 .sv-bw{display:flex;align-items:baseline;gap:10px;line-height:1;min-width:0}
 .sv-bw b{font-size:19px;font-weight:800;letter-spacing:-.01em;color:var(--wt)}
 .sv-bw i{font-style:normal;font-family:var(--wsans);font-size:13px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-html:not([data-ver=pro]) .svtag.a,html[data-ver=pro] .svtag.s{display:none}
+/* Overview and Autopilot say what GATA is; Self (the three panes) says what it is for */
+html:not([data-ui=simple]) .svtag.s,html[data-ui=simple] .svtag.a{display:none}
 .sv-who{display:flex;align-items:center;gap:9px;flex:1 1 0;justify-content:flex-end;min-width:0}
 /* connected: one pill the size of the Connect button - the wallet's mark, its address with a
    small copy glyph (one control), and a disconnect icon behind a hairline. No menu. */
@@ -3433,8 +3434,8 @@ font-family:var(--wmono);font-size:11px;font-weight:700;color:#0b0b18;background
 .sv-bw{align-items:center}
 /* set like the calculator's own title ("Nakamoto Bonus"): the line in ink, its last words in the
    section's amber */
-.sv-bw i{font-family:var(--wsans);font-size:clamp(16px,1.35vw,20px);font-weight:700;letter-spacing:-.012em;color:var(--wt)}
-.sv-bw i em{font-style:normal;color:#ffb02e}
+.sv-bw i{font-family:var(--wsans);font-size:clamp(17px,1.45vw,21px);font-weight:800;letter-spacing:-.02em;line-height:1;color:#fff}
+.sv-bw i em{font-style:normal;color:#ffb02e;text-shadow:0 0 18px rgba(255,176,46,.45)}
 .sv-brand{gap:12px}
 @media(max-width:900px){
   .sv-hmeta{flex:1 1 100%;white-space:normal;line-height:1.6}
@@ -3631,6 +3632,7 @@ transition:color .15s,background .15s}
 .l1badge{font-style:normal;font-family:var(--mono);font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--hot);border:1px solid;border-radius:99px;
 padding:2px 5px;line-height:1;opacity:.85}
 .brandbar [data-title-for]{display:none}
+.brandbar .tsfx.net{color:#2bc8bd}
 .brandbar .sv-brand{flex:0 1 auto}
 .l2host{margin-left:auto;display:flex;align-items:center;min-width:0;max-width:100%}
 .l2{display:none;align-items:center;min-width:0;max-width:100%}
@@ -3656,9 +3658,12 @@ transform:scaleX(var(--l2-lit,0));transition:transform .2s}
 /* a view that is off - announced, or not part of the open version - stays in its place,
    greyed, and does nothing */
 .l2tab[aria-disabled=true],.l2tab[aria-disabled=true]:hover{color:var(--l2-off);cursor:not-allowed}
-/* a section's version switch (the dashboard's Simple / Advanced): a two-pill track at the
-   end of the row, labelled like a group; it is a pair of toggle buttons, not tabs - it
-   changes how the views look, not which one is open */
+/* a section's group switch (the dashboard's Staking | Governance): a two-pill track at the end
+   of the row; it is a pair of toggle buttons, not tabs. The row between shows the open group's
+   views only (the generated rules show one .l2g by html[data-grp]); the switch names the group,
+   so the group's own label and the hairline between groups are not needed */
+.l2.grp .l2g,.l2.grp .l2div,.l2.grp .l2gl{display:none}
+.l2vb[aria-disabled=true],.l2vb[aria-disabled=true]:hover{color:var(--l2-off);cursor:not-allowed}
 .l2ver{display:none;flex-direction:column;align-items:flex-start;gap:3px;align-self:flex-end}
 .l2ver .l2trk{padding:2px}
 .l2vb{position:relative;flex:0 0 auto;display:inline-flex;align-items:center;height:25px;padding:0 12px;border:0;border-radius:999px;background:transparent;
@@ -3701,12 +3706,12 @@ background:transparent;color:var(--ink);font:inherit;font-size:12.5px;text-decor
 html[data-tab=connect] .l2host{display:none}
 /* level 1 between phone and desktop: three equal columns stop fitting under ~870px (the
    controls need 218px), so the sections centre in what the mark and the controls leave;
-   under 760px not even that fits, and the header takes the phone's two lines */
+   under 800px not even that fits (four sections), and the header takes the phone's two lines */
 @media(min-width:621px) and (max-width:900px){
   .folder{grid-template-columns:auto minmax(0,1fr) auto}
   .folder>.l1{justify-self:center}
 }
-@media(min-width:621px) and (max-width:759px){
+@media(min-width:621px) and (max-width:799px){
   .folder{height:auto;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"brand right" "nav nav";padding:6px 20px 4px;row-gap:2px}
   .folder>.l1{justify-self:stretch;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;width:100%}
   .l1tab{height:36px}
@@ -3767,6 +3772,7 @@ html[data-tab=connect] .l2host{display:none}
       <span class=calclab>Nakamoto</span>
     <header class=brandbar>
       <div class=bwrap data-title-for=staking><div class=bt><span class=btx><i class=nk>Nakamoto </i><i class=tsfx id=tsfx>Bonus</i></span></div></div>
+      <div class=bwrap data-title-for=network><div class=bt><span class=btx><i class=nk>AtomOne </i><i class="tsfx net">Network</i></span></div></div>
       <div class=bwrap data-title-for=governance><div class=bt><span class=btx><i class=nk>Governance </i><i class="tsfx tsub">Proposals</i></span></div></div>
       <span class=sv-brand data-title-for=dashboard><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><i class="svtag s">Non-custodial <em>staking</em></i><i class="svtag a">Decentralize the chain and <em>earn more</em></i></span><span class=welc id=svwelc hidden></span></span>
       <div class=l2host>{{SHELL_L2}}</div>

@@ -474,7 +474,7 @@
   window.__dashView = function(ui, scr){
     if(ui === "simple"){ root.setAttribute("data-ui", "simple"); if(scr) root.setAttribute("data-svs", scr); }
     else root.removeAttribute("data-ui");
-    /* th_ui is the version switch's (shell.js); this only remembers the screen */
+    /* this only remembers the screen */
     try{ if(scr) localStorage.setItem("th_svs", scr); }catch(e){}
     render();
   };

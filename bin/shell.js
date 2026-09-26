@@ -22,19 +22,9 @@
 
   function sec(k, v){ for(var i = 0; i < SECS.length; i++) if(SECS[i][k] === v) return SECS[i]; return null; }
   function sub(s, k, v){ for(var i = 0; i < s.sub.length; i++) if(s.sub[i][k] === v) return s.sub[i]; return null; }
-  /* the version switch: Simple or Advanced, the reader's own (th_ui), never part of a route.
-     A view's 'pro' says what it shows in Advanced - fields over its own - or 'hide' (its tab
-     leaves the row) or 'off' (its tab stays, greyed and inert). A view with 'off' set is inert
-     in both. eff() is the view as it stands now, null when it cannot be open. */
-  var VER = R.getAttribute("data-ver") || "simple";
-  function eff(s, v){
-    if(!s || !v) return v;
-    var o = v.pro, r = {}, k;
-    if(v.off) return null;
-    if(VER !== "pro" || !s.version || !o) return v;
-    if(o === "hide" || o === "off") return null;
-    for(k in v) r[k] = v[k]; for(k in o) r[k] = o[k]; return r;
-  }
+  /* A view that is 'off' is announced, not built: its tab stays in the row, greyed and inert,
+     and it cannot be open. eff() is the view, or null when it cannot be open. */
+  function eff(s, v){ if(!s || !v) return v; return v.off ? null : v; }
   function shown(s, v){ if(eff(s, v)) return v; for(var i = 0; i < s.sub.length; i++) if(eff(s, s.sub[i])) return s.sub[i]; return v; }
   function esc(v){ return String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
 
@@ -88,10 +78,11 @@
     SECS.forEach(function(x){ x.sub.forEach(function(w){
       var b = E("l2-" + x.id + "-" + w.id), e = eff(x, w); if(!b) return;
       if(e){ b.setAttribute("aria-controls", e.panel || "p-empty"); b.removeAttribute("aria-disabled"); b.removeAttribute("title"); }
-      else { b.setAttribute("aria-disabled", "true"); b.title = w.off ? (w.offnote || "Coming soon") : "In the Simple view"; }
+      else { b.setAttribute("aria-disabled", "true"); b.title = w.offnote || "Coming soon"; }
     }); });
+    /* the group switch: the open view's group is the pressed one */
     Array.prototype.forEach.call(document.querySelectorAll(".l2vb"), function(b){
-      b.setAttribute("aria-pressed", b.dataset.ver === VER ? "true" : "false"); });
+      b.setAttribute("aria-pressed", s && v && s.switch && b.dataset.g === v.group ? "true" : "false"); });
     var calc = E("calc");
     if(calc){
       if(s){ calc.setAttribute("aria-labelledby", "l1-" + s.id); calc.removeAttribute("aria-label"); }
@@ -165,6 +156,7 @@
     else {
       tab = wantsConnect(s) ? "connect" : (e.tab || "empty");
       R.setAttribute("data-sec", s.id); R.setAttribute("data-sv", s.id + "/" + v.id);
+      if(s.switch && v.group) R.setAttribute("data-grp", v.group); else R.removeAttribute("data-grp");
       if(tab === "dele" && window.__dashView) window.__dashView(e.ui, e.screen);
       var pn = panelOf(s, v); if(pn && pn.id !== "p-connect") pn.setAttribute("aria-labelledby", "l2-" + s.id + "-" + v.id);
       if(tab === "empty") fillEmpty(s, v);
@@ -180,18 +172,18 @@
     var h = hashOf(s, v);
     if(how === "push" && location.hash !== h) history.pushState(null, "", h);
     else if(how === "replace" && location.hash !== h) history.replaceState(null, "", h);
-    if(s) remember(s, v);
+    if(s){ remember(s, v); if(s.switch && v.group) GLAST[s.id + "/" + v.group] = v; }
     if(prevS !== s || prevV !== v) toTop(s, v);
   }
-  /* the switch: the same view, the other way of looking at it (or, if that version leaves it
-     out, the section's first view that it keeps); the address does not change */
-  function setVer(x){
-    if(x === VER) return;
-    VER = x; R.setAttribute("data-ver", x);
-    try{ localStorage.setItem("th_ui", x); }catch(e){}
-    if(cur.s) go(cur.s, cur.v, "replace"); else sync();
+  /* the group switch (Staking | Governance): a group opens on the view last open in it this
+     session, else its first view that can be open */
+  var GLAST = {};
+  function openGroup(g){
+    var s = cur.s; if(!s || !s.switch || (cur.v && cur.v.group === g)) return;
+    var v = GLAST[s.id + "/" + g], i;
+    if(!v || !eff(s, v)) for(v = null, i = 0; i < s.sub.length; i++) if(s.sub[i].group === g && eff(s, s.sub[i])){ v = s.sub[i]; break; }
+    if(v) go(s, v, "push");
   }
-  window.__shellVer = setVer;
   window.__shellGo = function(route){ var r = parse("#/" + route); if(r) r.intro ? go(null, null, "push") : go(r.s, r.v, "push"); };
 
   function activate(b){
@@ -206,7 +198,7 @@
   document.addEventListener("click", function(ev){
     var t = ev.target.closest ? ev.target.closest(".l1tab,.l2tab,.l2vb,[data-route],[data-shell-connect]") : null;
     if(!t) return;
-    if(t.classList.contains("l2vb")){ setVer(t.dataset.ver); return; }
+    if(t.classList.contains("l2vb")){ if(t.getAttribute("aria-disabled") !== "true") openGroup(t.dataset.g); return; }
     if(t.hasAttribute("data-shell-connect")){ var c = E("svconn"); if(c) c.click(); return; }
     if(t.hasAttribute("data-route")){ ev.preventDefault(); window.__shellGo(t.getAttribute("data-route")); return; }
     activate(t);
