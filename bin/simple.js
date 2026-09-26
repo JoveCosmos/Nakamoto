@@ -559,7 +559,7 @@
     var bad = list.filter(function(x){ return x.k; });
     SG.list = list; SG.rows = rows;
     var h = '<div class=sv-ph><h3>Signing</h3><span class=sv-gkey><i class=ok></i>signed<i class=bad></i>missed</span><div class=sv-rt>' +
-      st("Signed every block", (list.length - bad.length) + " of " + list.length, n ? "last " + n + " blocks" : "reading the blocks…") +
+      st("Signed", (list.length - bad.length) + " of " + list.length, n ? "last " + n + " blocks" : "reading the blocks…") +
       st("Missed signatures", n ? String(tot) : "—", !n ? "" : tot ? "across " + bad.length + " validator" + (bad.length === 1 ? "" : "s") : "none in the window", "#ff4d1f") +
       st("Most missed", bad.length ? esc(bad[0].m) : n ? "none" : "—", bad.length ? bad[0].k + " of " + n + " blocks" : n ? "all signed" : "", "#ff4d1f") + '</div></div>';
     if(!n){ put("sv-signp", h + '<div class=sv-upwait>Reading the latest blocks…</div>'); return; }
