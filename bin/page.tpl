@@ -3279,6 +3279,10 @@ background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opac
 .sv-upm.rt{transform:translateX(calc(-100% + 10px));flex-direction:row-reverse}
 .sv-upm b{font-weight:600}
 .sv-uplg{width:20px;height:20px;border-radius:6px;overflow:hidden;flex:0 0 auto;box-shadow:0 0 0 1.5px #ff4d1f}
+.sv-uplgs{display:inline-flex;flex:0 0 auto}
+.sv-uplgs .sv-uplg+.sv-uplg{margin-left:-7px}
+.sv-upm.rt .sv-uplgs{flex-direction:row-reverse}
+.sv-upm.rt .sv-uplgs .sv-uplg+.sv-uplg{margin-left:0;margin-right:-7px}
 .sv-uplg img,.sv-uplg .lg{width:20px;height:20px;display:grid;place-items:center;object-fit:cover;font-size:9px;font-weight:700;color:#fff}
 .sv-upplot{position:relative;flex:1 1 auto;min-height:0;border-bottom:1px solid var(--wbd2);cursor:crosshair}
 .sv-upbars{position:absolute;inset:0;display:flex;align-items:flex-end;gap:2px}

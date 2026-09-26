@@ -472,15 +472,32 @@
     var bars = rows.map(function(r, i){
       var missed = r[1] < r[2];
       return '<i class="' + (missed ? "miss" : "") + (i === n - 1 ? " tip" : "") + (i === UPHOVER ? " on" : "") + '" style="--h:' + H(pc[i]) + '%" data-i="' + i + '"></i>'; }).join("");
-    var marks = "", lastLabel = 1e9;
+    /* the misses on the plot, as clusters: misses closer than a label's room are one mark at
+       their middle - each validator's logo once (three at most, overlapping), then the names,
+       two and a count of the rest. A label that would run into the next mark shortens to one
+       name and a count, then to logos alone; the tooltip always names everyone and the blocks. */
+    var cl = [], W = Math.max(300, ((E("sv-up") || {}).clientWidth || 1200) - 32), px = function(p){ return p / 100 * W; };
     for(var i = n - 1; i >= 0; i--){
       var r = rows[i]; if(!(r[1] < r[2]) || !r[3]) continue;
-      var vs = r[3].split(",").map(who), x = (i + .5) / n * 100, lab = lastLabel - x > 11;
-      if(lab) lastLabel = x;
-      marks += '<span class="sv-upm' + (lab ? "" : " bare") + (x > 80 ? " rt" : "") + '" style="left:' + x.toFixed(2) + '%" title="' +
-        esc("block " + Number(r[0]).toLocaleString() + ": missed by " + vs.map(function(v){ return v.m; }).join(", ")) + '">' +
-        '<span class=sv-uplg>' + logo(vs[0].id, vs[0].m) + '</span>' + (lab ? '<b>' + esc(vs[0].m) + (vs.length > 1 ? " +" + (vs.length - 1) : "") + '</b>' : "") + '</span>';
+      var x = (i + .5) / n * 100, c = cl[cl.length - 1];
+      if(!c || px(c.lo - x) > 150) cl.push(c = { lo: x, hi: x, vs: [], seen: {}, blocks: [] });
+      c.lo = x; c.blocks.push(Number(r[0]));
+      r[3].split(",").map(who).forEach(function(v){ var k = v.id || v.m; if(!c.seen[k]){ c.seen[k] = 1; c.vs.push(v); } });
     }
+    cl.reverse();                                   /* oldest first, so each knows the next one's place */
+    var lab = function(c, full){ var k = c.vs.length, nm = c.vs.slice(0, full ? 2 : 1).map(function(v){ return v.m; }).join(", ");
+      var rest = k - (full ? 2 : 1); return nm + (rest > 0 ? " +" + rest : ""); };
+    var marks = cl.map(function(c, ci){
+      var x = (c.lo + c.hi) / 2, rt = x > 80, nx = cl[ci + 1], room = nx ? px((nx.lo + nx.hi) / 2 - x) - 30 : 1e9;
+      var lg = Math.min(3, c.vs.length), lw = 20 + (lg - 1) * 13 + 6, txt = lab(c, true);
+      if(!rt && lw + txt.length * 6.3 > room) txt = lab(c, false);
+      if(!rt && lw + txt.length * 6.3 > room) txt = "";
+      return '<span class="sv-upm' + (txt ? "" : " bare") + (rt ? " rt" : "") + '" style="left:' + x.toFixed(2) + '%" title="' +
+        esc("missed by " + c.vs.map(function(v){ return v.m; }).join(", ") + " · block" + (c.blocks.length > 1 ? "s " : " ") +
+          c.blocks.slice().reverse().map(function(b){ return b.toLocaleString(); }).join(", ")) + '">' +
+        '<span class=sv-uplgs>' + c.vs.slice(0, 3).map(function(v){ return '<span class=sv-uplg>' + logo(v.id, v.m) + '</span>'; }).join("") + '</span>' +
+        (txt ? '<b>' + esc(txt) + '</b>' : "") + '</span>';
+    }).join("");
     var hv = UPHOVER >= 0 && UPHOVER < n ? rows[UPHOVER] : null;
     put("sv-up", head +
         '<span class=sv-upwin>last ' + n + ' blocks ~' + mins + ' min</span>' +
