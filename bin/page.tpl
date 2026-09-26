@@ -3470,6 +3470,9 @@ background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opac
 .sv-boxes.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 .sv-boxes.three{grid-template-columns:repeat(3,minmax(0,1fr))}
 .sv-boxes.four{grid-template-columns:minmax(0,1.25fr) repeat(3,minmax(0,1fr))}
+.sv-boxes.four.eq{grid-template-columns:repeat(4,minmax(0,1fr))}
+.sv-boxes.eq .sv-bm{white-space:normal;line-height:1.35}
+.sv-mv.eq .sv-bv{font-size:30px}
 .sv-box{--bc:var(--wbd2);display:flex;flex-direction:column;gap:4px;min-width:0;padding:11px 14px 12px;border-radius:10px;
 border:1px solid var(--wbd);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012)),#0a0a17;position:relative;overflow:hidden}
 .sv-bl{display:flex;align-items:center;gap:7px;font-family:var(--wmono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ws);white-space:nowrap}
@@ -3495,6 +3498,8 @@ font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overfl
 .sv-mv .b-gain .sv-bv{font-size:28px}
 .sv-mvnote{font-size:11.5px;color:var(--wf)}
 #sv-optp .sv-note{margin-top:auto}
+.sv-jail{font-size:12px;line-height:1.5;color:var(--ws);padding:7px 12px;border-radius:8px;border:1px solid rgba(255,176,46,.35);background:rgba(255,176,46,.07)}
+.sv-jail b{color:var(--sv-amber);font-weight:700}
 /* the steps a first visit sees, one under another in the narrower column */
 .sv-steps.col{grid-template-columns:minmax(0,1fr);gap:8px}
 /* the validators: the scale, its key, then one shaded row each */
@@ -3532,7 +3537,7 @@ position:relative;overflow:hidden;min-width:0;min-height:0}
 }
 @media(max-width:900px){
   .sv-row2{grid-template-columns:minmax(0,1fr);flex:0 0 auto}
-  .sv-boxes.four{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sv-boxes.four,.sv-boxes.four.eq{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:620px){
   .sv-boxes.three{grid-template-columns:repeat(2,minmax(0,1fr))}

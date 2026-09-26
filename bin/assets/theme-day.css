@@ -541,6 +541,7 @@
   html[data-theme=light]:not([data-mono]) .b-rew .sv-bv{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .b-aft{border-color:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .b-gain{--bc:var(--accent);background:var(--accent-soft),var(--surface-2);border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-jail{border:1px solid var(--amber-bar);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) .sv-vr{background:var(--surface-2),var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sv-vr .sv-lgo img,html[data-theme=light]:not([data-mono]) .sv-vr .sv-lgo .lg{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .sv-va{text-decoration:none}

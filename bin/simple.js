@@ -164,10 +164,10 @@
           (window.__dayFull ? window.__dayFull(pos.until) : "") + '</b>.</div>';
     } else if(!plan || !(plan.gain > 0.5) || plan.after == null){
       h = '<div class=sv-ph><h3>Nothing to gain by moving</h3></div>' +
-          '<div class="sv-boxes two">' + box("now", "Your APR", '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>', "what your stake earns now", "--bc:" + heat(pos.rate).fill) +
+          '<div class="sv-boxes four eq sv-mv">' + box("now", "Your APR", '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>', "what your stake earns now", "--bc:" + heat(pos.rate).fill) +
             box("hi", "Best in the set", '<span style="color:' + heat(S.hi).ink + '">' + pct(S.hi) + '</span>', "the highest APR any validator pays", "--bc:" + heat(S.hi).fill) +
             box("stk", "Can move", fmt(pos.free), "ATONE free to redelegate") + box("tot", "Validators", String(pos.rows.length), "holding your stake") + '</div>' +
-          '<div class=sv-note>Your stake already earns as much as the set can pay it today. This window re-reads the chain every block and will say so when that changes.</div>';
+          '<div class=sv-note>Your stake already earns as much as the set can pay it today. This window re-reads the chain every block and will say so when that changes.</div>' + jailNote(pos);
     } else {
       /* now -> after -> a year: the stake as it earns today, where the plan puts it, and what
          that is worth - each side drawn in the colours the map gives it */
@@ -215,6 +215,19 @@
     var key = pos.total + "/" + pos.free + "/" + (window.__LIVEV ? window.__LIVEV() : 0) + "/" + (window.__POSAT || 0);
     if(PC.key !== key){ PC.key = key; PC.val = window.__optPlan(false); }
     return PC.val;
+  }
+  /* the reader's validators with a jailing on record, said plainly - only when there are any:
+     a record of Never says nothing */
+  function jailNote(pos){
+    var V = VALS(), by = {}, i;
+    for(i = 0; i < V.length; i++) if(V[i][4]) by[V[i][3]] = V[i][4];
+    var js = pos.rows.filter(function(r){ return by[r.id]; }).sort(function(a, b){ return by[b.id] - by[a.id]; });
+    if(!js.length) return "";
+    var nm = function(r){ return '<b>' + esc(r.m) + '</b>'; };
+    return '<div class=sv-jail>' + (js.length === 1
+      ? 'Your validator ' + nm(js[0]) + ' has been jailed ' + by[js[0].id] + '× in the past.'
+      : 'Your validators ' + js.slice(0, 3).map(function(r){ return nm(r) + ' (' + by[r.id] + '×)'; }).concat(js.length > 3 ? [(js.length - 3) + ' more'] : [])
+          .join(", ").replace(/, ([^,]*)$/, " and $1") + ' have been jailed in the past.') + '</div>';
   }
   /* one side of the plan: its APR in its own heat, and the stake as a bar of heat segments */
   function side(cls, lab, big, h, sub, segs){
