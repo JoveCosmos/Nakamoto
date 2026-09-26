@@ -1,0 +1,12 @@
+{
+  "name": "gata-authz-signer",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "GATA autopilot: signs authz MsgExec redelegations on AtomOne with its own key",
+  "dependencies": {
+    "@cosmjs/proto-signing": "^0.32.4",
+    "@cosmjs/stargate": "^0.32.4",
+    "cosmjs-types": "^0.9.0"
+  }
+}
