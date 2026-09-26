@@ -760,7 +760,7 @@
   }
   /* a bar's reading, at once (the native title waits a second): the bar's data-t, above it */
   function barHover(ev){
-    var b = ev.target.closest ? ev.target.closest(".sv-bars i[data-t],.sv-pace i[data-t],.sd-plot i[data-t]") : null;
+    var b = ev.target.closest ? ev.target.closest(".sv-bars i[data-t],.sv-pace i[data-t]") : null;
     Array.prototype.forEach.call(document.querySelectorAll(".sv-btip.on"), function(x){ if(!b || x.parentNode !== b.parentNode) x.classList.remove("on"); });
     if(!b) return;
     var box = b.parentNode, t = box.querySelector(".sv-btip");
