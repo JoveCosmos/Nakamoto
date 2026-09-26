@@ -328,7 +328,8 @@ function fields(e){
      figure - and a heat fill behind it just repeats Map in a second place. */
   var heat = MODE === "color";
   /* the halt marker is live math, never the slider's hypothetical set */
-  HALT = haltCount(VALS.map(function(v){ return v[1]; }));
+  /* testnet: no halting-set outline on the map (the operator's call); the count is in the Bonus card */
+  HALT = (D.net || {}).net === "testnet" ? 0 : haltCount(VALS.map(function(v){ return v[1]; }));
   /* In graph mode the 100-cell grid is display:none, and rebuilding its markup
      anyway is what made the Graph button feel slow - a hundred cells parsed on
      every switch for something nobody can see. The APR band below it is still

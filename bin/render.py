@@ -206,7 +206,8 @@ page = (TPL
   .replace("{{WEEK}}", str(e["week"])).replace("{{WEEKDAY}}", str(e["week_day"]))
   .replace("{{MIN}}", f"{e['min']:.2f}").replace("{{MAX}}", f"{e['max']:.2f}")
   .replace("{{STEP}}", f"{e['step']:.2f}")
-  .replace("{{NK}}", str(nk["proposals"]) if nk["proposals"] is not None else "N/A").replace("{{NK_STAKE}}", str(nk["stake"]))
+  # testnet has no indexed proposals: who could halt it is read from the stake itself
+  .replace("{{NK}}", str(nk["proposals"]) if nk["proposals"] is not None else (str(nk["stake"]) if TESTNET and nk.get("stake") else "N/A")).replace("{{NK_STAKE}}", str(nk["stake"]))
   .replace("{{RATIO}}", f"{th['ratio']:.2f}").replace("{{THRESH}}", f"{th['threshold']:.2f}")
   .replace("{{TRIPS}}", f"{th['threshold'] - 0.01:.2f}")
   .replace("{{TRIPS_C}}", str(int(round((th['threshold'] - 0.01) * 100))))
