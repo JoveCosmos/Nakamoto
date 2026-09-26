@@ -23,7 +23,7 @@ WEB=sys.argv[3]
 NODAY=sys.argv[4]
 snip=io.open(sys.argv[1],encoding='utf-8').read()
 h=io.open(WEB+'/index.html',encoding='utf-8').read()
-if NODAY: h=re.sub(r'<link rel=stylesheet href="assets/theme-day.css"[^>]*>\n?','',h)
+if NODAY: h=re.sub(r'<link rel=stylesheet href="assets/theme-day\.css[^"]*"[^>]*>\n?','',h)
 
 extra=''
 if sys.argv[2]=='--phone':

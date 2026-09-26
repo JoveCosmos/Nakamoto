@@ -319,6 +319,12 @@ import hashlib
 for _js in ("app.js", "boot.js", "tx.js", "simple.js", "shell.js"):
     _h = hashlib.sha256(open(os.path.join(OUT, _js), "rb").read()).hexdigest()[:10]
     page = page.replace(f'src="{_js}"', f'src="{_js}?v={_h}"')
+# the day sheet the same way: a versioned URL can be cached for good (nginx says so for any
+# ?v=), and a new sheet is a new URL
+_day = os.path.join(OUT, "assets", "theme-day.css")
+if os.path.exists(_day):
+    _h = hashlib.sha256(open(_day, "rb").read()).hexdigest()[:10]
+    page = page.replace('href="assets/theme-day.css"', f'href="assets/theme-day.css?v={_h}"')
 tmp = os.path.join(OUT, ".index.html.tmp")
 open(tmp, "w").write(page)
 os.chmod(tmp, 0o640)                     # the published mode, whatever umask the caller had
