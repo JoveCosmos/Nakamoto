@@ -282,6 +282,7 @@
     if(g && alist.length){ mark = {}; var VD = window.__VDBY || {}; for(var k in VD) if(VD[k].op && alist.indexOf(VD[k].op) >= 0) mark[k] = 1; }
     var until = g && g.expiration && window.__dayFull ? window.__dayFull(new Date(g.expiration).getTime()) : null;
     var rp = at && at.report, moves = rp && rp.history ? rp.history.length : 0, rec = g && rp && rp.record && rp.record.start ? rp.record : null;
+    var since = g && at.since ? window.__dayFull(at.since) : null;
     var sgn = function(d){ return (d >= 0 ? "+" : "−") + Math.abs(d * 100).toFixed(1) + "%"; }, sgnA = function(u){ return (u >= 0 ? "+" : "−") + one(Math.abs(u) / 1e6); };
     var door = !pos ? '<button class="sv-btn pri" type=button data-act=connect>Connect wallet</button>'
       : !pos.rows.length ? '<button class="sv-btn pri" type=button data-act=stake>Stake ATONE</button>'
@@ -292,16 +293,16 @@
       (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "—", rec ? sgnA((rec.rate - rec.start.rate) * rec.staked) + " ATONE a year" : "first check pending", null, "var(--sv-green)")
          : ro("Strategy", "—", "chosen when you set it up", null, "var(--sv-violet)")) +
       ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "—", g ? "ATONE, the cap you signed" : "a cap you set", g && a.max_tokens && pos ? Math.min(1, +a.max_tokens.amount / (pos.total || 1)) : null, "var(--sv-violet)") +
-      ro("Runs until", until || "—", g ? "then it lapses on its own" : "3 or 6 months", null, "var(--sv-violet)") +
+      ro("Runs until", until || "—", g ? (since ? "activated " + since : "then it lapses on its own") : "3 or 6 months", null, "var(--sv-violet)") +
       ro("Moves made", g ? String(moves) : "—", g ? (rp && rp.checked ? "checked " + window.__dayFull(rp.checked * 1000) : "not checked yet") : "", null, "var(--sv-teal)") +
       ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "—", pos && pos.rows.length ? "on " + whole(pos.total) + " ATONE" : "", pos && pos.rows.length ? heat(pos.rate).p : null, "", "", true));
     if(g) put("sd-ado",
       '<div class=sv-ph><h3>Autopilot is working</h3></div>' +
-      '<div class=sd-ok>Strategy is active on your stake' + (rec ? ', earning <b>' + sgn(rec.rate - rec.start.rate) + ' APR</b> (' + sgnA((rec.rate - rec.start.rate) * rec.staked) +
+      '<div class=sd-ok>Strategy is active on your stake' + (since ? ' since <b class=d>' + since + '</b>' : '') + (rec ? ', earning <b>' + sgn(rec.rate - rec.start.rate) + ' APR</b> (' + sgnA((rec.rate - rec.start.rate) * rec.staked) +
         ' ATONE a year) since Autopilot started, <b>' + sgn(rec.rate - rec.m3.rate) + '</b> over the last 3 months.' : '.') + '</div>' +
       '<div class=sd-figs>' +
         fig("Since Autopilot started", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.start.rate) + '</span><em class=u>APR</em>' : "—",
-            rec ? sgnA((rec.rate - rec.start.rate) * rec.staked) + " ATONE a year, since " + window.__dayFull(rec.start.at * 1000) : "its record starts with its first check", "var(--sv-green)") +
+            rec ? sgnA((rec.rate - rec.start.rate) * rec.staked) + " ATONE a year, since " + (since || window.__dayFull(rec.start.at * 1000)) : "its record starts with its first check", "var(--sv-green)") +
         fig("Last 3 months", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.m3.rate) + '</span><em class=u>APR</em>' : "—",
             rec ? sgnA((rec.rate - rec.m3.rate) * rec.staked) + " ATONE a year" : "", "var(--sv-teal)") +
       '</div>' +

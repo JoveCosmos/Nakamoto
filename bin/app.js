@@ -2376,10 +2376,27 @@ rememberGridH();
     if(!AT.addr || !who) return Promise.resolve({ who: who, grant: null, grants: [] });
     return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/authz/v1beta1/grants?granter=" + who + "&grantee=" + AT.addr + "&pagination.limit=50", { cache: "no-store" })
       .then(function(r){ return r.json(); })
-      .then(function(d){ var all = d.grants || [], g = null; all.forEach(function(x){ if(grantType(x) === REDEL) g = x; }); return { who: who, grant: g, grants: all }; })
+      .then(function(d){ var all = d.grants || [], g = null; all.forEach(function(x){ if(grantType(x) === REDEL) g = x; });
+        return (g ? grantedAt(who) : Promise.resolve(null)).then(function(at){ return { who: who, grant: g, grants: all, since: at }; }); })
       .catch(function(){ return { who: who, grant: null, grants: [] }; });
   }
-  function atKeep(r){ if(!r || r.who !== window.__ADDR) return false; AT.grant = r.grant; AT.grants = r.grants; return true; }
+  /* when the standing grant was made: the chain keeps only its expiry, so the date is the
+     latest MsgGrant this wallet signed to the keeper for redelegation (tx search); null if
+     the search fails */
+  function grantedAt(who){
+    var q = encodeURIComponent("message.action='/cosmos.authz.v1beta1.MsgGrant' AND message.sender='" + who + "'");
+    return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/tx/v1beta1/txs?query=" + q + "&order_by=ORDER_BY_DESC&pagination.limit=20", { cache: "no-store" })
+      .then(function(r){ return r.json(); })
+      .then(function(d){ var rs = d.tx_responses || [];
+        for(var i = 0; i < rs.length; i++){
+          var ms = ((rs[i].tx || {}).body || {}).messages || [];
+          for(var k = 0; k < ms.length; k++){ var m = ms[k], a = m.grant && m.grant.authorization || {};
+            if(m["@type"] === "/cosmos.authz.v1beta1.MsgGrant" && m.grantee === AT.addr && a.authorization_type === "AUTHORIZATION_TYPE_REDELEGATE")
+              return Date.parse(rs[i].timestamp) || null; } }
+        return null; })
+      .catch(function(){ return null; });
+  }
+  function atKeep(r){ if(!r || r.who !== window.__ADDR) return false; AT.grant = r.grant; AT.grants = r.grants; AT.since = r.since || null; return true; }
   function atReport(){
     if(!window.__ADDR) return Promise.resolve(null);
     return fetch("keeper/" + window.__ADDR + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
@@ -2718,7 +2735,7 @@ rememberGridH();
   };
   /* what stands between this reader and the keeper, for the simple view to state */
   window.__atInfo = function(){ return { addr: AT.addr, dry: AT.dry, grant: AT.grant, grants: AT.grants || [],
-    days: AT.days, split_pct: AT.split_pct || 0, report: AT.report,
+    days: AT.days, split_pct: AT.split_pct || 0, report: AT.report, since: AT.since || null,
     restake: (AT.grants || []).some(function(x){ return grantType(x) === DELEG; }) }; };
   window.__planDraw = draw;
   draw();

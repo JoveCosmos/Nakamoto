@@ -3767,6 +3767,7 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-gain{color:var(--sv-green)}
 .sd-ok{font-size:13px;line-height:1.45;color:var(--wt);padding:8px 12px;border-radius:8px;border:1px solid rgba(46,224,106,.35);background:rgba(46,224,106,.07)}
 .sd-ok b{color:var(--sv-green);font-weight:700}
+.sd-ok b.d{color:var(--wt)}
 .sd-go{width:100%;height:40px;flex:0 0 auto;justify-content:center}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}
