@@ -676,7 +676,7 @@
       if(d30 && d30.length){
         var m30 = Math.max(1, Math.max.apply(null, d30.map(function(x){ return x[1]; }))), t30 = "";
         d30.forEach(function(x, i){ if(i % 7 === 0) t30 += '<span style="left:' + (i / d30.length * 100).toFixed(2) + '%">' + new Date(x[0] + "T00:00:00Z").toLocaleDateString("en", { day: "numeric", month: "short", timeZone: "UTC" }) + '</span>'; });
-        body = '<div class="sv-bars hr">' + bscale(m30, function(v){ return Math.round(v).toLocaleString(); }) + d30.map(function(x, i){ var so = i === d30.length - 1;
+        body = '<div class="sv-bars hr">' + bscale(m30, function(v){ return Math.round(v).toLocaleString(); }, true) + d30.map(function(x, i){ var so = i === d30.length - 1;
           return '<i' + (so ? ' class=so' : '') + ' style="--h:' + Math.max(1.5, x[1] / m30 * 100).toFixed(1) + '%" data-t="' + dl(x[0]) + ": " + x[1].toLocaleString() + ' transactions' + (so ? ' so far' : '') + '"></i>'; }).join("") + '</div><div class=sv-bx>' + t30 + '</div>';
       } else body = '<div class=sv-upwait>Reading the last 30 days…</div>';
     } else {
@@ -687,7 +687,7 @@
       if(a24 && a24.length){
         var m = Math.max(1, Math.max.apply(null, a24.map(function(x){ return x[1]; }))), ticks = "";
         a24.forEach(function(x, i){ var d = new Date(x[0] * 1000); if(d.getHours() % 6 === 0) ticks += '<span style="left:' + (i / a24.length * 100).toFixed(2) + '%">' + (d.getHours() ? String(d.getHours()).padStart(2, "0") + ":00" : DAYN[d.getDay()] + " " + d.getDate()) + '</span>'; });
-        body = '<div class="sv-bars hr">' + bscale(m, function(v){ return String(Math.round(v)); }) + a24.map(function(x, i){ var so = i === a24.length - 1; return '<i' + (so ? ' class=so' : '') + ' style="--h:' + Math.max(1.5, x[1] / m * 100).toFixed(1) + '%" data-t="' + when(x[0]) + ": " + x[1] + ' transactions' + (so ? ' so far' : '') + '"></i>'; }).join("") + '</div><div class=sv-bx>' + ticks + '</div>';
+        body = '<div class="sv-bars hr">' + bscale(m, function(v){ return String(Math.round(v)); }, true) + a24.map(function(x, i){ var so = i === a24.length - 1; return '<i' + (so ? ' class=so' : '') + ' style="--h:' + Math.max(1.5, x[1] / m * 100).toFixed(1) + '%" data-t="' + when(x[0]) + ": " + x[1] + ' transactions' + (so ? ' so far' : '') + '"></i>'; }).join("") + '</div><div class=sv-bx>' + ticks + '</div>';
       } else body = '<div class=sv-upwait>Reading the last 24 hours…</div>';
     }
     put("sv-act7", '<div class=sv-ph><h3>Transactions</h3>' + sw + '<span class=sv-gkey>' + (AW === "24h" ? "per hour" : "per day") + '</span>' + stats + '</div>' + body);
@@ -696,14 +696,14 @@
        transactions, not gas or fees */
     var bw = BW, sb = '<span class=sv-sw role=group aria-label="Period">' + [["100", "Last 100 blocks"], ["10k", "Last 10k blocks"], ["all", "Since genesis"]].map(function(o){
       return '<button type=button data-act=bwin data-w=' + o[0] + ' aria-pressed=' + (bw === o[0]) + '>' + o[1] + '</button>'; }).join("") + '</span>';
-    var hb = function(k){ return '<div class=sv-ph><h3>Transactions per block</h3>' + sb + k + '</div>'; }, sl, lb;
+    var hb = function(k){ return '<div class=sv-ph><h3>Transactions per 100 blocks</h3>' + sb + k + '</div>'; }, sl, lb;
     if(bw === "100"){
       sl = '<div class=sv-rt>' + st("Transactions", rows.length ? tx.toLocaleString() : "—", rows.length ? "last " + rows.length + " blocks" : "", "var(--sv-violet)") +
         st("Gas used", rows.length ? (gas / 1e6).toFixed(1) + "M" : "—", rows.length ? "of " + (rows.length * 100).toLocaleString() + "M capacity" : "", "var(--sv-violet)") +
         st("Fees paid", rows.length ? (fee / 1e6).toFixed(2) + " PHOTON" : "—", rows.length ? "last " + rows.length + " blocks" : "", "var(--sv-pho)") + '</div>';
       if(rows.length){
         var mb = Math.max(1, Math.max.apply(null, rows.map(function(r){ return r[6]; })));
-        lb = '<div class="sv-bars live">' + bscale(mb, function(v){ return String(Math.round(v)); }) + rows.map(function(r){ return '<i class="' + (r[6] ? "" : "z") + '" style="--h:' + (r[6] ? Math.max(6, r[6] / mb * 100) : 3).toFixed(1) + '%" data-t="block ' + Number(r[0] + 1).toLocaleString() + ": " + r[6] + " transaction" + (r[6] === 1 ? "" : "s") +
+        lb = '<div class="sv-bars live">' + bscale(mb, function(v){ return String(Math.round(v)); }, true) + rows.map(function(r){ return '<i class="' + (r[6] ? "" : "z") + '" style="--h:' + (r[6] ? Math.max(6, r[6] / mb * 100) : 3).toFixed(1) + '%" data-t="block ' + Number(r[0] + 1).toLocaleString() + ": " + r[6] + " transaction" + (r[6] === 1 ? "" : "s") +
             (r[6] ? ", " + (r[7] >= 0 ? r[7].toLocaleString() + " gas, " + (r[8] / 1e6).toFixed(3) + " PHOTON" : "gas unknown") : "") + '"></i>'; }).join("") + '</div>' +
           '<div class=sv-gx><span>&larr; older, block ' + Number(rows[0][0] + 1).toLocaleString() + '</span><span>now, block ' + Number(rows[rows.length - 1][0] + 1).toLocaleString() + ' &rarr;</span></div>';
       } else lb = '<div class=sv-upwait>Waiting for the live feed…</div>';
@@ -711,23 +711,23 @@
       var bk = D.b10k || [], T = 0, B = 0, NZ = 0, pk = null;
       bk.forEach(function(x){ T += x[1]; B += x[2]; NZ += x[3]; var r = x[2] ? x[1] / x[2] : 0; if(!pk || r > pk.r) pk = { h: x[0], r: r, b: x[2] }; });
       var span = function(h, b){ return Number(h).toLocaleString() + "–" + Number(h + b - 1).toLocaleString(); };
-      sl = '<div class=sv-rt>' + st("Per block", B ? (T / B).toFixed(2) : "—", B ? T.toLocaleString() + " in " + B.toLocaleString() + " blocks" : "", "var(--sv-violet)") +
-        st("Busiest 100", pk ? pk.r.toFixed(2) : "—", pk ? "blocks " + Number(pk.h).toLocaleString() + " on" : "", "var(--sv-violet)") +
+      sl = '<div class=sv-rt>' + st("Per 100 blocks", B ? (T / B * 100).toFixed(1) : "—", B ? T.toLocaleString() + " in " + B.toLocaleString() + " blocks" : "", "var(--sv-violet)") +
+        st("Busiest 100", pk ? String(Math.round(pk.r * pk.b)) : "—", pk ? "blocks " + Number(pk.h).toLocaleString() + " on" : "", "var(--sv-violet)") +
         st("With transactions", B ? NZ.toLocaleString() : "—", B ? "of " + B.toLocaleString() + " blocks" : "") + '</div>';
       if(bk.length){
-        var m3 = Math.max(.01, Math.max.apply(null, bk.map(function(x){ return x[2] ? x[1] / x[2] : 0; })));
-        lb = '<div class="sv-bars live">' + bscale(m3, function(v){ return v.toFixed(2); }) + bk.map(function(x){ var r = x[2] ? x[1] / x[2] : 0;
-            return '<i class="' + (x[1] ? "" : "z") + '" style="--h:' + (x[1] ? Math.max(3, r / m3 * 100) : 2).toFixed(1) + '%" data-t="blocks ' + span(x[0], x[2]) + ": " + r.toFixed(2) + " per block, " + x[3] + " with transactions" + '"></i>'; }).join("") + '</div>' +
+        var m3 = Math.max(1, Math.max.apply(null, bk.map(function(x){ return x[1]; })));
+        lb = '<div class="sv-bars live">' + bscale(m3, function(v){ return String(Math.round(v)); }, true) + bk.map(function(x){
+            return '<i class="' + (x[1] ? "" : "z") + '" style="--h:' + (x[1] ? Math.max(3, x[1] / m3 * 100) : 2).toFixed(1) + '%" data-t="blocks ' + span(x[0], x[2]) + ": " + x[1] + " transaction" + (x[1] === 1 ? "" : "s") + ", in " + x[3] + " block" + (x[3] === 1 ? "" : "s") + '"></i>'; }).join("") + '</div>' +
           '<div class=sv-gx><span>&larr; older, block ' + Number(bk[0][0]).toLocaleString() + '</span><span>block ' + Number(bk[bk.length - 1][0] + bk[bk.length - 1][2] - 1).toLocaleString() + ' &rarr;</span></div>';
       } else lb = '<div class=sv-upwait>Reading the last 10,000 blocks…</div>';
     } else {
       var src = (td || []).map(function(x){ return { k: x[0], t: x[1], b: x[2] }; });
       var T = 0, B = 0, pk = null; src.forEach(function(x){ T += x.t; B += x.b; var r = x.b ? x.t / x.b : 0; if(!pk || r > pk.r) pk = { k: x.k, r: r }; });
-      sl = '<div class=sv-rt>' + st("Per block", B ? (T / B).toFixed(2) : "—", "since genesis", "var(--sv-violet)") +
-        st("Busiest day", pk ? pk.r.toFixed(2) : "—", pk ? dl(pk.k) + ", per block" : "", "var(--sv-violet)") +
+      sl = '<div class=sv-rt>' + st("Per 100 blocks", B ? (T / B * 100).toFixed(1) : "—", "since genesis", "var(--sv-violet)") +
+        st("Busiest day", pk ? (pk.r * 100).toFixed(0) : "—", pk ? dl(pk.k) + ", per 100 blocks" : "", "var(--sv-violet)") +
         st("Blocks", B ? B.toLocaleString() : "—", "since genesis") + '</div>';
-      lb = src.length ? chart("tpb", src.map(function(x){ return { d: x.k, r: x.b ? x.t / x.b : 0 }; }), [{ k: "r", cls: "tpb", area: true }], function(v){ return v <= 0 ? "0" : v.toFixed(v < 10 ? 1 : 0); },
-          function(v){ return v.toFixed(2) + " per block"; }) : '<div class=sv-upwait>Reading the history…</div>';
+      lb = src.length ? chart("tpb", src.map(function(x){ return { d: x.k, r: x.b ? x.t / x.b * 100 : 0 }; }), [{ k: "r", cls: "tpb", area: true }], function(v){ return v <= 0 ? "0" : String(Math.round(v)); },
+          function(v){ return v.toFixed(1) + " per 100 blocks"; }) : '<div class=sv-upwait>Reading the history…</div>';
     }
     put("sv-actlive", hb(sl) + lb);
   }
@@ -775,10 +775,13 @@
   }
   /* a bar chart's scale, the line charts' own: labelled levels at a third, two thirds and the
      top, each with its gridline across the bars */
-  function bscale(mx, f){
-    var seen = {};
-    return [1 / 3, 2 / 3, 1].map(function(k){ var t = f(mx * k); if(seen[t] || t === "0") return ""; seen[t] = 1;
-      return '<span class=sv-bl2 style="bottom:' + (k * 100).toFixed(2) + '%"><b>' + t + '</b></span>'; }).join("");
+  function bscale(mx, f, whole){
+    /* whole counts step in whole numbers, each level at its true height (a max of 1 is one level
+       at the top, never a '1' two thirds of the way up) */
+    var lv = [];
+    if(whole){ var step = Math.max(1, Math.ceil(mx / 3)); for(var v = step; v <= mx + 1e-9; v += step) lv.push(v); if(lv[lv.length - 1] < mx) lv.push(mx); }
+    else lv = [mx / 3, mx * 2 / 3, mx];
+    return lv.map(function(v){ return '<span class=sv-bl2 style="bottom:' + (v / mx * 100).toFixed(2) + '%"><b>' + f(v) + '</b></span>'; }).join("");
   }
   /* a bar's reading, at once (the native title waits a second): the bar's data-t, above it */
   function barHover(ev){
