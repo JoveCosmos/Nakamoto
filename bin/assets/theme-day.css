@@ -627,6 +627,7 @@
   html[data-theme=light]:not([data-mono]) .atcard .unfield.atfield:focus-within{box-shadow:0 0 0 3px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .atseg button{background:transparent}
   html[data-theme=light]:not([data-mono]) .atseg button[aria-pressed=true]{color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .atrsnote{border:1px solid var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .atuntil b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .atfee{border:1px solid var(--warn-bg);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) .atnote{border:1px solid var(--accent-soft);background:var(--accent-soft);color:var(--ink)}

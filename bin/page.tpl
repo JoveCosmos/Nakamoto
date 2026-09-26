@@ -3764,10 +3764,18 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-fig>b .u{font-style:normal;font-family:var(--wmono);font-size:10px;font-weight:400;letter-spacing:.14em;color:var(--wf)}
 .sd-fig small{font-size:11px;line-height:1.2;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sd-col>.sd-fig{flex:0 0 auto;padding-top:9px;padding-bottom:9px}
+/* the active Autopilot's two gains, side by side under the sentence */
+.sd-figs.two{flex-direction:row;flex:0 0 auto;gap:8px}
+.sd-figs.two .sd-fig{flex:1 1 0;margin-left:0;padding:8px 12px 9px 14px;border-left:1px solid var(--wbd2);border-radius:10px}
+.sd-figs.two .sd-fig::before{top:10px;bottom:10px}
+.sd-figs.two .sd-fig>b{font-size:21px}
+.sd-figs.two .sd-fig em{font-size:8.5px;letter-spacing:.12em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sd-gain{color:var(--sv-green)}
 .sd-ok{font-size:13px;line-height:1.45;color:var(--wt);padding:8px 12px;border-radius:8px;border:1px solid rgba(46,224,106,.35);background:rgba(46,224,106,.07)}
 .sd-ok b{color:var(--sv-green);font-weight:700}
 .sd-ok b.d{color:var(--wt)}
+.sd-rs{font-size:12px;line-height:1.45;color:var(--ws);padding-left:10px;border-left:2px solid var(--sv-violet)}
+.sd-rs b{color:var(--wt)}
 .sd-go{width:100%;height:40px;flex:0 0 auto;justify-content:center}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}
@@ -3903,6 +3911,7 @@ white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .atseg button:focus-visible{outline:2px solid var(--av);outline-offset:2px}
 /* the restake pair sits on its own in the row: as wide as its buttons, like the months */
 #atrsk{align-self:flex-start}
+.atrsnote{font-size:11.5px;line-height:1.45;color:var(--ws);padding:7px 10px;border-radius:7px;border:1px solid rgba(185,176,255,.35);background:rgba(185,176,255,.07)}
 #atrsk button{min-width:52px}
 .atuntil{font-family:var(--wmono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ws)}
 .atuntil b{font-family:var(--wsans);font-size:11.5px;font-weight:600;letter-spacing:0;text-transform:none;color:#fff8dc;margin-left:4px}
@@ -4593,6 +4602,7 @@ html[data-tab=connect] .l2host{display:none}
           <div class=attime><div class=atseg id=atseg><button type=button data-d=90 aria-pressed=true>3 months</button><button type=button data-d=180 aria-pressed=false>6 months</button></div><span class=atuntil id=atuntil></span></div></div>
         <div class=atrow><span class=atlab>Restake</span>
           <div class=atseg id=atrsk role=group aria-label="Restake rewards"><button type=button data-r=1 aria-pressed=false>Yes</button><button type=button data-r=0 aria-pressed=true>No</button></div><input type=checkbox id=atrestake hidden></div>
+        <div class=atrsnote id=atrsnote hidden></div>
         <div class=atfee id=atfee hidden></div>
       </div>
       <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. You can revoke auth at any time.</span></div>

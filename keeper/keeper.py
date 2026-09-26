@@ -34,6 +34,13 @@ FEE_PCT = float(os.environ.get("KEEPER_FEE_PCT", "0"))                     # ser
 FEE_TO = os.environ.get("KEEPER_FEE_TO", "").strip() or None
 SPLIT_PCT = float(os.environ.get("KEEPER_SPLIT_PCT", "0") or 0)            # our share of restaked rewards, percent (0 = free)
 SPLIT_TO = os.environ.get("KEEPER_SPLIT_TO", "").strip() or None           # the treasury allowed to receive it
+# restake: claim a granter's rewards and stake them back onto their allow-list. Planned and
+# reported always; executed only with KEEPER_RESTAKE=1 AND KEEPER_DRY=0
+RESTAKE = os.environ.get("KEEPER_RESTAKE", "0") == "1"
+MIN_RESTAKE = float(os.environ.get("KEEPER_MIN_RESTAKE_ATONE", "1"))       # skip while rewards are below this
+MAX_CLAIM = int(os.environ.get("KEEPER_MAX_CLAIM", "18"))                  # validators claimed in one transaction (the signer takes 20 messages)
+RESTAKE_URL = os.environ.get("KEEPER_RESTAKE_URL", "") or (SIGNER.rsplit("/", 1)[0] + "/authz-restake" if SIGNER else "")
+WDRAW_URL = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward"
 DATA = "/srv/atomone-app/web/data.json"
 STATE = "/srv/atomone-app/keeper/state/keeper.db"
 REPORTS = "/srv/atomone-app/web/keeper"
@@ -67,6 +74,7 @@ def db():
     c.execute("CREATE TABLE IF NOT EXISTS run_g(at INT, granter TEXT)")
     # the granter's blended APR at each check: the first row is where Autopilot started from
     c.execute("CREATE TABLE IF NOT EXISTS rate_log(at INT, granter TEXT, rate REAL, staked INT)")
+    c.execute("CREATE TABLE IF NOT EXISTS restake(at INT, granter TEXT, rewards INT, staked INT, sent INT, target TEXT, txhash TEXT, dry INT)")
     # the reward-split ledger: what each granter's stake has earned since we first saw
     # them, and what we have collected of our share - the difference is the due
     c.execute("CREATE TABLE IF NOT EXISTS fee_ledger(granter TEXT PRIMARY KEY, earned INT, collected INT, updated INT)")
@@ -88,10 +96,10 @@ def rate_after(m, t, c, x): return (1 - c) * (m[0] + m[1] / (t + x))
 
 # ── strategies: the word the page wrote into the grant's memo ───────────────
 PRESETS = {
-    "passive":    {"every": 7 * 86400, "min_apr": 0.015, "min_atone": 5.0, "dests": 2, "d90": 99},
-    "moderate":   {"every": 6 * 3600,  "min_apr": 0.005, "min_atone": 1.0, "dests": 5, "d90": 50},
-    "aggressive": {"every": 3600,      "min_apr": 0.0025, "min_atone": 0.5, "dests": 8, "d90": 50},
-    "picks":      {"every": 6 * 3600,  "min_apr": 0.005, "min_atone": 1.0, "dests": 5, "d90": 0},
+    "passive":    {"every": 7 * 86400, "min_apr": 0.015, "min_atone": 5.0, "dests": 2, "d90": 99, "restake_every": 7 * 86400},
+    "moderate":   {"every": 6 * 3600,  "min_apr": 0.005, "min_atone": 1.0, "dests": 5, "d90": 50, "restake_every": 86400},
+    "aggressive": {"every": 3600,      "min_apr": 0.0025, "min_atone": 0.5, "dests": 8, "d90": 50, "restake_every": 12 * 3600},
+    "picks":      {"every": 6 * 3600,  "min_apr": 0.005, "min_atone": 1.0, "dests": 5, "d90": 0, "restake_every": 86400},
 }
 def preset_of(granter):
     """The strategy rides in the memo of the granter's latest MsgGrant to us."""
@@ -130,6 +138,130 @@ def grants():
         key = d.get("pagination", {}).get("next_key")
         if not key: break
     return out
+
+# ── restake ────────────────────────────────────────────────────────────────
+def restake_grants():
+    """granter -> what they let us do with rewards: claim (a GenericAuthorization for
+    MsgWithdrawDelegatorReward), stake (StakeAuthorization DELEGATE: allow-list, what is left
+    of its cap) and send (SendAuthorization: what is left of its limit, for the split)"""
+    out, key, now = {}, None, time.gmtime()
+    while True:
+        d = get("/cosmos/authz/v1beta1/grants/grantee/%s?pagination.limit=200" % GRANTEE + ("&pagination.key=%s" % urllib.parse.quote(key) if key else ""))
+        for g in d.get("grants", []):
+            exp = g.get("expiration")
+            if exp and time.strptime(exp[:19], "%Y-%m-%dT%H:%M:%S") < now: continue
+            a, r = g.get("authorization", {}), out.setdefault(g["granter"], {})
+            t = a.get("@type")
+            if t == "/cosmos.authz.v1beta1.GenericAuthorization" and a.get("msg") == WDRAW_URL:
+                r["claim"] = True
+            elif t == "/cosmos.staking.v1beta1.StakeAuthorization" and a.get("authorization_type") == "AUTHORIZATION_TYPE_DELEGATE":
+                cap = a.get("max_tokens")
+                r["stake"] = {"allow": (a.get("allow_list") or {}).get("address") or [],
+                              "cap": int(cap["amount"]) if cap and cap.get("denom") == "uatone" else None}
+            elif t == "/cosmos.bank.v1beta1.SendAuthorization":
+                r["send"] = sum(int(x["amount"]) for x in a.get("spend_limit", []) if x.get("denom") == "uatone")
+        key = d.get("pagination", {}).get("next_key")
+        if not key: break
+    return {k: v for k, v in out.items() if v.get("claim") and v.get("stake")}
+
+def others_claiming(granter):
+    """validators another service already restakes for this granter. On AtomOne a restake
+    bot (REStake and the like) needs only a StakeAuthorization DELEGATE allow-listed to its
+    validator: delegating to a validator first pays that validator's pending rewards out, so
+    'delegate the pending amount' restakes them. If we claimed first, such a bot would stake
+    that amount out of the granter's liquid ATONE - so those validators are left to it.
+    None = another service may claim or delegate without naming validators: stay out."""
+    d = get("/cosmos/authz/v1beta1/grants/granter/%s?pagination.limit=200" % granter)
+    ops, who, now = set(), set(), time.gmtime()
+    for g in d.get("grants", []):
+        if g.get("grantee") == GRANTEE: continue
+        exp = g.get("expiration")
+        if exp and time.strptime(exp[:19], "%Y-%m-%dT%H:%M:%S") < now: continue
+        a = g.get("authorization", {})
+        if a.get("@type") == "/cosmos.authz.v1beta1.GenericAuthorization" and a.get("msg") in (WDRAW_URL, "/cosmos.staking.v1beta1.MsgDelegate"):
+            return None, sorted(who | {g["grantee"]})
+        if a.get("@type") == "/cosmos.staking.v1beta1.StakeAuthorization" and a.get("authorization_type") == "AUTHORIZATION_TYPE_DELEGATE":
+            allow = (a.get("allow_list") or {}).get("address") or []
+            if not allow: return None, sorted(who | {g["grantee"]})
+            ops |= set(allow); who.add(g["grantee"])
+    return ops, sorted(who)
+
+def plan_restake(c, granter, rg, vals, m, P):  # noqa: C901
+    """what a restake would do now: claim every reward we may (not those another service
+    claims), stake it on the best validator of the DELEGATE allow-list, less the split"""
+    last = c.execute("SELECT max(at) FROM restake WHERE granter=?", (granter,)).fetchone()[0] or 0
+    if time.time() - last < P.get("restake_every", 86400): return {"skip": "not due"}
+    wa = get("/cosmos/distribution/v1beta1/delegators/%s/withdraw_address" % granter).get("withdraw_address")
+    if wa != granter: return {"skip": "rewards are paid to another address"}
+    cov, who = others_claiming(granter)
+    if cov is None: return {"skip": "another service claims these rewards", "others": who}
+    # the largest rewards first, at most MAX_CLAIM validators a transaction, and no more than
+    # the DELEGATE cap can take back in: what is claimed is all staked, nothing left idle
+    pend = []
+    for r in get("/cosmos/distribution/v1beta1/delegators/%s/rewards" % granter).get("rewards", []):
+        v = r["validator_address"]
+        amt = sum(int(float(x["amount"])) for x in r.get("reward", []) if x.get("denom") == "uatone")
+        if amt > 0 and v not in cov: pend.append((amt, v))
+    pend.sort(reverse=True)
+    cap = rg["stake"]["cap"]
+    rewards, claim = 0, []
+    for amt, v in pend:
+        if len(claim) >= MAX_CLAIM: break
+        if cap is not None and claim and rewards + amt > cap: continue
+        rewards += amt; claim.append(v)
+    out = {"rewards": rewards, "pending_all": sum(a for a, _ in pend), "others": who, "covered": sorted(cov)}
+    if rewards < MIN_RESTAKE * 1e6: out["skip"] = "below %g ATONE" % MIN_RESTAKE; return out
+    send = 0
+    if SPLIT_PCT > 0 and SPLIT_TO and rg.get("send"):
+        sd = split_due(c, granter) or {}
+        send = min(sd.get("due", 0), rewards, rg["send"])
+    stake = rewards - send
+    if cap is not None and stake > cap: out["skip"] = "delegate cap used up"; return out
+    best, br = None, -1
+    for op in rg["stake"]["allow"]:
+        v = vals.get(op)
+        if not v or v["tomb"] or (P["d90"] and (v["d90"] is None or v["d90"] < P["d90"])): continue
+        rt = rate_after(m, v["t"], v["c"], stake)
+        if rt > br: best, br = op, rt
+    if not best or stake <= 0: out["skip"] = "no allowed validator to stake on" if not best else "delegate cap used up"; return out
+    out.update({"claim": claim, "stake": [{"validator": best, "amount": int(stake)}], "send": int(send), "rate": br,
+                "fee_uphoton": int((120000 + 60000 * (len(claim) + 2)) * 0.25)})
+    return out
+
+def execute_restake(granter, p):
+    body = {"granter": granter, "claim": p["claim"], "stake": [{"validator": s["validator"], "amount": str(s["amount"])} for s in p["stake"]], "memo": "GATA autopilot restake"}
+    if p.get("send"): body["send"] = str(p["send"])
+    req = urllib.request.Request(RESTAKE_URL, data=json.dumps(body).encode(), method="POST", headers={"content-type": "application/json", "x-gata-secret": SECRET})
+    try:
+        with urllib.request.urlopen(req, timeout=120) as r: return json.load(r)
+    except urllib.error.HTTPError as e:
+        try: return {"error": json.load(e)}
+        except Exception: return {"error": "HTTP %d" % e.code}
+
+def restake_step(c, granter, rgs, vals, m, P, dry):
+    """plan, execute when allowed, record; returns what the report shows"""
+    rg = rgs.get(granter)
+    if not rg: return None
+    try:
+        p = plan_restake(c, granter, rg, vals, m, P)
+    except Exception as e:
+        return {"error": str(e)[:200]}
+    live = RESTAKE and not dry
+    if "claim" in p:
+        amt = sum(s["amount"] for s in p["stake"])
+        if live:
+            r = execute_restake(granter, p); p["result"] = r
+            ok = "txhash" in r and "error" not in r
+            c.execute("INSERT INTO restake VALUES(?,?,?,?,?,?,?,?)", (int(time.time()), granter, p["rewards"], amt, p["send"], p["stake"][0]["validator"], r.get("txhash") if ok else None, 0))
+            if ok and p["send"]:
+                c.execute("UPDATE fee_ledger SET collected=collected+? WHERE granter=?", (p["send"], granter))
+            c.commit()
+            log("restake granter=%s rewards=%d staked=%d sent=%d -> %s" % (granter, p["rewards"], amt, p["send"], r))
+        else:
+            log("DRY restake granter=%s would claim %d from %d validators, stake %d on %s, send %d" % (granter, p["rewards"], len(p["claim"]), amt, p["stake"][0]["validator"][-6:], p["send"]))
+    done = c.execute("SELECT count(*), coalesce(sum(staked), 0), max(at) FROM restake WHERE granter=? AND dry=0 AND txhash IS NOT NULL", (granter,)).fetchone()
+    p.update({"live": live, "count": done[0], "total": done[1], "last_at": done[2]})
+    return p
 
 # ── a granter's position ───────────────────────────────────────────────────
 def position(addr, vals):
@@ -300,6 +432,8 @@ def once(c, only=None, live=None, force=False):
     dry = DRY if live is None else (not live)
     vals, m, eta = model()
     gs = [g for g in grants() if not only or g["granter"] == only]; acted = 0
+    try: rgs = restake_grants()
+    except Exception as e: rgs = {}; log("restake grants unreadable: %s" % e)
     log("grants=%d dry=%s eta=%.3f%s" % (len(gs), dry, eta, " only=" + only if only else ""))
     for g in gs:
         try:
@@ -311,9 +445,13 @@ def once(c, only=None, live=None, force=False):
             p = plan(g, rows, reds, vals, m, P)
             c.execute("INSERT INTO run_g VALUES(?,?)", (int(time.time()), g["granter"])); c.commit()
             record = rate_record(c, g["granter"], rows)
+            # restake before the moves: a redelegation pays its source's rewards out on its own,
+            # and the signer only restakes rewards still pending
+            rs = restake_step(c, g["granter"], rgs, vals, m, P, dry)
             rep = {"granter": g["granter"], "checked": int(time.time()), "dry": dry, "strategy": name, "grant": {"cap": g["cap"], "allow": len(g["allow"]) if g["allow"] else None, "expires": g["exp"]},
                    "staked": sum(r["x"] for r in rows), "now": None, "after": None, "moves": [], "last": None}
             if record: rep["record"] = record
+            if rs: rep["restake"] = rs
             hist = c.execute("SELECT at, src, dst, uatone, gain, txhash FROM move WHERE granter=? AND dry=0 ORDER BY at DESC LIMIT 10", (g["granter"],)).fetchall()
             rep["history"] = [{"at": h[0], "src": h[1], "dst": h[2], "uatone": h[3], "gain": h[4], "txhash": h[5]} for h in hist]
             if p:

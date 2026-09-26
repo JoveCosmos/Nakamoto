@@ -292,20 +292,30 @@
       /* active: what it has earned, never the strategy behind it */
       (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "—", rec ? sgnA((rec.rate - rec.start.rate) * rec.staked) + " ATONE a year" : "first check pending", null, "var(--sv-green)")
          : ro("Strategy", "—", "chosen when you set it up", null, "var(--sv-violet)")) +
-      ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "—", g ? "ATONE, the cap you signed" : "a cap you set", g && a.max_tokens && pos ? Math.min(1, +a.max_tokens.amount / (pos.total || 1)) : null, "var(--sv-violet)") +
+      ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "—", g ? "ATONE left, of the cap you signed" : "a cap you set, in all", g && a.max_tokens && pos ? Math.min(1, +a.max_tokens.amount / (pos.total || 1)) : null, "var(--sv-violet)") +
       ro("Runs until", until || "—", g ? (since ? "activated " + since : "then it lapses on its own") : "3 or 6 months", null, "var(--sv-violet)") +
       ro("Moves made", g ? String(moves) : "—", g ? (rp && rp.checked ? "checked " + window.__dayFull(rp.checked * 1000) : "not checked yet") : "", null, "var(--sv-teal)") +
       ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "—", pos && pos.rows.length ? "on " + whole(pos.total) + " ATONE" : "", pos && pos.rows.length ? heat(pos.rate).p : null, "", "", true));
+    /* restake, in one line: what it has done, or who does it instead, or that it waits */
+    function restakeLine(){
+      var rs = rp && rp.restake, ot = at && at.others;
+      if(!(at && at.restake)) return ot ? "Another service restakes your rewards." : "";
+      if(rs && rs.count) return "Restaked <b>" + fmt(rs.total) + " ATONE</b> of rewards in " + rs.count + " run" + (rs.count === 1 ? "" : "s") + (rs.last_at ? ", last " + window.__dayFull(rs.last_at * 1000) : "") + ".";
+      if((rs && /another service/.test(rs.skip || "")) || (ot && ot.all)) return "Another service restakes your rewards, so Autopilot leaves them to it.";
+      if(ot) return "Another service restakes your rewards on some validators; Autopilot restakes the rest.";
+      return "Restake is on: rewards are staked back as they build up.";
+    }
     if(g) put("sd-ado",
       '<div class=sv-ph><h3>Autopilot is working</h3></div>' +
       '<div class=sd-ok>Strategy is active on your stake' + (since ? ' since <b class=d>' + since + '</b>' : '') + (rec ? ', earning <b>' + sgn(rec.rate - rec.start.rate) + ' APR</b> (' + sgnA((rec.rate - rec.start.rate) * rec.staked) +
         ' ATONE a year) since Autopilot started, <b>' + sgn(rec.rate - rec.m3.rate) + '</b> over the last 3 months.' : '.') + '</div>' +
-      '<div class=sd-figs>' +
-        fig("Since Autopilot started", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.start.rate) + '</span><em class=u>APR</em>' : "—",
-            rec ? sgnA((rec.rate - rec.start.rate) * rec.staked) + " ATONE a year, since " + (since || window.__dayFull(rec.start.at * 1000)) : "its record starts with its first check", "var(--sv-green)") +
+      '<div class="sd-figs two">' +
+        fig("Since start", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.start.rate) + '</span><em class=u>APR</em>' : "—",
+            rec ? sgnA((rec.rate - rec.start.rate) * rec.staked) + " ATONE a year" : "from its first check", "var(--sv-green)") +
         fig("Last 3 months", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.m3.rate) + '</span><em class=u>APR</em>' : "—",
             rec ? sgnA((rec.rate - rec.m3.rate) * rec.staked) + " ATONE a year" : "", "var(--sv-teal)") +
       '</div>' +
+      (restakeLine() ? '<div class=sd-rs>' + restakeLine() + '</div>' : '') +
       '<div class=sd-fine>The chain enforces the grant: it may redelegate inside your allow-list, and never send, unstake or hold your ATONE.</div>');
     else put("sd-ado",
       '<div class=sv-ph><h3>What it does</h3></div>' +
