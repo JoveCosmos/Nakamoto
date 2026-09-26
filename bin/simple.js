@@ -47,11 +47,6 @@
   function VALS(){ return window.__VALS ? window.__VALS() : []; }
   function DD(){ return window.__D || { set: {}, eta: {}, nakamoto: {}, rule: {} }; }
   function tag(cls, t, title){ return '<span class="sv-tag ' + cls + '"' + (title ? ' title="' + esc(title) + '"' : '') + '>' + t + '</span>'; }
-  /* a shaded box inside a panel: a coloured tick and label, the value, a line of detail */
-  function box(cls, label, value, meta, style, act){
-    return '<div class="sv-box b-' + cls + '"' + (style ? ' style="' + style + '"' : '') + '>' + (act || "") + '<span class=sv-bl>' + label + '</span>' +
-      '<b class=sv-bv>' + value + '</b><span class=sv-bm>' + (meta || "") + '</span></div>';
-  }
   /* a span of the set's record: centred, and the set itself as a strip of cells under the figure,
      one a validator, lit if it was never jailed in the span */
   function span(k, v, clean, n){
@@ -59,10 +54,6 @@
     return '<div class="sv-card sv-span"><span class=sv-k>' + k + '</span><span class=sv-big>' + v + '</span>' +
       '<span class=sv-cells title="' + clean + ' of ' + n + ' never jailed in this span">' + c + '</span>' +
       '<span class=sv-sub>validator set average, ' + clean + ' never jailed</span></div>';
-  }
-  function card(k, v, sub, cls){
-    return '<div class=sv-card><span class=sv-k>' + k + '</span>' +
-           '<span class="sv-big ' + (cls || "") + '">' + v + '</span><span class=sv-sub>' + (sub || "") + '</span></div>';
   }
 
   /* ── heat: the calculator's own colour for an APR ─────────────────────────
@@ -107,17 +98,7 @@
   }
   /* where a rate sits on the map, as a bar with pins: the reader's validators (sized by their
      share), a faint tick for every validator in the set, the set's median */
-  function scale(pins, S, mini){
-    var ticks = "";
-    var md = heat(S.mid);
-    /* one line: the lowest rate the set pays, the ramp, the highest */
-    return '<div class="sv-hrow' + (mini ? " mini" : "") + '"><span class=sv-hl>' + pct(S.lo) + '</span>' +
-      '<div class=sv-heat><i style="background:' + rampCss() + '"></i>' + ticks +
-      '<u style="left:' + (md.p * 100).toFixed(2) + '%" title="the set\'s median, ' + pct(S.mid) + '"></u>' +
-      pins.map(function(q){ var h = heat(q.r);
-        return '<b style="left:' + (h.p * 100).toFixed(2) + '%;--c:' + h.fill + ';--s:' + (q.s || 12) + 'px"' + (q.t ? ' title="' + esc(q.t) + '"' : "") + '></b>'; }).join("") +
-      '</div><span class=sv-hl>' + pct(S.hi) + '</span></div>';
-  }
+
 
   /* ── the set, once: the figures every screen quotes ── */
   function setStats(){
@@ -141,97 +122,133 @@
              clean: clean, clean30: c30, clean90: c90, set: D.set || {} };
   }
 
-  /* ── OVERVIEW ───────────────────────────────────────────────────────────── */
+  /* ── WALLET ──────────────────────────────────────────────────────────────
+     One instrument: a readout strip lit from its top edge - who, then the five figures, each
+     standing on a meter of its share of the wallet (APR on the set's own heat ramp) - and three
+     columns under it: the move, where the stake earns (a skyline over the set's APR range),
+     and the validators. Autopilot is the same frame. */
+  function ro(label, value, meta, meter, color, act, apr){
+    var m = meter == null ? "" : apr
+      ? '<i class="sd-m apr" style="background:' + rampCss() + '"><u style="left:' + (Math.max(0, Math.min(1, meter)) * 100).toFixed(1) + '%"></u></i>'
+      : '<i class=sd-m><s style="width:' + (meter > 0 ? Math.max(1.5, Math.min(100, meter * 100)) : 0).toFixed(1) + '%"></s></i>';
+    return '<div class=sd-ro' + (color ? ' style="--rc:' + color + '"' : '') + '>' + (act || "") + '<em>' + label + '</em><b>' + value + '</b>' +
+      '<small>' + (meta || "&nbsp;") + '</small>' + m + '</div>';
+  }
+  function fig(label, value, meta, color){
+    return '<div class=sd-fig' + (color ? ' style="--rc:' + color + '"' : '') + '><em>' + label + '</em><b>' + value + '</b>' + (meta ? '<small>' + meta + '</small>' : '') + '</div>';
+  }
+  /* the skyline: the set's APR range left to right on its own heat ramp; each of the wallet's
+     validators a bar at its APR, as tall as the stake there; the plan's targets as outlines; the
+     rest of the set as faint ticks under them. mark: ids to cap in violet (Autopilot's allow-list) */
+  function sky(rows, S, picks, mark){
+    var V = VALS(), mx = 0, i, t = "", b = "";
+    rows.forEach(function(r){ if(r.x > mx) mx = r.x; }); (picks || []).forEach(function(q){ if(q.x > mx) mx = q.x; });
+    for(i = 0; i < V.length; i++) t += '<s style="left:' + (heat(rate0(V[i][1], V[i][2])).p * 100).toFixed(2) + '%"></s>';
+    (picks || []).forEach(function(q){ var h = heat(q.r);
+      b += '<i class="sd-b to" style="left:' + (h.p * 100).toFixed(2) + '%;height:' + Math.max(4, q.x / (mx || 1) * 100).toFixed(1) + '%" data-t="' + esc(q.m) + ": " + fmt(q.x) + ' ATONE would earn ' + pct(q.r) + '"></i>'; });
+    rows.forEach(function(r){ var h = heat(r.inactive ? 0 : r.rate);
+      b += '<i class="sd-b' + (mark && mark[r.id] ? ' mk' : '') + '" style="left:' + (h.p * 100).toFixed(2) + '%;height:' + Math.max(4, r.x / (mx || 1) * 100).toFixed(1) + '%;--c:' + h.fill + '" data-t="' +
+        esc(r.m) + ": " + fmt(r.x) + ' ATONE at ' + (r.inactive ? "0% (inactive)" : pct(r.rate)) + '"></i>'; });
+    var md = heat(S.mid).p * 100;
+    return '<div class=sd-sky><div class=sd-plot>' + t + b + '</div><div class=sd-ax style="background:' + rampCss() + '"></div>' +
+      '<div class=sd-axl><span style="left:0">' + pct(S.lo) + '</span><span class=md style="left:' + md.toFixed(1) + '%">median ' + pct(S.mid) + '</span><span style="left:100%">' + pct(S.hi) + '</span></div></div>';
+  }
+  /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake */
+  function vlist(rows, total, n, mark){
+    rows = rows.slice().sort(function(a, b){ return b.x - a.x; });
+    var shown = rows.length > n ? rows.slice(0, n - 1) : rows, rest = rows.slice(shown.length), rx = 0;
+    rest.forEach(function(r){ rx += r.x; });
+    var h = shown.map(function(r){ var c = heat(r.inactive ? 0 : r.rate);
+      return '<div class="sd-vr click" data-v="' + esc(r.id) + '" tabindex=0 title="Open this validator" style="--c:' + c.fill + '">' +
+        '<span class=sv-lgo>' + logo(r.id, r.m) + '</span><span class=sd-vn><b>' + esc(r.m) + (mark && mark[r.id] ? '<i class=sd-al title="in the allow-list">allowed</i>' : '') + '</b>' +
+        '<s>' + fmt(r.x) + ' ATONE, ' + (r.x / (total || 1) * 100).toFixed(0) + '%' + (r.locked > 0 ? ', cooldown' : '') + '</s></span>' +
+        '<u style="color:' + c.ink + '">' + (r.inactive ? "inactive" : pct(r.rate)) + '</u></div>'; }).join("");
+    if(rest.length) h += '<div class="sd-vr more" data-route="dashboard/manual" tabindex=0 title="All your validators, in Manual"><span class=sv-lgo>+' + rest.length + '</span>' +
+      '<span class=sd-vn><b>' + rest.length + ' more</b><s>' + fmt(rx) + ' ATONE</s></span><u>see all</u></div>';
+    return '<div class=sd-list>' + h + '</div>';
+  }
+  /* the list shows what fits: rows past the panel's height fold into the '+N more' row */
+  function fitList(id){
+    var box = document.querySelector("#" + id + " .sd-list"); if(!box) return;
+    var rows = [].slice.call(box.querySelectorAll(".sd-vr.click")), more = box.querySelector(".sd-vr.more");
+    rows.forEach(function(r){ r.hidden = false; });
+    var lim = box.getBoundingClientRect().bottom + 1, hid = 0;
+    for(var i = rows.length - 1; i >= 0 && (more ? more.getBoundingClientRect().bottom : rows[rows.length - 1].getBoundingClientRect().bottom) > lim; i--){
+      rows[i].hidden = true; hid++;
+      if(!more){ more = document.createElement("div"); more.className = "sd-vr more"; more.setAttribute("data-route", "dashboard/manual"); more.tabIndex = 0; box.appendChild(more); }
+    }
+    if(hid && more){ var n = (+(more.dataset.base || 0)) + hid;
+      if(!more.dataset.base) more.dataset.base = String(more.querySelector("b") ? parseInt(more.querySelector("b").textContent, 10) || 0 : 0);
+      more.innerHTML = '<span class=sv-lgo>+' + (hid + (+more.dataset.base)) + '</span><span class=sd-vn><b>' + (hid + (+more.dataset.base)) + ' more</b><s>in Manual</s></span><u>see all</u>'; }
+  }
+  function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }
 
   function drawOver(){
     var pos = window.__POS, S = setStats(), bal = window.__BAL;
-    /* the wallet, as one thing: what it holds in all, how that splits (staked, available, rewards
-       waiting), what the staked part earns - then the PHOTON that pays fees and when it was read */
+    var mine = pos && pos.rows.length, rew = window.__REW || 0, liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0, tot = liq + stk + rew;
     var wname = (window.__WALLET && String(window.__WALLET.label || "").trim()) || "Your wallet";
-    var mine = pos && pos.rows.length, hr = mine ? heat(pos.rate) : null, rew = window.__REW || 0;
-    var liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0, tot = liq + stk + rew;
     var read = pos ? '<span class=sv-wread>' + (window.__POSAT ? 'read ' + ago(window.__POSAT) : '') +
       '<button class=sv-rf type=button data-act=refresh title="Read the wallet again" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button></span>' : '';
-    put("sv-wal",
-      /* the heading is the account's own name, as the wallet calls it (Keplr's key name) */
-      '<div class=sv-ph><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3><span class="sv-tag g">Self-custody</span><div class=sv-rt>' + read + '</div></div>' +
-      '<div class="sv-boxes four">' +
-        box("tot", "Total", (pos ? fmt(tot) : "—") + '<em>ATONE</em>',
-            mine ? 'staked ATONE earns <b style="color:' + hr.ink + '">' + pct(pos.rate) + '</b> a year' : pos ? "nothing staked" : "connect a wallet to read it") +
-        box("stk", "Staked", pos ? fmt(stk) : "—",
-            mine ? "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s") + (pos.locked > 0 ? ", " + fmt(pos.locked) + " in cooldown" : "") : pos ? "nothing staked" : "") +
-        box("bal", "Available", bal ? fmt(liq) : "—", bal ? '<b class=sv-pho>' + fmt(bal.uphoton) + '</b> PHOTON for fees' : "") +
-        box("rew", "Rewards", window.__REW != null ? fmt(rew) : "—", rew > 0 ? "ready to claim" : pos ? "nothing waiting" : "",
-            null, rew >= 1 ? '<button class=sv-bact type=button data-act=claim title="Claim your staking rewards">Claim</button>' : "") +
-      '</div>');
+    put("sd-wstrip",
+      '<div class=sd-id><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3><span class="sv-tag g">Self-custody</span>' + read + '</div>' +
+      ro("Total", pos ? fmt(tot) : "—", pos ? "ATONE in this wallet" : "connect a wallet", pos ? 1 : null, "var(--wt)") +
+      ro("Staked", pos ? fmt(stk) : "—", mine ? "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s") : pos ? "nothing staked" : "", pos ? stk / (tot || 1) : null, "var(--sv-amber)") +
+      ro("Available", bal ? fmt(liq) : "—", bal ? '<b class=sv-pho>' + fmt(bal.uphoton) + '</b> PHOTON for fees' : "", pos ? liq / (tot || 1) : null, "var(--sv-violet)") +
+      ro("Rewards", window.__REW != null ? fmt(rew) : "—", rew > 0 ? "ready to claim" : pos ? "nothing waiting" : "", pos ? rew / (tot || 1) : null, "var(--sv-green)",
+         rew >= 1 ? '<button class=sd-act type=button data-act=claim title="Claim your staking rewards">Claim</button>' : "") +
+      ro("APR", mine ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "—", mine ? "a year, on the staked ATONE" : "", mine ? heat(pos.rate).p : null, "", "", true));
 
-    /* the opportunity: the same plan the advanced view would sign */
-    var plan = planNow(pos);
-    var h = "";
+    /* the move */
+    var plan = planNow(pos), h = "", byId = {};
+    VALS().forEach(function(v){ byId[v[3]] = v; });
+    var picks = [];
     if(!pos){
-      /* a first visit: the three steps this screen is for, in the colours they carry below */
-      h = '<div class=sv-ph><h3>See what your stake could earn</h3>' +
-            '<div class=sv-rt><button class="sv-btn pri" type=button data-act=connect>Connect wallet</button></div></div>' +
-          '<ol class="sv-steps col">' +
-            '<li style="--sc:#ffb02e"><b>Connect</b><span>your wallet reads your stake; nothing leaves it</span></li>' +
-            '<li style="--sc:' + heat(S.mid).fill + '"><b>See where it sits</b><span>on the map: brighter validators pay more</span></li>' +
-            '<li style="--sc:#2ee06a"><b>Redelegate</b><span>to the best-paying place, in one signature</span></li>' +
-          '</ol>';
+      h = '<div class=sv-ph><h3>What your stake could earn</h3></div>' +
+        '<ol class="sv-steps col">' +
+          '<li style="--sc:#ffb02e"><b>Connect</b><span>your wallet reads your stake; nothing leaves it</span></li>' +
+          '<li style="--sc:' + heat(S.mid).fill + '"><b>See where it sits</b><span>on the skyline: further right pays more</span></li>' +
+          '<li style="--sc:#2ee06a"><b>Redelegate</b><span>to the best-paying place, in one signature</span></li>' +
+        '</ol><button class="sv-btn pri sd-go" type=button data-act=connect>Connect wallet</button>';
     } else if(!pos.rows.length){
-      /* nothing below it to show: the message and its one action take the screen's middle */
-      h = '<div class=sv-none><h3>No stake on AtomOne</h3>' +
-            '<button class="sv-btn go" type=button data-act=stake>Stake ATONE</button></div>';
+      h = '<div class=sv-none><h3>No stake on AtomOne</h3><button class="sv-btn go" type=button data-act=stake>Stake ATONE</button></div>';
     } else if(!(pos.free > 0)){
       h = '<div class=sv-ph><h3>Everything is under cooldown</h3>' + tag("a", "21 days") + '</div>' +
-          '<div class="sv-boxes two">' + box("now", "Your APR", pct(pos.rate), "on " + pos.rows.length + " validators", "--bc:" + heat(pos.rate).fill) +
-            box("cool", "Free to move on", window.__dayFull ? window.__dayFull(pos.until) : "—", fmt(pos.total) + " ATONE redelegated recently") + '</div>' +
-          '<div class=sv-note>All <b>' + fmt(pos.total) + ' ATONE</b> was redelegated recently, so the chain will not move it again until <b>' +
-          (window.__dayFull ? window.__dayFull(pos.until) : "") + '</b>.</div>';
+        fig("Your APR", pct(pos.rate), "on " + pos.rows.length + " validators", heat(pos.rate).fill) +
+        fig("Free to move on", window.__dayFull ? window.__dayFull(pos.until) : "—", fmt(pos.total) + " ATONE redelegated recently", "var(--sv-amber)") +
+        '<div class=sv-note>The chain will not move it again until then.</div>';
     } else if(!plan || !(plan.gain > 0.5) || plan.after == null){
       h = '<div class=sv-ph><h3>Nothing to gain by moving</h3></div>' +
-          '<div class="sv-boxes four eq sv-mv">' + box("now", "Your APR", '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>', "what your stake earns now", "--bc:" + heat(pos.rate).fill) +
-            box("hi", "Best in the set", '<span style="color:' + heat(S.hi).ink + '">' + pct(S.hi) + '</span>', "the highest APR any validator pays", "--bc:" + heat(S.hi).fill) +
-            box("stk", "Can move", fmt(pos.free), "ATONE free to redelegate") + box("tot", "Validators", String(pos.rows.length), "holding your stake") + '</div>' +
-          '<div class=sv-note>Your stake already earns as much as the set can pay it today. This window re-reads the chain every block and will say so when that changes.</div>' + jailNote(pos);
+        fig("Your APR", '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>', "what your stake earns now", heat(pos.rate).fill) +
+        fig("Best in the set", '<span style="color:' + heat(S.hi).ink + '">' + pct(S.hi) + '</span>', "the highest APR any validator pays", heat(S.hi).fill) +
+        fig("Can move", fmt(pos.free), "ATONE free to redelegate", "var(--sv-amber)") +
+        '<div class=sv-note>Your stake already earns as much as the set can pay it today. This window re-reads the chain every block and will say so when that changes.</div>' + jailNote(pos);
     } else {
-      /* now -> after -> a year: the stake as it earns today, where the plan puts it, and what
-         that is worth - each side drawn in the colours the map gives it */
       var lift = plan.after - plan.now, hn = heat(plan.now), ha = heat(plan.after);
-      var nowSegs = pos.rows.slice().sort(function(a, b){ return b.x - a.x; }).map(function(r){ return { w: r.x, r: r.rate, t: r.m }; });
-      var V = VALS(), byId = {}; V.forEach(function(v){ byId[v[3]] = v; });
-      var aftSegs = plan.picks.map(function(q){ var v = byId[q.id];
-        return { w: q.x, r: v && window.__rateAfter ? window.__rateAfter(v[1], v[2], q.x) : plan.after, t: q.m }; });
-      if(pos.locked > 0) aftSegs.push({ w: pos.locked, r: plan.now, t: "stays: under cooldown" });
-      h = '<div class=sv-ph><h3>Move your stake, earn more</h3>' + tag("g", pp(lift) + " APR") +
-          '<div class=sv-rt><button class="sv-btn go" type=button data-act=opt>Redelegate</button></div></div>' +
-          '<div class="sv-boxes three sv-mv">' +
-            side("now", "Now", pct(plan.now), hn, "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s"), nowSegs) +
-            side("aft", "After", pct(plan.after), ha, "on " + plan.picks.length + " validator" + (plan.picks.length === 1 ? "" : "s"), aftSegs) +
-            box("gain", "A year", "+" + one(plan.gain) + '<em>ATONE</em>', "more, at today\'s rates") +
-          '</div>' +
-          '<div class=sv-mvnote>' + plan.moves + ' move' + (plan.moves === 1 ? "" : "s") + ' in one signature. Redelegated stake stays in place for 21 days.</div>';
+      picks = plan.picks.map(function(q){ var v = byId[q.id]; return { id: q.id, m: q.m, x: q.x, r: v && window.__rateAfter ? window.__rateAfter(v[1], v[2], q.x) : plan.after }; });
+      h = '<div class=sv-ph><h3>Move your stake</h3>' + tag("g", "+" + (lift * 100).toFixed(1) + "% APR") + '</div>' +
+        '<div class=sd-figs>' +
+          fig("Now", '<span style="color:' + hn.ink + '">' + pct(plan.now) + '</span>', "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s"), hn.fill) +
+          fig("After", '<span style="color:' + ha.ink + '">' + pct(plan.after) + '</span>', "on " + plan.picks.length + " validator" + (plan.picks.length === 1 ? "" : "s"), ha.fill) +
+          fig("A year", '<span class=sd-gain>+' + one(plan.gain) + '</span><em class=u>ATONE</em>', "more, at today\'s rates", "var(--sv-green)") +
+        '</div>' +
+        '<button class="sv-btn go sd-go" type=button data-act=opt>Redelegate</button>' +
+        '<div class=sd-fine>' + plan.moves + ' move' + (plan.moves === 1 ? "" : "s") + ' in one signature, then 21 days in place.</div>';
     }
-    /* the hero wash only when there is a move to make - the page's one call to action */
-    var op = put("sv-optp", h); op.classList.toggle("hero", h.indexOf("data-act=opt") >= 0); op.classList.toggle("fill", h.indexOf("sv-none") >= 0);
+    var op = put("sd-move", h); op.classList.toggle("fill", h.indexOf("sv-none") >= 0);
 
-    /* where the stake sits now */
-    var al = E("sv-allocp");
-    if(!pos){
-      /* no wallet: the section keeps its shape, like the wallet pane in the other view */
-      al.hidden = false;
-      put("sv-allocp", '<div class=sv-ph><h3>The validators</h3>' + tag("q", S.n + " in the set") + '</div>' + '<div class=sv-vsc>' + scale([], S, true) + '</div>' + valSkel());
-    }
-    else if(!pos.rows.length){ al.hidden = true; }
-    else {
-      al.hidden = false;
-      put("sv-allocp", '<div class=sv-ph><h3>Your validators</h3>' +
-        tag("q", pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s")) + '</div>' + valList(pos, S));
-    }
+    /* where it earns */
+    var rows = pos ? pos.rows : [];
+    put("sd-sky", '<div class=sv-ph><h3>Where your stake earns</h3><span class=sv-gkey><i class=sk></i>your stake' + (picks.length ? '<i class=to></i>after the move' : '') + '<i class=st></i>the set</span></div>' +
+      sky(rows, S, picks) + (!pos ? '<div class=sd-over>Connect a wallet to see where your stake sits</div>' : ''));
 
+    /* the validators */
+    put("sd-list", pos && rows.length
+      ? '<div class=sv-ph><h3>Your validators</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total, 7)
+      : '<div class=sv-ph><h3>' + (pos ? "Your validators" : "Validators") + '</h3></div>' + (pos ? '<div class=sv-upwait>None yet</div>' : vskel(6)));
+    fitList("sd-list");
   }
-  /* Pricing the plan runs the whole optimiser and two quiet redraws of the
-     advanced pane, so it is done once per change that can move the answer and
-     read from cache in between. */
+
+  /* the plan is recomputed only when a stake moves or the position is re-read */
   var PC = { key: null, val: null };
   function planNow(pos){
     if(!pos || !(pos.free > 0) || !window.__optPlan) return null;
@@ -255,142 +272,56 @@
           .join(", ").replace(/, ([^,]*)$/, " and $1") + ' have been jailed in the past.') + '</div>';
   }
   /* one side of the plan: its APR in its own heat, and the stake as a bar of heat segments */
-  function side(cls, lab, big, h, sub, segs){
-    /* a long list is its eleven largest and one segment for the rest (a hundred validators would
-       not fit the bar), the rest painted at its stake-weighted rate */
-    if(segs.length > 12){
-      segs = segs.slice().sort(function(a, b){ return b.w - a.w; });
-      var rest = segs.slice(11), rw = 0, rr = 0;
-      rest.forEach(function(q){ rw += q.w; rr += q.w * q.r; });
-      segs = segs.slice(0, 11).concat([{ w: rw, r: rw ? rr / rw : 0, t: rest.length + " more validators" }]);
-    }
-    var tot = 0; segs.forEach(function(q){ tot += q.w; });
-    return '<div class="sv-box b-' + cls + '" style="--bc:' + h.fill + '"><span class=sv-bl>' + lab + '</span><b class=sv-bv style="color:' + h.ink + '">' + big + '</b>' +
-      '<span class=sv-bm>' + sub + '</span>' +
-      '<div class=sv-mbar>' + segs.map(function(q){
-        return '<em style="flex:' + (tot ? (q.w / tot * 100).toFixed(2) : 1) + ' 1 0;background:' + heat(q.r).fill + '" title="' + esc(q.t) + '"></em>'; }).join("") +
-      '</div></div>';
-  }
-  /* the same shape, waiting for a wallet */
-  function skelAlloc(){
-    var h = '<div class=sv-chips>', i;
-    for(i = 0; i < 5; i++) h += '<div class="sv-chip skel"><span class=sv-lgo></span><b></b><em></em><s></s><u></u></div>';
-    return h + '</div>';
-  }
-  /* The stake on the map, then validator by validator, largest first. Each validator is
-     pinned where the map paints it (the pin's size is its share of the stake), and its card
-     carries the same colour: a reader sees at a glance whether the stake sits at the dim,
-     low-paying end or the bright one. */
-  /* The wallet's validators as a list: where the stake sits on the APR scale (pins, sized by
-     share), then one shaded row each - logo, name and amount, a share bar in the validator's heat,
-     its APR in that colour. Five rows at most: four and the rest, which opens Manual. */
-  function valList(pos, S){
-    var rows = pos.rows.slice().sort(function(a, b){ return b.x - a.x; });
-    var pins = rows.map(function(r){ return { r: r.inactive ? 0 : r.rate, s: Math.round(8 + 9 * Math.sqrt(r.x / pos.total)), t: r.m + ", " + pct(r.rate) }; });
-    if(rows.length > 12) pins.forEach(function(q){ q.s = Math.max(7, Math.round(q.s * .7)); });
-    var shown = rows.length > 5 ? rows.slice(0, 4) : rows, rest = rows.slice(shown.length), restX = 0;
-    rest.forEach(function(r){ restX += r.x; });
-    var h = '<div class=sv-vlist>' + shown.map(function(r){ var c = heat(r.inactive ? 0 : r.rate), sh = r.x / pos.total * 100;
-      return '<div class="sv-vr click" data-v="' + esc(r.id) + '" tabindex=0 title="Open this validator" style="--c:' + c.fill + '">' +
-        '<span class=sv-lgo>' + logo(r.id, r.m) + '</span>' +
-        '<b class=sv-vn>' + esc(r.m) + '</b><s class=sv-va title="' + (r.locked > 0 ? 'part of it in its 21-day cooldown' : '') + '">' + fmt(r.x) + '<em>ATONE</em></s>' +
-        '<span class=sv-vs><span class=sv-vt><i style="width:' + Math.max(2, sh).toFixed(1) + '%"></i></span><em>' + Math.round(sh) + '%</em></span>' +
-        '<u style="color:' + c.ink + '">' + (r.inactive ? "inactive" : pct(r.rate)) + '</u></div>'; }).join("");
-    if(rest.length) h += '<div class="sv-vr more" data-route="dashboard/manual" tabindex=0 title="All your validators, in Manual">' +
-      '<span class=sv-lgo>+' + rest.length + '</span><b class=sv-vn>' + rest.length + ' more</b><s class=sv-va>' + fmt(restX) + '<em>ATONE</em></s>' +
-      '<span class=sv-vs><span class=sv-vt><i style="width:' + (restX / pos.total * 100).toFixed(1) + '%"></i></span><em>' + Math.round(restX / pos.total * 100) + '%</em></span><u>see all</u></div>';
-    return '<div class=sv-vsc title="The largest validators pay least, the smallest pay most">' + scale(pins, S, true) + '</div>' + h + '</div>';
-  }
-  function valSkel(){
-    var h = '<div class=sv-vlist>', i;
-    for(i = 0; i < 4; i++) h += '<div class="sv-vr skel"><span class=sv-lgo></span><b class=sv-vn></b><s class=sv-va></s><span class=sv-vs><span class=sv-vt></span></span><u></u></div>';
-    return h + '</div>';
-  }
-  /* how to read the scale, said once, in its own colours */
-  function hint(){ return '<span class=sv-hint><i class=lo></i>the largest pay least<i class=hi></i>the smallest pay most</span>'; }
-  function allocation(pos, S, noScale){
-    var rows = pos.rows.slice().sort(function(a, b){ return b.x - a.x; });
-    var pins = rows.map(function(r){ return { r: r.inactive ? 0 : r.rate, s: Math.round(9 + 11 * Math.sqrt(r.x / pos.total)), t: r.m + ", " + pct(r.rate) }; });
-    /* one row, however many validators: the four largest and a card for the rest, which
-       opens Manual with the whole list (twenty or fifty cards would push the screen out of
-       its box). The pins still show every one, smaller the more there are. */
-    var shown = rows.length > 5 ? rows.slice(0, 4) : rows, rest = rows.slice(shown.length), restX = 0;
-    rest.forEach(function(r){ restX += r.x; });
-    if(rows.length > 12) pins.forEach(function(q){ q.s = Math.max(7, Math.round(q.s * .7)); });
-    var more = rest.length ? '<div class="sv-chip more click" data-route="dashboard/manual" tabindex=0 title="All your validators, in Manual">' +
-      '<span class=sv-lgo>+' + rest.length + '</span><b>' + rest.length + ' more</b><em>' + Math.round(restX / pos.total * 100) + '<small>%</small></em>' +
-      '<s>' + fmt(restX) + ' ATONE</s><u>see all</u></div>' : "";
-    return (noScale ? "" : scale(pins, S || setStats())) +
-      '<div class=sv-chips>' + shown.map(function(r){ var h = heat(r.inactive ? 0 : r.rate);
-        return '<div class="sv-chip click' + (r.locked > 0 ? " hld" : "") + '" data-v="' + esc(r.id) + '" tabindex=0 title="Open this validator" style="--c:' + h.fill + '">' +
-          '<span class=sv-lgo>' + logo(r.id, r.m) + '</span>' +
-          '<b>' + esc(r.m) + '</b><em>' + Math.round(r.x / pos.total * 100) + '<small>%</small></em>' +
-          '<s>' + fmt(r.x) + ' ATONE' + (r.locked > 0 ? ', in cooldown' : '') + '</s><u style="color:' + h.ink + '">' + (r.inactive ? "inactive" : pct(r.rate)) + '</u></div>'; }).join("") + more + '</div>';
-  }
   function ago(at){ var s = Math.max(0, Math.round((Date.now() - at) / 1000)); return s < 60 ? s + "s ago" : Math.floor(s / 60) + "m ago"; }
 
-  /* ── AUTOPILOT ──────────────────────────────────────────────────────────── */
+  /* ── AUTOPILOT: the Wallet's frame - the strip, then what it does, the skyline of what it
+     would manage (the allow-list capped in violet once a grant stands), and the validators ── */
   function drawAuto(){
-    var pos = window.__POS, at = window.__atInfo ? window.__atInfo() : null, g = at && at.grant;
-    var a = g && g.authorization || {};
-    var allow = ((a.allow_list || {}).address || []).length;
+    var pos = window.__POS, S = setStats(), at = window.__atInfo ? window.__atInfo() : null, g = at && at.grant;
+    var a = g && g.authorization || {}, alist = (a.allow_list || {}).address || [], mark = null;
+    if(g && alist.length){ mark = {}; var VD = window.__VDBY || {}; for(var k in VD) if(VD[k].op && alist.indexOf(VD[k].op) >= 0) mark[k] = 1; }
     var until = g && g.expiration && window.__dayFull ? window.__dayFull(new Date(g.expiration).getTime()) : null;
-    var state = g ? tag("g", "Active") : tag("q", "Inactive");
-    /* the one door this screen needs, for where the reader is: no wallet, a wallet with
-       nothing staked, a stake with no grant, a grant standing */
+    var rp = at && at.report, moves = rp && rp.history ? rp.history.length : 0, rec = g && rp && rp.record && rp.record.start ? rp.record : null;
+    var sgn = function(d){ return (d >= 0 ? "+" : "−") + Math.abs(d * 100).toFixed(1) + "%"; }, sgnA = function(u){ return (u >= 0 ? "+" : "−") + one(Math.abs(u) / 1e6); };
     var door = !pos ? '<button class="sv-btn pri" type=button data-act=connect>Connect wallet</button>'
       : !pos.rows.length ? '<button class="sv-btn pri" type=button data-act=stake>Stake ATONE</button>'
       : '<button class="sv-btn ' + (g ? "" : "vio") + '" type=button data-act=autopilot>' + (g ? "Manage" : "Set up") + '</button>';
-
-    put("sv-atp",
-      '<div class=sv-ph><h3>Autopilot</h3>' + state + '<div class=sv-rt>' + door + '</div></div>' +
-      '<div class=sv-note>Autopilot moves your stake to better-paying validators for you: only among the validators <i>you</i> pick, ' +
-      'only for as long as <i>you</i> choose. Your ATONE never leaves your wallet, and you can switch it off at any time.</div>' +
-      '<div class="sv-cards four">' +
-        card("Strategy", g ? esc(strategyWord(g)) : "—", g ? allow + " allowed validators" : "chosen when you set it up") +
-        card("Stake it may move", g ? esc(a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "—", g ? "the cap you signed" : "a cap you set") +
-        card("Runs until", until || "—", g ? "then it lapses on its own" : "3 or 6 months", "sm") +
-        card("Your APR", pos && pos.rows.length ? pct(pos.rate) : "—", pos && pos.rows.length ? "on " + whole(pos.total) + " ATONE" : "") +
-      '</div>');
-
-    var al = E("sv-atalloc");
-    if(!pos){
-      /* no wallet: the section keeps its shape, as on the overview */
-      al.hidden = false;
-      put("sv-atalloc", '<div class=sv-ph><h3>What it would manage</h3></div>' + skelAlloc());
-    } else if(pos.rows.length){
-      al.hidden = false;
-      var rp = at && at.report, last = rp && rp.checked ? window.__dayFull(rp.checked * 1000) : null;
-      /* what the keeper has done, in the header: the moves, and when it last looked */
-      var mv = rp && rp.history && rp.history.length
-        ? tag("q", rp.history.length + " move" + (rp.history.length === 1 ? "" : "s") + ", last " + window.__dayFull(rp.history[0].at * 1000))
-        : tag("q", "no move yet", "The keeper only moves stake when the gain is worth the 21-day cooldown it costs");
-      put("sv-atalloc", '<div class=sv-ph><h3>' + (g ? "What it manages" : "What it would manage") + '</h3>' +
-          tag("q", pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s")) +
-          '<div class=sv-rt>' + (g ? mv + tag("g", last ? "checked " + last : "not checked yet") : tag("q", "your stake as it stands")) + '</div></div>' +
-        allocation(pos, null, true));
-    } else al.hidden = true;
-
-    put("sv-atauth",
-      '<div class=sv-ph><h3>What the grant allows</h3>' + tag("q", "enforced by the chain, not by us") + '</div>' +
-      '<div class=sv-can>' +
-        '<div><u>it may</u><p>' +
-          '<span class=sv-ok>redelegate inside your allow-list</span>' +
-          (at && at.restake ? '<span class=sv-ok>claim and restake your rewards</span>' : '<span class=sv-dim>claim and restake, if you switch it on</span>') +
-        '</p></div>' +
-        '<div><u>it may never</u><p>' +
-          '<span class=sv-bad>send or spend your ATONE</span>' +
-          '<span class=sv-bad>unstake it</span>' +
-          '<span class=sv-bad>hold or custody it</span>' +
-        '</p></div>' +
+    put("sd-astrip",
+      '<div class=sd-id><h3>Autopilot</h3>' + (g ? tag("g", "Active") : tag("q", "Inactive")) + door + '</div>' +
+      /* active: what it has earned, never the strategy behind it */
+      (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "—", rec ? sgnA((rec.rate - rec.start.rate) * rec.staked) + " ATONE a year" : "first check pending", null, "var(--sv-green)")
+         : ro("Strategy", "—", "chosen when you set it up", null, "var(--sv-violet)")) +
+      ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "—", g ? "ATONE, the cap you signed" : "a cap you set", g && a.max_tokens && pos ? Math.min(1, +a.max_tokens.amount / (pos.total || 1)) : null, "var(--sv-violet)") +
+      ro("Runs until", until || "—", g ? "then it lapses on its own" : "3 or 6 months", null, "var(--sv-violet)") +
+      ro("Moves made", g ? String(moves) : "—", g ? (rp && rp.checked ? "checked " + window.__dayFull(rp.checked * 1000) : "not checked yet") : "", null, "var(--sv-teal)") +
+      ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "—", pos && pos.rows.length ? "on " + whole(pos.total) + " ATONE" : "", pos && pos.rows.length ? heat(pos.rate).p : null, "", "", true));
+    if(g) put("sd-ado",
+      '<div class=sv-ph><h3>Autopilot is working</h3></div>' +
+      '<div class=sd-ok>Your stake is safe with us, strategy is active.</div>' +
+      '<div class=sd-figs>' +
+        fig("Since Autopilot started", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.start.rate) + '</span><em class=u>APR</em>' : "—",
+            rec ? sgnA((rec.rate - rec.start.rate) * rec.staked) + " ATONE a year, since " + window.__dayFull(rec.start.at * 1000) : "its record starts with its first check", "var(--sv-green)") +
+        fig("Last 3 months", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.m3.rate) + '</span><em class=u>APR</em>' : "—",
+            rec ? sgnA((rec.rate - rec.m3.rate) * rec.staked) + " ATONE a year" : "", "var(--sv-teal)") +
       '</div>' +
-      '<div class=sv-note>' + (at && at.split_pct > 0
-        ? 'GATA keeps <b>' + at.split_pct + '%</b> of the rewards it restakes for you, and charges nothing else.'
-        : 'Autopilot is <b>free</b>: GATA takes no share of your rewards.') + '</div>' +
-      "");
+      '<div class=sd-fine>The chain enforces the grant: it may redelegate inside your allow-list, and never send, unstake or hold your ATONE.</div>');
+    else put("sd-ado",
+      '<div class=sv-ph><h3>What it does</h3></div>' +
+      '<div class=sv-note>It moves your stake to better-paying validators for you: only among the validators <i>you</i> pick, only for as long as <i>you</i> choose.</div>' +
+      '<div class=sd-can><u class=ok>It may</u>' +
+        '<span class=ok>redelegate inside your allow-list</span>' +
+        (at && at.restake ? '<span class=ok>claim and restake your rewards</span>' : '<span class=dim>claim and restake, if you switch it on</span>') +
+      '<u class=no>It may never</u><span class=no>send or spend your ATONE</span><span class=no>unstake it</span><span class=no>hold or custody it</span></div>' +
+      '<div class=sd-fine>' + (at && at.split_pct > 0 ? 'GATA keeps <b>' + at.split_pct + '%</b> of the rewards it restakes for you, and charges nothing else.'
+        : 'Autopilot is <b>free</b>: GATA takes no share of your rewards.') + ' The chain enforces these limits, not us.</div>');
+    var rows = pos ? pos.rows : [];
+    put("sd-asky", '<div class=sv-ph><h3>' + (g ? "What it manages" : "What it would manage") + '</h3><span class=sv-gkey><i class=sk></i>your stake' + (mark ? '<i class=mk></i>in the allow-list' : '') + '<i class=st></i>the set</span></div>' +
+      sky(rows, S, [], mark) + (!pos ? '<div class=sd-over>Connect a wallet to see what it would manage</div>' : !rows.length ? '<div class=sd-over>Nothing staked for it to manage</div>' : ''));
+    put("sd-alist", rows.length ? '<div class=sv-ph><h3>Validators</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total, 7, mark)
+      : '<div class=sv-ph><h3>Validators</h3></div>' + (pos ? '<div class=sv-upwait>None yet</div>' : vskel(6)));
+    fitList("sd-alist");
   }
-  /* the strategy word lives in the grant's memo, which the chain does not keep:
-     what stands on chain is the allow-list, so that is what this states */
+
   function strategyWord(g){
     var a = g && g.authorization || {}, n = ((a.allow_list || {}).address || []).length, V = VALS().length;
     return n >= V ? "Whole set" : n + " of " + V + " validators";
@@ -785,7 +716,7 @@
   }
   /* a bar's reading, at once (the native title waits a second): the bar's data-t, above it */
   function barHover(ev){
-    var b = ev.target.closest ? ev.target.closest(".sv-bars i[data-t],.sv-pace i[data-t]") : null;
+    var b = ev.target.closest ? ev.target.closest(".sv-bars i[data-t],.sv-pace i[data-t],.sd-plot i[data-t]") : null;
     Array.prototype.forEach.call(document.querySelectorAll(".sv-btip.on"), function(x){ if(!b || x.parentNode !== b.parentNode) x.classList.remove("on"); });
     if(!b) return;
     var box = b.parentNode, t = box.querySelector(".sv-btip");

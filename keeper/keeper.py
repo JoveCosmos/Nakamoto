@@ -46,11 +46,27 @@ def get(path):
     req = urllib.request.Request(API + path, headers={"accept": "application/json"})
     with urllib.request.urlopen(req, timeout=30) as r: return json.load(r)
 
+def rate_record(c, granter, rows):
+    """log the granter's blended APR now, and return it with the APR where Autopilot started
+    (the first logged check) and three months ago (the latest check at least 90 days old, else
+    the start) - what the page states as 'since Autopilot started' and 'over the last 3 months'"""
+    tot = sum(r["x"] for r in rows)
+    if not tot:
+        return None
+    now = int(time.time()); rate = sum(r["x"] * r["rate"] for r in rows) / tot
+    c.execute("INSERT INTO rate_log VALUES(?,?,?,?)", (now, granter, rate, int(tot))); c.commit()
+    first = c.execute("SELECT at, rate FROM rate_log WHERE granter=? ORDER BY at LIMIT 1", (granter,)).fetchone()
+    m3 = c.execute("SELECT at, rate FROM rate_log WHERE granter=? AND at<=? ORDER BY at DESC LIMIT 1", (granter, now - 90 * 86400)).fetchone() or first
+    return {"rate": rate, "staked": int(tot), "start": {"at": first[0], "rate": first[1]}, "m3": {"at": m3[0], "rate": m3[1]}}
+
+
 def db():
     c = sqlite3.connect(STATE); c.execute("PRAGMA journal_mode=WAL")
     c.execute("CREATE TABLE IF NOT EXISTS run(at INT, grants INT, acted INT, note TEXT)")
     c.execute("CREATE TABLE IF NOT EXISTS move(at INT, granter TEXT, src TEXT, dst TEXT, uatone INT, gain REAL, txhash TEXT, dry INT)")
     c.execute("CREATE TABLE IF NOT EXISTS run_g(at INT, granter TEXT)")
+    # the granter's blended APR at each check: the first row is where Autopilot started from
+    c.execute("CREATE TABLE IF NOT EXISTS rate_log(at INT, granter TEXT, rate REAL, staked INT)")
     # the reward-split ledger: what each granter's stake has earned since we first saw
     # them, and what we have collected of our share - the difference is the due
     c.execute("CREATE TABLE IF NOT EXISTS fee_ledger(granter TEXT PRIMARY KEY, earned INT, collected INT, updated INT)")
@@ -294,8 +310,10 @@ def once(c, only=None, live=None, force=False):
             rows, reds = position(g["granter"], vals)
             p = plan(g, rows, reds, vals, m, P)
             c.execute("INSERT INTO run_g VALUES(?,?)", (int(time.time()), g["granter"])); c.commit()
+            record = rate_record(c, g["granter"], rows)
             rep = {"granter": g["granter"], "checked": int(time.time()), "dry": dry, "strategy": name, "grant": {"cap": g["cap"], "allow": len(g["allow"]) if g["allow"] else None, "expires": g["exp"]},
                    "staked": sum(r["x"] for r in rows), "now": None, "after": None, "moves": [], "last": None}
+            if record: rep["record"] = record
             hist = c.execute("SELECT at, src, dst, uatone, gain, txhash FROM move WHERE granter=? AND dry=0 ORDER BY at DESC LIMIT 10", (g["granter"],)).fetchall()
             rep["history"] = [{"at": h[0], "src": h[1], "dst": h[2], "uatone": h[3], "gain": h[4], "txhash": h[5]} for h in hist]
             if p:

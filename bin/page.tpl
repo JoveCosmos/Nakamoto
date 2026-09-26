@@ -3725,6 +3725,115 @@ background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.01))}
 .sv-cells i{border-radius:1px;background:color-mix(in srgb,var(--sv-teal) 75%,transparent)}
 .sv-cells i.j{background:var(--sv-amber)}
 .sv-span .sv-sub{font-size:12px}
+/* ══ Wallet and Autopilot: one frame. A readout strip lit from its top edge (who, then five
+   figures, each in its own colour along the top rim and standing on a meter of its share),
+   then three columns: figures hanging from the left rim, the skyline, a flat list. ══ */
+html[data-svs=over] #sv-over,html[data-svs=auto] #sv-auto{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:12px}
+.sd-scr>*,.sd-scr>*:not(:first-child){margin-top:0}
+.sd-grid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.55fr) minmax(0,1fr);gap:12px;min-height:0}
+.sd-col{background:linear-gradient(180deg,#131329,#0c0c1a);border:1px solid var(--wbd2);border-radius:12px;box-shadow:inset 0 1px 0 #ffffff08;
+position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-direction:column}
+.sd-col::before{content:"";position:absolute;left:16px;right:16px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opacity:.95;pointer-events:none}
+#sd-move,#sd-ado{--tc:var(--sv-green)}#sd-sky,#sd-asky{--tc:var(--sv-amber)}#sd-list,#sd-alist{--tc:var(--sv-teal)}#sd-ado{--tc:var(--sv-violet)}
+/* the strip */
+.sd-strip{display:grid !important;grid-template-columns:minmax(0,1.2fr) repeat(5,minmax(0,1fr));padding:0 !important;gap:0 !important;overflow:hidden}
+.sd-id{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:7px;padding:14px 18px;min-width:0}
+.sd-id h3{margin:0;font-size:18px;font-weight:700;letter-spacing:-.01em;color:var(--wt);max-width:100%}
+.sd-id .sv-wread{font-size:11px}
+.sd-ro{--rc:var(--sv-teal);position:relative;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:14px 18px 13px;min-width:0;border-left:1px solid var(--wbd)}
+.sd-ro::before{content:"";position:absolute;left:18px;right:18px;top:0;height:2px;border-radius:0 0 2px 2px;background:var(--rc);box-shadow:0 0 12px var(--rc);opacity:.85}
+.sd-ro em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
+.sd-ro>b{font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.15;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sd-ro small{font-size:11px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sd-ro small b{font-size:inherit;font-weight:700}
+.sd-m{display:block;position:relative;height:4px;border-radius:2px;background:var(--wbd);margin-top:9px}
+.sd-m s{display:block;height:100%;border-radius:2px;background:var(--rc);box-shadow:0 0 8px var(--rc)}
+.sd-m.apr u{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--wc);border:2px solid var(--wt);box-shadow:0 0 8px rgba(255,255,255,.4)}
+.sd-act{position:absolute;top:12px;right:14px;height:22px;padding:0 9px;border-radius:6px;border:1px solid rgba(46,224,106,.45);background:rgba(46,224,106,.1);
+color:#5cf08e;font-family:var(--wmono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.sd-act:hover{background:#2ee06a;border-color:#2ee06a;color:#062a14}
+.sd-act:focus-visible{outline:2px solid #2ee06a;outline-offset:2px}
+/* figures hanging from the left rim: open on the rim side, the value's colour along it */
+.sd-figs{display:flex;flex-direction:column;gap:8px;flex:1 1 auto;min-height:0}
+.sd-fig{--rc:var(--sv-teal);position:relative;flex:1 1 0;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:1px;margin-left:-17px;
+padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radius:0 12px 12px 0;overflow:hidden;background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.008))}
+.sd-fig::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:2px;border-radius:0 2px 2px 0;background:var(--rc);box-shadow:0 0 12px var(--rc)}
+.sd-fig::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--rc),rgba(0,0,0,0) 70%);opacity:.1;pointer-events:none}
+.sd-fig em{font-style:normal;font-family:var(--wmono);font-size:9px;line-height:1.3;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+.sd-fig>b{display:flex;align-items:baseline;gap:7px;font-size:25px;font-weight:800;letter-spacing:-.02em;line-height:1.05;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sd-fig>b .u{font-style:normal;font-family:var(--wmono);font-size:10px;font-weight:400;letter-spacing:.14em;color:var(--wf)}
+.sd-fig small{font-size:11px;line-height:1.2;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sd-col>.sd-fig{flex:0 0 auto;padding-top:9px;padding-bottom:9px}
+.sd-gain{color:var(--sv-green)}
+.sd-ok{font-size:13px;line-height:1.45;color:var(--wt);padding:8px 12px;border-radius:8px;border:1px solid rgba(46,224,106,.35);background:rgba(46,224,106,.07)}
+.sd-go{width:100%;height:40px;flex:0 0 auto;justify-content:center}
+.sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
+.sd-fine b{color:var(--wt)}
+#sd-move.fill{justify-content:center;align-items:center}
+/* the skyline */
+.sd-sky{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.sd-plot{position:relative;flex:1 1 auto;min-height:60px;margin:0 14px;
+background:repeating-linear-gradient(0deg,transparent 0 calc(25% - 1px),rgba(255,255,255,.05) calc(25% - 1px) 25%)}
+.sd-plot s{position:absolute;bottom:0;width:1px;height:9px;margin-left:-.5px;background:var(--wf);opacity:.55}
+.sd-b{position:absolute;bottom:0;width:14px;margin-left:-7px;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--c),rgba(0,0,0,0) 180%);
+box-shadow:0 0 16px -3px var(--c);cursor:crosshair}
+.sd-b:hover{filter:brightness(1.25)}
+.sd-b.to{background:rgba(46,224,106,.06);border:1.5px dashed var(--sv-green);border-bottom:0;box-shadow:none}
+.sd-b.mk{box-shadow:inset 0 3px 0 var(--sv-violet),0 0 16px -3px var(--c)}
+.sd-ax{height:6px;margin:0 14px;border-radius:0 0 3px 3px}
+.sd-axl{position:relative;height:16px;margin:4px 14px 0;font-family:var(--wmono);font-size:9.5px;color:var(--ws)}
+.sd-axl span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+.sd-axl span:first-child{transform:none}.sd-axl span:last-child{transform:translateX(-100%)}
+.sd-axl span.md{color:var(--wf)}
+.sd-over{position:absolute;left:16px;right:16px;top:44px;bottom:34px;display:grid;place-items:center;text-align:center;font-size:12.5px;color:var(--ws);pointer-events:none}
+.sv-gkey i.sk{background:linear-gradient(90deg,#8a5bb8,#ff7a3c,#ffd662)}
+.sv-gkey i.to{background:transparent;border:1.5px dashed var(--sv-green);border-radius:2px}
+.sv-gkey i.st{width:1px;height:10px;border-radius:0;background:var(--wf)}
+.sv-gkey i.mk{background:var(--sv-violet)}
+/* the list: flat rows on hairlines, not boxes */
+.sd-list{display:flex;flex-direction:column;min-height:0;overflow:hidden;flex:1 1 auto}
+.sd-list>.sd-vr{flex:0 0 auto}
+.sd-vr{--c:var(--wbd2);display:grid;grid-template-columns:26px minmax(0,1fr) auto;align-items:center;gap:11px;padding:8px 6px;border-top:1px solid var(--wbd);border-radius:0}
+.sd-vr:first-child{border-top:0}
+.sd-vr.click,.sd-vr.more{cursor:pointer}
+.sd-vr.click:hover,.sd-vr.more:hover{background:rgba(255,255,255,.03)}
+.sd-vr:focus-visible{outline:2px solid var(--sv-teal);outline-offset:-2px}
+.sd-vr .sv-lgo{width:26px;height:26px;border-radius:8px;overflow:hidden;display:grid;place-items:center;box-shadow:0 0 0 1.5px var(--c)}
+.sd-vr .sv-lgo img,.sd-vr .sv-lgo .lg{width:26px;height:26px;display:grid;place-items:center;object-fit:cover;font-size:10px;font-weight:700;color:#fff}
+.sd-vn{display:flex;flex-direction:column;gap:1px;min-width:0}
+.sd-vn b{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--wt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sd-vn s{text-decoration:none;font-family:var(--wmono);font-size:10px;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sd-vr u{text-decoration:none;font-family:var(--wmono);font-size:12.5px;font-weight:700;white-space:nowrap}
+.sd-al{font-style:normal;font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--sv-violet);border:1px solid rgba(185,176,255,.4);border-radius:4px;padding:0 4px}
+.sd-vr.more .sv-lgo{background:var(--wbd);color:var(--ws);font-family:var(--wmono);font-size:10px;font-weight:700;box-shadow:none}
+.sd-vr.more u{color:var(--sv-teal);font-weight:400;font-size:10.5px}
+.sd-vr.skel .sv-lgo{background:var(--wbd2);opacity:.5;box-shadow:none}
+.sd-vr.skel b,.sd-vr.skel s,.sd-vr.skel u{display:block;height:9px;border-radius:3px;background:var(--wbd)}
+.sd-vr.skel b{width:60%}.sd-vr.skel s{width:40%;margin-top:4px}.sd-vr.skel u{width:40px}
+/* what Autopilot may and may never do */
+.sd-can{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--ws);flex:1 1 auto;min-height:0}
+.sd-can u{text-decoration:none;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;margin-top:6px}
+.sd-can u.ok{color:var(--sv-green)}.sd-can u.no{color:#ff7a57}
+.sd-can span{position:relative;padding-left:14px}
+.sd-can span::before{content:"";position:absolute;left:2px;top:.55em;width:6px;height:6px;border-radius:50%;background:currentColor}
+.sd-can span.ok{color:#8ff0b0}.sd-can span.no{color:#ff9b7a}.sd-can span.dim{color:var(--wf)}
+@media(min-width:901px) and (max-height:820px){
+  .sd-ro{padding-top:10px;padding-bottom:9px}.sd-ro>b{font-size:19px}.sd-m{margin-top:6px}
+  .sd-id{padding:10px 16px;gap:5px}.sd-id h3{font-size:16px}
+  .sd-col{padding:11px 14px;gap:8px}.sd-fig{margin-left:-15px}.sd-fig>b{font-size:21px}.sd-fig small{font-size:10px}
+  .sd-vr{padding-top:6px;padding-bottom:6px}.sd-go{height:36px}
+}
+@media(max-width:900px){
+  html[data-svs=over] #sv-over,html[data-svs=auto] #sv-auto{grid-template-rows:none}
+  .sd-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sd-id{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;align-items:center}
+  .sd-ro{border-left:0;border-top:1px solid var(--wbd)}
+  .sd-ro:nth-child(odd){border-left:1px solid var(--wbd)}
+  .sd-ro:last-child{grid-column:1/-1;border-left:0}
+  .sd-grid{grid-template-columns:minmax(0,1fr)}
+  .sd-plot{height:200px;flex:0 0 auto}
+  .sd-figs{flex:0 0 auto}.sd-fig{flex:0 0 auto;padding-top:9px;padding-bottom:9px}
+}
 /* ══ Autopilot: one screen to set it up ═══════════════════════════════════════════════
    The terms on the left (strategy, which validators, stake, time, restake), the validator set
    on the right to choose from - search it, narrow it, select one by one or by a rule - and one
@@ -4231,17 +4340,21 @@ html[data-tab=connect] .l2host{display:none}
   <!-- Simple: the dashboard's other face. Same window, same frame as the pane above. -->
   <div id=sv>
     <main class=sv-main>
-      <section class=sv-screen id=sv-over data-sc=over aria-label=Wallet>
-        <div class="sv-panel sv-wal" id=sv-wal></div>
-        <div class=sv-row2>
-          <div class=sv-panel id=sv-optp></div>
-          <div class=sv-panel id=sv-allocp></div>
+      <section class="sv-screen sd-scr" id=sv-over data-sc=over aria-label=Wallet>
+        <div class="sv-panel sd-strip" id=sd-wstrip></div>
+        <div class=sd-grid>
+          <div class="sv-panel sd-col" id=sd-move></div>
+          <div class="sv-panel sd-col" id=sd-sky></div>
+          <div class="sv-panel sd-col" id=sd-list></div>
         </div>
       </section>
-      <section class=sv-screen id=sv-auto data-sc=auto aria-label=Autopilot>
-        <div class=sv-panel id=sv-atp></div>
-        <div class=sv-panel id=sv-atalloc></div>
-        <div class=sv-panel id=sv-atauth></div>
+      <section class="sv-screen sd-scr" id=sv-auto data-sc=auto aria-label=Autopilot>
+        <div class="sv-panel sd-strip" id=sd-astrip></div>
+        <div class=sd-grid>
+          <div class="sv-panel sd-col" id=sd-ado></div>
+          <div class="sv-panel sd-col" id=sd-asky></div>
+          <div class="sv-panel sd-col" id=sd-alist></div>
+        </div>
       </section>
       <section class=sv-screen id=sv-net data-sc=net aria-label=Network>
         <div class=sv-cards id=sv-netcards></div>

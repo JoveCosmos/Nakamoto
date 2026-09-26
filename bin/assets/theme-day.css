@@ -575,6 +575,36 @@
   html[data-theme=light]:not([data-mono]) .sv-rd::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #sv-netcards .sv-span .sv-k::before,html[data-theme=light]:not([data-mono]) #sv-netcards .sv-span .sv-k::after{background:transparent}
   html[data-theme=light]:not([data-mono]) #sv-netcards .sv-span .sv-k::after{background:transparent}
+  html[data-theme=light]:not([data-mono]) .sd-col{background:var(--surface-2);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-col::before{background:transparent}
+  html[data-theme=light]:not([data-mono]) .sd-ro::before{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-m s{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-m.apr u{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-act{border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sd-act:hover{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .sd-act:focus-visible{outline:2px solid var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sd-fig{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sd-fig::before{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-fig::after{background:var(--rc)}
+  html[data-theme=light]:not([data-mono]) .sd-ok{border:1px solid var(--accent);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sd-plot{background:transparent}
+  html[data-theme=light]:not([data-mono]) .sd-b{background:var(--c);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-b.to{background:var(--accent-soft);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-b.mk{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-gkey i.sk{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-gkey i.to{background:transparent}
+  html[data-theme=light]:not([data-mono]) .sd-vr.click:hover,html[data-theme=light]:not([data-mono]) .sd-vr.more:hover{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sd-vr .sv-lgo{box-shadow:0 0 0 1.5px var(--c)}
+  html[data-theme=light]:not([data-mono]) .sd-vr .sv-lgo img,html[data-theme=light]:not([data-mono]) .sd-vr .sv-lgo .lg{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .sd-vn s{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .sd-vr u{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .sd-al{border:1px solid var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sd-vr.more .sv-lgo{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-vr.skel .sv-lgo{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-can u{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .sd-can u.no{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .sd-can span.ok{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sd-can span.no{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .pop .card.atcard{--av:var(--accent)}
   html[data-theme=light]:not([data-mono]) .pop .card.atcard::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .atcard .txsum{color:var(--muted)}
