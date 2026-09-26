@@ -647,16 +647,16 @@
 
   /* ── Activity: transactions per hour over the last 24 hours, or per day since genesis (a line),
      from the indexer; and per block, live ── */
-  var AW = (function(){ try{ return localStorage.getItem("th_aw") === "all" ? "all" : "24h"; }catch(e){ return "24h"; } })();
-  var BW = (function(){ try{ var v = localStorage.getItem("th_bw"); return v === "24h" || v === "all" ? v : "100"; }catch(e){ return "100"; } })();
+  var AW = (function(){ try{ var v = localStorage.getItem("th_aw"); return v === "30d" || v === "all" ? v : "24h"; }catch(e){ return "24h"; } })();
+  var BW = (function(){ try{ var v = localStorage.getItem("th_bw"); return v === "10k" || v === "all" ? v : "100"; }catch(e){ return "100"; } })();
   function drawAct(){
     var D = DD(), a24 = D.act7 ? D.act7.slice(-24) : null, td = D.txday || null, rows = upRows().filter(live), tx = 0, fee = 0, gas = 0;
     rows.forEach(function(r){ tx += r[6]; if(r[8] > 0) fee += r[8]; if(r[7] > 0) gas += r[7]; });
     var when = function(ts){ var d = new Date(ts * 1000); return DAYN[d.getDay()] + " " + String(d.getHours()).padStart(2, "0") + ":00"; };
     var dl = function(s){ return new Date(s + "T00:00:00Z").toLocaleDateString("en", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }); };
     var all = AW === "all", tot = 0, bl = 0, top = null, stats, body;
-    var sw = '<span class=sv-sw role=group aria-label="Period">' +
-      '<button type=button data-act=awin data-w=24h aria-pressed=' + !all + '>24 hours</button><button type=button data-act=awin data-w=all aria-pressed=' + all + '>Since genesis</button></span>';
+    var sw = '<span class=sv-sw role=group aria-label="Period">' + [["24h", "24 hours"], ["30d", "30 days"], ["all", "Since genesis"]].map(function(o){
+      return '<button type=button data-act=awin data-w=' + o[0] + ' aria-pressed=' + (AW === o[0]) + '>' + o[1] + '</button>'; }).join("") + '</span>';
     if(all){
       if(td) td.forEach(function(x){ tot += x[1]; bl += x[2]; if(!top || x[1] > top[1]) top = x; });
       var since = (D.coverage || {}).from_date;
@@ -667,6 +667,18 @@
           function(v){ return v <= 0 ? "0" : v >= 1000 ? Math.round(v / 1000) + "k" : String(Math.round(v)); },
           function(v){ return Math.round(v).toLocaleString() + " transactions"; })
         : '<div class=sv-upwait>Reading the history…</div>';
+    } else if(AW === "30d"){
+      var d30 = td ? td.slice(-30) : null;
+      if(d30) d30.forEach(function(x){ tot += x[1]; bl += x[2]; if(!top || x[1] > top[1]) top = x; });
+      stats = '<div class=sv-rt>' + st("Transactions", d30 ? tot.toLocaleString() : "—", d30 ? "about " + Math.round(tot / Math.max(1, d30.length)).toLocaleString() + " a day" : "") +
+        st("Busiest day", top ? top[1].toLocaleString() : "—", top ? dl(top[0]) : "") +
+        st("Per block", d30 && bl ? (tot / bl).toFixed(2) : "—", d30 ? "average over " + bl.toLocaleString() + " blocks" : "") + '</div>';
+      if(d30 && d30.length){
+        var m30 = Math.max(1, Math.max.apply(null, d30.map(function(x){ return x[1]; }))), t30 = "";
+        d30.forEach(function(x, i){ if(i % 7 === 0) t30 += '<span style="left:' + (i / d30.length * 100).toFixed(2) + '%">' + new Date(x[0] + "T00:00:00Z").toLocaleDateString("en", { day: "numeric", month: "short", timeZone: "UTC" }) + '</span>'; });
+        body = '<div class="sv-bars hr">' + bscale(m30, function(v){ return Math.round(v).toLocaleString(); }) + d30.map(function(x, i){ var so = i === d30.length - 1;
+          return '<i' + (so ? ' class=so' : '') + ' style="--h:' + Math.max(1.5, x[1] / m30 * 100).toFixed(1) + '%" data-t="' + dl(x[0]) + ": " + x[1].toLocaleString() + ' transactions' + (so ? ' so far' : '') + '"></i>'; }).join("") + '</div><div class=sv-bx>' + t30 + '</div>';
+      } else body = '<div class=sv-upwait>Reading the last 30 days…</div>';
     } else {
       if(a24) a24.forEach(function(x){ tot += x[1]; bl += x[2]; if(!top || x[1] > top[1]) top = x; });
       stats = '<div class=sv-rt>' + st("Transactions", a24 ? tot.toLocaleString() : "—", a24 ? "about " + Math.round(tot / Math.max(1, a24.length)) + " an hour" : "") +
@@ -675,13 +687,14 @@
       if(a24 && a24.length){
         var m = Math.max(1, Math.max.apply(null, a24.map(function(x){ return x[1]; }))), ticks = "";
         a24.forEach(function(x, i){ var d = new Date(x[0] * 1000); if(d.getHours() % 6 === 0) ticks += '<span style="left:' + (i / a24.length * 100).toFixed(2) + '%">' + (d.getHours() ? String(d.getHours()).padStart(2, "0") + ":00" : DAYN[d.getDay()] + " " + d.getDate()) + '</span>'; });
-        body = '<div class="sv-bars hr">' + bscale(m, function(v){ return String(Math.round(v)); }) + a24.map(function(x){ return '<i style="--h:' + Math.max(1.5, x[1] / m * 100).toFixed(1) + '%" data-t="' + when(x[0]) + ": " + x[1] + ' transactions"></i>'; }).join("") + '</div><div class=sv-bx>' + ticks + '</div>';
+        body = '<div class="sv-bars hr">' + bscale(m, function(v){ return String(Math.round(v)); }) + a24.map(function(x, i){ var so = i === a24.length - 1; return '<i' + (so ? ' class=so' : '') + ' style="--h:' + Math.max(1.5, x[1] / m * 100).toFixed(1) + '%" data-t="' + when(x[0]) + ": " + x[1] + ' transactions' + (so ? ' so far' : '') + '"></i>'; }).join("") + '</div><div class=sv-bx>' + ticks + '</div>';
       } else body = '<div class=sv-upwait>Reading the last 24 hours…</div>';
     }
-    put("sv-act7", '<div class=sv-ph><h3>Transactions</h3>' + sw + '<span class=sv-gkey>' + (all ? "per day" : "per hour") + '</span>' + stats + '</div>' + body);
-    /* per block: the last 100 blocks live (with gas and fees), or the average per hour over 24 hours,
-       or per day since genesis (a line) - the indexer keeps transactions, not gas or fees */
-    var bw = BW, sb = '<span class=sv-sw role=group aria-label="Period">' + [["100", "Last 100 blocks"], ["24h", "24 hours"], ["all", "Since genesis"]].map(function(o){
+    put("sv-act7", '<div class=sv-ph><h3>Transactions</h3>' + sw + '<span class=sv-gkey>' + (AW === "24h" ? "per hour" : "per day") + '</span>' + stats + '</div>' + body);
+    /* per block: the last 100 blocks live (with gas and fees), the last 10,000 in stretches of 100
+       (the average per block in each), or per day since genesis (a line) - the indexer keeps
+       transactions, not gas or fees */
+    var bw = BW, sb = '<span class=sv-sw role=group aria-label="Period">' + [["100", "Last 100 blocks"], ["10k", "Last 10k blocks"], ["all", "Since genesis"]].map(function(o){
       return '<button type=button data-act=bwin data-w=' + o[0] + ' aria-pressed=' + (bw === o[0]) + '>' + o[1] + '</button>'; }).join("") + '</span>';
     var hb = function(k){ return '<div class=sv-ph><h3>Transactions per block</h3>' + sb + k + '</div>'; }, sl, lb;
     if(bw === "100"){
@@ -694,20 +707,27 @@
             (r[6] ? ", " + (r[7] >= 0 ? r[7].toLocaleString() + " gas, " + (r[8] / 1e6).toFixed(3) + " PHOTON" : "gas unknown") : "") + '"></i>'; }).join("") + '</div>' +
           '<div class=sv-gx><span>&larr; older, block ' + Number(rows[0][0] + 1).toLocaleString() + '</span><span>now, block ' + Number(rows[rows.length - 1][0] + 1).toLocaleString() + ' &rarr;</span></div>';
       } else lb = '<div class=sv-upwait>Waiting for the live feed…</div>';
+    } else if(bw === "10k"){
+      var bk = D.b10k || [], T = 0, B = 0, NZ = 0, pk = null;
+      bk.forEach(function(x){ T += x[1]; B += x[2]; NZ += x[3]; var r = x[2] ? x[1] / x[2] : 0; if(!pk || r > pk.r) pk = { h: x[0], r: r, b: x[2] }; });
+      var span = function(h, b){ return Number(h).toLocaleString() + "–" + Number(h + b - 1).toLocaleString(); };
+      sl = '<div class=sv-rt>' + st("Per block", B ? (T / B).toFixed(2) : "—", B ? T.toLocaleString() + " in " + B.toLocaleString() + " blocks" : "", "var(--sv-violet)") +
+        st("Busiest 100", pk ? pk.r.toFixed(2) : "—", pk ? "blocks " + Number(pk.h).toLocaleString() + " on" : "", "var(--sv-violet)") +
+        st("With transactions", B ? NZ.toLocaleString() : "—", B ? "of " + B.toLocaleString() + " blocks" : "") + '</div>';
+      if(bk.length){
+        var m3 = Math.max(.01, Math.max.apply(null, bk.map(function(x){ return x[2] ? x[1] / x[2] : 0; })));
+        lb = '<div class="sv-bars live">' + bscale(m3, function(v){ return v.toFixed(2); }) + bk.map(function(x){ var r = x[2] ? x[1] / x[2] : 0;
+            return '<i class="' + (x[1] ? "" : "z") + '" style="--h:' + (x[1] ? Math.max(3, r / m3 * 100) : 2).toFixed(1) + '%" data-t="blocks ' + span(x[0], x[2]) + ": " + r.toFixed(2) + " per block, " + x[3] + " with transactions" + '"></i>'; }).join("") + '</div>' +
+          '<div class=sv-gx><span>&larr; older, block ' + Number(bk[0][0]).toLocaleString() + '</span><span>block ' + Number(bk[bk.length - 1][0] + bk[bk.length - 1][2] - 1).toLocaleString() + ' &rarr;</span></div>';
+      } else lb = '<div class=sv-upwait>Reading the last 10,000 blocks…</div>';
     } else {
-      var src = bw === "24h" ? (a24 || []).map(function(x){ return { k: x[0], t: x[1], b: x[2] }; }) : (td || []).map(function(x){ return { k: x[0], t: x[1], b: x[2] }; });
+      var src = (td || []).map(function(x){ return { k: x[0], t: x[1], b: x[2] }; });
       var T = 0, B = 0, pk = null; src.forEach(function(x){ T += x.t; B += x.b; var r = x.b ? x.t / x.b : 0; if(!pk || r > pk.r) pk = { k: x.k, r: r }; });
-      sl = '<div class=sv-rt>' + st("Per block", B ? (T / B).toFixed(2) : "—", bw === "24h" ? "last 24 hours" : "since genesis", "var(--sv-violet)") +
-        st(bw === "24h" ? "Busiest hour" : "Busiest day", pk ? pk.r.toFixed(2) : "—", pk ? (bw === "24h" ? when(pk.k) : dl(pk.k)) + ", per block" : "", "var(--sv-violet)") +
-        st("Blocks", B ? B.toLocaleString() : "—", bw === "24h" ? "last 24 hours" : "since genesis") + '</div>';
-      if(!src.length) lb = '<div class=sv-upwait>Reading the history…</div>';
-      else if(bw === "24h"){
-        var m2 = Math.max(.01, Math.max.apply(null, src.map(function(x){ return x.b ? x.t / x.b : 0; }))), tk = "";
-        src.forEach(function(x, i){ var d = new Date(x.k * 1000); if(d.getHours() % 6 === 0) tk += '<span style="left:' + (i / src.length * 100).toFixed(2) + '%">' + (d.getHours() ? String(d.getHours()).padStart(2, "0") + ":00" : DAYN[d.getDay()] + " " + d.getDate()) + '</span>'; });
-        lb = '<div class="sv-bars live hr">' + bscale(m2, function(v){ return v.toFixed(2); }) + src.map(function(x){ var r = x.b ? x.t / x.b : 0;
-          return '<i style="--h:' + Math.max(1.5, r / m2 * 100).toFixed(1) + '%" data-t="' + when(x.k) + ": " + r.toFixed(2) + ' per block"></i>'; }).join("") + '</div><div class=sv-bx>' + tk + '</div>';
-      } else lb = chart("tpb", src.map(function(x){ return { d: x.k, r: x.b ? x.t / x.b : 0 }; }), [{ k: "r", cls: "tpb", area: true }], function(v){ return v <= 0 ? "0" : v.toFixed(v < 10 ? 1 : 0); },
-          function(v){ return v.toFixed(2) + " per block"; });
+      sl = '<div class=sv-rt>' + st("Per block", B ? (T / B).toFixed(2) : "—", "since genesis", "var(--sv-violet)") +
+        st("Busiest day", pk ? pk.r.toFixed(2) : "—", pk ? dl(pk.k) + ", per block" : "", "var(--sv-violet)") +
+        st("Blocks", B ? B.toLocaleString() : "—", "since genesis") + '</div>';
+      lb = src.length ? chart("tpb", src.map(function(x){ return { d: x.k, r: x.b ? x.t / x.b : 0 }; }), [{ k: "r", cls: "tpb", area: true }], function(v){ return v <= 0 ? "0" : v.toFixed(v < 10 ? 1 : 0); },
+          function(v){ return v.toFixed(2) + " per block"; }) : '<div class=sv-upwait>Reading the history…</div>';
     }
     put("sv-actlive", hb(sl) + lb);
   }
@@ -910,8 +930,8 @@
     }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
-    if(act === "bwin"){ BW = t.dataset.w === "24h" || t.dataset.w === "all" ? t.dataset.w : "100"; try{ localStorage.setItem("th_bw", BW); }catch(e){} drawAct(); return; }
-    if(act === "awin"){ AW = t.dataset.w === "all" ? "all" : "24h"; try{ localStorage.setItem("th_aw", AW); }catch(e){} drawAct(); return; }
+    if(act === "bwin"){ BW = t.dataset.w === "10k" || t.dataset.w === "all" ? t.dataset.w : "100"; try{ localStorage.setItem("th_bw", BW); }catch(e){} drawAct(); return; }
+    if(act === "awin"){ AW = t.dataset.w === "30d" || t.dataset.w === "all" ? t.dataset.w : "24h"; try{ localStorage.setItem("th_aw", AW); }catch(e){} drawAct(); return; }
     if(act === "pwin"){ PW = t.dataset.w === "all" ? "all" : "24h"; try{ localStorage.setItem("th_pw", PW); }catch(e){} drawProp(); return; }
     if(act === "refresh"){
       if(window.__refreshPos){ t.classList.add("busy"); window.__refreshPos().then(function(){ t.classList.remove("busy"); render(); }); }

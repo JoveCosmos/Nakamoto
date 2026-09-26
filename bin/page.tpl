@@ -3631,6 +3631,7 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .sv-bars.live{gap:2px}
 .sv-bars.live i{background:linear-gradient(180deg,#b9b0ff,rgba(185,176,255,.3))}
 .sv-bars i.z,.sv-bars.live i.z{background:var(--wbd2)}
+.sv-bars i.so{opacity:.45;outline:1px dashed var(--wbd2);outline-offset:-1px}
 .sv-bx{position:relative;height:14px;font-family:var(--wmono);font-size:9.5px;color:var(--wf)}
 .sv-bx span{position:absolute;top:0;white-space:nowrap;padding-left:4px;border-left:1px solid var(--wbd2)}
 /* Economics: two line charts */

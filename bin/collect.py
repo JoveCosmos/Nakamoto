@@ -657,6 +657,14 @@ p24 = {r[0]: int(r[1]) for r in sql(f"""SELECT proposer_cons, count(*)::int FROM
 act7 = [[int(r[0]), int(r[1]), int(r[2])] for r in sql(f"""SELECT extract(epoch FROM date_trunc('hour', time))::bigint,
           coalesce(sum(tx_count), 0)::int, count(*)::int FROM block
           WHERE chain_id='{CHAIN}' AND time > now() - interval '7 days' GROUP BY 1 ORDER BY 1;""")]
+# The last 10,000 blocks in 100 stretches of 100, counted back from the newest: transactions, blocks, blocks that carried any. Through
+# the time index (30 hours covers 10,000 blocks at up to ~10 s each): by height alone the planner,
+# on the table's statistics, scanned the whole table (5 s against 0.15 s)
+b10k = [[int(r[0]), int(r[1]), int(r[2]), int(r[3])] for r in sql(f"""WITH w AS (SELECT height, tx_count FROM block
+          WHERE chain_id='{CHAIN}' AND time > now() - interval '30 hours'),
+     top AS (SELECT max(height) h FROM w)
+   SELECT min(height), coalesce(sum(tx_count), 0)::int, count(*)::int, count(*) FILTER (WHERE tx_count > 0)::int
+   FROM w, top WHERE height > top.h - 10000 GROUP BY (top.h - height) / 100 ORDER BY 1;""")]
 # Activity since genesis: transactions and blocks per day, kept in state/txdaily.json - the whole
 # history once (a ~7 s scan), then only the last two days on each build
 TXD = "/srv/atomone-app/state/txdaily.json"
@@ -722,7 +730,7 @@ out = {
                 "weeks_to_cap": int(round((float(nb["maximum_coefficient"]) - coef)
                                           / float(nb["step"]))) if float(nb["step"]) else None,
                 "monotonic_so_far": True},
-  "p24": p24, "act7": act7, "txday": txday, "econ": econ,
+  "p24": p24, "act7": act7, "txday": txday, "b10k": b10k, "econ": econ,
   # every block the index holds a proposer for, and how many validators ever proposed one
   "prop_all": {"blocks": sum(prop.values()), "proposers": len(prop)},
   "set": {"n": N, "bonded": S, "supply": supply, "bonded_pct": round(S/supply*100, 2),
