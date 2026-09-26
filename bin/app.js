@@ -1800,6 +1800,7 @@ rememberGridH();
     if(bl) bl.textContent = b ? exact(b.uatone) : "—";
     if(st) st.textContent = exact(pos.total);
     if(rw){ rw.textContent = window.__REW != null ? exact(window.__REW) : "—"; rw.className = window.__REW > 0 ? "ok" : ""; }
+    var rt = E("ds-rewt"); if(rt) rt.setAttribute("aria-disabled", clRows().length ? "false" : "true");
     if(mv){ mv.textContent = pos.free > 0 ? exact(pos.free, 2) : "0"; mv.title = pos.free > 0 ? exact(pos.free) + " ATONE can move" : "nothing can move until the cooldown ends"; mv.className = pos.free > 0 ? "" : "warn";
       var mxb = E("amtmax"); if(mxb) mxb.disabled = !(pos.free > 0); }
     var ap = E("ds-apr"); if(ap) ap.textContent = pos.rows.length ? pct(pos.rate) : "\u2014";
@@ -2085,8 +2086,7 @@ rememberGridH();
     }
   };
   var TXS = 0;
-  var txsign = E("txsign"), txcancel = E("txcancel");
-  if(txcancel) txcancel.addEventListener("click", function(){ POP.close(txpop); });
+  var txsign = E("txsign");
   /* the flow: the button spins, the notify at the top right spins with it until the
      chain confirms the transaction, then answers green or red; the card closes on green */
   if(txsign) txsign.addEventListener("click", function(){
@@ -2193,6 +2193,66 @@ rememberGridH();
     })
     .catch(function(e){ n.fail(e && e.message || String(e)); })
     .then(function(){ unsign.disabled = false; unsign.classList.remove("busy"); });
+  });
+
+  /* ── claim: the rewards waiting on each validator, one MsgWithdrawDelegatorReward per
+     validator ticked - all of them to begin with. Claimed ATONE lands as available and earns
+     nothing until it is staked again ── */
+  var clpop = E("clpop"), CLSEL = {};
+  function clRows(){
+    var pos = window.__POS, by = window.__REWBY || {}; if(!pos) return [];
+    return pos.rows.map(function(r){ return { id: r.id, m: r.m, op: r.op, x: by[r.id] || 0 }; })
+      .filter(function(r){ return r.x >= 1; }).sort(function(a, b){ return b.x - a.x; });
+  }
+  function clMsgs(){
+    var VD = window.__VDBY || {}, out = [];
+    clRows().forEach(function(r){ if(!CLSEL[r.id]) return; var d = VD[r.id], op = (d && d.op) || r.op; if(!op) return;
+      out.push({ type: "cosmos-sdk/MsgWithdrawDelegationReward", value: { delegator_address: window.__ADDR, validator_address: op } }); });
+    return out;
+  }
+  window.__clMsgs = clMsgs;
+  function clDraw(){
+    var el = E("clpick"), rows = clRows(); if(!el) return;
+    var n = 0, tot = 0, all = 0; rows.forEach(function(r){ all += r.x; if(CLSEL[r.id]){ n++; tot += r.x; } });
+    var every = rows.length > 1 ? '<label class="unrow all' + (n === rows.length ? ' on' : '') + '"><input type=checkbox value="*"' + (n === rows.length ? ' checked' : '') + '>' +
+      '<span class="wk-lg wk-lgx">\u2211</span><b>All validators</b><i>' + exact(all, 6) + '<em>ATONE</em></i></label>' : '';
+    el.innerHTML = every + rows.map(function(r){ var on = !!CLSEL[r.id];
+      return '<label class="unrow' + (on ? ' on' : '') + '"><input type=checkbox value="' + att(r.id) + '"' + (on ? ' checked' : '') + '>' +
+             logo(r.id, r.m) + '<b>' + att(r.m) + '</b><i>' + exact(r.x, 6) + '<em>ATONE</em></i></label>'; }).join("");
+    Array.prototype.forEach.call(el.querySelectorAll("input"), function(c){
+      c.addEventListener("change", function(){
+        if(c.value === "*") rows.forEach(function(r){ if(c.checked) CLSEL[r.id] = 1; else delete CLSEL[r.id]; });
+        else if(c.checked) CLSEL[c.value] = 1; else delete CLSEL[c.value];
+        clDraw(); }); });
+    var sm = E("clsum"); if(sm) sm.innerHTML = n ? exact(tot, 6) + " ATONE<br>from " + n + " validator" + (n === 1 ? "" : "s") : "";
+    var go = E("clsign"); if(go) go.disabled = !n || !window.__WALLET;
+    var st = E("clstep"); st.textContent = ""; st.className = "txstep";
+    feeSoon("cl", E("clfee"), n ? clMsgs : null);
+  }
+  window.__claim = function(){
+    if(!clpop || !window.__POS) return;
+    var rows = clRows(); if(!rows.length) return;
+    CLSEL = {}; rows.forEach(function(r){ CLSEL[r.id] = 1; });
+    var go = E("clsign"); if(go) go.textContent = "Claim";
+    E("clfee").textContent = "";
+    clDraw(); POP.open(clpop);
+  };
+  if(clpop) clpop.__onclose = function(){ feeSoon("cl"); };
+  var rewt = E("ds-rewt");
+  if(rewt){ rewt.addEventListener("click", function(){ window.__claim(); });
+    rewt.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); window.__claim(); } }); }
+  var clsign = E("clsign");
+  if(clsign) clsign.addEventListener("click", function(){
+    var msgs = clMsgs(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
+    clsign.disabled = true; clsign.classList.add("busy");
+    var n = window.__notify();
+    window.__TX.send(window.__WALLET, msgs, "", function(){})
+    .then(function(){
+      n.ok(); POP.close(clpop);
+      if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); });
+    })
+    .catch(function(e){ n.fail(e && e.message || String(e)); })
+    .then(function(){ clsign.disabled = false; clsign.classList.remove("busy"); });
   });
 
   /* ── stake: liquid ATONE onto validators the reader ticks, split equally, one

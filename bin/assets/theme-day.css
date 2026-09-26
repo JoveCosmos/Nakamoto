@@ -197,7 +197,7 @@
   html[data-theme=light]:not([data-mono]) .mbtn{background:transparent}
   html[data-theme=light]:not([data-mono]) .mbtn:hover{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .mbtn[aria-pressed=true]{background:var(--amber-bar);color:#FFFFFF}
-  html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) .hdr-r,html[data-theme=light]:not([data-mono]) .brandbar,html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard{--wsolid:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) .hdr-r,html[data-theme=light]:not([data-mono]) .brandbar,html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #clpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard{--wsolid:var(--ink)}
   html[data-theme=light]:not([data-mono]) .wk-addr::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-ib{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) #p-dele .wk-ib svg,html[data-theme=light]:not([data-mono]) #txpop .wk-ib svg{fill:none;stroke:currentColor}
@@ -210,7 +210,7 @@
   html[data-theme=light]:not([data-mono]) .wk-pl.dim{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-hb.hld i{background:transparent}
   html[data-theme=light]:not([data-mono]) .wk-lgx{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) .hdr-r,html[data-theme=light]:not([data-mono]) .brandbar,html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard{--wsolid:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) .hdr-r,html[data-theme=light]:not([data-mono]) .brandbar,html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #clpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard{--wsolid:var(--ink)}
   html[data-theme=light]:not([data-mono]) body{background-image:transparent}
   html[data-theme=light]:not([data-mono]) .folder{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sec,html[data-theme=light]:not([data-mono]) .sec.tight,html[data-theme=light]:not([data-mono]) .duo .sec,html[data-theme=light]:not([data-mono]) .duo .sec:nth-child(n){background:var(--surface);box-shadow:none}
@@ -462,7 +462,7 @@
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addr{background:transparent}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addr:hover{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #p-dele #wk-mine .wk-bh .wk-addr svg{fill:none;stroke:currentColor}
-  html[data-theme=light]:not([data-mono]) .sv-screen>.sv-panel,html[data-theme=light]:not([data-mono]) .sv-screen>.sv-strip{background:transparent}
+  html[data-theme=light]:not([data-mono]) .sv-screen>.sv-panel{background:transparent}
   html[data-theme=light]:not([data-mono]) .sv-screen .sv-card{background:transparent}
   html[data-theme=light]:not([data-mono]) .sv-sub s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sv-tag.g{border-color:var(--accent);background:var(--accent-soft)}
@@ -474,29 +474,17 @@
   html[data-theme=light]:not([data-mono]) .sv-btn.busy::after{border:2px solid var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sv-chip s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sv-chip u{text-decoration:none}
-  html[data-theme=light]:not([data-mono]) .sv-find:focus{outline:none}
-  html[data-theme=light]:not([data-mono]) .sv-seg{background:transparent}
-  html[data-theme=light]:not([data-mono]) .sv-tbl tbody tr.mine{background:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .sv-nm img,html[data-theme=light]:not([data-mono]) .sv-nm span.lg{box-shadow:0 0 0 1px var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .sv-nm span.lg{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .sv-can u{text-decoration:none}
-  html[data-theme=light]:not([data-mono]) .sv-screen{background:var(--surface-2);border-color:var(--surface-2);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .sv-ic svg{fill:none;stroke:currentColor}
+  html[data-theme=light]:not([data-mono]) .sv-screen{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-btn.go{background:var(--accent);border-color:var(--accent);color:#FFFFFF;box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-btn.go:hover:not(:disabled){background:var(--accent);border-color:var(--accent);color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .sv-btn.pri{background:var(--amber-bar);border-color:var(--amber-bar);color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .sv-btn.pri:hover:not(:disabled){background:var(--amber-bar);border-color:var(--amber-bar);color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) #sv-optp.hero{background:var(--accent-soft),var(--wh);border-color:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .sv-fig{background:var(--surface-2);border-color:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .sv-bar{background:transparent}
-  html[data-theme=light]:not([data-mono]) .sv-stat i{box-shadow:0 0 0 3px var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .sv-stat.on i{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .sv-tbl tbody tr:hover{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) #sv{--sv-amber:var(--warn);--sv-green:var(--accent);--sv-violet:var(--accent);--sv-teal:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-screen{background:var(--surface-2);border-color:var(--line)}
-  html[data-theme=light]:not([data-mono]) .sv-screen>.sv-panel,html[data-theme=light]:not([data-mono]) .sv-screen>.sv-strip,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card:first-child,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card+.sv-card{background:var(--surface-2);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .sv-screen>.sv-panel::before,html[data-theme=light]:not([data-mono]) .sv-screen>.sv-strip::before,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card::before{background:transparent}
-  html[data-theme=light]:not([data-mono]) .t-apr{--tc:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .sv-screen>.sv-panel,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card:first-child,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card+.sv-card{background:var(--surface-2);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-screen>.sv-panel::before,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .sv-pho{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-rf{background:transparent}
   html[data-theme=light]:not([data-mono]) .sv-rf svg{fill:none;stroke:currentColor}
@@ -514,36 +502,49 @@
   html[data-theme=light]:not([data-mono]) .sv-upbars i.tip::before{background:var(--accent);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-upy{background:var(--surface)}
   html[data-theme=light]:not([data-mono]) .sv-uptip{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .sv-wbar i.stk,html[data-theme=light]:not([data-mono]) .sv-wleg i.stk{background:var(--amber-bar)}
-  html[data-theme=light]:not([data-mono]) .sv-wbar i.bal,html[data-theme=light]:not([data-mono]) .sv-wleg i.bal{background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sv-wbar i.rew,html[data-theme=light]:not([data-mono]) .sv-wleg i.rew{background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sv-wleg s{text-decoration:none}
-  html[data-theme=light]:not([data-mono]) .sv-flow .sv-side{background:none}
-  html[data-theme=light]:not([data-mono]) .sv-flow .sv-side.gain{background:none;border-left:1px solid var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sv-wbar i.stk{background:var(--amber-bar)}
+  html[data-theme=light]:not([data-mono]) .sv-wbar i.bal{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-wbar i.rew{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-ph h3::before{background:var(--tc,var(--accent));box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-heat>i{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-heat>s{background:var(--surface-2);text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sv-heat>b{border:2px solid var(--surface);box-shadow:0 0 0 1.5px var(--wt)}
   html[data-theme=light]:not([data-mono]) .sv-hint i.lo{background:var(--surface-2);box-shadow:0 0 0 1px var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-hint i.hi{background:var(--amber-bar);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .sv-side{border:1px solid var(--surface-2);background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .sv-side.aft{border-color:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .sv-side.gain{background:var(--accent-soft);border-color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sv-arw svg{fill:none}
   html[data-theme=light]:not([data-mono]) .sv-steps li{border:1px solid var(--surface-2);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sv-steps li::before{color:var(--ink);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-chip{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sv-chip .sv-lgo img,html[data-theme=light]:not([data-mono]) .sv-chip .sv-lgo .lg{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .sv-stat i{box-shadow:0 0 0 3px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .sv-btn.vio{color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .sv-btn.vio:hover:not(:disabled){background:var(--accent);border-color:var(--accent);color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .sv-can>div{border:1px solid var(--accent-soft);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .sv-can>div+div{border-color:var(--danger-bg);background:var(--danger-bg)}
   html[data-theme=light]:not([data-mono]) .sv-can>div+div u{color:var(--danger)}
-  html[data-theme=light]:not([data-mono]) .sv-tbl tbody tr.mine{background:var(--warn-bg)}
-  html[data-theme=light]:not([data-mono]) .sv-tbl tbody tr.mine td:first-child{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .sv-seg[aria-pressed=true]{color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .sv-brand .tsfx{color:var(--warn)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5.wk-clk:not([aria-disabled=true]):hover{border-color:var(--accent);background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5.wk-clk:focus-visible{outline:2px solid var(--accent)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5.wk-clk::after{border-top:1.5px solid var(--accent);border-right:1.5px solid var(--accent)}
+  html[data-theme=light]:not([data-mono]) .clcard .unrow i{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-box .sv-bact{border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-box .sv-bact:hover{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .sv-box .sv-bact:focus-visible{outline:2px solid var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-row2>.sv-panel{background:var(--surface-2);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-row2>.sv-panel::before{background:transparent}
+  html[data-theme=light]:not([data-mono]) .sv-box{background:var(--surface-2),var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .b-stk{--bc:var(--warn)}
+  html[data-theme=light]:not([data-mono]) .b-bal{--bc:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .b-rew{--bc:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .b-hi{--bc:var(--warn)}
+  html[data-theme=light]:not([data-mono]) .b-cool{--bc:var(--warn)}
+  html[data-theme=light]:not([data-mono]) .b-tot{--bc:var(--ink);background:var(--surface-2),var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .b-stk .sv-bv{color:var(--warn)}
+  html[data-theme=light]:not([data-mono]) .b-rew .sv-bv{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .b-aft{border-color:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .b-gain{--bc:var(--accent);background:var(--accent-soft),var(--surface-2);border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-vr{background:var(--surface-2),var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sv-vr .sv-lgo img,html[data-theme=light]:not([data-mono]) .sv-vr .sv-lgo .lg{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .sv-va{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .sv-vr u{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .pop .card.atcard{--av:var(--accent)}
   html[data-theme=light]:not([data-mono]) .pop .card.atcard::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .atcard .txsum{color:var(--muted)}

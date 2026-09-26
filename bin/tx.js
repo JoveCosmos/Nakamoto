@@ -36,6 +36,11 @@ function msgBytes(m){
     return any("/cosmos.staking.v1beta1.MsgUndelegate", cat(
       strField(1, m.value.delegator_address), strField(2, m.value.validator_address),
       bytesField(3, coin(m.value.amount))));
+  /* claiming rewards: MsgWithdrawDelegatorReward{delegator_address(1), validator_address(2)};
+     its legacy amino name is "...DelegationReward" */
+  if(m.type === "cosmos-sdk/MsgWithdrawDelegationReward")
+    return any("/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward", cat(
+      strField(1, m.value.delegator_address), strField(2, m.value.validator_address)));
   if(m.type === "cosmos-sdk/MsgSend"){
     var coins = []; (m.value.amount || []).forEach(function(c){ coins = coins.concat(bytesField(3, coin(c))); });
     return any("/cosmos.bank.v1beta1.MsgSend", cat(strField(1, m.value.from_address), strField(2, m.value.to_address), coins));

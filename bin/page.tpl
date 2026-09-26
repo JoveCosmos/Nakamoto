@@ -1491,7 +1491,7 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
    top edge), Inter at 600-800, solid gradient buttons, tinted tag pills, inset
    tracks. Every class here is prefixed wk- or scoped under #p-dele, so nothing
    the calculator names can reach in - and nothing here reaches out. */
-#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard{
+#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard{
   --wsolid:rgba(14,24,38,.97);
   
   --wblue:#3B9EFF;--wcyan:#62D9FF;--wgreen:#36D399;--wamber:#FFB155;--wburn:#FF7A45;--wgold:#F5C66B;
@@ -1643,7 +1643,7 @@ html[data-tab=dele] .calclab,html[data-tab=empty] .calclab,html[data-tab=connect
 :root{--void:#06060c;--edge:#232342;--edge2:#34345c;--ink:#e6e4f0;--ink2:#a5a3c4;--ink3:#6f6d94;--faint:#3a3a54;
 --hot:#ffb02e;--burn:#ff4d1f;--cold:#6f66c8;--lit:#fff8dc;--card:#0b0b16;--card2:#111124;--inset:#0a0a14;
 --blue:#6f66c8;--cyan:#2bc8bd;--green:#2ee06a;--amber:#ffb02e}
-#sv,.hdr-r,.brandbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
+#sv,.hdr-r,.brandbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
 --wt:#e6e4f0;--ws:#a5a3c4;--wf:#6f6d94;--wblue:#6f66c8;--wcyan:#2bc8bd;--wgreen:#2ee06a;--wamber:#ffb02e;--wburn:#ff4d1f;--wgold:#ffb02e;
 --wsans:"Helvetica Neue",Helvetica,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--wmono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
 body{background:var(--void);background-image:radial-gradient(130% 62% at 50% 0%,#16162e 0%,#0a0a16 42%,var(--void) 74%)}
@@ -2048,7 +2048,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 
 /* the wallet, lifted out of the dark: lighter grounds, brighter hairlines and
    type, so the figures read without leaning in */
-#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#stpop .txcard,#atpop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
+#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
 
 .wk-pane{background:linear-gradient(180deg,#10101f,#0d0d1b)}
 .wk-tbl2 td{border-bottom-color:#22223c}
@@ -2377,8 +2377,8 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 
 /* the cards keep their height: the fee line and the step line have their room before
    they are filled, so nothing below them moves */
-#txpop .txfee,#unpop .txfee,#stpop .txfee{height:23px;min-height:23px;line-height:13px;overflow:hidden;white-space:nowrap}
-#txpop .txstep,#unpop .txstep,#stpop .txstep{min-height:20px}
+#txpop .txfee,#unpop .txfee,#clpop .txfee,#stpop .txfee{height:23px;min-height:23px;line-height:13px;overflow:hidden;white-space:nowrap}
+#txpop .txstep,#unpop .txstep,#clpop .txstep,#stpop .txstep{min-height:20px}
 @media(max-width:900px){
   .wk-two{align-content:start;grid-auto-rows:max-content}
   #wk-mine,#wk-plan,#wk-mv{height:auto;max-height:none;overflow:hidden}
@@ -2972,11 +2972,11 @@ html[data-ui=simple][data-tab=dele] .w#calc>#p-dele{display:none}
    It carries who is connected in both views, and the screens in the simple one. */
 /* three columns: the lockup, the screens centred, the wallet pinned right - so the
    wallet still sits at the end when the screens are not there (the advanced view) */
-.sv-brand{display:flex;align-items:center;gap:10px;flex:1 1 0;min-width:0}
+.sv-brand{display:flex;align-items:center;flex:1 1 0;min-width:0}
 .sv-brand img{width:28px;height:28px;border-radius:8px;display:block}
 /* the lockup on one line: the mark, the name at title size on the mark's centre line, and the
    tagline beside it - the simple views' and the advanced view's own */
-.sv-bw{display:flex;align-items:baseline;gap:10px;line-height:1;min-width:0}
+.sv-bw{display:flex;gap:10px;line-height:1;min-width:0}
 /* Overview and Autopilot say what GATA is; Self (the three panes) says what it is for */
 html:not([data-ui=simple]) .svtag.s,html[data-ui=simple] .svtag.a{display:none}
 .sv-who{display:flex;align-items:center;gap:9px;flex:1 1 0;justify-content:flex-end;min-width:0}
@@ -3043,7 +3043,7 @@ border:1px solid var(--wbd);border-radius:8px;}
    box, 8px corners): the parts inside are flat and parted by hairlines rather than
    floating as separate cards; spare room is shared out between the parts, so the box
    has no dead band anywhere - on Network the list grows into the room instead */
-.sv-screen>.sv-panel,.sv-screen>.sv-strip{background:transparent;}
+.sv-screen>.sv-panel{background:transparent;}
 
 .sv-screen{justify-content:space-between}
 
@@ -3065,8 +3065,7 @@ border-radius:99px;border:1px solid var(--wbd2);color:var(--ws);white-space:nowr
 .sv-tag.g{color:var(--wgreen);border-color:rgba(46,224,106,.38);background:rgba(46,224,106,.06)}
 .sv-tag.a{color:var(--wamber);border-color:rgba(255,176,46,.38);background:rgba(255,176,46,.06)}
 .sv-tag.r{color:var(--wburn);border-color:rgba(255,77,31,.38);background:rgba(255,77,31,.06)}
-.sv-tag.q{color:var(--wf)}
-.sv-kr{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+
 .sv-panel{border:1px solid var(--wbd);border-radius:12px;background:var(--wc);padding:13px 15px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
 .sv-ph{display:flex;align-items:center;gap:11px;flex-wrap:wrap;min-width:0}
 .sv-ph h3{margin:0;letter-spacing:-.01em}
@@ -3074,14 +3073,7 @@ border-radius:99px;border:1px solid var(--wbd2);color:var(--ws);white-space:nowr
 .sv-note{color:var(--ws);line-height:1.5}
 .sv-note b{color:var(--wt)}
 /* the four figures of the opportunity, and the button that signs it */
-.sv-figs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;min-width:0}
-.sv-fig{border:1px solid var(--wbd);border-radius:9px;display:flex;flex-direction:column;gap:4px;min-width:0}
-.sv-fig span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sv-fig b{font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
-.sv-fig b i{font-style:normal;color:var(--ws);margin-left:5px}
-.sv-fig.up b{color:var(--wgreen)}
-.sv-fig.dn b{color:var(--wburn)}
-.sv-fig.dim b{color:var(--wf)}
+
 .sv-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--wbd2);padding:0 20px;
 color:var(--wt);background:var(--wchip);cursor:pointer;
 white-space:nowrap;transition:color .16s,border-color .16s,background .16s;position:relative}
@@ -3100,90 +3092,46 @@ white-space:nowrap;transition:color .16s,border-color .16s,background .16s;posit
 .sv-btn.busy::after{content:"";position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;
 border:2px solid rgba(255,255,255,.25);border-top-color:var(--wt);animation:wkspin .8s linear infinite}
 /* the allocation: one bar, then the validators that make it */
-.sv-bar{display:flex;}
-.sv-bar i{display:block;height:100%}
-.sv-bar i.hld{opacity:.45}
-.sv-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
-.sv-chip{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:3px 10px;border:1px solid var(--wbd);border-radius:10px;
-padding:8px 11px;min-width:0}
-.sv-chip .sv-dot{width:8px;height:8px;border-radius:50%;grid-row:span 2}
+
+.sv-chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));}
+.sv-chip{display:grid;align-items:center;
+min-width:0}
+
 .sv-chip b{font-size:13px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sv-chip em{font-style:normal;color:var(--wt);justify-self:end}
-.sv-chip s{grid-column:2;text-decoration:none;font-size:11px;color:var(--ws);font-variant-numeric:tabular-nums}
+.sv-chip em{font-style:normal;justify-self:end}
+.sv-chip s{grid-column:2;text-decoration:none;font-variant-numeric:tabular-nums}
 .sv-chip u{grid-column:3;text-decoration:none;color:var(--wf);justify-self:end}
 .sv-chip.skel b,.sv-chip.skel em,.sv-chip.skel s,.sv-chip.skel u{height:7px;border-radius:4px;background:var(--wbd2);opacity:.5}
 .sv-chip.skel b{width:64%}.sv-chip.skel em{width:22px}.sv-chip.skel s{width:52%}.sv-chip.skel u{width:26px}
-.sv-chip.skel .sv-dot{background:var(--wbd2)}
+
 .sv-chip.click{cursor:pointer;transition:border-color .16s}
-.sv-chip.click:hover{border-color:var(--wbd2)}
+
 /* the line under a screen: state, then what to do about it */
-.sv-strip{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--wbd);border-radius:12px;background:var(--wc);padding:9px 15px;font-size:12px;color:var(--ws)}
-.sv-strip .sv-sep{color:var(--wf)}
-.sv-strip .sv-rt{margin-left:auto;display:flex;align-items:center;gap:9px}
 
 /* the set, as a table */
-.sv-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.sv-find{flex:1 1 220px;min-width:0;height:36px;border-radius:9px;border:1px solid var(--wbd);background:var(--wi);color:var(--wt);
-padding:0 12px;font-family:var(--wsans);font-size:12.5px}
-.sv-find::placeholder{color:var(--wf)}
-.sv-find:focus{outline:none;border-color:var(--wbd2)}
-.sv-segs{display:flex;gap:5px;flex-wrap:wrap}
-.sv-seg{border:1px solid var(--wbd);background:transparent;color:var(--wf);
-padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
-.sv-seg:hover{color:var(--ws);border-color:var(--wbd2)}
-.sv-seg[aria-pressed=true]{color:var(--wt);background:var(--wh);border-color:var(--wbd2)}
+
 .sv-wrap{overflow-x:auto}
 /* the Network list: the head and the figures stand, the list takes the rest of the
    window and scrolls inside itself - its search and its column heads stay put, its
    count line stays under it, and the panel's end is always on screen. Below 240px of
    room the screen itself scrolls rather than squeezing the list to nothing. */
-.sv-list{flex:1 1 auto;min-height:240px}
-.sv-list .sv-wrap{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain}
-.sv-list .sv-tbl thead th{position:sticky;top:0;z-index:2}
+
 /* this screen's figures give the list more of the window: tighter cards, tighter rows */
 .sv-screen[data-sc=net] .sv-card{gap:3px}
 .sv-screen[data-sc=net] .sv-big{font-size:23px}
-.sv-list .sv-tbl td{padding-top:6px;padding-bottom:6px}
-.sv-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px;min-width:760px}
-/* the phone's own four columns: fixed widths, the name cell takes the rest and ellipsises */
-.sv-tbl.ph{min-width:0;table-layout:fixed}
-.sv-tbl.ph th,.sv-tbl.ph td{padding-left:6px;padding-right:6px}
-.sv-tbl.ph th:first-child,.sv-tbl.ph td:first-child{padding-left:8px}
-.sv-tbl.ph th:last-child,.sv-tbl.ph td:last-child{padding-right:8px}
-.sv-tbl.ph td.l{overflow:hidden}
-.sv-tbl.ph .sv-nm .tx i{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sv-tbl th{color:var(--wf);
-text-align:right;padding:9px 10px;background:var(--wi);border-top:1px solid var(--wbd);border-bottom:1px solid var(--wbd);white-space:nowrap}
-.sv-tbl th:first-child,.sv-tbl th.l{text-align:left}
-.sv-tbl th:first-child{border-radius:8px 0 0 8px;padding-left:12px}
-.sv-tbl th:last-child{border-radius:0 8px 8px 0;padding-right:12px}
-.sv-tbl td{padding:9px 10px;text-align:right;border-bottom:1px solid var(--wbd);vertical-align:middle;font-variant-numeric:tabular-nums;white-space:nowrap}
-.sv-tbl td.l{text-align:left}
-.sv-tbl td:first-child{padding-left:12px;color:var(--wf);font-family:var(--wmono);font-size:10px}
-.sv-tbl td:last-child{padding-right:12px}
-.sv-tbl tbody tr{cursor:pointer}
 
-.sv-tbl tbody tr.mine{background:rgba(111,102,200,.08)}
-.sv-nm{display:flex;align-items:center;gap:9px;min-width:0}
-.sv-nm img,.sv-nm span.lg{width:22px;height:22px;border-radius:7px;flex:0 0 auto;object-fit:cover;box-shadow:0 0 0 1px #ffffff14}
-.sv-nm span.lg{display:grid;place-items:center;font-size:9px;font-weight:700;color:#fff}
-.sv-nm .tx{display:flex;flex-direction:column;gap:1px;min-width:0}
-.sv-nm .tx b{font-size:12.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sv-nm .tx i{font-style:normal;font-family:var(--wmono);font-size:9px;color:var(--wf);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sv-sm{display:block;font-family:var(--wmono);font-size:9px;color:var(--wf);margin-top:1px}
+/* the phone's own four columns: fixed widths, the name cell takes the rest and ellipsises */
+
 .sv-ok{color:var(--wgreen)}
-.sv-warn{color:var(--wamber)}
+
 .sv-bad{color:var(--wburn)}
 .sv-dim{color:var(--wf)}
-.sv-apr{font-size:13.5px;font-weight:700;color:var(--wamber)}
-.sv-apr.q{color:var(--ws);font-weight:400}
-.sv-foot2{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-family:var(--wmono);font-size:9.5px;letter-spacing:.06em;color:var(--wf);padding:2px 2px 0}
-.sv-foot2 .sv-rt{margin-left:auto}
+
 /* the autopilot screen: what stands, what it may do, what it may never do */
 
-.sv-can{display:flex;gap:18px;flex-wrap:wrap;font-size:11.5px}
+.sv-can{flex-wrap:wrap;}
 .sv-can div{display:flex;flex-direction:column;gap:5px;min-width:0}
-.sv-can u{text-decoration:none;color:var(--wf)}
+.sv-can u{text-decoration:none;}
 .sv-can p{margin:0;display:flex;gap:14px;flex-wrap:wrap}
 .sv-can p span{display:inline-flex;align-items:center;gap:6px}
 /* ══ Simple view, second pass (2026-09-25): depth, colour with meaning, one hero ══════════
@@ -3192,19 +3140,14 @@ text-align:right;padding:9px 10px;background:var(--wi);border-top:1px solid var(
    slate card on the calculator's edges, raised tiles inside it - so groups read without
    lines; a tinted badge per figure; one green hero with a solid action where the gain is;
    labels in sentence case a person reads at a glance. Scoped to #sv: Advanced keeps its look. */
-#sv{--wc:#0f1322;--wh:#161c2e;--wi:#0c1019;--wchip:#141a2b;--wbd:#232b41;--wbd2:#323c59;--wt:#eef1f8;--ws:#adb4c9;--wf:#8a93ad}
-.sv-screen{background:linear-gradient(180deg,#111627,#0d111d);border-color:#232b42;padding:16px 18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+
+.sv-screen{padding:16px 18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
 .sv-screen>:not(:first-child){border-top:0;margin-top:14px;padding-top:0}
-.sv-screen>.sv-panel,.sv-screen>.sv-strip{background:var(--wh);border:1px solid var(--wbd);border-radius:12px;padding:14px 16px}
+.sv-screen>.sv-panel{background:var(--wh);border:1px solid var(--wbd);border-radius:12px;padding:14px 16px}
 .sv-screen .sv-cards{gap:12px}
 .sv-screen .sv-card,.sv-screen .sv-card:first-child{background:var(--wh);border:1px solid var(--wbd);border-radius:12px;padding:14px 16px}
 .sv-screen .sv-card+.sv-card{border-left:1px solid var(--wbd)}
-.sv-kl{display:inline-flex;align-items:center;gap:10px;min-width:0}
-.sv-ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--icb);color:var(--ic);flex:0 0 auto}
-.sv-ic svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.sv-k{font-family:var(--wsans);font-size:12.5px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--ws)}
-.sv-big{font-size:30px;margin-top:6px}
-.sv-big em{font-family:var(--wsans);font-size:13px;font-weight:500;letter-spacing:0;color:var(--ws)}
+
 .sv-sub{font-size:12px}
 .sv-tag{font-family:var(--wsans);font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;padding:4px 10px}
 .sv-ph h3{font-size:16.5px;font-weight:700}
@@ -3219,59 +3162,43 @@ text-align:right;padding:9px 10px;background:var(--wi);border-top:1px solid var(
 /* the hero: the gain on a green wash, its figures as inset tiles */
 #sv-optp.hero{background:radial-gradient(120% 160% at 0% 0%,rgba(46,224,106,.17),rgba(46,224,106,0) 55%),linear-gradient(120deg,rgba(43,200,189,.07),rgba(43,200,189,0) 60%),var(--wh);
 border-color:rgba(46,224,106,.3)}
-.sv-fig{background:rgba(8,11,19,.55);border-color:rgba(255,255,255,.06);padding:10px 12px}
-.sv-fig span{font-family:var(--wsans);font-size:11.5px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--ws)}
-.sv-fig b{font-size:20px}
-.sv-fig b i{font-family:var(--wsans);font-size:11px;font-weight:500}
+
 /* the allocation reads as data: a thicker bar in parted segments, chips inset in their tile */
-.sv-bar{height:12px;border:0;background:transparent;gap:3px;border-radius:0;overflow:visible}
-.sv-bar i{border-radius:4px}
-.sv-chip{background:var(--wi);border-color:var(--wbd)}
-.sv-chip em{font-family:var(--wsans);font-size:12.5px;font-weight:700}
-.sv-chip u{font-family:var(--wsans);font-size:11px}
+
+.sv-chip{border-color:var(--wbd)}
+.sv-chip em{font-family:var(--wsans);}
+
 /* status: a dot that says on or off, not a sentence in grey */
-.sv-stat{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--wt)}
-.sv-stat i{width:8px;height:8px;border-radius:50%;background:var(--wf);box-shadow:0 0 0 3px rgba(127,136,163,.18)}
-.sv-stat.on i{background:#2ee06a;box-shadow:0 0 0 3px rgba(46,224,106,.2)}
+
 /* the network and autopilot screens speak the same type */
-.sv-tbl th{font-family:var(--wsans);font-size:11.5px;font-weight:600;letter-spacing:0;text-transform:none}
-.sv-seg{font-family:var(--wsans);font-size:12px;font-weight:500;letter-spacing:0;text-transform:none}
-.sv-can u{font-family:var(--wsans);font-size:12px;font-weight:600;letter-spacing:0;text-transform:none}
-.sv-tbl tbody tr:hover{background:rgba(255,255,255,.025)}
+
 /* a desktop window is the calculator's box, so every screen has to fit it whole: tiles sized to
    the frame, and the chips one row that scrolls sideways when a stake spans many validators
    (a wrapped second row would push the last part out of the box) */
 @media(min-width:901px){
   .sv-screen{padding:14px 16px}
   .sv-screen>:not(:first-child){margin-top:12px}
-  .sv-screen>.sv-panel,.sv-screen>.sv-strip{padding:12px 16px;gap:9px}
+  .sv-screen>.sv-panel{padding:12px 16px;gap:9px}
   .sv-screen .sv-card,.sv-screen .sv-card:first-child{padding:12px 16px}
-  .sv-ic{width:26px;height:26px;border-radius:8px}
-  .sv-ic svg{width:14px;height:14px}
-  .sv-big{font-size:26px;margin-top:2px}
-  .sv-btn{height:36px}
-  .sv-fig{padding:7px 12px 8px;gap:2px}
-  .sv-fig b{font-size:18px}
-  .sv-chips{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(160px,1fr);overflow-x:auto;scrollbar-width:thin}
+
+.sv-btn{height:36px}
+
+.sv-chips{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(160px,1fr);overflow-x:auto;scrollbar-width:thin}
   .sv-chip{padding-top:7px;padding-bottom:7px}
 }
 /* a short window (a laptop at 720-800px) shrinks the calculator's box with it: the same parts, closer */
 @media(min-width:901px) and (max-height:820px){
   .sv-screen{padding:10px 14px}
   .sv-screen>:not(:first-child){margin-top:9px}
-  .sv-screen>.sv-panel,.sv-screen>.sv-strip{padding:9px 14px;gap:7px}
+  .sv-screen>.sv-panel{padding:9px 14px;gap:7px}
   .sv-screen .sv-card,.sv-screen .sv-card:first-child{padding:9px 14px}
-  .sv-ic{width:22px;height:22px;border-radius:7px}
-  .sv-ic svg{width:12px;height:12px}
-  .sv-big{font-size:22px;margin-top:0}
-  .sv-btn{height:32px}
+
+.sv-btn{height:32px}
   .sv-ph h3{font-size:15px}
-  .sv-fig{padding:5px 11px 6px}
-  .sv-fig b{font-size:16px}
-  .sv-chip{padding-top:5px;padding-bottom:5px}
-  /* Network at 720px tall: its head and four cards leave the list 238px, and a 240px floor
+
+/* Network at 720px tall: its head and four cards leave the list 238px, and a 240px floor
      pushed the screen 2px past its box */
-  .sv-list{min-height:200px}
+  
 }
 @media(max-width:900px){.sv-screen .sv-card+.sv-card{border-left:1px solid var(--wbd)}}
 .sv-can p span::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;flex:0 0 auto}
@@ -3279,7 +3206,7 @@ border-color:rgba(46,224,106,.3)}
   .sv-cards,.sv-cards.four{grid-template-columns:repeat(2,minmax(0,1fr))}
   .sv-screen .sv-cards{gap:10px}
   .sv-screen .sv-card,.sv-screen .sv-card:first-child,.sv-screen .sv-card+.sv-card{border:1px solid var(--wbd);border-radius:9px;padding:10px 12px}
-  .sv-figs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  
   .sv-who{margin-left:auto;flex:0 0 auto}
 }
 @media(max-width:620px){
@@ -3287,11 +3214,11 @@ border-color:rgba(46,224,106,.3)}
   /* no window to fill on a phone: the parts simply stack */
   .sv-screen{justify-content:flex-start}
   .sv-cards,.sv-cards.four{grid-template-columns:minmax(0,1fr)}
-  .sv-big{font-size:28px}
+  
   /* a phone: the lockup keeps its whole tagline; the greeting takes the line under it */
   .brandbar .sv-brand{flex-wrap:wrap;row-gap:6px}
   .welc{flex:1 1 100%;margin-left:0;padding-left:0;border-left:0}
-  .sv-list .sv-wrap{max-height:62svh}
+  
   .sv-chips{grid-template-columns:minmax(0,1fr)}
 }
 /* ══ Simple view, third pass (2026-09-26): the theme's own surfaces, heat as the colour of meaning ══
@@ -3307,17 +3234,17 @@ border-color:rgba(46,224,106,.3)}
 #sv{--wc:#0e0e1d;--wh:#12122a;--wi:#0a0a16;--wchip:#101024;--wbd:#232342;--wbd2:#34345c;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4;
 --sv-amber:#ffb02e;--sv-green:#2ee06a;--sv-violet:#b9b0ff;--sv-teal:#2bc8bd}
 .sv-screen{background:linear-gradient(180deg,#0d0d1c,#09090f);border-color:#232342}
-.sv-screen>.sv-panel,.sv-screen>.sv-strip,.sv-screen .sv-card,.sv-screen .sv-card:first-child,.sv-screen .sv-card+.sv-card{
+.sv-screen>.sv-panel,.sv-screen .sv-card,.sv-screen .sv-card:first-child,.sv-screen .sv-card+.sv-card{
 background:linear-gradient(180deg,#131329,#0c0c1a);border:1px solid var(--wbd2);box-shadow:inset 0 1px 0 #ffffff08;position:relative}
-.sv-screen>.sv-panel::before,.sv-screen>.sv-strip::before,.sv-screen .sv-card::before{content:"";position:absolute;left:16px;right:16px;top:0;height:1px;
+.sv-screen>.sv-panel::before,.sv-screen .sv-card::before{content:"";position:absolute;left:16px;right:16px;top:0;height:1px;
 background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opacity:.95;pointer-events:none}
-.t-stk{--tc:var(--sv-amber)}.t-apr{--tc:#f07a3c}.t-rew{--tc:var(--sv-green)}
+
 #sv-optp{--tc:var(--sv-green)}#sv-allocp,#sv-atalloc{--tc:var(--sv-amber)}#sv-atp,#sv-atp .sv-card,#sv-atauth{--tc:var(--sv-violet)}
-.t-bal{--tc:var(--sv-violet)}
+
 /* the wallet tile: liquid ATONE, the PHOTON that pays fees, when it was read, and the one control
    that reads it again */
 .sv-pho{color:#7fd8ff;font-weight:600}
-.sv-ago{color:var(--wf)}
+
 .sv-rf{width:28px;height:28px;border-radius:8px;border:1px solid var(--wbd2);background:transparent;color:var(--ws);display:grid;place-items:center;cursor:pointer;position:relative;flex:0 0 auto}
 .sv-rf::after{content:"";position:absolute;inset:-8px}
 .sv-rf svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -3333,13 +3260,14 @@ background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opac
 .sv-screen>.sv-up{flex:1 1 auto;min-height:0}
 .sv-on{color:var(--sv-green)}.sv-off{color:var(--wf)}
 .sv-upwin{font-family:var(--wmono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ws)}
-.sv-upst{display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:8px;align-items:baseline;padding:6px 12px 7px;border:1px solid var(--wbd);border-radius:9px;background:rgba(8,8,18,.55);min-width:0}
+.sv-upst{display:grid;grid-template-columns:auto auto;column-gap:8px;align-items:baseline;padding:6px 12px 7px;border:1px solid var(--wbd);border-radius:9px;background:rgba(8,8,18,.55);min-width:0}
 .sv-upst .sw{grid-row:1/3;align-self:center;width:4px;height:26px;border-radius:2px;background:var(--sv-teal)}
 .sv-upst .sw.av{background:linear-gradient(180deg,var(--sv-teal),rgba(43,200,189,.35))}
 .sv-upst .sw.ref{width:0;border-left:3px dashed var(--wt);border-radius:0;background:none;opacity:.75}
 .sv-upst em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
 .sv-upst b{grid-column:2;font-size:17px;font-weight:800;line-height:1.1;color:var(--sv-teal);font-variant-numeric:tabular-nums}
-.sv-upst b.w{color:var(--wt)}
+.sv-upst b.wt{color:var(--wt)}
+.sv-upst .sw.set{background:var(--sv-violet)}
 .sv-upst small{grid-column:2;font-size:10.5px;color:var(--ws);white-space:nowrap}
 .sv-upst{grid-template-areas:"s e" "s b" "s m";grid-template-rows:auto auto auto}
 .sv-upst .sw{grid-area:s}.sv-upst em{grid-area:e}.sv-upst b{grid-area:b}.sv-upst small{grid-area:m}
@@ -3377,43 +3305,22 @@ background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opac
 /* the wallet header: the total on the left, large; on the right one bar that splits it (staked amber,
    available violet, rewards green) with the three figures under it; the fee token and freshness
    along the foot. One panel where there were four tiles, so the page has a first thing to read */
-#sv-wal{--tc:var(--sv-violet);display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.4fr);column-gap:28px;align-items:center}
-.sv-wtot{display:flex;flex-direction:column;gap:6px;min-width:0}
-.sv-wtot .sv-kr{justify-content:flex-start;gap:10px}
-.sv-wbig{display:flex;align-items:baseline;gap:9px;font-size:38px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--wt);font-variant-numeric:tabular-nums}
-.sv-wbig em{font-style:normal;font-family:var(--wmono);font-size:11px;font-weight:400;letter-spacing:.14em;color:var(--wf)}
-.sv-wbal{display:flex;align-items:center;gap:16px;flex-wrap:wrap;min-width:0}
+#sv-wal{--tc:var(--sv-violet);grid-template-columns:minmax(0,.9fr) minmax(0,1.4fr);column-gap:28px;}
+
 .sv-wread{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;color:var(--wf);white-space:nowrap}
-.sv-wapr{font-size:13px;color:var(--ws)}
-.sv-wapr b{font-size:15px;font-weight:800}
-.sv-wbrk{display:flex;flex-direction:column;gap:9px;min-width:0;padding-left:28px;border-left:1px solid var(--wbd)}
+
 .sv-wbar{display:flex;gap:3px;height:10px}
 .sv-wbar i{display:block;min-width:3px;border-radius:3px}
 .sv-wbar i.none{flex:1;background:var(--wbd)}
-.sv-wbar i.stk,.sv-wleg i.stk{background:linear-gradient(90deg,#ffb02e,#ffc861)}
-.sv-wbar i.bal,.sv-wleg i.bal{background:#b9b0ff}
-.sv-wbar i.rew,.sv-wleg i.rew{background:#2ee06a}
-.sv-wleg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.sv-wleg span{display:grid;grid-template-columns:auto 1fr;column-gap:7px;row-gap:1px;align-items:baseline;min-width:0}
-.sv-wleg i{width:8px;height:8px;border-radius:2px;grid-row:1}
-.sv-wleg em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ws)}
-.sv-wleg b{grid-column:1/-1;font-size:19px;font-weight:800;letter-spacing:-.02em;color:var(--wt);font-variant-numeric:tabular-nums}
-.sv-wleg s{grid-column:1/-1;text-decoration:none;font-size:11px;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:14px}
-.sv-wfoot{display:flex;align-items:center;gap:14px;font-size:11.5px;color:var(--ws)}
-.sv-wfoot span+span{color:var(--wf)}
+.sv-wbar i.stk{background:linear-gradient(90deg,#ffb02e,#ffc861)}
+.sv-wbar i.bal{background:#b9b0ff}
+.sv-wbar i.rew{background:#2ee06a}
+
 /* the move: three columns divided by hairlines, no boxes inside the panel; the gain carries the green */
-.sv-flow .sv-side{border:0;background:none;border-radius:0;padding:4px 20px}
-.sv-flow .sv-side.now{padding-left:0}
-.sv-flow .sv-side.gain{background:none;border-left:1px solid rgba(46,224,106,.3)}
-.sv-flow .sv-side.gain b{font-size:28px}
-.sv-flow{grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr) minmax(0,1fr);gap:0}
-.sv-flow .sv-side b{font-size:26px}
-.sv-flow .sv-mbar{height:auto;padding-top:8px}.sv-flow .sv-mbar em{height:8px}
-#sv-optp .sv-hmeta{font-family:var(--wsans);font-size:11.5px;letter-spacing:0;text-transform:none;color:var(--ws)}
-@media(max-width:900px){#sv-wal{grid-template-columns:minmax(0,1fr);row-gap:14px}.sv-wbrk{padding-left:0;border-left:0}
-  .sv-flow{grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr)}.sv-flow .sv-side.gain{border-left:0;padding-left:0}}
-@media(max-width:620px){.sv-wbig{font-size:32px}.sv-wleg{gap:8px}.sv-wleg b{font-size:16px}.sv-wleg s{font-size:10px;white-space:normal}
-  .sv-flow{grid-template-columns:minmax(0,1fr)}.sv-flow .sv-side{padding:6px 0}}
+
+@media(max-width:900px){#sv-wal{grid-template-columns:minmax(0,1fr);row-gap:14px}
+  }
+
 /* a wallet with nothing staked: the message and Stake ATONE in the middle of the space below the tiles */
 #sv-optp.fill{flex:1 1 auto;justify-content:center;align-items:center}
 .sv-none{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
@@ -3422,11 +3329,11 @@ background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opac
 /* the rest of a long list, as one card that opens Manual */
 .sv-chip.more .sv-lgo{display:grid;place-items:center;background:var(--wbd);color:var(--ws);font-family:var(--wmono);font-size:10px;font-weight:700}
 .sv-chip.more u{color:var(--sv-violet)}
-.sv-screen>.sv-list{--tc:var(--sv-teal)}
+
 /* labels in the calculator's voice; figures in the colour of what they are */
 .sv-k{font-family:var(--wmono);font-size:9.5px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--ws)}
 .sv-big em{font-family:var(--wmono);font-size:10px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
-.t-stk .sv-big{color:var(--sv-amber)}.t-rew .sv-big{color:var(--sv-green)}
+
 .sv-ph h3{display:inline-flex;align-items:center;gap:9px}
 .sv-ph h3::before{content:"";width:3px;height:15px;border-radius:2px;background:var(--tc,#6f66c8);box-shadow:0 0 10px -1px var(--tc,#6f66c8)}
 .sv-tag.q{font-family:var(--wmono);font-size:9px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--ws);border-color:var(--wbd2)}
@@ -3446,24 +3353,16 @@ box-shadow:0 0 0 1.5px var(--wt),0 0 14px var(--c);transform:translate(-50%,-50%
 .sv-hrow.mini .sv-heat>i{top:5px;height:5px}
 .sv-hrow.mini .sv-heat>u{top:1px;height:13px}
 .sv-hrow.mini .sv-heat>b{top:7.5px}
-.sv-scl{display:block;min-height:0}
+
 .sv-hint{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ws);white-space:nowrap}
 .sv-hint i{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
 .sv-hint i.lo{background:#572179;box-shadow:0 0 0 1px #8a5bb8}
 .sv-hint i.hi{background:#ffd662;margin-left:9px;box-shadow:0 0 8px #ffd66288}
 /* the plan: now -> after -> a year */
-.sv-flow{display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr) minmax(0,.95fr);gap:10px;align-items:stretch;min-width:0}
-.sv-side{display:flex;flex-direction:column;gap:2px;padding:8px 14px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.07);background:rgba(8,8,18,.55);min-width:0}
-.sv-lab{font-family:var(--wmono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--wf)}
-.sv-side b{font-size:23px;font-weight:800;letter-spacing:-.022em;line-height:1.1;font-variant-numeric:tabular-nums;white-space:nowrap}
-.sv-side i{font-style:normal;font-size:11.5px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
 .sv-mbar{display:flex;gap:2px;height:7px;margin-top:auto;padding-top:5px}
 .sv-mbar em{display:block;border-radius:3px;min-width:4px;height:7px}
-.sv-side.aft{border-color:rgba(46,224,106,.28)}
-.sv-side.gain{justify-content:center;background:linear-gradient(135deg,rgba(46,224,106,.17),rgba(46,224,106,.04));border-color:rgba(46,224,106,.38)}
-.sv-side.gain b{color:var(--sv-green);font-size:25px}
-.sv-arw{display:grid;place-items:center}
-.sv-arw svg{width:38px;height:16px;fill:none;stroke:var(--sv-green);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
 /* a first visit: three steps, in the colours they carry on the screen */
 .sv-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;counter-reset:st}
 .sv-steps li{counter-increment:st;display:flex;flex-direction:column;gap:3px;padding:11px 14px 12px 46px;position:relative;border:1px solid rgba(255,255,255,.07);
@@ -3489,13 +3388,13 @@ font-family:var(--wmono);font-size:11px;font-weight:700;color:#0b0b18;background
    their content spilled over the next one, and scrollHeight still matched). Only the network
    list gives way, and it scrolls inside itself */
 .sv-screen>*{flex-shrink:0}
-.sv-screen>.sv-list{flex-shrink:1}
+
 .sv-screen .sv-card,.sv-screen .sv-card:first-child,.sv-screen .sv-card+.sv-card{padding-top:12px;padding-bottom:12px}
 .sv-big{font-size:28px;margin-top:4px}
-.sv-hmeta{font-family:var(--wmono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ws);white-space:nowrap}
+
 /* the footer: a line, not a box - status, freshness, the two plain controls */
 /* Autopilot's own colour */
-.sv-stat i{background:var(--sv-violet);box-shadow:0 0 0 3px rgba(185,176,255,.18)}
+
 .sv-btn.vio{background:var(--sv-violet);border-color:var(--sv-violet);color:#161038}
 .sv-btn.vio:hover:not(:disabled){background:#cfc8ff;border-color:#cfc8ff;color:#161038}
 /* what the grant allows: two boxes, green and red, so "may" and "may never" cannot be misread */
@@ -3505,11 +3404,7 @@ font-family:var(--wmono);font-size:11px;font-weight:700;color:#0b0b18;background
 .sv-can u{font-family:var(--wmono);font-size:9px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--sv-green)}
 .sv-can>div+div u{color:#ff7a57}
 /* the set: APR in the map's colour, the reader's rows marked in amber */
-.sv-tbl tbody tr.mine{background:rgba(255,176,46,.06)}
-.sv-tbl tbody tr.mine td:first-child{box-shadow:inset 3px 0 0 var(--sv-amber)}
-.sv-tbl th{font-family:var(--wmono);font-size:9px;font-weight:400;letter-spacing:.14em;text-transform:uppercase}
-.sv-apr i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;vertical-align:1px}
-.sv-seg[aria-pressed=true]{color:#062522;background:var(--sv-teal);border-color:var(--sv-teal)}
+
 /* the lockup: the mark and one line beside it (the word GATA is gone, the mark says it) */
 .sv-bw{align-items:center}
 /* the calculator's own title markup (.bt/.btx/.nk/.tsfx), so the line is "Nakamoto Bonus" to the
@@ -3518,24 +3413,134 @@ font-family:var(--wmono);font-size:11px;font-weight:700;color:#0b0b18;background
 .sv-brand .tsfx{color:#ffb02e}
 .sv-brand{gap:12px}
 @media(max-width:900px){
-  .sv-hmeta{flex:1 1 100%;white-space:normal;line-height:1.6}
-  .sv-flow{grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr)}
-  .sv-side.gain{grid-column:1/-1}
-  .sv-steps{grid-template-columns:minmax(0,1fr)}
+
+.sv-steps{grid-template-columns:minmax(0,1fr)}
 }
 @media(max-width:620px){
-  .sv-flow{grid-template-columns:minmax(0,1fr)}
-  .sv-arw{display:none}
-  .sv-can{grid-template-columns:minmax(0,1fr)}
-  .sv-heatl span:nth-child(2){display:none}
+
+.sv-can{grid-template-columns:minmax(0,1fr)}
+  
 }
 @media(min-width:901px) and (max-height:820px){
-  .sv-side,.sv-steps li{padding-top:7px;padding-bottom:8px}
-  .sv-side b{font-size:21px}
-  .sv-side.gain b{font-size:22px}
-  .sv-heat{height:20px}
+  .sv-steps li{padding-top:7px;padding-bottom:8px}
+
+.sv-heat{height:20px}
   .sv-heat>i{top:7px}.sv-heat>s{top:4px}.sv-heat>u{top:1px}.sv-heat>b{top:10px}
   .sv-chip{padding-top:5px;padding-bottom:5px}
+}
+/* the rewards box on Manual opens the claim card: it lifts on hover and carries a chevron,
+   and stays quiet while there is nothing to claim */
+#wk-mine .wk-b5.wk-clk{cursor:pointer;transition:border-color .15s,background .15s}
+#wk-mine .wk-b5.wk-clk[aria-disabled=true]{cursor:default}
+#wk-mine .wk-b5.wk-clk:not([aria-disabled=true]):hover{border-color:rgba(46,224,106,.55);background:linear-gradient(180deg,#132a1f,#0b1812)}
+#wk-mine .wk-b5.wk-clk:focus-visible{outline:2px solid #2ee06a;outline-offset:2px}
+#wk-mine .wk-b5.wk-clk::after{content:"";position:absolute;right:7px;top:50%;width:4px;height:4px;border-top:1.5px solid #2ee06a;border-right:1.5px solid #2ee06a;
+transform:translateY(-50%) rotate(45deg);opacity:.6;pointer-events:none}
+#wk-mine .wk-b5.wk-clk:not([aria-disabled=true]):hover::after{opacity:1}
+#wk-mine .wk-b5.wk-clk[aria-disabled=true]::after{content:none}
+/* the claim card: the unstake card's rows, with square ticks since several can be chosen */
+.clcard .unpick{max-height:300px}
+.clcard .unrow input{border-radius:3px}
+.clcard .unrow input:checked::after{border-radius:1px}
+.clcard .unrow i{color:#5cf08e}
+/* the claim button inside the wallet's rewards box */
+.sv-box .sv-bact{position:absolute;top:8px;right:8px;height:24px;padding:0 10px;border-radius:7px;border:1px solid rgba(46,224,106,.45);background:rgba(46,224,106,.1);
+color:#5cf08e;font-family:var(--wmono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.sv-box .sv-bact:hover{background:#2ee06a;border-color:#2ee06a;color:#062a14}
+.sv-box .sv-bact:focus-visible{outline:2px solid #2ee06a;outline-offset:2px}
+/* ══ Wallet: a dashboard, not a page ═══════════════════════════════════════════════════
+   Three panels in one frame, 12px apart and no more: the wallet across the top, then the move
+   (left) and the validators holding the stake (right) side by side, filling what is left. Every
+   figure sits in a shaded box (.sv-box) - a coloured tick and a mono label, the value, a line of
+   detail - the same box in every panel, so the page reads as one instrument. */
+#sv-over{justify-content:flex-start;gap:12px}
+#sv-over>*,#sv-over>*:not(:first-child){margin-top:0}
+.sv-row2{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:12px;flex:1 1 auto;min-height:0}
+.sv-row2:has(> #sv-allocp[hidden]){grid-template-columns:minmax(0,1fr)}
+.sv-row2>.sv-panel{background:linear-gradient(180deg,#131329,#0c0c1a);border:1px solid var(--wbd2);border-radius:12px;box-shadow:inset 0 1px 0 #ffffff08;
+position:relative;padding:14px 16px;gap:12px;min-height:0}
+.sv-row2>.sv-panel::before{content:"";position:absolute;left:16px;right:16px;top:0;height:1px;
+background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opacity:.95;pointer-events:none}
+#sv-wal{display:flex;flex-direction:column;align-items:stretch;gap:12px;text-align:left}
+#sv-wal .sv-ph{justify-content:flex-start}
+#sv-wal .sv-wbar{height:8px}
+.sv-boxes{display:grid;gap:10px;min-width:0}
+.sv-boxes.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sv-boxes.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.sv-boxes.four{grid-template-columns:minmax(0,1.25fr) repeat(3,minmax(0,1fr))}
+.sv-box{--bc:var(--wbd2);display:flex;flex-direction:column;gap:4px;min-width:0;padding:11px 14px 12px;border-radius:10px;
+border:1px solid var(--wbd);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012)),#0a0a17;position:relative;overflow:hidden}
+.sv-bl{display:flex;align-items:center;gap:7px;font-family:var(--wmono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ws);white-space:nowrap}
+.sv-bl::before{content:"";width:7px;height:7px;border-radius:2px;background:var(--bc);flex:0 0 auto}
+.sv-bv{display:flex;align-items:baseline;gap:7px;font-size:22px;font-weight:800;letter-spacing:-.022em;line-height:1.15;color:var(--wt);
+font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-bv em{font-style:normal;font-family:var(--wmono);font-size:10px;font-weight:400;letter-spacing:.14em;color:var(--wf)}
+.sv-bm{font-size:11.5px;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:15px}
+.sv-bm b{font-weight:700}
+.b-stk{--bc:#ffb02e}.b-bal{--bc:#b9b0ff}.b-rew{--bc:#2ee06a}.b-hi{--bc:#ffd662}.b-cool{--bc:#ffb02e}
+.b-tot{--bc:#f0eef8;background:radial-gradient(130% 140% at 0% 0%,rgba(185,176,255,.14),rgba(185,176,255,0) 60%),linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.012)),#0a0a17;border-color:var(--wbd2)}
+.b-tot .sv-bv{font-size:27px}
+.b-stk .sv-bv{color:#ffc861}.b-rew .sv-bv{color:#5cf08e}
+.b-aft{border-color:rgba(46,224,106,.3)}
+.b-gain{--bc:#2ee06a;justify-content:center;background:linear-gradient(135deg,rgba(46,224,106,.18),rgba(46,224,106,.04)),#0a0a17;border-color:rgba(46,224,106,.4)}
+.b-gain .sv-bv{color:var(--sv-green);font-size:26px}
+.sv-box .sv-mbar{display:flex;gap:2px;height:auto;margin-top:auto;padding-top:8px}
+.sv-box .sv-mbar em{height:7px}
+.sv-mv{flex:1 1 auto;min-height:0}
+.sv-mv .sv-box{justify-content:center;gap:5px}
+.sv-mv .sv-box .sv-mbar{margin-top:10px;padding-top:0}
+.sv-mv .sv-bv{font-size:34px}
+.sv-mv .b-gain .sv-bv{font-size:28px}
+.sv-mvnote{font-size:11.5px;color:var(--wf)}
+#sv-optp .sv-note{margin-top:auto}
+/* the steps a first visit sees, one under another in the narrower column */
+.sv-steps.col{grid-template-columns:minmax(0,1fr);gap:8px}
+/* the validators: the scale, its key, then one shaded row each */
+#sv-allocp .sv-hrow.mini{margin-top:2px}
+#sv-allocp .sv-hint{white-space:normal;flex-wrap:wrap;row-gap:4px}
+.sv-vlist{flex:1 1 auto;min-height:0;display:grid;grid-auto-rows:minmax(30px,44px);align-content:start;gap:6px}
+.sv-vr{--c:var(--wbd2);display:grid;grid-template-columns:24px minmax(0,1fr) auto minmax(60px,.7fr) 54px;align-items:center;gap:12px;
+padding:0 12px 0 13px;border-radius:10px;border:1px solid var(--wbd);background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01)),#0a0a17;
+position:relative;overflow:hidden;min-width:0;min-height:0}
+.sv-vr::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c)}
+.sv-vr .sv-lgo{width:24px;height:24px;border-radius:7px;overflow:hidden;display:grid;place-items:center}
+.sv-vr .sv-lgo img,.sv-vr .sv-lgo .lg{width:24px;height:24px;display:grid;place-items:center;object-fit:cover;font-size:10px;font-weight:700;color:#fff}
+.sv-vn{font-size:13px;font-weight:700;color:var(--wt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.sv-va{text-decoration:none;font-family:var(--wmono);font-size:11px;color:var(--ws);white-space:nowrap;font-variant-numeric:tabular-nums}
+.sv-va em{font-style:normal;font-size:8px;letter-spacing:.12em;color:var(--wf);margin-left:5px}
+.sv-vs{display:flex;align-items:center;gap:8px;min-width:0}
+.sv-vt{flex:1 1 auto;height:6px;border-radius:3px;background:var(--wbd);overflow:hidden}
+.sv-vt i{display:block;height:100%;border-radius:3px;background:var(--c)}
+.sv-vs em{font-style:normal;font-family:var(--wmono);font-size:10.5px;color:var(--ws);min-width:30px;text-align:right}
+.sv-vr u{text-decoration:none;font-family:var(--wmono);font-size:12px;font-weight:700;text-align:right;white-space:nowrap}
+.sv-vr.click,.sv-vr.more{cursor:pointer}
+.sv-vr.click:hover,.sv-vr.more:hover{border-color:var(--c)}
+.sv-vr:focus-visible{outline:2px solid var(--sv-amber);outline-offset:2px}
+.sv-vr.more .sv-lgo{background:var(--wbd);color:var(--ws);font-family:var(--wmono);font-size:10px;font-weight:700}
+.sv-vr.more u{color:var(--sv-amber);font-weight:400;font-size:10.5px;letter-spacing:.06em}
+.sv-vr.skel .sv-lgo{background:var(--wbd2);opacity:.5}
+.sv-vr.skel .sv-vn,.sv-vr.skel .sv-va,.sv-vr.skel u{display:block;height:9px;border-radius:3px;background:var(--wbd)}
+.sv-vr.skel .sv-vn{width:60%}.sv-vr.skel .sv-va{width:60px}
+@media(min-width:901px) and (max-height:820px){
+  #sv-over,.sv-row2{gap:10px}
+  .sv-box{padding:8px 12px 9px;gap:2px}
+  .sv-bv{font-size:20px}.b-tot .sv-bv{font-size:23px}.b-gain .sv-bv{font-size:22px}
+  .sv-row2>.sv-panel{padding:11px 14px;gap:9px}
+  .sv-vlist{gap:5px}.sv-mv .sv-bv{font-size:25px}.sv-mv .b-gain .sv-bv{font-size:21px}
+}
+@media(max-width:900px){
+  .sv-row2{grid-template-columns:minmax(0,1fr);flex:0 0 auto}
+  .sv-boxes.four{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){
+  .sv-boxes.three{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sv-boxes.three>.b-gain{grid-column:1/-1}
+  .sv-bm{white-space:normal}
+  .sv-box .sv-bact{position:static;order:3;align-self:flex-start;margin-top:4px}
+  .sv-bv{font-size:19px}.b-tot .sv-bv{font-size:22px}
+  .sv-vr{grid-template-columns:22px minmax(0,1fr) auto 50px;gap:9px}
+  .sv-vr .sv-vs{display:none}
+  .sv-vlist{grid-auto-rows:40px}
 }
 /* ══ Autopilot: one screen to set it up ═══════════════════════════════════════════════
    The terms on the left (strategy, which validators, stake, time, restake), the validator set
@@ -3663,7 +3668,7 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 /* the footer keeps the card's two columns: the actions centred under the setup, the fee and the
    signing steps beside them under the list */
 .atfoot{flex:0 0 auto;display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);grid-template-areas:"b f";align-items:center;padding:12px 0 14px;border-top:1px solid var(--wbd)}
-.atcard .atfoot .txbtns{grid-area:b;justify-content:center;padding:0 20px}
+.atcard .atfoot .txbtns{grid-area:b;justify-content:center;}
 .atfoot .atfs{grid-area:f;padding:0 20px}
 .atfs{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
 .atcard .atfoot .txfee,.atcard .atfoot .txstep{padding:0;min-height:0}
@@ -3740,8 +3745,8 @@ color:var(--ink2);font:inherit;font-family:var(--sans);font-size:12px;font-weigh
 .l2gl{font-family:var(--mono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:#7c7aa3;padding-left:10px;line-height:1}
 .l2div{align-self:stretch;width:.5px;background:var(--edge2)}
 /* label and track share the 50px title line: the pills there run a little smaller */
-.l2.split .l2trk{padding:2px}
-.l2.split .l2tab{height:25px;padding:0 12px}
+
+.l2.split .l2tab{height:25px;}
 /* a split row's views are words, not pills: the open one in full ink over a short bar of the
    section's accent (the generated rule sets --l2-lit), the others quiet. The pill track is left
    to the version switch, so the two controls never read as one */
@@ -4012,7 +4017,7 @@ html[data-tab=connect] .l2host{display:none}
         <section class=wk-pane id=wk-mine>
           <div id=wk-acct>
           <header class="wk-ph wk-bh"><h3 id=wname>Wallet</h3><span class=wk-addrw><button class=wk-addr id=waddr type=button hidden title="Copy address" aria-label="Copy address"></button></span></header>
-          <div class=wk-bal5><div class=wk-b5><i><img src="assets/atomone.svg" alt="">ATONE</i><b id=ds-bal>&mdash;</b></div><div class=wk-b5><i><img src="assets/photon.svg" alt="">PHOTON</i><b id=ds-photon class=pho>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">staked</i><b id=ds-staked>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">rewards</i><b id=ds-rew>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">APR</i><b id=ds-apr>&mdash;</b></div></div>
+          <div class=wk-bal5><div class=wk-b5><i><img src="assets/atomone.svg" alt="">ATONE</i><b id=ds-bal>&mdash;</b></div><div class=wk-b5><i><img src="assets/photon.svg" alt="">PHOTON</i><b id=ds-photon class=pho>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">staked</i><b id=ds-staked>&mdash;</b></div><div class="wk-b5 wk-clk" id=ds-rewt role=button tabindex=0 aria-disabled=true title="Claim rewards"><i><img src="assets/atomone.svg" alt="">rewards</i><b id=ds-rew>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">APR</i><b id=ds-apr>&mdash;</b></div></div>
           <div class=wk-ap id=wkap hidden><span class=wk-apk>Autopilot</span><span class=wk-aps id=wkaps>inactive</span><button class=wk-apb id=atbtn type=button title="Let GATA keep this stake where it earns most, inside limits you set">Set up</button></div>
           <div class=wk-rule></div>
           <header class="wk-ph wk-t1"><h3>Delegations</h3><span class=wk-pn id=dmyn></span>
@@ -4045,8 +4050,10 @@ html[data-tab=connect] .l2host{display:none}
     <main class=sv-main>
       <section class=sv-screen id=sv-over data-sc=over aria-label=Wallet>
         <div class="sv-panel sv-wal" id=sv-wal></div>
-        <div class=sv-panel id=sv-optp></div>
-        <div class=sv-panel id=sv-allocp></div>
+        <div class=sv-row2>
+          <div class=sv-panel id=sv-optp></div>
+          <div class=sv-panel id=sv-allocp></div>
+        </div>
       </section>
       <section class=sv-screen id=sv-auto data-sc=auto aria-label=Autopilot>
         <div class=sv-panel id=sv-atp></div>
@@ -4202,7 +4209,7 @@ html[data-tab=connect] .l2host{display:none}
   <div class=txlock id=txlock></div>
   <div class=txfee id=txfee></div>
   <div class=txstep id=txstep></div>
-  <div class=txbtns><button class="wk-btn wk-bell" id=txbell type=button title="Alerts for these validators"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>Alerts</button><button class=wk-btn id=txcancel type=button>Cancel</button><button class="wk-btn wk-go" id=txsign type=button>Redelegate</button></div>
+  <div class=txbtns><button class="wk-btn wk-bell" id=txbell type=button title="Alerts for these validators"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>Alerts</button><button class="wk-btn wk-go" id=txsign type=button>Redelegate</button></div>
 </div></div>
 
 <div class=pop id=unpop><div class="card txcard uncard">
@@ -4216,6 +4223,14 @@ html[data-tab=connect] .l2host{display:none}
   <div class=txfee id=unfee></div>
   <div class=txstep id=unstep></div>
   <div class=txbtns><button class=wk-btn id=uncancel type=button>Cancel</button><button class="wk-btn wk-go" id=unsign type=button disabled>Unstake</button></div>
+</div></div>
+
+<div class=pop id=clpop><div class="card txcard uncard clcard" role=dialog aria-modal=true aria-labelledby=clttl>
+  <header class=wk-txh><div><b id=clttl>Claim rewards</b><span>atomone-1</span></div><span class=txsum id=clsum></span></header>
+  <div class=unpick id=clpick></div>
+  <div class=txfee id=clfee></div>
+  <div class=txstep id=clstep></div>
+  <div class=txbtns><button class="wk-btn wk-go" id=clsign type=button disabled>Claim</button></div>
 </div></div>
 
 <div class=pop id=stpop><div class="card txcard uncard stcard">

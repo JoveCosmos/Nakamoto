@@ -37,7 +37,11 @@
   function VALS(){ return window.__VALS ? window.__VALS() : []; }
   function DD(){ return window.__D || { set: {}, eta: {}, nakamoto: {}, rule: {} }; }
   function tag(cls, t, title){ return '<span class="sv-tag ' + cls + '"' + (title ? ' title="' + esc(title) + '"' : '') + '>' + t + '</span>'; }
-  function fig(cls, k, v){ return '<div class="sv-fig ' + cls + '"><span>' + k + '</span><b>' + v + '</b></div>'; }
+  /* a shaded box inside a panel: a coloured tick and label, the value, a line of detail */
+  function box(cls, label, value, meta, style, act){
+    return '<div class="sv-box b-' + cls + '"' + (style ? ' style="' + style + '"' : '') + '>' + (act || "") + '<span class=sv-bl>' + label + '</span>' +
+      '<b class=sv-bv>' + value + '</b><span class=sv-bm>' + (meta || "") + '</span></div>';
+  }
   function card(k, v, sub, cls){
     return '<div class=sv-card><span class=sv-k>' + k + '</span>' +
            '<span class="sv-big ' + (cls || "") + '">' + v + '</span><span class=sv-sub>' + (sub || "") + '</span></div>';
@@ -120,24 +124,19 @@
     var mine = pos && pos.rows.length, hr = mine ? heat(pos.rate) : null, rew = window.__REW || 0;
     var liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0, tot = liq + stk + rew;
     var seg = function(cls, v){ return v > 0 ? '<i class=' + cls + ' style="flex:' + Math.max(v / (tot || 1), .006).toFixed(4) + ' 1 0"></i>' : ''; };
+    var read = pos ? '<span class=sv-wread>' + (window.__POSAT ? 'read ' + ago(window.__POSAT) : '') +
+      '<button class=sv-rf type=button data-act=refresh title="Read the wallet again" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button></span>' : '';
     put("sv-wal",
-      '<div class=sv-wtot><span class=sv-kr><span class=sv-k>Your wallet</span><span class="sv-tag g">Self-custody</span></span>' +
-        /* the balance says how fresh it is, and the one control that reads it again sits beside it */
-        '<span class=sv-wbal><b class=sv-wbig>' + (pos ? fmt(tot) : "—") + '<em>ATONE</em></b>' +
-          (pos ? '<span class=sv-wread>' + (window.__POSAT ? 'read ' + ago(window.__POSAT) : '') +
-            '<button class=sv-rf type=button data-act=refresh title="Read the wallet again" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button></span>' : '') +
-        '</span>' +
-        '<span class=sv-wapr>' + (mine ? 'staked ATONE earns <b style="color:' + hr.ink + '">' + pct(pos.rate) + '</b> a year'
-          : pos ? 'nothing staked' : 'connect a wallet to read it') + '</span></div>' +
-      '<div class=sv-wbrk>' +
-        '<div class=sv-wbar>' + (pos ? seg("stk", stk) + seg("bal", liq) + seg("rew", rew) : '<i class=none></i>') + '</div>' +
-        '<div class=sv-wleg>' +
-          '<span><i class=stk></i><em>Staked</em><b>' + (pos ? fmt(stk) : "—") + '</b><s>' + (mine ? "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s") : "") +
-            (pos && pos.locked > 0 ? ", " + fmt(pos.locked) + " under cooldown" : "") + '</s></span>' +
-          '<span><i class=bal></i><em>Available</em><b>' + (bal ? fmt(liq) : "—") + '</b><s>in the wallet</s></span>' +
-          '<span><i class=rew></i><em>Rewards</em><b>' + (window.__REW != null ? fmt(rew) : "—") + '</b><s>' + (rew > 0 ? "ready to claim" : "") + '</s></span>' +
-        '</div>' +
-        '<div class=sv-wfoot><span><b class=sv-pho>' + (bal ? fmt(bal.uphoton) : "—") + '</b> PHOTON for fees</span></div>' +
+      '<div class=sv-ph><h3>Your wallet</h3><span class="sv-tag g">Self-custody</span><div class=sv-rt>' + read + '</div></div>' +
+      '<div class=sv-wbar>' + (pos ? seg("stk", stk) + seg("bal", liq) + seg("rew", rew) : '<i class=none></i>') + '</div>' +
+      '<div class="sv-boxes four">' +
+        box("tot", "Total", (pos ? fmt(tot) : "—") + '<em>ATONE</em>',
+            mine ? 'staked ATONE earns <b style="color:' + hr.ink + '">' + pct(pos.rate) + '</b> a year' : pos ? "nothing staked" : "connect a wallet to read it") +
+        box("stk", "Staked", pos ? fmt(stk) : "—",
+            mine ? "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s") + (pos.locked > 0 ? ", " + fmt(pos.locked) + " in cooldown" : "") : pos ? "nothing staked" : "") +
+        box("bal", "Available", bal ? fmt(liq) : "—", bal ? '<b class=sv-pho>' + fmt(bal.uphoton) + '</b> PHOTON for fees' : "") +
+        box("rew", "Rewards", window.__REW != null ? fmt(rew) : "—", rew > 0 ? "ready to claim" : pos ? "nothing waiting" : "",
+            null, rew >= 1 ? '<button class=sv-bact type=button data-act=claim title="Claim your staking rewards">Claim</button>' : "") +
       '</div>');
 
     /* the opportunity: the same plan the advanced view would sign */
@@ -147,7 +146,7 @@
       /* a first visit: the three steps this screen is for, in the colours they carry below */
       h = '<div class=sv-ph><h3>See what your stake could earn</h3>' +
             '<div class=sv-rt><button class="sv-btn pri" type=button data-act=connect>Connect wallet</button></div></div>' +
-          '<ol class=sv-steps>' +
+          '<ol class="sv-steps col">' +
             '<li style="--sc:#ffb02e"><b>Connect</b><span>your wallet reads your stake; nothing leaves it</span></li>' +
             '<li style="--sc:' + heat(S.mid).fill + '"><b>See where it sits</b><span>on the map: brighter validators pay more</span></li>' +
             '<li style="--sc:#2ee06a"><b>Redelegate</b><span>to the best-paying place, in one signature</span></li>' +
@@ -158,13 +157,16 @@
             '<button class="sv-btn go" type=button data-act=stake>Stake ATONE</button></div>';
     } else if(!(pos.free > 0)){
       h = '<div class=sv-ph><h3>Everything is under cooldown</h3>' + tag("a", "21 days") + '</div>' +
+          '<div class="sv-boxes two">' + box("now", "Your APR", pct(pos.rate), "on " + pos.rows.length + " validators", "--bc:" + heat(pos.rate).fill) +
+            box("cool", "Free to move on", window.__dayFull ? window.__dayFull(pos.until) : "—", fmt(pos.total) + " ATONE redelegated recently") + '</div>' +
           '<div class=sv-note>All <b>' + fmt(pos.total) + ' ATONE</b> was redelegated recently, so the chain will not move it again until <b>' +
           (window.__dayFull ? window.__dayFull(pos.until) : "") + '</b>.</div>';
     } else if(!plan || !(plan.gain > 0.5) || plan.after == null){
       h = '<div class=sv-ph><h3>Nothing to gain by moving</h3></div>' +
-          '<div class=sv-note>Your stake already earns as much as the set can pay it today. This screen re-reads the chain every block, so it will say so when that changes.</div>' +
-          '<div class=sv-figs>' + fig("", "your APR", pct(pos.rate)) + fig("dim", "best in set", pct(S.hi)) +
-          fig("dim", "can move", fmt(pos.free) + '<i>ATONE</i>') + fig("dim", "validators", String(pos.rows.length)) + '</div>';
+          '<div class="sv-boxes two">' + box("now", "Your APR", '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>', "what your stake earns now", "--bc:" + heat(pos.rate).fill) +
+            box("hi", "Best in the set", '<span style="color:' + heat(S.hi).ink + '">' + pct(S.hi) + '</span>', "the highest APR any validator pays", "--bc:" + heat(S.hi).fill) +
+            box("stk", "Can move", fmt(pos.free), "ATONE free to redelegate") + box("tot", "Validators", String(pos.rows.length), "holding your stake") + '</div>' +
+          '<div class=sv-note>Your stake already earns as much as the set can pay it today. This screen re-reads the chain every block and will say so when that changes.</div>';
     } else {
       /* now -> after -> a year: the stake as it earns today, where the plan puts it, and what
          that is worth - each side drawn in the colours the map gives it */
@@ -175,14 +177,13 @@
         return { w: q.x, r: v && window.__rateAfter ? window.__rateAfter(v[1], v[2], q.x) : plan.after, t: q.m }; });
       if(pos.locked > 0) aftSegs.push({ w: pos.locked, r: plan.now, t: "stays: under cooldown" });
       h = '<div class=sv-ph><h3>Move your stake, earn more</h3>' + tag("g", pp(lift) + " APR") +
-          '<div class=sv-rt><span class=sv-hmeta title="Redelegated stake cannot move again for 21 days">' + plan.moves + ' move' + (plan.moves === 1 ? "" : "s") +
-            ' in one signature, then 21 days in place</span><button class="sv-btn go" type=button data-act=opt>Redelegate</button></div></div>' +
-          '<div class=sv-flow>' +
-            side("now", "Now", pct(plan.now), hn.ink, "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s"), nowSegs) +
-            '<div class=sv-arw aria-hidden=true><svg viewBox="0 0 40 16"><path d="M1 8h36M31 2l6 6-6 6"/></svg></div>' +
-            side("aft", "After", pct(plan.after), ha.ink, "on " + plan.picks.length + " validator" + (plan.picks.length === 1 ? "" : "s"), aftSegs) +
-            '<div class="sv-side gain"><span class=sv-lab>A year</span><b>+' + one(plan.gain) + '</b><i>ATONE more, at today\'s rates</i></div>' +
-          '</div>';
+          '<div class=sv-rt><button class="sv-btn go" type=button data-act=opt>Redelegate</button></div></div>' +
+          '<div class="sv-boxes three sv-mv">' +
+            side("now", "Now", pct(plan.now), hn, "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s"), nowSegs) +
+            side("aft", "After", pct(plan.after), ha, "on " + plan.picks.length + " validator" + (plan.picks.length === 1 ? "" : "s"), aftSegs) +
+            box("gain", "A year", "+" + one(plan.gain) + '<em>ATONE</em>', "more, at today\'s rates") +
+          '</div>' +
+          '<div class=sv-mvnote>' + plan.moves + ' move' + (plan.moves === 1 ? "" : "s") + ' in one signature. Redelegated stake stays in place for 21 days.</div>';
     }
     /* the hero wash only when there is a move to make - the page's one call to action */
     var op = put("sv-optp", h); op.classList.toggle("hero", h.indexOf("data-act=opt") >= 0); op.classList.toggle("fill", h.indexOf("sv-none") >= 0);
@@ -192,14 +193,13 @@
     if(!pos){
       /* no wallet: the section keeps its shape, like the wallet pane in the other view */
       al.hidden = false;
-      put("sv-allocp", '<div class=sv-ph><h3>The validators</h3>' + tag("q", S.n + " in the set") + '<div class=sv-rt>' + hint() + '</div></div>' + scale([], S) + skelAlloc());
+      put("sv-allocp", '<div class=sv-ph><h3>The validators</h3>' + tag("q", S.n + " in the set") + '</div>' + '<div class=sv-vsc>' + scale([], S, true) + '</div>' + valSkel());
     }
     else if(!pos.rows.length){ al.hidden = true; }
     else {
       al.hidden = false;
       put("sv-allocp", '<div class=sv-ph><h3>Your validators</h3>' +
-        tag("q", pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s")) +
-        '<div class=sv-rt>' + hint() + '</div></div>' + allocation(pos, S));
+        tag("q", pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s")) + '</div>' + valList(pos, S));
     }
 
   }
@@ -216,7 +216,7 @@
     return PC.val;
   }
   /* one side of the plan: its APR in its own heat, and the stake as a bar of heat segments */
-  function side(cls, lab, big, ink, sub, segs){
+  function side(cls, lab, big, h, sub, segs){
     /* a long list is its eleven largest and one segment for the rest (a hundred validators would
        not fit the bar), the rest painted at its stake-weighted rate */
     if(segs.length > 12){
@@ -226,7 +226,8 @@
       segs = segs.slice(0, 11).concat([{ w: rw, r: rw ? rr / rw : 0, t: rest.length + " more validators" }]);
     }
     var tot = 0; segs.forEach(function(q){ tot += q.w; });
-    return '<div class="sv-side ' + cls + '"><span class=sv-lab>' + lab + '</span><b style="color:' + ink + '">' + big + '</b><i>' + sub + '</i>' +
+    return '<div class="sv-box b-' + cls + '" style="--bc:' + h.fill + '"><span class=sv-bl>' + lab + '</span><b class=sv-bv style="color:' + h.ink + '">' + big + '</b>' +
+      '<span class=sv-bm>' + sub + '</span>' +
       '<div class=sv-mbar>' + segs.map(function(q){
         return '<em style="flex:' + (tot ? (q.w / tot * 100).toFixed(2) : 1) + ' 1 0;background:' + heat(q.r).fill + '" title="' + esc(q.t) + '"></em>'; }).join("") +
       '</div></div>';
@@ -241,6 +242,31 @@
      pinned where the map paints it (the pin's size is its share of the stake), and its card
      carries the same colour: a reader sees at a glance whether the stake sits at the dim,
      low-paying end or the bright one. */
+  /* The wallet's validators as a list: where the stake sits on the APR scale (pins, sized by
+     share), then one shaded row each - logo, name and amount, a share bar in the validator's heat,
+     its APR in that colour. Five rows at most: four and the rest, which opens Manual. */
+  function valList(pos, S){
+    var rows = pos.rows.slice().sort(function(a, b){ return b.x - a.x; });
+    var pins = rows.map(function(r){ return { r: r.inactive ? 0 : r.rate, s: Math.round(8 + 9 * Math.sqrt(r.x / pos.total)), t: r.m + ", " + pct(r.rate) }; });
+    if(rows.length > 12) pins.forEach(function(q){ q.s = Math.max(7, Math.round(q.s * .7)); });
+    var shown = rows.length > 5 ? rows.slice(0, 4) : rows, rest = rows.slice(shown.length), restX = 0;
+    rest.forEach(function(r){ restX += r.x; });
+    var h = '<div class=sv-vlist>' + shown.map(function(r){ var c = heat(r.inactive ? 0 : r.rate), sh = r.x / pos.total * 100;
+      return '<div class="sv-vr click" data-v="' + esc(r.id) + '" tabindex=0 title="Open this validator" style="--c:' + c.fill + '">' +
+        '<span class=sv-lgo>' + logo(r.id, r.m) + '</span>' +
+        '<b class=sv-vn>' + esc(r.m) + '</b><s class=sv-va title="' + (r.locked > 0 ? 'part of it in its 21-day cooldown' : '') + '">' + fmt(r.x) + '<em>ATONE</em></s>' +
+        '<span class=sv-vs><span class=sv-vt><i style="width:' + Math.max(2, sh).toFixed(1) + '%"></i></span><em>' + Math.round(sh) + '%</em></span>' +
+        '<u style="color:' + c.ink + '">' + (r.inactive ? "inactive" : pct(r.rate)) + '</u></div>'; }).join("");
+    if(rest.length) h += '<div class="sv-vr more" data-route="dashboard/manual" tabindex=0 title="All your validators, in Manual">' +
+      '<span class=sv-lgo>+' + rest.length + '</span><b class=sv-vn>' + rest.length + ' more</b><s class=sv-va>' + fmt(restX) + '<em>ATONE</em></s>' +
+      '<span class=sv-vs><span class=sv-vt><i style="width:' + (restX / pos.total * 100).toFixed(1) + '%"></i></span><em>' + Math.round(restX / pos.total * 100) + '%</em></span><u>see all</u></div>';
+    return '<div class=sv-vsc title="The largest validators pay least, the smallest pay most">' + scale(pins, S, true) + '</div>' + h + '</div>';
+  }
+  function valSkel(){
+    var h = '<div class=sv-vlist>', i;
+    for(i = 0; i < 4; i++) h += '<div class="sv-vr skel"><span class=sv-lgo></span><b class=sv-vn></b><s class=sv-va></s><span class=sv-vs><span class=sv-vt></span></span><u></u></div>';
+    return h + '</div>';
+  }
   /* how to read the scale, said once, in its own colours */
   function hint(){ return '<span class=sv-hint><i class=lo></i>the largest pay least<i class=hi></i>the smallest pay most</span>'; }
   function allocation(pos, S, noScale){
@@ -321,8 +347,7 @@
       '</div>' +
       '<div class=sv-note>' + (at && at.split_pct > 0
         ? 'GATA keeps <b>' + at.split_pct + '%</b> of the rewards it restakes for you, and charges nothing else.'
-        : 'Autopilot is <b>free</b>: GATA takes no share of your rewards.') +
-      ' It can only do what you allowed above; AtomOne itself refuses anything else.</div>' +
+        : 'Autopilot is <b>free</b>: GATA takes no share of your rewards.') + '</div>' +
       "");
   }
   /* the strategy word lives in the grant's memo, which the chain does not keep:
@@ -341,11 +366,14 @@
     PROPS.at = Date.now();
     var api = (window.__API || "https://atomone-api.gatadao.com") + "/atomone/gov/v1/proposals";
     Promise.all([
-      fetch(api + "?pagination.limit=1&pagination.count_total=true&pagination.reverse=true").then(function(r){ return r.json(); }),
+      fetch(api + "?pagination.limit=500").then(function(r){ return r.json(); }),
       fetch(api + "?proposal_status=PROPOSAL_STATUS_VOTING_PERIOD&pagination.limit=50").then(function(r){ return r.json(); })
     ]).then(function(x){
-      PROPS.total = +((x[0].pagination || {}).total || 0) || null;
-      var p = (x[0].proposals || [])[0]; PROPS.last = p ? { id: p.id, status: String(p.status || "").replace("PROPOSAL_STATUS_", "").toLowerCase() } : null;
+      /* counted by outcome: ids skip (a proposal that never reached its deposit is pruned), so
+         the latest id is not the count and is not quoted beside it */
+      var all = x[0].proposals || [], by = {};
+      all.forEach(function(p){ var s = String(p.status || "").replace("PROPOSAL_STATUS_", "").toLowerCase(); by[s] = (by[s] || 0) + 1; });
+      PROPS.total = all.length || null; PROPS.by = by;
       PROPS.voting = (x[1].proposals || []).length;
       if(screen() === "net") drawNet();
     }).catch(function(){ PROPS.at = 0; });
@@ -359,7 +387,7 @@
            e.enabled ? (e.week ? "week " + e.week + " · " : "") + (e.now != null ? Math.round(e.now * 100) + "% of the reward pool shared equally" : "") : "the reward pool follows stake alone") +
       card("Proposals", PROPS.total != null ? String(PROPS.total) : "—",
            PROPS.voting ? '<b class=sv-on>' + PROPS.voting + ' in voting now</b>'
-             : PROPS.last ? "none in voting · #" + esc(PROPS.last.id) + " " + esc(PROPS.last.status.replace(/_/g, " ")) : "") +
+             : PROPS.by ? (PROPS.by.passed || 0) + " passed · " + (PROPS.by.rejected || 0) + " rejected" + (PROPS.by.failed ? " · " + PROPS.by.failed + " failed" : "") + " · none in voting" : "") +
       card("Uptime", (S.up != null ? S.up.toFixed(2) + "%" : "—"),
            "30-day average across the set, " + S.clean + " never jailed"));
 
@@ -435,11 +463,12 @@
     }
     var hv = UPHOVER >= 0 && UPHOVER < n ? rows[UPHOVER] : null;
     put("sv-up", head +
-        '<span class=sv-upwin>last ' + n + ' blocks · about ' + mins + ' min</span>' +
+        '<span class=sv-upwin>last ' + n + ' blocks ~' + mins + ' min</span>' +
         '<div class=sv-rt>' +
+          '<span class=sv-upst><i class="sw set"></i><em>Active validators</em><b class=wt>' + (last[2] || S.n) + '</b><small>signing each block</small></span>' +
           '<span class=sv-upst><i class=sw></i><em>This block</em><b>' + now.toFixed(0) + '%</b><small>' + last[1] + ' of ' + last[2] + ' signed</small></span>' +
           '<span class=sv-upst><i class="sw av"></i><em>Last ' + n + ' blocks</em><b>' + avg.toFixed(2) + '%</b><small>average</small></span>' +
-          (ref != null ? '<span class=sv-upst><i class="sw ref"></i><em>30-day average</em><b class=w>' + ref.toFixed(2) + '%</b><small>dashed line</small></span>' : '') +
+          (ref != null ? '<span class=sv-upst><i class="sw ref"></i><em>30-day average</em><b class=wt>' + ref.toFixed(2) + '%</b><small>dashed line</small></span>' : '') +
         '</div></div>' +
       '<div class=sv-upchart>' +
         '<div class=sv-upmarks>' + marks + '</div>' +
@@ -559,6 +588,7 @@
       return;
     }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
+    if(act === "claim"){ if(window.__claim) window.__claim(); return; }
     if(act === "refresh"){
       if(window.__refreshPos){ t.classList.add("busy"); window.__refreshPos().then(function(){ t.classList.remove("busy"); render(); }); }
       else { var rf = E("wrefresh"); if(rf) rf.click(); }
@@ -570,7 +600,7 @@
   }
   function onKey(ev){
     if(ev.key !== "Enter" && ev.key !== " ") return;
-    var rt = ev.target.closest ? ev.target.closest(".sv-chip[data-route]") : null;
+    var rt = ev.target.closest ? ev.target.closest(".sv-chip[data-route],.sv-vr[data-route]") : null;
     if(rt && window.__shellGo){ ev.preventDefault(); window.__shellGo(rt.getAttribute("data-route")); return; }
     var t = ev.target.closest ? ev.target.closest("[data-v]") : null;
     if(!t || !window.__vshow) return;
