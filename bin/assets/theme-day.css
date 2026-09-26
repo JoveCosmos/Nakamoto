@@ -547,9 +547,11 @@
     html[data-theme=light]:not([data-mono]) .atview button[aria-selected=true]{color:#FFFFFF}
     html[data-theme=light]:not([data-mono]) .atview button[aria-selected=true] b{color:#FFFFFF}
   }
+  html[data-theme=light]:not([data-mono]){--l2-off:var(--faint)}
   html[data-theme=light]:not([data-mono]) .l1tab{background:transparent}
   html[data-theme=light]:not([data-mono]) .l2tab{background:transparent}
   html[data-theme=light]:not([data-mono]) .l2gl{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .l2.split .l2trk{background:none}
   html[data-theme=light]:not([data-mono]) .l2vb{background:transparent}
   html[data-theme=light]:not([data-mono]) .shell-act{background:transparent;text-decoration:none}
   html[data-theme=light]:not([data-mono]) [role=tabpanel]:focus{outline:none}

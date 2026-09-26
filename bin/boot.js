@@ -20,14 +20,15 @@ try{(function(){
   function bytab(t, pick){ for(var i = 0; i < S.length; i++) for(var j = 0; j < S[i].sub.length; j++)
     if(S[i].sub[j].tab === t && (!pick || pick(S[i].sub[j]))) return [S[i], S[i].sub[j]]; return null; }
   var mem = {}; try{ mem = JSON.parse(sessionStorage.getItem("shell_last") || "{}"); }catch(e){}
-  /* the version switch (Simple / Advanced) is the reader's, kept per browser; ?dash=b previews
-     the second layout while the two are being compared */
-  var ver = localStorage.getItem("th_ui") === "pro" ? "pro" : "simple", vb = /[?&]dash=b\b/.test(location.search);
-  R.setAttribute("data-ver", ver); if(vb) R.setAttribute("data-var", "b");
+  /* the version switch (Simple / Advanced) is the reader's, kept per browser; a view that is
+     off - always, or in the open version - cannot be open */
+  var ver = localStorage.getItem("th_ui") === "pro" ? "pro" : "simple";
+  R.setAttribute("data-ver", ver);
   function eff(s, v){
-    var o = vb && "pro_b" in v ? v.pro_b : v.pro, r = {}, k;
+    var o = v.pro, r = {}, k;
+    if(v.off) return null;
     if(ver !== "pro" || !s.version || !o) return v;
-    if(o === "hide") return null;
+    if(o === "hide" || o === "off") return null;
     for(k in v) r[k] = v[k]; for(k in o) r[k] = o[k]; return r;
   }
   var h = (location.hash || "").replace(/^#\/?/, "").split("/"), s = null, v = null, f;

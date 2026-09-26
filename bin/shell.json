@@ -17,8 +17,9 @@
     "A section may carry a version switch - version: {group it sits beside, options, default}.",
     "Simple or Advanced is a way of looking at the same views, kept per browser (th_ui), never a",
     "route. A sub-view's 'pro' says what changes in the second option: fields that override its own",
-    "(ui, panel, screen, tab), or 'hide' to leave that tab out. 'pro_b' does the same for the",
-    "preview variant (?dash=b) while the two layouts are being compared."
+    "(ui, panel, screen, tab), 'hide' to leave that tab out, or 'off' to keep it in place, greyed and",
+    "inert. A sub-view with 'off': true is greyed in every version (offnote is its tooltip) - it is",
+    "announced, not built. The switch sits after the section's views, at the end of the row."
   ],
   "home": "staking/bonus",
   "sections": [
@@ -55,12 +56,12 @@
         {"id": "overview",  "label": "Overview",  "route": "overview",  "group": "Staking", "tab": "dele", "ui": "simple", "screen": "over", "panel": "sv-over",
          "pro": {"ui": "pro", "panel": "p-dele"}},
         {"id": "autopilot", "label": "Autopilot", "route": "autopilot", "group": "Staking", "tab": "dele", "ui": "simple", "screen": "auto", "panel": "sv-auto",
-         "pro_b": "hide"},
+         "pro": "off"},
         {"id": "network",   "label": "Network",   "route": "network",   "group": "Staking", "tab": "dele", "ui": "simple", "screen": "net",  "panel": "sv-net",
-         "pro_b": "hide"},
-        {"id": "votes",     "label": "Votes",     "route": "votes",     "group": "Governance",
+         "pro": "off"},
+        {"id": "votes",     "label": "Votes",     "route": "votes",     "group": "Governance", "off": true, "offnote": "Coming soon",
          "empty": {"title": "Votes", "text": "How your wallet voted on AtomOne proposals will be listed here."}},
-        {"id": "governors", "label": "Governors", "route": "governors", "group": "Governance",
+        {"id": "governors", "label": "Governors", "route": "governors", "group": "Governance", "off": true, "offnote": "Coming soon",
          "empty": {"title": "Governors", "text": "The governors your wallet follows will be listed here."}}
       ]
     }

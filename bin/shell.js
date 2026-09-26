@@ -23,14 +23,16 @@
   function sec(k, v){ for(var i = 0; i < SECS.length; i++) if(SECS[i][k] === v) return SECS[i]; return null; }
   function sub(s, k, v){ for(var i = 0; i < s.sub.length; i++) if(s.sub[i][k] === v) return s.sub[i]; return null; }
   /* the version switch: Simple or Advanced, the reader's own (th_ui), never part of a route.
-     A view's 'pro' (or, previewing the second layout with ?dash=b, its 'pro_b') says what it
-     shows in Advanced - fields over its own - or 'hide'. eff() is the view as it stands now. */
-  var VER = R.getAttribute("data-ver") || "simple", VB = R.getAttribute("data-var") === "b";
+     A view's 'pro' says what it shows in Advanced - fields over its own - or 'hide' (its tab
+     leaves the row) or 'off' (its tab stays, greyed and inert). A view with 'off' set is inert
+     in both. eff() is the view as it stands now, null when it cannot be open. */
+  var VER = R.getAttribute("data-ver") || "simple";
   function eff(s, v){
     if(!s || !v) return v;
-    var o = VB && "pro_b" in v ? v.pro_b : v.pro, r = {}, k;
+    var o = v.pro, r = {}, k;
+    if(v.off) return null;
     if(VER !== "pro" || !s.version || !o) return v;
-    if(o === "hide") return null;
+    if(o === "hide" || o === "off") return null;
     for(k in v) r[k] = v[k]; for(k in o) r[k] = o[k]; return r;
   }
   function shown(s, v){ if(eff(s, v)) return v; for(var i = 0; i < s.sub.length; i++) if(eff(s, s.sub[i])) return s.sub[i]; return v; }
@@ -81,9 +83,13 @@
       });
       if(!hit && tabs.length) tabs[0].tabIndex = 0;
     });
-    /* what each tab controls follows the version (Overview is the three-pane screen in Advanced) */
+    /* what each tab controls follows the version (Overview is the three-pane screen in
+       Advanced); a tab the version turns off stays in the row, greyed, and says why */
     SECS.forEach(function(x){ x.sub.forEach(function(w){
-      var b = E("l2-" + x.id + "-" + w.id), e = eff(x, w); if(b && e) b.setAttribute("aria-controls", e.panel || "p-empty"); }); });
+      var b = E("l2-" + x.id + "-" + w.id), e = eff(x, w); if(!b) return;
+      if(e){ b.setAttribute("aria-controls", e.panel || "p-empty"); b.removeAttribute("aria-disabled"); b.removeAttribute("title"); }
+      else { b.setAttribute("aria-disabled", "true"); b.title = w.off ? (w.offnote || "Coming soon") : "In the Simple view"; }
+    }); });
     Array.prototype.forEach.call(document.querySelectorAll(".l2vb"), function(b){
       b.setAttribute("aria-pressed", b.dataset.ver === VER ? "true" : "false"); });
     var calc = E("calc");
@@ -189,6 +195,7 @@
   window.__shellGo = function(route){ var r = parse("#/" + route); if(r) r.intro ? go(null, null, "push") : go(r.s, r.v, "push"); };
 
   function activate(b){
+    if(b.getAttribute("aria-disabled") === "true") return;
     var s = sec("id", b.dataset.section); if(!s) return;
     if(b.classList.contains("l1tab")) go(s, cur.s === s && s.entry !== "first" ? cur.v : last(s), "push");
     else { var v = sub(s, "id", b.dataset.sub); if(v) go(s, v, "push"); }
@@ -210,8 +217,8 @@
     var t = ev.target;
     if(!t || !t.getAttribute || t.getAttribute("role") !== "tab") return;
     var list = t.closest("[role=tablist]"); if(!list) return;
-    /* a tab the open version leaves out is not there to land on */
-    var tabs = [].slice.call(list.querySelectorAll("[role=tab]")).filter(function(b){ return b.offsetParent !== null; }), i = tabs.indexOf(t), j = -1;
+    /* a tab the open version leaves out, or turns off, is not there to land on */
+    var tabs = [].slice.call(list.querySelectorAll("[role=tab]")).filter(function(b){ return b.offsetParent !== null && b.getAttribute("aria-disabled") !== "true"; }), i = tabs.indexOf(t), j = -1;
     if(ev.key === "ArrowRight" || ev.key === "ArrowDown") j = (i + 1) % tabs.length;
     else if(ev.key === "ArrowLeft" || ev.key === "ArrowUp") j = (i - 1 + tabs.length) % tabs.length;
     else if(ev.key === "Home") j = 0;

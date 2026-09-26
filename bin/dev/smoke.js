@@ -162,6 +162,8 @@ t('shell-every-view-renders', function(){
   var bad=[];
   SECS.forEach(function(s){ s.sub.forEach(function(v){
     go(s.route+'/'+v.route);
+    /* a view that is off cannot be open: its route lands on the section's first view */
+    if(v.off){ if(location.hash!=='#/'+s.route+'/'+s.sub[0].route) bad.push(s.id+'/'+v.id+' (off, opened '+location.hash+')'); return; }
     var R=document.documentElement, ok=location.hash==='#/'+s.route+'/'+v.route && R.getAttribute('data-sv')===s.id+'/'+v.id;
     var p=document.getElementById(v.panel||'p-empty'), r=p&&p.getBoundingClientRect();
     if(!ok || !p || r.height<60 || !p.textContent.trim()) bad.push(s.id+'/'+v.id+(ok?'':' (route)')+(p?' h'+Math.round(r.height):' (no panel)'));
@@ -190,29 +192,41 @@ t('shell-aria', function(){
   return !bad.length || bad.join(', ');
 });
 /* the dashboard's version switch: Simple / Advanced changes how its views look, never the
-   route; in Advanced, Overview is the three-pane screen; the live layout (A) keeps every tab,
-   the preview (?dash=b) leaves out the ones its config hides */
+   route; it ends the title row, after the views. In Advanced, Overview is the three-pane
+   screen and every other tab stays in place, greyed and inert; Votes and Governors are
+   greyed in both */
 t('shell-version', function(){
-  var R=document.documentElement, bad=[], B=R.getAttribute('data-var')==='b';
+  var R=document.documentElement, bad=[];
   function vis(id){ var e=document.getElementById(id); return !!e && e.offsetParent!==null && e.getBoundingClientRect().height>0; }
   function tabs(){ return [].filter.call(document.querySelectorAll('.l2[data-for=dashboard] .l2tab'),function(b){ return b.offsetParent!==null; }).map(function(b){ return b.dataset.sub; }).join(); }
+  function off(){ return [].filter.call(document.querySelectorAll('.l2[data-for=dashboard] .l2tab'),function(b){ return b.getAttribute('aria-disabled')==='true'; }).map(function(b){ return b.dataset.sub; }).join(); }
+  var ALL='overview,autopilot,network,votes,governors';
   window.__shellVer('simple'); go('dashboard/overview');
-  var sw=document.querySelector('.l2ver[data-for=dashboard]');
+  var sw=document.querySelector('.l2ver[data-for=dashboard]'), l2=document.querySelector('.l2[data-for=dashboard]');
   if(!sw || sw.offsetParent===null) bad.push('switch not shown');
   if(sw && sw.closest('[role=tablist]')) bad.push('switch inside a tablist');
+  if(sw && l2 && innerWidth>620 && sw.getBoundingClientRect().left < l2.getBoundingClientRect().right) bad.push('switch not after the views');
+  if(sw && l2 && !(l2.compareDocumentPosition(sw) & 4)) bad.push('switch before the views in the markup');
   if(!vis('sv-over') || vis('p-dele')) bad.push('simple overview');
+  if(tabs()!==ALL || off()!=='votes,governors') bad.push('simple tabs '+tabs()+' off '+off());
+  document.getElementById('l2-dashboard-votes').click();
+  if(location.hash!=='#/dashboard/overview') bad.push('votes opened '+location.hash);
   document.querySelector('.l2vb[data-ver=pro]').click();
   if(R.getAttribute('data-ver')!=='pro' || location.hash!=='#/dashboard/overview') bad.push('pro: ver '+R.getAttribute('data-ver')+' '+location.hash);
   if(!vis('p-dele') || vis('sv')) bad.push('pro overview is not the three panes');
   if(document.getElementById('l2-dashboard-overview').getAttribute('aria-controls')!=='p-dele') bad.push('overview controls');
   if(document.querySelector('.l2vb[data-ver=pro]').getAttribute('aria-pressed')!=='true') bad.push('pressed');
-  var want=B?'overview,votes,governors':'overview,autopilot,network,votes,governors';
-  if(tabs()!==want) bad.push('pro tabs '+tabs());
+  if(tabs()!==ALL || off()!=='autopilot,network,votes,governors') bad.push('pro tabs '+tabs()+' off '+off());
+  var ap=document.getElementById('l2-dashboard-autopilot');
+  if(getComputedStyle(ap).color===getComputedStyle(document.getElementById('l2-dashboard-overview')).color) bad.push('off tab not greyed');
+  ap.click(); if(location.hash!=='#/dashboard/overview') bad.push('autopilot opened in pro '+location.hash);
+  go('dashboard/network'); if(location.hash!=='#/dashboard/overview') bad.push('network route in pro '+location.hash);
   var tg=[].filter.call(document.querySelectorAll('.brandbar .svtag'),function(x){ return x.offsetParent!==null; });
-  if(innerWidth>1023 && innerWidth>620 && (tg.length!==1 || !tg[0].classList.contains('a'))) bad.push('pro tagline');
+  if(innerWidth>1239 && (tg.length!==1 || !tg[0].classList.contains('a'))) bad.push('pro tagline');
   [].forEach.call(document.querySelectorAll('.l2vb'),function(b){ var h=parseFloat(getComputedStyle(b,'::after').height); if(!(h>=44) && b.getBoundingClientRect().height<44) bad.push('switch target '+h); });
   document.querySelector('.l2vb[data-ver=simple]').click();
-  if(!vis('sv-over') || tabs()!=='overview,autopilot,network,votes,governors') bad.push('back to simple '+tabs());
+  if(!vis('sv-over') || off()!=='votes,governors') bad.push('back to simple off '+off());
+  go('dashboard/autopilot'); if(location.hash!=='#/dashboard/autopilot') bad.push('autopilot in simple '+location.hash);
   try{ localStorage.removeItem('th_ui'); }catch(e){}
   go('staking/bonus');
   return !bad.length || bad.join(', ');
