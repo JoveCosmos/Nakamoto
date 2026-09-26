@@ -1,8 +1,12 @@
 # GATA authz signer - install on the signer VPS
 
 Its own key, its own secret, its own unit and port (8788, WireGuard only). It signs
-one message type: `MsgExec` wrapping `MsgBeginRedelegate`, on behalf of delegators who
-granted this address a `StakeAuthorization REDELEGATE`. It cannot move its own coins.
+two jobs, both `MsgExec` on behalf of delegators who granted this address: moves
+(`MsgBeginRedelegate`, inside a `StakeAuthorization REDELEGATE`) and restake
+(`MsgWithdrawDelegatorReward` + `MsgDelegate`, and a `MsgSend` of the split only when
+`SPLIT_TO` is set here). Before a restake it reads the chain itself and refuses unless the
+delegator's rewards come back to the delegator and what it stakes plus sends is no more
+than the rewards pending. It cannot move its own coins.
 
 Run as root on the VPS after the next `signer-pull` (the files arrive under
 `/opt/signer-sync/dist/vps/authz-signer/`).
@@ -36,3 +40,18 @@ journalctl -u gata-authz-signer -n 5 --no-pager        # expect: "signing as ato
 
 Rotate the secret: re-run the `authz_secret` line, restart the unit, update the app box.
 Retire it: `systemctl disable --now gata-authz-signer`; every grant to its address goes inert.
+
+## Update to the restake build (2026-09-26)
+
+Nothing changes for moves. After the next `signer-pull`:
+
+```bash
+cp /opt/signer-sync/dist/vps/authz-signer/server.mjs /opt/gata-authz-signer/
+chown gata-signer:gata-signer /opt/gata-authz-signer/server.mjs
+# only if a reward split is to be collected: the one treasury it may send to
+#   echo 'SPLIT_TO=atone1...' >> /etc/gata/authz-signer.env
+systemctl restart gata-authz-signer && journalctl -u gata-authz-signer -n 5 --no-pager
+```
+
+The keeper does not call `/authz-restake` until `KEEPER_RESTAKE=1` and `KEEPER_DRY=0` are
+both set on the app box - installing this changes nothing by itself.

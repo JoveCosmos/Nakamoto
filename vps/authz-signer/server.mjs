@@ -1,11 +1,16 @@
 // GATA authz signer - RUNS ON THE SIGNER VPS, on its own key, on its own port.
 //
-// One job: execute redelegations that AtomOne delegators have AUTHORISED this
-// account to make on their behalf (x/authz StakeAuthorization, REDELEGATE), inside
-// the bounds each grant carries - the chain enforces the allow-list, the cap and
-// the expiry; this service only signs MsgExec{MsgBeginRedelegate...} and nothing
-// else. It cannot send coins, cannot grant, cannot delegate. Fees are PHOTON from
-// this account's own balance.
+// Two jobs, both on behalf of AtomOne delegators who AUTHORISED this account (x/authz):
+//  1. moves: MsgExec{MsgBeginRedelegate...} inside a StakeAuthorization REDELEGATE grant;
+//  2. restake: MsgExec{MsgWithdrawDelegatorReward..., MsgDelegate...[, MsgSend]} - claim the
+//     rewards, stake them back onto the grant's allow-list, and (only when a split is
+//     configured HERE) send the split to the one treasury address this host is told of.
+// The chain enforces every grant's allow-list, cap and expiry. On top, before signing a
+// restake this service reads the chain itself and refuses unless the delegator's rewards
+// are paid to the delegator's own address AND what it would stake plus send is no more
+// than the rewards pending on the validators it claims from - so it can never be used
+// to stake or send a delegator's own liquid ATONE, whatever the keeper asks. It cannot
+// grant. Fees are PHOTON from this account's own balance.
 //
 // Independent of the payout signer: a different mnemonic, a different secret, a
 // different unit and port. Compromise of one does not reach the other.
@@ -14,6 +19,11 @@
 //   POST /authz-exec      -> { txhash, height }                 (secret required)
 //        { granter: "atone1...", memo?: "...",
 //          moves: [ { src: "atonevaloper1...", dst: "atonevaloper1...", amount: "123456" } ] }
+//   POST /authz-restake   -> { txhash, height, rewards }         (secret required)
+//        { granter: "atone1...", memo?: "...",
+//          claim: [ "atonevaloper1...", ... ],
+//          stake: [ { validator: "atonevaloper1...", amount: "123456" } ],
+//          send?: "12345" }                 (to SPLIT_TO from this host's env, never from the request)
 //   node server.mjs --keygen   prints a fresh 24-word mnemonic and its address, stores nothing
 //
 // Secrets arrive as systemd credentials (LoadCredentialEncrypted), never as env:
@@ -22,14 +32,18 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
-import { SigningStargateClient, GasPrice } from "@cosmjs/stargate";
-import { MsgBeginRedelegate } from "cosmjs-types/cosmos/staking/v1beta1/tx.js";
+import { SigningStargateClient, GasPrice, QueryClient, setupDistributionExtension } from "@cosmjs/stargate";
+import { MsgBeginRedelegate, MsgDelegate } from "cosmjs-types/cosmos/staking/v1beta1/tx.js";
+import { MsgWithdrawDelegatorReward } from "cosmjs-types/cosmos/distribution/v1beta1/tx.js";
+import { MsgSend } from "cosmjs-types/cosmos/bank/v1beta1/tx.js";
 
 const PREFIX = "atone", CHAIN_ID = "atomone-1";
 const GAS = process.env.ATOMONE_GAS_PRICE || "0.25uphoton";
 const RPCS = (process.env.ATOMONE_RPC || "https://atomone-rpc.gatadao.com,https://atomone-rpc.polkachu.com").split(",").map(s => s.trim()).filter(Boolean);
 const BIND = process.env.BIND || "10.9.0.2", PORT = +(process.env.PORT || 8788);
 const MAX_MOVES = +(process.env.MAX_MOVES || 20);
+// the treasury a restake may send the split to; unset = a restake never sends
+const SPLIT_TO = (process.env.SPLIT_TO || "").trim();
 
 if (process.argv.includes("--keygen")) {
   const w = await DirectSecp256k1HdWallet.generate(24, { prefix: PREFIX });
@@ -61,7 +75,8 @@ async function getClient() {
       const client = await connectFirst(RPCS, rpc => SigningStargateClient.connectWithSigner(rpc, wallet, { gasPrice: GasPrice.fromString(GAS) }));
       const id = await client.getChainId();
       if (id !== CHAIN_ID) throw new Error("wrong chain " + id);
-      return { client, sender: account.address };
+      const query = QueryClient.withExtensions(client.forceGetCometClient(), setupDistributionExtension);
+      return { client, sender: account.address, query };
     })().catch(e => { clientPromise = null; throw e; });
   }
   return clientPromise;
@@ -83,6 +98,7 @@ const server = http.createServer(async (req, res) => {
   if (req.headers["x-gata-secret"] !== SECRET) return send(401, { error: "unauthorized" });
   try {
     if (req.method === "GET" && req.url === "/whoami") { const { sender } = await getClient(); return send(200, { address: sender, chain_id: CHAIN_ID }); }
+    if (req.method === "POST" && req.url === "/authz-restake") return await restake(JSON.parse(await readBody(req)), send);
     if (req.method !== "POST" || req.url !== "/authz-exec") return send(404, { error: "not found" });
     const body = JSON.parse(await readBody(req));
     const { granter, moves, memo } = body;
@@ -107,5 +123,42 @@ const server = http.createServer(async (req, res) => {
     return send(500, { error: String(e.message || e) });
   }
 });
+// the rewards pending for one delegation, in whole uatone (the chain keeps 18 decimals)
+async function pending(query, delegator, validator) {
+  const r = await query.distribution.delegationRewards(delegator, validator);
+  let t = 0n;
+  for (const c of r.rewards || []) if (c.denom === "uatone") t += BigInt(c.amount) / 10n ** 18n;
+  return t;
+}
+async function restake(body, send) {
+  const { granter, claim, stake, memo } = body;
+  const out = body.send == null ? 0n : (isAmt(body.send) ? BigInt(body.send) : -1n);
+  if (!isAcc(granter)) return send(400, { error: "bad granter" });
+  if (!Array.isArray(claim) || !claim.length || claim.length > MAX_MOVES || !claim.every(isVal) || new Set(claim).size !== claim.length) return send(400, { error: "bad claim" });
+  if (!Array.isArray(stake) || stake.length > MAX_MOVES || !stake.every(s => isVal(s.validator) && isAmt(s.amount))) return send(400, { error: "bad stake" });
+  if (out < 0n || (out > 0n && !isAcc(SPLIT_TO))) return send(400, { error: "no split on this host" });
+  const { client, sender, query } = await getClient();
+  // rewards must come back to the delegator: otherwise the claim lands elsewhere and a
+  // stake of 'the same amount' would be the delegator's own liquid ATONE
+  const wa = await query.distribution.delegatorWithdrawAddress(granter);
+  if (wa.withdrawAddress !== granter) return send(409, { error: "rewards are paid to another address" });
+  let rewards = 0n;
+  for (const v of claim) rewards += await pending(query, granter, v);
+  const staked = stake.reduce((a, s) => a + BigInt(s.amount), 0n);
+  if (staked + out > rewards) return send(409, { error: "more than the rewards pending", rewards: rewards.toString() });
+  if (staked + out === 0n) return send(400, { error: "nothing to do" });
+  const inner = claim.map(v => ({ typeUrl: "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
+    value: MsgWithdrawDelegatorReward.encode({ delegatorAddress: granter, validatorAddress: v }).finish() }))
+    .concat(stake.map(s => ({ typeUrl: "/cosmos.staking.v1beta1.MsgDelegate",
+      value: MsgDelegate.encode({ delegatorAddress: granter, validatorAddress: s.validator, amount: { denom: "uatone", amount: String(s.amount) } }).finish() })))
+    .concat(out > 0n ? [{ typeUrl: "/cosmos.bank.v1beta1.MsgSend",
+      value: MsgSend.encode({ fromAddress: granter, toAddress: SPLIT_TO, amount: [{ denom: "uatone", amount: out.toString() }] }).finish() }] : []);
+  const exec = { typeUrl: "/cosmos.authz.v1beta1.MsgExec", value: { grantee: sender, msgs: inner } };
+  const result = await serial(() => client.signAndBroadcast(sender, [exec], "auto", typeof memo === "string" && memo.length <= 64 ? memo : "GATA autopilot restake"));
+  console.log(`authz-signer: restake granter=${granter} claim=${claim.length} rewards=${rewards} staked=${staked} sent=${out} code=${result.code} hash=${result.transactionHash} height=${result.height}`);
+  if (result.code !== 0) return send(502, { error: "rejected", code: result.code, raw_log: result.rawLog, txhash: result.transactionHash });
+  return send(200, { txhash: result.transactionHash, height: result.height, rewards: rewards.toString(), gas_used: result.gasUsed?.toString?.() });
+}
+
 getClient().then(({ sender }) => console.log("authz-signer: signing as " + sender)).catch(e => console.error("authz-signer: " + (e.message || e)));
 server.listen(PORT, BIND, () => console.log(`authz-signer: listening on ${BIND}:${PORT}`));
