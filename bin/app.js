@@ -352,9 +352,10 @@ function fields(e){
                   ? (T[i]/D.set.bonded*100).toFixed(2) + '% of stake'
                   : (ys[i]*100).toFixed(1) + '% APR'), flat);
   }).join("") +
-  /* a smaller set (testnet: 43) keeps the map a hundred places tall: the rest are empty,
-     so the calculator - and every frame sized from it - has the same shape on both nets */
-  new Array(Math.max(0, 100 - VALS.length) + 1).join('<div class="cell pad" aria-hidden=true></div>');
+  /* the active set has a hundred places: the ones no validator holds stand as grey boxes
+     (testnet: 43 held, 57 open), and a validator that joins takes the next one - so the map,
+     and every frame sized from it, keeps its shape on both nets */
+  new Array(Math.max(0, 100 - VALS.length) + 1).join('<div class="cell pad" aria-hidden=true title="An open place in the active set"></div>');
   /* a hundred cells are re-parsed only when one of them changed: a tick that moves no
      figure costs nothing, and the cell the keyboard is on keeps its focus */
   var g2 = E("g2"); if(g2.__h !== g2h){ g2.__h = g2h; g2.innerHTML = g2h; }

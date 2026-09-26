@@ -109,7 +109,8 @@ position:relative;top:.06em}
 
 @media(max-width:620px){.grid{grid-template-columns:repeat(10,1fr)}}
 .cell{aspect-ratio:1;border-radius:3px;position:relative;overflow:hidden;cursor:pointer}
-.cell.pad{visibility:hidden;pointer-events:none}
+/* an open place in the set: a quiet grey box, not a validator - no colour, no hover */
+.cell.pad{background:rgba(255,255,255,.045);border:1px dashed rgba(255,255,255,.1);cursor:default;pointer-events:none}
 /* the heat tiles are lit prisms rather than flat swatches: a light catch along
    the top-left, shade toward the bottom-right, a hairline rim so even the
    darkest tile keeps an edge, and a shallow drop so they lift off the frame */

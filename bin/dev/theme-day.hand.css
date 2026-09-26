@@ -138,3 +138,5 @@
   html[data-theme=light]:not([data-mono]) #sv .sv-lc .ln.txl{stroke:#0f5e50}
   html[data-theme=light]:not([data-mono]) #sv .sv-lc .ar.tpb{fill:rgba(107,95,208,.13)}
   html[data-theme=light]:not([data-mono]) #sv .sv-lc .ln.tpb{stroke:#6b5fd0}
+  /* open places in the active set: a light grey box with a dashed edge on the ivory ground */
+  html[data-theme=light]:not([data-mono]) .cell.pad{background:rgba(40,30,20,.05);border:1px dashed rgba(40,30,20,.16)}

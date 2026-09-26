@@ -18,6 +18,7 @@
   html[data-theme=light]:not([data-mono]) .grid.flat .cell{border:1px solid var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .grid.flat .cell .pct{color:var(--accent);text-shadow:none}
   html[data-theme=light]:not([data-mono]) .grid.flat .cell:hover .pct,html[data-theme=light]:not([data-mono]) .grid.flat .cell:focus-visible .pct{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .cell.pad{background:var(--surface-2);border:1px dashed var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .grid:not(.flat) .cell{background-image:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .grid:not(.flat) .cell.halt{box-shadow:0 0 0 1.5px var(--burn)}
   html[data-theme=light]:not([data-mono]) .cell img{box-shadow:0 0 0 1px var(--bg)}
@@ -818,4 +819,6 @@
   html[data-theme=light]:not([data-mono]) #sv .sv-lc .ln.txl{stroke:#0f5e50}
   html[data-theme=light]:not([data-mono]) #sv .sv-lc .ar.tpb{fill:rgba(107,95,208,.13)}
   html[data-theme=light]:not([data-mono]) #sv .sv-lc .ln.tpb{stroke:#6b5fd0}
+  /* open places in the active set: a light grey box with a dashed edge on the ivory ground */
+  html[data-theme=light]:not([data-mono]) .cell.pad{background:rgba(40,30,20,.05);border:1px dashed rgba(40,30,20,.16)}
 
