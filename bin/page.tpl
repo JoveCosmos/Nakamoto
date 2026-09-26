@@ -3801,27 +3801,29 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 #sd-move.fill{justify-content:center;align-items:center}
 /* the skyline */
 .sd-sky{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
-.sd-plot{position:relative;flex:1 1 auto;min-height:60px;margin:0 14px;
-background:repeating-linear-gradient(0deg,transparent 0 calc(25% - 1px),rgba(255,255,255,.05) calc(25% - 1px) 25%)}
-/* the band chart: a column per APR band - the set's count as a heat-tinted column with a lit top,
-   your stake as an amber bar inside it - and the markers standing over the plot */
-.sd-plot{display:flex;align-items:stretch;gap:3px;padding-top:26px}
-.sd-hc{--c:#6f66c8;flex:1 1 0;position:relative;min-width:0;cursor:crosshair}
-.sd-hc s{position:absolute;left:0;right:0;bottom:0;border-radius:3px 3px 0 0;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 42%,transparent),color-mix(in srgb,var(--c) 12%,transparent));
-border-top:2px solid var(--c)}
-.sd-hc u{position:absolute;left:22%;right:22%;bottom:0;border-radius:3px 3px 0 0;background:linear-gradient(180deg,#ffc861,#ffb02e 60%,rgba(255,176,46,.55));box-shadow:0 0 14px -2px rgba(255,176,46,.7)}
-.sd-hc.al s{box-shadow:inset 0 3px 0 var(--sv-violet)}
-.sd-hc:hover s{filter:brightness(1.3)}
-.sd-mk{position:absolute;top:0;bottom:0;width:0;border-left:1.5px dashed var(--wf);pointer-events:none;z-index:2}
-.sd-mk b{position:absolute;top:0;left:0;transform:translateX(-50%);white-space:nowrap;font-family:var(--wmono);font-size:9.5px;font-weight:600;padding:1px 6px;border-radius:4px;
-background:var(--wc);border:1px solid currentColor}
-.sd-mk.rt b{transform:translateX(-100%)}
-.sd-mk.md{color:var(--ws);border-color:var(--ws)}
-.sd-mk.you{color:var(--sv-amber);border-left:2px solid var(--sv-amber)}.sd-mk.you b{top:0}
-.sd-mk.aft{color:var(--sv-green);border-left:2px solid var(--sv-green)}.sd-mk.aft b{top:18px}
-.sd-mk.md b{top:36px}
-.sd-off{font-size:11px;color:var(--wf);margin-top:4px}
-.sv-gkey i.st2{background:linear-gradient(180deg,rgba(255,176,46,.35),rgba(111,102,200,.3));border-top:2px solid #b35;border-radius:1px}
+/* How your APR compares: a sentence, one ruler with pins, three small facts */
+.sd-say{font-size:14px;line-height:1.5;color:var(--ws)}
+.sd-sky{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;min-height:0}
+.sd-off{font-size:11px;color:var(--wf);margin:8px 10px 0}
+.sd-say b{color:var(--wt);font-weight:800}
+.sd-rule{position:relative;margin:34px 10px 0;flex:0 0 auto}
+.sd-bar{position:relative;height:14px;border-radius:7px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.sd-bar s{position:absolute;top:3px;bottom:3px;width:1px;background:rgba(0,0,0,.45)}
+.sd-bar s.al{top:-4px;bottom:-4px;width:2px;background:var(--sv-violet)}
+.sd-pin{position:absolute;bottom:-4px;width:0;height:22px;pointer-events:none}
+.sd-pin::before{content:"";position:absolute;left:-7px;bottom:0;width:14px;height:14px;border-radius:50%;background:var(--wc);border:3px solid var(--pc,var(--wt));box-shadow:0 0 10px var(--pc,var(--wt))}
+.sd-pin b,.sd-pin em{position:absolute;left:0;transform:translateX(-50%);white-space:nowrap;font-style:normal}
+.sd-pin b{bottom:26px;font-size:10px;font-family:var(--wmono);letter-spacing:.1em;text-transform:uppercase;color:var(--pc,var(--wt))}
+.sd-pin em{top:26px;font-size:15px;font-weight:800;color:var(--wt);font-variant-numeric:tabular-nums}
+.sd-pin.rt b,.sd-pin.rt em{transform:translateX(-100%)}.sd-pin.lt b,.sd-pin.lt em{transform:none}
+.sd-pin.you{--pc:var(--sv-amber)}.sd-pin.md{--pc:var(--ws)}.sd-pin.aft{--pc:var(--sv-green)}
+.sd-pin.md b{bottom:auto;top:46px}.sd-pin.md em{top:60px;font-size:12px;font-weight:600;color:var(--ws)}
+.sd-sky .sd-axl{margin:66px 10px 0}
+.sd-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:auto}
+.sd-fact{--rc:var(--wf);position:relative;padding:9px 12px 10px;border:1px solid var(--wbd);border-radius:10px;background:rgba(255,255,255,.02);overflow:hidden}
+.sd-fact::before{content:"";position:absolute;left:12px;right:12px;top:0;height:2px;background:var(--rc);opacity:.8}
+.sd-fact em{display:block;font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sd-fact b{display:block;font-size:18px;font-weight:800;color:var(--wt);margin-top:2px;font-variant-numeric:tabular-nums}
 .sd-ax{height:6px;margin:0 14px;border-radius:0 0 3px 3px}
 .sd-axl{position:relative;height:16px;margin:4px 14px 0;font-family:var(--wmono);font-size:9.5px;color:var(--ws)}
 .sd-axl span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
@@ -3873,7 +3875,6 @@ background:var(--wc);border:1px solid currentColor}
   .sd-ro:nth-child(odd){border-left:1px solid var(--wbd)}
   .sd-ro:last-child{grid-column:1/-1;border-left:0}
   .sd-grid{grid-template-columns:minmax(0,1fr)}
-  .sd-plot{height:200px;flex:0 0 auto}
   .sd-figs{flex:0 0 auto}.sd-fig{flex:0 0 auto;padding-top:9px;padding-bottom:9px}
 }
 /* ══ Governors ══ */
