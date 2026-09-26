@@ -3463,6 +3463,8 @@ position:relative;padding:14px 16px;gap:12px;min-height:0}
 background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opacity:.95;pointer-events:none}
 #sv-wal{display:flex;flex-direction:column;align-items:stretch;gap:12px;text-align:left}
 #sv-wal .sv-ph{justify-content:flex-start}
+#sv-wal .sv-ph h3{min-width:0;max-width:60%}
+.sv-wn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 #sv-wal .sv-wbar{height:8px}
 .sv-boxes{display:grid;gap:10px;min-width:0}
 .sv-boxes.two{grid-template-columns:repeat(2,minmax(0,1fr))}

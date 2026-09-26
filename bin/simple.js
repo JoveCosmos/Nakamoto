@@ -122,12 +122,14 @@
     var pos = window.__POS, S = setStats(), bal = window.__BAL;
     /* the wallet, as one thing: what it holds in all, how that splits (staked, available, rewards
        waiting), what the staked part earns - then the PHOTON that pays fees and when it was read */
+    var wname = (window.__WALLET && String(window.__WALLET.label || "").trim()) || "Your wallet";
     var mine = pos && pos.rows.length, hr = mine ? heat(pos.rate) : null, rew = window.__REW || 0;
     var liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0, tot = liq + stk + rew;
     var read = pos ? '<span class=sv-wread>' + (window.__POSAT ? 'read ' + ago(window.__POSAT) : '') +
       '<button class=sv-rf type=button data-act=refresh title="Read the wallet again" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button></span>' : '';
     put("sv-wal",
-      '<div class=sv-ph><h3>Your wallet</h3><span class="sv-tag g">Self-custody</span><div class=sv-rt>' + read + '</div></div>' +
+      /* the heading is the account's own name, as the wallet calls it (Keplr's key name) */
+      '<div class=sv-ph><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3><span class="sv-tag g">Self-custody</span><div class=sv-rt>' + read + '</div></div>' +
       '<div class="sv-boxes four">' +
         box("tot", "Total", (pos ? fmt(tot) : "—") + '<em>ATONE</em>',
             mine ? 'staked ATONE earns <b style="color:' + hr.ink + '">' + pct(pos.rate) + '</b> a year' : pos ? "nothing staked" : "connect a wallet to read it") +
