@@ -32,7 +32,17 @@
   /* write a box only when its markup changed: a block tick that changes nothing touches no
      DOM, and the row or chip the keyboard is on keeps its focus */
   var LASTH = {};
-  function put(id, h){ var el = E(id); if(!el || LASTH[id] === h) return el; LASTH[id] = h; el.innerHTML = h; return el; }
+  function put(id, h){ if(RAIL[id]) h = rail(h); var el = E(id); if(!el || LASTH[id] === h) return el; LASTH[id] = h; el.innerHTML = h; return el; }
+  /* Network panels carry their readouts on a rail down the right rim, the panel's full height,
+     not in the heading: the heading is one line beside the graph's column. The draw functions still
+     write the readouts in the heading's .sv-rt; this lifts them out beside the body. */
+  var RAIL = { "sv-up": 1, "sv-pace": 1, "sv-signp": 1, "sv-prop24": 1, "sv-act7": 1, "sv-actlive": 1, "sv-ecoa": 1, "sv-ecop": 1 };
+  function rail(h){
+    var i = h.indexOf("<div class=sv-rt>"); if(i < 0 || h.indexOf("sv-rd", i) < 0) return h;
+    var j = h.indexOf("</div>", i), k = h.indexOf("</div>", j + 6); if(j < 0 || k < 0) return h;
+    var stats = h.slice(i + 17, j);
+    return '<div class=sv-rbody><div class=sv-rmain>' + h.slice(0, i) + h.slice(j + 6) + '</div><div class=sv-rail>' + stats + '</div></div>';
+  }
   function rate0(t, c){ return window.__rateAfter ? window.__rateAfter(t, c, 0) : 0; }
   function VALS(){ return window.__VALS ? window.__VALS() : []; }
   function DD(){ return window.__D || { set: {}, eta: {}, nakamoto: {}, rule: {} }; }
@@ -41,6 +51,14 @@
   function box(cls, label, value, meta, style, act){
     return '<div class="sv-box b-' + cls + '"' + (style ? ' style="' + style + '"' : '') + '>' + (act || "") + '<span class=sv-bl>' + label + '</span>' +
       '<b class=sv-bv>' + value + '</b><span class=sv-bm>' + (meta || "") + '</span></div>';
+  }
+  /* a span of the set's record: centred, and the set itself as a strip of cells under the figure,
+     one a validator, lit if it was never jailed in the span */
+  function span(k, v, clean, n){
+    var c = ""; for(var i = 0; i < n; i++) c += '<i' + (i < clean ? '' : ' class=j') + '></i>';
+    return '<div class="sv-card sv-span"><span class=sv-k>' + k + '</span><span class=sv-big>' + v + '</span>' +
+      '<span class=sv-cells title="' + clean + ' of ' + n + ' never jailed in this span">' + c + '</span>' +
+      '<span class=sv-sub>validator set average, ' + clean + ' never jailed</span></div>';
   }
   function card(k, v, sub, cls){
     return '<div class=sv-card><span class=sv-k>' + k + '</span>' +
@@ -384,10 +402,8 @@
   function drawNet(){
     var S = setStats(), f = function(v){ return v != null ? v.toFixed(2) + "%" : "—"; };
     /* the set's uptime over three spans: each is the average of the validators' own records */
-    put("sv-netcards",
-      card("30 days", f(S.up), "validator set average, " + S.clean30 + " never jailed") +
-      card("90 days", f(S.up90), "validator set average, " + S.clean90 + " never jailed") +
-      card("Since genesis", f(S.life), "validator set average, " + S.clean + " never jailed"));
+    put("sv-netcards", span("30 days", f(S.up), S.clean30, S.n) + span("90 days", f(S.up90), S.clean90, S.n) +
+      span("Since genesis", f(S.life), S.clean, S.n));
 
     drawUp(S);
   }
@@ -483,9 +499,9 @@
     put("sv-up", head +
         '<span class=sv-upwin>last ' + n + ' blocks ~' + mins + ' min</span>' +
         '<div class=sv-rt>' +
-          '<span class=sv-upst><i class="sw set"></i><em>Active validators</em><b class=wt>' + (last[2] || S.n) + '</b><small>signing each block</small></span>' +
-          '<span class=sv-upst><i class=sw></i><em>This block</em><b>' + now.toFixed(0) + '%</b><small>' + last[1] + ' of ' + last[2] + ' signed</small></span>' +
-          '<span class=sv-upst><i class="sw av"></i><em>Last ' + n + ' blocks</em><b>' + avg.toFixed(2) + '%</b><small>average</small></span>' +
+          st("Active validators", String(last[2] || S.n), "signing each block", "var(--sv-violet)") +
+          st("This block", now.toFixed(0) + "%", last[1] + " of " + last[2] + " signed") +
+          st("Last " + n + " blocks", avg.toFixed(2) + "%", "average") +
         '</div></div>' +
       '<div class=sv-upchart>' +
         '<div class=sv-upmarks>' + marks + '</div>' +
@@ -538,9 +554,10 @@
   }
 
   /* ════ the Network tabs past Uptime: Signing, Proposers, Activity, Economics ════ */
-  /* every figure on Network is the Uptime panel's stat: a swatch, a mono label, the value, a line */
+  /* every figure on Network is a readout hanging from its panel's lit top edge: the label, the
+     value, a line under it, centred, in its own colour (--rc) */
   function st(label, value, meta, sw){
-    return '<span class=sv-upst><i class=sw' + (sw ? ' style="background:' + sw + '"' : '') + '></i><em>' + label + '</em><b class=wt>' + value + '</b><small>' + (meta || "") + '</small></span>';
+    return '<span class=sv-rd' + (sw ? ' style="--rc:' + sw + '"' : '') + '><em>' + label + '</em><b>' + value + '</b>' + (meta ? '<small>' + meta + '</small>' : '') + '</span>';
   }
   var DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   function big(u){ var a = u / 1e6; return a >= 1e6 ? (a / 1e6).toFixed(1) + "M" : a >= 1e3 ? (a / 1e3).toFixed(1) + "k" : a.toFixed(1); }
@@ -632,9 +649,12 @@
     var wk = 0, hrs = a7 ? a7.length : 0, top = null;
     if(a7) a7.forEach(function(x){ wk += x[1]; if(!top || x[1] > top[1]) top = x; });
     var when = function(ts){ var d = new Date(ts * 1000); return DAYN[d.getDay()] + " " + String(d.getHours()).padStart(2, "0") + ":00"; };
+    var bl7 = 0; if(a7) a7.forEach(function(x){ bl7 += x[2]; });
     var s7 = '<div class=sv-rt>' + st("Transactions", a7 ? wk.toLocaleString() : "—", a7 ? "about " + Math.round(wk / Math.max(1, hrs)) + " an hour" : "") +
-      st("Busiest hour", top ? top[1].toLocaleString() : "—", top ? when(top[0]) : "") + '</div>';
-    var sl = '<div class=sv-rt>' + st("Transactions", rows.length ? tx.toLocaleString() : "—", rows.length ? (gas / 1e6).toFixed(1) + "M gas" : "", "var(--sv-violet)") +
+      st("Busiest hour", top ? top[1].toLocaleString() : "—", top ? when(top[0]) : "") +
+      st("Per block", a7 && bl7 ? (wk / bl7).toFixed(2) : "—", a7 ? "average over " + bl7.toLocaleString() + " blocks" : "") + '</div>';
+    var sl = '<div class=sv-rt>' + st("Transactions", rows.length ? tx.toLocaleString() : "—", rows.length ? "last " + rows.length + " blocks" : "", "var(--sv-violet)") +
+      st("Gas used", rows.length ? (gas / 1e6).toFixed(1) + "M" : "—", rows.length ? "of " + (rows.length * 100).toLocaleString() + "M the blocks could hold" : "", "var(--sv-violet)") +
       st("Fees paid", rows.length ? (fee / 1e6).toFixed(2) + " PHOTON" : "—", rows.length ? "last " + rows.length + " blocks" : "", "var(--sv-pho)") + '</div>';
     if(a7 && a7.length){
       var m7 = Math.max(1, Math.max.apply(null, a7.map(function(x){ return x[1]; }))), days = "";
@@ -681,11 +701,14 @@
     var M = function(v){ return v <= 0 ? "0" : (v / 1e12).toFixed(0) + "M"; };
     put("sv-ecoa", '<div class=sv-ph><h3>ATONE</h3><span class=sv-gkey><i class=sup></i>supply<i class=bon></i>bonded</span><div class=sv-rt>' +
       st("Supply", big(now.atone), sg(ch("atone")), "var(--sv-amber)") +
-      st("Bonded", (now.bonded / now.atone * 100).toFixed(1) + "%", big(now.bonded) + " staked", "var(--sv-amber)") + '</div></div>' +
+      st("Bonded", (now.bonded / now.atone * 100).toFixed(1) + "%", big(now.bonded) + " staked", "var(--sv-amber)") +
+      st("Inflation", DD().set && DD().set.inflation != null ? (DD().set.inflation * 100).toFixed(0) + "%" : "—", "a year, minted to stakers", "var(--sv-amber)") +
+      st("Community pool", big(now.pool), "ATONE", "var(--sv-green)") + '</div></div>' +
       chart(hist, [{ k: "bonded", cls: "bon", area: true }, { k: "atone", cls: "sup" }], M));
     put("sv-ecop", '<div class=sv-ph><h3>PHOTON</h3><span class=sv-gkey><i class=pho></i>supply</span><div class=sv-rt>' +
-      st("Supply", big(now.photon), E0.conv ? "1 ATONE mints " + E0.conv.toFixed(2) : sg(ch("photon")), "var(--sv-pho)") +
-      st("Community pool", big(now.pool) + " ATONE", big(now.pool_ph) + " PHOTON", "var(--sv-green)") + '</div></div>' +
+      st("Supply", big(now.photon), sg(ch("photon")), "var(--sv-pho)") +
+      st("Mint rate", E0.conv ? E0.conv.toFixed(2) : "—", "PHOTON for each ATONE burned", "var(--sv-pho)") +
+      st("Community pool", big(now.pool_ph), "PHOTON", "var(--sv-green)") + '</div></div>' +
       chart(hist, [{ k: "photon", cls: "pho", area: true }], M));
   }
 

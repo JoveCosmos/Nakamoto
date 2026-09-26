@@ -3260,19 +3260,8 @@ background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opac
 .sv-screen>.sv-up{flex:1 1 auto;min-height:0}
 .sv-on{color:var(--sv-green)}.sv-off{color:var(--wf)}
 .sv-upwin{font-family:var(--wmono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ws)}
-.sv-upst{display:grid;grid-template-columns:auto auto;column-gap:8px;align-items:baseline;padding:6px 12px 7px;border:1px solid var(--wbd);border-radius:9px;background:rgba(8,8,18,.55);min-width:0}
-.sv-upst .sw{grid-row:1/3;align-self:center;width:4px;height:26px;border-radius:2px;background:var(--sv-teal)}
-.sv-upst .sw.av{background:linear-gradient(180deg,var(--sv-teal),rgba(43,200,189,.35))}
-.sv-upst .sw.ref{width:0;border-left:3px dashed var(--wt);border-radius:0;background:none;opacity:.75}
-.sv-upst em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
-.sv-upst b{grid-column:2;font-size:17px;font-weight:800;line-height:1.1;color:var(--sv-teal);font-variant-numeric:tabular-nums}
-.sv-upst b.wt{color:var(--wt)}
-.sv-upst .sw.set{background:var(--sv-violet)}
-.sv-upst small{grid-column:2;font-size:10.5px;color:var(--ws);white-space:nowrap}
-.sv-upst{grid-template-areas:"s e" "s b" "s m";grid-template-rows:auto auto auto}
-.sv-upst .sw{grid-area:s}.sv-upst em{grid-area:e}.sv-upst b{grid-area:b}.sv-upst small{grid-area:m}
 .sv-upchart{flex:1 1 auto;min-height:120px;display:flex;flex-direction:column;gap:4px}
-.sv-upmarks{position:relative;height:26px;flex:0 0 auto}
+.sv-upmarks{position:relative;height:22px;flex:0 0 auto}
 .sv-upm{position:absolute;bottom:0;display:inline-flex;align-items:center;gap:5px;transform:translateX(-10px);white-space:nowrap;font-size:10.5px;color:#ff9a7a}
 .sv-upm.rt{transform:translateX(calc(-100% + 10px));flex-direction:row-reverse}
 .sv-upm b{font-weight:600}
@@ -3301,12 +3290,10 @@ background:var(--wc);border:1px solid var(--wbd2);padding:1px 6px;border-radius:
 .sv-uptip b{display:block;color:var(--wt);font-weight:700}
 .sv-upx{display:flex;justify-content:space-between;font-family:var(--wmono);font-size:9px;letter-spacing:.06em;color:var(--wf)}
 .sv-upwait{flex:1 1 auto;display:grid;place-items:center;color:var(--wf);font-size:12px;min-height:90px}
-@media(max-width:900px){.sv-upst small{display:none}}
 .sv-upx i{font-style:normal}
 @media(max-width:620px){
   .sv-screen>.sv-up{min-height:360px}.sv-upchart{min-height:190px}.sv-upm b{display:none}
   #sv-up .sv-rt{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;gap:6px;margin-left:0}
-  .sv-upst{padding:5px 8px;column-gap:6px}.sv-upst em{font-size:7.5px;letter-spacing:.06em;white-space:normal}.sv-upst b{font-size:15px}
   .sv-upx .bn{display:none}
 }
 /* the wallet header: the total on the left, large; on the right one bar that splits it (staked amber,
@@ -3562,7 +3549,6 @@ position:relative;overflow:hidden;min-width:0;min-height:0}
 #sv-net>*,#sv-net>*:not(:first-child){margin-top:0}
 #sv-netcards{grid-template-columns:repeat(3,minmax(0,1fr))}
 #sv-net>.sv-up{flex:1 1 0;min-height:0}
-#sv-net .sv-upst{padding-top:4px;padding-bottom:5px}
 #sv-net .sv-upchart{min-height:0}
 #sv-netrow{flex:1 1 0;grid-template-columns:minmax(0,1fr)}
 #sv-pace{--tc:var(--sv-teal)}
@@ -3580,8 +3566,6 @@ background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--wt) 80%,trans
   #sv-net,#sv-netrow{gap:10px}
   #sv-pace .sv-bv{font-size:16px}
   #sv-pace .sv-bm{display:none}
-  #sv-net .sv-upst small{display:none}
-  #sv-net .sv-upst .sw{height:20px}
 }
 @media(max-width:900px){
   #sv-netcards{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -3591,7 +3575,6 @@ background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--wt) 80%,trans
 }
 @media(max-width:620px){
   #sv-up .sv-rt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:8px}
-  #sv-up .sv-upst{justify-content:start}
   .sv-pace{height:90px;flex:0 0 auto}
 }
 /* ══ Network tabs: Signing, Proposers, Activity, Economics - the Uptime panel's stats in
@@ -3600,7 +3583,6 @@ background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--wt) 80%,trans
 #sv-sign>*,#sv-prop>*,#sv-act>*,#sv-eco>*,#sv-sign>*:not(:first-child),#sv-prop>*:not(:first-child),#sv-act>*:not(:first-child),#sv-eco>*:not(:first-child){margin-top:0}
 #sv-signp,#sv-prop24,#sv-act7,#sv-actlive{flex:1 1 0;min-height:0}
 #sv-sign .sv-panel,#sv-prop .sv-panel,#sv-act .sv-panel,#sv-eco .sv-panel{--tc:var(--sv-teal)}
-#sv-sign .sv-upst,#sv-prop .sv-upst,#sv-act .sv-upst,#sv-eco .sv-upst,#sv-pace .sv-upst{padding-top:4px;padding-bottom:5px}
 .sv-gkey{display:inline-flex;align-items:center;gap:6px;font-family:var(--wmono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
 .sv-gkey i{width:9px;height:9px;border-radius:2px;margin-left:6px}
 .sv-gkey i:first-child{margin-left:0}
@@ -3664,8 +3646,41 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
   .sv-pb s{display:none}
   .sv-upbars,.sv-pace,.sv-bars.live{gap:1px}
   #sv-sign .sv-rt,#sv-prop .sv-rt,#sv-act .sv-rt,#sv-eco .sv-rt,#sv-pace .sv-rt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:8px}
-  #sv-sign .sv-upst,#sv-prop .sv-upst,#sv-act .sv-upst,#sv-eco .sv-upst,#sv-pace .sv-upst{justify-content:start}
 }
+/* ══ Readouts: every Network figure sits on a rail down its panel's right rim - tags cut from
+   the rim, open on the rim side, rounded toward the content, their colour running along the edge.
+   They share the body's height between them, so the heading stays one line and the graph gets
+   what a row of boxes used to cost. ══ */
+.sv-rbody{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:14px}
+.sv-rmain{display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0}
+.sv-rail{display:flex;flex-direction:column;gap:6px;margin-right:-17px;min-height:0}
+.sv-rd{--rc:var(--sv-teal);position:relative;flex:1 1 0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1px;
+min-width:132px;min-height:0;padding:3px 18px 3px 14px;border:1px solid var(--wbd2);border-right:0;border-radius:12px 0 0 12px;overflow:hidden;
+background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.01))}
+.sv-rd::after{content:"";position:absolute;inset:0;background:linear-gradient(270deg,var(--rc),rgba(0,0,0,0) 75%);opacity:.14;pointer-events:none}
+.sv-rd::before{content:"";position:absolute;right:0;top:8px;bottom:8px;width:2px;border-radius:2px 0 0 2px;background:var(--rc);box-shadow:0 0 12px var(--rc)}
+.sv-rd em{font-style:normal;font-family:var(--wmono);font-size:8.5px;line-height:1.2;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
+.sv-rd b{font-size:17px;font-weight:800;letter-spacing:-.015em;line-height:1.15;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sv-rd small{font-size:10px;line-height:1.2;color:var(--ws);white-space:nowrap}
+@media(min-width:901px) and (max-height:820px){.sv-rd{gap:0;padding-top:2px;padding-bottom:2px}.sv-rd b{font-size:14px;line-height:1.1}.sv-rd small{font-size:9px}.sv-rd em{font-size:8px}.sv-rail{gap:4px;margin-right:-15px}}
+@media(max-width:900px){
+  .sv-rbody{grid-template-columns:minmax(0,1fr);row-gap:10px}
+  .sv-rail{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin-right:0}
+  #sv-netcards .sv-span:last-child:nth-child(odd){grid-column:1/-1}
+  .sv-rd{border-right:1px solid var(--wbd2);border-radius:10px;min-width:0;padding:7px 10px}
+  .sv-rd::before{right:auto;left:10px;top:auto;bottom:0;width:auto;right:10px;height:2px;border-radius:2px 2px 0 0}
+  .sv-rd small{white-space:normal}
+}
+/* the span cards: centred, the figure over a strip of the set */
+.sv-span{align-items:center;text-align:center;gap:6px}
+#sv-netcards .sv-span .sv-k{display:flex;align-items:center;gap:10px;width:100%;justify-content:center}
+#sv-netcards .sv-span .sv-k::before,#sv-netcards .sv-span .sv-k::after{content:"";flex:0 1 38px;height:1px;background:linear-gradient(90deg,transparent,var(--wbd2))}
+#sv-netcards .sv-span .sv-k::after{background:linear-gradient(90deg,var(--wbd2),transparent)}
+.sv-span .sv-big{font-size:30px;margin:0}
+.sv-cells{display:grid;grid-template-columns:repeat(100,minmax(0,1fr));gap:1px;width:min(100%,420px);height:7px}
+.sv-cells i{border-radius:1px;background:color-mix(in srgb,var(--sv-teal) 75%,transparent)}
+.sv-cells i.j{background:var(--sv-amber)}
+.sv-span .sv-sub{font-size:12px}
 /* ══ Autopilot: one screen to set it up ═══════════════════════════════════════════════
    The terms on the left (strategy, which validators, stake, time, restake), the validator set
    on the right to choose from - search it, narrow it, select one by one or by a rule - and one

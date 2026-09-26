@@ -172,6 +172,17 @@ def split_top(s, sep=","):
     out.append(cur)
     return out
 
+def first_token(s):
+    """the first whitespace-separated token at bracket depth 0: 'color-mix(in srgb,x 5%,y) 30%'
+       is one token, not 'color-mix(in' - splitting inside a bracket once left an unclosed '('
+       that swallowed the rest of the day sheet"""
+    d = 0
+    for i, ch in enumerate(s.strip()):
+        if ch == "(": d += 1
+        elif ch == ")": d -= 1
+        elif ch.isspace() and d == 0: return s.strip()[:i]
+    return s.strip()
+
 def flatten_layers(value, prop):
     """gradients become flat colours (or nothing, for highlight lines and glows)"""
     layers = split_top(value)
@@ -191,7 +202,7 @@ def flatten_layers(value, prop):
             if any(x.lower().startswith("transparent") for x in stops):
                 continue                                   # a highlight line: gone
             if not stops: continue
-            first = stops[0].split()[0]                    # "colour 30%" -> colour
+            first = first_token(stops[0])                  # "colour 30%" -> colour, color-mix(...) whole
             out.append(map_colours(first, prop) if COLOR_RE.search(first) else first)
             continue
         out.append(map_colours(t, prop))
@@ -222,6 +233,15 @@ COLOUR_PROPS = {"color", "background", "background-color", "background-image", "
                 "column-rule", "column-rule-color", "border-block", "border-inline", "text-decoration"}
 
 def transform_decl(prop, value, important):
+    """a night declaration -> its day shadow, or None; a result whose brackets do not balance is
+       dropped rather than emitted (one bad '(' invalidates everything after it)"""
+    r = _transform_decl(prop, value, important)
+    if r and r[1].count("(") != r[1].count(")"):
+        print(f"daygen: dropped unbalanced {prop}: {r[1][:60]}", file=sys.stderr)
+        return None
+    return r
+
+def _transform_decl(prop, value, important):
     """a night declaration -> its day shadow, or None to leave it alone"""
     p = prop.lower().strip()
     v = value.strip()
