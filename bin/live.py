@@ -26,7 +26,7 @@ EVERY = float(os.environ.get("LIVE_SECONDS", "6"))      # one block
 CHAIN = os.environ.get("CHAIN_ID", "atomone-1")
 DST = os.path.join(OUT, "live.json")
 # How many recent blocks the network-uptime graph shows (~12 minutes at 6 s a block).
-UP_N = int(os.environ.get("LIVE_UP_BLOCKS", "120"))
+UP_N = int(os.environ.get("LIVE_UP_BLOCKS", "100"))
 
 
 def get(url, timeout=12):
@@ -70,7 +70,7 @@ def snapshot():
 
 
 # Network uptime, block by block: who signed each commit. A block never changes once made, so
-# each height is read once (one /block from our own node per new block; 120 once at start)
+# each height is read once (one /block from our own node per new block; 100 once at start)
 # and kept. Published as "up": [[height, signed, validators, "HEX,HEX" of those who did not
 # sign], block time in epoch ms, proposer (index into "px"), transactions, gas used, PHOTON fees
 # in uphoton (-1 = unknown)], oldest first - every visitor reads it from this file instead of
@@ -143,8 +143,8 @@ def uptime(head):
 
 
 def pack(rows):
-    """the proposer as an index into one list of addresses ("px"), so 120 rows do not carry
-    120 forty-character strings to every visitor every block"""
+    """the proposer as an index into one list of addresses ("px"), so 100 rows do not carry
+    100 forty-character strings to every visitor every block"""
     px, ix, out = [], {}, []
     for r in rows:
         a = r[5]

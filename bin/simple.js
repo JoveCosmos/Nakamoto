@@ -384,18 +384,18 @@
   }
 
   /* ── network uptime, live ────────────────────────────────────────────────
-     Block by block, the share of the set that signed: the last ~120 blocks (live.py publishes
+     Block by block, the share of the set that signed: the last 100 blocks (live.py publishes
      them in live.json, which every visitor already reads each block). Until that file carries
      them - an older live.py, or dev, which reads production's file - the screen reads the last
-     60 blocks itself, four at a time, and then one per new block. */
+     100 blocks itself, two at a time (under the RPC's 20 a second), then one per new block. */
   var FB = { rows: {}, busy: false };
   function fbRows(){
     if(FB.busy) return;
     FB.busy = true;
     fetch("/rpc/status", { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(j){
       var head = Number(j.result.sync_info.latest_block_height), want = [], h;
-      for(h = head - 59; h <= head; h++) if(!FB.rows[h]) want.push(h);
-      for(var k in FB.rows) if(+k <= head - 60) delete FB.rows[k];
+      for(h = head - 99; h <= head; h++) if(!FB.rows[h]) want.push(h);
+      for(var k in FB.rows) if(+k <= head - 100) delete FB.rows[k];
       var next = function(){
         var hh = want.shift(); if(hh === undefined) return Promise.resolve();
         return fetch("/rpc/block?height=" + hh, { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(b){
@@ -404,14 +404,15 @@
           if(sigs.length) FB.rows[hh] = [hh - 1, sigs.length - miss.length, sigs.length, miss.join(","), Date.parse(b.result.block.header.time)];
         }).catch(function(){}).then(next);
       };
-      return Promise.all([next(), next(), next(), next()]);
+      return Promise.all([next(), next()]);
     }).catch(function(){}).then(function(){ FB.busy = false; if(screen() === "net") drawUp(setStats()); });
   }
+  /* the window every Network figure speaks of: the last 100 blocks, whatever the feed carries */
+  var WIN = 100;
   function upRows(){
     var r = window.__UP && window.__UP.length ? window.__UP
       : Object.keys(FB.rows).map(Number).sort(function(a, b){ return a - b; }).map(function(k){ return FB.rows[k]; });
-    /* a phone shows the last 40: 120 bars on 360 pixels are hairlines */
-    return innerWidth <= 620 && r.length > 40 ? r.slice(-40) : r;
+    return r.length > WIN ? r.slice(-WIN) : r;
   }
   var UPHOVER = -1;
   /* consensus address (hex) -> the validator's id, name */
@@ -509,10 +510,9 @@
   }
   function drawPace(){
     readDay();
-    var src = timed(window.__UP) ? window.__UP : Object.keys(FB.rows).map(Number).sort(function(a, b){ return a - b; }).map(function(k){ return FB.rows[k]; });
+    var src = (timed(window.__UP) ? window.__UP : Object.keys(FB.rows).map(Number).sort(function(a, b){ return a - b; }).map(function(k){ return FB.rows[k]; })).slice(-WIN);
     var iv = [], i;
     for(i = 1; i < src.length; i++) if(src[i][4] && src[i - 1][4] && src[i][0] === src[i - 1][0] + 1) iv.push({ h: src[i][0] + 1, s: (src[i][4] - src[i - 1][4]) / 1000 });
-    if(innerWidth <= 620 && iv.length > 40) iv = iv.slice(-40);
     var h = '<div class=sv-ph><h3>Chain pace</h3></div>';
     if(iv.length < 2){ put("sv-pace", h + '<div class=sv-upwait>Reading block times…</div>'); return; }
     var sum = 0, mx = 0, slow = iv[0]; iv.forEach(function(x){ sum += x.s; if(x.s > mx){ mx = x.s; slow = x; } });
@@ -520,6 +520,7 @@
     h = '<div class=sv-ph><h3>Chain pace</h3><div class=sv-rt>' +
       st("Block time", avg.toFixed(2) + " s", "last " + (iv.length + 1) + " blocks, slowest " + slow.s.toFixed(1) + " s") +
       st("Blocks a day", DAY.avg ? Math.round(86400 / DAY.avg).toLocaleString() : "—", DAY.avg ? "last 24 hours, " + DAY.avg.toFixed(2) + " s each" : "measuring…") +
+      st("Total blocks", Number(src[src.length - 1][0] + 1).toLocaleString(), "since genesis" + ((DD().coverage || {}).from_date ? ", " + DD().coverage.from_date : "")) +
     '</div></div>' +
     '<div class=sv-pace><span class=sv-pavg style="bottom:' + (avg / top * 100).toFixed(1) + '%"><b>' + avg.toFixed(1) + ' s</b></span>' +
       iv.map(function(x){ return '<i class="' + (x.s > avg * 1.5 ? "slow" : "") + '" style="--h:' + Math.max(4, x.s / top * 100).toFixed(1) + '%" title="block ' + x.h.toLocaleString() + ': ' + x.s.toFixed(2) + ' s"></i>'; }).join("") +
@@ -541,7 +542,7 @@
   function live(r){ return r && r.length > 6; }
 
   /* ── Signing: every validator by every block of the window, a missed signature red.
-     Missers first (most first), then by stake. One canvas: 100 rows by 120 blocks is
+     Missers first (most first), then by stake. One canvas: 100 rows by 100 blocks is
      12,000 cells, redrawn each block ── */
   var SG = { list: [], rows: [] };
   function drawSign(){

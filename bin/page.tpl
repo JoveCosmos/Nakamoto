@@ -3662,6 +3662,7 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 @media(max-width:620px){
   .sv-grid{grid-template-columns:120px minmax(0,1fr)}
   .sv-pb s{display:none}
+  .sv-upbars,.sv-pace,.sv-bars.live{gap:1px}
   #sv-sign .sv-rt,#sv-prop .sv-rt,#sv-act .sv-rt,#sv-eco .sv-rt,#sv-pace .sv-rt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:8px}
   #sv-sign .sv-upst,#sv-prop .sv-upst,#sv-act .sv-upst,#sv-eco .sv-upst,#sv-pace .sv-upst{justify-content:start}
 }

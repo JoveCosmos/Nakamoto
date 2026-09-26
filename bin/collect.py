@@ -669,13 +669,13 @@ try:
         if c.get("denom") == "uphoton":
             cpp = float(c["amount"])
     conv = float(get(f"{API}/atomone/photon/v1/conversion_rate")["conversion_rate"])
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    hist = json.load(open(ECON)) if os.path.exists(ECON) else []
-    hist = [p for p in hist if p["d"] != today] + [{"d": today, "h": head, "atone": supply, "photon": phs,
+    eday = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    ehist = json.load(open(ECON)) if os.path.exists(ECON) else []
+    ehist = [p for p in ehist if p["d"] != eday] + [{"d": eday, "h": head, "atone": supply, "photon": phs,
             "bonded": S, "pool": round(cpool), "pool_ph": round(cpp)}]
-    hist.sort(key=lambda p: p["h"])
-    _t = ECON + ".tmp"; json.dump(hist, open(_t, "w")); os.replace(_t, ECON)
-    econ = {"conv": conv, "hist": hist}
+    ehist.sort(key=lambda p: p["h"])
+    _t = ECON + ".tmp"; json.dump(ehist, open(_t, "w")); os.replace(_t, ECON)
+    econ = {"conv": conv, "hist": ehist}
 except Exception as e:
     print(f"atomone-app: economics skipped ({e})", file=sys.stderr)
 

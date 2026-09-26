@@ -162,7 +162,11 @@ payload = json.dumps({"generated": D["generated"], "thresh": th["threshold"],
                       "validators": [[v["m"], v["t"], v["c"], v["op"][-6:], v.get("jail") or 0,
                                       round((1 - v["life_missed"]/v["life_n"]) * 100, 3)
                                       if v.get("life_n") else None] for v in V],
-                      "eta": e, "set": s}, separators=(",", ":"))
+                      "eta": e, "set": s,
+                      # the Network tabs: 24h proposers, 7 days of hourly activity, the economics
+                      # history, and where the chain's record starts
+                      "p24": D.get("p24"), "act7": D.get("act7"), "econ": D.get("econ"),
+                      "coverage": D.get("coverage")}, separators=(",", ":"))
 
 TPL = open(os.path.join(os.path.dirname(__file__), "page.tpl")).read()
 # the navigation shell: both tab strips, their pre-paint CSS and the embedded config all come
