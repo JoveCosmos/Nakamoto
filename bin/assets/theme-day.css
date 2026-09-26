@@ -229,7 +229,7 @@
   html[data-theme=light]:not([data-mono]) .wk-pl{box-shadow:none;background:transparent}
   html[data-theme=light]:not([data-mono]) .wk-pre button[aria-pressed=true]{color:#FFFFFF;background:var(--accent);border-color:var(--accent);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-mv .a{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .wk-btn.wk-go{background:var(--accent-soft);border:1px solid var(--accent-soft);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .wk-btn.wk-go{border:1px solid var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .pop .card.txcard{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #qpop .card,html[data-theme=light]:not([data-mono]) #cpop .card,html[data-theme=light]:not([data-mono]) #spop .card{background:var(--surface);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #qpop .vhead,html[data-theme=light]:not([data-mono]) #cpop .vhead,html[data-theme=light]:not([data-mono]) #spop .vhead{background:transparent}
@@ -274,7 +274,6 @@
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td .sb{background:var(--line-soft)}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td .sb i{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td.ck input:checked::after{border:solid var(--surface)}
-  html[data-theme=light]:not([data-mono]) .wk-tbl2 tr.pad td{border-bottom-color:transparent;background:transparent}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td.r2 s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) #p-home .tapnote svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .wk-ph .wk-ib,html[data-theme=light]:not([data-mono]) #wk-plan .wk-ph .wk-ib{box-shadow:none}

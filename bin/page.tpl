@@ -32,7 +32,6 @@ html:not([data-tab=dele]) #calc,.pop .card:not(.txcard){--void:var(--cv);--edge:
 /* the mark sits against the whole lockup - title AND slogan - rather than inside
    the title line, where it centred on the title alone and rode high over the pair */
 
-.lead{width:38px;height:38px;border-radius:50%;flex:0 0 auto}
 .bwrap{display:flex;flex-direction:column;gap:2px;min-width:0}
 .bt{font-size:var(--tfs);display:flex;
 align-items:center;flex-wrap:wrap;line-height:1.1;gap:5px 9px}
@@ -461,8 +460,6 @@ min-width:11ch;text-align:right;flex:0 0 auto}
    the whole page. Let it flow and scroll instead. */
 @media(max-width:620px){
   .fold{min-height:auto;}
-  
-  .lead{width:30px;height:30px}
 
 .aplab{font-size:8px;letter-spacing:.1em}
 
@@ -1102,7 +1099,7 @@ border-top:1px solid var(--edge);overflow:hidden}
    openers below them, and each one swaps what fills the screen underneath. */
 .brandbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
 --tfs:clamp(17px,2vw,26px);padding:4px 0 2px}
-.brandbar .lead{width:36px;height:36px}
+
 /* auto side margins cancel stretch in a column flex container, so the wrapper
    was sizing to its content and squeezing the title row */
 .panes>.w{width:100%}
@@ -1110,7 +1107,7 @@ border-top:1px solid var(--edge);overflow:hidden}
 
 @media(max-width:620px){
   .brandbar{gap:9px;padding:2px 0 0}
-  .brandbar .lead{width:29px;height:29px}
+  
   .tabs{width:100%;margin:2px 0 0;}
   
 }
@@ -1603,7 +1600,7 @@ transition:filter .12s,transform .12s,box-shadow .2s,opacity .2s}
 .wk-mv .r{grid-area:r;text-align:right;font-family:var(--wmono);white-space:nowrap;font-variant-numeric:tabular-nums}
 .wk-mv .r s{color:var(--wf);margin-right:5px}
 .wk-mv .r b{color:var(--wgreen);}
-.wk-mv .r .dr{font-size:9.5px;font-weight:700;margin-left:4px}.wk-mv .r .dr.dn{color:var(--wburn)}.wk-mv .r .dr.up{color:var(--wgreen)}
+
 .wk-mv .g{grid-area:g;display:flex;flex-direction:column;align-items:flex-end;gap:1px;font-family:var(--wmono);color:var(--wgreen);font-variant-numeric:tabular-nums;white-space:nowrap}
 .wk-mv .g.dim{color:var(--wf)}
 .wk-mv .g em{font-style:normal;font-family:var(--wsans);text-transform:uppercase;color:var(--wf)}
@@ -1645,7 +1642,6 @@ transition:filter .12s,transform .12s,box-shadow .2s,opacity .2s}
 
 /* on a phone the column is a document: blocks in order, nothing scrolls inside
      anything (a nested flex chain with min-height:0 collapsed the ledger to 0px) */
-  .wk-body{display:block}
 
 /* columns: rank · validator · bar · ATONE · share · APR · a year · status - the phone keeps rank, name, ATONE, APR, status */
 
@@ -1709,7 +1705,7 @@ body{background:var(--void);background-image:radial-gradient(130% 62% at 50% 0%,
 .wk-mv .st b{font-weight:400;color:var(--ws)}
 .wk-mv .st i{font-weight:400}
 .wk-btn{font-family:var(--wmono);letter-spacing:.16em;text-transform:uppercase;font-weight:400;border-radius:6px;padding:0 16px}
-.wk-btn.wk-go{background:rgba(46,224,106,.05);border:1px solid rgba(46,224,106,.27);color:var(--wgreen);box-shadow:none}
+.wk-btn.wk-go{border:1px solid rgba(46,224,106,.27);}
 
 .wk-txh b{font-size:14px;font-weight:400}.wk-txh span{font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase}
 .txrow{font-weight:400;font-size:12px}.txrow b{font-weight:400;color:var(--wcyan)}
@@ -1965,7 +1961,7 @@ background:transparent;border:0;box-shadow:none;padding:0;color:var(--ink2)}
 .wk-tbl2 td.ck input{appearance:none;-webkit-appearance:none;margin:0;border:1px solid var(--wbd2);cursor:pointer;position:relative;vertical-align:middle}
 
 .wk-tbl2 td.ck input:checked::after{content:"";position:absolute;border:solid #062012;border-width:0 2px 2px 0;transform:rotate(45deg)}
-.wk-tbl2 tr.pad td{border-bottom-color:transparent;background:transparent}
+
 .wk-tbl2 td.r2 s{text-decoration:none;color:var(--wf)}.wk-tbl2 td.r2 b{font-weight:400;color:var(--wgreen)}.wk-tbl2 td.r2 em{font-style:normal;color:var(--wf);margin:0 4px}
 .wk-pf{margin-top:auto;padding-top:8px;display:flex;align-items:center;gap:12px;flex:0 0 auto}
 
@@ -2240,8 +2236,6 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 
 /* the button and the two wallet squares share one box, both hanging from the same top
    edge, so the tap replaces one with the other and nothing above it moves */
-
-@keyframes wkrise{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
 /* ── the three titles: the wallet's sans face, a short bar of their own colour before
    each - cyan for your validators, green for the move, violet for what moves ── */

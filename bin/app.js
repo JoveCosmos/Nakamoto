@@ -930,6 +930,9 @@ rememberGridH();
     E("vname").textContent = v.m;
     /* the operator's own site, shown as a bare host so it stays one short line */
     var wl = E("vweb"), u = (v.web || "").trim();
+    /* a bare domain ("nylira.net") is a website too - only a plain host (letters, digits, dots,
+       dashes, then a path) is taken, so nothing else a moniker's owner types becomes a link */
+    if(u && !/^https?:\/\//i.test(u) && /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}(\/[^\s"'<>]*)?$/i.test(u)) u = "https://" + u;
     if(wl){
       if(u && /^https?:\/\//i.test(u)){
         wl.href = u;
@@ -990,34 +993,11 @@ rememberGridH();
     /* the note repeated what the map, the graph and the APR band already say */
     POP.open(vpop);
   }
-  function zero(c){ return c === "0"; }
-  /* One column per day, oldest to newest. A day the validator proposed nothing is
-     drawn full height in burn - downtime should be the loudest thing in the strip,
-     not the quietest. The newest column is today and therefore partial, which is
-     why collect.py normalises it against the blocks actually produced so far. */
   var MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   function dmy(iso){
     if(!iso) return "";
     var p = String(iso).split("-");
     return p.length === 3 ? (+p[2]) + " " + MON[+p[1] - 1] + " " + p[0] : iso;
-  }
-  function dayISO(i){
-    if(!D.uptime_from) return "";
-    return new Date(new Date(D.uptime_from + "T00:00:00Z").getTime() + i * 86400000)
-             .toISOString().slice(0, 10);
-  }
-  function strip(el, str, lead){
-    el.innerHTML = "";
-    var off = D.uptime_days ? D.uptime_days - str.length : 0;
-    for(var i = 0; i < str.length; i++){
-      var d = +str[i], abs = i + off, b = document.createElement("b");
-      b.style.height = d ? (22 + d / 9 * 78) + "%" : "100%";
-      if(!d)                        b.className = abs < lead ? "n" : "z";
-      else if(i === str.length - 1) b.className = "tip";
-      b.title = dayISO(abs) + (d ? " — proposing"
-                                 : abs < lead ? " — not in the active set" : " — no blocks proposed");
-      el.appendChild(b);
-    }
   }
   /* ── live signing strip ────────────────────────────────────────────────────
      The last N commits, read off the node this page is served from. A commit for
@@ -1107,7 +1087,6 @@ rememberGridH();
       .then(function(){ pingBusy = false; });
   }
 
-  function vhide(){ POP.close(vpop); }
   vpop.__onclose = pingStop;                       /* however it closes, the poll stops */
   document.addEventListener("click", function(ev){
     var c = ev.target.closest ? ev.target.closest(".cell, tr.vrow") : null;
@@ -1734,21 +1713,9 @@ rememberGridH();
     return one(u / 1e6);
   }
 
-  var LAST = {};
-  window.__driftReset = function(){ LAST = {}; };
-  function drift(id, after){
-    var p = LAST[id]; LAST[id] = after;
-    if(p === undefined) return "";
-    var d = (after - p) * 100;
-    if(Math.abs(d) < 0.02) return "";
-    return '<span class="dr ' + (d < 0 ? "dn" : "up") + '">' +
-           (d < 0 ? "\u25be" : "\u25b4") + Math.abs(d).toFixed(2) + '</span>';
-  }
-
   function pct(x){ return (x * 100).toFixed(1) + "%"; }
   function yr(u, rate){ return one(u * rate / 1e6); }
   function rankOf(V, id){ for(var i = 0; i < V.length; i++) if(V[i][3] === id) return i + 1; return 0; }
-  function rankAfter(V, id, t, x){ var n = 1; for(var i = 0; i < V.length; i++) if(V[i][3] !== id && V[i][1] > t + x) n++; return n; }
   function empty(t){ return '<div class=wk-empty>' + t + '</div>'; }
   function pill(cls, t){ return '<span class="wk-pl ' + cls + '">' + t + '</span>'; }
   function bar(share, cls){ return '<span class="wk-hb ' + (cls || "") + '"><i style="width:' + Math.max(1, Math.round(share * 100)) + '%"></i></span>'; }
@@ -1772,13 +1739,8 @@ rememberGridH();
     Array.prototype.forEach.call(el.querySelectorAll("button"), function(b){ b.addEventListener("click", function(){ PG[key] = Math.max(0, Math.min(pages - 1, PG[key] + (+b.dataset.d))); draw(); }); });
     return page;
   }
-  function padRows(h, have, per, cols){ for(var k = have; k < per; k++) h += '<tr class=pad><td colspan=' + cols + '></td></tr>'; return h; }
   var CLEAN = false;                               /* the never-jailed filter */
-  function tail(){                                 /* the two smallest, by live stake */
-    var V = window.__VALS(), x = {};
-    if(V.length > 2){ x[V[V.length - 1][3]] = 1; x[V[V.length - 2][3]] = 1; }
-    return x;
-  }
+
   /* every validator that would pay this stake more than it earns now (its
      rate before the stake arrives, so the list is stable), best rate first;
      the two smallest on the chain left out, as everywhere in the wallet */
@@ -1923,11 +1885,11 @@ rememberGridH();
     var top = el.scrollTop;
     el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
     Array.prototype.forEach.call(el.querySelectorAll("tbody input"), function(c){
-      c.addEventListener("change", function(){ if(c.checked) SEL[c.dataset.id] = 1; else delete SEL[c.dataset.id]; window.__driftReset(); draw(); }); });
+      c.addEventListener("change", function(){ if(c.checked) SEL[c.dataset.id] = 1; else delete SEL[c.dataset.id]; draw(); }); });
     /* the head's box ticks everyone, or clears everyone; half-ticked it shows as such */
     var all = E("ckall");
     if(all){ all.indeterminate = sel.n > 0 && sel.n < opt.length;
-      all.addEventListener("change", function(){ SEL = {}; if(all.checked) opt.forEach(function(v){ SEL[v.id] = 1; }); window.__driftReset(); draw(); }); }
+      all.addEventListener("change", function(){ SEL = {}; if(all.checked) opt.forEach(function(v){ SEL[v.id] = 1; }); draw(); }); }
   }
 
   /* ── the answer: one strip - now → after, the gain, the count, the button ── */
@@ -1984,21 +1946,6 @@ rememberGridH();
            '<thead><tr><th class=l>from</th><th></th><th class=l>to</th><th>stake</th><th>ATONE/yr</th></tr></thead><tbody>' + h + '</tbody></table>';
   }
 
-  /* what a validator is, for the comparison: fee and 90-day record from the page's vector */
-  function vinfo(id){
-    var V = window.__VALS(), d = (window.__VDBY && window.__VDBY[id]) || {}, c = null;
-    for(var i = 0; i < V.length; i++) if(V[i][3] === id){ c = V[i][2]; break; }
-    return { c: c, d90: d.d90 != null ? +d.d90 : null, jail: d.jail || 0 };
-  }
-  /* one side of the pair: its own figures, each lit when it beats the other side */
-  function vstats(rate, me, orate, other){
-    var s = '<span class=vs>';
-    s += '<em class="' + (rate > orate + 0.0005 ? 'up' : rate < orate - 0.0005 ? 'dn' : '') + '"><i>APR</i>' + pct(rate) + '</em>';
-    if(me.c != null) s += '<em class="' + (other.c != null && me.c < other.c ? 'up' : other.c != null && me.c > other.c ? 'dn' : '') + '"><i>fee</i>' + Math.round(me.c * 100) + '%</em>';
-    if(me.d90 != null) s += '<em class="' + (other.d90 != null && me.d90 > other.d90 ? 'up' : other.d90 != null && me.d90 < other.d90 ? 'dn' : '') + '"><i>90d</i>' + me.d90.toFixed(1) + '%</em>';
-    return s + '</span>';
-  }
-
   /* ── status pills at the foot ── */
   function statusFoot(pos, V){
     var el = E("dstat"); if(!el) return;
@@ -2052,7 +1999,7 @@ rememberGridH();
 
   /* att() is the file-level escaper (defined beside POP) */
 
-  amt.addEventListener("input", function(){ window.__driftReset(); draw(); });
+  amt.addEventListener("input", function(){ draw(); });
   /* a delegation row opens its validator's card - the same card the map opens */
   var go0 = E("dgo"); if(go0) go0.addEventListener("click", function(){ if(window.__goSign) window.__goSign(); });
   var dmy = E("dmy");
@@ -2066,14 +2013,14 @@ rememberGridH();
   /* the Redelegate list too: its name cells open the card, its boxes keep the tick */
   var dpk = E("dpicks"); if(dpk){ dpk.addEventListener("click", rowCard); dpk.addEventListener("keydown", rowCard); }
   /* max is what can actually move; with nothing free (all in cooldown) or no wallet it does nothing */
-  var mx = E("amtmax"); if(mx) mx.addEventListener("click", function(){ var pos = window.__POS; if(!pos || !(pos.free > 0)) return; amt.value = exact(pos.free); window.__driftReset(); draw(); });
+  var mx = E("amtmax"); if(mx) mx.addEventListener("click", function(){ var pos = window.__POS; if(!pos || !(pos.free > 0)) return; amt.value = exact(pos.free); draw(); });
   /* amount presets: a share of what can move */
   Array.prototype.forEach.call(document.querySelectorAll("#amtseg button"), function(b){
     b.addEventListener("click", function(){
       var pos = window.__POS, base = pos && pos.free > 0 ? pos.free : 10000e6;
       amt.value = Math.floor(base * (+b.dataset.p) / 100 / 1e6).toLocaleString();
       Array.prototype.forEach.call(document.querySelectorAll("#amtseg button"), function(o){ o.setAttribute("aria-pressed", o === b ? "true" : "false"); });
-      window.__driftReset(); draw();
+      draw();
     });
   });
 
@@ -2936,7 +2883,6 @@ rememberGridH();
         var p = position(window.__DELS, rd.redelegation_responses || []);
         window.__POSAT = Date.now();
         window.__POS = p;
-        if(window.__driftReset) window.__driftReset();
         window.__MINE = {}; p.rows.forEach(function(x){ window.__MINE[x.id] = 1; });
         if(window.__redraw) window.__redraw();
         try{ localStorage.setItem("th_wallet", w.name); }catch(e){}

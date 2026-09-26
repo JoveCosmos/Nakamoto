@@ -150,15 +150,19 @@ KL_ETA = knob_left(e["now"] * 100, 3, 100)
 KL_C   = knob_left(th["ratio"] * 100, 100, 1600)
 KL_S   = knob_left(s["bonded_pct"], 5, 100)
 
+# each validator's detail as the page's scripts read it - nothing else rides in the page (the
+# daily bars, the detail strings, the earning band... stay in data.json, which the refresh reads
+# whole); a field a script starts to read is added here
+VD_KEYS = ("op", "chex", "id", "vid", "m", "t", "c", "jail", "tomb", "burned", "vp", "up", "d30", "d90",
+           "life_up", "life_n", "life_missed", "prop", "joined", "last_slash", "earn_avg", "web", "av")
 payload = json.dumps({"generated": D["generated"], "thresh": th["threshold"],
                       "bot": D.get("bot"),
                       "weekly": nk["weekly"], "schedule": D["schedule"], "eta_stats": es,
-                      "vdetail": D["validators"], "sign_window": D["sign_window"],
-                        "uptime_days": D["uptime_days"], "uptime_from": D["uptime_from"],
+                      "vdetail": [{k: v[k] for k in VD_KEYS if k in v} for v in D["validators"]],
                       "validators": [[v["m"], v["t"], v["c"], v["op"][-6:], v.get("jail") or 0,
                                       round((1 - v["life_missed"]/v["life_n"]) * 100, 3)
                                       if v.get("life_n") else None] for v in V],
-                      "trend": D["trend"], "eta": e, "set": s}, separators=(",", ":"))
+                      "eta": e, "set": s}, separators=(",", ":"))
 
 TPL = open(os.path.join(os.path.dirname(__file__), "page.tpl")).read()
 # the navigation shell: both tab strips, their pre-paint CSS and the embedded config all come
