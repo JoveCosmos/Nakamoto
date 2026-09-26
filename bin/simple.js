@@ -297,7 +297,8 @@
       ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "—", pos && pos.rows.length ? "on " + whole(pos.total) + " ATONE" : "", pos && pos.rows.length ? heat(pos.rate).p : null, "", "", true));
     if(g) put("sd-ado",
       '<div class=sv-ph><h3>Autopilot is working</h3></div>' +
-      '<div class=sd-ok>Your stake is safe with us, strategy is active.</div>' +
+      '<div class=sd-ok>Strategy is active on your stake' + (rec ? ', earning <b>' + sgn(rec.rate - rec.start.rate) + ' APR</b> (' + sgnA((rec.rate - rec.start.rate) * rec.staked) +
+        ' ATONE a year) since Autopilot started, <b>' + sgn(rec.rate - rec.m3.rate) + '</b> over the last 3 months.' : '.') + '</div>' +
       '<div class=sd-figs>' +
         fig("Since Autopilot started", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.start.rate) + '</span><em class=u>APR</em>' : "—",
             rec ? sgnA((rec.rate - rec.start.rate) * rec.staked) + " ATONE a year, since " + window.__dayFull(rec.start.at * 1000) : "its record starts with its first check", "var(--sv-green)") +
