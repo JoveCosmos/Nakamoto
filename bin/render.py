@@ -48,7 +48,7 @@ if t10:
                 f"{'decreased' if t10['pct'] < 0 else 'increased'} by "
                 f"{abs(t10['pct']):.1f}% last {t10['days'] // 7}W")
 else:
-    t10_line = "Share of blocks proposed by the ten largest validators" + (": N/A on testnet, where proposals are not indexed" if TESTNET else "")
+    t10_line = "Share of blocks proposed by the ten largest validators" + (": N/A on testnet" if TESTNET else "")
 
 # "Is it working?" is answered by the kink at the bonus line, not by two slopes
 # side by side that the reader has to divide in their head. Do the division.
@@ -69,7 +69,7 @@ else:
     speedup, speedup_k, speedup_sub = "\u2014", "since the bonus", "not enough weeks yet"
 if TESTNET:
     # what only the index knows: N/A, never a dash that reads as "not yet"
-    speedup, speedup_sub = "N/A", "not indexed on testnet"
+    speedup, speedup_sub = "N/A", "N/A on testnet"
     mv_top = mv_small = mv_new = mv_grew = mv_wk = "N/A"
 
 def _eta_attr(r): return f"{r['eta']:.2f}" if r["eta"] is not None else ""
@@ -266,8 +266,8 @@ page = (TPL
   .replace("{{APRTABLE}}", tbl_apr)
   .replace("{{NCLEAN}}", "N/A" if TESTNET else str(n_clean)).replace("{{UPMIN}}", f"{UP_MIN:.0f}")
   .replace("{{PICKTABLE}}", "").replace("{{LIFEWIN}}", life_win)
-  .replace("{{UPTABLE}}", tbl_up or ("<tr><td colspan=6 class=dim>N/A on testnet: signing records come from our index (mainnet only)</td></tr>" if TESTNET else ""))
-  .replace("{{EARNTABLE}}", tbl_earn or ("<tr><td colspan=5 class=dim>N/A on testnet: earnings come from our index (mainnet only)</td></tr>" if TESTNET else "")).replace("{{EARNWK}}", "N/A" if TESTNET else str(earn_weeks))
+  .replace("{{UPTABLE}}", tbl_up or ("<tr><td colspan=6 class=dim>N/A on testnet</td></tr>" if TESTNET else ""))
+  .replace("{{EARNTABLE}}", tbl_earn or ("<tr><td colspan=5 class=dim>N/A on testnet</td></tr>" if TESTNET else "")).replace("{{EARNWK}}", "N/A" if TESTNET else str(earn_weeks))
   .replace("{{COVFROM}}", "genesis" if cov["genesis"] else esc(cov["from_date"]))
   .replace("{{DATA}}", payload.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")))
 # ^ the payload sits inside a <script> element: a moniker containing "</script>"

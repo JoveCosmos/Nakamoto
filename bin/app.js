@@ -879,7 +879,7 @@ rememberGridH();
     if(i<=nowI) dp+=(dp?"L":"M")+pt;
     if(i>=nowI) df+=(df?"L":"M")+pt; });
   if(SC.some(function(r){ return r.eta==null; }))
-    s+='<text x="'+((PL+X(nowI))/2).toFixed(1)+'" y="'+(Y(ES.floor)-40)+'" text-anchor="middle" font-size="12" fill="#8f8db4">past weeks N/A: the step rule cannot be replayed onto the live value here</text>';
+    s+='<text x="'+((PL+X(nowI))/2).toFixed(1)+'" y="'+(Y(ES.floor)-40)+'" text-anchor="middle" font-size="12" fill="#8f8db4">past weeks N/A</text>';
   s+='<path d="'+df+'" fill="none" stroke="#6f6d94" stroke-width="2" stroke-dasharray="5 4"/>';
   s+='<path d="'+dp+'" fill="none" stroke="#ffb02e" stroke-width="3"/>';
   s+='<line x1="'+X(nowI)+'" y1="'+PT+'" x2="'+X(nowI)+'" y2="'+(H-PB)+'" stroke="#ff4d1f" stroke-width="1.5"/>';

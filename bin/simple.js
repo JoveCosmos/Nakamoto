@@ -49,7 +49,7 @@
   /* the testnet page: what only our index knows (history, proposers, jailings, the
      30/90-day and lifetime records) is not known there - it reads N/A, never a zero */
   function TN(){ return ((DD().net || {}).net) === "testnet"; }
-  var NA = "N/A", NAMSG = '<div class=sv-upwait>N/A on testnet: this history comes from our index, which covers mainnet only</div>';
+  var NA = "N/A", NAMSG = '<div class=sv-upwait>N/A on testnet</div>';
   function tag(cls, t, title){ return '<span class="sv-tag ' + cls + '"' + (title ? ' title="' + esc(title) + '"' : '') + '>' + t + '</span>'; }
   /* a span of the set's record: centred, and the set itself as a strip of cells under the figure,
      one a validator, lit if it was never jailed in the span */
@@ -604,7 +604,7 @@
     var sw = '<span class=sv-sw role=group aria-label="Period">' +
       '<button type=button data-act=pwin data-w=24h aria-pressed=' + !all + '>24 hours</button><button type=button data-act=pwin data-w=all aria-pressed=' + all + '>Since genesis</button></span>';
     if(TN()){
-      stats = '<div class=sv-rt>' + st("Blocks", NA, "not indexed on testnet") + st("Proposers", NA, "", "var(--sv-violet)") + st("Top proposer", NA, "", "var(--sv-amber)") + '</div>';
+      stats = '<div class=sv-rt>' + st("Blocks", NA, "on testnet") + st("Proposers", NA, "", "var(--sv-violet)") + st("Top proposer", NA, "", "var(--sv-amber)") + '</div>';
       put("sv-prop24", '<div class=sv-ph><h3>Blocks proposed</h3>' + stats + '</div>' + NAMSG); return;
     }
     var head = '<div class=sv-ph><h3>Blocks proposed</h3>' + sw + stats + '</div>';
@@ -663,7 +663,7 @@
         body = '<div class="sv-bars hr">' + bscale(m, function(v){ return String(Math.round(v)); }, true) + a24.map(function(x, i){ var so = i === a24.length - 1; return '<i' + (so ? ' class=so' : '') + ' style="--h:' + Math.max(1.5, x[1] / m * 100).toFixed(1) + '%" data-t="' + when(x[0]) + ": " + x[1] + ' transactions' + (so ? ' so far' : '') + '"></i>'; }).join("") + '</div><div class=sv-bx>' + ticks + '</div>';
       } else body = '<div class=sv-upwait>Reading the last 24 hours…</div>';
     }
-    if(TN()){ stats = '<div class=sv-rt>' + st("Transactions", NA, "not indexed on testnet") + st("Busiest hour", NA) + st("Per block", NA) + '</div>'; body = NAMSG; sw = ""; }
+    if(TN()){ stats = '<div class=sv-rt>' + st("Transactions", NA, "on testnet") + st("Busiest hour", NA) + st("Per block", NA) + '</div>'; body = NAMSG; sw = ""; }
     put("sv-act7", '<div class=sv-ph><h3>Transactions</h3>' + sw + '<span class=sv-gkey>' + (AW === "24h" ? "per hour" : "per day") + '</span>' + stats + '</div>' + body);
     /* per block: the last 100 blocks live (with gas and fees), the last 10,000 in stretches of 100
        (the average per block in each), or per day since genesis (a line) - the indexer keeps
@@ -715,7 +715,7 @@
      a dot on each series, the date and each value. key names the chart for the hover's lookup. */
   var CH = {};
   function chart(key, pts, lines, fmtY, fmtV){
-    var n = pts.length; if(n < 2) return TN() ? '<div class=sv-upwait>History N/A on testnet: only today\'s figures are read</div>' : '<div class=sv-upwait>Not enough history yet</div>';
+    var n = pts.length; if(n < 2) return TN() ? '<div class=sv-upwait>History N/A on testnet</div>' : '<div class=sv-upwait>Not enough history yet</div>';
     var lo = Infinity, hi = -Infinity;
     lines.forEach(function(l){ pts.forEach(function(p){ var v = p[l.k]; if(v < lo) lo = v; if(v > hi) hi = v; }); });
     if(lines.some(function(l){ return l.area; })) lo = Math.min(lo, 0);
