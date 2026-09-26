@@ -500,11 +500,20 @@
   html[data-theme=light]:not([data-mono]) .sv-pho{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-rf{background:transparent}
   html[data-theme=light]:not([data-mono]) .sv-rf svg{fill:none;stroke:currentColor}
+  html[data-theme=light]:not([data-mono]) .sv-upst{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sv-upst .sw.av{background:var(--sv-teal)}
+  html[data-theme=light]:not([data-mono]) .sv-upst .sw.ref{background:none}
   html[data-theme=light]:not([data-mono]) .sv-livedot{box-shadow:0 0 0 0 var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sv-upplot .line{fill:none}
-  html[data-theme=light]:not([data-mono]) .sv-updot{border:2px solid var(--surface);box-shadow:0 0 0 1.5px var(--sv-teal)}
+  html[data-theme=light]:not([data-mono]) .sv-upm{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .sv-uplg{box-shadow:0 0 0 1.5px var(--danger-bar)}
+  html[data-theme=light]:not([data-mono]) .sv-uplg img,html[data-theme=light]:not([data-mono]) .sv-uplg .lg{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .sv-upbars i{background:var(--danger-bg)}
+  html[data-theme=light]:not([data-mono]) .sv-upbars i::before{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-upbars i.miss{background:var(--danger-bar)}
+  html[data-theme=light]:not([data-mono]) .sv-upbars i.miss::before{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-upbars i.tip::before{background:var(--accent);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-upy{background:var(--surface)}
   html[data-theme=light]:not([data-mono]) .sv-uptip{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .sv-upmiss span{border:1px solid var(--danger-bar);color:var(--danger);background:var(--danger-bg)}
   html[data-theme=light]:not([data-mono]) .sv-ph h3::before{background:var(--tc,var(--accent));box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-heat>i{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-heat>s{background:var(--surface-2);text-decoration:none}

@@ -22,7 +22,6 @@
   function whole(u){ return Math.floor(u / 1e6).toLocaleString(); }
   function pct(x){ return (x * 100).toFixed(1) + "%"; }
   function pp(x){ return (x >= 0 ? "+" : "−") + Math.abs(x * 100).toFixed(1) + "%"; }
-  function big(u){ var a = u / 1e6; return a >= 1e6 ? (a / 1e6).toFixed(2) + "M" : a >= 1e3 ? (a / 1e3).toFixed(1) + "k" : String(Math.floor(a)); }
   function hueOf(n){ var h = 0, s = String(n || "?"); for(var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return h; }
   function logo(id, name){
     var d = window.__VDBY && window.__VDBY[id];
@@ -326,32 +325,35 @@
   }
 
   /* ── NETWORK ────────────────────────────────────────────────────────────── */
+  /* the chain's governance at a glance: how many proposals, what is open or how the last ended
+     (read once a visit from the chain's API; a proposal takes weeks) */
+  var PROPS = { at: 0, total: null, voting: 0, last: null };
+  function readProps(){
+    if(PROPS.at && Date.now() - PROPS.at < 600000) return;
+    PROPS.at = Date.now();
+    var api = (window.__API || "https://atomone-api.gatadao.com") + "/atomone/gov/v1/proposals";
+    Promise.all([
+      fetch(api + "?pagination.limit=1&pagination.count_total=true&pagination.reverse=true").then(function(r){ return r.json(); }),
+      fetch(api + "?proposal_status=PROPOSAL_STATUS_VOTING_PERIOD&pagination.limit=50").then(function(r){ return r.json(); })
+    ]).then(function(x){
+      PROPS.total = +((x[0].pagination || {}).total || 0) || null;
+      var p = (x[0].proposals || [])[0]; PROPS.last = p ? { id: p.id, status: String(p.status || "").replace("PROPOSAL_STATUS_", "").toLowerCase() } : null;
+      PROPS.voting = (x[1].proposals || []).length;
+      if(screen() === "net") drawNet();
+    }).catch(function(){ PROPS.at = 0; });
+  }
   function drawNet(){
-    var D = DD(), S = setStats(), s = S.set, V = VALS(), mine = window.__MINE || {};
-    var e = D.eta || {}, i10 = 0, t10 = 0;
-    for(i10 = 0; i10 < 10 && i10 < V.length; i10++) t10 += V[i10][1];
-    var top10 = s.bonded ? t10 / s.bonded * 100 : 0;
-    var ratio = window.__ratio ? window.__ratio() : NaN;
-    put("sv-nethead",
-      '<div class=sv-ph><h3>The AtomOne set</h3>' +
-        (e.enabled ? tag("a", "Nakamoto bonus active") : tag("q", "bonus off")) +
-        (e.week ? tag("q", "week " + e.week) : "") +
-        '<div class=sv-rt>' + tag("q", big(s.bonded || 0) + " ATONE staked") +
-          tag("q", (s.bonded_pct != null ? s.bonded_pct.toFixed(1) : "—") + "% of supply") +
-          tag("q", S.n + " validators") + '</div>' +
-      '</div>' +
-      '<div class=sv-note>AtomOne shares part of <b>the reward pool, after the community tax,</b> equally between validators and the rest by stake. ' +
-      'That is why a smaller validator can pay a higher APR on the same ATONE, and why spreading a stake earns more than concentrating it.</div>');
-
+    var D = DD(), S = setStats(), e = D.eta || {};
+    readProps();
+    var bon = e.enabled ? '<span class=sv-on>Active</span>' : '<span class=sv-off>Off</span>';
     put("sv-netcards",
-      card("Bonus coefficient", 'η ' + (e.now != null ? e.now.toFixed(2) : "—"),
-           e.now != null ? Math.round(e.now * 100) + "% of the reward pool, shared equally" : "") +
-      card("APR across the set", '<span style="color:' + heat(S.lo).ink + '">' + pct(S.lo) + '</span><em>to</em><span style="color:' + heat(S.hi).ink + '">' + pct(S.hi) + '</span>',
-           "median " + pct(S.mid) + ", brighter pays more") +
-      card("Concentration", (isFinite(ratio) ? ratio.toFixed(1) : "—") + '<em>×</em>',
-           "largest third against smallest, top ten hold " + top10.toFixed(0) + "%") +
-      card("Record", (S.up != null ? S.up.toFixed(2) + "%" : "—"),
-           "average 30-day uptime, " + S.clean + " never jailed"));
+      card("Nakamoto Bonus", bon,
+           e.enabled ? (e.week ? "week " + e.week + " · " : "") + (e.now != null ? Math.round(e.now * 100) + "% of the reward pool shared equally" : "") : "the reward pool follows stake alone") +
+      card("Proposals", PROPS.total != null ? String(PROPS.total) : "—",
+           PROPS.voting ? '<b class=sv-on>' + PROPS.voting + ' in voting now</b>'
+             : PROPS.last ? "none in voting · #" + esc(PROPS.last.id) + " " + esc(PROPS.last.status.replace(/_/g, " ")) : "") +
+      card("Uptime", (S.up != null ? S.up.toFixed(2) + "%" : "—"),
+           "30-day average across the set, " + S.clean + " never jailed"));
 
     drawUp(S);
   }
@@ -381,64 +383,73 @@
     }).catch(function(){}).then(function(){ FB.busy = false; if(screen() === "net") drawUp(setStats()); });
   }
   function upRows(){
-    if(window.__UP && window.__UP.length) return window.__UP;
-    return Object.keys(FB.rows).map(Number).sort(function(a, b){ return a - b; }).map(function(k){ return FB.rows[k]; });
-  }
-  /* consensus address (hex) -> moniker, for who missed */
-  function byCons(){
-    var VD = window.__VDBY || {}, m = {}, k;
-    for(k in VD) if(VD[k].chex) m[String(VD[k].chex).toUpperCase()] = VD[k].m;
-    return m;
+    var r = window.__UP && window.__UP.length ? window.__UP
+      : Object.keys(FB.rows).map(Number).sort(function(a, b){ return a - b; }).map(function(k){ return FB.rows[k]; });
+    /* a phone shows the last 40: 120 bars on 360 pixels are hairlines */
+    return innerWidth <= 620 && r.length > 40 ? r.slice(-40) : r;
   }
   var UPHOVER = -1;
+  /* consensus address (hex) -> the validator's id, name */
+  function consIndex(){
+    var VD = window.__VDBY || {}, m = {}, k;
+    for(k in VD) if(VD[k].chex) m[String(VD[k].chex).toUpperCase()] = { id: k, m: VD[k].m };
+    return m;
+  }
   function drawUp(S){
     var rows = upRows();
     if(!window.__UP) fbRows();
+    var head = '<div class=sv-ph><h3>Network uptime</h3><span class="sv-tag q"><i class=sv-livedot></i>live</span>';
     if(!rows.length){
-      put("sv-up", '<div class=sv-ph><h3>Network uptime</h3><span class="sv-tag q"><i class=sv-livedot></i>live</span></div><div class=sv-upwait>Reading the latest blocks…</div>');
+      put("sv-up", head + '</div><div class=sv-upwait>Reading the latest blocks…</div>');
       return;
     }
-    var pc = rows.map(function(r){ return r[2] ? r[1] / r[2] * 100 : 100; });
-    var last = rows[rows.length - 1], now = pc[pc.length - 1], avg = 0;
-    pc.forEach(function(v){ avg += v; }); avg /= pc.length;
-    var ref = S.up != null ? S.up : null;
-    var lo = Math.min.apply(null, pc.concat(ref != null ? [ref] : []));
-    lo = Math.max(0, Math.min(95, Math.floor(lo - 1)));
-    var W = 1000, H = 200, n = pc.length;
-    var x = function(i){ return n > 1 ? i / (n - 1) * W : W; }, y = function(v){ return H - (v - lo) / (100 - lo) * H; };
-    var line = pc.map(function(v, i){ return (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1); }).join(" ");
-    var area = line + " L" + W + " " + H + " L0 " + H + " Z";
-    var names = byCons(), missNow = last[3] ? last[3].split(",").map(function(a){ return names[a.toUpperCase()] || a.slice(0, 8) + "…"; }) : [];
-    var hv = UPHOVER >= 0 && UPHOVER < n ? UPHOVER : -1, hr = hv >= 0 ? rows[hv] : null;
-    var dotI = hv >= 0 ? hv : n - 1;
-    put("sv-up",
-      '<div class=sv-ph><h3>Network uptime</h3><span class="sv-tag q"><i class=sv-livedot></i>live</span>' +
-        '<div class=sv-rt><span class=sv-upfig><em>this block</em><b>' + now.toFixed(0) + '%</b><i>' + last[1] + ' of ' + last[2] + ' signed</i></span>' +
-        '<span class=sv-upfig><em>last ' + n + ' blocks</em><b>' + avg.toFixed(2) + '%</b></span>' +
-        (ref != null ? '<span class=sv-upfig><em>30-day average</em><b class=ref>' + ref.toFixed(2) + '%</b></span>' : '') + '</div></div>' +
+    var n = rows.length, pc = rows.map(function(r){ return r[2] ? r[1] / r[2] * 100 : 100; });
+    var last = rows[n - 1], now = pc[n - 1], avg = 0, ref = S.up != null ? S.up : null;
+    pc.forEach(function(v){ avg += v; }); avg /= n;
+    var lo = Math.max(0, Math.min(95, Math.floor(Math.min.apply(null, pc.concat(ref != null ? [ref] : [])) - 1)));
+    var H = function(v){ return ((v - lo) / (100 - lo) * 100).toFixed(2); };
+    var ix = consIndex(), who = function(a){ return ix[a.toUpperCase()] || { id: null, m: a.slice(0, 8) + "…" }; };
+    var mins = Math.round(n * 6 / 60);
+    /* one bar per block, oldest on the left: the signed share in teal, the missing share in red
+       above it. A block someone missed carries that validator's mark on the plot, named where
+       there is room (newest first, a label every ~11% of the width). */
+    var bars = rows.map(function(r, i){
+      var missed = r[1] < r[2];
+      return '<i class="' + (missed ? "miss" : "") + (i === n - 1 ? " tip" : "") + (i === UPHOVER ? " on" : "") + '" style="--h:' + H(pc[i]) + '%" data-i="' + i + '"></i>'; }).join("");
+    var marks = "", lastLabel = 1e9;
+    for(var i = n - 1; i >= 0; i--){
+      var r = rows[i]; if(!(r[1] < r[2]) || !r[3]) continue;
+      var vs = r[3].split(",").map(who), x = (i + .5) / n * 100, lab = lastLabel - x > 11;
+      if(lab) lastLabel = x;
+      marks += '<span class="sv-upm' + (lab ? "" : " bare") + (x > 80 ? " rt" : "") + '" style="left:' + x.toFixed(2) + '%" title="' +
+        esc("block " + Number(r[0]).toLocaleString() + ": missed by " + vs.map(function(v){ return v.m; }).join(", ")) + '">' +
+        '<span class=sv-uplg>' + logo(vs[0].id, vs[0].m) + '</span>' + (lab ? '<b>' + esc(vs[0].m) + (vs.length > 1 ? " +" + (vs.length - 1) : "") + '</b>' : "") + '</span>';
+    }
+    var hv = UPHOVER >= 0 && UPHOVER < n ? rows[UPHOVER] : null;
+    put("sv-up", head +
+        '<span class=sv-upwin>last ' + n + ' blocks · about ' + mins + ' min</span>' +
+        '<div class=sv-rt>' +
+          '<span class=sv-upst><i class=sw></i><em>This block</em><b>' + now.toFixed(0) + '%</b><small>' + last[1] + ' of ' + last[2] + ' signed</small></span>' +
+          '<span class=sv-upst><i class="sw av"></i><em>Last ' + n + ' blocks</em><b>' + avg.toFixed(2) + '%</b><small>average</small></span>' +
+          (ref != null ? '<span class=sv-upst><i class="sw ref"></i><em>30-day average</em><b class=w>' + ref.toFixed(2) + '%</b><small>dashed line</small></span>' : '') +
+        '</div></div>' +
       '<div class=sv-upchart>' +
-        '<div class=sv-upy><span>100%</span><span>' + ((100 + lo) / 2).toFixed(1) + '%</span><span>' + lo + '%</span></div>' +
-        '<div class=sv-upplot><svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio=none aria-hidden=true>' +
-          '<defs><linearGradient id=svupg x1=0 y1=0 x2=0 y2=1><stop offset=0 stop-color="#2bc8bd" stop-opacity=".45"/><stop offset=1 stop-color="#2bc8bd" stop-opacity="0"/></linearGradient></defs>' +
-          '<line class=grid x1=0 x2=' + W + ' y1=0 y2=0 /><line class=grid x1=0 x2=' + W + ' y1=' + H / 2 + ' y2=' + H / 2 + ' />' +
-          (ref != null ? '<line class=ref x1=0 x2=' + W + ' y1=' + y(ref).toFixed(1) + ' y2=' + y(ref).toFixed(1) + ' />' : '') +
-          '<path class=area d="' + area + '"/><path class=line d="' + line + '"/>' +
-          (hv >= 0 ? '<line class=cur x1=' + x(hv).toFixed(1) + ' x2=' + x(hv).toFixed(1) + ' y1=0 y2=' + H + ' />' : '') +
-        '</svg><i class=sv-updot style="left:' + (x(dotI) / W * 100).toFixed(2) + '%;top:' + (y(pc[dotI]) / H * 100).toFixed(2) + '%"></i>' +
-        (hr ? '<div class=sv-uptip style="left:' + Math.min(78, Math.max(0, x(hv) / W * 100 - 11)).toFixed(1) + '%"><b>block ' + Number(hr[0]).toLocaleString() + '</b>' +
-          hr[1] + ' of ' + hr[2] + ' signed' + (hr[3] ? '<br>missed: ' + esc(hr[3].split(",").map(function(a){ return names[a.toUpperCase()] || a.slice(0, 8) + "…"; }).join(", ")) : '') + '</div>' : '') +
+        '<div class=sv-upmarks>' + marks + '</div>' +
+        '<div class=sv-upplot>' +
+          '<span class=sv-upy style="bottom:100%">100%</span><span class=sv-upy style="bottom:0">' + lo + '%</span>' +
+          (ref != null ? '<span class=sv-upref style="bottom:' + H(ref) + '%"></span>' : '') +
+          '<div class=sv-upbars>' + bars + '</div>' +
+          (hv ? '<div class=sv-uptip style="left:' + Math.min(76, Math.max(0, (UPHOVER + .5) / n * 100 - 12)).toFixed(1) + '%"><b>block ' + Number(hv[0]).toLocaleString() + '</b>' +
+            hv[1] + ' of ' + hv[2] + ' signed' + (hv[3] ? '<br>missed by ' + esc(hv[3].split(",").map(function(a){ return who(a).m; }).join(", ")) : '') + '</div>' : '') +
         '</div>' +
-        '<div class=sv-upx><span>block ' + Number(rows[0][0]).toLocaleString() + '</span><span>block ' + Number(last[0]).toLocaleString() + '</span></div>' +
-      '</div>' +
-      '<div class=sv-upmiss>' + (missNow.length
-        ? '<em>missed the latest block</em>' + missNow.slice(0, 8).map(function(m){ return '<span>' + esc(m) + '</span>'; }).join("") + (missNow.length > 8 ? '<span>+' + (missNow.length - 8) + ' more</span>' : '')
-        : '<em>every validator signed the latest block</em>') + '</div>');
+        '<div class=sv-upx><span>&larr; older<i class=bn> · block ' + Number(rows[0][0]).toLocaleString() + '</i></span><span>now<i class=bn> · block ' + Number(last[0]).toLocaleString() + '</i> &rarr;</span></div>' +
+      '</div>');
   }
   /* hovering the plot names a block: its height, how many signed, who did not */
   sv.addEventListener("mousemove", function(ev){
     var p = ev.target.closest ? ev.target.closest(".sv-upplot") : null;
     if(!p){ if(UPHOVER !== -1){ UPHOVER = -1; if(screen() === "net") drawUp(setStats()); } return; }
-    var r = p.getBoundingClientRect(), n = upRows().length, i = Math.round((ev.clientX - r.left) / r.width * (n - 1));
+    var r = p.getBoundingClientRect(), n = upRows().length, i = Math.floor((ev.clientX - r.left) / r.width * n);
     i = Math.max(0, Math.min(n - 1, i));
     if(i !== UPHOVER){ UPHOVER = i; drawUp(setStats()); }
   });

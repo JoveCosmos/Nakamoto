@@ -3326,36 +3326,54 @@ background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opac
 .sv-rf[hidden]{display:none}
 .sv-rf.busy svg{animation:svspin .8s linear infinite}
 @keyframes svspin{to{transform:rotate(360deg)}}
-/* network uptime, live: the share of the set that signed each of the last blocks, against the
-   set's 30-day average (dashed); the panel takes the rest of the screen and the plot fills it */
-#sv-up{--tc:var(--sv-teal)}
+/* network uptime, live: one bar per block (oldest left, now right), the signed share teal and the
+   missing share red; the set's 30-day average dashed; a block someone missed carries their mark.
+   The plot, the title and the stats share the panel's edges. */
+#sv-up,#sv-netcards .sv-card{--tc:var(--sv-teal)}
 .sv-screen>.sv-up{flex:1 1 auto;min-height:0}
-.sv-upfig{display:inline-flex;align-items:baseline;gap:7px;margin-left:18px;white-space:nowrap}
-.sv-upfig em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
-.sv-upfig b{font-size:17px;font-weight:800;color:var(--sv-teal);font-variant-numeric:tabular-nums}
-.sv-upfig b.ref{color:var(--wt)}
-.sv-upfig i{font-style:normal;font-size:11.5px;color:var(--ws)}
+.sv-on{color:var(--sv-green)}.sv-off{color:var(--wf)}
+.sv-upwin{font-family:var(--wmono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ws)}
+.sv-upst{display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:8px;align-items:baseline;padding:6px 12px 7px;border:1px solid var(--wbd);border-radius:9px;background:rgba(8,8,18,.55);min-width:0}
+.sv-upst .sw{grid-row:1/3;align-self:center;width:4px;height:26px;border-radius:2px;background:var(--sv-teal)}
+.sv-upst .sw.av{background:linear-gradient(180deg,var(--sv-teal),rgba(43,200,189,.35))}
+.sv-upst .sw.ref{width:0;border-left:3px dashed var(--wt);border-radius:0;background:none;opacity:.75}
+.sv-upst em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
+.sv-upst b{grid-column:2;font-size:17px;font-weight:800;line-height:1.1;color:var(--sv-teal);font-variant-numeric:tabular-nums}
+.sv-upst b.w{color:var(--wt)}
+.sv-upst small{grid-column:2;font-size:10.5px;color:var(--ws);white-space:nowrap}
+.sv-upst{grid-template-areas:"s e" "s b" "s m";grid-template-rows:auto auto auto}
+.sv-upst .sw{grid-area:s}.sv-upst em{grid-area:e}.sv-upst b{grid-area:b}.sv-upst small{grid-area:m}
 .sv-livedot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--sv-teal);margin-right:6px;box-shadow:0 0 0 0 rgba(43,200,189,.6);animation:svlive 1.8s ease-out infinite}
 @keyframes svlive{0%{box-shadow:0 0 0 0 rgba(43,200,189,.6)}80%,100%{box-shadow:0 0 0 7px rgba(43,200,189,0)}}
-.sv-upchart{flex:1 1 auto;min-height:90px;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;column-gap:10px;row-gap:4px}
-.sv-upy{grid-row:1;display:flex;flex-direction:column;justify-content:space-between;font-family:var(--wmono);font-size:9px;color:var(--wf);text-align:right;padding:0 0 0}
-.sv-upplot{grid-row:1;grid-column:2;position:relative;min-height:0;border-left:1px solid var(--wbd2);border-bottom:1px solid var(--wbd2);cursor:crosshair}
-.sv-upplot svg{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible}
-.sv-upplot .area{fill:url(#svupg)}
-.sv-upplot .line{fill:none;stroke:var(--sv-teal);stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round}
-.sv-upplot .grid{stroke:var(--wbd);stroke-width:1;vector-effect:non-scaling-stroke}
-.sv-upplot .ref{stroke:var(--wt);stroke-width:1;stroke-dasharray:5 5;opacity:.55;vector-effect:non-scaling-stroke}
-.sv-upplot .cur{stroke:var(--ws);stroke-width:1;vector-effect:non-scaling-stroke}
-.sv-updot{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--sv-teal);border:2px solid #0b0b18;box-shadow:0 0 0 1.5px var(--sv-teal),0 0 12px var(--sv-teal);transform:translate(-50%,-50%);pointer-events:none}
-.sv-uptip{position:absolute;top:6px;width:22%;min-width:170px;padding:7px 10px;border:1px solid var(--wbd2);border-radius:8px;background:#15152c;font-size:11px;line-height:1.45;color:var(--ws);pointer-events:none;z-index:2}
+.sv-upchart{flex:1 1 auto;min-height:120px;display:flex;flex-direction:column;gap:4px}
+.sv-upmarks{position:relative;height:26px;flex:0 0 auto}
+.sv-upm{position:absolute;bottom:0;display:inline-flex;align-items:center;gap:5px;transform:translateX(-10px);white-space:nowrap;font-size:10.5px;color:#ff9a7a}
+.sv-upm.rt{transform:translateX(calc(-100% + 10px));flex-direction:row-reverse}
+.sv-upm b{font-weight:600}
+.sv-uplg{width:20px;height:20px;border-radius:6px;overflow:hidden;flex:0 0 auto;box-shadow:0 0 0 1.5px #ff4d1f}
+.sv-uplg img,.sv-uplg .lg{width:20px;height:20px;display:grid;place-items:center;object-fit:cover;font-size:9px;font-weight:700;color:#fff}
+.sv-upplot{position:relative;flex:1 1 auto;min-height:0;border-bottom:1px solid var(--wbd2);cursor:crosshair}
+.sv-upbars{position:absolute;inset:0;display:flex;align-items:flex-end;gap:2px}
+.sv-upbars i{flex:1 1 0;min-width:1px;height:100%;position:relative;border-radius:2px 2px 0 0;background:rgba(255,77,31,.0)}
+.sv-upbars i::before{content:"";position:absolute;left:0;right:0;bottom:0;height:var(--h);border-radius:2px 2px 0 0;background:linear-gradient(180deg,rgba(43,200,189,.95),rgba(43,200,189,.35))}
+.sv-upbars i.miss{background:linear-gradient(180deg,rgba(255,77,31,.85),rgba(255,77,31,.5))}
+.sv-upbars i.miss::before{background:linear-gradient(180deg,rgba(43,200,189,.7),rgba(43,200,189,.3))}
+.sv-upbars i.tip::before{background:linear-gradient(180deg,#7ff0e6,rgba(43,200,189,.5));box-shadow:0 0 12px rgba(43,200,189,.6)}
+.sv-upbars i.on{outline:1px solid var(--wt);outline-offset:1px}
+.sv-upy{position:absolute;left:4px;transform:translateY(50%);z-index:1;font-family:var(--wmono);font-size:9px;color:var(--wt);background:rgba(9,9,15,.7);padding:1px 4px;border-radius:3px;pointer-events:none}
+.sv-upref{position:absolute;left:0;right:0;height:0;border-top:1.5px dashed var(--wt);opacity:.6;z-index:1;pointer-events:none}
+.sv-uptip{position:absolute;top:8px;width:24%;min-width:180px;padding:7px 10px;border:1px solid var(--wbd2);border-radius:8px;background:#15152c;font-size:11px;line-height:1.45;color:var(--ws);pointer-events:none;z-index:3}
 .sv-uptip b{display:block;color:var(--wt);font-weight:700}
-.sv-upx{grid-row:2;grid-column:2;display:flex;justify-content:space-between;font-family:var(--wmono);font-size:9px;color:var(--wf)}
-.sv-upmiss{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11.5px;color:var(--ws);min-height:22px}
-.sv-upmiss em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);margin-right:4px}
-.sv-upmiss span{padding:2px 8px;border-radius:999px;border:1px solid rgba(255,77,31,.35);color:#ff8a6b;background:rgba(255,77,31,.06)}
+.sv-upx{display:flex;justify-content:space-between;font-family:var(--wmono);font-size:9px;letter-spacing:.06em;color:var(--wf)}
 .sv-upwait{flex:1 1 auto;display:grid;place-items:center;color:var(--wf);font-size:12px;min-height:90px}
-@media(max-width:900px){.sv-upfig{margin-left:10px}.sv-upfig i{display:none}}
-@media(max-width:620px){.sv-screen>.sv-up{min-height:320px}.sv-upchart{min-height:170px}.sv-upfig{margin:0 12px 0 0}}
+@media(max-width:900px){.sv-upst small{display:none}}
+.sv-upx i{font-style:normal}
+@media(max-width:620px){
+  .sv-screen>.sv-up{min-height:360px}.sv-upchart{min-height:190px}.sv-upm b{display:none}
+  #sv-up .sv-rt{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;gap:6px;margin-left:0}
+  .sv-upst{padding:5px 8px;column-gap:6px}.sv-upst em{font-size:7.5px;letter-spacing:.06em;white-space:normal}.sv-upst b{font-size:15px}
+  .sv-upx .bn{display:none}
+}
 /* a wallet with nothing staked: the message and Stake ATONE in the middle of the space below the tiles */
 #sv-optp.fill{flex:1 1 auto;justify-content:center;align-items:center}
 .sv-none{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
@@ -3364,7 +3382,7 @@ background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opac
 /* the rest of a long list, as one card that opens Manual */
 .sv-chip.more .sv-lgo{display:grid;place-items:center;background:var(--wbd);color:var(--ws);font-family:var(--wmono);font-size:10px;font-weight:700}
 .sv-chip.more u{color:var(--sv-violet)}
-#sv-nethead,#sv-netcards .sv-card,.sv-screen>.sv-list{--tc:var(--sv-teal)}
+.sv-screen>.sv-list{--tc:var(--sv-teal)}
 /* labels in the calculator's voice; figures in the colour of what they are */
 .sv-k{font-family:var(--wmono);font-size:9.5px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--ws)}
 .sv-big em{font-family:var(--wmono);font-size:10px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
@@ -4005,8 +4023,7 @@ html[data-tab=connect] .l2host{display:none}
         <div class=sv-panel id=sv-atauth></div>
       </section>
       <section class=sv-screen id=sv-net data-sc=net aria-label=Network>
-        <div class=sv-panel id=sv-nethead></div>
-        <div class="sv-cards four" id=sv-netcards></div>
+        <div class=sv-cards id=sv-netcards></div>
         <div class="sv-panel sv-up" id=sv-up></div>
       </section>
     </main>
