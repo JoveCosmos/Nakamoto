@@ -3499,7 +3499,10 @@ border:1px solid var(--wbd2);border-radius:6px;background:linear-gradient(180deg
 .atrow:has(.atfield) .atlab{flex:0 0 100%}
 .atcard .unfield.atfield{width:240px;height:30px}
 .atcard .unfield.atfield:focus-within{border-color:var(--av);box-shadow:0 0 0 3px rgba(185,176,255,.13)}
-.atcard .atrow .unhint{flex:1 1 auto;min-width:0;margin:0;font-family:var(--wmono);font-size:8.5px;letter-spacing:.06em;color:var(--wf);white-space:normal}
+/* the line under the stake field is always there, empty or not: a message appearing ("Select
+   validators", a cap over the balance) must not push the rows below it down */
+.atcard .atrow .unhint{flex:0 0 auto;display:block;min-width:0;height:13px;line-height:13px;margin:0;font-family:var(--wmono);font-size:8.5px;letter-spacing:.06em;color:var(--wf);
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .atcard .atrow .unhint.bad{color:var(--wamber)}
 .attime{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .atseg{display:inline-flex;gap:4px;padding:3px;border:1px solid var(--wbd2);border-radius:6px;background:var(--wi)}
@@ -3526,12 +3529,6 @@ border:1px solid var(--wbd2);border-radius:6px;background:linear-gradient(180deg
 .atrt b{font-family:var(--wsans);font-size:13px;font-weight:600;color:#fff8dc}
 .atrt span{font-family:var(--wmono);font-size:9px;letter-spacing:.06em;color:var(--ws)}
 .atrt span b{font-family:var(--wmono);font-size:9px;font-weight:400;color:var(--av)}
-.atqa{display:flex;gap:6px;flex-wrap:wrap}
-.atqa[hidden]{display:none}
-.atq{height:26px;padding:0 10px;border-radius:5px;border:1px solid var(--wbd2);background:transparent;color:var(--ws);font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;cursor:pointer;transition:color .12s,border-color .12s}
-.atq:hover{border-color:var(--av);color:#d6d1ff}
-.atq:focus-visible{outline:2px solid var(--av);outline-offset:2px}
-.atq:disabled{opacity:.4;cursor:default}
 .atrs{display:flex;align-items:center;gap:8px;margin-top:12px}
 .atfind{flex:1 1 auto;min-width:0;height:30px;padding:0 10px;margin:0;border-radius:6px;border:1px solid var(--wbd2);background:var(--wi);color:#fff8dc;font-family:var(--wsans);font-size:12px;outline:none;-webkit-appearance:none;appearance:none}
 .atfind::placeholder{color:var(--wf)}
@@ -3540,7 +3537,11 @@ border:1px solid var(--wbd2);border-radius:6px;background:linear-gradient(180deg
 .atflt button{height:22px;padding:0 10px;border:0;border-radius:4px;background:transparent;color:var(--ws);font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
 .atflt button[aria-pressed=true]{background:var(--av);color:#1b1440}
 .atflt button:focus-visible{outline:2px solid var(--av);outline-offset:2px}
-.atlist{flex:1 1 auto;min-height:0;overflow-y:auto;margin-top:10px;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;overscroll-behavior:contain}
+/* the gutter is kept whether the list scrolls or not: "Selected" can show three rows where "All"
+   shows a hundred, and a scrollbar that came and went moved every column sideways */
+.atlist{flex:1 1 auto;min-height:0;overflow-y:auto;margin-top:10px;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;overscroll-behavior:contain;scrollbar-gutter:stable}
+.atlist th:last-child,.atlist td:last-child{padding-right:12px}
+.atlist th.ck{padding:0 0 0 6px;text-align:left}
 .atlist table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
 .atlist thead th{position:sticky;top:0;z-index:1;height:28px;padding:0 5px;background:#12122a;border-top:1px solid var(--wbd2);border-bottom:1px solid var(--wbd2);
 font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:400;color:#c1bfdc;text-align:right;white-space:nowrap}
@@ -3553,11 +3554,12 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .atlist tr.on td:first-child{box-shadow:inset 2px 0 0 var(--av)}
 .atlist.ro td{cursor:default}
 .atlist td.ck{padding:0 0 0 6px}
-.atlist td.ck input{appearance:none;-webkit-appearance:none;display:block;width:15px;height:15px;margin:0;border-radius:4px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0e0e1d);position:relative;cursor:pointer}
-.atlist td.ck input:checked{background:linear-gradient(180deg,#d4ceff,#9d93f0);border-color:var(--av);box-shadow:0 0 0 3px rgba(185,176,255,.14)}
-.atlist td.ck input:checked::after{content:"";position:absolute;left:4.5px;top:1.5px;width:4px;height:8px;border:solid #1b1440;border-width:0 2px 2px 0;transform:rotate(45deg)}
-.atlist td.ck input:focus-visible{outline:2px solid var(--av);outline-offset:2px}
-.atlist td.ck input:disabled{cursor:default}
+.atlist th.ck input,.atlist td.ck input{appearance:none;-webkit-appearance:none;display:block;width:15px;height:15px;margin:0;border-radius:4px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0e0e1d);position:relative;cursor:pointer}
+.atlist th.ck input:checked,.atlist th.ck input:indeterminate,.atlist td.ck input:checked{background:linear-gradient(180deg,#d4ceff,#9d93f0);border-color:var(--av);box-shadow:0 0 0 3px rgba(185,176,255,.14)}
+.atlist th.ck input:indeterminate::after{content:"";position:absolute;left:3px;top:6px;width:7px;height:2px;border-radius:1px;background:#1b1440}
+.atlist th.ck input:checked::after,.atlist td.ck input:checked::after{content:"";position:absolute;left:4.5px;top:1.5px;width:4px;height:8px;border:solid #1b1440;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.atlist th.ck input:focus-visible,.atlist td.ck input:focus-visible{outline:2px solid var(--av);outline-offset:2px}
+.atlist th.ck input:disabled,.atlist td.ck input:disabled{cursor:default}
 .atlist .nmw{display:flex;align-items:center;gap:7px;min-width:0}
 .atlist .nmw>span.nmt{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--wsans);font-size:11.5px;color:#fff8dc}
 .atlist .wk-lg{width:16px;height:16px;margin:0;flex:0 0 auto}
@@ -3601,7 +3603,6 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
   .atR{padding:12px 16px 0}
   .atrs{flex-wrap:wrap}
   .atfind{flex:1 1 100%;height:36px}
-  .atq{height:32px}
   .atlist td{height:40px}
   .atcard .unfield.atfield{width:100%;max-width:260px}
   .atfoot{flex-wrap:wrap;gap:8px;padding:10px 16px 12px}
@@ -4190,9 +4191,8 @@ html[data-tab=connect] .l2host{display:none}
       </div>
       <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. You can revoke authz at any time.</span></div>
     </section>
-    <section class=atR id=atR aria-label="Validators the keeper may use">
-      <div class=atrh><div class=atrt><b>Validators the keeper may use</b><span id=atcount></span></div>
-        <div class=atqa id=atqa><button type=button class=atq data-q=fit id=atqfit>Fits strategy</button><button type=button class=atq data-q=mine id=atqmine>Yours</button><button type=button class=atq data-q=clear>Clear</button></div></div>
+    <section class=atR id=atR aria-label="Select your validators">
+      <div class=atrh><div class=atrt><b>Select your validators</b><span id=atcount></span></div></div>
       <div class=atrs><input class=atfind id=atfind type=search placeholder="Find by name or operator key" aria-label="Find a validator" autocomplete=off spellcheck=false>
         <div class=atflt id=atflt role=group aria-label="Show"><button type=button data-f=all aria-pressed=true>All</button><button type=button data-f=sel aria-pressed=false>Selected</button></div></div>
       <div class=atlist id=atlist></div>

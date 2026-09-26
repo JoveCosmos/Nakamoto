@@ -388,7 +388,7 @@
         '<td class=l><span class=sv-nm>' + logo(v[3], v[0]) + '<span class=tx><b>' + esc(v[0]) + '</b><i>' + esc(String(d.op || "").slice(0, 14)) + '…</i></span></span></td>' +
         '<td>' + big(v[1]) + ' <span class=sv-dim>ATONE</span><span class=sv-sm>' + (d.vp != null ? d.vp.toFixed(2) + "% share" : "") + '</span></td>' +
         '<td class="' + (up == null ? "sv-dim" : up >= 95 ? "sv-ok" : up >= 85 ? "sv-warn" : "sv-bad") + '">' + (up == null ? "—" : up.toFixed(2) + "%") + '</td>' +
-        '<td class="' + (!j ? "sv-dim" : j === 1 ? "sv-warn" : "sv-bad") + '">' + (j ? j + "×" : "never") + '</td>' +
+        '<td class="' + (!j ? "sv-dim" : j === 1 ? "sv-warn" : "sv-bad") + '">' + (j ? j + "×" : "Never") + '</td>' +
         '<td>' + Math.round(v[2] * 100) + '%</td>' +
         '<td>' + aprCell(rate0(v[1], v[2])) + '</td>' +
         '<td>' + (held[v[3]] ? '<b>' + fmt(held[v[3]]) + '</b>' : '<span class=sv-dim>—</span>') + '</td></tr>';

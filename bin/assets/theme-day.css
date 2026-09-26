@@ -554,8 +554,6 @@
   html[data-theme=light]:not([data-mono]) .atnote{border:1px solid var(--accent-soft);background:var(--accent-soft);color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .atnote svg{fill:none;stroke:var(--accent)}
   html[data-theme=light]:not([data-mono]) .atrt b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .atq{background:transparent}
-  html[data-theme=light]:not([data-mono]) .atq:hover{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .atfind{color:var(--ink);outline:none}
   html[data-theme=light]:not([data-mono]) .atfind:focus{box-shadow:0 0 0 3px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .atflt button{background:transparent}
@@ -565,9 +563,10 @@
   html[data-theme=light]:not([data-mono]) .atlist tr:hover td{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .atlist tr.on td{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .atlist tr.on td:first-child{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .atlist td.ck input{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .atlist td.ck input:checked{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .atlist td.ck input:checked::after{border:solid var(--surface)}
+  html[data-theme=light]:not([data-mono]) .atlist th.ck input,html[data-theme=light]:not([data-mono]) .atlist td.ck input{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .atlist th.ck input:checked,html[data-theme=light]:not([data-mono]) .atlist th.ck input:indeterminate,html[data-theme=light]:not([data-mono]) .atlist td.ck input:checked{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .atlist th.ck input:indeterminate::after{background:var(--surface)}
+  html[data-theme=light]:not([data-mono]) .atlist th.ck input:checked::after,html[data-theme=light]:not([data-mono]) .atlist td.ck input:checked::after{border:solid var(--surface)}
   html[data-theme=light]:not([data-mono]) .atlist .nmw>span.nmt{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .atlist .wk-lgx{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .atlist .attg.y{border-color:var(--amber-bar)}

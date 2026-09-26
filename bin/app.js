@@ -2398,7 +2398,6 @@ rememberGridH();
     var n = view ? Object.keys(atGrantIds()).length : atPick() === "all" ? set : sel;
     var c = E("atcount"); if(c) c.innerHTML = view ? "<b>" + n + "</b> allowed by your grant" : atPick() === "all" ? "All <b>" + set + "</b> of the set" : "<b>" + sel + "</b> of " + set + " selected";
     var vn = E("atvn"); if(vn) vn.textContent = n;
-    var qf = E("atqfit"); if(qf) qf.textContent = "Fits " + (AT_WORD[atPreset()] || "moderate");
   }
   /* the set, in rank order: a box per validator, what it pays, its record, and marks for the
      ones already holding the reader's stake and the ones the strategy would pick */
@@ -2413,9 +2412,12 @@ rememberGridH();
       if(AT_FLT === "sel" && !o.on) return false;
       /* a name matches on any letters; an operator key only from five on, or every key matches "at" */
       return !q || String(o.m).toLowerCase().indexOf(q) >= 0 || (q.length >= 5 && String(d.op).toLowerCase().indexOf(q) >= 0); });
+    /* the head's box speaks for the rows shown: checked when all are on, a dash when some are */
+    var on = 0; rows.forEach(function(o){ if(o.on) on++; }); AT_VIS = rows.map(function(o){ return o.id; });
     var h = '<table><colgroup><col style="width:30px">' + (ph ? '' : '<col style="width:34px">') + '<col><col style="width:' + (ph ? 66 : 64) + 'px">' +
             (ph ? '' : '<col style="width:50px">') + '<col style="width:' + (ph ? 56 : 62) + 'px"></colgroup>' +
-            '<thead><tr><th></th>' + (ph ? '' : '<th>rank</th>') + '<th class=l>validator</th><th>90<span class=lc>d</span> uptime</th>' + (ph ? '' : '<th>jailed</th>') + '<th>APR</th></tr></thead><tbody>';
+            '<thead><tr><th class=ck><input type=checkbox id=atall' + (view ? ' disabled' : '') + ' aria-label="Select every validator shown"' +
+              (rows.length && on === rows.length ? ' checked' : '') + '></th>' + (ph ? '' : '<th>rank</th>') + '<th class=l>validator</th><th>90<span class=lc>d</span> uptime</th>' + (ph ? '' : '<th>jailed</th>') + '<th>APR</th></tr></thead><tbody>';
     rows.forEach(function(o){
       var d = VD[o.id], u90 = d.d90 != null ? +d.d90 : (o.up != null ? +o.up : null);
       h += '<tr' + (o.on ? ' class=on' : '') + ' data-id="' + att(o.id) + '"><td class=ck><input type=checkbox aria-label="' + att(o.m) + '"' + (o.on ? ' checked' : '') + (view ? ' disabled' : '') + '></td>' +
@@ -2423,14 +2425,16 @@ rememberGridH();
            '<td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span class=nmt>' + att(o.m) + '</span>' +
              (mine[o.id] ? '<span class="attg y">yours</span>' : '') + (fit[o.id] && !ph ? '<span class="attg f">fits</span>' : '') + '</div></td>' +
            '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '—' : u90.toFixed(1) + '%') + '</td>' +
-           (ph ? '' : '<td class="' + (!o.jail ? 'dim' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail + '×' : 'never') + '</td>') +
+           (ph ? '' : '<td class="' + (!o.jail ? 'dim' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail + '×' : 'Never') + '</td>') +
            '<td class=r2><b>' + pct(window.__rateAfter(o.t, o.c, 0)) + '</b></td></tr>';
     });
     if(!rows.length) h += '<tr><td class=atnone colspan=' + (ph ? 4 : 6) + '>' +
       (q ? 'No validator matches “' + att(AT_FIND.trim()) + '”.' : AT_FLT === "sel" ? 'None selected yet.' : 'The set has not loaded yet.') + '</td></tr>';
     var top = el.scrollTop; el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
     el.classList.toggle("ro", view);
+    var ha = E("atall"); if(ha) ha.indeterminate = on > 0 && on < rows.length;
   }
+  var AT_VIS = [];
   function atFltSync(){ Array.prototype.forEach.call(document.querySelectorAll("#atflt button"), function(o){ o.setAttribute("aria-pressed", o.dataset.f === AT_FLT ? "true" : "false"); }); }
   /* a phone shows one side at a time */
   function atView(v){
@@ -2443,13 +2447,11 @@ rememberGridH();
     atCounts();
     var mx = E("atmaxv"); if(mx) mx.textContent = pos ? exact(pos.free, 2) : "—";
     var un = E("atuntil"); if(un) un.innerHTML = "until <b>" + window.__dayFull(Date.now() + AT.days * 86400000) + "</b>";
-    var qa = E("atqa"); if(qa) qa.hidden = view;
-    var qm = E("atqmine"); if(qm) qm.disabled = !Object.keys(window.__MINE || {}).length;
     var signer = !!window.__WALLET && !!window.__WALLET.signDirect;
     var ok = !view && !!AT.addr && scope.length > 0 && cap > 0 && signer;
     var hint = E("athint");
     if(hint){ hint.className = "unhint"; hint.textContent = !signer ? "Needs Keplr (direct signing)"
-      : !scope.length ? (atPick() === "selected" ? "select the validators it may use" + (innerWidth <= 620 ? ", under Validators" : ", on the right") : "the set has not loaded yet") : ""; }
+      : !scope.length ? (atPick() === "selected" ? "Select validators" : "the set has not loaded yet") : ""; }
     var go = E("atgrant"); if(go) go.disabled = !ok;
     var sm = E("atsum");
     if(sm) sm.innerHTML = view ? "Active" : !AT.addr ? '<span class=atclosed>Inactive</span>' : ok ? fmt(cap) + " ATONE<br>" + (AT_WORD[atPreset()] || "moderate") + ", " +
@@ -2517,20 +2519,23 @@ rememberGridH();
      starts a selection of the whole set less that one */
   var atlist = E("atlist");
   if(atlist) atlist.addEventListener("click", function(ev){
+    /* the head's box: every validator shown on, or every one shown off (a search or the
+       Selected filter narrows what "every" means); all of the set on is simply "All" */
+    if(ev.target.id === "atall"){
+      if(atViewing()) return;
+      var want = ev.target.checked, setIds = atIdsFor("all");
+      if(atPick() === "all"){ if(want) return; ATSEL = {}; setIds.forEach(function(x){ ATSEL[x] = 1; }); }
+      AT_VIS.forEach(function(x){ if(want) ATSEL[x] = 1; else delete ATSEL[x]; });
+      atSetPick(setIds.length && setIds.every(function(x){ return ATSEL[x]; }) ? "all" : "selected");
+      atRefresh();
+      return;
+    }
     var tr = ev.target.closest ? ev.target.closest("tr[data-id]") : null;
     if(!tr || atViewing()) return;
     var box = tr.querySelector("input"), on = ev.target === box ? box.checked : !tr.classList.contains("on");
     if(atPick() === "all"){ ATSEL = {}; atIdsFor("all").forEach(function(x){ ATSEL[x] = 1; }); atSetPick("selected"); }
     if(on) ATSEL[tr.dataset.id] = 1; else delete ATSEL[tr.dataset.id];
     atRefresh();
-  });
-  var atqa = E("atqa");
-  if(atqa) atqa.addEventListener("click", function(ev){
-    var b = ev.target.closest ? ev.target.closest("[data-q]") : null;
-    if(!b || b.disabled || atViewing()) return;
-    var mine = window.__MINE || {}, ids = b.dataset.q === "fit" ? atIdsFor(atPreset()) : b.dataset.q === "mine" ? atIdsFor("all").filter(function(id){ return mine[id]; }) : [];
-    ATSEL = {}; ids.forEach(function(id){ ATSEL[id] = 1; });
-    atSetPick("selected"); atRefresh();
   });
   var atflt = E("atflt");
   if(atflt) atflt.addEventListener("click", function(ev){ var b = ev.target.closest ? ev.target.closest("[data-f]") : null; if(!b) return; AT_FLT = b.dataset.f; atFltSync(); atRows(); });
