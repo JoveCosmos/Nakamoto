@@ -78,7 +78,8 @@ t('picks-tables', function(){
   go('staking/picks');
   var r=document.querySelectorAll('#p-pays .ptab tbody tr').length;
   var l=document.querySelectorAll('#p-pays .ptab .tlg').length;
-  if(TESTNET) return (r===7 && l===5 && /N\/A/.test(document.getElementById('p-pays').textContent)) || 'testnet rows='+r+' logos='+l;
+  var ph=document.querySelectorAll('#p-pays .ptab tbody tr.phr').length;
+  if(TESTNET) return (r===15 && ph===10) || 'testnet rows='+r+' placeholders='+ph;   /* five rows each, history rows as placeholders */
   return (r===15 && l===15) || 'rows='+r+' logos='+l;   /* three lists of five */
 });
 t('trend-charts', function(){

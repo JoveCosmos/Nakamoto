@@ -1341,6 +1341,10 @@ margin:16px 0 -6px}
 /* the charts scale to the pane instead of forcing a sideways drag */
 .pane svg[viewBox]{width:100%;height:auto;display:block;margin:10px 0 2px;max-height:34vh}
 .ptab{width:100%}
+/* a placeholder row: the same height as a real one, nothing to click */
+.ptab tr.phr td{color:var(--ink3,#6f6d94)}
+.ptab tr.phr .phb{display:inline-block;width:55%;height:8px;border-radius:4px;background:rgba(255,255,255,.07);vertical-align:middle}
+.ptab tr.phr .tlg{opacity:.35}
 /* nothing lives under the tabs on a phone: the bar is the end of the page */
 @media(max-width:620px){
   .below{flex-direction:column;min-height:100svh}

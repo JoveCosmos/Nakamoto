@@ -72,6 +72,14 @@ if TESTNET:
     speedup, speedup_sub = "N/A", "N/A on testnet"
     mv_top = mv_small = mv_new = mv_grew = mv_wk = "N/A"
 
+def _pad5(rows, figs):
+    """every Picks table keeps five rows: a list shorter than five (testnet has no history)
+    is topped up with placeholder rows of the same height - a faded name bar, N/A figures"""
+    have = rows.count("<tr")
+    ph = ("<tr class=phr aria-hidden=true><td class=rkc>&ndash;</td><td class=nm><span class='tlg tlgx'></span><i class=phb></i></td>"
+          + "<td class=dim>N/A</td>" * figs + "</tr>")
+    return rows + ph * max(0, 5 - have)
+
 def _eta_attr(r): return f"{r['eta']:.2f}" if r["eta"] is not None else ""
 def _eta_cell(r): return f"{r['eta']:.2f}" if r["eta"] is not None else "<span class=dim>N/A</span>"
 def _pct_cell(r): return f"{r['pct']:.0f}%" if r["pct"] is not None else "<span class=dim>N/A</span>"
@@ -128,7 +136,7 @@ def _up(v):
     return (f"{(1 - v['life_missed']/v['life_n'])*100:.2f}%"
             if v.get("life_up") is not None and v["life_n"] else ("N/A" if TESTNET else "&mdash;"))
 tbl_apr = "".join(
-    prow(v, f"<td class=ok>{_up(v)}</td>"
+    prow(v, f"<td class={'ok' if v.get('life_up') is not None and v['life_n'] else 'dim'}>{_up(v)}</td>"
             f"{_jail(v)}") for v in by_apr[:5])
 
 # ── the longest clean signing record we can actually prove ──────────────────
@@ -263,11 +271,11 @@ page = (TPL
   .replace("{{KL_ETA}}", KL_ETA).replace("{{KL_C}}", KL_C).replace("{{KL_S}}", KL_S)
   .replace("{{MV_TOP}}", mv_top).replace("{{MV_SMALL}}", mv_small)
   .replace("{{MV_NEW}}", mv_new).replace("{{MV_GREW}}", mv_grew).replace("{{MV_WK}}", mv_wk).replace("{{SCHEDULE}}", sched).replace("{{TRENDROWS}}", trend_rows)
-  .replace("{{APRTABLE}}", tbl_apr)
+  .replace("{{APRTABLE}}", _pad5(tbl_apr, 3))
   .replace("{{NCLEAN}}", "N/A" if TESTNET else str(n_clean)).replace("{{UPMIN}}", f"{UP_MIN:.0f}")
   .replace("{{PICKTABLE}}", "").replace("{{LIFEWIN}}", life_win)
-  .replace("{{UPTABLE}}", tbl_up or ("<tr><td colspan=6 class=dim>N/A on testnet</td></tr>" if TESTNET else ""))
-  .replace("{{EARNTABLE}}", tbl_earn or ("<tr><td colspan=5 class=dim>N/A on testnet</td></tr>" if TESTNET else "")).replace("{{EARNWK}}", "N/A" if TESTNET else str(earn_weeks))
+  .replace("{{UPTABLE}}", _pad5(tbl_up, 4))
+  .replace("{{EARNTABLE}}", _pad5(tbl_earn, 3)).replace("{{EARNWK}}", "N/A" if TESTNET else str(earn_weeks))
   .replace("{{COVFROM}}", "genesis" if cov["genesis"] else esc(cov["from_date"]))
   .replace("{{DATA}}", payload.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")))
 # ^ the payload sits inside a <script> element: a moniker containing "</script>"

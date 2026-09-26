@@ -186,6 +186,8 @@
   html[data-theme=light]:not([data-mono]) .duotab .ptw{scrollbar-color:var(--edge2) var(--surface)}
   html[data-theme=light]:not([data-mono]) .ptab thead th{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .tcap.good{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .ptab tr.phr td{color:var(--ink3,var(--faint))}
+  html[data-theme=light]:not([data-mono]) .ptab tr.phr .phb{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .brand{text-decoration:none;color:inherit}
   html[data-theme=light]:not([data-mono]) .intro::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .intro h1 em{background:var(--amber-bar);color:transparent}
