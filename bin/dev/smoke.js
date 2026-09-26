@@ -226,7 +226,7 @@ t('shell-groups', function(){
   document.getElementById('l2-dashboard-votes').click();
   if(!vis('p-empty') || document.getElementById('shellempty').textContent.indexOf('Votes')<0) bad.push('votes page');
   document.getElementById('l2-dashboard-governors').click();
-  if(location.hash!=='#/dashboard/governors' || document.getElementById('shellempty').textContent.indexOf('Governors')<0) bad.push('governors page');
+  if(location.hash!=='#/dashboard/governors' || !vis('sv-mygov')) bad.push('governors page');
   document.querySelector('.l2vb[data-g=Staking]').click();
   if(location.hash!=='#/dashboard/manual') bad.push('staking returns to its last view '+location.hash);
   [].forEach.call(document.querySelectorAll('.l2vb'),function(b){ var h=parseFloat(getComputedStyle(b,'::after').height); if(!(h>=44) && b.getBoundingClientRect().height<44) bad.push('switch target '+h); });

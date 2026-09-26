@@ -3876,6 +3876,26 @@ background:var(--wc);border:1px solid currentColor}
   .sd-plot{height:200px;flex:0 0 auto}
   .sd-figs{flex:0 0 auto}.sd-fig{flex:0 0 auto;padding-top:9px;padding-bottom:9px}
 }
+/* ══ Governors ══ */
+#sv-govs,#sv-mygov{justify-content:flex-start;gap:12px}
+#sv-govs>*,#sv-mygov>*,#sv-govs>*:not(:first-child),#sv-mygov>*:not(:first-child){margin-top:0}
+#sv-govcards{grid-template-columns:repeat(3,minmax(0,1fr))}
+#sv-govcards .sv-card{--tc:var(--sv-teal)}
+#sv-govlist,#sv-mygovlist{flex:1 1 0;min-height:0;--tc:var(--sv-teal)}
+#sv-mygovp{--tc:var(--sv-violet)}
+.sv-glist{overflow-y:auto;flex:1 1 auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
+.sv-glist .sv-vr{flex:0 0 52px;grid-template-columns:28px minmax(0,1.4fr) 84px minmax(0,1fr) 90px minmax(0,1fr) 40px}
+.sv-glist .sv-vr.me{border-color:var(--sv-violet)}
+.sv-glist .sv-lgo .lg{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff}
+.sv-gst em{font-style:normal;font-family:var(--wmono);font-size:10px;padding:1px 8px;border-radius:999px;border:1px solid currentColor}
+.sv-gst em.on{color:var(--sv-green)}.sv-gst em.off{color:var(--wf)}
+.sv-gn2{display:flex;flex-direction:column;min-width:0}
+.sv-gn2 b{font-size:13px;font-weight:700;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sv-gn2 s{text-decoration:none;font-size:10.5px;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-gweb{font-family:var(--wmono);font-size:10.5px;color:var(--sv-teal);text-decoration:none}
+.sv-gweb:hover{text-decoration:underline}
+@media(max-width:900px){.sv-glist .sv-vr{grid-template-columns:28px minmax(0,1fr) auto;row-gap:4px;flex-basis:auto;padding-top:8px;padding-bottom:8px}
+  .sv-glist .sv-gn2,.sv-glist .sv-gweb{grid-column:2/-1}#sv-govcards{grid-template-columns:minmax(0,1fr)}}
 /* ══ Autopilot: one screen to set it up ═══════════════════════════════════════════════
    The terms on the left (strategy, which validators, stake, time, restake), the validator set
    on the right to choose from - search it, narrow it, select one by one or by a rule - and one
@@ -4430,6 +4450,14 @@ html[data-tab=connect] .l2host{display:none}
       <section class=sv-screen id=sv-act data-sc=act aria-label=Activity>
         <div class=sv-panel id=sv-act7></div>
         <div class=sv-panel id=sv-actlive></div>
+      </section>
+      <section class=sv-screen id=sv-govs data-sc=govs aria-label=Governors>
+        <div class=sv-cards id=sv-govcards></div>
+        <div class=sv-panel id=sv-govlist><div class=sv-ph><h3>Governors</h3></div><div class=sv-upwait>Reading the governors…</div></div>
+      </section>
+      <section class=sv-screen id=sv-mygov data-sc=mygov aria-label="Your governor">
+        <div class=sv-panel id=sv-mygovp><div class=sv-ph><h3>Your governor</h3></div><div class=sv-upwait>Reading…</div></div>
+        <div class=sv-panel id=sv-mygovlist></div>
       </section>
       <section class=sv-screen id=sv-eco data-sc=eco aria-label=Economics>
         <div class=sv-cards id=sv-ecocards></div>

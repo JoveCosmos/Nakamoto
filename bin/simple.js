@@ -800,6 +800,81 @@
       chart("ecop", hist, [{ k: "photon", cls: "pho", area: true, name: "Supply" }], M, function(v){ return big(v); }));
   }
 
+  /* ════ Governors: AtomOne's x/gov governors (atomone/gov/v1) - a delegator may follow one, whose
+     vote then counts for their stake unless they vote themselves. Read from the chain every 5 min:
+     the list, each one's delegators, its voting power (val-shares turned into ATONE by each
+     validator's tokens per share), and the governor the connected wallet follows ════ */
+  var GV = { at: 0, busy: false, list: null, err: null, mine: {}, bonded: 0 };
+  function gapi(p){ return fetch((window.__API || "https://atomone-api.gatadao.com") + p, { cache: "no-store" }).then(function(r){ return r.json(); }); }
+  function loadGovs(){
+    if(GV.busy || (GV.list && Date.now() - GV.at < 300000)) return;
+    GV.busy = true;
+    Promise.all([gapi("/atomone/gov/v1/governors?pagination.limit=500"), gapi("/cosmos/staking/v1beta1/validators?pagination.limit=500")])
+      .then(function(x){
+        var per = {}, bonded = 0;
+        (x[1].validators || []).forEach(function(v){ var sh = parseFloat(v.delegator_shares); per[v.operator_address] = sh > 0 ? parseFloat(v.tokens) / sh : 1;
+          if(v.status === "BOND_STATUS_BONDED") bonded += parseFloat(v.tokens); });
+        GV.bonded = bonded;
+        var gs = (x[0].governors || []).map(function(g){ var d = g.description || {};
+          return { addr: g.governor_address, m: (d.moniker || "").trim() || g.governor_address.slice(0, 14), web: d.website || "", det: d.details || "",
+                   active: g.status === "GOVERNOR_STATUS_ACTIVE", since: Date.parse(g.last_status_change_time) || null, vp: null, n: null }; });
+        return Promise.all(gs.map(function(g){
+          return Promise.all([gapi("/atomone/gov/v1/vshares/" + g.addr + "?pagination.limit=500").catch(function(){ return {}; }),
+                              gapi("/atomone/gov/v1/governors/" + g.addr + "/delegations?pagination.limit=1&pagination.count_total=true").catch(function(){ return {}; })])
+            .then(function(y){ var vp = 0; (y[0].val_shares || []).forEach(function(s){ vp += parseFloat(s.shares) * (per[s.validator_address] || 1); });
+              g.vp = vp; g.n = y[1].pagination ? +y[1].pagination.total : null; return g; }); }));
+      })
+      .then(function(gs){ gs.sort(function(a, b){ return (b.active - a.active) || (b.vp - a.vp); }); GV.list = gs; GV.at = Date.now(); GV.err = null; })
+      .catch(function(e){ GV.err = String(e && e.message || e); })
+      .then(function(){ GV.busy = false; var sc = screen(); if(sc === "govs" || sc === "mygov") render(); });
+  }
+  function myGov(){
+    var a = window.__ADDR; if(!a) return undefined;
+    var c = GV.mine[a];
+    if(c === undefined){ GV.mine[a] = null;
+      gapi("/atomone/gov/v1/delegations/" + a).then(function(d){ GV.mine[a] = d.governor_address || ""; }).catch(function(){ GV.mine[a] = ""; })
+        .then(function(){ if(screen() === "mygov") render(); }); }
+    return GV.mine[a];
+  }
+  function govRows(list, mine){
+    var tot = 0; list.forEach(function(g){ tot += g.vp || 0; });
+    return '<div class="sv-vlist sv-glist">' + list.map(function(g){
+      var sh = GV.bonded ? (g.vp || 0) / GV.bonded * 100 : null;
+      return '<div class="sv-vr' + (g.addr === mine ? ' me' : '') + '" style="--c:' + (g.active ? 'var(--sv-teal)' : 'var(--wbd2)') + '">' +
+        '<span class=sv-lgo><span class="lg" style="background:hsl(' + (g.m.charCodeAt(0) * 37 % 360) + ',42%,30%)">' + esc(g.m.charAt(0).toUpperCase()) + '</span></span>' +
+        '<span class=sd-vn><b>' + esc(g.m) + (g.addr === mine ? '<i class=sd-al>yours</i>' : '') + '</b><s>' + esc(g.addr.slice(0, 16) + "\u2026" + g.addr.slice(-6)) + '</s></span>' +
+        '<span class=sv-gst><em class=' + (g.active ? "on" : "off") + '>' + (g.active ? "active" : "inactive") + '</em></span>' +
+        '<span class=sv-gn2><b>' + (g.vp != null ? fmt(g.vp) : NA) + '</b><s>ATONE' + (sh != null ? ', ' + sh.toFixed(2) + '% of bonded' : '') + '</s></span>' +
+        '<span class=sv-gn2><b>' + (g.n != null ? g.n : NA) + '</b><s>delegator' + (g.n === 1 ? '' : 's') + '</s></span>' +
+        '<span class=sv-gn2><b>' + (g.since ? window.__dayFull(g.since) : NA) + '</b><s>' + (g.active ? 'active since' : 'inactive since') + '</s></span>' +
+        (g.web && /^https?:\/\//.test(g.web) ? '<a class=sv-gweb href="' + esc(g.web) + '" target=_blank rel="noopener noreferrer">site</a>' : '<span></span>') + '</div>'; }).join("") + '</div>';
+  }
+  function govEmpty(t){ return '<div class=sv-upwait>' + t + '</div>'; }
+  function drawGovs(){
+    loadGovs();
+    var L = GV.list, act = L ? L.filter(function(g){ return g.active; }) : [], vp = 0, n = 0;
+    (L || []).forEach(function(g){ vp += g.vp || 0; n += g.n || 0; });
+    var c = function(k, v, sub){ return '<div class="sv-card sv-span"><span class=sv-k>' + k + '</span><span class=sv-big>' + v + '</span><span class=sv-sub>' + sub + '</span></div>'; };
+    put("sv-govcards", c("Governors", L ? String(L.length) : "\u2014", L ? act.length + " active" : "reading the chain\u2026") +
+      c("Voting power", L ? fmt(vp) : "\u2014", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(2) + "% of bonded ATONE follows a governor" : "ATONE") +
+      c("Delegators", L ? String(n) : "\u2014", "wallets that follow a governor"));
+    var h = '<div class=sv-ph><h3>Governors</h3><span class=sv-gkey>a delegator\'s vote goes with its governor unless it votes itself</span></div>';
+    put("sv-govlist", h + (GV.err && !L ? govEmpty("Could not read the governors") : !L ? govEmpty("Reading the governors\u2026")
+      : !L.length ? govEmpty("No governors on AtomOne yet") : govRows(L, myGov())));
+  }
+  function drawMyGov(){
+    loadGovs();
+    var L = GV.list, mine = myGov(), g = L && mine ? L.filter(function(x){ return x.addr === mine; })[0] : null;
+    var h = '<div class=sv-ph><h3>Your governor</h3></div>';
+    if(!window.__ADDR) h += govEmpty("Connect a wallet to see the governor it follows");
+    else if(mine === null || (mine && !L)) h += govEmpty("Reading\u2026");
+    else if(!mine) h += '<div class=sd-ok>You follow no governor: your stake votes only when you vote.</div>';
+    else h += '<div class=sd-ok>Your stake follows <b class=d>' + esc(g ? g.m : mine) + '</b>' + (g && !g.active ? ', which is inactive: its votes do not count for you' : '') +
+      '. Its vote counts for you on any proposal you do not vote on yourself.</div>' + (g ? govRows([g], mine) : "");
+    put("sv-mygovp", h);
+    put("sv-mygovlist", '<div class=sv-ph><h3>Governors</h3></div>' + (!L ? govEmpty("Reading the governors\u2026") : !L.length ? govEmpty("No governors on AtomOne yet") : govRows(L, mine)));
+  }
+
   /* hovering the plot names a block: its height, how many signed, who did not */
   sv.addEventListener("mousemove", function(ev){
     var p = ev.target.closest ? ev.target.closest(".sv-upplot") : null;
@@ -885,6 +960,8 @@
     else if(s === "prop") drawProp();
     else if(s === "act") drawAct();
     else if(s === "eco") drawEco();
+    else if(s === "govs") drawGovs();
+    else if(s === "mygov") drawMyGov();
     else drawNet();
   }
   function schedule(){
