@@ -677,14 +677,15 @@
       } else body = '<div class=sv-upwait>Reading the last 24 hours…</div>';
     }
     if(TN()){ stats = '<div class=sv-rt>' + st("Transactions", NA, "on testnet") + st("Busiest hour", NA) + st("Per block", NA) + '</div>'; body = NAMSG; sw = ""; }
-    put("sv-act7", '<div class=sv-ph><h3>Transactions</h3>' + sw + '<span class=sv-gkey>' + (AW === "24h" ? "per hour" : "per day") + '</span>' + stats + '</div>' + body);
+    /* the unit stands right after the title, ahead of the switch - the same in both panels */
+    put("sv-act7", '<div class=sv-ph><h3>Transactions</h3><span class=sv-gkey>' + (AW === "24h" ? "per hour" : "per day") + '</span>' + sw + stats + '</div>' + body);
     /* per block: the last 100 blocks live (with gas and fees), the last 10,000 in stretches of 100
        (the average per block in each), or per day since genesis (a line) - the indexer keeps
        transactions, not gas or fees */
     var bw = BW, sb = '<span class=sv-sw role=group aria-label="Period">' + [["100", "Last 100 blocks"], ["10k", "Last 10k blocks"], ["all", "Since genesis"]].map(function(o){
       return '<button type=button data-act=bwin data-w=' + o[0] + ' aria-pressed=' + (bw === o[0]) + '>' + o[1] + '</button>'; }).join("") + '</span>';
     if(TN()) sb = "";           /* testnet: only the live 100 blocks are known */
-    var hb = function(k){ return '<div class=sv-ph><h3>Transactions per 100 blocks</h3>' + sb + k + '</div>'; }, sl, lb;
+    var hb = function(k){ return '<div class=sv-ph><h3>Transactions</h3><span class=sv-gkey>per 100 blocks</span>' + sb + k + '</div>'; }, sl, lb;
     if(bw === "100"){
       sl = '<div class=sv-rt>' + st("Transactions", rows.length ? tx.toLocaleString() : "—", rows.length ? "last " + rows.length + " blocks" : "", "var(--sv-violet)") +
         st("Gas used", rows.length ? (gas / 1e6).toFixed(1) + "M" : "—", rows.length ? "of " + (rows.length * 100).toLocaleString() + "M capacity" : "", "var(--sv-violet)") +
