@@ -2793,6 +2793,62 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
 
 #dpicks td.nm .nmw>span.wk-lgx{min-width:0;flex:0 0 17px;width:17px}
 
+/* ── the three dial cards (eta, C, S), 2026-09-27 (kp-): a real title and one plain line, the figure the
+   card is about, facts with labels one can read, sentences where the old card had code ── */
+.kp{--kp-f:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-family:var(--kp-f)}
+.kp .kp-h{display:flex;align-items:center;gap:13px;padding:18px 22px 15px;border-bottom:1px solid var(--edge)}
+.kp .kp-h .disc{position:static;transform:none;width:34px;height:34px;flex:0 0 34px;font-size:14px;margin:0}
+.kp .kp-h .disc .kg{width:62%;height:62%}
+.kp .kp-h h2{margin:0;font-size:18px;font-weight:700;letter-spacing:-.01em;line-height:1.2;color:var(--ink)}
+.kp .kp-h p{margin:3px 0 0;font-size:12.5px;line-height:1.45;color:var(--ink2);text-wrap:pretty}
+.kp .backq{flex:0 0 auto;align-self:center}
+.kp .kp-b{display:flex;flex-direction:column;gap:12px;padding:16px 22px 20px}
+.kp em{font-style:normal;font-size:11.5px;line-height:1.3;color:var(--ink2)}
+.kp small{font-size:11.5px;line-height:1.3;color:var(--ink2)}
+.kp b{font-weight:700;color:var(--ink)}
+.kp .am{color:#ffb02e}.kp .gr{color:#2ee06a}.kp .or{color:#ff7a57}
+/* the lead figure(s) */
+.kp-hero,.kp-eq{display:flex;align-items:stretch;gap:10px;padding:14px 16px;border:1px solid var(--edge2);border-radius:12px;background:rgba(255,255,255,.03)}
+.kp-hv{flex:1 1 0;display:flex;flex-direction:column;gap:3px;min-width:0}
+.kp-hv b{font-size:30px;line-height:1.1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.kp-hero .kp-arr,.kp-eq>i{font-style:normal;align-self:center;font-size:20px;color:var(--ink3)}
+.kp-eq .kp-hv b{font-size:21px}.kp-eq .kp-res b{font-size:27px}
+.kp-eq .kp-res{padding-left:12px;border-left:1px solid var(--edge2)}
+/* facts */
+.kp-g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.kp-g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.kp-f{display:flex;flex-direction:column;gap:3px;padding:10px 13px 11px;border:1px solid var(--edge);border-radius:10px;background:rgba(255,255,255,.02);min-width:0;text-align:left}
+.kp-f b{font-size:19px;line-height:1.15;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kp-wide{grid-column:1/-1}
+.kp-btn{font:inherit;color:inherit;cursor:pointer}
+.kp-btn:hover{border-color:#ffb02e}.kp-btn:focus-visible{outline:2px solid #ffb02e;outline-offset:2px}
+.kp-go{margin-left:8px;font-size:12px;font-weight:600;color:#ffb02e}
+/* eta's rule: the live half lit, the pair opens the concentration card */
+.kp-rule{display:grid;grid-template-columns:1fr 1fr auto;align-items:center;gap:8px;padding:8px;border:1px solid var(--edge2);border-radius:12px;cursor:pointer;background:rgba(255,255,255,.02)}
+.kp-rule:hover{border-color:#ff7a57}.kp-rule:focus-visible{outline:2px solid #ff7a57;outline-offset:2px}
+.kp-ru{display:flex;flex-direction:column;gap:2px;padding:8px 11px;border-radius:9px;border:1px solid transparent}
+.kp-ru b{font-size:17px;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.kp-ru.hot{border-color:color-mix(in srgb,#ffb02e 55%,transparent);background:color-mix(in srgb,#ffb02e 10%,transparent)}
+.kp-ru.hot b{color:#ffb02e}
+.kp-ru.hot em::after{content:"  now";color:#ffb02e;font-weight:600}
+.kp-rgo{padding:0 8px;font-size:12px;font-weight:600;color:#ff7a57;white-space:nowrap}
+/* notes and the move sentence */
+.kp .kp-notes{margin:0;padding:0 0 0 2px;list-style:none;display:flex;flex-direction:column;gap:6px}
+.kp .kp-notes li{position:relative;padding-left:14px;font-size:13px;line-height:1.5;color:var(--ink2)}
+.kp .kp-notes li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;border-radius:50%;background:#ffb02e}
+.kp .kp-notes b{color:var(--ink)}
+.kp-move{margin:0;padding:12px 14px;border-radius:10px;border:1px solid color-mix(in srgb,#ff7a57 40%,transparent);background:color-mix(in srgb,#ff7a57 7%,transparent);font-size:13px;line-height:1.55;color:var(--ink2)}
+.kp-lw{text-transform:lowercase}
+.kp .haltn{display:inline-block;min-width:1.6em;padding:0 6px;border:1.5px solid #ff4d1f;border-radius:6px;color:#ff7a57;text-align:center}
+/* staked: the figure over a bar of the bonded share */
+.kp-big{display:flex;flex-direction:column;gap:6px;padding:14px 16px;border:1px solid var(--edge2);border-radius:12px;background:rgba(255,255,255,.03)}
+.kp-big b{font-size:32px;line-height:1.05;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.kp-big em{font-size:12.5px}.kp-big strong{color:var(--ink);font-weight:700}
+.kp-bar{display:block;height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden}
+.kp-bar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#ffb02e,#8fe8e0)}
+@media(max-width:560px){.kp .kp-h{padding:14px 16px 12px}.kp .kp-b{padding:14px 16px 16px}.kp-hv b{font-size:24px}.kp-eq{flex-wrap:wrap}
+.kp-eq .kp-res{flex-basis:100%;padding:10px 0 0;border-left:0;border-top:1px solid var(--edge2)}.kp-g3{grid-template-columns:1fr 1fr}.kp-rule{grid-template-columns:1fr 1fr}.kp-rgo{grid-column:1/-1;text-align:right}}
+
 /* ── Self, 2026-09-27: no balance boxes; the three lists hold ten rows and scroll past them; the columns
    sit at the bottom of the frame and the room above carries one Autopilot row (sa-) ── */
 /* its own colours: Self's pane does not carry the dashboard screens' tokens (the hand layer sets the day ones) */
@@ -4684,91 +4740,72 @@ html[data-tab=connect] .l2host{display:none}
   </div>
 </div></div>
 
-<div class=pop id=cpop><div class="card vcard">
-  <div class=vhead>
-    <button class=backq id=backq type=button aria-label="Back to the coefficient">
-      &larr; <span class=lc>&eta;</span></button>
-    <div class="vhid cmid"><div class=vname><span class="ptag tc">Concentration</span></div>
-      <span class="disc dc ck"><svg class=kg aria-hidden=true><use href="#g-c"/></svg></span></div>
-  </div>
-  <div class=cband>
-    <div class=cbcap>average ATONE stake</div>
-    <div class=cbrow>
-      <div class=cbc><span class=cbl>largest third</span><b class=cbn>{{HIGH}}</b>
-        <span class=cbs>{{GROUP}} validators</span></div>
-      <span class=cbx><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="6.2" r="2.1"/><rect x="3.4" y="10.9" width="17.2" height="2.2" rx="1.1"/><circle cx="12" cy="17.8" r="2.1"/></svg></span>
-      <div class=cbc><span class=cbl>smallest third</span><b class=cbn>{{LOW}}</b>
-        <span class=cbs>{{GROUP_LO}} validators</span></div>
+<div class=pop id=cpop><div class="card vcard kp kp-c">
+  <div class=kp-h>
+    <button class=backq id=backq type=button aria-label="Back to the bonus share">&larr; <span class=lc>&eta;</span></button>
+    <span class="disc dc"><svg class=kg aria-hidden=true><use href="#g-c"/></svg></span>
+    <div><h2>Concentration</h2><p>How much more the largest third of validators holds than the smallest third, on average</p></div></div>
+  <div class=kp-b>
+    <div class=kp-eq>
+      <div class=kp-hv><em>Largest third</em><b>{{HIGH}}</b><small>average of {{GROUP}} validators</small></div>
+      <i aria-hidden=true>&divide;</i>
+      <div class=kp-hv><em>Smallest third</em><b>{{LOW}}</b><small>average of {{GROUP_LO}} validators</small></div>
+      <i aria-hidden=true>=</i>
+      <div class="kp-hv kp-res"><em>Concentration</em><b class=or>{{RATIO}}&times;</b><small>times as large</small></div>
     </div>
-  </div>
-  <div class=vgrid>
-    <div class="vstat hot"><span class=vk>concentration</span><span class=vv>{{RATIO}}&times;</span></div>
-    <div class=vstat><span class=vk><span class=lc>&eta;</span> reverses when</span><span class=vv>{{REV_WHEN}}</span></div>
-    <div class=vstat><span class=vk>validators</span><span class=vv>{{N}}</span></div>
-    <div class=vstat><span class=vk>could halt chain</span><span class=vv><b class=haltn>{{NK}}</b></span></div>
-    <div class="vstat vfull rdg">
-            <div class=rdgbox>
-        <span class=rdgp><span class=rdgc>ATONE</span><span class=rdgv>{{MOVE}}</span></span>
-        <span class=rdgp><span class=rdgc>validator</span>
-          <span class=rdgf><i>{{MOVE_FROM}} third</i><em>&rarr;</em><i>{{MOVE_TO}} third</i></span></span>
-        <span class=rdgp><span class=rdgc>concentration</span>
-          <span class=rdgr><i>{{RATIO}}&times;</i><em>&rarr;</em><i class=to>{{THRESH}}&times;</i></span></span>
-      </div></div>
+    <div class="kp-g kp-g3">
+      <div class=kp-f><em><span class=lc>&eta;</span> reverses when</em><b>{{REV_WHEN}}</b></div>
+      <div class=kp-f><em>Could halt the chain</em><b><span class=haltn>{{NK}}</span></b><small>validators together</small></div>
+      <div class=kp-f><em>Validators</em><b>{{N}}</b><small>in the active set</small></div>
+    </div>
+    <p class=kp-move>To go from <b>{{RATIO}}&times;</b> to <b>{{THRESH}}&times;</b>, <b class=or>{{MOVE}} ATONE</b> would have to move from the <span class=kp-lw>{{MOVE_FROM}}</span> third of validators to the <span class=kp-lw>{{MOVE_TO}}</span> third.</p>
   </div>
 </div></div>
-
-<div class=pop id=spop><div class="card vcard">
-  <div class=vhead>
-    <div class=vhid><div class=vname><span class="ptag ts">ATONE staked</span></div>
-      <span class="disc ds ck"><svg class=kg aria-hidden=true><use href="#g-s"/></svg></span></div>
-  </div>
-  <div class=vgrid>
-    <div class="vstat hot"><span class=vk>staked</span><span class=vv>{{BONDED}}<i class=pc>{{BONDED_PCT}}%</i></span></div>
-    <div class=vstat><span class=vk>total supply</span><span class=vv>{{SUPPLY}}</span></div>
-    <div class=vstat><span class=vk>inflation</span><span class=vv>{{INFL}}%</span></div>
-    <div class=vstat><span class=vk>minted / yr</span><span class=vv>{{MINTED}}</span></div>
-    <div class=vstat><span class=vk>delegators</span><span class=vv>{{DELEG}}<i class=vsubn>{{N}} validators</i></span></div>
-    <div class=vstat><span class=vk>reward pool / yr</span><span class=vv>{{POOL}}</span></div>
-    <div class=vstat><span class=vk>community tax</span><span class=vv>{{TAX}}%</span></div>
-    <div class=vstat><span class=vk>community pool / yr</span><span class=vv>{{CTAKE}}</span></div>
-  </div>
-</div></div>
-
-<div class=pop id=qpop><div class="card vcard">
-  <div class=vhead><span class="disc de ck"><svg class=kg aria-hidden=true><use href="#g-eta"/></svg></span>
-  </div>
-  <div class=vgrid>
-      <div class="vstat hot"><span class=vk>current</span><span class=vv>{{ETA}}<i class=pdate>{{NOW_DATE}}</i></span></div>
-    <div class="vstat proj"><span class=vk>projected</span><span class=vv>{{ETA_NEXT}}<i class=pdate>{{NEXT_DATE}}</i></span></div>
-    <div class=vstat><span class=vk>step / week</span><span class=vv>&plusmn; {{STEP}}</span></div>
-    <button class="vstat sgo" id=histgo type=button aria-label="Every weekly step so far"><span class=vk>weeks</span><span class=vv>{{WEEK}} <span class=sgoarr>&rarr;</span></span></button>
-    <div class=vstat><span class=vk>floor</span><span class=vv>{{FLOOR}}<i class=pdate>started here</i></span></div>
-    <div class=vstat><span class=vk>cap</span><span class=vv>{{CAP}}<i class=pdate>{{CAPSUB2}}</i></span></div>
-    <div class=cgate id=cgate role=button tabindex=0
-      aria-label="What concentration is, and where it stands">
-      <div class="vstat {{RISE_ON}}"><span class=vk><span class=lc>&eta;</span> rises when</span><span class=vv>C &ge; {{THRESH}}&times;</span></div>
-      <div class="vstat {{FALL_ON}}"><span class=vk><span class=lc>&eta;</span> falls when</span><span class=vv>C &lt; {{THRESH}}&times;</span></div>
+<div class=pop id=spop><div class="card vcard kp kp-s">
+  <div class=kp-h><span class="disc ds"><svg class=kg aria-hidden=true><use href="#g-s"/></svg></span>
+    <div><h2>ATONE staked</h2><p>How much ATONE is bonded, and where the newly minted ATONE goes</p></div></div>
+  <div class=kp-b>
+    <div class=kp-big><b class=am>{{BONDED}}</b><em>ATONE staked, <strong>{{BONDED_PCT}}%</strong> of {{SUPPLY}}</em>
+      <span class=kp-bar><i style="width:{{BONDED_PCT}}%"></i></span></div>
+    <div class=kp-g>
+      <div class=kp-f><em>Inflation</em><b>{{INFL}}%</b><small>a year</small></div>
+      <div class=kp-f><em>Minted</em><b>{{MINTED}}</b><small>ATONE a year</small></div>
+      <div class=kp-f><em>Reward pool</em><b>{{POOL}}</b><small>ATONE a year, to stakers</small></div>
+      <div class=kp-f><em>Community pool</em><b>{{CTAKE}}</b><small>ATONE a year, {{TAX}}% tax</small></div>
+      <div class="kp-f kp-wide"><em>Delegators</em><b>{{DELEG}}</b><small>staking with {{N}} validators</small></div>
     </div>
   </div>
-  <ul class=bul>
-    <li><span class=lc>&eta;</span> rises or falls based on BONDED ATONE
-      <b class=hotc>concentration (<span class=sc>c</span>)</b> across the validator set.</li>
-  </ul>
-    <div class="vgrid gbelow">
-      <div class=vstat><span class=vk>reward pool</span><span class=vv>{{POOL}} / yr</span></div>
-      <div class=vstat><span class=vk>validators</span><span class=vv>{{N}}</span></div>
-    </div>
-  <ul class="bul bul2">
-    <li><b>{{ETA}}</b> &rarr; <b>{{ETA_PCT}}%</b> of all rewards are split equally between
-      the {{N}} validators.</li>
-    <li>When <span class=lc>&eta;</span> rises, APR rises proportionally for every validator
-      (<b class=hov id=meanhov title="live average stake: {{MEAN}} ATONE">below the average stake</b>).</li>
-  </ul>
 </div></div>
-
-
-
-
+<div class=pop id=qpop><div class="card vcard kp kp-q">
+  <div class=kp-h><span class="disc de"><svg class=kg aria-hidden=true><use href="#g-eta"/></svg></span>
+    <div><h2>Bonus share <span class=lc>&eta;</span></h2><p>The share of all rewards split equally between the validators</p></div></div>
+  <div class=kp-b>
+    <div class=kp-hero>
+      <div class=kp-hv><em>Now</em><b class=am>{{ETA}}</b><small>{{NOW_DATE}}</small></div>
+      <i class=kp-arr aria-hidden=true>&rarr;</i>
+      <div class=kp-hv><em>Projected</em><b class=gr>{{ETA_NEXT}}</b><small>{{NEXT_DATE}}</small></div>
+    </div>
+    <div class=kp-g>
+      <div class=kp-f><em>Weekly step</em><b>&plusmn; {{STEP}}</b></div>
+      <button class="kp-f kp-btn" id=histgo type=button aria-label="Every weekly step so far"><em>Weeks so far</em><b>{{WEEK}}<span class=kp-go>every step &rarr;</span></b></button>
+      <div class=kp-f><em>Floor</em><b>{{FLOOR}}</b><small>where it started</small></div>
+      <div class=kp-f><em>Cap</em><b>{{CAP}}</b><small>{{CAPSUB2}}</small></div>
+    </div>
+    <div class=kp-rule id=cgate role=button tabindex=0 aria-label="What concentration is, and where it stands">
+      <div class="kp-ru {{RISE_ON}}"><em><span class=lc>&eta;</span> rises while</em><b>C &ge; {{THRESH}}&times;</b></div>
+      <div class="kp-ru {{FALL_ON}}"><em><span class=lc>&eta;</span> falls while</em><b>C &lt; {{THRESH}}&times;</b></div>
+      <span class=kp-rgo>Concentration &rarr;</span>
+    </div>
+    <div class=kp-g>
+      <div class=kp-f><em>Reward pool</em><b>{{POOL}}</b><small>ATONE a year</small></div>
+      <div class=kp-f><em>Validators</em><b>{{N}}</b><small>share the bonus equally</small></div>
+    </div>
+    <ul class="bul kp-notes">
+      <li>At <b>{{ETA}}</b>, <b>{{ETA_PCT}}%</b> of all rewards are split equally between the {{N}} validators.</li>
+      <li>When <span class=lc>&eta;</span> rises, APR rises for every validator <b class=hov id=meanhov title="live average stake: {{MEAN}} ATONE">below the average stake</b>.</li>
+    </ul>
+  </div>
+</div></div>
 <div class=pop id=txpop><div class="card txcard">
   <header class=wk-txh><div><b>Redelegate</b><span id=txn hidden></span></div><span class=txsum id=txsum></span></header>
   <div class=txans id=txans></div>
