@@ -4117,7 +4117,7 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .se-mid::after{content:"";flex:1 1 0}
 .se-mid+.se-fine{margin-top:0}
 /* What your stake earns (Wallet) and what Autopilot would do / Your grant (Autopilot): se- */
-.sd-off{font-size:11px;color:var(--wf);margin:8px 2px 0}
+.sd-off{font-size:11px;color:#ff6a3d;margin:8px 2px 0}   /* stake that earns nothing: red */
 .se-hero{display:flex;flex-direction:column;gap:2px;padding:6px 0 12px}
 /* the year in its own box, as the day/week/month boxes are - both states */
 .se-card{position:relative;display:flex;flex-direction:column;gap:2px;padding:12px 18px 13px;border:1px solid var(--wbd2);border-radius:12px;overflow:hidden;
