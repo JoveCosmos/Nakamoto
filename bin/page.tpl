@@ -200,8 +200,8 @@ background:var(--edge);border:1px solid var(--edge2);margin-bottom:26px}
 @media(min-width:901px){#p-eta .panel>.sub{min-height:2.9em}}
 /* the graphs keep their 42% when it fits and give way on a short window, so the boxes under them are
    never cut: nothing in a pane may fall below its frame (it is clipped, with no scroll to reach it) */
-#p-eta .panel>svg[viewBox]{flex:0 1 42%;height:auto;min-height:80px}
-#p-eta .panel>.sbox{flex:0 0 auto}
+@media(min-width:901px){#p-eta .panel>svg[viewBox]{flex:0 1 42%;height:auto;min-height:80px}
+#p-eta .panel>.sbox{flex:0 0 auto}}
 
 table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13.5px;font-variant-numeric:tabular-nums}
 th{text-align:right;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);
@@ -3114,6 +3114,18 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
   html[data-tab=dele] #p-dele>.pw,html[data-tab=dele] #sv>.sv-main{height:auto;min-height:0}
   html[data-tab=dele] .folder{position:sticky;top:0;z-index:20;background:var(--void)}
 }
+/* Staking on the phone reads as a page too (2026-09-27): Bonus, Trend and Picks were a window of Bonus's
+   height with Trend and Picks scrolling inside it - a box that ended above the foot of the screen and
+   left a dead band under it. Now the PHONE scrolls, as on the dashboard; the bar stays at the top */
+@media(max-width:620px){
+  html:is([data-tab=home],[data-tab=eta],[data-tab=pays]) .below{height:auto;min-height:100svh;overflow:visible}
+  html:is([data-tab=home],[data-tab=eta],[data-tab=pays]) .panes{overflow:visible;height:auto}
+  html:is([data-tab=home],[data-tab=eta],[data-tab=pays]) .w#calc{overflow:visible;height:auto}
+  html[data-tab=home] .w#calc>#p-home,html[data-tab=eta] .w#calc>#p-eta,html[data-tab=pays] .w#calc>#p-pays,
+  html[data-tab=home] #p-home,html[data-tab=eta] #p-eta,html[data-tab=pays] #p-pays{height:auto;max-height:none;margin-top:0;flex:1 1 auto;overflow:visible;overscroll-behavior:auto}
+  html:is([data-tab=eta],[data-tab=pays]) :is(#p-eta,#p-pays)>.pw{height:auto;min-height:0}
+  html:is([data-tab=home],[data-tab=eta],[data-tab=pays]) .folder{position:sticky;top:0;z-index:20;background:var(--void)}
+}
 /* ── the phone's Redelegate list: four real columns (its markup is its own), laid out
    fixed so nothing is cut; the APR pair shows whole; the plan's addition keeps room ── */
 @media(max-width:700px){
@@ -3963,6 +3975,9 @@ position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-dire
 /* wide enough: the first box takes a little more, so the name and the read time share one row */
 @media(min-width:1200px){.sd-strip{grid-template-columns:minmax(0,1.6fr) repeat(5,minmax(0,1fr)) !important}}
 .sd-top .sv-wread{flex:0 0 auto}
+/* the wallet box's refresh: a small door beside "read Ns ago", not a big square */
+.sd-top .sv-rf{width:20px;height:20px;border-radius:5px}
+.sd-top .sv-rf svg{width:11px;height:11px}
 /* the wallet box's second and third lines: address + copy, then the wallet app and the network */
 .sd-wmeta{display:flex;flex-direction:column;align-items:flex-start;gap:5px;margin-top:-2px;min-width:0;width:100%}
 .sd-wa{display:inline-flex;align-items:center;gap:4px;max-width:100%;min-width:0;height:22px;box-sizing:border-box;padding:0 2px 0 8px;border:1px solid var(--wbd2);border-radius:7px;background:rgba(255,255,255,.025)}
@@ -4555,6 +4570,31 @@ html[data-tab=connect] .l2host{display:none}
   .l2ver{flex:1 1 100%;align-items:stretch}
   .l2ver .l2trk{display:grid;grid-template-columns:1fr 1fr;padding:5px}
   .l2vb{height:34px;justify-content:center}
+  /* a section's views share the row evenly and all show (Network has five): no chip cut at either end */
+  .l2:not(.split) .l2trk{display:flex;width:100%;box-sizing:border-box;padding:3px}
+  .l2:not(.split) .l2tab{flex:1 1 auto;justify-content:center;padding:0 6px;font-size:11.5px}
+}
+/* ── the phone, 2026-09-27 audit (dev/phone.js): the page scrolls, so nothing fills "the rest of the
+   height" - lists stand at their own height; card rows stack; long lines wrap ── */
+@media(max-width:620px){
+  #sv-proplist,#sv-govlist,#sv-mygovlist{flex:0 0 auto;min-height:0}
+  #sv-proplist .gp-list,.sv-glist{flex:0 0 auto;overflow:visible;max-height:none}
+  #sv-propcards,#sv-daocards,#sv-govcards{grid-template-columns:minmax(0,1fr)}
+  .sv-gkey{white-space:normal;flex-wrap:wrap;row-gap:4px}
+  /* a date axis at quarters is eight labels; the phone shows every other one (half-years) */
+  .sv-gxt span:nth-child(even){display:none}
+  /* Picks: the column is the screen's width, not the table's; the tables lay out fixed - rank, the
+     name taking what is left (cut with an ellipsis), the figures in narrow columns */
+  .duotab{grid-template-columns:minmax(0,1fr)}
+  .ptab{table-layout:fixed;width:100%}
+  .ptab th:first-child,.ptab td:first-child{width:30px}
+  .ptab th:nth-child(n+3),.ptab td:nth-child(n+3){width:15%;padding-left:4px;padding-right:6px}
+  .ptab td:nth-child(n+3){font-size:10.5px}
+  .ptab .nm{max-width:none;min-width:0}
+  /* Self: the delegations list is as tall as its rows (it held room for eight); the count beside the
+     title gives way to Stake / Unstake / Rewards (the rows say it) */
+  #wk-mine .wk-tbl2{height:auto;min-height:0}
+  #wk-mine .wk-t1 .wk-pn{display:none}
 }
 </style>
 <link rel=stylesheet href="assets/theme-day.css">
