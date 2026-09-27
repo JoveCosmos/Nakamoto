@@ -167,8 +167,10 @@
     return '<div class=sd-list>' + rows.map(function(r){ var c = heat(r.inactive ? 0 : r.rate);
       return '<div class="sd-vr click" data-v="' + esc(r.id) + '" tabindex=0 title="Open this validator" style="--c:' + c.fill + '">' +
         '<span class=sv-lgo>' + logo(r.id, r.m) + '</span><span class=sd-vn><b>' + esc(r.m) + (mark && mark[r.id] ? '<i class=sd-al title="in the allow-list">allowed</i>' : '') + '</b>' +
-        '<s>' + fmt(r.x) + ' ATONE, ' + (r.x / (total || 1) * 100).toFixed(0) + '%' + (r.locked > 0 ? ', cooldown' : '') + '</s></span>' +
-        '<u style="color:' + c.ink + '">' + (r.inactive ? "inactive" : pct(r.rate)) + '</u></div>'; }).join("") + '</div>';
+        /* the line under the name in colour: the stake in the Staked amber, its share in teal, a cooldown in violet */
+        '<s><em class=a>' + fmt(r.x) + '</em> ATONE, <em class=p>' + (r.x / (total || 1) * 100).toFixed(0) + '%</em>' + (r.locked > 0 ? ', <em class=l>cooldown</em>' : '') + '</s></span>' +
+        /* out of the set: "jailed" when it is, in red; otherwise "inactive" */
+        (r.inactive && ((window.__INACT || {})[r.id] || {}).jailed ? '<u class=jl>jailed</u>' : '<u style="color:' + c.ink + '">' + (r.inactive ? "inactive" : pct(r.rate)) + '</u>') + '</div>'; }).join("") + '</div>';
   }
   function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }
 

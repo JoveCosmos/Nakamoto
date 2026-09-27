@@ -654,6 +654,7 @@
   html[data-theme=light]:not([data-mono]) .sd-vr .sv-lgo img,html[data-theme=light]:not([data-mono]) .sd-vr .sv-lgo .lg{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .sd-vn s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sd-vr u{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .sd-vr u.jl{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .sd-al{border:1px solid var(--accent)}
   html[data-theme=light]:not([data-mono]) .sd-vr.skel .sv-lgo{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-can u{text-decoration:none}

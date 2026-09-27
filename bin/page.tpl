@@ -4148,6 +4148,9 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin-right:-8px;p
 .sd-vn b{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--wt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sd-vn s{text-decoration:none;font-family:var(--wmono);font-size:10px;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sd-vr u{text-decoration:none;font-family:var(--wmono);font-size:12.5px;font-weight:700;white-space:nowrap}
+.sd-vn s em{font-style:normal}
+.sd-vn s em.a{color:var(--sv-amber)}.sd-vn s em.p{color:var(--sv-teal)}.sd-vn s em.l{color:var(--sv-violet)}
+.sd-vr u.jl{color:#ff6a3d}
 .sd-al{font-style:normal;font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--sv-violet);border:1px solid rgba(185,176,255,.4);border-radius:4px;padding:0 4px}
 .sd-vr.skel .sv-lgo{background:var(--wbd2);opacity:.5;box-shadow:none}
 .sd-vr.skel b,.sd-vr.skel s,.sd-vr.skel u{display:block;height:9px;border-radius:3px;background:var(--wbd)}
