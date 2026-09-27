@@ -3836,12 +3836,16 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sv-gkey i.to{background:transparent;border:1.5px dashed var(--sv-green);border-radius:2px}
 .sv-gkey i.st{width:1px;height:10px;border-radius:0;background:var(--wf)}
 /* the list: flat rows on hairlines, not boxes */
-.sd-list{display:flex;flex-direction:column;min-height:0;overflow:hidden;flex:1 1 auto}
+/* every validator, scrolling inside the panel: a thin bar in the theme's own border colour */
+.sd-list{display:flex;flex-direction:column;min-height:0;overflow-y:auto;overscroll-behavior:contain;flex:1 1 auto;
+scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin-right:-8px;padding-right:4px}
+.sd-list::-webkit-scrollbar{width:6px}.sd-list::-webkit-scrollbar-track{background:transparent}
+.sd-list::-webkit-scrollbar-thumb{background:var(--wbd2);border-radius:3px}
 .sd-list>.sd-vr{flex:0 0 auto}
 .sd-vr{--c:var(--wbd2);display:grid;grid-template-columns:26px minmax(0,1fr) auto;align-items:center;gap:11px;padding:8px 6px;border-top:1px solid var(--wbd);border-radius:0}
 .sd-vr:first-child{border-top:0}
-.sd-vr.click,.sd-vr.more{cursor:pointer}
-.sd-vr.click:hover,.sd-vr.more:hover{background:rgba(255,255,255,.03)}
+.sd-vr.click{cursor:pointer}
+.sd-vr.click:hover{background:rgba(255,255,255,.03)}
 .sd-vr:focus-visible{outline:2px solid var(--sv-teal);outline-offset:-2px}
 .sd-vr .sv-lgo{width:26px;height:26px;border-radius:8px;overflow:hidden;display:grid;place-items:center;box-shadow:0 0 0 1.5px var(--c)}
 .sd-vr .sv-lgo img,.sd-vr .sv-lgo .lg{width:26px;height:26px;display:grid;place-items:center;object-fit:cover;font-size:10px;font-weight:700;color:#fff}
@@ -3850,8 +3854,6 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-vn s{text-decoration:none;font-family:var(--wmono);font-size:10px;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sd-vr u{text-decoration:none;font-family:var(--wmono);font-size:12.5px;font-weight:700;white-space:nowrap}
 .sd-al{font-style:normal;font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--sv-violet);border:1px solid rgba(185,176,255,.4);border-radius:4px;padding:0 4px}
-.sd-vr.more .sv-lgo{background:var(--wbd);color:var(--ws);font-family:var(--wmono);font-size:10px;font-weight:700;box-shadow:none}
-.sd-vr.more u{color:var(--sv-teal);font-weight:400;font-size:10.5px}
 .sd-vr.skel .sv-lgo{background:var(--wbd2);opacity:.5;box-shadow:none}
 .sd-vr.skel b,.sd-vr.skel s,.sd-vr.skel u{display:block;height:9px;border-radius:3px;background:var(--wbd)}
 .sd-vr.skel b{width:60%}.sd-vr.skel s{width:40%;margin-top:4px}.sd-vr.skel u{width:40px}

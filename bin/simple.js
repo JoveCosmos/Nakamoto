@@ -155,33 +155,15 @@
       (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') +
       '<div class=se-fine>Today\'s rate carried forward. Rewards build up every block and wait for you to claim them.</div>';
   }
-  /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake */
-  function vlist(rows, total, n, mark){
+  /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every
+     one of them, largest first; the list scrolls inside its panel */
+  function vlist(rows, total, mark){
     rows = rows.slice().sort(function(a, b){ return b.x - a.x; });
-    var shown = rows.length > n ? rows.slice(0, n - 1) : rows, rest = rows.slice(shown.length), rx = 0;
-    rest.forEach(function(r){ rx += r.x; });
-    var h = shown.map(function(r){ var c = heat(r.inactive ? 0 : r.rate);
+    return '<div class=sd-list>' + rows.map(function(r){ var c = heat(r.inactive ? 0 : r.rate);
       return '<div class="sd-vr click" data-v="' + esc(r.id) + '" tabindex=0 title="Open this validator" style="--c:' + c.fill + '">' +
         '<span class=sv-lgo>' + logo(r.id, r.m) + '</span><span class=sd-vn><b>' + esc(r.m) + (mark && mark[r.id] ? '<i class=sd-al title="in the allow-list">allowed</i>' : '') + '</b>' +
         '<s>' + fmt(r.x) + ' ATONE, ' + (r.x / (total || 1) * 100).toFixed(0) + '%' + (r.locked > 0 ? ', cooldown' : '') + '</s></span>' +
-        '<u style="color:' + c.ink + '">' + (r.inactive ? "inactive" : pct(r.rate)) + '</u></div>'; }).join("");
-    if(rest.length) h += '<div class="sd-vr more" data-route="dashboard/self" tabindex=0 title="All your validators, in Self"><span class=sv-lgo>+' + rest.length + '</span>' +
-      '<span class=sd-vn><b>' + rest.length + ' more</b><s>' + fmt(rx) + ' ATONE</s></span><u>see all</u></div>';
-    return '<div class=sd-list>' + h + '</div>';
-  }
-  /* the list shows what fits: rows past the panel's height fold into the '+N more' row */
-  function fitList(id){
-    var box = document.querySelector("#" + id + " .sd-list"); if(!box) return;
-    var rows = [].slice.call(box.querySelectorAll(".sd-vr.click")), more = box.querySelector(".sd-vr.more");
-    rows.forEach(function(r){ r.hidden = false; });
-    var lim = box.getBoundingClientRect().bottom + 1, hid = 0;
-    for(var i = rows.length - 1; i >= 0 && (more ? more.getBoundingClientRect().bottom : rows[rows.length - 1].getBoundingClientRect().bottom) > lim; i--){
-      rows[i].hidden = true; hid++;
-      if(!more){ more = document.createElement("div"); more.className = "sd-vr more"; more.setAttribute("data-route", "dashboard/self"); more.tabIndex = 0; box.appendChild(more); }
-    }
-    if(hid && more){ var n = (+(more.dataset.base || 0)) + hid;
-      if(!more.dataset.base) more.dataset.base = String(more.querySelector("b") ? parseInt(more.querySelector("b").textContent, 10) || 0 : 0);
-      more.innerHTML = '<span class=sv-lgo>+' + (hid + (+more.dataset.base)) + '</span><span class=sd-vn><b>' + (hid + (+more.dataset.base)) + ' more</b><s>in Self</s></span><u>see all</u>'; }
+        '<u style="color:' + c.ink + '">' + (r.inactive ? "inactive" : pct(r.rate)) + '</u></div>'; }).join("") + '</div>';
   }
   function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }
 
@@ -249,9 +231,8 @@
 
     /* the validators */
     put("sd-list", pos && rows.length
-      ? '<div class=sv-ph><h3>Your validators</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total, 7)
+      ? '<div class=sv-ph><h3>Your validators</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total)
       : '<div class=sv-ph><h3>' + (pos ? "Your validators" : "Validators") + '</h3></div>' + (pos ? '<div class=sv-upwait>None yet</div>' : vskel(6)));
-    fitList("sd-list");
   }
 
   /* the plan is recomputed only when a stake moves or the position is re-read */
@@ -336,9 +317,8 @@
     var ado = E("sd-ado"); if(ado && !g){ ado.classList.remove("tight"); if(ado.scrollHeight > ado.clientHeight + 1) ado.classList.add("tight"); }
     var rows = pos ? pos.rows : [];
     put("sd-asky", g ? grantView(g, at, rp, since, until) : wouldDo(pos));
-    put("sd-alist", rows.length ? '<div class=sv-ph><h3>Validators</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total, 7, mark)
+    put("sd-alist", rows.length ? '<div class=sv-ph><h3>Validators</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total, mark)
       : '<div class=sv-ph><h3>Validators</h3></div>' + (pos ? '<div class=sv-upwait>None yet</div>' : vskel(6)));
-    fitList("sd-alist");
   }
 
   /* Before a grant: what Autopilot would change, in two numbers - where the stake earns now and

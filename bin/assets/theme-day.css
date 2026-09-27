@@ -595,13 +595,13 @@
   html[data-theme=light]:not([data-mono]) .se-mv>div u{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sv-gkey i.sk{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-gkey i.to{background:transparent}
-  html[data-theme=light]:not([data-mono]) .sd-vr.click:hover,html[data-theme=light]:not([data-mono]) .sd-vr.more:hover{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sd-list::-webkit-scrollbar-track{background:transparent}
+  html[data-theme=light]:not([data-mono]) .sd-vr.click:hover{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sd-vr .sv-lgo{box-shadow:0 0 0 1.5px var(--c)}
   html[data-theme=light]:not([data-mono]) .sd-vr .sv-lgo img,html[data-theme=light]:not([data-mono]) .sd-vr .sv-lgo .lg{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .sd-vn s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sd-vr u{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sd-al{border:1px solid var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sd-vr.more .sv-lgo{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-vr.skel .sv-lgo{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-can u{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sd-can u.no{color:var(--danger)}
