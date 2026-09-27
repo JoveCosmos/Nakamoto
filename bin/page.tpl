@@ -2793,6 +2793,39 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
 
 #dpicks td.nm .nmw>span.wk-lgx{min-width:0;flex:0 0 17px;width:17px}
 
+/* ── Self, 2026-09-27: no balance boxes; the three lists hold ten rows and scroll past them; the columns
+   sit at the bottom of the frame and the room above carries one Autopilot row (sa-) ── */
+/* its own colours: Self's pane does not carry the dashboard screens' tokens (the hand layer sets the day ones) */
+.sa-band{--sa-v:#b9b0ff;--sa-t:#2bc8bd;--sa-g:#2ee06a;--sa-on:#161038;display:flex;align-items:center;justify-content:center;flex:0 0 auto;padding:0 0 10px}
+.sa-row{display:flex;align-items:center;gap:18px;width:100%;max-width:1200px;height:52px;padding:0 10px 0 18px;border-radius:999px;white-space:nowrap;
+border:1px solid color-mix(in srgb,var(--sa-v) 40%,transparent);background:linear-gradient(90deg,color-mix(in srgb,var(--sa-v) 14%,transparent),color-mix(in srgb,var(--sa-t) 8%,transparent))}
+.sa-k{font-family:var(--wmono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--sa-v)}
+.sa-main{font-size:16px;color:var(--ws)}.sa-main b{color:var(--wt);font-weight:700}
+.sa-main .sa-num{color:var(--sa-g);font-variant-numeric:tabular-nums;font-size:19px;font-weight:800}
+.sa-rot{position:relative;flex:1 1 auto;height:22px;min-width:0;padding-left:18px;border-left:1px solid color-mix(in srgb,var(--sa-v) 35%,transparent)}
+.sa-l{position:absolute;left:18px;right:0;top:0;font-size:13.5px;line-height:22px;color:var(--ws);opacity:0;transform:translateY(6px);overflow:hidden;text-overflow:ellipsis}
+.sa-l.on{opacity:1;transform:none}
+@media(prefers-reduced-motion:no-preference){.sa-l{transition:opacity .45s,transform .45s}}
+.sa-go{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 16px;border-radius:999px;background:var(--sa-v);color:var(--sa-on);font-weight:700;font-size:13.5px;text-decoration:none;flex:0 0 auto}
+.sa-go svg{display:block;flex:0 0 16px;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+@media(prefers-reduced-motion:no-preference){.sa-go svg{transition:transform .18s}.sa-go:hover svg{transform:translateX(3px)}}
+.sa-go:focus-visible{outline:2px solid var(--sa-v);outline-offset:3px}
+@media(max-width:1100px){.sa-rot{display:none}.sa-row{justify-content:space-between}}
+@media(max-width:700px){.sa-row{height:auto;min-height:48px;padding:8px 8px 8px 14px;gap:10px;white-space:normal;border-radius:14px}.sa-k{display:none}.sa-main{font-size:14px}}
+/* ten rows at the most (measured: a 29-30 px head, 32 px a row), fewer leave the room; each list scrolls
+   past them. The selectors match the earlier no-wallet rule that lifts the cap, so this one wins */
+#wk-mine .wk-tbl2,html:not([data-wallet]) #wk-mine .wk-tbl2{max-height:calc(29px + 10 * 32px)}
+#wk-plan .wk-tbl2,html:not([data-wallet]) #wk-plan .wk-tbl2{max-height:calc(30px + 10 * 32px)}
+#dstrat{max-height:calc(10 * 32px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
+@media(min-width:901px){
+  /* the columns stand on the frame's floor at their own height; the band takes the room above them */
+  #wbody{display:flex;flex-direction:column;justify-content:flex-end}
+  .sa-band{flex:1 1 auto;min-height:62px}
+  .wk-two{position:relative;left:auto;right:auto;top:auto;bottom:auto;flex:0 1 auto;min-height:0;grid-template-rows:minmax(0,1fr)}
+  #wk-mine .wk-tbl2{flex:0 1 auto;height:auto;min-height:0}
+  #wk-plan .wk-tbl2,html:not([data-wallet]) #wk-plan .wk-tbl2{flex:0 1 auto;min-height:0}
+}
+
 /* ── three columns again, in the calculator's frame: the wallet down the left,
    Redelegate in the middle taking what is left, Outcome on the right ── */
 @media(min-width:901px){
@@ -4499,13 +4532,15 @@ html[data-tab=connect] .l2host{display:none}
   <section class=pane id=p-connect role=tabpanel tabindex=0><div class=shell-box><div class=shell-empty id=shellconnect></div></div></section>
   <section class=pane id=p-dele><div class=pw>
     <div class=wk-body id=wbody>
+      <!-- Self: one row above the columns that steers toward Autopilot - the reader's own gain, what it
+           takes off their hands (turning), the door. Filled by simple.js (selfBand) -->
+      <div class=sa-band id=saband><div class=sa-row><span class=sa-k>Autopilot</span><span class=sa-main id=samain>Your stake at the best rate, <b>hands-free</b></span>
+        <span class=sa-rot aria-hidden=true><span class="sa-l on">re-checks every validator every 6 hours</span><span class=sa-l>moves while you sleep</span><span class=sa-l>no charts to watch, no moves to plan</span><span class=sa-l>watches your validators around the clock</span><span class=sa-l>one signature, then it runs for months</span></span>
+        <a class=sa-go href="#/dashboard/autopilot" data-route="dashboard/autopilot">Set up<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></a></div></div>
       <div class=wk-two>
         <section class=wk-pane id=wk-mine>
           <div id=wk-acct>
-          <header class="wk-ph wk-bh"><h3 id=wname>Wallet</h3><span class=wk-addrw><button class=wk-addr id=waddr type=button hidden title="Copy address" aria-label="Copy address"></button></span></header>
-          <div class=wk-bal5><div class=wk-b5><i><img src="assets/atomone.svg" alt="">ATONE</i><b id=ds-bal>&mdash;</b></div><div class=wk-b5><i><img src="assets/photon.svg" alt="">PHOTON</i><b id=ds-photon class=pho>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">staked</i><b id=ds-staked>&mdash;</b></div><div class="wk-b5 wk-clk" id=ds-rewt role=button tabindex=0 aria-disabled=true title="Claim rewards"><i><img src="assets/atomone.svg" alt="">rewards</i><b id=ds-rew>&mdash;</b></div><div class=wk-b5><i><img src="assets/atomone.svg" alt="">APR</i><b id=ds-apr>&mdash;</b></div></div>
           <div class=wk-ap id=wkap hidden><span class=wk-apk>Autopilot</span><span class=wk-aps id=wkaps>inactive</span><button class=wk-apb id=atbtn type=button title="Let GATA keep this stake where it earns most, inside limits you set">Set up</button></div>
-          <div class=wk-rule></div>
           <header class="wk-ph wk-t1"><h3>Delegations</h3><span class=wk-pn id=dmyn></span>
             <div class=wk-foot id=dstat></div>
             <button class="wk-unb wk-stb" id=stbtn type=button hidden title="Stake liquid ATONE">Stake</button>

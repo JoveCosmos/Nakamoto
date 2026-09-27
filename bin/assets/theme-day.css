@@ -425,6 +425,10 @@
   html[data-theme=light]:not([data-mono]) #wk-plan .wk-field.need{border-color:var(--amber-bar);box-shadow:0 0 0 3px var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-btn.wk-go{color:#FFFFFF;background:var(--accent);border:1px solid var(--accent);box-shadow:0 0 0 1px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-btn.wk-go:disabled{background:var(--surface-2);border-color:var(--line-strong);color:var(--faint);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sa-band{--sa-v:var(--accent);--sa-t:var(--accent);--sa-g:var(--accent);--sa-on:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .sa-row{background:color-mix(in srgb,var(--sa-v) 14%,transparent)}
+  html[data-theme=light]:not([data-mono]) .sa-go{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .sa-go svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.gain:has(b.neg){--c:var(--danger)}
   html[data-theme=light]:not([data-mono]) #dpicks td.nm .gtag.neg{border-color:var(--danger-bar);background:var(--danger-bg)}
   html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-field{background:var(--surface-2);box-shadow:none}
@@ -844,4 +848,7 @@
      the GATA mark (a white glyph) gets the dark tile it wears elsewhere, or it vanishes on ivory. */
   html[data-theme=light]:not([data-mono]) .intro h1 em{-webkit-background-clip:text;background-clip:text;color:transparent}
   html[data-theme=light]:not([data-mono]) #p-intro .introby img{background:#1b1a22;padding:2px}
+
+  /* Self's Autopilot row: its own tokens, in the day palette */
+  html[data-theme=light]:not([data-mono]) .sa-band{--sa-v:#5b4fc4;--sa-t:#0f5e50;--sa-g:#16733a;--sa-on:#ffffff}
 

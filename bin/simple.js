@@ -1110,8 +1110,39 @@
     a.setAttribute("data-route", want); a.setAttribute("href", "#/" + want);
     a.firstChild.nodeValue = dash ? "Dashboard" : "Network";
   }
+  /* Self's Autopilot row: the reader's own gain (the plan the Wallet's Move panel prices, cached the
+     same way), counted up once; the line under it turns while Self is open. Working out the plan
+     briefly touches Self's amount field, so nothing is recomputed while the reader is typing there. */
+  var SA = { g: null, counted: false, i: 0 };
+  function selfBand(){
+    var m = E("samain"); if(!m || root.getAttribute("data-sv") !== "dashboard/self") return;
+    var act = document.activeElement, typing = act && act.tagName === "INPUT" && act.closest && act.closest("#p-dele");
+    var pos = window.__POS, plan = typing ? null : planNow(pos), g = typing ? SA.g : (plan && plan.gain > 0.5 ? plan.gain : 0);
+    if(g === SA.g && m.getAttribute("data-g") !== null) return;
+    SA.g = g; m.setAttribute("data-g", g || 0);
+    if(!g){ m.innerHTML = 'Your stake at the best rate, <b>hands-free</b>'; return; }
+    var n = m.querySelector(".sa-num");
+    if(n && SA.counted){ n.textContent = "+" + one(g); return; }
+    /* the true figure is written first; the count-up only decorates it, frame by frame, so a browser
+       that runs no frames (a background tab) still shows the real number */
+    m.innerHTML = 'Earn <b class=sa-num>+' + one(g) + '</b> <b>ATONE a year</b> more, <b>hands-free</b>';
+    if(SA.counted) return;
+    SA.counted = true; n = m.querySelector(".sa-num");
+    if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var t0 = null, done = false;
+    requestAnimationFrame(function step(t){ if(done) return; if(t0 === null){ t0 = t; requestAnimationFrame(step); return; }
+      var k = Math.min(1, (t - t0) / 1200); n.textContent = "+" + one(SA.g * (1 - Math.pow(1 - k, 3)));
+      if(k < 1) requestAnimationFrame(step); else done = true; });
+    setTimeout(function(){ done = true; if(n.isConnected) n.textContent = "+" + one(SA.g); }, 1300);   /* frames or not, it ends on the real figure */
+  }
+  setInterval(function(){
+    if(root.getAttribute("data-sv") !== "dashboard/self" || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var L = document.querySelectorAll("#saband .sa-l"); if(!L.length) return;
+    L[SA.i % L.length].classList.remove("on"); SA.i++; L[SA.i % L.length].classList.add("on");
+  }, 2800);
   function render(){
     homeDoor();
+    selfBand();
     drawHead();
     if(root.getAttribute("data-tab") !== "dele" || root.getAttribute("data-ui") !== "simple") return;
     var s = screen();
