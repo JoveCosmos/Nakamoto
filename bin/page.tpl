@@ -2900,6 +2900,9 @@ border:1px solid color-mix(in srgb,var(--sa-v) 40%,transparent);background:linea
 #wk-mine .wk-tbl2,html:not([data-wallet]) #wk-mine .wk-tbl2{max-height:calc(29px + 10 * 32px)}
 #wk-plan .wk-tbl2,html:not([data-wallet]) #wk-plan .wk-tbl2{max-height:calc(30px + 10 * 32px)}
 #dstrat{max-height:calc(10 * 32px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
+/* Outcome never sets the row's height: the two lists do. It takes their height (height 0, at least the
+   row) and its moves scroll inside it, so a long plan cannot grow the row and lift all three columns */
+@media(min-width:901px){#wk-mv{height:0;min-height:100%}#wk-mv #dstrat{flex:1 1 0;min-height:0;max-height:none}}
 @media(min-width:901px){
   /* the columns stand on the frame's floor at their own height; the band takes the room above them */
   #wbody{display:flex;flex-direction:column;justify-content:flex-end}
