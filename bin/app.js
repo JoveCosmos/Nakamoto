@@ -1920,6 +1920,7 @@ rememberGridH();
   function picks(opt, r, B, pos){
     var el = E("dpicks"); if(!el) return;
     var sel = chosen(opt);
+    var sn = E("dseln"); if(sn) sn.innerHTML = sel.n ? "<b>" + sel.n + "</b>selected" : "";
     var now = pos ? pos.rate : 0;
     /* without a wallet the chip is invisible but keeps its slot, so the field and the
        button do not move when one connects */
@@ -2392,6 +2393,7 @@ rememberGridH();
     if(hint){ hint.className = "unhint" + (over ? " bad" : ""); hint.textContent = over ? "more than the wallet holds" : (P.u > 0 && !P.n ? "Select a validator" : ""); }
     if(go) go.disabled = !ok || !window.__WALLET;
     var sb = E("stbell"); if(sb) sb.disabled = !P.n;
+    var sn = E("stseln"); if(sn) sn.innerHTML = P.n ? "<b>" + P.n + "</b>selected" : "";
     /* the blended rate rides in the summary's second line */
     if(sm) sm.innerHTML = ok ? fmt(P.u) + " ATONE<br>to " + P.n + " validator" + (P.n === 1 ? "" : "s") + " at " + pct(P.rate) : "";
     if(lk) lk.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +

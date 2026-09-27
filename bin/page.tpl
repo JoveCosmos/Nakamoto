@@ -1553,6 +1553,10 @@ transition:filter .12s,transform .12s,box-shadow .2s,opacity .2s}
 
 /* amount presets: plain small buttons, the chosen one lit */
 .wk-pre{display:inline-flex;gap:5px}
+/* "N selected" beside an amount: its slot is always there, empty or not, so nothing moves when it
+   appears (Self's Redelegate row and the Stake card) */
+.wk-seln{flex:0 0 auto;display:inline-flex;align-items:center;height:22px;min-width:10.5em;font-family:var(--wmono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--wf);white-space:nowrap;font-variant-numeric:tabular-nums}
+.wk-seln b{font-size:11px;font-weight:700;letter-spacing:0;color:var(--wgreen);margin-right:5px}
 .wk-pre button{padding:0 9px;border:1px solid var(--wbd2);background:transparent;cursor:pointer;transition:color .14s,border-color .14s,background .14s}
 .wk-pre button:hover{color:var(--wt);border-color:var(--ws)}
 
@@ -4657,7 +4661,7 @@ html[data-tab=connect] .l2host{display:none}
           </div>
         </section>
         <section class=wk-pane id=wk-plan>
-          <header class="wk-ph wk-t2"><h3>Redelegate</h3><div class=wk-field><input class=wk-amt2 id=amt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to move"><button class=wk-max id=amtmax type=button title="Everything that can move">max <b id=ds-mov>&mdash;</b></button></div><div class=wk-pre id=amtseg hidden><button data-p=100 type=button aria-pressed=true>All</button></div>
+          <header class="wk-ph wk-t2"><h3>Redelegate</h3><div class=wk-field><input class=wk-amt2 id=amt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to move"><button class=wk-max id=amtmax type=button title="Everything that can move">max <b id=ds-mov>&mdash;</b></button></div><div class=wk-pre id=amtseg hidden><button data-p=100 type=button aria-pressed=true>All</button></div><span class=wk-seln id=dseln aria-live=polite></span>
             <button class=wk-ib id=wrefresh type=button title="Read the chain again now" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6M20.5 3.5v5h-5"/></svg></button>
             <span class=wk-ago id=dago title="the numbers follow every block tick; refresh re-reads your position">&mdash;</span>
             <span class=wk-lockn id=dlockn hidden></span></header>
@@ -4887,6 +4891,7 @@ html[data-tab=connect] .l2host{display:none}
   <div class="wk-tbl2 stlist" id=stlist></div>
   <div class=unamt>
     <div class="wk-field unfield"><input class=wk-amt2 id=stamt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to stake"><button class=wk-max id=stmax type=button title="Every liquid ATONE">max <b id=stmaxv>&mdash;</b></button></div>
+    <span class=wk-seln id=stseln aria-live=polite></span>
     <span class=unhint id=sthint></span>
   </div>
   <div class=txlock id=stlock></div>
