@@ -889,6 +889,8 @@
   function loadGovs(){
     if(GV.busy || (GV.list && Date.now() - GV.at < 300000)) return;
     GV.busy = true;
+    gapi("/atomone/gov/v1/params/voting").then(function(x){ var q = x.params || {};
+      GV.rules = { minSelf: +q.min_governor_self_delegation || null, period: parseInt(q.governor_status_change_period, 10) || null }; }).catch(function(){});
     Promise.all([gapi("/atomone/gov/v1/governors?pagination.limit=500"), gapi("/cosmos/staking/v1beta1/validators?pagination.limit=500")])
       .then(function(x){
         var per = {}, bonded = 0;
@@ -897,6 +899,7 @@
         GV.bonded = bonded;
         var gs = (x[0].governors || []).map(function(g){ var d = g.description || {};
           return { addr: g.governor_address, m: (d.moniker || "").trim() || g.governor_address.slice(0, 14), web: d.website || "", det: d.details || "",
+                   ident: d.identity || "", sec: d.security_contact || "",
                    active: g.status === "GOVERNOR_STATUS_ACTIVE", since: Date.parse(g.last_status_change_time) || null, vp: null, n: null }; });
         return Promise.all(gs.map(function(g){
           return Promise.all([gapi("/atomone/gov/v1/vshares/" + g.addr + "?pagination.limit=500").catch(function(){ return {}; }),
@@ -920,7 +923,7 @@
     var tot = 0; list.forEach(function(g){ tot += g.vp || 0; });
     return '<div class="sv-vlist sv-glist">' + list.map(function(g){
       var sh = GV.bonded ? (g.vp || 0) / GV.bonded * 100 : null;
-      return '<div class="sv-vr' + (g.addr === mine ? ' me' : '') + '" style="--c:' + (g.active ? 'var(--sv-teal)' : 'var(--wbd2)') + '">' +
+      return '<div class="sv-vr click' + (g.addr === mine ? ' me' : '') + '" data-gv="' + esc(g.addr) + '" tabindex=0 title="Open this governor" style="--c:' + (g.active ? 'var(--sv-teal)' : 'var(--wbd2)') + '">' +
         '<span class=sv-lgo><span class="lg" style="background:hsl(' + (g.m.charCodeAt(0) * 37 % 360) + ',42%,30%)">' + esc(g.m.charAt(0).toUpperCase()) + '</span></span>' +
         '<span class=sd-vn><b>' + esc(g.m) + (g.addr === mine ? '<i class=sd-al>yours</i>' : '') + '</b><s>' + esc(g.addr.slice(0, 16) + "\u2026" + g.addr.slice(-6)) + '</s></span>' +
         '<span class=sv-gst><em class=' + (g.active ? "on" : "off") + '>' + (g.active ? "active" : "inactive") + '</em></span>' +
@@ -949,6 +952,34 @@
         setTimeout(function(){ delete GV.mine[a]; GV.at = 0; render(); }, 7000); })
       .catch(function(e){ if(n) n.fail(e && e.message || String(e)); })
       .then(function(){ t.classList.remove("busy"); t.disabled = false; });
+  }
+  /* a governor's card, as a validator's: who it is, what it holds, and the chain's rules for governors */
+  function govCard(addr){
+    var g = (GV.list || []).filter(function(x){ return x.addr === addr; })[0]; if(!g) return;
+    var P = window.__POP, pop = E("gvpop");
+    if(!pop){ pop = document.createElement("div"); pop.className = "pop"; pop.id = "gvpop"; document.body.appendChild(pop);
+      pop.addEventListener("click", onClick); }
+    var R = GV.rules || {}, mine = myGov(), sh = GV.bonded ? (g.vp || 0) / GV.bonded * 100 : null;
+    var st = function(k, v, sub){ return '<div class=vstat><span class=vk>' + k + '</span><span class=vv>' + v + '</span>' + (sub ? '<i class=vsubn>' + sub + '</i>' : '') + '</div>'; };
+    var web = g.web && /^https?:\/\//.test(g.web) ? '<a class=vweb href="' + esc(g.web) + '" target=_blank rel="noopener noreferrer">' + esc(g.web.replace(/^https?:\/\//, "").replace(/\/+$/, "")) + '</a>' : '<span class="vweb none">no website</span>';
+    pop.innerHTML = '<div class="card vcard gvcard" role=dialog aria-modal=true aria-label="Governor ' + esc(g.m) + '">' +
+      '<div class="vhead vwrap"><span class=vmono style="display:flex;background:hsl(' + (g.m.charCodeAt(0) * 37 % 360) + ',42%,30%)">' + esc(g.m.charAt(0).toUpperCase()) + '</span>' +
+        '<div class=vcol><div class=vname><span class=vnm>' + esc(g.m) + '</span></div><div class=vsub>' + web + '</div></div></div>' +
+      '<div class=vbadges><span class="badge ' + (g.active ? 'ok' : 'dn') + '">' + (g.active ? 'ACTIVE' : 'INACTIVE') + '</span>' + (g.addr === mine ? '<span class="badge up">YOU FOLLOW IT</span>' : '') + '</div>' +
+      (g.det ? '<p class=gv-det>' + esc(g.det) + '</p>' : '') +
+      '<div class=vgrid>' +
+        st("voting power", g.vp != null ? fmt(g.vp) : NA, sh != null ? sh.toFixed(2) + "% of bonded ATONE" : "") +
+        st("delegators", g.n != null ? String(g.n) : NA, "wallets that follow it") +
+        st(g.active ? "active since" : "inactive since", g.since && window.__dayFull ? window.__dayFull(g.since) : NA, "") +
+        st("security contact", g.sec ? esc(g.sec) : "\u2014", "") +
+        st("identity", g.ident ? esc(g.ident) : "\u2014", g.ident ? "Keybase" : "") +
+        st("address", esc(g.addr.slice(0, 12) + "\u2026" + g.addr.slice(-6)), "") +
+      '</div>' +
+      '<p class=gv-rules>A governor must hold at least <b>' + (R.minSelf ? whole(R.minSelf) : NA) + ' ATONE</b> of its own stake, and may change its status once every <b>' +
+        (R.period ? Math.round(R.period / 86400) + ' days' : NA) + '</b>. While inactive, its votes do not count for those who follow it.</p>' +
+      (govBtn(g, mine) ? '<div class=gv-go>' + govBtn(g, mine) + '</div>' : '') +
+    '</div>';
+    if(P) P.open(pop);
   }
   function govEmpty(t){ return '<div class=sv-upwait>' + t + '</div>'; }
   function drawGovs(){
@@ -1266,9 +1297,10 @@
   };
 
   function onClick(ev){
-    var t = ev.target.closest ? ev.target.closest("[data-act],[data-f],[data-v]") : null;
+    var t = ev.target.closest ? ev.target.closest("[data-act],[data-f],[data-v],[data-gv]") : null;
     if(!t) return;
     var act = t.dataset.act;
+    if(!act && t.dataset.gv){ govCard(t.dataset.gv); return; }
     if(act === "opt"){
       if(!window.__optPlan || !window.__goSign) return;
       t.classList.add("busy");
@@ -1298,6 +1330,8 @@
     if(ev.key !== "Enter" && ev.key !== " ") return;
     var rt = ev.target.closest ? ev.target.closest(".sv-chip[data-route],.sv-vr[data-route]") : null;
     if(rt && window.__shellGo){ ev.preventDefault(); window.__shellGo(rt.getAttribute("data-route")); return; }
+    var gv = ev.target.closest ? ev.target.closest("[data-gv]") : null;
+    if(gv && ev.target === gv){ ev.preventDefault(); govCard(gv.dataset.gv); return; }
     var t = ev.target.closest ? ev.target.closest("[data-v]") : null;
     if(!t || !window.__vshow) return;
     ev.preventDefault(); window.__vshow(t.dataset.v);

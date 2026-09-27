@@ -4301,6 +4301,16 @@ color:#6fe3da;font:600 11.5px var(--wsans);cursor:pointer;white-space:nowrap}
 .sv-gbtn.busy{opacity:.55;cursor:progress}
 .sv-gbtn:focus-visible{outline:2px solid #2bc8bd;outline-offset:2px}
 .sv-glist .sv-vr.me{border-color:var(--sv-violet)}
+.sv-glist .sv-vr.click{cursor:pointer}
+/* the governor's card */
+.gvcard{max-width:460px}
+.gvcard .vbadges{padding:14px 28px 0}
+.gv-det{margin:12px 28px 0;font-size:12.5px;line-height:1.5;color:var(--ink2)}
+.gvcard .vgrid .vv{font-size:13px;overflow-wrap:anywhere}
+.gv-rules{margin:14px 28px 0;font-size:11.5px;line-height:1.5;color:var(--ink3)}
+.gv-rules b{color:var(--ink)}
+.gv-go{display:flex;padding:16px 28px 24px}.gv-go .sv-gbtn{flex:1 1 auto;height:36px;font-size:12.5px}
+.gvcard:not(:has(.gv-go)){padding-bottom:20px}
 .sv-glist .sv-lgo .lg{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff}
 .sv-gst em{font-style:normal;font-family:var(--wmono);font-size:10px;padding:1px 8px;border-radius:999px;border:1px solid currentColor}
 .sv-gst em.on{color:var(--sv-green)}.sv-gst em.off{color:var(--wf)}
