@@ -224,28 +224,18 @@
   /* the wallet strip, one builder for Overview and Manage: the wallet box, then Total, Staked,
      Available, Rewards and APR, each figure in its engraved well */
   function wstrip(){
-    var pos = window.__POS, bal = window.__BAL, S = setStats();
-    var mine = pos && pos.rows.length, rew = window.__REW || 0, liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0, tot = liq + stk + rew;
+    var pos = window.__POS, bal = window.__BAL;
+    var mine = pos && pos.rows.length, rew = window.__REW || 0, liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0;
     var wname = (window.__WALLET && String(window.__WALLET.label || "").trim()) || "Your wallet";
-    /* the APR's gauge spans the set's own range, lowest to highest, with the two ends written at its ends */
-    var span = S.hi > S.lo ? S.hi - S.lo : 0, at = mine && span ? (pos.rate - S.lo) / span : null;
-    var aprm = mine ? '<i class="sd-m apr" style="background:' + rampCss() + '"><u style="left:' + (Math.max(0, Math.min(1, at || 0)) * 100).toFixed(1) + '%"></u></i>' : null;
+    /* the wallet card, then five boxes - Available, Photon, Staked, APR, Rewards - each figure in its well */
     return (
-      /* the wallet card: its name, the address, the wallet app and the network */
-      '<div class="sd-id sd-idw"><div class=sd-idl><div class=sd-top><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3></div>' + wmeta() + '</div>' +
-        /* the rewards waiting, on the card's right side, with the door to claim them */
-        (window.__REW != null ? '<div class=sd-rw><em>Rewards</em><b>' + fmt(rew) + '<i>ATONE</i></b>' +
-          (rew >= 1 ? '<button class=sd-rwb type=button data-act=claim title="Claim your staking rewards">Claim</button>' : '<small>nothing waiting</small>') + '</div>' : '') + '</div>' +
-      /* Total's gauge is the wallet split three ways - staked, available, rewards */
-      ro("Total", pos ? fmt(tot) : "\u2014", "", pos ? '<i class="sd-m mix">' +
-        [[stk, "var(--sv-amber)"], [liq, "var(--sv-violet)"], [rew, "var(--sv-green)"]].map(function(q){
-          return q[0] > 0 ? '<s style="flex:' + q[0] + ' 1 0;background:' + q[1] + '"></s>' : ''; }).join("") + '</i>' : null, "var(--wt)", "", false, pos ? "ATONE" : "") +
-      ro("Staked", pos ? fmt(stk) : "\u2014", "", pos ? stk / (tot || 1) : null, "var(--sv-amber)", "", false, pos ? "ATONE" : "") +
-      /* Available: ATONE, and in its own compartment the PHOTON that pays the fees */
-      ro("Available", bal ? fmt(liq) : "\u2014", "", pos ? liq / (tot || 1) : null, "var(--sv-violet)", "", false, bal ? "ATONE" : "") +
-      ro("APR", mine ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", aprm, "", "", false, "") +
-      /* PHOTON, AtomOne's fee token, in its own box */
-      ro("Photon", bal ? '<span class=sv-pho>' + fmt(bal.uphoton) + '</span>' : "\u2014", "", null, "var(--sv-pho)", "", false, bal ? "for fees" : ""));
+      '<div class="sd-id sd-idw"><div class=sd-idl><div class=sd-top><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3></div>' + wmeta() + '</div></div>' +
+      ro("Available", bal ? fmt(liq) : "\u2014", "", null, "var(--sv-violet)", "", false, bal ? "ATONE" : "") +
+      ro("Photon", bal ? '<span class=sv-pho>' + fmt(bal.uphoton) + '</span>' : "\u2014", "", null, "var(--sv-pho)", "", false, "") +
+      ro("Staked", pos ? fmt(stk) : "\u2014", "", null, "var(--sv-amber)", "", false, pos ? "ATONE" : "") +
+      ro("APR", mine ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)", "", false, "") +
+      ro("Rewards", window.__REW != null ? fmt(rew) : "\u2014", "", null, "var(--sv-green)",
+         rew >= 1 ? '<button class=sd-act type=button data-act=claim title="Claim your staking rewards">Claim</button>' : "", false, window.__REW != null ? "ATONE" : ""));
   }
   function drawOver(){
     var pos = window.__POS, S = setStats(), bal = window.__BAL;

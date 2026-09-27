@@ -180,10 +180,6 @@
   html[data-theme=light]:not([data-mono]) .fp-c{background:color-mix(in srgb,var(--t) 34%,#f2eee4);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--t) 30%,transparent)}
   html[data-theme=light]:not([data-mono]) .fp-c.on{background:color-mix(in srgb,var(--t) calc(40% + var(--l) * 60%),#f2eee4);box-shadow:none}
 
-  html[data-theme=light]:not([data-mono]) .sd-rw{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18)}
-  html[data-theme=light]:not([data-mono]) .sd-rw em,html[data-theme=light]:not([data-mono]) .sd-rw b i,html[data-theme=light]:not([data-mono]) .sd-rw small{color:rgba(236,232,255,.72)}
-  html[data-theme=light]:not([data-mono]) .sd-rw b{color:#8cf5b0}
-  html[data-theme=light]:not([data-mono]) .sd-rwb{background:#2ee06a;color:#05170c}
 
 
   /* the network line and its menu in day: the same teal and amber, the menu an ivory card */
