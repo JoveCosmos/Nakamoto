@@ -24,6 +24,17 @@
   "home": "staking/bonus",
   "sections": [
     {
+      "id": "network", "label": "Network", "route": "network", "account": "none", "accent": "#2bc8bd",
+      "hint": "the validator set, and how AtomOne pays it",
+      "sub": [
+        {"id": "uptime",    "label": "Uptime",    "route": "uptime",    "tab": "dele", "ui": "simple", "screen": "net",  "panel": "sv-net", "accent": "#2bc8bd"},
+        {"id": "signing",   "label": "Signing",   "route": "signing",   "tab": "dele", "ui": "simple", "screen": "sign", "panel": "sv-sign", "accent": "#2bc8bd"},
+        {"id": "proposers", "label": "Proposers", "route": "proposers", "tab": "dele", "ui": "simple", "screen": "prop", "panel": "sv-prop", "accent": "#2bc8bd"},
+        {"id": "activity",  "label": "Activity",  "route": "activity",  "tab": "dele", "ui": "simple", "screen": "act",  "panel": "sv-act", "accent": "#2bc8bd"},
+        {"id": "economics", "label": "Economics", "route": "economics", "tab": "dele", "ui": "simple", "screen": "eco",  "panel": "sv-eco", "accent": "#2bc8bd"}
+      ]
+    },
+    {
       "id": "staking", "label": "Staking", "route": "staking", "account": "none", "accent": "#ffb02e", "entry": "first",
       "hint": "the validators, the Nakamoto bonus",
       "sub": [
@@ -37,24 +48,13 @@
       "hint": "proposals, the constitution, the core DAOs", "badge": "soon",
       "sub": [
         {"id": "proposals", "label": "Proposals", "route": "proposals",
-         "empty": {"title": "Proposals", "text": "Governance proposals on AtomOne will be listed here."}},
+         "tab": "dele", "ui": "simple", "screen": "props", "panel": "sv-props", "accent": "#2bc8bd"},
         {"id": "constitution", "label": "Constitution", "route": "constitution",
          "empty": {"title": "Constitution", "text": "The AtomOne constitution will be readable here.",
                    "action": {"label": "Read it on GitHub", "href": "https://github.com/atomone-hub/genesis/blob/main/CONSTITUTION.md"}}},
         {"id": "core-daos", "label": "Core DAOs", "route": "core-daos",
-         "empty": {"title": "Core DAOs", "text": "AtomOne's core DAOs will be listed here."}},
+         "tab": "dele", "ui": "simple", "screen": "daos", "panel": "sv-daos", "accent": "#2bc8bd"},
         {"id": "governors", "label": "Governors", "route": "governors", "tab": "dele", "ui": "simple", "screen": "govs", "panel": "sv-govs", "accent": "#2bc8bd"}
-      ]
-    },
-    {
-      "id": "network", "label": "Network", "route": "network", "account": "none", "accent": "#2bc8bd",
-      "hint": "the validator set, and how AtomOne pays it",
-      "sub": [
-        {"id": "uptime",    "label": "Uptime",    "route": "uptime",    "tab": "dele", "ui": "simple", "screen": "net",  "panel": "sv-net", "accent": "#2bc8bd"},
-        {"id": "signing",   "label": "Signing",   "route": "signing",   "tab": "dele", "ui": "simple", "screen": "sign", "panel": "sv-sign", "accent": "#2bc8bd"},
-        {"id": "proposers", "label": "Proposers", "route": "proposers", "tab": "dele", "ui": "simple", "screen": "prop", "panel": "sv-prop", "accent": "#2bc8bd"},
-        {"id": "activity",  "label": "Activity",  "route": "activity",  "tab": "dele", "ui": "simple", "screen": "act",  "panel": "sv-act", "accent": "#2bc8bd"},
-        {"id": "economics", "label": "Economics", "route": "economics", "tab": "dele", "ui": "simple", "screen": "eco",  "panel": "sv-eco", "accent": "#2bc8bd"}
       ]
     },
     {

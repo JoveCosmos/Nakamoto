@@ -3856,6 +3856,33 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sv-gkey i.to{background:transparent;border:1.5px dashed var(--sv-green);border-radius:2px}
 .sv-gkey i.st{width:1px;height:10px;border-radius:0;background:var(--wf)}
 /* the list: flat rows on hairlines, not boxes */
+/* Governance: Proposals (gp-) and Core DAOs (gd-) - rows in the Governors' manner */
+#sv-proplist{display:flex;flex-direction:column}
+.gp-list{display:flex;flex-direction:column;min-height:0;overflow-y:auto;flex:1 1 auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin-right:-8px;padding-right:4px}
+.gp-r{display:grid;grid-template-columns:44px minmax(0,1fr) 82px minmax(150px,230px);align-items:center;gap:14px;padding:10px 8px;border-top:1px solid var(--wbd);cursor:pointer}
+.gp-r:hover{background:rgba(255,255,255,.03)}.gp-r:focus-visible{outline:2px solid var(--sv-teal);outline-offset:-2px}
+.gp-r.open{background:rgba(255,255,255,.025)}
+.gp-id{font-family:var(--wmono);font-size:12px;color:var(--wf)}
+.gp-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.gp-t b{font-size:13.5px;font-weight:700;color:var(--wt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gp-t s{text-decoration:none;font-size:11.5px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gp-st{justify-self:start;font-family:var(--wmono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid currentColor}
+.gp-st.p{color:var(--sv-green)}.gp-st.r{color:var(--wburn)}.gp-st.f{color:var(--sv-amber)}.gp-st.v{color:var(--sv-teal)}.gp-st.d{color:var(--wf)}
+.gp-v{display:flex;flex-direction:column;gap:3px;min-width:0}
+.gp-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--wbd)}
+.gp-bar i{display:block;height:100%}.gp-bar i.y{background:var(--sv-green)}.gp-bar i.n{background:var(--wburn)}.gp-bar i.a{background:var(--wf)}
+.gp-v em{font-style:normal;font-size:12px;font-weight:700;color:var(--wt);font-variant-numeric:tabular-nums}
+.gp-v small{font-size:10.5px;color:var(--wf);white-space:nowrap}
+.gp-d{padding:4px 8px 14px 66px;border-top:0;display:flex;flex-direction:column;gap:10px;background:rgba(255,255,255,.025)}
+.gp-f{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:12px;color:var(--wt)}
+.gp-f em{display:block;font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
+.gp-sum{font-size:12px;line-height:1.55;color:var(--ws);white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow-y:auto;padding:10px 12px;border:1px solid var(--wbd);border-radius:8px}
+.gd-list{display:flex;flex-direction:column;gap:12px}
+.gd-r{padding:12px 14px;border:1px solid var(--wbd);border-radius:10px}
+.gd-h{display:flex;align-items:center;gap:10px}.gd-h b{font-size:14px;color:var(--wt)}
+.gd-r p{margin:6px 0 0;font-size:12.5px;line-height:1.55;color:var(--ws)}
+.gd-note{font-size:12px;line-height:1.55;color:var(--wf)}.gd-note b{color:var(--wt)}.gd-note a{color:var(--sv-teal)}
+@media(max-width:700px){.gp-r{grid-template-columns:34px minmax(0,1fr) auto;gap:10px}.gp-v{grid-column:2/-1}.gp-d{padding-left:12px}}
 /* every validator, scrolling inside the panel: a thin bar in the theme's own border colour */
 .sd-list{display:flex;flex-direction:column;min-height:0;overflow-y:auto;overscroll-behavior:contain;flex:1 1 auto;
 scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin-right:-8px;padding-right:4px}
@@ -3913,6 +3940,14 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin-right:-8px;p
 #sv-govcards .sv-card{--tc:var(--sv-teal)}
 #sv-govlist,#sv-mygovlist{flex:1 1 0;min-height:0;--tc:var(--sv-teal)}
 #sv-mygovp{--tc:var(--sv-violet)}
+/* Proposals and Core DAOs sit in the same frame: cards on top, the panel under them taking the rest
+   (the proposal list scrolls inside it; the DAOs' panel sits right under the cards) */
+#sv-props,#sv-daos{justify-content:flex-start;gap:12px}
+#sv-props>*,#sv-daos>*,#sv-props>*:not(:first-child),#sv-daos>*:not(:first-child){margin-top:0}
+#sv-propcards,#sv-daocards{grid-template-columns:repeat(3,minmax(0,1fr))}
+#sv-propcards .sv-card,#sv-daocards .sv-card{--tc:var(--sv-teal)}
+#sv-proplist{flex:1 1 0;min-height:0;--tc:var(--sv-teal)}
+#sv-daop{flex:0 1 auto;min-height:0;overflow-y:auto;--tc:var(--sv-teal)}
 .sv-glist{overflow-y:auto;flex:1 1 auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .sv-glist .sv-vr{flex:0 0 52px;grid-template-columns:28px minmax(0,1.4fr) 84px minmax(0,1fr) 90px minmax(0,1fr) 40px}
 .sv-glist .sv-vr.me{border-color:var(--sv-violet)}
@@ -4130,6 +4165,16 @@ transition:color .15s,background .15s}
 .l1badge{font-style:normal;font-family:var(--mono);font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--hot);border:1px solid;border-radius:99px;
 padding:2px 5px;line-height:1;opacity:.85}
 .brandbar [data-title-for]{display:none}
+/* home's door to the first tab: "Network" with an arrow, beside the title, on the home view only */
+.hnet{align-items:center;gap:8px;height:30px;padding:0 12px 0 14px;border-radius:999px;border:1px solid color-mix(in srgb,#2bc8bd 55%,transparent);
+background:color-mix(in srgb,#2bc8bd 10%,transparent);color:var(--wt);font:600 12.5px/1 var(--wsans,system-ui);cursor:pointer;white-space:nowrap}
+.hnet i{width:14px;height:10px;position:relative}
+.hnet i::before{content:"";position:absolute;left:0;right:3px;top:4px;height:1.6px;background:#2bc8bd;border-radius:1px}
+.hnet i::after{content:"";position:absolute;right:1px;top:1px;width:6px;height:6px;border-top:1.6px solid #2bc8bd;border-right:1.6px solid #2bc8bd;transform:rotate(45deg)}
+.hnet:hover{background:color-mix(in srgb,#2bc8bd 20%,transparent)}.hnet:hover i{transform:translateX(2px)}
+.hnet:focus-visible{outline:2px solid #2bc8bd;outline-offset:2px}
+@media(prefers-reduced-motion:no-preference){.hnet i{transition:transform .15s}}
+html:not([data-sv="staking/bonus"]) .brandbar .hnet{display:none!important}
 .brandbar .tsfx.net{color:#2bc8bd}
 .brandbar .sv-brand{flex:0 1 auto}
 .l2host{margin-left:auto;display:flex;align-items:center;min-width:0;max-width:100%}
@@ -4271,6 +4316,7 @@ html[data-tab=connect] .l2host{display:none}
       <span class=calclab>Nakamoto</span>
     <header class=brandbar>
       <div class=bwrap data-title-for=staking><div class=bt><span class=btx><i class=nk>Nakamoto </i><i class=tsfx id=tsfx>Bonus</i></span></div></div>
+      <button class=hnet type=button data-title-for=staking data-route="network" title="The validator set, live">Network<i aria-hidden=true></i></button>
       <div class=bwrap data-title-for=network><div class=bt><span class=btx><i class=nk>Network </i><i class="tsfx net tsub">Uptime</i></span></div></div>
       <div class=bwrap data-title-for=governance><div class=bt><span class=btx><i class=nk>Governance </i><i class="tsfx tsub">Proposals</i></span></div></div>
       <span class=sv-brand data-title-for=dashboard><span class=sv-bw><span class="bt svtag s"><span class=btx><i class=nk>Non-custodial </i><i class="tsfx grp-s">staking</i><i class="tsfx grp-g">Governance</i></span></span><span class="bt svtag a"><span class=btx><i class=nk>Decentralize the chain and </i><i class=tsfx>earn more</i></span></span></span><span class=welc id=svwelc hidden></span></span>
@@ -4480,6 +4526,14 @@ html[data-tab=connect] .l2host{display:none}
       <section class=sv-screen id=sv-act data-sc=act aria-label=Activity>
         <div class=sv-panel id=sv-act7></div>
         <div class=sv-panel id=sv-actlive></div>
+      </section>
+      <section class=sv-screen id=sv-props data-sc=props aria-label=Proposals>
+        <div class=sv-cards id=sv-propcards></div>
+        <div class=sv-panel id=sv-proplist><div class=sv-ph><h3>Proposals</h3></div><div class=sv-upwait>Reading the proposals…</div></div>
+      </section>
+      <section class=sv-screen id=sv-daos data-sc=daos aria-label="Core DAOs">
+        <div class=sv-cards id=sv-daocards></div>
+        <div class=sv-panel id=sv-daop><div class=sv-ph><h3>Core DAOs</h3></div><div class=sv-upwait>Reading the chain…</div></div>
       </section>
       <section class=sv-screen id=sv-govs data-sc=govs aria-label=Governors>
         <div class=sv-cards id=sv-govcards></div>

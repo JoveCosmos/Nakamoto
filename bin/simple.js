@@ -886,6 +886,110 @@
     put("sv-mygovlist", '<div class=sv-ph><h3>Governors</h3></div>' + (!L ? govEmpty("Reading the governors\u2026") : !L.length ? govEmpty("No governors on AtomOne yet") : govRows(L, mine)));
   }
 
+  /* ════ Proposals: every AtomOne proposal, read from the chain every 5 min (the one being voted on
+     gets its running tally); the tallying rules and the core DAOs' parameters come with them ════ */
+  var GP = { at: 0, busy: false, list: null, err: null, tp: null, dao: null, open: {} };
+  function loadProps(){
+    if(GP.busy || (GP.list && Date.now() - GP.at < 300000)) return;
+    GP.busy = true;
+    Promise.all([gapi("/atomone/gov/v1/proposals?pagination.limit=500&pagination.reverse=true"),
+                 gapi("/atomone/gov/v1/params/tallying").catch(function(){ return {}; }),
+                 gapi("/atomone/coredaos/v1/params").catch(function(){ return {}; })])
+      .then(function(x){
+        var L = (x[0].proposals || []).map(function(p){
+          return { id: +p.id, title: p.title || ("Proposal " + p.id), st: p.status, tally: p.final_tally_result || {}, submit: p.submit_time,
+                   vs: p.voting_start_time, ve: p.voting_end_time, de: p.deposit_end_time, sum: p.summary || "", by: p.proposer || "",
+                   msgs: (p.messages || []).map(function(m){ return m["@type"] || ""; }),
+                   dep: (p.total_deposit || []).filter(function(c){ return c.denom === "uatone"; }).reduce(function(a, c){ return a + +c.amount; }, 0),
+                   endorsed: !!p.endorsed, ext: +(p.times_voting_period_extended || 0) }; });
+        L.sort(function(a, b){ return b.id - a.id; });
+        var live = L.filter(function(p){ return p.st === "PROPOSAL_STATUS_VOTING_PERIOD"; });
+        return Promise.all(live.map(function(p){ return gapi("/atomone/gov/v1/proposals/" + p.id + "/tally").then(function(t){ if(t.tally) p.tally = t.tally; }).catch(function(){}); }))
+          .then(function(){ GP.list = L; GP.tp = x[1].tally_params || x[1].params || null; GP.dao = x[2].params || null; GP.err = null; GP.at = Date.now(); });
+      })
+      .catch(function(e){ GP.err = (e && e.message) || "error"; })
+      .then(function(){ GP.busy = false; var sc = screen(); if(sc === "props" || sc === "daos") render(); });
+  }
+  var PST = { PROPOSAL_STATUS_VOTING_PERIOD: ["voting", "v"], PROPOSAL_STATUS_PASSED: ["passed", "p"], PROPOSAL_STATUS_REJECTED: ["rejected", "r"],
+              PROPOSAL_STATUS_FAILED: ["failed", "f"], PROPOSAL_STATUS_DEPOSIT_PERIOD: ["deposit", "d"] };
+  /* what a proposal does, in words: the kind of its first message */
+  var PKIND = { MsgSoftwareUpgrade: "Software upgrade", MsgCancelUpgrade: "Upgrade cancelled", MsgUpdateParams: "Parameter change",
+                MsgCommunityPoolSpend: "Community pool spend", MsgRecoverClient: "IBC client recovery", MsgIBCSoftwareUpgrade: "IBC upgrade",
+                MsgExecLegacyContent: "Legacy proposal", MsgUpdateClient: "IBC client update", MsgAnnotateProposal: "Annotation", MsgEndorseProposal: "Endorsement" };
+  function pkind(p){
+    if(!p.msgs.length) return "Text";
+    var t = String(p.msgs[0]).split(".").pop(), k = PKIND[t] || t.replace(/^Msg/, "").replace(/([a-z])([A-Z])/g, "$1 $2");
+    return k + (p.msgs.length > 1 ? " and " + (p.msgs.length - 1) + " more" : "");
+  }
+  function ptally(t){ var y = +(t.yes_count || 0), n = +(t.no_count || 0), a = +(t.abstain_count || 0), s = y + n + a; return { y: y, n: n, a: a, s: s }; }
+  function pday(t){ return t && window.__dayFull ? window.__dayFull(new Date(t).getTime()) : "—"; }
+  function drawProps(){
+    loadProps();
+    var L = GP.list, tp = GP.tp || {}, c = function(k, v, sub){ return '<div class="sv-card sv-span"><span class=sv-k>' + k + '</span><span class=sv-big>' + v + '</span><span class=sv-sub>' + sub + '</span></div>'; };
+    var n = function(st){ return L ? L.filter(function(p){ return p.st === st; }).length : 0; }, live = L ? L.filter(function(p){ return p.st === "PROPOSAL_STATUS_VOTING_PERIOD"; }) : [];
+    put("sv-propcards",
+      c("Proposals", L ? String(L.length) : "—", L ? n("PROPOSAL_STATUS_PASSED") + " passed, " + n("PROPOSAL_STATUS_REJECTED") + " rejected" + (n("PROPOSAL_STATUS_FAILED") ? ", " + n("PROPOSAL_STATUS_FAILED") + " failed" : "") +
+        /* ids run to the newest; a proposal that never met its deposit is deleted by the chain, so
+           the count can be lower - said, so "20" beside "#21" does not read as a mistake */
+        (L.length && L[0].id > L.length ? ", " + (L[0].id - L.length) + " dropped (deposit not met)" : "") : "reading the chain…") +
+      c("Voting now", L ? (live.length ? String(live.length) : "None") : "—", L ? (live.length ? "#" + live[live.length - 1].id + " ends " + pday(live[live.length - 1].ve) : "no proposal is open") : "") +
+      c("To pass", tp.threshold ? "&gt;" + (tp.threshold * 100).toFixed(1) + "%" : "—", tp.quorum ? "of votes yes, with " + (tp.quorum * 100).toFixed(1) + "% of bonded ATONE voting" + (tp.law_threshold ? "; laws and amendments " + (tp.law_threshold * 100).toFixed(0) + "%" : "") : "of votes yes"));
+    var h = '<div class=sv-ph><h3>Proposals</h3><span class=sv-gkey>newest first; tap one to read it</span></div>';
+    if(GP.err && !L){ put("sv-proplist", h + govEmpty("Could not read the proposals")); return; }
+    if(!L){ put("sv-proplist", h + govEmpty("Reading the proposals…")); return; }
+    if(!L.length){ put("sv-proplist", h + govEmpty("No proposals yet")); return; }
+    put("sv-proplist", h + '<div class=gp-list>' + L.map(function(p){
+      var s = PST[p.st] || ["unknown", "d"], t = ptally(p.tally), pc = function(v){ return t.s ? (v / t.s * 100) : 0; }, open = !!GP.open[p.id];
+      var when = p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? "ends " + pday(p.ve) : p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? "deposit until " + pday(p.de) : "ended " + pday(p.ve);
+      var row = '<div class="gp-r' + (open ? ' open' : '') + '" data-gp="' + p.id + '" tabindex=0 role=button aria-expanded=' + open + '>' +
+        '<span class=gp-id>#' + p.id + '</span>' +
+        '<span class=gp-t><b>' + esc(p.title) + '</b><s>' + esc(pkind(p)) + ', ' + when + (p.endorsed ? ', endorsed by the Steering DAO' : '') + (p.ext ? ', voting extended ' + p.ext + '×' : '') + '</s></span>' +
+        '<span class="gp-st ' + s[1] + '">' + s[0] + '</span>' +
+        '<span class=gp-v>' + (t.s ? '<span class=gp-bar><i class=y style="width:' + pc(t.y).toFixed(2) + '%"></i><i class=n style="width:' + pc(t.n).toFixed(2) + '%"></i><i class=a style="width:' + pc(t.a).toFixed(2) + '%"></i></span>' +
+          '<em>Yes ' + pc(t.y).toFixed(1) + '%</em><small>No ' + pc(t.n).toFixed(1) + '%, abstain ' + pc(t.a).toFixed(1) + '%</small>' : '<small>no votes' + (p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? ' yet' : '') + '</small>') + '</span></div>';
+      if(open){
+        var sm = p.sum.length > 2400 ? p.sum.slice(0, 2400) + "…" : p.sum;
+        row += '<div class=gp-d><div class=gp-f>' +
+          '<span><em>Proposer</em>' + esc(p.by ? p.by.slice(0, 12) + "…" + p.by.slice(-6) : "—") + '</span>' +
+          '<span><em>Deposit</em>' + (p.dep ? fmt(p.dep) + ' ATONE' : '—') + '</span>' +
+          '<span><em>Submitted</em>' + pday(p.submit) + '</span>' +
+          '<span><em>Voting</em>' + (p.vs ? pday(p.vs) + ' to ' + pday(p.ve) : 'not started') + '</span>' +
+          (t.s ? '<span><em>Votes cast</em>' + fmt(t.s) + ' ATONE</span>' : '') + '</div>' +
+          (sm ? '<div class=gp-sum>' + esc(sm) + '</div>' : '') + '</div>';
+      }
+      return row; }).join("") + '</div>');
+  }
+  /* ════ Core DAOs: the Steering and Oversight DAOs the constitution provides for - who holds them
+     on chain (x/coredaos params), what each may do, and what has been endorsed so far ════ */
+  function drawDaos(){
+    loadProps();
+    var d = GP.dao, L = GP.list, net = TN() ? "testnet" : "mainnet";
+    var c = function(k, v, sub){ return '<div class="sv-card sv-span"><span class=sv-k>' + k + '</span><span class=sv-big>' + v + '</span><span class=sv-sub>' + sub + '</span></div>'; };
+    var who = function(a){ return !d ? "—" : a ? esc(a.slice(0, 10) + "…" + a.slice(-6)) : "Not appointed"; };
+    var ext = d ? +(d.voting_period_extensions_limit || 0) : null, dur = d ? Math.round(parseInt(d.voting_period_extension_duration || "0", 10) / 86400) : null;
+    put("sv-daocards", c("Steering DAO", who(d && d.steering_dao_address), d ? (d.steering_dao_address ? "on chain" : "none on " + net + " yet") : "reading the chain…") +
+      c("Oversight DAO", who(d && d.oversight_dao_address), d ? (d.oversight_dao_address ? "on chain" : "none on " + net + " yet") : "") +
+      c("Endorsed proposals", L ? String(L.filter(function(p){ return p.endorsed; }).length) : "—", L ? "of " + L.length + " proposals" : ""));
+    var row = function(name, has, text){ return '<div class=gd-r><div class=gd-h><b>' + name + '</b><span class="gp-st ' + (has ? 'p' : 'd') + '">' + (has ? 'appointed' : 'not appointed') + '</span></div><p>' + text + '</p></div>'; };
+    put("sv-daop", '<div class=sv-ph><h3>What they are for</h3></div>' + (GP.err && !d ? govEmpty("Could not read the chain") : !d ? govEmpty("Reading the chain…") :
+      '<div class=gd-list>' +
+      row("Steering DAO", !!d.steering_dao_address, "At most one. It can add advisory notes to proposals, make announcements on chain and extend a proposal's voting period. Its endorsement lets a law pass with more than two thirds instead of 90%.") +
+      row("Oversight DAO", !!d.oversight_dao_address, "It can veto a proposal that breaks a governing document, with proof, and extend a proposal's voting period. It cannot act on proposals about its own members.") +
+      '<div class=gd-note>' + (ext != null ? 'A proposal\'s voting period can be extended up to <b>' + ext + ' times</b>, <b>' + dur + ' days</b> each. ' : '') +
+        'Members of both are appointed by governance and must be public, real people. ' +
+        '<a href="https://github.com/atomone-hub/genesis/blob/main/CONSTITUTION.md" target=_blank rel="noopener noreferrer">The constitution</a> sets the rules.</div></div>'));
+  }
+
+  /* a proposal row opens and closes its details: a tap, or Enter / Space on it */
+  function gpToggle(ev){
+    var r = ev.target.closest ? ev.target.closest(".gp-r") : null; if(!r) return;
+    if(ev.type === "keydown"){ if(ev.key !== "Enter" && ev.key !== " ") return; ev.preventDefault(); }
+    var id = +r.dataset.gp; GP.open[id] = !GP.open[id]; drawProps();
+    var again = document.querySelector('.gp-r[data-gp="' + id + '"]'); if(again && ev.type === "keydown") again.focus();
+  }
+  sv.addEventListener("click", gpToggle);
+  sv.addEventListener("keydown", gpToggle);
+
   /* hovering the plot names a block: its height, how many signed, who did not */
   sv.addEventListener("mousemove", function(ev){
     var p = ev.target.closest ? ev.target.closest(".sv-upplot") : null;
@@ -972,6 +1076,8 @@
     else if(s === "act") drawAct();
     else if(s === "eco") drawEco();
     else if(s === "govs") drawGovs();
+    else if(s === "props") drawProps();
+    else if(s === "daos") drawDaos();
     else if(s === "mygov") drawMyGov();
     else drawNet();
   }

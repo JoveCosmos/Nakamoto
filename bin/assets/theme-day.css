@@ -597,6 +597,10 @@
   html[data-theme=light]:not([data-mono]) .se-mv>div u{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sv-gkey i.sk{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-gkey i.to{background:transparent}
+  html[data-theme=light]:not([data-mono]) .gp-r:hover{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .gp-r.open{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .gp-t s{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .gp-d{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sd-list::-webkit-scrollbar-track{background:transparent}
   html[data-theme=light]:not([data-mono]) .sd-vr.click:hover{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sd-vr .sv-lgo{box-shadow:0 0 0 1.5px var(--c)}
@@ -674,6 +678,11 @@
   html[data-theme=light]:not([data-mono]) .netsw a:focus-visible{outline:2px solid var(--accent)}
   html[data-theme=light]:not([data-mono])[data-net=testnet] .bheight::after{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) .l1tab{background:transparent}
+  html[data-theme=light]:not([data-mono]) .hnet{border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+  html[data-theme=light]:not([data-mono]) .hnet i::before{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .hnet i::after{border-top:1.6px solid var(--accent);border-right:1.6px solid var(--accent)}
+  html[data-theme=light]:not([data-mono]) .hnet:hover{background:color-mix(in srgb,var(--accent) 20%,transparent)}
+  html[data-theme=light]:not([data-mono]) .hnet:focus-visible{outline:2px solid var(--accent)}
   html[data-theme=light]:not([data-mono]) .brandbar .tsfx.net{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .l2tab{background:transparent}
   html[data-theme=light]:not([data-mono]) .l2gl{color:var(--muted)}
