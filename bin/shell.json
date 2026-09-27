@@ -19,7 +19,9 @@
     "group on its first view; a group whose views are all off is greyed in it.",
     "A sub-view with 'off': true is shown greyed and inert (offnote is its tooltip) - announced, not",
     "built - and its route lands on the section's first view.",
-    "A section with a single view and no switch shows no level-2 strip: its title says what it is."
+    "A section with a single view and no switch shows no level-2 strip: its title says what it is.",
+    "home: where a visit with no route in the address lands - 'intro' (the logo's page, the landing",
+    "page since 2026-09-27) or a section/sub-view route."
   ],
   "home": "intro",
   "sections": [
