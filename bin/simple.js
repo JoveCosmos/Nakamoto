@@ -190,7 +190,7 @@
       h = '<div class=sv-ph><h3>What your stake could earn</h3></div>' +
         '<ol class="sv-steps col">' +
           '<li style="--sc:#ffb02e"><b>Connect</b><span>your wallet reads your stake; nothing leaves it</span></li>' +
-          '<li style="--sc:' + heat(S.mid).fill + '"><b>See what it earns</b><span>a day, a week, a year, in ATONE and dollars</span></li>' +
+          '<li style="--sc:' + heat(S.mid).fill + '"><b>See what it earns</b><span>a day, a week, a year, in ATONE</span></li>' +
           '<li style="--sc:#2ee06a"><b>Redelegate</b><span>to the best-paying place, in one signature</span></li>' +
         '</ol><button class="sv-btn pri sd-go" type=button data-act=connect>Connect wallet</button>';
     } else if(!pos.rows.length){
