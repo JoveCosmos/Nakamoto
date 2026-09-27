@@ -3926,13 +3926,16 @@ position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-dire
 @media(min-width:1200px){.sd-strip{grid-template-columns:minmax(0,1.6fr) repeat(5,minmax(0,1fr)) !important}}
 .sd-top .sv-wread{flex:0 0 auto}
 .sd-ro{--rc:var(--sv-teal);position:relative;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:14px 18px 13px;min-width:0;border-left:1px solid var(--wbd)}
-.sd-ro::before{content:"";position:absolute;left:18px;right:18px;top:0;height:2px;border-radius:0 0 2px 2px;background:var(--rc);box-shadow:0 0 12px var(--rc);opacity:.85}
+/* each box's colour is a small key before its label, as the graphs' legends are */
+.sd-ro em::before{content:"";display:inline-block;width:6px;height:6px;margin-right:7px;border-radius:2px;vertical-align:1px;background:var(--rc);box-shadow:0 0 8px var(--rc)}
 .sd-ro em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
 .sd-ro>b{font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.15;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sd-ro small{font-size:11px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sd-ro small b{font-size:inherit;font-weight:700}
 .sd-m{display:block;position:relative;height:4px;border-radius:2px;background:var(--wbd);margin-top:9px}
 .sd-m s{display:block;height:100%;border-radius:2px;background:var(--rc);box-shadow:0 0 8px var(--rc)}
+.sd-m.mix{display:flex;gap:2px;background:none}
+.sd-m.mix s{min-width:2px;box-shadow:none}
 .sd-m.apr u{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--wc);border:2px solid var(--wt);box-shadow:0 0 8px rgba(255,255,255,.4)}
 .sd-act{position:absolute;top:12px;right:14px;height:22px;padding:0 9px;border-radius:6px;border:1px solid rgba(46,224,106,.45);background:rgba(46,224,106,.1);
 color:#5cf08e;font-family:var(--wmono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
@@ -3965,6 +3968,13 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}
 #sd-move.fill{justify-content:center;align-items:center}
+/* Move your stake: Now and After side by side, the gain under both, inset like the button below */
+.sd-mv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:8px}
+.sd-mv .sd-fig{margin-left:0;padding:10px 14px 10px 16px;border-left:1px solid var(--wbd2);border-radius:10px}
+.sd-mv .sd-fig::before{top:10px;bottom:10px}
+.sd-mv .sd-fig:last-child{grid-column:1/-1}
+.se-mid{margin:auto 0;display:flex;flex-direction:column}
+.se-mid+.se-fine{margin-top:0}
 /* What your stake earns (Wallet) and what Autopilot would do / Your grant (Autopilot): se- */
 .sd-off{font-size:11px;color:var(--wf);margin:8px 2px 0}
 .se-hero{display:flex;flex-direction:column;gap:2px;padding:6px 0 12px}

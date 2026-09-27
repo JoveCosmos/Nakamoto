@@ -132,7 +132,8 @@
      columns under it: the move, where the stake earns (a skyline over the set's APR range),
      and the validators. Autopilot is the same frame. */
   function ro(label, value, meta, meter, color, act, apr){
-    var m = meter == null ? "" : apr
+    /* a meter given as markup (the Total's split) goes in as it is */
+    var m = meter == null ? "" : typeof meter === "string" ? meter : apr
       ? '<i class="sd-m apr" style="background:' + rampCss() + '"><u style="left:' + (Math.max(0, Math.min(1, meter)) * 100).toFixed(1) + '%"></u></i>'
       : '<i class=sd-m><s style="width:' + (meter > 0 ? Math.max(1.5, Math.min(100, meter * 100)) : 0).toFixed(1) + '%"></s></i>';
     return '<div class=sd-ro' + (color ? ' style="--rc:' + color + '"' : '') + '>' + (act || "") + '<em>' + label + '</em><b>' + value + '</b>' +
@@ -152,10 +153,11 @@
     var tile = function(k, u){ return fig(k, '<span class=sd-gain>+' + one(u / 1e6) + '</span>', ex ? "ATONE" : usd(usdOf(u)) || "ATONE", "var(--sv-green)"); };
     if(ex) return '<div class=se-ex><div class=se-hero><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>~' + pct(rate) + ' APR</i></b><small>ATONE</small></div>' +
       '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div></div>';
-    return '<div class=se-hero><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b>' +
+    /* the year and its three steps stand in the middle of the panel, the note at its foot */
+    return '<div class=se-mid><div class=se-hero><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b>' +
         '<small>' + (usdOf(y) != null ? usd(usdOf(y)) + ' at today\'s price, ' : '') + 'at ' + pct(rate) + ' APR on ' + whole(stake) + ' ATONE</small></div>' +
       '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' +
-      (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') +
+      (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + '</div>' +
       '<div class=se-fine>Today\'s rate carried forward. Rewards build up every block and wait for you to claim them.</div>';
   }
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every
@@ -179,7 +181,10 @@
     put("sd-wstrip",
       /* one row: the wallet's name, and at the box's right end when it was read, with the refresh */
       '<div class="sd-id sd-idw"><div class=sd-top><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3>' + read + '</div></div>' +
-      ro("Total", pos ? fmt(tot) : "—", pos ? "ATONE in this wallet" : "connect a wallet", pos ? 1 : null, "var(--wt)") +
+      /* the Total's bar is the wallet split three ways - staked, available, rewards - not a full line */
+      ro("Total", pos ? fmt(tot) : "—", pos ? "ATONE in this wallet" : "connect a wallet", pos ? '<i class="sd-m mix">' +
+        [[stk, "var(--sv-amber)"], [liq, "var(--sv-violet)"], [rew, "var(--sv-green)"]].map(function(q){
+          return q[0] > 0 ? '<s style="flex:' + q[0] + ' 1 0;background:' + q[1] + '"></s>' : ''; }).join("") + '</i>' : null, "var(--wt)") +
       ro("Staked", pos ? fmt(stk) : "—", mine ? "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s") : pos ? "nothing staked" : "", pos ? stk / (tot || 1) : null, "var(--sv-amber)") +
       ro("Available", bal ? fmt(liq) : "—", bal ? '<b class=sv-pho>' + fmt(bal.uphoton) + '</b> PHOTON for fees' : "", pos ? liq / (tot || 1) : null, "var(--sv-violet)") +
       ro("Rewards", window.__REW != null ? fmt(rew) : "—", rew > 0 ? "ready to claim" : pos ? "nothing waiting" : "", pos ? rew / (tot || 1) : null, "var(--sv-green)",
@@ -214,10 +219,10 @@
       var lift = plan.after - plan.now, hn = heat(plan.now), ha = heat(plan.after);
       picks = plan.picks.map(function(q){ var v = byId[q.id]; return { id: q.id, m: q.m, x: q.x, r: v && window.__rateAfter ? window.__rateAfter(v[1], v[2], q.x) : plan.after }; });
       h = '<div class=sv-ph><h3>Move your stake</h3>' + tag("g", "+" + (lift * 100).toFixed(1) + "% APR") + '</div>' +
-        '<div class=sd-figs>' +
+        '<div class="sd-figs sd-mv">' +
           fig("Now", '<span style="color:' + hn.ink + '">' + pct(plan.now) + '</span>', "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s"), hn.fill) +
           fig("After", '<span style="color:' + ha.ink + '">' + pct(plan.after) + '</span>', "on " + plan.picks.length + " validator" + (plan.picks.length === 1 ? "" : "s"), ha.fill) +
-          fig("ATONE", '<span class=sd-gain>+' + one(plan.gain) + '</span>', "a year at today\'s rates", "var(--sv-green)") +
+          fig("Gain", '<span class=sd-gain>+' + one(plan.gain) + '</span><i class=u>ATONE</i>', "a year more, at today\'s rates", "var(--sv-green)") +
         '</div>' +
         '<button class="sv-btn go sd-go" type=button data-act=opt>Redelegate</button>' +
         '<div class=sd-fine>' + plan.moves + ' move' + (plan.moves === 1 ? "" : "s") + ' in one signature</div>';

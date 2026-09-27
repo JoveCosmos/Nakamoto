@@ -621,8 +621,10 @@
   html[data-theme=light]:not([data-mono]) #sv-netcards .sv-span .sv-k::after{background:transparent}
   html[data-theme=light]:not([data-mono]) .sd-col{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-col::before{background:transparent}
-  html[data-theme=light]:not([data-mono]) .sd-ro::before{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-ro em::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-m s{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-m.mix{background:none}
+  html[data-theme=light]:not([data-mono]) .sd-m.mix s{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-m.apr u{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-act{border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sd-act:hover{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
