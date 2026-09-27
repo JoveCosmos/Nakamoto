@@ -3999,7 +3999,7 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-mv .sd-fig{margin-left:0;padding:10px 14px 10px 16px;border-left:1px solid var(--wbd2);border-radius:10px}
 .sd-mv .sd-fig::before{top:10px;bottom:10px}
 .sd-mv .sd-fig:last-child{grid-column:1/-1}
-.se-mid{margin:auto 0;display:flex;flex-direction:column}
+.se-mid{margin:0 0 auto;padding-top:14px;display:flex;flex-direction:column}   /* under the title, as the no-wallet example */
 .se-mid+.se-fine{margin-top:0}
 /* What your stake earns (Wallet) and what Autopilot would do / Your grant (Autopilot): se- */
 .sd-off{font-size:11px;color:var(--wf);margin:8px 2px 0}
