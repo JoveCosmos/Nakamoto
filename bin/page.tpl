@@ -2420,6 +2420,8 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .uncard .unrow i{font-style:normal;font-family:var(--wmono);font-size:10.5px;color:var(--ws);font-variant-numeric:tabular-nums;white-space:nowrap}
 .uncard .unrow i em{font-style:normal;font-size:7px;letter-spacing:.12em;text-transform:uppercase;color:var(--wf);margin-left:5px}
 .uncard .unamt{display:flex;align-items:center;gap:10px;padding:12px 20px 0}
+/* Stake: the amount and the count above the list, as Redelegate's title row holds them */
+.stcard .unamt.sttop{padding-top:10px;padding-bottom:10px}
 .uncard .unfield{width:200px;height:30px;display:inline-flex;align-items:center;padding:0 4px 0 0;border-radius:6px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#0b0b18,#0e0e1d);box-shadow:inset 0 1px 0 #ffffff06;transition:border-color .15s,box-shadow .15s}
 .uncard .unfield:focus-within{border-color:#b9b0ff;box-shadow:0 0 0 3px rgba(185,176,255,.13)}
 .uncard .unfield.bad{border-color:var(--wburn);box-shadow:0 0 0 3px rgba(255,77,31,.12)}
@@ -5059,12 +5061,12 @@ html[data-tab=connect] .l2host{display:none}
 
 <div class=pop id=stpop><div class="card txcard uncard stcard">
   <header class=wk-txh><div><b>Stake</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=stsum></span></header>
-  <div class="wk-tbl2 stlist" id=stlist></div>
-  <div class=unamt>
+  <div class="unamt sttop">
     <div class="wk-field unfield"><input class=wk-amt2 id=stamt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to stake"><button class=wk-max id=stmax type=button title="Every liquid ATONE">max <b id=stmaxv>&mdash;</b></button></div>
     <span class=wk-seln id=stseln aria-live=polite></span>
     <span class=unhint id=sthint></span>
   </div>
+  <div class="wk-tbl2 stlist" id=stlist></div>
   <div class=txlock id=stlock></div>
   <div class=txfee id=stfee></div>
   <div class=txstep id=ststep></div>
