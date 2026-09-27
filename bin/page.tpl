@@ -3995,21 +3995,21 @@ background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,2
 radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear-gradient(140deg,#4130a0 0%,#271c6c 52%,#150f3b 100%)}
 /* What your stake earns wears the wallet card's fill, exactly - the violet, the orbit rings, the light -
    and its cards are frosted glass on it */
-#sd-sky{color:#fff;border-color:rgba(185,176,255,.35);background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,255,.13) 45px 46px,transparent 47px 70px,rgba(255,255,255,.09) 71px 72px,transparent 73px 98px,rgba(255,255,255,.06) 99px 100px,transparent 101px 128px,rgba(255,255,255,.035) 129px 130px,transparent 131px),
-radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear-gradient(140deg,#4130a0 0%,#271c6c 52%,#150f3b 100%)}
-#sd-sky::after{content:"";position:absolute;right:26px;top:24px;width:7px;height:7px;border-radius:50%;background:#e9e4ff;box-shadow:0 0 12px 2px rgba(214,206,255,.9);pointer-events:none}
+#sd-sky{color:#fff;border-color:rgba(143,240,176,.3);background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,255,.12) 45px 46px,transparent 47px 72px,rgba(255,255,255,.085) 73px 74px,transparent 75px 102px,rgba(255,255,255,.055) 103px 104px,transparent 105px 134px,rgba(255,255,255,.03) 135px 136px,transparent 137px),
+radial-gradient(120% 90% at 0% 0%,rgba(143,240,176,.26),transparent 60%),linear-gradient(140deg,#13603b 0%,#0d3f2d 52%,#08231d 100%)}
+#sd-sky::after{content:"";position:absolute;right:26px;top:24px;width:7px;height:7px;border-radius:50%;background:#e2ffe9;box-shadow:0 0 12px 2px rgba(143,240,176,.9);pointer-events:none}
 #sd-sky .sv-ph h3{color:#fff}
 #sd-sky .sv-ph h3::before{background:#fff;box-shadow:0 0 10px -1px #fff}
 #sd-sky .se-card{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
 #sd-sky .se-card::after{display:none}
-#sd-sky .se-card em{color:rgba(236,232,255,.72)}
+#sd-sky .se-card em{color:rgba(226,255,233,.72)}
 #sd-sky .se-card>b .sd-gain{color:#8cf5b0}
-#sd-sky .se-card>b i,#sd-sky .se-card small.se-apr{color:rgba(236,232,255,.72)}
+#sd-sky .se-card>b i,#sd-sky .se-card small.se-apr{color:rgba(226,255,233,.72)}
 #sd-sky .sd-fig{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18)}
 #sd-sky .sd-fig::after{display:none}
-#sd-sky .sd-fig em,#sd-sky .sd-fig small{color:rgba(236,232,255,.72)}
+#sd-sky .sd-fig em,#sd-sky .sd-fig small{color:rgba(226,255,233,.72)}
 #sd-sky .sd-fig>b .sd-gain{color:#8cf5b0}
-#sd-sky .sd-off{color:rgba(236,232,255,.72)}
+#sd-sky .sd-off{color:rgba(226,255,233,.72)}
 .sd-idw::after{content:"";position:absolute;right:22px;bottom:18px;width:7px;height:7px;border-radius:50%;background:#e9e4ff;box-shadow:0 0 12px 2px rgba(214,206,255,.9)}
 .sd-idw h3,.sd-idw .sv-wn{color:#fff}
 .sd-idw .sd-wch i.app{color:#e4dfff;border-color:rgba(255,255,255,.32);background:rgba(255,255,255,.1)}
@@ -4146,6 +4146,17 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%)}
 .se-card::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:2px;border-radius:0 2px 2px 0;background:var(--sv-green);box-shadow:0 0 12px var(--sv-green)}
 .se-hero:has(>.se-card){padding:0}
+/* the example's spread: lowest and highest year either side of a line, the middle marked on it, the APR
+   range under it */
+.se-rng{margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.14);display:flex;flex-direction:column;gap:5px}
+.se-rv{display:flex;align-items:center;gap:10px}
+.se-rv b{font-size:15px;font-weight:700;color:#bff7d2;font-variant-numeric:tabular-nums;white-space:nowrap}
+.se-rl{position:relative;flex:1 1 auto;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(191,247,210,.35),#8cf5b0)}
+.se-rl::before,.se-rl::after{content:"";position:absolute;top:50%;width:6px;height:6px;margin-top:-3px;border-top:2px solid rgba(191,247,210,.7);border-left:2px solid rgba(191,247,210,.7)}
+.se-rl::before{left:-1px;transform:rotate(-45deg)}.se-rl::after{right:-1px;transform:rotate(135deg);border-color:#8cf5b0}
+.se-rl i{position:absolute;left:var(--at);top:50%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:#e2ffe9;box-shadow:0 0 10px #8cf5b0}
+.se-ra{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--wmono);font-size:9px;letter-spacing:.08em;color:rgba(226,255,233,.6)}
+.se-ra span{visibility:hidden}.se-ra em{font-style:normal;color:rgba(226,255,233,.78)}
 /* the year card wears the wallet card's build - a hard colour, orbit rings from its corner, a light from
    the top left - in the earnings green, the same in day and night */
 .se-card{color:#fff;border-color:rgba(143,240,176,.25);
