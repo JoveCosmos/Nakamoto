@@ -4042,7 +4042,11 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .se-hero small.se-apr{color:var(--wf)}   /* the rate under the year, in the shade of its "A year" label */
 .se-row .sd-fig small{margin-top:4px}
 /* the example (no wallet): figure and boxes centred in the panel, nothing under them */
-.se-ex{margin:0 0 auto;padding-top:14px;display:flex;flex-direction:column}
+/* the no-wallet example stands exactly as the connected panel does (.se-mid): boxes where the centred block
+   puts them, the year centred between the title and them */
+.se-ex{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.se-ex>.se-hero{flex:1 1 auto;justify-content:center}
+.se-ex::after{content:"";flex:1 1 0}
 .se-fine{margin-top:auto;padding-top:10px;font-size:11px;line-height:1.4;color:var(--wf)}
 .se-fine+.se-fine{margin-top:4px;padding-top:0}
 .se-say{font-size:13.5px;line-height:1.5;color:var(--ws);margin-top:auto}
