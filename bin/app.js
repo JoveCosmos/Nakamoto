@@ -950,7 +950,31 @@ rememberGridH();
   /* a refresh brings a new detail list: the same map, refilled, so every holder of it reads the new rows */
   window.__setVD = function(list){ VD = list || []; for(var k in VDBY) delete VDBY[k]; VD.forEach(function(d){ if(d.op) VDBY[String(d.op).slice(-6)] = d; }); };
   /* other sections open a card by the validator's id (the wallet's delegation rows) */
-  window.__vshow = function(id){ for(var k = 0; k < VALS.length; k++) if(VALS[k][3] === id){ vshow(k); return true; } return false; };
+  window.__vshow = function(id){ for(var k = 0; k < VALS.length; k++) if(VALS[k][3] === id){ vshow(k); return true; } return ishow(id); };
+  /* a validator outside the active set (inactive, or jailed out) has no live record to show: its own
+     small card - what it is, why it earns nothing, the reader's stake there, and the two ways out */
+  function ishow(id){
+    var x = (window.__INACT || {})[id], pos = window.__POS, row = null, k;
+    if(pos) for(k = 0; k < pos.rows.length; k++) if(pos.rows[k].id === id) row = pos.rows[k];
+    if(!x && !row) return false;
+    var m = x ? x.m : row.m, op = x ? x.op : row.op, mo = E("imono");
+    E("iname").textContent = m;
+    if(mo){ mo.style.display = "flex"; mo.style.background = tint(m || ""); mo.textContent = initial(m); }
+    E("iop").textContent = op ? op.slice(0, 14) + "\u2026" + op.slice(-6) : "";
+    E("iop").title = op || "";
+    var jailed = x && x.jailed;
+    E("ibadges").innerHTML = jailed ? '<span class="badge warn">JAILED</span>' : '<span class="badge dn">INACTIVE</span>';
+    E("inote").textContent = jailed ? "Jailed and out of the active set: it earns nothing until its operator unjails it and it is back in the top 100."
+                                    : "Outside the active set (the top 100 by stake): it earns nothing until it is back in.";
+    E("imine").textContent = row ? f(row.x / 1e6) : "\u2014";
+    E("istake").textContent = x ? f(x.t / 1e6) : "\u2014";
+    E("icomm").textContent = x ? (x.c * 100).toFixed(0) + "%" : "\u2014";
+    var go = E("igo"), un = E("iun"); if(go) go.hidden = !row; if(un){ un.hidden = !row; un.dataset.v = id; }
+    POP.open(E("ipop"));
+    return true;
+  }
+  var igo = E("igo"); if(igo) igo.addEventListener("click", function(){ POP.closeAll(); if(window.__shellGo) window.__shellGo("dashboard/self"); });
+  var iun = E("iun"); if(iun) iun.addEventListener("click", function(){ if(window.__unstakeFrom) window.__unstakeFrom(iun.dataset.v); });
   function vshow(i){
     var v = (VALS[i] && VDBY[VALS[i][3]]) || VD[i]; if(!v) return;
     var liveT = VALS[i] ? VALS[i][1] : v.t;
@@ -1911,7 +1935,7 @@ rememberGridH();
     h += '<table><colgroup><col style="width:30px"><col><col style="width:80px"><col style="width:50px"><col style="width:56px"></colgroup><thead><tr><th class=c>rank</th><th class=l>validator</th><th>ATONE</th><th>APR</th><th>rewards</th></tr></thead><tbody>';
     for(k = 0; k < slice.length; k++){
       var rw = slice[k], rk = rankOf(V, rw.id);
-      h += '<tr' + (rw.inactive ? ' class=inactive title="Not in the active set: this stake earns nothing until it is moved or unstaked"' : ' data-v="' + att(rw.id) + '" tabindex=0 title="Open this validator"') + '><td class="c rk">' + (rk || '\u2014') + '</td><td class="l nm">' + logo(rw.id, rw.m) + '<span>' + att(rw.m) + '</span></td>' +
+      h += '<tr' + (rw.inactive ? ' class=inactive' : '') + ' data-v="' + att(rw.id) + '" tabindex=0 title="' + (rw.inactive ? 'Not in the active set: this stake earns nothing until it is moved or unstaked' : 'Open this validator') + '"><td class="c rk">' + (rk || '\u2014') + '</td><td class="l nm">' + logo(rw.id, rw.m) + '<span>' + att(rw.m) + '</span></td>' +
            '<td class=amt><span title="' + (rw.locked > 0 ? 'held until ' + window.__day(rw.until) : 'free to move') + '">' + fmt(rw.x) + (rw.locked > 0 ? LOCK : '') + '</span></td>' +
            '<td>' + pct(rw.rate) + '</td><td class=rw>' + (RB[rw.id] != null ? fmt(RB[rw.id]) : '\u2014') + '</td></tr>';
     }
@@ -2267,6 +2291,12 @@ rememberGridH();
     var go = E("unsign"); if(go){ go.disabled = true; go.textContent = "Unstake"; }
     unRows(); unState(); POP.open(unpop); if(a) a.focus();
   });
+  window.__unstakeFrom = function(id){
+    if(!unpop || !window.__POS) return;
+    UNSEL = id; var a = E("unamt"); if(a) a.value = "";
+    var go = E("unsign"); if(go){ go.disabled = true; go.textContent = "Unstake"; }
+    unRows(); unState(); POP.open(unpop); if(a) a.focus();
+  };
   var unamtEl = E("unamt"); if(unamtEl) unamtEl.addEventListener("input", unState);
   var unmax = E("unmax"); if(unmax) unmax.addEventListener("click", function(){ var r = unRow(); if(!r) return; E("unamt").value = exact(r.x); unState(); });
   if(unpop) unpop.__onclose = function(){ feeSoon("un"); };
@@ -3030,7 +3060,7 @@ rememberGridH();
       var rate = v ? window.__rateAfter(v[1], v[2], 0) : 0;   /* already in, no dilution */
       total += amt; free += (amt - held); weighted += amt * rate;
       if(L && L.until > until) until = L.until;
-      rows.push({ id: id6, op: op, m: v ? v[0] : "Inactive validator", x: amt, rate: rate, locked: held, until: L ? L.until : 0, inactive: !v });
+      rows.push({ id: id6, op: op, m: v ? v[0] : (((window.__INACT || {})[id6] || {}).m || "Inactive validator"), x: amt, rate: rate, locked: held, until: L ? L.until : 0, inactive: !v });
     }
     return { total: total, free: free, locked: total - free, until: until,
              rate: total ? weighted / total : 0, rows: rows };

@@ -413,6 +413,14 @@ fill:none;stroke:#9ed6f7;stroke-width:1.2;stroke-dasharray:5 4;animation:march .
 
 /* the alert chooser */
 .acard{max-width:430px}
+/* a validator outside the active set: its own small card */
+.icard{max-width:430px}
+.iop{font-family:var(--mono);font-size:10.5px;color:var(--ink3)}
+.icard .vbadges{padding:0 28px}
+.inote{margin:12px 28px 0;font-size:12.5px;line-height:1.5;color:var(--ink2)}
+.ibtns{display:flex;gap:10px;padding:18px 28px 24px}
+.ibtns .wk-btn{flex:1 1 0;height:38px}
+.ibtns .wk-btn[hidden]{display:none}
 
 .alist{display:flex;flex-direction:column;gap:1px;background:var(--edge);
 border-top:1px solid var(--edge);border-bottom:1px solid var(--edge);margin-top:16px}
@@ -3984,14 +3992,14 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 #sd-move.fill{justify-content:center;align-items:center}
 .sd-mvh{flex-wrap:nowrap;container-type:inline-size;min-height:27px}
 .sd-mvh .sv-tag{flex:0 0 auto}
-.sd-mvn .m,.sd-mvn .s{display:none}
-/* the row picks its wording by its own width (title 150, pill 106, gaps 10): pill and the whole line,
-   pill and the count, then without the pill (Now and After below say the same) the line, a shorter
-   line, the count */
-@container (max-width:421px){.sd-mvn .l{display:none}.sd-mvn .s{display:inline}}
-@container (max-width:322px){.sd-mvh .sv-tag{display:none}.sd-mvn .s{display:none}.sd-mvn .l{display:inline}}
+.sd-mvn .m{display:none}
+/* the count always says "1 signature"; the row's own width picks the wording (title 150, pill 106,
+   gaps 10): pill and the whole line, pill and "N moves, 1 signature", then without the pill (Now and
+   After below say the same) the whole line, the short one, and on the narrowest a smaller title */
+@container (max-width:421px){.sd-mvn .l{display:none}.sd-mvn .m{display:inline}}
+@container (max-width:397px){.sd-mvh .sv-tag{display:none}.sd-mvn .m{display:none}.sd-mvn .l{display:inline}}
 @container (max-width:305px){.sd-mvn .l{display:none}.sd-mvn .m{display:inline}}
-@container (max-width:281px){.sd-mvn .m{display:none}.sd-mvn .s{display:inline}}
+@container (max-width:281px){#sd-move .sd-mvh{column-gap:8px}#sd-move .sd-mvh h3{font-size:13px}#sd-move .sd-mvh .sd-mvn{font-size:9.5px}}
 .sd-mvh h3{flex:0 0 auto;white-space:nowrap}
 .sd-mvh .sd-mvn{margin-left:auto;min-width:0;font-size:11px;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
 /* Move your stake: Now and After side by side, the gain under both, inset like the button below */
@@ -3999,7 +4007,12 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-mv .sd-fig{margin-left:0;padding:10px 14px 10px 16px;border-left:1px solid var(--wbd2);border-radius:10px}
 .sd-mv .sd-fig::before{top:10px;bottom:10px}
 .sd-mv .sd-fig:last-child{grid-column:1/-1}
-.se-mid{margin:0 0 auto;padding-top:14px;display:flex;flex-direction:column}   /* under the title, as the no-wallet example */
+/* the boxes stand where the centred block put them (equal room above the block and below it); the
+   year rises into the middle of the room between the title and the boxes: the hero takes its own
+   height plus half the spare room and centres itself in it, the ::after spacer the other half */
+.se-mid{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.se-mid>.se-hero{flex:1 1 auto;justify-content:center}
+.se-mid::after{content:"";flex:1 1 0}
 .se-mid+.se-fine{margin-top:0}
 /* What your stake earns (Wallet) and what Autopilot would do / Your grant (Autopilot): se- */
 .sd-off{font-size:11px;color:var(--wf);margin:8px 2px 0}
@@ -4976,6 +4989,20 @@ html[data-tab=connect] .l2host{display:none}
     <div class=atfs><div class=txfee id=attxfee></div><div class=txstep id=atstep></div></div>
     <div class=txbtns><button class=wk-btn id=atcancel type=button hidden>Back</button><button class="wk-btn wk-danger" id=atrevoke type=button hidden>Revoke</button><button class=wk-btn id=atedit type=button hidden>Change</button><button class="wk-btn wk-go" id=atgrant type=button disabled>Grant</button></div>
   </div>
+</div></div>
+
+<div class=pop id=ipop><div class="card vcard icard">
+  <div class="vhead vwrap"><span class=vmono id=imono></span>
+    <div class=vcol><div class=vname><span class=vnm id=iname>&mdash;</span></div><div class=vsub><span class=iop id=iop></span></div></div></div>
+  <div class=vbadges id=ibadges></div>
+  <p class=inote id=inote></p>
+  <div class=vgrid>
+    <div class=vstat><span class=vk>your stake</span><span class=vv id=imine>&mdash;</span></div>
+    <div class=vstat><span class=vk>APR now</span><span class=vv style="color:var(--burn)">0%</span></div>
+    <div class=vstat><span class=vk>ATONE staked</span><span class=vv id=istake>&mdash;</span></div>
+    <div class=vstat><span class=vk>commission</span><span class=vv id=icomm>&mdash;</span></div>
+  </div>
+  <div class=ibtns><button class="wk-btn wk-go" id=igo type=button title="Move this stake to validators that pay">Redelegate</button><button class=wk-btn id=iun type=button title="Unstake from this validator (21 days)">Unstake</button></div>
 </div></div>
 
 <div class=pop id=apop><div class="card vcard acard">
