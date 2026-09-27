@@ -198,9 +198,9 @@
     if(out > 0) sums.push(["Inactive", out, 3]);
     /* the thirds as Move your stake shows its figures: cards, two side by side, the third under both
        (four as two and two when some stake sits on inactive validators) */
-    var col = ["#ff9b7a", "#ffc453", "#8cf5b0", "rgba(236,232,255,.7)"], edge = ["#ff6a3d", "#ffb02e", "#2ee06a", "var(--wf)"];
+    var edge = ["#ff6a3d", "#ffb02e", "#2ee06a", "var(--wf)"];
     return head + '<div class="sd-figs sd-mv' + (sums.length > 3 ? ' four' : '') + '">' + sums.map(function(q){
-      return fig(q[0], '<span style="color:' + col[q[2]] + '">' + sh(q[1]) + '%</span>', (q[1] >= 1e12 ? big(q[1]) : fmt(q[1])) + ' ATONE', edge[q[2]]); }).join("") + '</div>';
+      return fig(q[0], '<span class=fpt' + q[2] + '>' + sh(q[1]) + '%</span>', (q[1] >= 1e12 ? big(q[1]) : fmt(q[1])) + ' ATONE', edge[q[2]]); }).join("") + '</div>';
   }
 
   function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }
