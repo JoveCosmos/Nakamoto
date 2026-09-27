@@ -4073,6 +4073,14 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-rs b{color:var(--wt)}
 .sd-go{width:100%;height:40px;flex:0 0 auto;justify-content:center}
 .sd-go2{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:0 0 auto;margin-top:auto}
+/* Overview's three panels line up as Manage's do: one title-row height, the content starting on one line;
+   What your stake earns stands at the top - the year card, its three boxes 8px under it, as Move your
+   stake's cards - its doors at the foot */
+#sv-over .sd-col>.sv-ph{min-height:27px}
+#sv-over .se-mid,#sv-over .se-ex{flex:0 0 auto;gap:8px}
+#sv-over .se-mid>.se-hero,#sv-over .se-ex>.se-hero{flex:0 0 auto}
+#sv-over .se-mid::after,#sv-over .se-ex::after{display:none}
+#sv-over .se-row{margin-top:0}
 .sd-go2 .sd-go{width:auto}
 .sv-btn.go.sd-cl{background:transparent;color:#5cf08e;border-color:rgba(46,224,106,.6);box-shadow:none}
 .sv-btn.go.sd-cl:hover:not(:disabled){background:rgba(46,224,106,.12);color:#8ef0b0;border-color:#2ee06a}
