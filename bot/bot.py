@@ -399,7 +399,12 @@ def handle(c, msg, V):
                 head = "Watching %d validators:\n%s" % (len(many), "\n".join("- <b>%s</b>" % md(V[op]["m"]) for op, _ in many))
                 if updated:
                     head += "\n\n%d of them you already watched: their alerts are replaced by these." % len(updated)
-            return send(chat, "%s\n\n%s%s\n\n/stop to undo." % (head, what, standing(c, many, V)))
+            # each validator is its own row, so adding one leaves the others as they were: say so,
+            # or an add reads like a replace
+            total = c.execute("SELECT count(*) FROM sub WHERE chat=?", (chat,)).fetchone()[0]
+            tail = ("\n\nYou now watch %d validators in all, each with its own alerts. /list shows them."
+                    % total) if total > len(many) else ""
+            return send(chat, "%s\n\n%s%s%s\n\n/stop &lt;name&gt; removes one, /stop removes all." % (head, what, standing(c, many, V), tail))
         if arg:
             return send(chat, "That validator is not in the active set.")
         return send(chat, HELP)
