@@ -195,6 +195,9 @@ background:var(--edge);border:1px solid var(--edge2);margin-bottom:26px}
 .sbox .s{font-size:12px;color:var(--ink2);margin-top:5px}
 /* the Projection's figures read label first: started at, today, cap, next - then the value */
 #p-eta .sbox>*>.k:first-child{margin:0 0 7px}
+/* the two Trend panels side by side: each subtitle keeps room for two lines, so the graphs and the
+   boxes under them start on the same line whichever subtitle is longer */
+@media(min-width:901px){#p-eta .panel>.sub{min-height:2.9em}}
 
 table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13.5px;font-variant-numeric:tabular-nums}
 th{text-align:right;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);
@@ -4578,10 +4581,10 @@ html[data-tab=connect] .l2host{display:none}
     <svg id=trend viewBox="0 0 900 300" role=img tabindex=0
       aria-label="Top-ten proposal share over time. Open for a closer look."></svg>
     <div class=sbox>
-      <div><div class=v>{{TOP10}}%</div><div class=k>block share</div><div class=s>from {{TOP10_FIRST}}%</div></div>
-      <div><div class=v style="color:var(--hot)">{{SPEEDUP}}</div><div class=k>{{SPEEDUP_K}}</div><div class=s>{{SPEEDUP_SUB}}</div></div>
-      <div><div class=v style="color:var(--burn)">{{MV_TOP}}</div><div class=k>ATONE</div><div class=s>left the top 10</div></div>
-      <div><div class=v>{{MV_NEW}}</div><div class=k>ATONE</div><div class=s>net new bonded</div></div>
+      <div><div class=k>block share</div><div class=v>{{TOP10}}%</div><div class=s>from {{TOP10_FIRST}}%</div></div>
+      <div><div class=k>{{SPEEDUP_K}}</div><div class=v style="color:var(--hot)">{{SPEEDUP}}</div><div class=s>{{SPEEDUP_SUB}}</div></div>
+      <div><div class=k>left the top 10</div><div class=v style="color:var(--burn)">{{MV_TOP}}</div><div class=s>ATONE</div></div>
+      <div><div class=k>net new bonded</div><div class=v>{{MV_NEW}}</div><div class=s>ATONE</div></div>
     </div>
       </div>
     </div>

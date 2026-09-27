@@ -861,7 +861,8 @@ rememberGridH();
   var SC = D.schedule, ES = D.eta_stats;
   if(!SC || !SC.length) return;
   var sm = window.innerWidth < 620;
-  var W=sm?460:900, H=300, PL=sm?40:58, PR=sm?14:26, PT=sm?22:30, PB=sm?36:48;
+  /* the same frame as the Effect graph beside it (PL/PR/PT/PB and the label offsets), so the two line up */
+  var W=sm?460:900, H=300, PL=sm?44:64, PR=sm?16:28, PT=sm?20:26, PB=sm?34:46;
   /* a week whose eta is not known (the rule could not be replayed onto the live value:
      testnet, or a history this page cannot reproduce) has eta null - no point, no line */
   var lo=0, hi=Math.max(ES.cap*0.22, Math.max.apply(null,SC.filter(function(r){return r.eta!=null;}).map(function(r){return r.eta;}))*1.9);
@@ -871,7 +872,7 @@ rememberGridH();
   var s="";
   for(var g=0;g<=4;g++){ var v=hi*g/4;
     s+='<line x1="'+PL+'" y1="'+Y(v)+'" x2="'+(W-PR)+'" y2="'+Y(v)+'" stroke="#232342"/>'+
-       '<text x="'+(PL-10)+'" y="'+(Y(v)+4)+'" text-anchor="end" font-size="11" fill="#6f6d94">'+v.toFixed(2)+'</text>'; }
+       '<text x="'+(PL-11)+'" y="'+(Y(v)+4)+'" text-anchor="end" font-size="11.5" fill="#6f6d94">'+v.toFixed(2)+'</text>'; }
   s+='<line x1="'+PL+'" y1="'+Y(ES.floor)+'" x2="'+(W-PR)+'" y2="'+Y(ES.floor)+
      '" stroke="#6f66c8" stroke-width="1.5" stroke-dasharray="4 4"/>'+
      '<text x="'+(W-PR)+'" y="'+(Y(ES.floor)-7)+'" text-anchor="end" font-size="11" fill="#6f66c8">FLOOR '+ES.floor.toFixed(2)+'</text>';
@@ -887,15 +888,15 @@ rememberGridH();
   s+='<path d="'+df+'" fill="none" stroke="#6f6d94" stroke-width="2" stroke-dasharray="5 4"/>';
   s+='<path d="'+dp+'" fill="none" stroke="#ffb02e" stroke-width="3"/>';
   s+='<line x1="'+X(nowI)+'" y1="'+PT+'" x2="'+X(nowI)+'" y2="'+(H-PB)+'" stroke="#ff4d1f" stroke-width="1.5"/>';
-  s+='<text x="'+(X(nowI)+9)+'" y="'+(PT+15)+'" font-size="11.5" fill="#ff4d1f">TODAY</text>';
+  s+='<text x="'+(X(nowI)+10)+'" y="'+(PT+17)+'" font-size="12.5" fill="#ff4d1f">TODAY</text>';
   SC.forEach(function(r,i){
-    if(r.eta==null){ if(i%2===0) s+='<text x="'+X(i).toFixed(1)+'" y="'+(H-PB+21)+'" text-anchor="middle" font-size="10" fill="#6f6d94">'+r.date.split(" ")[0]+'</text>'; return; }
+    if(r.eta==null){ if(i%2===0) s+='<text x="'+X(i).toFixed(1)+'" y="'+(H-PB+23)+'" text-anchor="middle" font-size="10.5" fill="#6f6d94">'+r.date.split(" ")[0]+'</text>'; return; }
     s+='<circle class="etapt" data-i="'+i+'" cx="'+X(i).toFixed(1)+'" cy="'+Y(r.eta).toFixed(1)+
        '" r="'+(r.now?6:4)+'" fill="'+(r.now?"#ff4d1f":i<nowI?"#ffb02e":"#6f6d94")+
        '" stroke="#06060c" stroke-width="1.5" style="cursor:pointer"><title>week '+r.week+
        ", "+r.date+", η "+r.eta.toFixed(2)+'</title></circle>';
-    if(i%2===0) s+='<text x="'+X(i).toFixed(1)+'" y="'+(H-PB+21)+
-       '" text-anchor="middle" font-size="10" fill="#6f6d94">'+r.date.split(" ")[0]+'</text>'; });
+    if(i%2===0) s+='<text x="'+X(i).toFixed(1)+'" y="'+(H-PB+23)+
+       '" text-anchor="middle" font-size="10.5" fill="#6f6d94">'+r.date.split(" ")[0]+'</text>'; });
   E("etacurve").setAttribute("viewBox","0 0 "+W+" "+H);
   E("etacurve").innerHTML=s;
 

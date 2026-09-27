@@ -149,3 +149,11 @@
 
   /* Self's Autopilot row: its own tokens, in the day palette */
   html[data-theme=light]:not([data-mono]) .sa-band{--sa-v:#5b4fc4;--sa-t:#0f5e50;--sa-g:#16733a;--sa-on:#ffffff}
+
+  /* Trend's two graphs draw with SVG colour attributes meant for the night card: the Effect line
+     and its weeks are near-white, the grid a night navy; on ivory they take ink and a light rule */
+  html[data-theme=light]:not([data-mono]) :is(#trend,#trendbig) path[stroke="#fff8dc"]{stroke:#2c2940}
+  html[data-theme=light]:not([data-mono]) :is(#trend,#trendbig) circle[fill="#fff8dc"]{fill:#2c2940;stroke:#fbf9f3}
+  html[data-theme=light]:not([data-mono]) :is(#trend,#trendbig,#etacurve) circle[stroke="#06060c"]{stroke:#fbf9f3}
+  html[data-theme=light]:not([data-mono]) :is(#trend,#trendbig,#etacurve) line[stroke="#232342"]{stroke:#e2ddd0}
+  html[data-theme=light]:not([data-mono]) :is(#trend,#trendbig) text[fill="#a5a3c4"]{fill:#5d5a74}
