@@ -3993,6 +3993,23 @@ position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-dire
 .sd-idw{position:relative;overflow:hidden;color:#fff;
 background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,255,.13) 45px 46px,transparent 47px 70px,rgba(255,255,255,.09) 71px 72px,transparent 73px 98px,rgba(255,255,255,.06) 99px 100px,transparent 101px 128px,rgba(255,255,255,.035) 129px 130px,transparent 131px),
 radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear-gradient(140deg,#4130a0 0%,#271c6c 52%,#150f3b 100%)}
+/* What your stake earns wears the wallet card's fill, exactly - the violet, the orbit rings, the light -
+   and its cards are frosted glass on it */
+#sd-sky{color:#fff;border-color:rgba(185,176,255,.35);background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,255,.13) 45px 46px,transparent 47px 70px,rgba(255,255,255,.09) 71px 72px,transparent 73px 98px,rgba(255,255,255,.06) 99px 100px,transparent 101px 128px,rgba(255,255,255,.035) 129px 130px,transparent 131px),
+radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear-gradient(140deg,#4130a0 0%,#271c6c 52%,#150f3b 100%)}
+#sd-sky::after{content:"";position:absolute;right:26px;top:24px;width:7px;height:7px;border-radius:50%;background:#e9e4ff;box-shadow:0 0 12px 2px rgba(214,206,255,.9);pointer-events:none}
+#sd-sky .sv-ph h3{color:#fff}
+#sd-sky .sv-ph h3::before{background:#fff;box-shadow:0 0 10px -1px #fff}
+#sd-sky .se-card{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+#sd-sky .se-card::after{display:none}
+#sd-sky .se-card em{color:rgba(236,232,255,.72)}
+#sd-sky .se-card>b .sd-gain{color:#8cf5b0}
+#sd-sky .se-card>b i,#sd-sky .se-card small.se-apr{color:rgba(236,232,255,.72)}
+#sd-sky .sd-fig{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18)}
+#sd-sky .sd-fig::after{display:none}
+#sd-sky .sd-fig em,#sd-sky .sd-fig small{color:rgba(236,232,255,.72)}
+#sd-sky .sd-fig>b .sd-gain{color:#8cf5b0}
+#sd-sky .sd-off{color:rgba(236,232,255,.72)}
 .sd-idw::after{content:"";position:absolute;right:22px;bottom:18px;width:7px;height:7px;border-radius:50%;background:#e9e4ff;box-shadow:0 0 12px 2px rgba(214,206,255,.9)}
 .sd-idw h3,.sd-idw .sv-wn{color:#fff}
 .sd-idw .sd-wa{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.2)}
@@ -4091,9 +4108,9 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 /* Where the stake sits: the set as a 10x10 map in rank order, each third tinted, the validators that
    hold the stake lit by how much; the three shares under it in wells */
 .fp-map{flex:1 1 auto;min-height:120px;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:3px;margin-top:4px}
-.fp-c{--t:#ff6a3d;border-radius:3px;cursor:pointer;background:color-mix(in srgb,var(--t) 13%,rgba(255,255,255,.02));box-shadow:inset 0 1px 2px rgba(0,0,0,.5)}
+.fp-c{--t:#ff6a3d;border-radius:3px;cursor:pointer;background:color-mix(in srgb,var(--t) 30%,rgba(255,255,255,.05));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--t) 22%,transparent)}
 .fp-c.b1{--t:#ffb02e}.fp-c.b2{--t:#2ee06a}
-.fp-c.on{background:color-mix(in srgb,var(--t) calc(35% + var(--l) * 65%),rgba(255,255,255,.04));box-shadow:0 0 calc(var(--l) * 12px) color-mix(in srgb,var(--t) 70%,transparent),inset 0 1px 0 rgba(255,255,255,.25)}
+.fp-c.on{background:color-mix(in srgb,var(--t) calc(62% + var(--l) * 38%),#fff 0%);box-shadow:0 0 calc(var(--l) * 12px) color-mix(in srgb,var(--t) 70%,transparent),inset 0 1px 0 rgba(255,255,255,.25)}
 .fp-c:hover{outline:1px solid var(--wt);outline-offset:1px}
 .fp-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:6px;margin-top:10px}
 .fp-s{--rc:#ff6a3d;min-width:0}.fp-s.b1{--rc:#ffb02e}.fp-s.b2{--rc:#2ee06a}.fp-s.b3{--rc:var(--wf)}

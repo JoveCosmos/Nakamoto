@@ -190,5 +190,13 @@
   html[data-theme=light]:not([data-mono]) .se-card small.se-apr{color:rgba(226,255,233,.75)}
 
 
-  html[data-theme=light]:not([data-mono]) .fp-c{background:color-mix(in srgb,var(--t) 16%,#f2eee4);box-shadow:inset 0 1px 2px rgba(60,50,20,.15)}
+  html[data-theme=light]:not([data-mono]) .fp-c{background:color-mix(in srgb,var(--t) 34%,#f2eee4);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--t) 30%,transparent)}
   html[data-theme=light]:not([data-mono]) .fp-c.on{background:color-mix(in srgb,var(--t) calc(40% + var(--l) * 60%),#f2eee4);box-shadow:none}
+  /* What your stake earns keeps the wallet card's violet in day, its cards frosted on it */
+  html[data-theme=light]:not([data-mono]) #sd-sky{color:#fff;border-color:rgba(91,79,196,.4);background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,255,.13) 45px 46px,transparent 47px 70px,rgba(255,255,255,.09) 71px 72px,transparent 73px 98px,rgba(255,255,255,.06) 99px 100px,transparent 101px 128px,rgba(255,255,255,.035) 129px 130px,transparent 131px),
+radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear-gradient(140deg,#4130a0 0%,#271c6c 52%,#150f3b 100%)}
+  html[data-theme=light]:not([data-mono]) #sd-sky .sv-ph h3{color:#fff}
+  html[data-theme=light]:not([data-mono]) #sd-sky .se-card,html[data-theme=light]:not([data-mono]) #sd-sky .sd-fig{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)}
+  html[data-theme=light]:not([data-mono]) #sd-sky .se-card em,html[data-theme=light]:not([data-mono]) #sd-sky .sd-fig em,html[data-theme=light]:not([data-mono]) #sd-sky .sd-fig small,html[data-theme=light]:not([data-mono]) #sd-sky .se-card small.se-apr,html[data-theme=light]:not([data-mono]) #sd-sky .se-card>b i{color:rgba(236,232,255,.75)}
+  html[data-theme=light]:not([data-mono]) #sv #sd-sky .sd-gain,html[data-theme=light]:not([data-mono]) #sv #sd-sky .se-card>b .sd-gain{color:#8cf5b0}
+

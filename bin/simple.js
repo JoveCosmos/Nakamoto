@@ -259,7 +259,7 @@
           '<li style="--sc:#2ee06a"><b>Redelegate</b><span>to the best earning place, in single signature</span></li>' +
         '</ol>';
     } else if(!pos.rows.length){
-      h = '<div class=sv-none><h3>No stake on AtomOne</h3><button class="sv-btn go" type=button data-act=stake>Stake ATONE</button></div>';
+      h = '<div class=sv-none><h3>Nothing staked yet</h3><p class=sd-fine>so nothing to move: Stake, beside, is the way in</p></div>';
     } else if(!(pos.free > 0)){
       h = '<div class=sv-ph><h3>Everything is under cooldown</h3>' + tag("a", "21 days") + '</div>' +
         fig("Your APR", pct(pos.rate), "on " + pos.rows.length + " validators", heat(pos.rate).fill) +
@@ -295,7 +295,9 @@
     var off = 0; rows.forEach(function(r){ if(r.inactive) off += r.x; });
     put("sd-sky", mine
       ? '<div class=sv-ph><h3>What your stake earns</h3></div>' + earns(pos.total, pos.rate, off)
-      : '<div class=sv-ph><h3>What 1,000 ATONE earns</h3></div>' + earns(1e9, S.mid, 0, true));
+      : '<div class=sv-ph><h3>What 1,000 ATONE earns</h3></div>' + earns(1e9, S.mid, 0, true) +
+        /* a wallet with nothing staked: the door to its first stake (no wallet: no door, the steps say how) */
+        (pos ? '<button class="sv-btn go sd-go" type=button data-act=stake>Stake</button>' : ''));
 
     /* the validators */
     put("sd-list", footprint(pos));
