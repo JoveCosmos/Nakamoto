@@ -1981,10 +1981,12 @@ rememberGridH();
     ijWire(el, draw);
     Array.prototype.forEach.call(el.querySelectorAll("tbody input"), function(c){
       c.addEventListener("change", function(){ if(c.checked) SEL[c.dataset.id] = 1; else delete SEL[c.dataset.id]; draw(); }); });
-    /* the head's box ticks everyone, or clears everyone; half-ticked it shows as such */
+    /* the head's box ticks the whole active set, or clears it; half-ticked it shows as such. An
+       inactive validator is never part of "all": it is ticked on its own row and stays as it was */
     var all = E("ckall");
-    if(all){ all.indeterminate = sel.n > 0 && sel.n < opt.length;
-      all.addEventListener("change", function(){ SEL = {}; if(all.checked) opt.forEach(function(v){ SEL[v.id] = 1; }); draw(); }); }
+    if(all){ var on = opt.filter(function(v){ return SEL[v.id]; }).length;
+      all.checked = on > 0 && on === opt.length; all.indeterminate = on > 0 && on < opt.length;
+      all.addEventListener("change", function(){ opt.forEach(function(v){ if(all.checked) SEL[v.id] = 1; else delete SEL[v.id]; }); draw(); }); }
   }
 
   /* ── the answer: one strip - now → after, the gain, the count, the button ── */
