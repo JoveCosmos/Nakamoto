@@ -3959,6 +3959,24 @@ position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-dire
 /* wide enough: the first box takes a little more, so the name and the read time share one row */
 @media(min-width:1200px){.sd-strip{grid-template-columns:minmax(0,1.6fr) repeat(5,minmax(0,1fr)) !important}}
 .sd-top .sv-wread{flex:0 0 auto}
+/* the wallet box's second and third lines: address + copy, then the wallet app and the network */
+.sd-wmeta{display:flex;flex-direction:column;align-items:flex-start;gap:5px;margin-top:-2px;min-width:0;width:100%}
+.sd-wa{display:inline-flex;align-items:center;gap:4px;max-width:100%;min-width:0;height:22px;box-sizing:border-box;padding:0 2px 0 8px;border:1px solid var(--wbd2);border-radius:7px;background:rgba(255,255,255,.025)}
+.sd-wa code{font-family:var(--wmono);font-size:11px;letter-spacing:.02em;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sd-wcp{flex:0 0 auto;width:18px;height:18px;display:grid;place-items:center;border:0;border-radius:5px;background:transparent;color:var(--wf);cursor:pointer}
+.sd-wcp svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sd-wcp:hover{color:var(--sv-violet);background:rgba(185,176,255,.1)}
+.sd-wcp.ok{color:var(--sv-green)}
+.sd-wcp:focus-visible{outline:2px solid var(--sv-violet);outline-offset:1px}
+.sd-wch{display:flex;gap:6px;flex-wrap:wrap}
+.sd-wch i{font-style:normal;font-family:var(--wmono);font-size:8.5px;line-height:1;letter-spacing:.14em;text-transform:uppercase;padding:3px 7px;border-radius:999px;border:1px solid}
+.sd-wch i.app{color:var(--sv-violet);border-color:rgba(185,176,255,.4);background:rgba(185,176,255,.08)}
+.sd-wch i.net{color:var(--sv-teal);border-color:rgba(43,200,189,.4);background:rgba(43,200,189,.08)}
+.sd-wch i.net.tn{color:var(--sv-amber);border-color:rgba(255,176,46,.4);background:rgba(255,176,46,.08)}
+.sd-wnone{font-size:12px;color:var(--wf)}
+.sd-wbtn{height:30px;padding:0 14px;border-radius:8px;border:1px solid rgba(255,176,46,.55);background:linear-gradient(180deg,rgba(255,176,46,.22),rgba(255,176,46,.1));color:#ffc453;font:600 12px var(--wsans);cursor:pointer}
+.sd-wbtn:hover{border-color:#ffb02e;color:#ffd58a}
+.sd-wbtn:focus-visible{outline:2px solid #ffb02e;outline-offset:2px}
 .sd-ro{--rc:var(--sv-teal);position:relative;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:14px 18px 13px;min-width:0;border-left:1px solid var(--wbd)}
 /* each box's colour is a small key before its label, as the graphs' legends are */
 .sd-ro em::before{content:"";display:inline-block;width:6px;height:6px;margin-right:7px;border-radius:2px;vertical-align:1px;background:var(--rc);box-shadow:0 0 8px var(--rc)}

@@ -174,6 +174,16 @@
   }
   function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }
 
+  /* the wallet box under its name: the address with a copy button, then the wallet app and the network
+     as two chips; with no wallet, a line and the door to connect one */
+  function wmeta(){
+    var W = window.__WALLET, a = window.__ADDR, net = TN() ? "Testnet" : "Mainnet";
+    if(!W || !a) return '<div class=sd-wmeta><span class=sd-wnone>Not connected</span>' +
+      '<button class=sd-wbtn type=button data-act=connect>Connect wallet</button></div>';
+    return '<div class=sd-wmeta><span class=sd-wa title="' + esc(a) + '"><code>' + esc(a.slice(0, 10) + "\u2026" + a.slice(-6)) + '</code>' +
+      '<button class=sd-wcp type=button data-act=copyaddr title="Copy the address" aria-label="Copy the address"><svg viewBox="0 0 24 24" aria-hidden=true><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></span>' +
+      '<span class=sd-wch><i class=app>' + esc(W.name || "Wallet") + '</i><i class="net' + (TN() ? ' tn' : '') + '">' + net + '</i></span></div>';
+  }
   function drawOver(){
     var pos = window.__POS, S = setStats(), bal = window.__BAL;
     var mine = pos && pos.rows.length, rew = window.__REW || 0, liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0, tot = liq + stk + rew;
@@ -182,7 +192,7 @@
       '<button class=sv-rf type=button data-act=refresh title="Read the wallet again" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button></span>' : '';
     put("sd-wstrip",
       /* one row: the wallet's name, and at the box's right end when it was read, with the refresh */
-      '<div class="sd-id sd-idw"><div class=sd-top><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3>' + read + '</div></div>' +
+      '<div class="sd-id sd-idw"><div class=sd-top><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3>' + read + '</div>' + wmeta() + '</div>' +
       /* the Total's bar is the wallet split three ways - staked, available, rewards - not a full line */
       ro("Total", pos ? fmt(tot) : "—", pos ? "ATONE in this wallet" : "connect a wallet", pos ? '<i class="sd-m mix">' +
         [[stk, "var(--sv-amber)"], [liq, "var(--sv-violet)"], [rew, "var(--sv-green)"]].map(function(q){
@@ -1253,6 +1263,7 @@
       return;
     }
     if(act === "autopilot"){ var ab = E("atbtn"); if(ab) ab.click(); return; }
+    if(act === "copyaddr"){ var ad = window.__ADDR; if(ad && navigator.clipboard){ navigator.clipboard.writeText(ad).then(function(){ t.classList.add("ok"); t.title = "Copied"; setTimeout(function(){ t.classList.remove("ok"); t.title = "Copy the address"; }, 1400); }, function(){}); } return; }
     if(act === "connect"){ var cb = E("svconn"); if(cb){ ev.stopPropagation(); cb.click(); } return; }
     if(t.dataset.v && window.__vshow) window.__vshow(t.dataset.v);
   }

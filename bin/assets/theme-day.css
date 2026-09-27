@@ -623,6 +623,16 @@
   html[data-theme=light]:not([data-mono]) #sv-netcards .sv-span .sv-k::after{background:transparent}
   html[data-theme=light]:not([data-mono]) .sd-col{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-col::before{background:transparent}
+  html[data-theme=light]:not([data-mono]) .sd-wa{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sd-wcp{background:transparent}
+  html[data-theme=light]:not([data-mono]) .sd-wcp svg{fill:none;stroke:currentColor}
+  html[data-theme=light]:not([data-mono]) .sd-wcp:hover{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sd-wch i.app{border-color:var(--accent);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sd-wch i.net{border-color:var(--accent);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sd-wch i.net.tn{border-color:var(--amber-bar);background:var(--warn-bg)}
+  html[data-theme=light]:not([data-mono]) .sd-wbtn{border:1px solid var(--amber-bar);background:var(--warn-bg);color:var(--warn)}
+  html[data-theme=light]:not([data-mono]) .sd-wbtn:hover{border-color:var(--amber-bar);color:var(--warn)}
+  html[data-theme=light]:not([data-mono]) .sd-wbtn:focus-visible{outline:2px solid var(--amber-bar)}
   html[data-theme=light]:not([data-mono]) .sd-ro em::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-m s{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-m.mix{background:none}
