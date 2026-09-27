@@ -3810,7 +3810,15 @@ background:var(--wc);padding:1px 6px;border-radius:4px;border:1px solid var(--wb
 .sv-lcend em.bon{transform:translateY(30%)}
 .sv-lc.on .sv-lcend{opacity:0}
 /* Economics: four readouts stay one column (the price first), so the graphs keep their width */
-#sv-eco .sv-rail:has(>.sv-rd:nth-child(4)){display:flex;flex-direction:column;width:176px}
+/* Economics: the price in the title row, a little apart from the title and its key */
+.sv-tp{display:inline-flex;align-items:baseline;gap:12px;margin-left:22px;padding-left:20px;border-left:1px solid var(--wbd2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.sv-tp b{font-size:16px;font-weight:800;letter-spacing:-.01em;line-height:1}
+.sv-tp i{font-style:normal;font-family:var(--wmono);font-size:11px;letter-spacing:.02em}
+.sv-tp i.up{color:var(--sv-green)}.sv-tp i.dn{color:#ff6a3d}
+.sv-tp small{font-family:var(--wmono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--wf)}
+.sv-tp small u{text-decoration:none;font-size:11px;letter-spacing:.02em;color:var(--ws);margin-left:4px}
+@media(max-width:620px){.sv-tp{flex:1 1 100%;flex-wrap:wrap;row-gap:4px;margin-left:0;padding-left:0;border-left:0}}
+.sv-tmax{font-family:var(--wmono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sv-pho);opacity:.85;white-space:nowrap}
 .sv-lcur{position:absolute;top:0;bottom:0;width:1px;margin-left:-.5px;background:var(--wt);opacity:0;pointer-events:none}
 .sv-lc.on .sv-lcur{opacity:.45}
 .sv-lcdots{position:absolute;inset:0;pointer-events:none;display:none}
@@ -3873,8 +3881,6 @@ background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.01))}
 @media(min-width:901px) and (max-height:820px){.sv-rd{gap:0;padding-top:2px;padding-bottom:2px}.sv-rd b{font-size:14px;line-height:1.1}.sv-rd small{font-size:9px}.sv-rd em{font-size:8px}.sv-rail{gap:4px;margin-right:-15px}}
 /* Economics stacks three readouts on each rail under two price cards, so its rails are shorter:
    the compact readout from a taller screen down, so every bottom line (the 30-day change) shows */
-@media(min-width:901px) and (max-height:1000px){#sv-eco .sv-rd{gap:0;padding-top:2px;padding-bottom:2px}#sv-eco .sv-rd b{font-size:14px;line-height:1.1}
-#sv-eco .sv-rd small{font-size:9px}#sv-eco .sv-rd em{font-size:8px}#sv-eco .sv-rail{gap:4px}}
 @media(max-width:900px){
   .sv-rbody{grid-template-columns:minmax(0,1fr);row-gap:10px}
   .sv-rail{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin-right:0;width:auto}

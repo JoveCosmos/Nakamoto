@@ -608,6 +608,8 @@
   html[data-theme=light]:not([data-mono]) .sv-lc .ar.txl{fill:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-lc .ar.tpb{fill:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-lcend i.bon{border-color:var(--amber-bar)}
+  html[data-theme=light]:not([data-mono]) .sv-tp i.dn{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .sv-tp small u{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sv-lcdots i.bon{border-color:var(--amber-bar)}
   html[data-theme=light]:not([data-mono]) .sv-lctip{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-lctip i.bon{background:var(--amber-bar)}
