@@ -1944,6 +1944,26 @@ background:transparent;border:0;box-shadow:none;padding:0;color:var(--ink2)}
 .wk-tbl2 td.rk{color:var(--wf);font-size:10px}
 .wk-tbl2 td.rw{color:var(--wgreen)}
 .wk-tbl2 .ok{color:var(--wgreen)}.wk-tbl2 .warn{color:var(--wamber)}.wk-tbl2 .bad{color:var(--wburn)}.wk-tbl2 .dim{color:var(--wf)}
+/* the closing "Inactive and jailed validators" row of the stake and redelegate lists: one
+   button across the table that folds open into plain rows - listed, never offered (ij-) */
+.wk-tbl2 tr.ij-t td{height:auto;padding:0;border-bottom:0;border-top:1px solid var(--wbd2);text-align:left;overflow:visible}
+.ij-b{width:100%;display:flex;align-items:center;gap:9px;padding:9px 8px;background:transparent;border:0;cursor:pointer;
+font-family:var(--wsans);font-size:12px;color:var(--ws);text-align:left}
+.ij-b span{color:var(--wt);font-weight:600}
+.ij-b i{font-style:normal;font-family:var(--wmono);font-size:9.5px;padding:1px 7px;border:1px solid var(--wbd2);border-radius:999px;color:var(--ws)}
+.ij-b em{font-style:normal;font-size:11px;color:var(--wf);margin-left:auto}
+.ij-b u{width:7px;height:7px;border-right:1.5px solid var(--wf);border-bottom:1.5px solid var(--wf);transform:rotate(45deg);margin:-4px 4px 0 4px}
+.ij-t.open .ij-b u{transform:rotate(-135deg);margin-top:3px}
+.ij-b:hover{background:rgba(255,255,255,.03)}.ij-b:hover u{border-color:var(--wt)}
+.ij-b:focus-visible{outline:2px solid var(--av);outline-offset:-2px}
+.wk-tbl2 tr.ij-r td{text-align:left;padding:0 8px}
+.ij-w{display:flex;align-items:center;gap:8px;min-width:0}
+.ij-w .wk-lg{width:16px;height:16px;margin:0;opacity:.7}.ij-w .wk-lgx{line-height:16px;font-size:7px}
+.ij-n{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;font-family:var(--wsans);font-size:11.5px;color:var(--ws)}
+.ij-tag{flex:0 0 auto;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;padding:1px 6px;border-radius:4px;border:1px solid currentColor}
+.ij-tag.j{color:var(--wburn)}.ij-tag.i{color:var(--wf)}
+.ij-s{flex:0 0 auto;color:var(--ws)}
+.ij-e{flex:0 0 auto;color:var(--wf);font-size:10px}
 
 .wk-tbl2 td.ck{width:22px;padding:0 0 0 4px}
 .wk-tbl2 td.ck input{appearance:none;-webkit-appearance:none;margin:0;border:1px solid var(--wbd2);cursor:pointer;position:relative;vertical-align:middle}
@@ -4675,8 +4695,8 @@ html[data-tab=connect] .l2host{display:none}
           </div></div>
         <div class=atrow><span class=atlab>Validators</span>
           <div class="atpre at2">
-            <label class=atpc><input type=radio name=atpick value=all checked><b>All</b><em id=atna></em></label>
-            <label class=atpc><input type=radio name=atpick value=selected><b>My selection</b><em id=atn2></em></label>
+            <label class=atpc><input type=radio name=atpick value=selected><b>Choose yourself</b><em id=atn2></em></label>
+            <label class=atpc><input type=radio name=atpick value=auto checked><b>Let us decide</b><em id=atna></em></label>
           </div></div>
         <div class=atrow><span class=atlab>Stake</span>
           <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>

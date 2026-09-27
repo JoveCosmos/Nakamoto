@@ -1821,6 +1821,26 @@ rememberGridH();
     for(var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) % 360;
     return '<span class="wk-lg wk-lgx" style="background:hsl(' + h + ',42%,30%)">' + c.toUpperCase() + '</span>';
   }
+  /* The lists' closing row: the validators outside the active set - jailed, or no longer
+     bonded - folded into one row that opens on a tap. Listed, never offered: they earn
+     nothing while they are out. key names the list, so each keeps its own open state. */
+  var IJ = {};
+  function ijRows(key, cols){
+    var L = (window.__D && window.__D.inactive) || [];
+    if(!L.length) return "";
+    var open = !!IJ[key], nj = 0; L.forEach(function(v){ if(v[4]) nj++; });
+    var h = '<tr class="ij-t' + (open ? ' open' : '') + '"><td colspan=' + cols + '><button type=button class=ij-b data-ij="' + key + '" aria-expanded=' + open + '>' +
+      '<span>Inactive and jailed validators</span><i>' + L.length + '</i><em>' + (nj ? nj + ' jailed, ' : '') + (L.length - nj) + ' inactive</em><u aria-hidden=true></u></button></td></tr>';
+    if(open) L.forEach(function(v){
+      h += '<tr class=ij-r><td colspan=' + cols + '><div class=ij-w>' + logo(v[3], v[0]) + '<span class=ij-n>' + att(v[0]) + '</span>' +
+        '<span class="ij-tag ' + (v[4] ? 'j' : 'i') + '">' + (v[4] ? 'jailed' : 'inactive') + '</span>' +
+        '<span class=ij-s>' + big(v[1]) + ' ATONE</span><span class=ij-e>earns nothing</span></div></td></tr>'; });
+    return h;
+  }
+  function ijWire(el, redraw){
+    var b = el.querySelector(".ij-b"); if(!b) return;
+    b.addEventListener("click", function(){ IJ[b.dataset.ij] = !IJ[b.dataset.ij]; redraw(); });
+  }
 
   /* ── the stat strip ── */
   function stats(pos){
@@ -1933,8 +1953,10 @@ rememberGridH();
            (o.jail == null ? '<td class=dim>N/A</td>' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>') +
            (lay ? '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '\u2014') + '</s><em>→</em><b>' + pct(there) + '</b></td>' : '<td class=r2><b>' + pct(o.rate0) + '</b></td>') + '</tr>';
     });
+    h += ijRows("rd", (h.match(/<col[ >]/g) || []).length);
     var top = el.scrollTop;
     el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
+    ijWire(el, draw);
     Array.prototype.forEach.call(el.querySelectorAll("tbody input"), function(c){
       c.addEventListener("change", function(){ if(c.checked) SEL[c.dataset.id] = 1; else delete SEL[c.dataset.id]; draw(); }); });
     /* the head's box ticks everyone, or clears everyone; half-ticked it shows as such */
@@ -2317,7 +2339,9 @@ rememberGridH();
            (o.jail == null ? '<td class=dim>N/A</td>' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>') +
            '<td>' + (m ? fmt(m.x) : '\u2014') + '</td><td class=r2><b>' + pct(m ? m.after : o.rate0) + '</b></td></tr>';
     });
+    h += ijRows("st", 7);
     var top = el.scrollTop; el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
+    ijWire(el, stRows);
     Array.prototype.forEach.call(el.querySelectorAll("tbody input"), function(c){
       c.addEventListener("change", function(){ if(c.checked) STSEL[c.dataset.id] = 1; else delete STSEL[c.dataset.id]; stRows(); stState(); }); });
   }
@@ -2448,7 +2472,10 @@ rememberGridH();
     return fetch("keeper/" + window.__ADDR + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
   }
   function atPreset(){ return (document.querySelector("#atpop input[name=atstrat]:checked") || {}).value || "below"; }
-  function atPick(){ return (document.querySelector("#atpop input[name=atpick]:checked") || {}).value || "all"; }
+  /* the allow-list: chosen by the reader (between AT_MIN and AT_MAX validators), or decided by
+     Autopilot - the best-paying validators that fit the strategy, AT_MAX of them */
+  var AT_MIN = 5, AT_MAX = 20;
+  function atPick(){ return (document.querySelector("#atpop input[name=atpick]:checked") || {}).value || "auto"; }
   function atSetPick(v){ var r = document.querySelector('#atpop input[name=atpick][value="' + v + '"]'); if(r) r.checked = true; }
   function atRestake(){ var c = E("atrestake"); return !!(c && c.checked); }
   function atViewing(){ return !!AT.grant && !AT_EDIT; }
@@ -2464,6 +2491,20 @@ rememberGridH();
       else { if(c.t < MEAN && !c.jail && (d90 == null || d90 >= 95)) out.push(c.id); } });
     return out;
   }
+  /* Autopilot's own choice: the strategy's fits, best-paying first, AT_MAX of them - topped up
+     from the clean rest of the set (never jailed, 95% over 90 days) if too few fit */
+  function atAutoIds(){
+    var VD = window.__VDBY || {};
+    var all = {}; window.__candidates({ except: {}, cleanRecord: false }).forEach(function(c){ all[c.id] = c; });
+    var by = function(a, b){ return window.__rateAfter(all[b].t, all[b].c, 0) - window.__rateAfter(all[a].t, all[a].c, 0); };
+    var out = atIdsFor(atPreset()).filter(function(id){ return all[id]; }).sort(by).slice(0, AT_MAX);
+    if(out.length < AT_MIN){
+      var have = {}; out.forEach(function(id){ have[id] = 1; });
+      Object.keys(all).filter(function(id){ var d = VD[id] || {}; return !have[id] && !all[id].jail && !d.tomb && (d.d90 == null || +d.d90 >= 95); })
+        .sort(by).slice(0, AT_MIN - out.length).forEach(function(id){ out.push(id); });
+    }
+    return out;
+  }
   function atOps(ids){ var VD = window.__VDBY || {}, out = []; ids.forEach(function(id){ var d = VD[id]; if(d && d.op) out.push(d.op); }); return out; }
   function atSelIds(){ var VD = window.__VDBY || {}; return Object.keys(ATSEL).filter(function(id){ return VD[id] && VD[id].op; }); }
   /* a standing grant's allow-list, as the set's ids */
@@ -2474,7 +2515,7 @@ rememberGridH();
     return out;
   }
   /* the allow-list: the whole set, or the reader's own selection; the strategy sets the pace */
-  function atScope(){ return atOps(atPick() === "selected" ? atSelIds() : atIdsFor("all")); }
+  function atScope(){ return atOps(atPick() === "selected" ? atSelIds() : atAutoIds()); }
   /* the memo the keeper reads: the strategy word, then the flags */
   var AT_WORD = { passive: "passive", below: "moderate", aggressive: "aggressive" };
   function atMemo(){ return "gata:" + (AT_WORD[atPreset()] || "moderate") + (atPick() === "selected" ? ":picks" : "") + (atRestake() ? ":restake" : ""); }
@@ -2536,23 +2577,25 @@ rememberGridH();
   }
   /* the counts: on the strategy and validator cards, over the list, on the phone's tab */
   function atCounts(){
-    var set = atIdsFor("all").length, sel = atSelIds().length, view = atViewing();
-    var na = E("atna"); if(na) na.textContent = set + " validators";
-    var n2 = E("atn2"); if(n2) n2.textContent = sel ? sel + " selected" : "none yet";
-    var n = view ? Object.keys(atGrantIds()).length : atPick() === "all" ? set : sel;
-    var c = E("atcount"); if(c) c.innerHTML = view ? "<b>" + n + "</b> allowed by your grant" : atPick() === "all" ? "All <b>" + set + "</b> of the set" : "<b>" + sel + "</b> of " + set + " selected";
+    var auto = atAutoIds().length, sel = atSelIds().length, view = atViewing(), word = { passive: "Passive", below: "Moderate", aggressive: "Aggressive" }[atPreset()] || "Moderate";
+    var na = E("atna"); if(na) na.textContent = auto + " picked for " + word;
+    var n2 = E("atn2"); if(n2) n2.textContent = sel ? sel + " selected" : AT_MIN + " to " + AT_MAX + " validators";
+    var n = view ? Object.keys(atGrantIds()).length : atPick() === "auto" ? auto : sel;
+    var c = E("atcount"); if(c) c.innerHTML = view ? "<b>" + n + "</b> allowed by your grant" : atPick() === "auto" ? "<b>" + auto + "</b> picked by Autopilot, best-paying that fit " + word
+      : "<b>" + sel + "</b> selected, " + AT_MIN + " to " + AT_MAX;
     var vn = E("atvn"); if(vn) vn.textContent = n;
   }
   /* the set, in rank order: a box per validator, what it pays, its record, and marks for the
      ones already holding the reader's stake and the ones the strategy would pick */
   function atRows(){
     var el = E("atlist"); if(!el) return;
-    var view = atViewing(), all = !view && atPick() === "all", allow = view ? atGrantIds() : null;
+    var view = atViewing(), auto = !view && atPick() === "auto", allow = view ? atGrantIds() : null, aset = {};
+    if(auto) atAutoIds().forEach(function(id){ aset[id] = 1; });
     var fit = {}; atIdsFor(atPreset()).forEach(function(id){ fit[id] = 1; });
     var mine = window.__MINE || {}, VD = window.__VDBY || {}, q = AT_FIND.trim().toLowerCase(), ph = innerWidth <= 620;
     var rows = window.__candidates({ except: {}, cleanRecord: false }).filter(function(o){
       var d = VD[o.id]; if(!d || !d.op) return false;
-      o.on = view ? !!allow[o.id] : all || !!ATSEL[o.id];
+      o.on = view ? !!allow[o.id] : auto ? !!aset[o.id] : !!ATSEL[o.id];
       if(AT_FLT === "sel" && !o.on) return false;
       /* a name matches on any letters; an operator key only from five on, or every key matches "at" */
       return !q || String(o.m).toLowerCase().indexOf(q) >= 0 || (q.length >= 5 && String(d.op).toLowerCase().indexOf(q) >= 0); });
@@ -2592,10 +2635,12 @@ rememberGridH();
     var mx = E("atmaxv"); if(mx) mx.textContent = pos ? exact(pos.free, 2) : "—";
     var un = E("atuntil"); if(un) un.innerHTML = "until <b>" + window.__dayFull(Date.now() + AT.days * 86400000) + "</b>";
     var signer = !!window.__WALLET && !!window.__WALLET.signDirect;
-    var ok = !view && !!AT.addr && scope.length > 0 && cap > 0 && signer;
+    var nsc = scope.length, ok = !view && !!AT.addr && nsc >= AT_MIN && nsc <= AT_MAX && cap > 0 && signer;
     var hint = E("athint");
     if(hint){ hint.className = "unhint"; hint.textContent = !signer ? "Needs Keplr (direct signing)"
-      : !scope.length ? (atPick() === "selected" ? "Select validators" : "the set has not loaded yet") : ""; }
+      : !scope.length ? (atPick() === "selected" ? "Select " + AT_MIN + " to " + AT_MAX + " validators" : "the set has not loaded yet")
+      : scope.length < AT_MIN ? "Select at least " + AT_MIN + " validators (" + scope.length + " now)"
+      : scope.length > AT_MAX ? "At most " + AT_MAX + " validators (" + scope.length + " now)" : ""; }
     var go = E("atgrant"); if(go) go.disabled = !ok;
     var rn = E("atrsnote"), ot = AT.others;
     if(rn){ var mine = pos ? pos.rows.filter(function(r){ var d = (window.__VDBY || {})[r.id]; return ot && d && ot.ops[d.op]; }).length : 0;
@@ -2616,7 +2661,8 @@ rememberGridH();
   /* a standing grant, read back into the card: its list, its cap, its restake */
   function atFromGrant(){
     var ids = atGrantIds(), a = AT.grant.authorization || {}, cap = E("atcap"), rs = E("atrestake");
-    ATSEL = ids; atSetPick(Object.keys(ids).length >= atIdsFor("all").length ? "all" : "selected");
+    var gn = Object.keys(ids).length;
+    ATSEL = gn >= AT_MIN && gn <= AT_MAX ? ids : {}; atSetPick(gn >= AT_MIN && gn <= AT_MAX ? "selected" : "auto");
     if(cap) cap.value = a.max_tokens ? exact(+a.max_tokens.amount) : "";
     if(rs) rs.checked = (AT.grants || []).some(function(x){ return grantType(x) === DELEG; });
     atRsSync();
@@ -2654,7 +2700,7 @@ rememberGridH();
     var a = E("atcap"); if(a) a.value = "";
     if(AT.grant) atFromGrant();
     else if(!atSelIds().length) Object.keys(SEL).forEach(function(id){ ATSEL[id] = 1; });   /* a first selection: the Redelegate list's */
-    AT_FLT = AT.grant ? "sel" : "all";
+    AT_FLT = AT.grant || atPick() === "auto" ? "sel" : "all";
     atView("setup"); atShow(); POP.open(atpop);
     var tok = ++AT_OPEN;
     atStatus().then(function(){ return Promise.all([atGrant(), atReport()]); }).then(function(r){
@@ -2666,7 +2712,10 @@ rememberGridH();
   if(atpop) atpop.__onclose = function(){ AT_EDIT = false; AT_OPEN++; feeSoon("at"); };
   var atcapEl = E("atcap"); if(atcapEl) atcapEl.addEventListener("input", atState);
   var atmax = E("atmax"); if(atmax) atmax.addEventListener("click", function(){ var pos = window.__POS; if(!pos || !(pos.free > 0)) return; E("atcap").value = exact(pos.free); atState(); });
-  Array.prototype.forEach.call(document.querySelectorAll("#atpop input[name=atstrat],#atpop input[name=atpick]"), function(r){ r.addEventListener("change", atRefresh); });
+  Array.prototype.forEach.call(document.querySelectorAll("#atpop input[name=atstrat]"), function(r){ r.addEventListener("change", atRefresh); });
+  /* Let us decide shows what Autopilot picked; Choose yourself, the whole set to pick from */
+  Array.prototype.forEach.call(document.querySelectorAll("#atpop input[name=atpick]"), function(r){ r.addEventListener("change", function(){
+    AT_FLT = atPick() === "auto" ? "sel" : "all"; atFltSync(); atRefresh(); }); });
   var atrs = E("atrestake"); if(atrs) atrs.addEventListener("change", atState);
   Array.prototype.forEach.call(document.querySelectorAll("#atrsk button"), function(b){ b.addEventListener("click", function(){
     if(!atrs || atViewing()) return; atrs.checked = b.dataset.r === "1"; atRsSync(); atState(); }); });
@@ -2680,17 +2729,21 @@ rememberGridH();
        Selected filter narrows what "every" means); all of the set on is simply "All" */
     if(ev.target.id === "atall"){
       if(atViewing()) return;
-      var want = ev.target.checked, setIds = atIdsFor("all");
-      if(atPick() === "all"){ if(want) return; ATSEL = {}; setIds.forEach(function(x){ ATSEL[x] = 1; }); }
-      AT_VIS.forEach(function(x){ if(want) ATSEL[x] = 1; else delete ATSEL[x]; });
-      atSetPick(setIds.length && setIds.every(function(x){ return ATSEL[x]; }) ? "all" : "selected");
+      var want = ev.target.checked;
+      if(atPick() === "auto"){ ATSEL = {}; atAutoIds().forEach(function(x){ ATSEL[x] = 1; }); atSetPick("selected"); }
+      /* every one shown off, or on up to the most a grant may carry */
+      AT_VIS.forEach(function(x){ if(!want) delete ATSEL[x]; else if(atSelIds().length < AT_MAX) ATSEL[x] = 1; });
       atRefresh();
       return;
     }
     var tr = ev.target.closest ? ev.target.closest("tr[data-id]") : null;
     if(!tr || atViewing()) return;
     var box = tr.querySelector("input"), on = ev.target === box ? box.checked : !tr.classList.contains("on");
-    if(atPick() === "all"){ ATSEL = {}; atIdsFor("all").forEach(function(x){ ATSEL[x] = 1; }); atSetPick("selected"); }
+    /* from Autopilot's pick, the first tap starts the reader's own list from that pick */
+    if(atPick() === "auto"){ ATSEL = {}; atAutoIds().forEach(function(x){ ATSEL[x] = 1; }); atSetPick("selected"); }
+    if(on && !ATSEL[tr.dataset.id] && atSelIds().length >= AT_MAX){
+      atRefresh(); var hn = E("athint"); if(hn){ hn.className = "unhint bad"; hn.textContent = "At most " + AT_MAX + " validators: untick one first"; }
+      return; }
     if(on) ATSEL[tr.dataset.id] = 1; else delete ATSEL[tr.dataset.id];
     atRefresh();
   });

@@ -271,6 +271,8 @@
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td.amt .lk svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td .sb{background:var(--line-soft)}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td .sb i{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .ij-b{background:transparent}
+  html[data-theme=light]:not([data-mono]) .ij-b:hover{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td.ck input:checked::after{border:solid var(--surface)}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td.r2 s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) #p-home .tapnote svg{fill:none;stroke:currentColor}

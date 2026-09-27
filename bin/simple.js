@@ -306,7 +306,7 @@
       '<div class=sd-fine>The chain enforces the grant: it may redelegate inside your allow-list, and never send, unstake or hold your ATONE.</div>');
     else put("sd-ado",
       '<div class=sv-ph><h3>What it does</h3></div>' +
-      '<div class=sv-note>It moves your stake to better-paying validators, only among those <i>you</i> pick, for as long as <i>you</i> choose.</div>' +
+      '<div class=sv-note>It moves your stake to better-paying validators, only among the validators in <i>your</i> grant, for as long as <i>you</i> choose.</div>' +
       '<div class=sd-can><div><u class=ok>It may</u>' +
         /* Autopilot is GATA's service, not only the keeper: the validator watch covers the whole
            set every minute and reaches our operators, who act through the admin console */

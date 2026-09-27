@@ -411,6 +411,16 @@ for ca, kind, n, h, t, burned in srows:
     if e["last"] is None or t > e["last"]: e["last"] = t; e["last_height"] = int(h)
     e["burned"] += int(burned or 0)
 
+# The validators outside the active set - jailed, or bonded no more - for the lists' closing
+# "Inactive and jailed" row: listed, never offered (they earn nothing while there). A dust
+# stake under 1 ATONE is dropped: those are the long-dead ones.
+_ST = {"BOND_STATUS_BONDED": "bonded", "BOND_STATUS_UNBONDING": "unbonding", "BOND_STATUS_UNBONDED": "unbonded"}
+INACT = sorted([{"m": v["description"]["moniker"], "op": v["operator_address"], "t": int(v["tokens"]),
+                 "c": float(v["commission"]["commission_rates"]["rate"]), "jailed": bool(v.get("jailed")),
+                 "st": _ST.get(v.get("status"), "unbonded"), "jail": hist.get(_cons(v), {}).get("jailed")}
+                for v in all_r if (v.get("jailed") or v.get("status") != "BOND_STATUS_BONDED") and int(v["tokens"]) >= 1_000_000],
+               key=lambda x: -x["t"])
+
 # LIFETIME, not a window. A "last 200k blocks" figure invites the question "why
 # 200k?" and has no good answer; we index from height 1, so the honest number is
 # every block the validator has ever proposed. Costs ~2s on 10.3M rows.
@@ -846,6 +856,7 @@ out = {
   "move13": move13,
   "delegators": delegators,
   "coverage": coverage,
+  "inactive": INACT,
   "validators": [dict(
       m=v["m"], t=v["t"], c=v["c"], op=v["op"], web=v["web"], det=v["det"], vid=VIDS[v["op"]],
       apr=apr(v["t"], coef), net=apr(v["t"], coef)*(1-v["c"]),
