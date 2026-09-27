@@ -21,7 +21,7 @@
     "built - and its route lands on the section's first view.",
     "A section with a single view and no switch shows no level-2 strip: its title says what it is."
   ],
-  "home": "staking/bonus",
+  "home": "intro",
   "sections": [
     {
       "id": "network", "label": "Network", "route": "network", "account": "none", "accent": "#2bc8bd",

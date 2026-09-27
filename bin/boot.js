@@ -27,6 +27,8 @@ try{(function(){
   var h = (location.hash || "").replace(/^#\/?/, "").split("/"), s = null, v = null, f;
   if(h[0] === "intro"){ R.setAttribute("data-tab", "intro"); return; }
   if(h[0] && (s = sec("route", h[0]))) v = s.entry === "first" ? s.sub[0] : (h[1] && sub(s, "route", h[1])) || sub(s, "id", mem[s.id]) || s.sub[0];
+  /* no route in the address: the landing page is home (the intro) when the config says so */
+  if(!s && !h[0] && C.home === "intro"){ R.setAttribute("data-tab", "intro"); return; }
   if(!s){
     var t = localStorage.getItem("th_tab");
     if(t === "intro"){ R.setAttribute("data-tab", "intro"); return; }

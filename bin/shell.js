@@ -258,7 +258,7 @@
   (function(){
     var s = sec("id", R.getAttribute("data-sec")), v = s && sub(s, "id", (R.getAttribute("data-sv") || "").split("/")[1]);
     if(s && v){ go(s, v, "replace"); return; }
-    if(R.getAttribute("data-tab") === "intro"){ go(null, null, "replace"); return; }
+    if(R.getAttribute("data-tab") === "intro" || C.home === "intro"){ go(null, null, "replace"); return; }
     var hm = (C.home || "").split("/"); s = sec("route", hm[0]); v = s && sub(s, "route", hm[1]);
     if(s && v) go(s, v, "replace");
   })();

@@ -97,8 +97,8 @@ def validate(cfg, tpl):
         if s.get("switch") and all(v.get("off") for v in subs if v.get("group") == subs[0].get("group")):
             errs.append(f"section {sid}: the first group needs a view that is not off")
     home = (cfg.get("home") or "").split("/")
-    if len(home) != 2 or not any(s.get("route") == home[0] and any(v.get("route") == home[1] for v in s.get("sub") or []) for s in secs):
-        errs.append("home must name an existing section/sub-view route")
+    if home != ["intro"] and (len(home) != 2 or not any(s.get("route") == home[0] and any(v.get("route") == home[1] for v in s.get("sub") or []) for s in secs)):
+        errs.append("home must be 'intro' or name an existing section/sub-view route")
     if errs:
         raise SystemExit("atomone-app: FATAL shell.json: " + "; ".join(errs))
 
