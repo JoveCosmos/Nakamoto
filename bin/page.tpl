@@ -4040,6 +4040,26 @@ box-shadow:inset 0 2px 6px rgba(0,0,0,.6),inset 0 -1px 0 rgba(255,255,255,.05),0
 .sd-m.mix{display:flex;gap:2px;background:none}
 .sd-m.mix s{min-width:2px;box-shadow:none}
 .sd-m.apr u{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--wc);border:2px solid var(--wt);box-shadow:0 0 8px rgba(255,255,255,.4)}
+/* the strip, 2026-09-27 evening: no captions; the well fills the box under its label, the unit beside the
+   figure, a second compartment where one belongs (PHOTON, the validator count), the gauge set into the
+   well's floor, the APR's range written at its ends */
+.sd-strip .sd-ro{justify-content:flex-start;gap:0;padding:12px 14px 12px}
+.sd-strip .sd-ro em{margin-bottom:7px}
+.sd-strip .sd-well{position:relative;flex:1 1 auto;align-items:center;gap:6px;margin:0;padding:6px 12px 6px;min-height:46px;box-sizing:border-box}
+.sd-strip .sd-well.mtr{padding-bottom:14px}
+.sd-strip .sd-well>b{font-size:22px}
+.sd-well>i.u{flex:0 0 auto;align-self:baseline;margin-top:auto;font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;color:var(--wf);padding-bottom:3px}
+.sd-wx{flex:0 1 auto;min-width:0;margin-left:auto;padding-left:10px;border-left:1px solid rgba(255,255,255,.09);display:flex;flex-direction:column;align-items:flex-end;
+font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
+.sd-wx b{font-family:var(--wsans);font-size:14px;font-weight:700;letter-spacing:-.01em;text-transform:none;color:var(--ws);font-variant-numeric:tabular-nums}
+.sd-wx.pho b{color:var(--sv-pho)}
+.sd-strip .sd-well>b{flex:0 0 auto}
+.sd-strip .sd-well>i.u{min-width:0;overflow:hidden}
+@media(max-width:620px){.fp-map{flex:0 0 auto;height:230px}}
+.sd-strip .sd-well>.sd-m{position:absolute;left:12px;right:12px;bottom:6px;margin:0;height:3px;background:rgba(255,255,255,.06)}
+.sd-strip .sd-well>.sd-m.apr{bottom:7px;height:3px}
+.sd-strip .sd-well>.sd-m.apr u{width:9px;height:9px;margin:-4.5px 0 0 -4.5px}
+.sd-strip .sd-act{top:9px;right:12px;height:20px}
 .sd-act{position:absolute;top:12px;right:14px;height:22px;padding:0 9px;border-radius:6px;border:1px solid rgba(46,224,106,.45);background:rgba(46,224,106,.1);
 color:#5cf08e;font-family:var(--wmono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
 .sd-act:hover{background:#2ee06a;border-color:#2ee06a;color:#062a14}
@@ -4068,17 +4088,19 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-rs{font-size:12px;line-height:1.45;color:var(--ws);padding-left:10px;border-left:2px solid var(--sv-violet)}
 .sd-rs b{color:var(--wt)}
 .sd-go{width:100%;height:40px;flex:0 0 auto;justify-content:center}
-/* Where the stake sits: three bands of the set, each a bar in an engraved track */
-.fp-rows{display:flex;flex-direction:column;gap:11px;margin-top:4px}
-.fp-r{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;row-gap:6px}
-.fp-k{display:flex;flex-direction:column;gap:1px;min-width:0}
-.fp-k b{font-size:13px;font-weight:700;color:var(--wt)}
-.fp-k i{font-style:normal;font-family:var(--wmono);font-size:9.5px;letter-spacing:.04em;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fp-r u{text-decoration:none;font-family:var(--wmono);font-size:15px;font-weight:700;color:var(--c);font-variant-numeric:tabular-nums}
-.fp-bar{grid-column:1/-1;height:10px;border-radius:6px;overflow:hidden;background:linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,.22));box-shadow:inset 0 2px 4px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.05)}
-.fp-bar s{display:block;height:100%;border-radius:6px;background:var(--c);box-shadow:0 0 10px var(--c)}
-.fp-r small{grid-column:1/-1;margin-top:-2px;font-family:var(--wmono);font-size:10px;color:var(--ws)}
-.fp-note{margin-top:auto;padding-top:12px;font-size:11.5px;line-height:1.45;color:var(--wf)}
+/* Where the stake sits: the set as a 10x10 map in rank order, each third tinted, the validators that
+   hold the stake lit by how much; the three shares under it in wells */
+.fp-map{flex:1 1 auto;min-height:120px;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:3px;margin-top:4px}
+.fp-c{--t:#ff6a3d;border-radius:3px;cursor:pointer;background:color-mix(in srgb,var(--t) 13%,rgba(255,255,255,.02));box-shadow:inset 0 1px 2px rgba(0,0,0,.5)}
+.fp-c.b1{--t:#ffb02e}.fp-c.b2{--t:#2ee06a}
+.fp-c.on{background:color-mix(in srgb,var(--t) calc(35% + var(--l) * 65%),rgba(255,255,255,.04));box-shadow:0 0 calc(var(--l) * 12px) color-mix(in srgb,var(--t) 70%,transparent),inset 0 1px 0 rgba(255,255,255,.25)}
+.fp-c:hover{outline:1px solid var(--wt);outline-offset:1px}
+.fp-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:6px;margin-top:10px}
+.fp-s{--rc:#ff6a3d;min-width:0}.fp-s.b1{--rc:#ffb02e}.fp-s.b2{--rc:#2ee06a}.fp-s.b3{--rc:var(--wf)}
+.fp-s em{display:block;font-style:normal;font-family:var(--wmono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.fp-s .sd-well{margin:0;padding:5px 9px;justify-content:center}
+.fp-s .sd-well>b{font-size:16px;color:var(--rc)}
+.fp-note{margin-top:0;padding-top:8px;font-size:11.5px;line-height:1.45;color:var(--wf)}
 .sv-btn.go.sd-go:disabled{background:rgba(255,255,255,.05);border-color:var(--wbd2);color:var(--wf);box-shadow:none;cursor:not-allowed;margin-top:auto}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}
@@ -4117,6 +4139,17 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%)}
 .se-card::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:2px;border-radius:0 2px 2px 0;background:var(--sv-green);box-shadow:0 0 12px var(--sv-green)}
 .se-hero:has(>.se-card){padding:0}
+/* the year card wears the wallet card's build - a hard colour, orbit rings from its corner, a light from
+   the top left - in the earnings green, the same in day and night */
+.se-card{color:#fff;border-color:rgba(143,240,176,.25);
+background:radial-gradient(circle at 102% 125%,transparent 0 44px,rgba(255,255,255,.12) 45px 46px,transparent 47px 72px,rgba(255,255,255,.085) 73px 74px,transparent 75px 102px,rgba(255,255,255,.055) 103px 104px,transparent 105px 134px,rgba(255,255,255,.03) 135px 136px,transparent 137px),
+radial-gradient(120% 110% at 0% 0%,rgba(143,240,176,.28),transparent 60%),linear-gradient(135deg,#0f5a37 0%,#0c3b2c 55%,#0a2320 100%)}
+.se-card::before{display:none}
+.se-card::after{content:"";position:absolute;right:24px;bottom:18px;width:7px;height:7px;border-radius:50%;background:#e2ffe9;box-shadow:0 0 12px 2px rgba(143,240,176,.9)}
+.se-card em{color:rgba(226,255,233,.7)}
+.se-card>b .sd-gain{color:#8cf5b0}
+.se-card>b i{color:rgba(226,255,233,.65)}
+.se-card small.se-apr{color:rgba(226,255,233,.75)}
 .se-hero em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
 .se-hero>b,.se-card>b{display:flex;align-items:baseline;gap:8px;font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1.05;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}
 .se-hero>b i,.se-card>b i{font-style:normal;font-family:var(--wmono);font-size:11px;font-weight:400;letter-spacing:.14em;color:var(--wf)}
@@ -4260,7 +4293,7 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin-right:-8px;p
 .sd-can span::before{content:"";position:absolute;left:2px;top:.55em;width:6px;height:6px;border-radius:50%;background:currentColor}
 .sd-can span.ok{color:#8ff0b0}.sd-can span.no{color:#ff9b7a}.sd-can span.dim{color:var(--wf)}
 @media(min-width:901px) and (max-height:820px){
-  .sd-ro{padding-top:10px;padding-bottom:9px}.sd-well{margin:4px 0 3px;padding:3px 10px 4px}.sd-well>b{font-size:18px}.sd-m{margin-top:6px}
+  .sd-ro{padding-top:10px;padding-bottom:9px}.sd-well{margin:4px 0 3px;padding:3px 10px 4px}.sd-well>b{font-size:18px}.sd-m{margin-top:6px}.sd-strip .sd-well>b{font-size:19px}.sd-strip .sd-well{min-height:40px}.sd-strip .sd-ro{padding-top:10px;padding-bottom:10px}
   .sd-id{padding:10px 16px;gap:5px}.sd-id h3{font-size:16px}
   .sd-col{padding:11px 14px;gap:8px}.sd-fig{margin-left:-15px}.sd-fig>b{font-size:21px}.sd-fig small{font-size:10px}
   .sd-vr{padding-top:6px;padding-bottom:6px}.sd-go{height:36px}

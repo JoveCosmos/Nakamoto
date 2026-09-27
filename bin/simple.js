@@ -131,14 +131,18 @@
      standing on a meter of its share of the wallet (APR on the set's own heat ramp) - and three
      columns under it: the move, where the stake earns (a skyline over the set's APR range),
      and the validators. Autopilot is the same frame. */
-  function ro(label, value, meta, meter, color, act, apr){
-    /* a meter given as markup (the Total's split) goes in as it is */
+  /* a strip box: its label, then the figure in an engraved well that fills the box - the unit beside it,
+     an optional second compartment (x), and the box's bar set into the well's floor, like a gauge. A
+     caption (meta) shows only where one is given (Autopilot's, which explains an empty box) */
+  function ro(label, value, meta, meter, color, act, apr, unit, x){
     var m = meter == null ? "" : typeof meter === "string" ? meter : apr
       ? '<i class="sd-m apr" style="background:' + rampCss() + '"><u style="left:' + (Math.max(0, Math.min(1, meter)) * 100).toFixed(1) + '%"></u></i>'
       : '<i class=sd-m><s style="width:' + (meter > 0 ? Math.max(1.5, Math.min(100, meter * 100)) : 0).toFixed(1) + '%"></s></i>';
-    return '<div class=sd-ro' + (color ? ' style="--rc:' + color + '"' : '') + '>' + (act || "") + '<em>' + label + '</em><span class=sd-well><b>' + value + '</b></span>' +
-      '<small>' + (meta || "&nbsp;") + '</small>' + m + '</div>';
+    return '<div class=sd-ro' + (color ? ' style="--rc:' + color + '"' : '') + '>' + (act || "") + '<em>' + label + '</em>' +
+      '<span class="sd-well' + (m ? ' mtr' : '') + '"><b>' + value + '</b>' + (unit ? '<i class=u>' + unit + '</i>' : '') + (x || '') + m + '</span>' +
+      (meta ? '<small>' + meta + '</small>' : '') + '</div>';
   }
+
   function fig(label, value, meta, color){
     return '<div class=sd-fig' + (color ? ' style="--rc:' + color + '"' : '') + '><em>' + label + '</em><b>' + value + '</b>' + (meta ? '<small>' + meta + '</small>' : '') + '</div>';
   }
@@ -180,20 +184,28 @@
   function footprint(pos){
     var V = VALS(), n = V.length, mine = !!(pos && pos.rows.length);
     var head = '<div class=sv-ph><h3>' + (mine ? "Where your stake sits" : "Where all stake sits") + '</h3></div>';
-    if(!n) return head + '<div class=sv-upwait>Reading the set…</div>';
-    var at = {}, amt = [0, 0, 0], out = 0, tot = 0, i;
-    for(i = 0; i < n; i++) at[V[i][3]] = i;
+    if(!n) return head + '<div class=sv-upwait>Reading the set\u2026</div>';
+    /* the set as a map, rank order (largest first), each third its own tint; a validator lights by how
+       much of the stake it holds - yours with a wallet, all bonded ATONE without one */
     var band = function(k){ return k < n / 3 ? 0 : k < 2 * n / 3 ? 1 : 2; };
-    if(mine) pos.rows.forEach(function(r){ var k = at[r.id]; if(k == null || r.inactive) out += r.x; else amt[band(k)] += r.x; tot += r.x; });
-    else for(i = 0; i < n; i++){ amt[band(i)] += V[i][1]; tot += V[i][1]; }
-    var rowsH = [["Largest third", "validators 1 to " + Math.ceil(n / 3), amt[0], "#ff6a3d"], ["Middle third", "validators " + (Math.ceil(n / 3) + 1) + " to " + Math.ceil(2 * n / 3), amt[1], "var(--sv-amber)"],
-                 ["Smallest third", "validators " + (Math.ceil(2 * n / 3) + 1) + " to " + n, amt[2], "var(--sv-green)"]];
-    if(out > 0) rowsH.push(["Outside the set", "inactive or jailed, earning nothing", out, "var(--wf)"]);
-    return head + '<div class=fp-rows>' + rowsH.map(function(r){ var sh = tot ? r[2] / tot * 100 : 0;
-      return '<div class=fp-r style="--c:' + r[3] + '"><span class=fp-k><b>' + r[0] + '</b><i>' + r[1] + '</i></span><u>' + (sh < 0.05 && sh > 0 ? "<0.1" : sh.toFixed(sh < 10 && sh > 0 ? 1 : 0)) + '%</u>' +
-        '<span class=fp-bar><s style="width:' + Math.min(100, sh).toFixed(2) + '%"></s></span><small>' + fmt(r[2]) + ' ATONE</small></div>'; }).join("") + '</div>' +
+    var at = {}, x = [], amt = [0, 0, 0], out = 0, tot = 0, i, hi = 0;
+    for(i = 0; i < n; i++){ at[V[i][3]] = i; x[i] = mine ? 0 : V[i][1]; }
+    if(mine) pos.rows.forEach(function(r){ var k = at[r.id]; if(k == null || r.inactive) out += r.x; else x[k] += r.x; });
+    for(i = 0; i < n; i++){ amt[band(i)] += x[i]; tot += x[i]; if(x[i] > hi) hi = x[i]; }
+    tot += out;
+    var cells = "";
+    for(i = 0; i < n; i++){
+      var lv = x[i] > 0 && hi ? Math.sqrt(x[i] / hi) : 0;
+      cells += '<i class="fp-c b' + band(i) + (lv ? ' on' : '') + '" data-v="' + esc(V[i][3]) + '" style="--l:' + lv.toFixed(3) + '" title="#' + (i + 1) + ' ' + esc(V[i][0]) +
+        (x[i] > 0 ? ', ' + fmt(x[i]) + ' ATONE' : '') + '"></i>'; }
+    var sh = function(v){ var p = tot ? v / tot * 100 : 0; return p > 0 && p < 0.1 ? "<0.1" : p.toFixed(p > 0 && p < 10 ? 1 : 0); };
+    var sums = [["Largest third", amt[0], 0], ["Middle third", amt[1], 1], ["Smallest third", amt[2], 2]];
+    if(out > 0) sums.push(["Outside", out, 3]);
+    return head + '<div class=fp-map>' + cells + '</div>' +
+      '<div class=fp-sum>' + sums.map(function(q){ return '<div class="fp-s b' + q[2] + '"><em>' + q[0] + '</em><span class=sd-well><b>' + sh(q[1]) + '%</b></span></div>'; }).join("") + '</div>' +
       '<div class=fp-note>The bonus is split equally: the smallest third pays the most.</div>';
   }
+
   function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }
 
   /* the wallet box under its name: the address with a copy button, then the wallet app and the network
@@ -208,21 +220,27 @@
   /* the wallet strip, one builder for Overview and Manage: the wallet box, then Total, Staked,
      Available, Rewards and APR, each figure in its engraved well */
   function wstrip(){
-    var pos = window.__POS, bal = window.__BAL;
+    var pos = window.__POS, bal = window.__BAL, S = setStats();
     var mine = pos && pos.rows.length, rew = window.__REW || 0, liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0, tot = liq + stk + rew;
     var wname = (window.__WALLET && String(window.__WALLET.label || "").trim()) || "Your wallet";
+    /* the APR's gauge spans the set's own range, lowest to highest, with the two ends written at its ends */
+    var span = S.hi > S.lo ? S.hi - S.lo : 0, at = mine && span ? (pos.rate - S.lo) / span : null;
+    var aprm = mine ? '<i class="sd-m apr" style="background:' + rampCss() + '"><u style="left:' + (Math.max(0, Math.min(1, at || 0)) * 100).toFixed(1) + '%"></u></i>' : null;
+    var rng = S.hi > 0 ? '<span class=sd-wx><b>' + (S.lo * 100).toFixed(0) + '\u2013' + (S.hi * 100).toFixed(0) + '%</b>set range</span>' : "";
     return (
-      /* the wallet box: its name, the address, the wallet app and the network */
+      /* the wallet card: its name, the address, the wallet app and the network */
       '<div class="sd-id sd-idw"><div class=sd-top><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3></div>' + wmeta() + '</div>' +
-      /* the Total's bar is the wallet split three ways - staked, available, rewards - not a full line */
-      ro("Total", pos ? fmt(tot) : "—", pos ? "ATONE in this wallet" : "connect a wallet", pos ? '<i class="sd-m mix">' +
+      /* Total's gauge is the wallet split three ways - staked, available, rewards */
+      ro("Total", pos ? fmt(tot) : "\u2014", "", pos ? '<i class="sd-m mix">' +
         [[stk, "var(--sv-amber)"], [liq, "var(--sv-violet)"], [rew, "var(--sv-green)"]].map(function(q){
-          return q[0] > 0 ? '<s style="flex:' + q[0] + ' 1 0;background:' + q[1] + '"></s>' : ''; }).join("") + '</i>' : null, "var(--wt)") +
-      ro("Staked", pos ? fmt(stk) : "—", mine ? "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s") : pos ? "nothing staked" : "", pos ? stk / (tot || 1) : null, "var(--sv-amber)") +
-      ro("Available", bal ? fmt(liq) : "—", bal ? '<b class=sv-pho>' + fmt(bal.uphoton) + '</b> PHOTON for fees' : "", pos ? liq / (tot || 1) : null, "var(--sv-violet)") +
-      ro("Rewards", window.__REW != null ? fmt(rew) : "—", rew > 0 ? "ready to claim" : pos ? "nothing waiting" : "", pos ? rew / (tot || 1) : null, "var(--sv-green)",
-         rew >= 1 ? '<button class=sd-act type=button data-act=claim title="Claim your staking rewards">Claim</button>' : "") +
-      ro("APR", mine ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "—", mine ? "a year, on the staked ATONE" : "", mine ? heat(pos.rate).p : null, "", "", true));
+          return q[0] > 0 ? '<s style="flex:' + q[0] + ' 1 0;background:' + q[1] + '"></s>' : ''; }).join("") + '</i>' : null, "var(--wt)", "", false, pos ? "ATONE" : "") +
+      ro("Staked", pos ? fmt(stk) : "\u2014", "", pos ? stk / (tot || 1) : null, "var(--sv-amber)", "", false, pos ? "ATONE" : "") +
+      /* Available: ATONE, and in its own compartment the PHOTON that pays the fees */
+      ro("Available", bal ? fmt(liq) : "\u2014", "", pos ? liq / (tot || 1) : null, "var(--sv-violet)", "", false, bal ? "ATONE" : "",
+         bal ? '<span class="sd-wx pho"><b>' + fmt(bal.uphoton) + '</b>PHOTON</span>' : "") +
+      ro("Rewards", window.__REW != null ? fmt(rew) : "\u2014", "", pos ? rew / (tot || 1) : null, "var(--sv-green)",
+         rew >= 1 ? '<button class=sd-act type=button data-act=claim title="Claim your staking rewards">Claim</button>' : "", false, window.__REW != null ? "ATONE" : "") +
+      ro("APR", mine ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", aprm, "", "", false, "", rng));
   }
   function drawOver(){
     var pos = window.__POS, S = setStats(), bal = window.__BAL;
