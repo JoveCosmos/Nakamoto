@@ -190,11 +190,9 @@
     var pos = window.__POS, S = setStats(), bal = window.__BAL;
     var mine = pos && pos.rows.length, rew = window.__REW || 0, liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0, tot = liq + stk + rew;
     var wname = (window.__WALLET && String(window.__WALLET.label || "").trim()) || "Your wallet";
-    var read = pos ? '<span class=sv-wread>' + (window.__POSAT ? 'read ' + ago(window.__POSAT) : '') +
-      '<button class=sv-rf type=button data-act=refresh title="Read the wallet again" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button></span>' : '';
     put("sd-wstrip",
-      /* one row: the wallet's name, and at the box's right end when it was read, with the refresh */
-      '<div class="sd-id sd-idw"><div class=sd-top><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3>' + read + '</div>' + wmeta() + '</div>' +
+      /* the wallet box: its name, the address, the wallet app and the network */
+      '<div class="sd-id sd-idw"><div class=sd-top><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3></div>' + wmeta() + '</div>' +
       /* the Total's bar is the wallet split three ways - staked, available, rewards - not a full line */
       ro("Total", pos ? fmt(tot) : "—", pos ? "ATONE in this wallet" : "connect a wallet", pos ? '<i class="sd-m mix">' +
         [[stk, "var(--sv-amber)"], [liq, "var(--sv-violet)"], [rew, "var(--sv-green)"]].map(function(q){
@@ -285,7 +283,6 @@
           .join(", ").replace(/, ([^,]*)$/, " and $1") + ' have been jailed in the past.') + '</div>';
   }
   /* one side of the plan: its APR in its own heat, and the stake as a bar of heat segments */
-  function ago(at){ var s = Math.max(0, Math.round((Date.now() - at) / 1000)); return s < 60 ? s + "s ago" : Math.floor(s / 60) + "m ago"; }
 
   /* ── AUTOPILOT: the Wallet's frame - the strip, then what it does, the skyline of what it
      would manage (the allow-list capped in violet once a grant stands), and the validators ── */

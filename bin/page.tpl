@@ -3433,14 +3433,6 @@ background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opac
    that reads it again */
 .sv-pho{color:#7fd8ff;font-weight:600}
 
-.sv-rf{width:28px;height:28px;border-radius:8px;border:1px solid var(--wbd2);background:transparent;color:var(--ws);display:grid;place-items:center;cursor:pointer;position:relative;flex:0 0 auto}
-.sv-rf::after{content:"";position:absolute;inset:-8px}
-.sv-rf svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.sv-rf:hover{color:var(--sv-violet);border-color:var(--sv-violet)}
-.sv-rf:focus-visible{outline:2px solid var(--sv-violet);outline-offset:2px}
-.sv-rf[hidden]{display:none}
-.sv-rf.busy svg{animation:svspin .8s linear infinite}
-@keyframes svspin{to{transform:rotate(360deg)}}
 /* network uptime, live: one bar per block (oldest left, now right), the signed share teal and the
    missing share red; the set's 30-day average dashed; a block someone missed carries their mark.
    The plot, the title and the stats share the panel's edges. */
@@ -3489,7 +3481,6 @@ background:var(--wc);border:1px solid var(--wbd2);padding:1px 6px;border-radius:
    along the foot. One panel where there were four tiles, so the page has a first thing to read */
 #sv-wal{--tc:var(--sv-violet);grid-template-columns:minmax(0,.9fr) minmax(0,1.4fr);column-gap:28px;}
 
-.sv-wread{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;color:var(--wf);white-space:nowrap}
 
 .sv-wbar{display:flex;gap:3px;height:10px}
 .sv-wbar i{display:block;min-width:3px;border-radius:3px}
@@ -3967,17 +3958,12 @@ position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-dire
 .sd-strip{display:grid !important;grid-template-columns:minmax(0,1.2fr) repeat(5,minmax(0,1fr));padding:0 !important;gap:0 !important;overflow:hidden}
 .sd-id{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:7px;padding:14px 18px;min-width:0}
 .sd-id h3{margin:0;font-size:18px;font-weight:700;letter-spacing:-.01em;color:var(--wt);max-width:100%}
-.sd-id .sv-wread{font-size:11px}
 /* the Wallet's box: the name and the read time with its refresh on one row, the time at the right end */
 .sd-idw{justify-content:flex-start;align-items:stretch}
 .sd-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px;width:100%;min-width:0}
 .sd-top h3{flex:1 1 auto;min-width:min(100%,108px);overflow:hidden}
 /* wide enough: the first box takes a little more, so the name and the read time share one row */
 @media(min-width:1200px){.sd-strip{grid-template-columns:minmax(0,1.6fr) repeat(5,minmax(0,1fr)) !important}}
-.sd-top .sv-wread{flex:0 0 auto}
-/* the wallet box's refresh: a small door beside "read Ns ago", not a big square */
-.sd-top .sv-rf{width:20px;height:20px;border-radius:5px}
-.sd-top .sv-rf svg{width:11px;height:11px}
 /* the wallet box's second and third lines: address + copy, then the wallet app and the network */
 .sd-wmeta{display:flex;flex-direction:column;align-items:flex-start;gap:5px;margin-top:-2px;min-width:0;width:100%}
 .sd-wa{display:inline-flex;align-items:center;gap:4px;max-width:100%;min-width:0;height:22px;box-sizing:border-box;padding:0 2px 0 8px;border:1px solid var(--wbd2);border-radius:7px;background:rgba(255,255,255,.025)}

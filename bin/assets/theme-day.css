@@ -528,8 +528,6 @@
   html[data-theme=light]:not([data-mono]) .sv-screen>.sv-panel,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card:first-child,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card+.sv-card{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-screen>.sv-panel::before,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .sv-pho{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sv-rf{background:transparent}
-  html[data-theme=light]:not([data-mono]) .sv-rf svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .sv-upm{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .sv-uplg{box-shadow:0 0 0 1.5px var(--danger-bar)}
   html[data-theme=light]:not([data-mono]) .sv-uplg img,html[data-theme=light]:not([data-mono]) .sv-uplg .lg{color:var(--ink)}
