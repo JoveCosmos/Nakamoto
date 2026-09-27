@@ -647,9 +647,6 @@
   html[data-theme=light]:not([data-mono]) .sd-m.apr u{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-wx{border-left:1px solid var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sd-strip .sd-well>.sd-m{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .sd-act{border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sd-act:hover{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
-  html[data-theme=light]:not([data-mono]) .sd-act:focus-visible{outline:2px solid var(--accent)}
   html[data-theme=light]:not([data-mono]) .sd-fig{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sd-fig::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-fig::after{background:var(--rc)}

@@ -226,8 +226,7 @@
       ro("Photon", bal ? '<span class=sv-pho>' + fmt(bal.uphoton) + '</span>' : "\u2014", "", null, "var(--sv-pho)", "", false, "") +
       ro("Staked", pos ? fmt(stk) : "\u2014", "", null, "var(--sv-amber)", "", false, pos ? "ATONE" : "") +
       ro("APR", mine ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)", "", false, "") +
-      ro("Rewards", window.__REW != null ? fmt(rew) : "\u2014", "", null, "var(--sv-green)",
-         rew >= 1 ? '<button class=sd-act type=button data-act=claim title="Claim your staking rewards">Claim</button>' : "", false, window.__REW != null ? "ATONE" : ""));
+      ro("Rewards", window.__REW != null ? fmt(rew) : "\u2014", "", null, "var(--sv-green)", "", false, window.__REW != null ? "ATONE" : ""));
   }
   function drawOver(){
     var pos = window.__POS, S = setStats(), bal = window.__BAL;

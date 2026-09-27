@@ -4048,11 +4048,6 @@ font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:upper
 .sd-strip .sd-well>.sd-m{position:absolute;left:12px;right:12px;bottom:6px;margin:0;height:3px;background:rgba(255,255,255,.06)}
 .sd-strip .sd-well>.sd-m.apr{bottom:7px;height:3px}
 .sd-strip .sd-well>.sd-m.apr u{width:9px;height:9px;margin:-4.5px 0 0 -4.5px}
-.sd-strip .sd-act{top:9px;right:12px;height:20px}
-.sd-act{position:absolute;top:12px;right:14px;height:22px;padding:0 9px;border-radius:6px;border:1px solid rgba(46,224,106,.45);background:rgba(46,224,106,.1);
-color:#5cf08e;font-family:var(--wmono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
-.sd-act:hover{background:#2ee06a;border-color:#2ee06a;color:#062a14}
-.sd-act:focus-visible{outline:2px solid #2ee06a;outline-offset:2px}
 /* figures hanging from the left rim: open on the rim side, the value's colour along it */
 .sd-figs{display:flex;flex-direction:column;gap:8px;flex:1 1 auto;min-height:0}
 .sd-fig{--rc:var(--sv-teal);position:relative;flex:1 1 0;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:1px;margin-left:-17px;
