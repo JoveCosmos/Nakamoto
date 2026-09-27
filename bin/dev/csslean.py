@@ -131,9 +131,12 @@ def parse(text, start, end, ctx):
             head_end = text.find("{", i)
             head = strip_comments(text[i:head_end]).strip()
             close = find_block_end(text, head_end)
-            if head.startswith("@media"):
+            if head.startswith("@media") or head.startswith("@container"):
+                # a container query is a context like a media query: its rules only compete with rules
+                # of the same context (the context string carries the at-rule's name to keep them apart)
                 medias.append({"s": i, "e": close, "head": head, "open": head_end})
-                parse(text, head_end + 1, close - 1, re.sub(r"\s+", " ", head[6:].strip()))
+                ctx2 = re.sub(r"\s+", " ", head[6:].strip()) if head.startswith("@media") else "container " + re.sub(r"\s+", " ", head[10:].strip())
+                parse(text, head_end + 1, close - 1, ctx2)
             elif head.startswith("@keyframes"):
                 keyframes.append({"s": i, "e": close, "name": head.split()[1]})
             else:

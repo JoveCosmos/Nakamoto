@@ -198,6 +198,10 @@ background:var(--edge);border:1px solid var(--edge2);margin-bottom:26px}
 /* the two Trend panels side by side: each subtitle keeps room for two lines, so the graphs and the
    boxes under them start on the same line whichever subtitle is longer */
 @media(min-width:901px){#p-eta .panel>.sub{min-height:2.9em}}
+/* the graphs keep their 42% when it fits and give way on a short window, so the boxes under them are
+   never cut: nothing in a pane may fall below its frame (it is clipped, with no scroll to reach it) */
+#p-eta .panel>svg[viewBox]{flex:0 1 42%;height:auto;min-height:80px}
+#p-eta .panel>.sbox{flex:0 0 auto}
 
 table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13.5px;font-variant-numeric:tabular-nums}
 th{text-align:right;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);
@@ -4673,9 +4677,6 @@ html[data-tab=connect] .l2host{display:none}
       <div><div class=k>cap</div><div class=v>{{CAP}}</div><div class=s>{{CAPSUB}}</div></div>
       <div><div class=k>next</div><div class=v>{{ETA_NEXT}}</div><div class=s>{{NEXT_DATE}}</div></div>
     </div>
-    <p class=note>Dates are the chain's own weekly epoch. Past &eta; is the step rule replayed from the floor through
-    each week's measured concentration, shown only when it lands exactly on the live coefficient; the projection
-    follows today's concentration, up while it is &ge; 3&times; and down below, until the cap or the floor.</p>
       </div>
       <div class=panel><div class=ptitle>Effect</div>
 <p class=sub>{{T10LINE}}</p>
@@ -4713,8 +4714,6 @@ html[data-tab=connect] .l2host{display:none}
         <tbody>{{UPTABLE}}</tbody></table></div>
       </div>
     </div>
-    <p class=note>Net APR at today's &eta;; what a delegation actually returned over {{EARNWK}} weeks, signing included;
-    the cleanest signing record since {{COVFROM}}. {{NCLEAN}} validators have never been jailed or slashed. Not advice &mdash; check a validator yourself.</p>
   </div></section>
   </div>
   <section class=pane id=p-intro><div class=w>
