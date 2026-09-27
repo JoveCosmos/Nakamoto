@@ -19,7 +19,14 @@ setTimeout(function(){
        if(r.top>=ar.bottom-1){ why='below '+(a.id?'#'+a.id:a.className.split(' ')[0]||a.tagName); break; }
        if(r.bottom>ar.bottom+2){ why='cut by '+(a.id?'#'+a.id:a.className.split(' ')[0]||a.tagName)+' ('+Math.round(r.bottom-ar.bottom)+'px)'; break; } }
      a=a.parentElement; }
-   if(ok) continue;
+   /* text spilling out of its own panel: a panel does not clip, and an outer scroller would pass it as
+      reachable, so this is checked first - a spill is a fault whether or not the page scrolls */
+   var pn=e.closest('.sd-col,.wk-pane,.sv-panel,.panel'); if(pn && pn!==e){ var pr=pn.getBoundingClientRect();
+     /* a list scrolling inside the panel is fine: only text with no scroller between it and the panel counts */
+     var py=getComputedStyle(pn).overflowY, inner=(py==='auto'||py==='scroll') && pn.scrollHeight>pn.clientHeight+1;   /* the panel scrolls itself */
+     for(var q=e.parentElement; !inner && q && q!==pn; q=q.parentElement){ var qy=getComputedStyle(q).overflowY; if((qy==='auto'||qy==='scroll') && q.scrollHeight>q.clientHeight+1){ inner=true; break; } }
+     if(!inner && r.bottom>pr.bottom+2){ why='spills out of '+(pn.id?'#'+pn.id:pn.className.split(' ')[0])+' ('+Math.round(r.bottom-pr.bottom)+'px)'; ok=false; } }
+   if(ok && !why) continue;
    var docScroll = document.scrollingElement.scrollHeight > VH+1 && getComputedStyle(document.body).overflowY!=='hidden' && getComputedStyle(document.documentElement).overflowY!=='hidden';
    if(!why && r.top>=VH-1 && !docScroll) why='below screen';
    if(!why && r.bottom>VH+2 && !docScroll) why='cut by screen';

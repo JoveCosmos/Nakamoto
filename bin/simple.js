@@ -155,13 +155,18 @@
   function earns(stake, rate, off, ex){
     var y = stake * rate, per = function(days){ return y * days / 365; };
     var tile = function(k, u){ return fig(k, '<span class=sd-gain>+' + one(u / 1e6) + '</span>', "ATONE", "var(--sv-green)"); };   /* ATONE, never dollars */
+    /* restaking monthly: the rewards claimed and staked again each month earn too - a year of it against
+       the plain year (today's rate carried forward, compounded twelve times) */
+    var cy = stake * (Math.pow(1 + rate / 12, 12) - 1), more = cy - y;
+    var rst = rate > 0 ? '<div class="sd-fig se-rs" style="--rc:var(--sv-teal)"><em>Restake monthly</em><b><span class=sd-gain>+' + one(cy / 1e6) + '</span><i class=u>ATONE a year</i></b>' +
+      '<small><span class=se-rsm>+' + one(more / 1e6) + '</span> more than leaving rewards unclaimed</small></div>' : '';
     /* the same block as the connected one: the figure in ATONE, the rate under it */
     if(ex) return '<div class=se-ex><div class=se-hero><div class=se-card><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b><small class=se-apr>' + pct(rate) + ' APR</small></div></div>' +
-      '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div></div>';
+      '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' + rst + '</div>';
     /* the year and its three steps stand in the middle of the panel, the note at its foot */
     return '<div class=se-mid><div class=se-hero><div class=se-card><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b>' +
         '<small class=se-apr>' + pct(rate) + ' APR</small></div></div>' +
-      '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' +
+      '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' + rst +
       (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + '</div>' +
       /* two doors on one row: claim what it has earned (greyed while nothing waits), and stake more of it */
       '<div class=sd-go2><button class="sv-btn go sd-go sd-cl" type=button data-act=claim' + ((window.__REW || 0) >= 1 ? '' : ' disabled title="No rewards waiting yet"') + '>Claim rewards</button>' +
@@ -269,7 +274,7 @@
         '<div class="sd-figs sd-mv">' +
           fig("Now", '<span style="color:' + hn.ink + '">' + pct(plan.now) + '</span>', "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s"), hn.fill) +
           fig("After", '<span style="color:' + ha.ink + '">' + pct(plan.after) + '</span>', "on " + plan.picks.length + " validator" + (plan.picks.length === 1 ? "" : "s"), ha.fill) +
-          fig("Gain", '<span class=sd-gain>+' + one(plan.gain) + '</span><i class=u>ATONE</i>', "a year, at today\'s rates", "var(--sv-green)") +
+          fig("Gain", '<span class=sd-gain>+' + one(plan.gain) + '</span>', "ATONE a year", "var(--sv-green)") +
         '</div>' +
         '<button class="sv-btn go sd-go" type=button data-act=opt>Redelegate</button>';
     }
