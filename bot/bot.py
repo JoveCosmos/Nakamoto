@@ -291,14 +291,16 @@ def resolve(arg, V):
 
 
 # ── commands ────────────────────────────────────────────────────────────────
+# the two helper lines every confirmation and the help end with
+HELPERS = ("/list shows every validator you watch and its alerts.\n"
+           "/stop stops all validators, /stop &lt;name&gt; stops one validator.")
+
 HELP = ("Alerts for AtomOne validators: when one stops signing, misses half its slashing "
         "window, is jailed, changes rank or its APR moves.\n\n"
         "Open the AtomOne app and tap the Telegram button in a validator's signing "
         "row, or the bell on the stake and redelegate cards, then choose what to hear "
         "about.\n\n"
-        "/list - who you are watching\n"
-        "/stop - unsubscribe from all\n"
-        "/stop &lt;moniker&gt; - unsubscribe from one\n\n" + PAGE)
+        + HELPERS + "\n\n" + PAGE)
 
 
 def md(name):
@@ -382,6 +384,9 @@ def handle(c, msg, V):
             # one row per chat and validator: subscribing again REPLACES that validator's
             # choices (it is how a reader changes them), and the reply says so
             fl, updated = many[0][1], []
+            # what the chat watched BEFORE this link: the reader knows that number, the page
+            # cannot (it never sees who is subscribed), so the reply states it
+            before = c.execute("SELECT count(*) FROM sub WHERE chat=?", (chat,)).fetchone()[0]
             for op, flags in many:
                 old = c.execute("SELECT flags FROM sub WHERE chat=? AND op=?", (chat, op)).fetchone()
                 if old: updated.append((op, old[0] or "d"))
@@ -399,12 +404,11 @@ def handle(c, msg, V):
                 head = "Watching %d validators:\n%s" % (len(many), "\n".join("- <b>%s</b>" % md(V[op]["m"]) for op, _ in many))
                 if updated:
                     head += "\n\n%d of them you already watched: their alerts are replaced by these." % len(updated)
-            # each validator is its own row, so adding one leaves the others as they were: say so,
-            # or an add reads like a replace
-            total = c.execute("SELECT count(*) FROM sub WHERE chat=?", (chat,)).fetchone()[0]
-            tail = ("\n\nYou now watch %d validators in all, each with its own alerts. /list shows them."
-                    % total) if total > len(many) else ""
-            return send(chat, "%s\n\n%s%s%s\n\n/stop &lt;name&gt; removes one, /stop removes all." % (head, what, standing(c, many, V), tail))
+            # each validator is its own row, so adding one leaves the others as they were
+            count = ("Before this, you did not watch any validators." if before == 0 else
+                     "You already watch 1 validator." if before == 1 else
+                     "You already watch %d validators." % before)
+            return send(chat, "%s\n\n%s%s\n\n%s\n%s" % (head, what, standing(c, many, V), count, HELPERS))
         if arg:
             return send(chat, "That validator is not in the active set.")
         return send(chat, HELP)
