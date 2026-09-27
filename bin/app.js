@@ -1937,7 +1937,8 @@ rememberGridH();
       var rw = slice[k], rk = rankOf(V, rw.id);
       h += '<tr' + (rw.inactive ? ' class=inactive' : '') + ' data-v="' + att(rw.id) + '" tabindex=0 title="' + (rw.inactive ? 'Not in the active set: this stake earns nothing until it is moved or unstaked' : 'Open this validator') + '"><td class="c rk">' + (rk || '\u2014') + '</td><td class="l nm">' + logo(rw.id, rw.m) + '<span>' + att(rw.m) + '</span></td>' +
            '<td class=amt><span title="' + (rw.locked > 0 ? 'held until ' + window.__day(rw.until) : 'free to move') + '">' + fmt(rw.x) + (rw.locked > 0 ? LOCK : '') + '</span></td>' +
-           '<td>' + pct(rw.rate) + '</td><td class=rw>' + (RB[rw.id] != null ? fmt(RB[rw.id]) : '\u2014') + '</td></tr>';
+           /* out of the set, the APR cell names why: Jailed (red) or Inactive */
+           '<td' + (rw.inactive ? ' class=st' : '') + '>' + (rw.inactive ? (((window.__INACT || {})[rw.id] || {}).jailed ? '<span class=dmj>Jailed</span>' : '<span class=dmi>Inactive</span>') : pct(rw.rate)) + '</td><td class=rw>' + (RB[rw.id] != null ? fmt(RB[rw.id]) : '\u2014') + '</td></tr>';
     }
     return h + '</tbody></table>';
   }

@@ -168,8 +168,8 @@
         '<span class=sv-lgo>' + logo(r.id, r.m) + '</span><span class=sd-vn><b>' + esc(r.m) + (mark && mark[r.id] ? '<i class=sd-al title="in the allow-list">allowed</i>' : '') + '</b>' +
         /* the line under the name in colour: the stake in the Staked amber, its share in teal, a cooldown in violet */
         '<s><em class=a>' + fmt(r.x) + '</em> ATONE, <em class=p>' + (r.x / (total || 1) * 100).toFixed(0) + '%</em>' + (r.locked > 0 ? ', <em class=l>cooldown</em>' : '') + '</s></span>' +
-        /* out of the set: "jailed" when it is, in red; otherwise "inactive" */
-        (r.inactive && ((window.__INACT || {})[r.id] || {}).jailed ? '<u class=jl>jailed</u>' : '<u style="color:' + c.ink + '">' + (r.inactive ? "inactive" : pct(r.rate)) + '</u>') + '</div>'; }).join("") + '</div>';
+        /* out of the set: "Jailed" when it is, in red; otherwise "Inactive" */
+        (r.inactive && ((window.__INACT || {})[r.id] || {}).jailed ? '<u class=jl>Jailed</u>' : '<u style="color:' + c.ink + '">' + (r.inactive ? "Inactive" : pct(r.rate)) + '</u>') + '</div>'; }).join("") + '</div>';
   }
   function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }
 
