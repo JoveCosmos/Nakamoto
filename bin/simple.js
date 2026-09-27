@@ -146,9 +146,12 @@
      accrue every block, so these are today's rate carried forward, and say so. */
   function usdOf(u){ var p = !TN() && DD().prices && DD().prices.atone && DD().prices.atone.usd; return p ? u / 1e6 * p : null; }
   function usd(v){ return v == null ? "" : "≈ $" + (v >= 100 ? Math.round(v).toLocaleString() : v >= 1 ? v.toFixed(2) : v.toFixed(3)); }
-  function earns(stake, rate, off){
+  /* ex: the example for a visitor with no wallet - ATONE only, the rate as a single figure, no notes */
+  function earns(stake, rate, off, ex){
     var y = stake * rate, per = function(days){ return y * days / 365; };
-    var tile = function(k, u){ return fig(k, '<span class=sd-gain>+' + one(u / 1e6) + '</span>', usd(usdOf(u)) || "ATONE", "var(--sv-green)"); };
+    var tile = function(k, u){ return fig(k, '<span class=sd-gain>+' + one(u / 1e6) + '</span>', ex ? "ATONE" : usd(usdOf(u)) || "ATONE", "var(--sv-green)"); };
+    if(ex) return '<div class=se-ex><div class=se-hero><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE a year</i></b><small>~' + pct(rate) + ' APR</small></div>' +
+      '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div></div>';
     return '<div class=se-hero><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b>' +
         '<small>' + (usdOf(y) != null ? usd(usdOf(y)) + ' at today\'s price, ' : '') + 'at ' + pct(rate) + ' APR on ' + whole(stake) + ' ATONE</small></div>' +
       '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' +
@@ -227,8 +230,7 @@
     var off = 0; rows.forEach(function(r){ if(r.inactive) off += r.x; });
     put("sd-sky", mine
       ? '<div class=sv-ph><h3>What your stake earns</h3></div>' + earns(pos.total, pos.rate, off)
-      : '<div class=sv-ph><h3>What 1,000 ATONE earns</h3>' + tag("q", "example") + '</div>' + earns(1e9, S.mid) +
-        '<div class=se-fine>At the set\'s middle APR. ' + (pos ? 'Stake to start earning.' : 'Connect a wallet to see your own.') + '</div>');
+      : '<div class=sv-ph><h3>What 1,000 ATONE earns</h3></div>' + earns(1e9, S.mid, 0, true));
 
     /* the validators */
     put("sd-list", pos && rows.length
