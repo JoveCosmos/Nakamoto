@@ -3982,6 +3982,18 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}
 #sd-move.fill{justify-content:center;align-items:center}
+.sd-mvh{flex-wrap:nowrap;container-type:inline-size;min-height:27px}
+.sd-mvh .sv-tag{flex:0 0 auto}
+.sd-mvn .m,.sd-mvn .s{display:none}
+/* the row picks its wording by its own width (title 150, pill 106, gaps 10): pill and the whole line,
+   pill and the count, then without the pill (Now and After below say the same) the line, a shorter
+   line, the count */
+@container (max-width:421px){.sd-mvn .l{display:none}.sd-mvn .s{display:inline}}
+@container (max-width:322px){.sd-mvh .sv-tag{display:none}.sd-mvn .s{display:none}.sd-mvn .l{display:inline}}
+@container (max-width:305px){.sd-mvn .l{display:none}.sd-mvn .m{display:inline}}
+@container (max-width:281px){.sd-mvn .m{display:none}.sd-mvn .s{display:inline}}
+.sd-mvh h3{flex:0 0 auto;white-space:nowrap}
+.sd-mvh .sd-mvn{margin-left:auto;min-width:0;font-size:11px;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
 /* Move your stake: Now and After side by side, the gain under both, inset like the button below */
 .sd-mv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:8px}
 .sd-mv .sd-fig{margin-left:0;padding:10px 14px 10px 16px;border-left:1px solid var(--wbd2);border-radius:10px}
