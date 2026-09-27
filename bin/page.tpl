@@ -4077,37 +4077,21 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-rs{font-size:12px;line-height:1.45;color:var(--ws);padding-left:10px;border-left:2px solid var(--sv-violet)}
 .sd-rs b{color:var(--wt)}
 .sd-go{width:100%;height:40px;flex:0 0 auto;justify-content:center}
-/* Where the stake sits: a ring of the three thirds, the largest share in its middle; the shares in wells */
-.fp-ring{position:relative;flex:1 1 auto;min-height:130px;display:grid;place-items:center;margin-top:2px}
-.fp-ring svg{width:auto;height:100%;max-height:210px;aspect-ratio:1;display:block}
-.fp-ring svg circle{transition:stroke-dasharray .6s}
-.fp-trk{stroke:rgba(255,255,255,.06)}
-.fp-mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}
-.fp-mid b{font-size:26px;font-weight:800;letter-spacing:-.02em;color:var(--wt);font-variant-numeric:tabular-nums}
-.fp-mid small{max-width:110px;font-size:10px;line-height:1.3;color:var(--wf)}
-@media(max-width:620px){.fp-ring{flex:0 0 auto;height:200px}}
-.fp-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:6px;margin-top:10px}
-.fp-s{--rc:#ff6a3d;min-width:0}.fp-s.b1{--rc:#ffb02e}.fp-s.b2{--rc:#2ee06a}.fp-s.b3{--rc:var(--wf)}
-.fp-s em{display:block;font-style:normal;font-family:var(--wmono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
-.fp-s .sd-well{margin:0;padding:5px 9px;justify-content:center}
-.fp-s .sd-well>b{font-size:16px;color:var(--rc)}
-.fp-note{margin-top:0;padding-top:8px;font-size:11.5px;line-height:1.45;color:var(--wf)}
 .sv-btn.go.sd-go:disabled{background:rgba(255,255,255,.05);border-color:var(--wbd2);color:var(--wf);box-shadow:none;cursor:not-allowed;margin-top:auto}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}
 #sd-move.fill{justify-content:center;align-items:center}
-/* Move your stake wears the wallet card's fill - the violet, the orbit rings, the light - its cards
-   frosted on it, the Redelegate door green as ever */
-#sd-move{color:#fff;border-color:rgba(185,176,255,.35);background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,255,.13) 45px 46px,transparent 47px 70px,rgba(255,255,255,.09) 71px 72px,transparent 73px 98px,rgba(255,255,255,.06) 99px 100px,transparent 101px 128px,rgba(255,255,255,.035) 129px 130px,transparent 131px),
+/* Where your stake sits wears the wallet card's fill - violet, orbit rings, light - and shows its data as
+   Move your stake does: cards, frosted on the violet */
+#sd-list{color:#fff;border-color:rgba(185,176,255,.35);background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,255,.13) 45px 46px,transparent 47px 70px,rgba(255,255,255,.09) 71px 72px,transparent 73px 98px,rgba(255,255,255,.06) 99px 100px,transparent 101px 128px,rgba(255,255,255,.035) 129px 130px,transparent 131px),
 radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear-gradient(140deg,#4130a0 0%,#271c6c 52%,#150f3b 100%)}
-#sd-move .sv-ph h3{color:#fff}
-#sd-move .sv-ph h3::before{background:#fff;box-shadow:0 0 10px -1px #fff}
-#sd-move .sd-fig{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
-#sd-move .sd-fig::after{display:none}
-#sd-move .sd-fig em,#sd-move .sd-fig small,#sd-move .sd-fig>b .u,#sd-move .sd-mvn{color:rgba(236,232,255,.75)}
-#sd-move .sd-fig>b .sd-gain{color:#8cf5b0}
-#sd-move .sv-tag.g{color:#8cf5b0;border-color:rgba(143,240,176,.5);background:rgba(46,224,106,.14)}
-#sd-move .sv-none h3,#sd-move .sd-fine{color:#fff}
+#sd-list .sv-ph h3{color:#fff}
+#sd-list .sv-ph h3::before{background:#fff;box-shadow:0 0 10px -1px #fff}
+#sd-list .sd-fig{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+#sd-list .sd-fig::after{display:none}
+#sd-list .sd-fig em,#sd-list .sd-fig small{color:rgba(236,232,255,.78)}
+#sd-list .sd-mv .sd-fig>b{font-size:24px}
+
 .sd-mvh{flex-wrap:nowrap;container-type:inline-size;min-height:27px}
 .sd-mvh .sv-tag{flex:0 0 auto}
 /* title, +APR pill and "N moves, 1 signature" on one line always; the row's own width tightens them in
@@ -4125,6 +4109,7 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
 .sd-mv .sd-fig{margin-left:0;padding:10px 14px 10px 16px;border-left:1px solid var(--wbd2);border-radius:10px}
 .sd-mv .sd-fig::before{top:10px;bottom:10px}
 .sd-mv .sd-fig:last-child{grid-column:1/-1}
+.sd-mv.four .sd-fig:last-child{grid-column:auto}
 .sd-mv .sd-fig{align-items:center;text-align:center}
 .sd-mv .sd-fig>b{justify-content:center}
 /* the boxes stand where the centred block put them (equal room above the block and below it); the

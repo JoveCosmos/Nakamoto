@@ -181,17 +181,7 @@
 
 
 
-  /* Move your stake keeps the wallet card's violet in day, its cards frosted on it */
-  html[data-theme=light]:not([data-mono]) #sd-move{color:#fff;border-color:rgba(91,79,196,.4);background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,255,.13) 45px 46px,transparent 47px 70px,rgba(255,255,255,.09) 71px 72px,transparent 73px 98px,rgba(255,255,255,.06) 99px 100px,transparent 101px 128px,rgba(255,255,255,.035) 129px 130px,transparent 131px),
 radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear-gradient(140deg,#4130a0 0%,#271c6c 52%,#150f3b 100%)}
-  html[data-theme=light]:not([data-mono]) #sd-move .sv-ph h3,html[data-theme=light]:not([data-mono]) #sd-move .sv-none h3{color:#fff}
-  html[data-theme=light]:not([data-mono]) #sd-move .sv-ph h3::before{background:#fff;box-shadow:0 0 10px -1px #fff}
-  html[data-theme=light]:not([data-mono]) #sv #sd-move .sd-fig{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)}
-  html[data-theme=light]:not([data-mono]) #sv #sd-move .sd-fig em,html[data-theme=light]:not([data-mono]) #sv #sd-move .sd-fig small,html[data-theme=light]:not([data-mono]) #sv #sd-move .sd-fig>b .u,html[data-theme=light]:not([data-mono]) #sv #sd-move .sd-mvn{color:rgba(236,232,255,.8)}
-  html[data-theme=light]:not([data-mono]) #sv #sd-move .sd-fig>b .sd-gain{color:#8cf5b0}
-  html[data-theme=light]:not([data-mono]) #sv #sd-move .sv-tag.g{color:#8cf5b0;border-color:rgba(143,240,176,.5);background:rgba(46,224,106,.14)}
-  html[data-theme=light]:not([data-mono]) .fp-trk{stroke:rgba(60,50,20,.08)}
-  html[data-theme=light]:not([data-mono]) #sv #sd-move .sd-fig>b>span[style]{filter:brightness(2.3) saturate(.85)}
 
   /* the Testnet switch and tag in day */
   html[data-theme=light]:not([data-mono]) .nettog{color:var(--muted);border-color:var(--line-strong,#d9d3c4)}
@@ -203,3 +193,11 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .bheight,html[data-theme=light]:not([data-mono]) .bheight b{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .bheight i{background:var(--accent);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .nettog[aria-checked=true] .ntk i{background:#fff}
+
+  /* Where your stake sits keeps the wallet card's violet in day, its cards frosted on it */
+  html[data-theme=light]:not([data-mono]) #sd-list{color:#fff;border-color:rgba(91,79,196,.4);background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,255,.13) 45px 46px,transparent 47px 70px,rgba(255,255,255,.09) 71px 72px,transparent 73px 98px,rgba(255,255,255,.06) 99px 100px,transparent 101px 128px,rgba(255,255,255,.035) 129px 130px,transparent 131px),
+radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear-gradient(140deg,#4130a0 0%,#271c6c 52%,#150f3b 100%)}
+  html[data-theme=light]:not([data-mono]) #sd-list .sv-ph h3{color:#fff}
+  html[data-theme=light]:not([data-mono]) #sd-list .sv-ph h3::before{background:#fff;box-shadow:0 0 10px -1px #fff}
+  html[data-theme=light]:not([data-mono]) #sv #sd-list .sd-fig{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)}
+  html[data-theme=light]:not([data-mono]) #sv #sd-list .sd-fig em,html[data-theme=light]:not([data-mono]) #sv #sd-list .sd-fig small{color:rgba(236,232,255,.8)}

@@ -202,17 +202,11 @@
     var sh = function(v){ var p = tot ? v / tot * 100 : 0; return p > 0 && p < 0.1 ? "<0.1" : p.toFixed(p > 0 && p < 10 ? 1 : 0); };
     var sums = [["Largest third", amt[0], 0], ["Middle third", amt[1], 1], ["Smallest third", amt[2], 2]];
     if(out > 0) sums.push(["Inactive", out, 3]);
-    /* a ring of the three thirds (and any inactive), the largest share written in its middle */
-    var segs = [[amt[0], "#ff6a3d"], [amt[1], "#ffb02e"], [amt[2], "#2ee06a"]]; if(out > 0) segs.push([out, "var(--wf)"]);
-    var R0 = 54, C = 2 * Math.PI * R0, off = 0, arcs = "", big = 0, bi = 0;
-    segs.forEach(function(q, k){ var f = tot ? q[0] / tot : 0; if(f > big){ big = f; bi = k; }
-      if(f > 0) arcs += '<circle r="' + R0 + '" cx="70" cy="70" fill="none" stroke="' + q[1] + '" stroke-width="16" stroke-dasharray="' + (f * C).toFixed(2) + ' ' + C.toFixed(2) + '" stroke-dashoffset="' + (-off * C).toFixed(2) + '"/>';
-      off += f; });
-    var names = ["of it on the largest third", "on the middle third", "on the smallest third", "on inactive validators"];
-    return head + '<div class=fp-ring><svg viewBox="0 0 140 140" aria-hidden=true><circle r="' + R0 + '" cx="70" cy="70" fill="none" class=fp-trk stroke-width="16"/>' +
-        '<g transform="rotate(-90 70 70)">' + arcs + '</g></svg><div class=fp-mid><b>' + sh(segs[bi][0]) + '%</b><small>' + names[bi] + '</small></div></div>' +
-      '<div class=fp-sum>' + sums.map(function(q){ return '<div class="fp-s b' + q[2] + '"><em>' + q[0] + '</em><span class=sd-well><b>' + sh(q[1]) + '%</b></span></div>'; }).join("") + '</div>' +
-      '<div class=fp-note>The bonus is split equally: the smallest third pays the most.</div>';
+    /* the thirds as Move your stake shows its figures: cards, two side by side, the third under both
+       (four as two and two when some stake sits on inactive validators) */
+    var col = ["#ff9b7a", "#ffc453", "#8cf5b0", "rgba(236,232,255,.7)"], edge = ["#ff6a3d", "#ffb02e", "#2ee06a", "var(--wf)"];
+    return head + '<div class="sd-figs sd-mv' + (sums.length > 3 ? ' four' : '') + '">' + sums.map(function(q){
+      return fig(q[0], '<span style="color:' + col[q[2]] + '">' + sh(q[1]) + '%</span>', (q[1] >= 1e12 ? big(q[1]) : fmt(q[1])) + ' ATONE', edge[q[2]]); }).join("") + '</div>';
   }
 
   function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }
