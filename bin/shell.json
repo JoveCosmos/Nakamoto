@@ -45,7 +45,7 @@
     },
     {
       "id": "governance", "label": "Governance", "route": "governance", "account": "none", "accent": "#2bc8bd",
-      "hint": "proposals, the constitution, the core DAOs", "badge": "soon",
+      "hint": "proposals, the constitution, the core DAOs",
       "sub": [
         {"id": "proposals", "label": "Proposals", "route": "proposals",
          "tab": "dele", "ui": "simple", "screen": "props", "panel": "sv-props", "accent": "#2bc8bd"},
