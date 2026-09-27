@@ -3859,11 +3859,12 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin-right:-8px;p
 .sd-vr.skel b{width:60%}.sd-vr.skel s{width:40%;margin-top:4px}.sd-vr.skel u{width:40px}
 /* what Autopilot may and may never do */
 /* what it may and may never do, side by side: allowed on the left, never on the right */
-.sd-can{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;font-size:12px;color:var(--ws);flex:0 0 auto;margin-top:4px}
+.sd-can{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:14px;font-size:12px;color:var(--ws);flex:0 0 auto;margin-top:4px}
 .sd-can>div{display:flex;flex-direction:column;gap:5px;min-width:0}
 /* the list keeps its height: the note under it takes what space is left */
 #sd-ado>.sd-fine:last-child{margin-top:auto;padding-top:8px}
 #sd-ado.tight>.sv-note{display:none}
+#sd-ado.tight .sd-can{font-size:11.5px;gap:10px}#sd-ado.tight .sd-can>div{gap:3px}#sd-ado.tight .sd-can span{line-height:1.3}#sd-ado.tight>.sd-fine{font-size:10.5px;line-height:1.35}
 .sd-can u{text-decoration:none;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:1px}
 .sd-can u.ok{color:var(--sv-green)}.sd-can u.no{color:#ff7a57}
 .sd-can span{position:relative;padding-left:14px}

@@ -308,8 +308,11 @@
       '<div class=sv-ph><h3>What it does</h3></div>' +
       '<div class=sv-note>It moves your stake to better-paying validators, only among those <i>you</i> pick, for as long as <i>you</i> choose.</div>' +
       '<div class=sd-can><div><u class=ok>It may</u>' +
-        '<span class=ok>strategize for a better APR, moving within your allow-list</span>' +
-        (at && at.restake ? '<span class=ok>claim and restake your rewards</span>' : '<span class=dim>claim and restake, if you switch it on</span>') +
+        /* Autopilot is GATA's service, not only the keeper: the validator watch covers the whole
+           set every minute and reaches our operators, who act through the admin console */
+        '<span class=ok>monitor your validators, around the clock</span>' +
+        '<span class=ok>strategize for a better APR, within your allow-list</span>' +
+        (at && at.restake ? '<span class=ok>restake your rewards</span>' : '<span class=dim>restake rewards, if you switch it on</span>') +
       '</div><div><u class=no>It may never</u><span class=no>send or spend your ATONE</span><span class=no>unstake it</span><span class=no>hold or custody it</span></div></div>' +
       '<div class=sd-fine>' + (at && at.split_pct > 0 ? 'GATA keeps <b>' + at.split_pct + '%</b> of the rewards it restakes for you, and charges nothing else.'
         : 'Autopilot is <b>free</b>: GATA takes no share of your rewards.') + ' The chain enforces these limits, not us.</div>');
