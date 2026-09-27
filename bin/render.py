@@ -311,6 +311,12 @@ for _fn, _body in (("admin.js", _ajs), ("admin.html", _ah.encode())):
     _t = os.path.join(OUT, "." + _fn + ".tmp"); open(_t, "wb").write(_body); os.chmod(_t, 0o640); os.replace(_t, os.path.join(OUT, _fn))
 # Brand marks: AtomOne and PHOTON are the official chain-registry SVGs, GATA is the
 # same mark the snapshot pages use. Published from bin/ like everything else.
+# the Constitution view's text: the official file, converted once per render into a fragment the
+# view fetches when it is opened (the page itself stays the size it was)
+import constitution as _cn
+_cd = os.path.dirname(__file__)
+_cf = _cn.fragment(open(os.path.join(_cd, "constitution.md")).read(), json.load(open(os.path.join(_cd, "constitution.json"))))
+_t = os.path.join(OUT, ".constitution.html.tmp"); open(_t, "w").write(_cf); os.replace(_t, os.path.join(OUT, "constitution.html"))
 src_a = os.path.join(os.path.dirname(__file__), "assets")
 dst_a = os.path.join(OUT, "assets")
 os.makedirs(dst_a, exist_ok=True)

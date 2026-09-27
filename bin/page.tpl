@@ -1899,6 +1899,13 @@ background:transparent;border:0;box-shadow:none;padding:0;color:var(--ink2)}
 #p-intro .introby img{width:18px;height:18px;border-radius:5px;display:block;opacity:.85;transform:translateY(-1px);margin-left:-2px}
 .introby span{font-family:var(--mono);font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;white-space:nowrap}
 .introby:hover{color:var(--ink)}
+/* home's one door: plain words and an arrow under the headline, into the first tab */
+.introgo{position:relative;display:inline-flex;align-items:center;gap:10px;margin-top:30px;color:var(--ink2);text-decoration:none;
+font-size:clamp(15px,1.4vw,18px);font-weight:600;letter-spacing:.01em}
+.intro .introgo svg{position:static;inset:auto;flex:0 0 20px;width:20px;height:20px;max-width:none;fill:none;stroke:#2bc8bd;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.introgo:hover{color:var(--ink)}.intro .introgo:hover svg{transform:translateX(4px)}
+.introgo:focus-visible{outline:2px solid #2bc8bd;outline-offset:6px;border-radius:4px}
+@media(prefers-reduced-motion:no-preference){.intro .introgo svg{transition:transform .18s}}
 /* ── the connect section: the whole section is the screen. No card inside a
    frame - the ground is the section, the words and the two wallets sit on it ── */
 
@@ -3883,6 +3890,41 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .gd-r p{margin:6px 0 0;font-size:12.5px;line-height:1.55;color:var(--ws)}
 .gd-note{font-size:12px;line-height:1.55;color:var(--wf)}.gd-note b{color:var(--wt)}.gd-note a{color:var(--sv-teal)}
 @media(max-width:700px){.gp-r{grid-template-columns:34px minmax(0,1fr) auto;gap:10px}.gp-v{grid-column:2/-1}.gp-d{padding-left:12px}}
+/* Constitution (cn-): the contents on the left, the text in a reading column on the right; each
+   scrolls on its own, and the contents follow what is being read */
+#sv-cons{justify-content:flex-start}
+.cn-wrap{display:grid;grid-template-columns:250px minmax(0,1fr);gap:16px;flex:1 1 0;min-height:0}
+.cn-toc{display:flex;flex-direction:column;gap:1px;overflow-y:auto;min-height:0;padding:12px 8px 12px 10px;border:1px solid var(--wbd);border-radius:12px;
+background:var(--wc);scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
+.cn-toc em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);padding:2px 8px 8px}
+.cn-toc a{display:block;padding:4px 8px;border-radius:6px;color:var(--ws);text-decoration:none;font-size:12px;line-height:1.35;border-left:2px solid transparent}
+.cn-toc a.cn-l2{color:var(--wt);font-weight:700;font-size:12.5px;margin-top:8px}.cn-toc a.cn-l2:first-of-type{margin-top:0}
+.cn-toc a.cn-l3{padding-left:16px}.cn-toc a.cn-l4{padding-left:28px;font-size:11.5px;color:var(--wf)}
+.cn-toc a:hover{background:rgba(255,255,255,.04);color:var(--wt)}
+.cn-toc a.on{border-left-color:var(--sv-teal);color:var(--wt);background:color-mix(in srgb,var(--sv-teal) 10%,transparent)}
+.cn-toc a:focus-visible{outline:2px solid var(--sv-teal);outline-offset:-2px}
+.cn-art{position:relative;overflow-y:auto;min-height:0;border:1px solid var(--wbd);border-radius:12px;background:var(--wc);
+scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
+.cn-art:focus-visible{outline:2px solid var(--sv-teal);outline-offset:-2px}
+.cn-in{max-width:72ch;margin:0 auto;padding:28px 32px 64px;font-size:14.5px;line-height:1.7;color:var(--ws)}
+.cn-hd{padding-bottom:18px;margin-bottom:8px;border-bottom:1px solid var(--wbd)}
+.cn-hd h1{margin:0;font-size:26px;letter-spacing:-.01em;color:var(--wt);text-wrap:balance}
+.cn-hd p{margin:6px 0 0;font-size:12px;line-height:1.5;color:var(--wf)}.cn-hd a{color:var(--sv-teal)}.cn-hd b{color:var(--ws);font-family:var(--wmono);font-weight:400}
+.cn-in h2{margin:40px 0 4px;font-size:21px;color:var(--wt);text-wrap:balance;scroll-margin-top:16px}
+.cn-in h3{margin:26px 0 2px;font-size:16px;color:var(--wt);text-wrap:balance;scroll-margin-top:16px}
+.cn-in h4{margin:20px 0 0;font-size:14.5px;color:var(--sv-teal);scroll-margin-top:16px}
+.cn-in h2+h3{margin-top:14px}
+.cn-in p{margin:10px 0}.cn-in b{color:var(--wt);font-weight:700}
+.cn-in ul{margin:8px 0;padding-left:22px}.cn-in li{margin:4px 0}.cn-in li::marker{color:var(--wf)}
+.cn-in ul.cn-terms{list-style:none;padding-left:0}.cn-in ul.cn-terms>li{padding:8px 0;border-bottom:1px solid var(--wbd);margin:0}
+.cn-sel{display:none}
+@media(max-width:900px){.cn-wrap{grid-template-columns:minmax(0,1fr)}.cn-toc{display:none}
+.cn-sel{display:block;width:100%;margin:0 0 14px;height:34px;padding:0 10px;border-radius:8px;border:1px solid var(--wbd2);background:var(--wi);color:var(--wt);font:inherit;font-size:13px}
+.cn-in{padding:18px 16px 48px;font-size:14px}}
+/* a phone: the frame takes its height from what it holds, so these panels flow with the page instead
+   of filling a frame - the constitution scrolls with the page, the proposal list runs its full length */
+@media(max-width:620px){.cn-wrap{display:block;flex:none}.cn-art{overflow:visible;border:0;background:transparent}
+.cn-in{padding:6px 2px 32px}#sv-proplist{flex:none}.gp-list{overflow:visible;flex:none;margin-right:0;padding-right:0}}
 /* every validator, scrolling inside the panel: a thin bar in the theme's own border colour */
 .sd-list{display:flex;flex-direction:column;min-height:0;overflow-y:auto;overscroll-behavior:contain;flex:1 1 auto;
 scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin-right:-8px;padding-right:4px}
@@ -4165,16 +4207,6 @@ transition:color .15s,background .15s}
 .l1badge{font-style:normal;font-family:var(--mono);font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--hot);border:1px solid;border-radius:99px;
 padding:2px 5px;line-height:1;opacity:.85}
 .brandbar [data-title-for]{display:none}
-/* home's door to the first tab: "Network" with an arrow, beside the title, on the home view only */
-.hnet{align-items:center;gap:8px;height:30px;padding:0 12px 0 14px;border-radius:999px;border:1px solid color-mix(in srgb,#2bc8bd 55%,transparent);
-background:color-mix(in srgb,#2bc8bd 10%,transparent);color:var(--wt);font:600 12.5px/1 var(--wsans,system-ui);cursor:pointer;white-space:nowrap}
-.hnet i{width:14px;height:10px;position:relative}
-.hnet i::before{content:"";position:absolute;left:0;right:3px;top:4px;height:1.6px;background:#2bc8bd;border-radius:1px}
-.hnet i::after{content:"";position:absolute;right:1px;top:1px;width:6px;height:6px;border-top:1.6px solid #2bc8bd;border-right:1.6px solid #2bc8bd;transform:rotate(45deg)}
-.hnet:hover{background:color-mix(in srgb,#2bc8bd 20%,transparent)}.hnet:hover i{transform:translateX(2px)}
-.hnet:focus-visible{outline:2px solid #2bc8bd;outline-offset:2px}
-@media(prefers-reduced-motion:no-preference){.hnet i{transition:transform .15s}}
-html:not([data-sv="staking/bonus"]) .brandbar .hnet{display:none!important}
 .brandbar .tsfx.net{color:#2bc8bd}
 .brandbar .sv-brand{flex:0 1 auto}
 .l2host{margin-left:auto;display:flex;align-items:center;min-width:0;max-width:100%}
@@ -4316,7 +4348,6 @@ html[data-tab=connect] .l2host{display:none}
       <span class=calclab>Nakamoto</span>
     <header class=brandbar>
       <div class=bwrap data-title-for=staking><div class=bt><span class=btx><i class=nk>Nakamoto </i><i class=tsfx id=tsfx>Bonus</i></span></div></div>
-      <button class=hnet type=button data-title-for=staking data-route="network" title="The validator set, live">Network<i aria-hidden=true></i></button>
       <div class=bwrap data-title-for=network><div class=bt><span class=btx><i class=nk>Network </i><i class="tsfx net tsub">Uptime</i></span></div></div>
       <div class=bwrap data-title-for=governance><div class=bt><span class=btx><i class=nk>Governance </i><i class="tsfx tsub">Proposals</i></span></div></div>
       <span class=sv-brand data-title-for=dashboard><span class=sv-bw><span class="bt svtag s"><span class=btx><i class=nk>Non-custodial </i><i class="tsfx grp-s">staking</i><i class="tsfx grp-g">Governance</i></span></span><span class="bt svtag a"><span class=btx><i class=nk>Decentralize the chain and </i><i class=tsfx>earn more</i></span></span></span><span class=welc id=svwelc hidden></span></span>
@@ -4449,6 +4480,7 @@ html[data-tab=connect] .l2host{display:none}
   <section class=pane id=p-intro><div class=w>
     <div class=intro>
       <h1>The chain that <em>rewards decentralization</em></h1>
+      <a class=introgo href="#/network" data-route="network">Network<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
       <a class=introby href="https://gatahub.zone/" target=_blank rel="noopener noreferrer" title="GATA HUB"><span>powered by</span><img src="assets/gata.png" alt="GATA HUB"></a>
     </div>
   </div></section>
@@ -4530,6 +4562,9 @@ html[data-tab=connect] .l2host{display:none}
       <section class=sv-screen id=sv-props data-sc=props aria-label=Proposals>
         <div class=sv-cards id=sv-propcards></div>
         <div class=sv-panel id=sv-proplist><div class=sv-ph><h3>Proposals</h3></div><div class=sv-upwait>Reading the proposals…</div></div>
+      </section>
+      <section class=sv-screen id=sv-cons data-sc=cons aria-label=Constitution>
+        <div class=cn-wrap id=sv-consp><div class=sv-upwait>Opening the constitution…</div></div>
       </section>
       <section class=sv-screen id=sv-daos data-sc=daos aria-label="Core DAOs">
         <div class=sv-cards id=sv-daocards></div>

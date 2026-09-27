@@ -980,6 +980,42 @@
         '<a href="https://github.com/atomone-hub/genesis/blob/main/CONSTITUTION.md" target=_blank rel="noopener noreferrer">The constitution</a> sets the rules.</div></div>'));
   }
 
+  /* ════ Constitution: the official text, as the build converted it (constitution.html), fetched
+     the first time the view opens; the contents follow the reading and take the reader anywhere ════ */
+  var CN = { busy: false, ok: false, err: false };
+  function drawCons(){
+    var box = E("sv-consp"); if(!box || CN.ok || CN.busy) return;
+    CN.busy = true;
+    fetch("constitution.html", { cache: "no-cache" }).then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); })
+      .then(function(h){ box.innerHTML = h; CN.ok = true; cnWire(box); })
+      .catch(function(){ box.innerHTML = '<div class=sv-upwait>Could not open the constitution. <a href="https://github.com/atomone-hub/genesis/blob/main/CONSTITUTION.md" target=_blank rel="noopener noreferrer">Read it on GitHub</a>.</div>'; })
+      .then(function(){ CN.busy = false; });
+  }
+  function cnWire(box){
+    var art = box.querySelector(".cn-art"), links = [].slice.call(box.querySelectorAll(".cn-toc a")), sel = box.querySelector(".cn-sel");
+    var heads = links.map(function(a){ return box.querySelector("#" + a.dataset.cn); });
+    /* the column scrolls on its own in the frame; on a phone it flows and the page scrolls instead */
+    function inner(){ return getComputedStyle(art).overflowY !== "visible"; }
+    /* a jump is instant: across thousands of lines a glide only delays the reader */
+    function go(id){ var h = box.querySelector("#" + id); if(!h) return;
+      if(inner()) art.scrollTop += h.getBoundingClientRect().top - art.getBoundingClientRect().top - 12;
+      else window.scrollBy(0, h.getBoundingClientRect().top - 70);
+      spy(); }
+    links.forEach(function(a){ a.addEventListener("click", function(ev){ ev.preventDefault(); go(a.dataset.cn); }); });
+    if(sel) sel.addEventListener("change", function(){ go(sel.value); });
+    /* the contents mark the part being read: the last heading above the top third of the column */
+    var tick = false;
+    function spy(){ tick = false; var cur = 0, top = inner() ? art.getBoundingClientRect().top : 0, line = top + (inner() ? art.clientHeight : innerHeight) / 3;
+      for(var i = 0; i < heads.length; i++) if(heads[i] && heads[i].getBoundingClientRect().top <= line) cur = i;
+      links.forEach(function(a, i){ a.classList.toggle("on", i === cur); });
+      if(sel && heads[cur]) sel.value = heads[cur].id;
+      var on = links[cur], toc = box.querySelector(".cn-toc");
+      if(on && toc && (on.offsetTop < toc.scrollTop || on.offsetTop > toc.scrollTop + toc.clientHeight - 30)) toc.scrollTop = on.offsetTop - toc.clientHeight / 2; }
+    var onScroll = function(){ if(!tick){ tick = true; requestAnimationFrame(spy); } };
+    art.addEventListener("scroll", onScroll); window.addEventListener("scroll", onScroll, { passive: true });
+    spy();
+  }
+
   /* a proposal row opens and closes its details: a tap, or Enter / Space on it */
   function gpToggle(ev){
     var r = ev.target.closest ? ev.target.closest(".gp-r") : null; if(!r) return;
@@ -1078,6 +1114,7 @@
     else if(s === "govs") drawGovs();
     else if(s === "props") drawProps();
     else if(s === "daos") drawDaos();
+    else if(s === "cons") drawCons();
     else if(s === "mygov") drawMyGov();
     else drawNet();
   }

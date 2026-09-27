@@ -140,3 +140,9 @@
   html[data-theme=light]:not([data-mono]) #sv .sv-lc .ln.tpb{stroke:#6b5fd0}
   /* open places in the active set: a light grey box with a dashed edge on the ivory ground */
   html[data-theme=light]:not([data-mono]) .cell.pad{background:rgba(40,30,20,.05);border:1px dashed rgba(40,30,20,.16)}
+
+  /* home: the headline's last words are gradient TEXT. The shadow's background shorthand resets
+     background-clip, which turned them into solid amber blocks: the clip is restored here. And
+     the GATA mark (a white glyph) gets the dark tile it wears elsewhere, or it vanishes on ivory. */
+  html[data-theme=light]:not([data-mono]) .intro h1 em{-webkit-background-clip:text;background-clip:text;color:transparent}
+  html[data-theme=light]:not([data-mono]) #p-intro .introby img{background:#1b1a22;padding:2px}

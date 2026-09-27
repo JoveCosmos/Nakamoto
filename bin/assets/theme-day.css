@@ -261,6 +261,9 @@
   html[data-theme=light]:not([data-mono]) .wk-btn.wk-go{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-btn.wk-go:disabled{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .introby{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .introgo{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .intro .introgo svg{fill:none;stroke:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .introgo:focus-visible{outline:2px solid var(--accent)}
   html[data-theme=light]:not([data-mono]) .wk-pane::before{background:transparent}
   html[data-theme=light]:not([data-mono]) #wk-mine{--a:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-plan{--a:var(--accent)}
@@ -601,6 +604,11 @@
   html[data-theme=light]:not([data-mono]) .gp-r.open{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .gp-t s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .gp-d{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .cn-toc a{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .cn-toc a:hover{background:var(--surface-2)}
+  @media(max-width:620px){
+    html[data-theme=light]:not([data-mono]) .cn-art{background:transparent}
+  }
   html[data-theme=light]:not([data-mono]) .sd-list::-webkit-scrollbar-track{background:transparent}
   html[data-theme=light]:not([data-mono]) .sd-vr.click:hover{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sd-vr .sv-lgo{box-shadow:0 0 0 1.5px var(--c)}
@@ -678,11 +686,6 @@
   html[data-theme=light]:not([data-mono]) .netsw a:focus-visible{outline:2px solid var(--accent)}
   html[data-theme=light]:not([data-mono])[data-net=testnet] .bheight::after{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) .l1tab{background:transparent}
-  html[data-theme=light]:not([data-mono]) .hnet{border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
-  html[data-theme=light]:not([data-mono]) .hnet i::before{background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .hnet i::after{border-top:1.6px solid var(--accent);border-right:1.6px solid var(--accent)}
-  html[data-theme=light]:not([data-mono]) .hnet:hover{background:color-mix(in srgb,var(--accent) 20%,transparent)}
-  html[data-theme=light]:not([data-mono]) .hnet:focus-visible{outline:2px solid var(--accent)}
   html[data-theme=light]:not([data-mono]) .brandbar .tsfx.net{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .l2tab{background:transparent}
   html[data-theme=light]:not([data-mono]) .l2gl{color:var(--muted)}
@@ -835,4 +838,10 @@
   html[data-theme=light]:not([data-mono]) #sv .sv-lc .ln.tpb{stroke:#6b5fd0}
   /* open places in the active set: a light grey box with a dashed edge on the ivory ground */
   html[data-theme=light]:not([data-mono]) .cell.pad{background:rgba(40,30,20,.05);border:1px dashed rgba(40,30,20,.16)}
+
+  /* home: the headline's last words are gradient TEXT. The shadow's background shorthand resets
+     background-clip, which turned them into solid amber blocks: the clip is restored here. And
+     the GATA mark (a white glyph) gets the dark tile it wears elsewhere, or it vanishes on ivory. */
+  html[data-theme=light]:not([data-mono]) .intro h1 em{-webkit-background-clip:text;background-clip:text;color:transparent}
+  html[data-theme=light]:not([data-mono]) #p-intro .introby img{background:#1b1a22;padding:2px}
 
