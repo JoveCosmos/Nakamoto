@@ -2067,9 +2067,11 @@ rememberGridH();
              '<td class=amt>' + fmt(t) + '</td>' + gainCell(gain, left) + '</tr>'; });
     });
     if(!h) return "";                                /* ticks, but nothing that can move */
-    return '<table><colgroup><col><col style="width:14px"><col><col style="width:66px"><col style="width:76px"></colgroup>' +
-           '<thead><tr><th class=l>from</th><th></th><th class=l>to</th><th>stake</th><th>ATONE/yr</th></tr></thead><tbody>' + h + '</tbody></table>';
+    return MVHEAD + '<tbody>' + h + '</tbody></table>';
   }
+  /* the moves table's head, shown on its own while there are no moves yet */
+  var MVHEAD = '<table><colgroup><col><col style="width:14px"><col><col style="width:66px"><col style="width:76px"></colgroup>' +
+               '<thead><tr><th class=l>from</th><th></th><th class=l>to</th><th>stake</th><th>ATONE/yr</th></tr></thead>';
 
   /* ── status pills at the foot ── */
   function statusFoot(pos, V){
@@ -2117,7 +2119,7 @@ rememberGridH();
     if(a) a.innerHTML = myRows(pos, V);
     var mv = movesPanel(pos, V, r);                /* first: the list shows each tick's gain */
     picks(opt, r, B, pos);
-    if(c) c.innerHTML = mv;
+    if(c){ c.innerHTML = mv || MVHEAD + '</table>'; c.classList.toggle("none", !mv); }
     var mn = E("dmvn"); if(mn) mn.textContent = MSGS.length ? MSGS.length + (MSGS.length === 1 ? " move" : " moves") : "";
     var me = E("dmvempty"); if(me) me.hidden = !!MSGS.length;
     result(pos, r, B, sel.n);

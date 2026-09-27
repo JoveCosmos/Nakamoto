@@ -2900,9 +2900,14 @@ border:1px solid color-mix(in srgb,var(--sa-v) 40%,transparent);background:linea
 #wk-mine .wk-tbl2,html:not([data-wallet]) #wk-mine .wk-tbl2{max-height:calc(29px + 10 * 32px)}
 #wk-plan .wk-tbl2,html:not([data-wallet]) #wk-plan .wk-tbl2{max-height:calc(30px + 10 * 32px)}
 #dstrat{max-height:calc(10 * 32px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
-/* Outcome never sets the row's height: the two lists do. It takes their height (height 0, at least the
-   row) and its moves scroll inside it, so a long plan cannot grow the row and lift all three columns */
-@media(min-width:901px){#wk-mv{height:0;min-height:100%}#wk-mv #dstrat{flex:1 1 0;min-height:0;max-height:none}}
+/* Outcome never sets the row's height: the two lists do. contain:size sizes it as if empty, it stretches to
+   the row, and its moves scroll inside it, so a long plan cannot grow the row and lift all three columns */
+@media(min-width:901px){#wk-mv{contain:size;min-height:0}#wk-mv #dstrat{flex:1 1 0;min-height:0;max-height:none}}
+/* the three title rows one height (the Redelegate row's, which holds the amount field), everything in
+   them centred: Delegations, Redelegate and Outcome, and Stake / Unstake / Rewards, on one line */
+@media(min-width:901px){#wk-mine .wk-t1,#wk-plan .wk-t2,#wk-mv .wk-t3,#wk-mv #dmvh{height:32px;min-height:32px;max-height:32px;padding-top:0;padding-bottom:0;margin-top:0;margin-bottom:0;align-items:center;box-sizing:border-box}}
+/* with no moves yet the table keeps its head (from, to, stake, ATONE/yr) and the prompt sits under it */
+#wk-mv #dstrat.none{flex:0 0 auto}
 @media(min-width:901px){
   /* the columns stand on the frame's floor at their own height; the band takes the room above them */
   #wbody{display:flex;flex-direction:column;justify-content:flex-end}
