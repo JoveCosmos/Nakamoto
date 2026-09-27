@@ -219,10 +219,10 @@
       var lift = plan.after - plan.now, hn = heat(plan.now), ha = heat(plan.after);
       picks = plan.picks.map(function(q){ var v = byId[q.id]; return { id: q.id, m: q.m, x: q.x, r: v && window.__rateAfter ? window.__rateAfter(v[1], v[2], q.x) : plan.after }; });
       /* the moves' count rides at the right end of the title row, on the same line */
-      h = '<div class="sv-ph sd-mvh"><h3>Move your stake</h3>' + tag("g", "+" + (lift * 100).toFixed(1) + "% APR") +
-        /* three wordings; the row's own width picks one (container queries), so it never wraps */
+      h = '<div class="sv-ph sd-mvh"><h3>Move your stake</h3>' + tag("g", "+" + (lift * 100).toFixed(1) + "%<i> APR</i>") +
+        /* one wording; the row's own width decides whether the pill stays (container queries), so it never wraps */
         (function(n){ var w = n + ' move' + (n === 1 ? '' : 's');
-          return '<span class=sd-mvn title="' + w + ' in one signature"><span class=l>' + w + ' in one signature</span><span class=m>' + w + ', 1 signature</span></span>'; })(plan.moves) + '</div>' +
+          return '<span class=sd-mvn title="' + w + ', 1 signature">' + w + ', 1 signature</span>'; })(plan.moves) + '</div>' +
         '<div class="sd-figs sd-mv">' +
           fig("Now", '<span style="color:' + hn.ink + '">' + pct(plan.now) + '</span>', "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s"), hn.fill) +
           fig("After", '<span style="color:' + ha.ink + '">' + pct(plan.after) + '</span>', "on " + plan.picks.length + " validator" + (plan.picks.length === 1 ? "" : "s"), ha.fill) +

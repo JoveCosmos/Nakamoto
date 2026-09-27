@@ -1563,7 +1563,7 @@ transition:filter .12s,transform .12s,box-shadow .2s,opacity .2s}
 .wk-pre{display:inline-flex;gap:5px}
 /* "N selected" beside an amount: its slot is always there, empty or not, so nothing moves when it
    appears (Self's Redelegate row and the Stake card) */
-.wk-seln{flex:0 0 auto;display:inline-flex;align-items:center;height:22px;min-width:10.5em;font-family:var(--wmono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--wf);white-space:nowrap;font-variant-numeric:tabular-nums}
+.wk-seln{flex:0 0 auto;display:inline-flex;align-items:baseline;height:22px;line-height:22px;min-width:10.5em;font-family:var(--wmono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--wf);white-space:nowrap;font-variant-numeric:tabular-nums}
 .wk-seln b{font-size:11px;font-weight:700;letter-spacing:0;color:var(--wgreen);margin-right:5px}
 .wk-pre button{padding:0 9px;border:1px solid var(--wbd2);background:transparent;cursor:pointer;transition:color .14s,border-color .14s,background .14s}
 .wk-pre button:hover{color:var(--wt);border-color:var(--ws)}
@@ -3003,9 +3003,9 @@ background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba
 #wk-mine .wk-t1 .wk-unb:not(.wk-stb):hover{color:#ffd58a;border-color:#ffc453;background:linear-gradient(180deg,rgba(255,176,46,.3),rgba(255,176,46,.16));box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 14px -6px rgba(255,176,46,.5)}
 #wk-mine .wk-t1 .wk-unb:active{transform:translateY(0) scale(.97);filter:brightness(.98)}
 #wk-mine .wk-t1 .wk-unb:focus-visible{outline:2px solid #fff;outline-offset:2px}
-/* the three doors sit together just after the title - Stake, Unstake, Claim - not pushed to the far end */
+/* the three doors - Stake, Unstake, Reward - sit together at the right end of the title row */
 #wk-mine .wk-t1{column-gap:5px}
-#wk-mine .wk-t1 .wk-unb.wk-stb{margin-left:7px}
+#wk-mine .wk-t1 .wk-unb.wk-stb{margin-left:auto}   /* Stake, Unstake, Reward at the right end of the title row */
 #wk-mine .wk-t1 .wk-unb+.wk-unb{margin-left:0}
 #wk-mine .wk-t1 .wk-unb{padding:0 8px;font-size:10.5px}
 @media(min-width:901px) and (max-width:1399px){#wk-mine .wk-t1 .wk-unb{padding:0 7px;font-size:10px}}
@@ -3930,7 +3930,9 @@ background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.01))}
    then three columns: figures hanging from the left rim, the skyline, a flat list. ══ */
 html[data-svs=over] #sv-over,html[data-svs=auto] #sv-auto{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:12px}
 .sd-scr>*,.sd-scr>*:not(:first-child){margin-top:0}
-.sd-grid{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.55fr) minmax(0,1fr);gap:12px;min-height:0}
+/* the left column a little wider than it was (.95 / 1.55), so Move your stake's title, its +APR pill and
+   "N moves, 1 signature" share one line; the middle panel has room to give */
+.sd-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1.35fr) minmax(0,1fr);gap:12px;min-height:0}
 .sd-col{background:linear-gradient(180deg,#131329,#0c0c1a);border:1px solid var(--wbd2);border-radius:12px;box-shadow:inset 0 1px 0 #ffffff08;
 position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-direction:column}
 .sd-col::before{content:"";position:absolute;left:16px;right:16px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opacity:.95;pointer-events:none}
@@ -3992,14 +3994,14 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 #sd-move.fill{justify-content:center;align-items:center}
 .sd-mvh{flex-wrap:nowrap;container-type:inline-size;min-height:27px}
 .sd-mvh .sv-tag{flex:0 0 auto}
-.sd-mvn .m{display:none}
-/* the count always says "1 signature"; the row's own width picks the wording (title 150, pill 106,
-   gaps 10): pill and the whole line, pill and "N moves, 1 signature", then without the pill (Now and
-   After below say the same) the whole line, the short one, and on the narrowest a smaller title */
-@container (max-width:421px){.sd-mvn .l{display:none}.sd-mvn .m{display:inline}}
-@container (max-width:397px){.sd-mvh .sv-tag{display:none}.sd-mvn .m{display:none}.sd-mvn .l{display:inline}}
-@container (max-width:305px){.sd-mvn .l{display:none}.sd-mvn .m{display:inline}}
-@container (max-width:281px){#sd-move .sd-mvh{column-gap:8px}#sd-move .sd-mvh h3{font-size:13px}#sd-move .sd-mvh .sd-mvn{font-size:9.5px}}
+/* title, +APR pill and "N moves, 1 signature" on one line always; the row's own width tightens them in
+   steps: smaller type, then the pill without its "APR", and only on the narrowest the pill gives way */
+#sd-move .sd-mvh .sv-tag i{font-style:normal}
+#sd-move .sd-mvh{column-gap:8px}   /* on the row itself: a container query cannot style its own container */
+@container (max-width:405px){#sd-move .sd-mvh h3{font-size:13px}#sd-move .sd-mvh .sd-mvn{font-size:9.5px}
+  #sd-move .sd-mvh .sv-tag{font-size:10px;padding-left:8px;padding-right:8px}}
+@container (max-width:345px){#sd-move .sd-mvh>*+*{margin-left:-3px}#sd-move .sd-mvh h3{font-size:12.5px}#sd-move .sd-mvh .sv-tag i{display:none}#sd-move .sd-mvh .sv-tag{padding-left:6px;padding-right:6px}#sd-move .sd-mvh .sd-mvn{font-size:9px}}
+@container (max-width:300px){#sd-move .sd-mvh .sv-tag{display:none}}
 .sd-mvh h3{flex:0 0 auto;white-space:nowrap}
 .sd-mvh .sd-mvn{margin-left:auto;min-width:0;font-size:11px;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
 /* Move your stake: Now and After side by side, the gain under both, inset like the button below */
@@ -4699,7 +4701,7 @@ html[data-tab=connect] .l2host{display:none}
             <div class=wk-foot id=dstat></div>
             <button class="wk-unb wk-stb" id=stbtn type=button hidden title="Stake liquid ATONE">Stake</button>
             <button class=wk-unb id=unbtn type=button hidden title="Unstake from a validator">Unstake</button>
-            <button class="wk-unb wk-clb" id=clbtn type=button hidden title="Claim your staking rewards">Claim</button></header>
+            <button class="wk-unb wk-clb" id=clbtn type=button hidden title="Claim your staking rewards">Reward</button></header>
           <div class=wk-tbl2 id=dmy></div>
           <footer class=wk-pf><nav class=wk-pg id=dmypg></nav></footer>
           </div>
