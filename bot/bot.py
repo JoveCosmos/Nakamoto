@@ -37,17 +37,12 @@ CHECK  = int(os.environ.get("CHECK_SECONDS", "60"))
 # a rank alert needs a move of this many places from the rank at the last alert, so two
 # validators a few ATONE apart swapping places on every rebuild cannot spam anyone
 RANK_STEP = int(os.environ.get("RANK_STEP", "2"))
-# the index is the only feed: if its newest block is older than this, say so on the ops
-# Discord once, rather than go quiet and look like nothing is happening
+# the index is the only feed: while its newest block is older than this, signing verdicts
+# wait. Alerting on a stalled index is Uptime Kuma's job (check_indexer.sh, per chain), so
+# this only logs the change.
 STALE_S = int(os.environ.get("STALE_SECONDS", "300"))
 STATE  = os.path.dirname(IDFILE)
 BACKUP = os.path.join(STATE, "subs.backup.db")
-# notify.py (the app's Discord sender) lives with the other services; optional here
-sys.path.insert(0, os.environ.get("BIN_DIR", "/srv/atomone-app/bin"))
-try:
-    import notify
-except Exception:
-    notify = None
 API    = "https://api.telegram.org/bot" + TOKEN + "/"
 
 if not TOKEN:
@@ -412,11 +407,6 @@ def check(c, V):
     if stale != STALE[0]:
         STALE[0] = stale
         log("index %s: newest block %s is %ss old" % ("STALE" if stale else "fresh again", height, age))
-        if notify:
-            notify.send("warn" if stale else "ok",
-                        "Telegram alerts paused: the index is behind" if stale else "Telegram alerts running again",
-                        "The newest indexed block is %d s old, so signing alerts cannot be trusted." % age
-                        if stale else "", {"Height": format(height, ",")})
     known = height - 1                                   # the newest height whose signatures are in
     subs = {}
     for op, chat, fl in c.execute("SELECT op, chat, flags FROM sub").fetchall():
