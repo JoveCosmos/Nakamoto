@@ -475,6 +475,8 @@
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb.wk-stb:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-soft);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb:not(.wk-stb):hover{color:var(--warn);border-color:var(--amber-bar);background:var(--warn-bg);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb:focus-visible{outline:2px solid var(--accent)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb.wk-clb{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb.wk-clb:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-soft);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5 i{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) #dmy thead th{color:var(--muted);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .thbtn{background:transparent}

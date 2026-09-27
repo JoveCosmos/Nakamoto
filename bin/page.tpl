@@ -2930,7 +2930,8 @@ border:1px solid color-mix(in srgb,var(--sa-v) 40%,transparent);background:linea
 /* below a wide frame the side columns are tighter: the counts leave the Delegations and
    Outcome lines so the doors and the tagline keep to them (the wallet list drops its
    share column too) */
-@media(min-width:901px) and (max-width:1439px){
+/* desktop: the title row holds Stake, Unstake and Claim, so the count gives way (the rows below say it) */
+@media(min-width:901px){
   #wk-mine .wk-t1 .wk-pn{display:none}
 }
 /* a move that earns less: its ATONE/year in red - the box, the row tag, the moves list - at every width */
@@ -2994,6 +2995,15 @@ background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba
 #wk-mine .wk-t1 .wk-unb:not(.wk-stb):hover{color:#ffd58a;border-color:#ffc453;background:linear-gradient(180deg,rgba(255,176,46,.3),rgba(255,176,46,.16));box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 14px -6px rgba(255,176,46,.5)}
 #wk-mine .wk-t1 .wk-unb:active{transform:translateY(0) scale(.97);filter:brightness(.98)}
 #wk-mine .wk-t1 .wk-unb:focus-visible{outline:2px solid #fff;outline-offset:2px}
+/* the three doors sit together just after the title - Stake, Unstake, Claim - not pushed to the far end */
+#wk-mine .wk-t1{column-gap:5px}
+#wk-mine .wk-t1 .wk-unb.wk-stb{margin-left:7px}
+#wk-mine .wk-t1 .wk-unb+.wk-unb{margin-left:0}
+#wk-mine .wk-t1 .wk-unb{padding:0 8px;font-size:10.5px}
+@media(min-width:901px) and (max-width:1399px){#wk-mine .wk-t1 .wk-unb{padding:0 7px;font-size:10px}}
+@media(min-width:901px) and (max-width:1279px){#wk-mine .wk-t1 .wk-unb{padding:0 5px}}
+#wk-mine .wk-t1 .wk-unb.wk-clb{color:#6fe3da;border-color:rgba(43,200,189,.55);background:linear-gradient(180deg,rgba(43,200,189,.2),rgba(43,200,189,.1))}
+#wk-mine .wk-t1 .wk-unb.wk-clb:hover{color:#a6f1eb;border-color:#2bc8bd;background:linear-gradient(180deg,rgba(43,200,189,.3),rgba(43,200,189,.16));box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 14px -6px rgba(43,200,189,.5)}
 /* the five tiles, tighter: less empty room, a label one can read, a mark one can see */
 #wk-mine .wk-b5{height:46px;padding:0 6px;gap:3px;justify-content:center}
 #wk-mine .wk-b5 i{font-size:9px;letter-spacing:.1em;color:#c1bfdc;gap:5px}
@@ -4655,7 +4665,8 @@ html[data-tab=connect] .l2host{display:none}
           <header class="wk-ph wk-t1"><h3>Delegations</h3><span class=wk-pn id=dmyn></span>
             <div class=wk-foot id=dstat></div>
             <button class="wk-unb wk-stb" id=stbtn type=button hidden title="Stake liquid ATONE">Stake</button>
-            <button class=wk-unb id=unbtn type=button hidden title="Unstake from a validator">Unstake</button></header>
+            <button class=wk-unb id=unbtn type=button hidden title="Unstake from a validator">Unstake</button>
+            <button class="wk-unb wk-clb" id=clbtn type=button hidden title="Claim your staking rewards">Claim</button></header>
           <div class=wk-tbl2 id=dmy></div>
           <footer class=wk-pf><nav class=wk-pg id=dmypg></nav></footer>
           </div>

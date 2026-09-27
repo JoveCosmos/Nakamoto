@@ -2047,7 +2047,7 @@ rememberGridH();
   /* ── status pills at the foot ── */
   function statusFoot(pos, V){
     var el = E("dstat"); if(!el) return;
-    if(!pos){ el.innerHTML = ""; var ub0 = E("unbtn"); if(ub0) ub0.hidden = true; var sb0 = E("stbtn"); if(sb0) sb0.hidden = true; return; }
+    if(!pos){ el.innerHTML = ""; ["unbtn", "stbtn", "clbtn"].forEach(function(k){ var b0 = E(k); if(b0) b0.hidden = true; }); return; }
     /* only what needs saying: stake that is held, stake on its way out */
     var h = "";
     /* the cooldown is said once, in the Redelegate title row, where the stake is asked for */
@@ -2057,6 +2057,8 @@ rememberGridH();
     el.innerHTML = h;
     var ub = E("unbtn"); if(ub) ub.hidden = !(pos && pos.rows.length);
     var sb = E("stbtn"); if(sb) sb.hidden = !pos;
+    /* Claim: only while some validator holds rewards to take; it opens the claim card */
+    var cb = E("clbtn"); if(cb){ var rb = window.__REWBY || {}, any = pos.rows.some(function(r){ return (rb[r.id] || 0) >= 1; }); cb.hidden = !any; }
   }
 
   /* rows a page: what the pane has room for, measured, never fewer than four */
@@ -2323,6 +2325,7 @@ rememberGridH();
     clDraw(); POP.open(clpop);
   };
   if(clpop) clpop.__onclose = function(){ feeSoon("cl"); };
+  var clbtn = E("clbtn"); if(clbtn) clbtn.addEventListener("click", function(){ window.__claim(); });
   var rewt = E("ds-rewt");
   if(rewt){ rewt.addEventListener("click", function(){ window.__claim(); });
     rewt.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); window.__claim(); } }); }
