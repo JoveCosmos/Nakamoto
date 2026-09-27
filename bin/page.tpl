@@ -2981,7 +2981,6 @@ html[data-ui=simple][data-tab=dele] .w#calc>#p-dele{display:none}
 /* three columns: the lockup, the screens centred, the wallet pinned right - so the
    wallet still sits at the end when the screens are not there (the advanced view) */
 .sv-brand{display:flex;align-items:center;flex:1 1 0;min-width:0}
-.sv-brand img{width:28px;height:28px;border-radius:8px;display:block}
 /* the lockup on one line: the mark, the name at title size on the mark's centre line, and the
    tagline beside it - the simple views' and the advanced view's own */
 .sv-bw{display:flex;gap:10px;line-height:1;min-width:0}
@@ -3014,7 +3013,7 @@ color:var(--wt);font-family:var(--wmono);font-size:10.5px;cursor:pointer}
 /* the lockup owns the title line's first column, beside the centred views: the greeting
    only where there is room to read it, then each tagline while it still fits whole */
 @media(min-width:621px) and (max-width:1599px){.brandbar .welc{display:none}}
-@media(min-width:621px) and (max-width:1439px){.brandbar .svtag.a{display:none}}
+@media(min-width:621px) and (max-width:1079px){.brandbar .svtag.a{display:none}}
 @media(min-width:621px) and (max-width:1079px){.brandbar .svtag.s{display:none}}
 .sv-who{position:relative}
 .sv-menu{position:absolute;right:0;top:calc(100% + 9px);z-index:60;min-width:232px;padding:7px;border:1px solid var(--wbd2);
@@ -3419,6 +3418,9 @@ font-family:var(--wmono);font-size:11px;font-weight:700;color:#0b0b18;background
 .sv-brand .grp-g,html[data-grp=Governance] .sv-brand .grp-s{display:none}
 html[data-grp=Governance] .sv-brand .grp-g{display:inline}
 .sv-brand{gap:12px}
+/* Self has no Autopilot line: the row is kept, hidden, because its button (#atbtn) is the door
+   the Autopilot screen opens the setup card through */
+#wkap{display:none!important}
 @media(max-width:900px){
 
 .sv-steps{grid-template-columns:minmax(0,1fr)}
@@ -3799,41 +3801,40 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}
 #sd-move.fill{justify-content:center;align-items:center}
-/* the skyline */
-.sd-sky{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
-/* How your APR compares: a sentence, one ruler with pins, three small facts */
-.sd-say{font-size:14px;line-height:1.5;color:var(--ws)}
-.sd-sky{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;min-height:0}
-.sd-off{font-size:11px;color:var(--wf);margin:8px 10px 0}
-.sd-say b{color:var(--wt);font-weight:800}
-.sd-rule{position:relative;margin:34px 10px 0;flex:0 0 auto}
-.sd-bar{position:relative;height:14px;border-radius:7px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
-.sd-bar s{position:absolute;top:3px;bottom:3px;width:1px;background:rgba(0,0,0,.45)}
-.sd-bar s.al{top:-4px;bottom:-4px;width:2px;background:var(--sv-violet)}
-.sd-pin{position:absolute;bottom:-4px;width:0;height:22px;pointer-events:none}
-.sd-pin::before{content:"";position:absolute;left:-7px;bottom:0;width:14px;height:14px;border-radius:50%;background:var(--wc);border:3px solid var(--pc,var(--wt));box-shadow:0 0 10px var(--pc,var(--wt))}
-.sd-pin b,.sd-pin em{position:absolute;left:0;transform:translateX(-50%);white-space:nowrap;font-style:normal}
-.sd-pin b{bottom:26px;font-size:10px;font-family:var(--wmono);letter-spacing:.1em;text-transform:uppercase;color:var(--pc,var(--wt))}
-.sd-pin em{top:26px;font-size:15px;font-weight:800;color:var(--wt);font-variant-numeric:tabular-nums}
-.sd-pin.rt b,.sd-pin.rt em{transform:translateX(-100%)}.sd-pin.lt b,.sd-pin.lt em{transform:none}
-.sd-pin.you{--pc:var(--sv-amber)}.sd-pin.md{--pc:var(--ws)}.sd-pin.aft{--pc:var(--sv-green)}
-.sd-pin.md b{bottom:auto;top:46px}.sd-pin.md em{top:60px;font-size:12px;font-weight:600;color:var(--ws)}
-.sd-sky .sd-axl{margin:66px 10px 0}
-.sd-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:auto}
-.sd-fact{--rc:var(--wf);position:relative;padding:9px 12px 10px;border:1px solid var(--wbd);border-radius:10px;background:rgba(255,255,255,.02);overflow:hidden}
-.sd-fact::before{content:"";position:absolute;left:12px;right:12px;top:0;height:2px;background:var(--rc);opacity:.8}
-.sd-fact em{display:block;font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sd-fact b{display:block;font-size:18px;font-weight:800;color:var(--wt);margin-top:2px;font-variant-numeric:tabular-nums}
-.sd-ax{height:6px;margin:0 14px;border-radius:0 0 3px 3px}
-.sd-axl{position:relative;height:16px;margin:4px 14px 0;font-family:var(--wmono);font-size:9.5px;color:var(--ws)}
-.sd-axl span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
-.sd-axl span:first-child{transform:none}.sd-axl span:last-child{transform:translateX(-100%)}
-.sd-axl span.md{color:var(--wf)}
+/* What your stake earns (Wallet) and what Autopilot would do / Your grant (Autopilot): se- */
+.sd-off{font-size:11px;color:var(--wf);margin:8px 2px 0}
+.se-hero{display:flex;flex-direction:column;gap:2px;padding:6px 0 12px}
+.se-hero em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+.se-hero>b{display:flex;align-items:baseline;gap:8px;font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1.05;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}
+.se-hero>b i{font-style:normal;font-family:var(--wmono);font-size:11px;font-weight:400;letter-spacing:.14em;color:var(--wf)}
+.se-hero small{font-size:12px;line-height:1.35;color:var(--ws)}
+.se-hero.sm{padding:10px 0 8px}.se-hero.sm>b{font-size:30px}
+.se-row .sd-fig>b{font-size:19px}
+.se-fine{margin-top:auto;padding-top:10px;font-size:11px;line-height:1.4;color:var(--wf)}
+.se-fine+.se-fine{margin-top:4px;padding-top:0}
+.se-say{font-size:13.5px;line-height:1.5;color:var(--ws);margin-top:auto}
+.se-say b{color:var(--wt);font-weight:700}
+.se-vs{display:flex;align-items:center;gap:16px;padding:8px 0 4px}
+.se-vs div{display:flex;flex-direction:column;gap:2px}
+.se-vs em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+.se-vs b{font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1.05;font-variant-numeric:tabular-nums}
+.se-vs small{font-size:11.5px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px}
+.se-vs>i{font-style:normal;font-size:24px;color:var(--wf);padding-top:12px}
+.se-time{padding:4px 0 14px}
+.se-tbar{height:10px;border-radius:5px;background:var(--wbd);overflow:hidden}
+.se-tbar s{display:block;height:100%;border-radius:5px;background:var(--sv-violet);box-shadow:0 0 10px var(--sv-violet)}
+.se-tl{display:flex;justify-content:space-between;gap:10px;margin-top:6px;font-family:var(--wmono);font-size:10px;color:var(--wf)}
+.se-tl b{font-family:var(--wsans,inherit);font-size:12.5px;font-weight:700;color:var(--wt)}
+.se-mv{display:flex;flex-direction:column;gap:7px}
+.se-mv>em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+.se-mv>div{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;font-size:12.5px;color:var(--ws);padding:7px 10px;border:1px solid var(--wbd);border-radius:9px}
+.se-mv>div u{text-decoration:none;font-family:var(--wmono);font-size:10.5px;color:var(--wf);padding-top:2px}
+.se-mv>div b{color:var(--wt)}
+.se-mv>div.none{display:block}
 .sd-over{position:absolute;left:16px;right:16px;top:44px;bottom:34px;display:grid;place-items:center;text-align:center;font-size:12.5px;color:var(--ws);pointer-events:none}
 .sv-gkey i.sk{background:linear-gradient(90deg,#8a5bb8,#ff7a3c,#ffd662)}
 .sv-gkey i.to{background:transparent;border:1.5px dashed var(--sv-green);border-radius:2px}
 .sv-gkey i.st{width:1px;height:10px;border-radius:0;background:var(--wf)}
-.sv-gkey i.mk{background:var(--sv-violet)}
 /* the list: flat rows on hairlines, not boxes */
 .sd-list{display:flex;flex-direction:column;min-height:0;overflow:hidden;flex:1 1 auto}
 .sd-list>.sd-vr{flex:0 0 auto}
@@ -3855,8 +3856,13 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-vr.skel b,.sd-vr.skel s,.sd-vr.skel u{display:block;height:9px;border-radius:3px;background:var(--wbd)}
 .sd-vr.skel b{width:60%}.sd-vr.skel s{width:40%;margin-top:4px}.sd-vr.skel u{width:40px}
 /* what Autopilot may and may never do */
-.sd-can{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--ws);flex:1 1 auto;min-height:0}
-.sd-can u{text-decoration:none;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;margin-top:6px}
+/* what it may and may never do, side by side: allowed on the left, never on the right */
+.sd-can{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;font-size:12px;color:var(--ws);flex:0 0 auto;margin-top:4px}
+.sd-can>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+/* the list keeps its height: the note under it takes what space is left */
+#sd-ado>.sd-fine:last-child{margin-top:auto;padding-top:8px}
+#sd-ado.tight>.sv-note{display:none}
+.sd-can u{text-decoration:none;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:1px}
 .sd-can u.ok{color:var(--sv-green)}.sd-can u.no{color:#ff7a57}
 .sd-can span{position:relative;padding-left:14px}
 .sd-can span::before{content:"";position:absolute;left:2px;top:.55em;width:6px;height:6px;border-radius:50%;background:currentColor}
@@ -4244,7 +4250,7 @@ html[data-tab=connect] .l2host{display:none}
       <div class=bwrap data-title-for=staking><div class=bt><span class=btx><i class=nk>Nakamoto </i><i class=tsfx id=tsfx>Bonus</i></span></div></div>
       <div class=bwrap data-title-for=network><div class=bt><span class=btx><i class=nk>Network </i><i class="tsfx net tsub">Uptime</i></span></div></div>
       <div class=bwrap data-title-for=governance><div class=bt><span class=btx><i class=nk>Governance </i><i class="tsfx tsub">Proposals</i></span></div></div>
-      <span class=sv-brand data-title-for=dashboard><img src="assets/gata.png" alt="" style="background:#0d1420;padding:4px"><span class=sv-bw><span class="bt svtag s"><span class=btx><i class=nk>Non-custodial </i><i class="tsfx grp-s">staking</i><i class="tsfx grp-g">Governance</i></span></span><span class="bt svtag a"><span class=btx><i class=nk>Decentralize the chain and </i><i class=tsfx>earn more</i></span></span></span><span class=welc id=svwelc hidden></span></span>
+      <span class=sv-brand data-title-for=dashboard><span class=sv-bw><span class="bt svtag s"><span class=btx><i class=nk>Non-custodial </i><i class="tsfx grp-s">staking</i><i class="tsfx grp-g">Governance</i></span></span><span class="bt svtag a"><span class=btx><i class=nk>Decentralize the chain and </i><i class=tsfx>earn more</i></span></span></span><span class=welc id=svwelc hidden></span></span>
       <div class=l2host>{{SHELL_L2}}</div>
     </header>
   <div class=flipbox id=flipbox>

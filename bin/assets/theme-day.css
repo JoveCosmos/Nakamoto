@@ -591,10 +591,8 @@
   html[data-theme=light]:not([data-mono]) .sd-fig::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-fig::after{background:var(--rc)}
   html[data-theme=light]:not([data-mono]) .sd-ok{border:1px solid var(--accent);background:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .sd-bar{box-shadow:inset 0 0 0 1px var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .sd-bar s{background:var(--bg)}
-  html[data-theme=light]:not([data-mono]) .sd-pin::before{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .sd-fact{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .se-tbar s{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .se-mv>div u{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sv-gkey i.sk{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-gkey i.to{background:transparent}
   html[data-theme=light]:not([data-mono]) .sd-vr.click:hover,html[data-theme=light]:not([data-mono]) .sd-vr.more:hover{background:var(--surface-2)}

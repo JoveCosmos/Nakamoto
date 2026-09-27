@@ -141,40 +141,19 @@
   function fig(label, value, meta, color){
     return '<div class=sd-fig' + (color ? ' style="--rc:' + color + '"' : '') + '><em>' + label + '</em><b>' + value + '</b>' + (meta ? '<small>' + meta + '</small>' : '') + '</div>';
   }
-  /* How your APR compares - plain on purpose: a sentence, one ruler from the lowest to the highest
-     APR the set pays (the set as faint ticks, the outer 2% folded to its ends), pins for You, the
-     Median and After the move, and three small facts. marks: [{v, label, cls}] */
-  function sky(rows, S, marks, mark){
-    var V = VALS(), rs = [], i;
-    for(i = 0; i < V.length; i++) rs.push({ id: V[i][3], r: rate0(V[i][1], V[i][2]) });
-    var sorted = rs.map(function(x){ return x.r; }).sort(function(a, b){ return a - b; });
-    var k = sorted.length >= 20 ? Math.max(1, Math.floor(sorted.length * .02)) : 0;   /* as the map's ramp() */
-    var lo = sorted[k] || 0, hi = sorted[sorted.length - 1 - k] || 0;
-    if(!(hi > lo)){ lo = sorted[0] || 0; hi = sorted[sorted.length - 1] || 1; }
-    var X = function(v){ return Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100)); };
-    var ticks = rs.map(function(x){ return '<s' + (mark && mark[x.id] ? ' class=al' : '') + ' style="left:' + X(x.r).toFixed(2) + '%"></s>'; }).join("");
-    var pins = (marks || []).filter(function(m){ return m.v != null; }).map(function(m){
-      var x = X(m.v), out = m.v > hi ? " \u2192" : m.v < lo ? " \u2190" : "";
-      return '<span class="sd-pin ' + m.cls + (x > 82 ? ' rt' : x < 18 ? ' lt' : '') + '" style="left:' + x.toFixed(2) + '%"><b>' + m.label + '</b><em>' + pct(m.v) + out + '</em></span>'; }).join("");
-    var off = 0; rows.forEach(function(r){ if(r.inactive) off += r.x; });
-    return '<div class=sd-sky><div class=sd-rule><div class=sd-bar style="background:' + rampCss() + '">' + ticks + '</div>' + pins + '</div>' +
-      '<div class=sd-axl><span style="left:0">' + pct(lo) + '</span><span style="left:100%">' + pct(hi) + ' and above</span></div>' +
-      (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + '</div>';
-  }
-  /* how many validators pay more than a rate */
-  function paysMore(r){ var V = VALS(), n = 0; for(var i = 0; i < V.length; i++) if(rate0(V[i][1], V[i][2]) > r + 1e-9) n++; return n; }
-  function compare(pos, S, after){
-    if(!pos || !pos.rows.length) return '<div class=sd-say>Connect a wallet to see how your APR compares with the set.</div>';
-    var more = paysMore(pos.rate), n = VALS().length;
-    return '<div class=sd-say>Your stake earns <b style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</b> a year. ' +
-      (more ? '<b>' + more + ' of ' + n + '</b> validators pay more.' : 'No validator pays more.') + '</div>';
-  }
-  function facts(pos, S, after){
-    var f = function(k, v, c){ return '<div class=sd-fact style="--rc:' + c + '"><em>' + k + '</em><b>' + v + '</b></div>'; };
-    var more = pos && pos.rows.length ? paysMore(pos.rate) : null;
-    return '<div class=sd-facts>' + f("Paying more than you", more == null ? "\u2014" : more + " of " + VALS().length, "var(--sv-amber)") +
-      f("Median of the set", pct(S.mid), "var(--wf)") +
-      (after != null ? f("After the move", pct(after), "var(--sv-green)") : f("Highest in the set", pct(S.hi), "var(--sv-teal)")) + '</div>';
+  /* What a stake earns - money, not a ranking: a year of it as the big figure, then a day, a
+     week and a month, each in ATONE with its dollars at today's price (none on testnet). Rewards
+     accrue every block, so these are today's rate carried forward, and say so. */
+  function usdOf(u){ var p = !TN() && DD().prices && DD().prices.atone && DD().prices.atone.usd; return p ? u / 1e6 * p : null; }
+  function usd(v){ return v == null ? "" : "≈ $" + (v >= 100 ? Math.round(v).toLocaleString() : v >= 1 ? v.toFixed(2) : v.toFixed(3)); }
+  function earns(stake, rate, off){
+    var y = stake * rate, per = function(days){ return y * days / 365; };
+    var tile = function(k, u){ return fig(k, '<span class=sd-gain>+' + one(u / 1e6) + '</span>', usd(usdOf(u)) || "ATONE", "var(--sv-green)"); };
+    return '<div class=se-hero><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b>' +
+        '<small>' + (usdOf(y) != null ? usd(usdOf(y)) + ' at today\'s price, ' : '') + 'at ' + pct(rate) + ' APR on ' + whole(stake) + ' ATONE</small></div>' +
+      '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' +
+      (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') +
+      '<div class=se-fine>Today\'s rate carried forward. Rewards build up every block and wait for you to claim them.</div>';
   }
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake */
   function vlist(rows, total, n, mark){
@@ -186,7 +165,7 @@
         '<span class=sv-lgo>' + logo(r.id, r.m) + '</span><span class=sd-vn><b>' + esc(r.m) + (mark && mark[r.id] ? '<i class=sd-al title="in the allow-list">allowed</i>' : '') + '</b>' +
         '<s>' + fmt(r.x) + ' ATONE, ' + (r.x / (total || 1) * 100).toFixed(0) + '%' + (r.locked > 0 ? ', cooldown' : '') + '</s></span>' +
         '<u style="color:' + c.ink + '">' + (r.inactive ? "inactive" : pct(r.rate)) + '</u></div>'; }).join("");
-    if(rest.length) h += '<div class="sd-vr more" data-route="dashboard/manual" tabindex=0 title="All your validators, in Manual"><span class=sv-lgo>+' + rest.length + '</span>' +
+    if(rest.length) h += '<div class="sd-vr more" data-route="dashboard/self" tabindex=0 title="All your validators, in Self"><span class=sv-lgo>+' + rest.length + '</span>' +
       '<span class=sd-vn><b>' + rest.length + ' more</b><s>' + fmt(rx) + ' ATONE</s></span><u>see all</u></div>';
     return '<div class=sd-list>' + h + '</div>';
   }
@@ -198,11 +177,11 @@
     var lim = box.getBoundingClientRect().bottom + 1, hid = 0;
     for(var i = rows.length - 1; i >= 0 && (more ? more.getBoundingClientRect().bottom : rows[rows.length - 1].getBoundingClientRect().bottom) > lim; i--){
       rows[i].hidden = true; hid++;
-      if(!more){ more = document.createElement("div"); more.className = "sd-vr more"; more.setAttribute("data-route", "dashboard/manual"); more.tabIndex = 0; box.appendChild(more); }
+      if(!more){ more = document.createElement("div"); more.className = "sd-vr more"; more.setAttribute("data-route", "dashboard/self"); more.tabIndex = 0; box.appendChild(more); }
     }
     if(hid && more){ var n = (+(more.dataset.base || 0)) + hid;
       if(!more.dataset.base) more.dataset.base = String(more.querySelector("b") ? parseInt(more.querySelector("b").textContent, 10) || 0 : 0);
-      more.innerHTML = '<span class=sv-lgo>+' + (hid + (+more.dataset.base)) + '</span><span class=sd-vn><b>' + (hid + (+more.dataset.base)) + ' more</b><s>in Manual</s></span><u>see all</u>'; }
+      more.innerHTML = '<span class=sv-lgo>+' + (hid + (+more.dataset.base)) + '</span><span class=sd-vn><b>' + (hid + (+more.dataset.base)) + ' more</b><s>in Self</s></span><u>see all</u>'; }
   }
   function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }
 
@@ -229,7 +208,7 @@
       h = '<div class=sv-ph><h3>What your stake could earn</h3></div>' +
         '<ol class="sv-steps col">' +
           '<li style="--sc:#ffb02e"><b>Connect</b><span>your wallet reads your stake; nothing leaves it</span></li>' +
-          '<li style="--sc:' + heat(S.mid).fill + '"><b>See where it sits</b><span>on the ruler: further right pays more</span></li>' +
+          '<li style="--sc:' + heat(S.mid).fill + '"><b>See what it earns</b><span>a day, a week, a year, in ATONE and dollars</span></li>' +
           '<li style="--sc:#2ee06a"><b>Redelegate</b><span>to the best-paying place, in one signature</span></li>' +
         '</ol><button class="sv-btn pri sd-go" type=button data-act=connect>Connect wallet</button>';
     } else if(!pos.rows.length){
@@ -262,9 +241,11 @@
     /* where it earns */
     var rows = pos ? pos.rows : [];
     var aft = picks.length && plan ? plan.after : null;
-    put("sd-sky", '<div class=sv-ph><h3>How your APR compares</h3></div>' + compare(pos, S, aft) +
-      sky(rows, S, [{ v: S.mid, label: "Median", cls: "md" }, { v: mine ? pos.rate : null, label: "You", cls: "you" },
-                    { v: aft, label: "After the move", cls: "aft" }]) + facts(pos, S, aft));
+    var off = 0; rows.forEach(function(r){ if(r.inactive) off += r.x; });
+    put("sd-sky", mine
+      ? '<div class=sv-ph><h3>What your stake earns</h3></div>' + earns(pos.total, pos.rate, off)
+      : '<div class=sv-ph><h3>What 1,000 ATONE earns</h3>' + tag("q", "example") + '</div>' + earns(1e9, S.mid) +
+        '<div class=se-fine>At the set\'s middle APR. ' + (pos ? 'Stake to start earning.' : 'Connect a wallet to see your own.') + '</div>');
 
     /* the validators */
     put("sd-list", pos && rows.length
@@ -344,19 +325,67 @@
       '<div class=sd-fine>The chain enforces the grant: it may redelegate inside your allow-list, and never send, unstake or hold your ATONE.</div>');
     else put("sd-ado",
       '<div class=sv-ph><h3>What it does</h3></div>' +
-      '<div class=sv-note>It moves your stake to better-paying validators for you: only among the validators <i>you</i> pick, only for as long as <i>you</i> choose.</div>' +
-      '<div class=sd-can><u class=ok>It may</u>' +
-        '<span class=ok>redelegate inside your allow-list</span>' +
+      '<div class=sv-note>It moves your stake to better-paying validators, only among those <i>you</i> pick, for as long as <i>you</i> choose.</div>' +
+      '<div class=sd-can><div><u class=ok>It may</u>' +
+        '<span class=ok>strategize for a better APR, moving within your allow-list</span>' +
         (at && at.restake ? '<span class=ok>claim and restake your rewards</span>' : '<span class=dim>claim and restake, if you switch it on</span>') +
-      '<u class=no>It may never</u><span class=no>send or spend your ATONE</span><span class=no>unstake it</span><span class=no>hold or custody it</span></div>' +
+      '</div><div><u class=no>It may never</u><span class=no>send or spend your ATONE</span><span class=no>unstake it</span><span class=no>hold or custody it</span></div></div>' +
       '<div class=sd-fine>' + (at && at.split_pct > 0 ? 'GATA keeps <b>' + at.split_pct + '%</b> of the rewards it restakes for you, and charges nothing else.'
         : 'Autopilot is <b>free</b>: GATA takes no share of your rewards.') + ' The chain enforces these limits, not us.</div>');
+    /* a short window: the intro goes before anything is clipped (the heading and the two lists say it) */
+    var ado = E("sd-ado"); if(ado && !g){ ado.classList.remove("tight"); if(ado.scrollHeight > ado.clientHeight + 1) ado.classList.add("tight"); }
     var rows = pos ? pos.rows : [];
-    put("sd-asky", '<div class=sv-ph><h3>' + (g ? "What it manages" : "What it would manage") + '</h3>' + (mark ? '<span class=sv-gkey><i class=mk></i>allow-list</span>' : '') + '</div>' + compare(pos, S) +
-      sky(rows, S, [{ v: S.mid, label: "Median", cls: "md" }, { v: pos && pos.rows.length ? pos.rate : null, label: "You", cls: "you" }], mark) + facts(pos, S) + (pos && !rows.length ? '<div class=sd-say>Nothing staked for it to manage.</div>' : ''));
+    put("sd-asky", g ? grantView(g, at, rp, since, until) : wouldDo(pos));
     put("sd-alist", rows.length ? '<div class=sv-ph><h3>Validators</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total, 7, mark)
       : '<div class=sv-ph><h3>Validators</h3></div>' + (pos ? '<div class=sv-upwait>None yet</div>' : vskel(6)));
     fitList("sd-alist");
+  }
+
+  /* Before a grant: what Autopilot would change, in two numbers - where the stake earns now and
+     the best it can reach today (the same plan the Wallet's Redelegate uses) - and what that is
+     worth a year. */
+  function wouldDo(pos){
+    var h = '<div class=sv-ph><h3>What Autopilot would do</h3></div>';
+    if(!pos){
+      /* no wallet: the spread Autopilot works in, as two plain facts - what the largest validator
+         pays, and the middle of the set (half pay more). Not the single best payer: that is a
+         tiny validator whose rate a real stake would dilute at once, so it would read as a promise */
+      var V = VALS(), big = null, S0 = setStats();
+      V.forEach(function(v){ if(!big || v[1] > big.t) big = { t: v[1], r: rate0(v[1], v[2]), m: v[0] }; });
+      if(!big) return h + '<div class=se-say>Connect a wallet to see what Autopilot would do for your stake.</div>';
+      return h + '<div class=se-vs><div><em>The largest validator</em><b style="color:' + heat(big.r).ink + '">' + pct(big.r) + '</b><small>' + esc(big.m) + '</small></div><i aria-hidden=true>\u2192</i>' +
+          '<div><em>Half the set pays over</em><b style="color:' + heat(S0.mid).ink + '">' + pct(S0.mid) + '</b><small>of ' + V.length + ' validators</small></div></div>' +
+        '<div class=se-say>The same ATONE earns more in some places than others. Autopilot keeps your stake with the better payers, among the validators you allow.' +
+        ' Connect a wallet to see it for yours.</div>';
+    }
+    if(!pos.rows.length) return h + '<div class=se-say>Nothing staked yet, so nothing for it to manage.</div>';
+    if(!(pos.free > 0)) return h + '<div class=se-say>Your stake is in its 21-day cooldown until <b>' + (window.__dayFull ? window.__dayFull(pos.until) : "later") + '</b>. Autopilot can move it after that.</div>';
+    var plan = planNow(pos), hn = heat(pos.rate);
+    if(!plan || !(plan.gain > 0.5) || plan.after == null)
+      return h + '<div class=se-vs><div><em>Now</em><b style="color:' + hn.ink + '">' + pct(pos.rate) + '</b></div></div>' +
+        '<div class=se-say>Your stake already earns the best it can today. Autopilot keeps it there: when rates change, it moves your stake for you.</div>';
+    var ha = heat(plan.after);
+    return h + '<div class=se-vs><div><em>Now</em><b style="color:' + hn.ink + '">' + pct(plan.now) + '</b></div><i aria-hidden=true>\u2192</i>' +
+        '<div><em>Best today</em><b style="color:' + ha.ink + '">' + pct(plan.after) + '</b></div></div>' +
+      '<div class="se-hero sm"><em>More a year</em><b><span class=sd-gain>+' + one(plan.gain) + '</span><i>ATONE</i></b>' +
+        (usdOf(plan.gain * 1e6) != null ? '<small>' + usd(usdOf(plan.gain * 1e6)) + ' at today\'s price</small>' : '') + '</div>' +
+      '<div class=se-say>Autopilot moves your stake there, and again whenever rates change. You approve once.</div>';
+  }
+  /* With a grant: how far along it is, and what it has done - its last three moves in words */
+  function grantView(g, at, rp, since, until){
+    var t0 = at && at.since, t1 = g.expiration ? new Date(g.expiration).getTime() : null, now = Date.now(), day = 86400000;
+    var h = '<div class=sv-ph><h3>Your grant</h3></div>';
+    if(t0 && t1 && t1 > t0){
+      var tot = Math.max(1, Math.round((t1 - t0) / day)), dn = Math.min(tot, Math.max(1, Math.ceil((now - t0) / day))), left = Math.max(0, Math.ceil((t1 - now) / day));
+      h += '<div class=se-time><div class=se-tbar><s style="width:' + (Math.min(1, (now - t0) / (t1 - t0)) * 100).toFixed(1) + '%"></s></div>' +
+        '<div class=se-tl><span>' + since + '</span><b>Day ' + dn + ' of ' + tot + ', ' + left + ' day' + (left === 1 ? '' : 's') + ' left</b><span>' + until + '</span></div></div>';
+    }
+    var name = function(op){ var V = VALS(), id = String(op || "").slice(-6); for(var i = 0; i < V.length; i++) if(V[i][3] === id) return esc(V[i][0]); return id; };
+    var hist = (rp && rp.history || []).slice(-3).reverse();
+    h += '<div class=se-mv><em>Last moves</em>' + (hist.length ? hist.map(function(m){
+        return '<div><u>' + (window.__dayFull ? window.__dayFull(m.at * 1000) : "") + '</u><span><b>' + fmt(m.uatone) + ' ATONE</b> from ' + name(m.src) + ' to ' + name(m.dst) + '</span></div>'; }).join("")
+      : '<div class=none>No move yet: your stake already sits where it earns the most.</div>') + '</div>';
+    return h;
   }
 
   function strategyWord(g){

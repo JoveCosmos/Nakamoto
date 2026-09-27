@@ -103,7 +103,7 @@ go('staking/bonus');
 /* the wallet section: no gate of its own any more - the sub-header is the only door,
    and the pane stands with its structure (a skeleton) until a wallet fills it */
 t('wallet-door', function(){
-  var root=document.documentElement; go('dashboard/manual');
+  var root=document.documentElement; go('dashboard/self');
   var g=document.getElementById('wgate'), a=document.getElementById('wk-acct');
   var skel=document.querySelectorAll('#dmy tr.skel').length;
   var rows=document.querySelectorAll('#dpicks tbody tr').length, cap=!document.getElementById('dcap');   /* the count line is gone from the page */
@@ -119,7 +119,7 @@ t('wallet-door', function(){
 
 /* the dashboard's two views share one window: the same box, one at a time */
 t('simple-view', function(){
-  go('dashboard/manual');
+  go('dashboard/self');
   var pane=document.getElementById('p-dele'), sv=document.getElementById('sv');
   var advBox=pane.getBoundingClientRect();
   go('dashboard/wallet');
@@ -214,7 +214,7 @@ t('shell-groups', function(){
   if(R.getAttribute('data-grp')!=='Staking') bad.push('grp '+R.getAttribute('data-grp'));
   if(!vis('sv-over') || vis('p-dele')) bad.push('overview is not the simple screen');
   document.getElementById('l2-dashboard-self').click();
-  if(location.hash!=='#/dashboard/manual' || !vis('p-dele') || vis('sv')) bad.push('manual is not the three panes '+location.hash);
+  if(location.hash!=='#/dashboard/self' || !vis('p-dele') || vis('sv')) bad.push('self is not the three panes '+location.hash);
   if(document.getElementById('l2-dashboard-self').getAttribute('aria-controls')!=='p-dele') bad.push('self controls');
   var tg=[].filter.call(document.querySelectorAll('.brandbar .svtag'),function(x){ return x.offsetParent!==null; });
   if(innerWidth>1439 && (tg.length!==1 || !tg[0].classList.contains('a'))) bad.push('self tagline');
@@ -228,7 +228,7 @@ t('shell-groups', function(){
   document.getElementById('l2-dashboard-governors').click();
   if(location.hash!=='#/dashboard/governors' || !vis('sv-mygov')) bad.push('governors page');
   document.querySelector('.l2vb[data-g=Staking]').click();
-  if(location.hash!=='#/dashboard/manual') bad.push('staking returns to its last view '+location.hash);
+  if(location.hash!=='#/dashboard/self') bad.push('staking returns to its last view '+location.hash);
   [].forEach.call(document.querySelectorAll('.l2vb'),function(b){ var h=parseFloat(getComputedStyle(b,'::after').height); if(!(h>=44) && b.getBoundingClientRect().height<44) bad.push('switch target '+h); });
   go('network/uptime'); if(location.hash!=='#/network/uptime' || !vis('sv-net')) bad.push('network '+location.hash);
   go('staking/bonus');
