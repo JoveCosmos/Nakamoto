@@ -94,7 +94,9 @@ def fragment(md, meta):
     nav = []
     for lvl, sid, text in toc:
         short = re.sub(r"^(Article \d+|Section [\w.]+):\s*", lambda k: k.group(1) + ": ", text)
-        nav.append('<a class="cn-l%d" href="#%s" data-cn="%s">%s</a>' % (lvl, sid, sid, html.escape(short)))
+        # the class names are written out whole, so a scan for used classes (dev/csslean.py) finds them
+        cls = {2: "cn-l2", 3: "cn-l3", 4: "cn-l4"}[lvl]
+        nav.append('<a class="%s" href="#%s" data-cn="%s">%s</a>' % (cls, sid, sid, html.escape(short)))
     opts = "".join('<option value="%s">%s%s</option>' % (sid, " " * (lvl - 2), html.escape(text)) for lvl, sid, text in toc)
     src = ('The official text, <a href="%s" target=_blank rel="noopener noreferrer">%s</a>, commit <b>%s</b> of %s. Nothing here is edited.'
            % (html.escape(meta["url"]), html.escape(meta["repo"]), html.escape(meta["commit"][:7]), html.escape(meta["date"])))
