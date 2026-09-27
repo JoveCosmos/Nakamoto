@@ -157,8 +157,7 @@
     return '<div class=se-mid><div class=se-hero><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b>' +
         '<small class=se-apr>' + pct(rate) + ' APR</small></div>' +
       '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' +
-      (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + '</div>' +
-      '<div class=se-fine>Today\'s rate carried forward. Rewards build up every block and wait for you to claim them.</div>';
+      (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + '</div>';
   }
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every
      one of them, largest first; the list scrolls inside its panel */
