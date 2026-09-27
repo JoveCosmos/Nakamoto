@@ -2868,7 +2868,9 @@ rememberGridH();
     if(!pos || !(B > 0)) return null;
     var keep = null, kamt = amt.value;
     if(!apply){ keep = {}; for(k in SEL) keep[k] = 1; }
-    var r = window.__planWith(B, { cleanRecord: CLEAN, maxVals: 4 });
+    /* up to ten validators, so a large stake can spread instead of piling onto four; the stake is
+       then split equally across the picks, as a hand-ticked plan is */
+    var r = window.__planWith(B, { cleanRecord: CLEAN, maxVals: 10 });
     if(!r.moves.length) return null;
     for(k in SEL) delete SEL[k];
     r.moves.forEach(function(m){ SEL[m.id] = 1; });
