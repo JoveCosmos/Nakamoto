@@ -242,8 +242,8 @@
 
     /* the validators */
     put("sd-list", pos && rows.length
-      ? '<div class=sv-ph><h3>Your validators</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total)
-      : '<div class=sv-ph><h3>' + (pos ? "Your validators" : "Validators") + '</h3></div>' + (pos ? '<div class=sv-upwait>None yet</div>' : vskel(6)));
+      ? '<div class=sv-ph><h3>Your delegations</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total)
+      : '<div class=sv-ph><h3>' + (pos ? "Your delegations" : "Validators") + '</h3></div>' + (pos ? '<div class=sv-upwait>None yet</div>' : vskel(6)));
   }
 
   /* the plan is recomputed only when a stake moves or the position is re-read */
