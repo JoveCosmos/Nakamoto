@@ -4077,6 +4077,10 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-rs{font-size:12px;line-height:1.45;color:var(--ws);padding-left:10px;border-left:2px solid var(--sv-violet)}
 .sd-rs b{color:var(--wt)}
 .sd-go{width:100%;height:40px;flex:0 0 auto;justify-content:center}
+.sd-go2{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:0 0 auto;margin-top:auto}
+.sd-go2 .sd-go{width:auto}
+.sv-btn.go.sd-cl{background:transparent;color:#5cf08e;border-color:rgba(46,224,106,.6);box-shadow:none}
+.sv-btn.go.sd-cl:hover:not(:disabled){background:rgba(46,224,106,.12);color:#8ef0b0;border-color:#2ee06a}
 .sv-btn.go.sd-go:disabled{background:rgba(255,255,255,.05);border-color:var(--wbd2);color:var(--wf);box-shadow:none;cursor:not-allowed;margin-top:auto}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}

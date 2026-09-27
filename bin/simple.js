@@ -163,8 +163,9 @@
         '<small class=se-apr>' + pct(rate) + ' APR</small></div></div>' +
       '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' +
       (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + '</div>' +
-      /* the way to earn more of it: the same door as Redelegate, opening the Stake card */
-      '<button class="sv-btn go sd-go" type=button data-act=stake>Stake more</button>';
+      /* two doors on one row: stake more of it, and claim what it has earned (greyed while nothing waits) */
+      '<div class=sd-go2><button class="sv-btn go sd-go" type=button data-act=stake>Stake more</button>' +
+        '<button class="sv-btn go sd-go sd-cl" type=button data-act=claim' + ((window.__REW || 0) >= 1 ? '' : ' disabled title="No rewards waiting yet"') + '>Claim rewards</button></div>';
   }
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every
      one of them, largest first; the list scrolls inside its panel */
