@@ -281,9 +281,7 @@
     var off = 0; rows.forEach(function(r){ if(r.inactive) off += r.x; });
     put("sd-sky", mine
       ? '<div class=sv-ph><h3>What your stake earns</h3></div>' + earns(pos.total, pos.rate, off)
-      : '<div class=sv-ph><h3>What 1,000 ATONE earns</h3></div>' + earns(1e9, S.mid, 0, true) +
-        /* a wallet with nothing staked: the door to its first stake (no wallet: no door, the steps say how) */
-        (pos ? '<button class="sv-btn go sd-go" type=button data-act=stake>Stake</button>' : ''));
+      : '<div class=sv-ph><h3>What 1,000 ATONE earns</h3></div>' + earns(1e9, S.mid, 0, true));
 
     /* the validators */
     put("sd-list", footprint(pos));
