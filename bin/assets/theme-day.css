@@ -293,8 +293,6 @@
   html[data-theme=light]:not([data-mono]) .txcard .txrow .f.to b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .txlock{border:1px solid var(--warn-bg);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) .txlock svg{fill:none}
-  html[data-theme=light]:not([data-mono]) .bheight{color:var(--muted)}
-  html[data-theme=light]:not([data-mono]) .bheight i{box-shadow:none}
   @media(max-width:700px){
     html[data-theme=light]:not([data-mono]) .w#calc,html[data-theme=light]:not([data-mono]) .panes>.w{background:transparent;box-shadow:none}
   }
@@ -765,17 +763,23 @@
     html[data-theme=light]:not([data-mono]) .atview button[aria-selected=true] b{color:#FFFFFF}
   }
   html[data-theme=light]:not([data-mono]){--l2-off:var(--faint)}
-  html[data-theme=light]:not([data-mono]) .netsw{border:1px solid var(--wbd2,var(--line-strong));background:var(--bg);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .netsw::before{background:var(--accent);box-shadow:none}
-  html[data-theme=light]:not([data-mono])[data-net=testnet] .netsw::before,html[data-theme=light]:not([data-mono])[data-netgo=testnet] .netsw::before{background:var(--amber-bar);box-shadow:none}
-  html[data-theme=light]:not([data-mono])[data-net=testnet][data-netgo=mainnet] .netsw::before{background:var(--accent);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .netsw a{color:var(--ws,var(--muted));text-decoration:none}
-  html[data-theme=light]:not([data-mono]) .netsw a:hover{color:var(--wt,var(--ink))}
-  html[data-theme=light]:not([data-mono]) .netsw a[aria-current=page]{color:#FFFFFF}
-  html[data-theme=light]:not([data-mono])[data-net=testnet] .netsw a[aria-current=page]{color:#FFFFFF}
-  html[data-theme=light]:not([data-mono])[data-netgo] .netsw a[aria-current=page]{color:var(--ws,var(--muted))}
-  html[data-theme=light]:not([data-mono])[data-netgo] .netsw a:not([aria-current]){color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .netsw a:focus-visible{outline:2px solid var(--accent)}
+  html[data-theme=light]:not([data-mono]) .netbtn{background:none;color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .netbtn>i{background:var(--accent);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .netbtn .nn{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .netbtn svg{fill:none;stroke:currentColor}
+  html[data-theme=light]:not([data-mono]) .netbtn:focus-visible{outline:2px solid var(--accent)}
+  html[data-theme=light]:not([data-mono])[data-net=testnet] .netbtn>i{background:var(--amber-bar);box-shadow:none}
+  html[data-theme=light]:not([data-mono])[data-net=testnet] .netbtn .nn{color:var(--warn)}
+  html[data-theme=light]:not([data-mono]) .netpop{border:1px solid var(--line-strong);background:var(--surface-2);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .netpop a{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .netpop a:hover,html[data-theme=light]:not([data-mono]) .netpop a:focus-visible{background:var(--surface-2);outline:none}
+  html[data-theme=light]:not([data-mono]) .netpop a>i{background:var(--accent);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .netpop a#nettest>i{background:var(--amber-bar);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .netpop a small{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .netpop a[aria-current=page]{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .netpop a#nettest[aria-current=page]{background:var(--warn-bg)}
+  html[data-theme=light]:not([data-mono]) .netpop a[aria-current=page] u{border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .netpop a#nettest[aria-current=page] u{border-color:var(--amber-bar)}
   html[data-theme=light]:not([data-mono]) .l1tab{background:transparent}
   html[data-theme=light]:not([data-mono]) .brandbar .tsfx.net{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .l2tab{background:transparent}
@@ -801,8 +805,6 @@
   html[data-theme=light]:not([data-mono]) .folder{background:rgba(244,241,234,.93);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wordmark{font-family:var(--day-display);color:var(--ink)}
 
-  html[data-theme=light]:not([data-mono]) .bheight,html[data-theme=light]:not([data-mono]) .bheight b{color:var(--muted)}
-  html[data-theme=light]:not([data-mono]) .bheight i{background:var(--accent);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .thbtn{border-color:var(--line-strong);background:var(--surface);color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .thbtn:hover{color:var(--ink);background:#ECE8DF}
   html[data-theme=light]:not([data-mono]) .tsfx{color:var(--accent)!important}
@@ -976,4 +978,13 @@
   html[data-theme=light]:not([data-mono]) .sd-rw b{color:#8cf5b0}
   html[data-theme=light]:not([data-mono]) .sd-rwb{background:#2ee06a;color:#05170c}
 
+
+  /* the network line and its menu in day: the same teal and amber, the menu an ivory card */
+  html[data-theme=light]:not([data-mono]) .netbtn{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .netbtn .nn{color:#0f7a72}
+  html[data-theme=light]:not([data-mono])[data-net=testnet] .netbtn .nn{color:#a86400}
+  html[data-theme=light]:not([data-mono]) .netpop{background:var(--surface,#fbf9f3);border-color:var(--line-strong,#d9d3c4);box-shadow:0 18px 40px -16px rgba(60,50,20,.35)}
+  html[data-theme=light]:not([data-mono]) .netpop a{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .netpop a small{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .netpop a:hover{background:rgba(60,50,20,.05)}
 
