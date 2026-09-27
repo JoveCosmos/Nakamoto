@@ -629,6 +629,14 @@
   html[data-theme=light]:not([data-mono]) .sd-ida .sv-tag.g{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .sd-col{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-col::before{background:transparent}
+  html[data-theme=light]:not([data-mono]) .sd-rw{background:var(--surface-2);border:1px solid var(--surface-2);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-rw em{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sd-rw b{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sd-rw b i{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sd-rw small{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sd-rwb{background:var(--accent);color:#FFFFFF;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-rwb:hover{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sd-rwb:focus-visible{outline:2px solid var(--accent)}
   html[data-theme=light]:not([data-mono]) .sd-idw{color:var(--ink);background:var(--accent)}
   html[data-theme=light]:not([data-mono]) #sd-sky{color:var(--ink);border-color:var(--accent-soft);background:var(--accent)}
   html[data-theme=light]:not([data-mono]) #sd-sky::after{background:var(--accent);box-shadow:none}
@@ -1010,4 +1018,9 @@
   html[data-theme=light]:not([data-mono]) #sv #sd-sky .se-ra,html[data-theme=light]:not([data-mono]) #sv #sd-sky .se-ra em{color:rgba(226,255,233,.78)}
   html[data-theme=light]:not([data-mono]) #sv #sd-sky .se-rng{border-top-color:rgba(255,255,255,.14)}
   html[data-theme=light]:not([data-mono]) #sd-sky .sv-ph h3::before{background:#fff;box-shadow:0 0 10px -1px #fff}
+  html[data-theme=light]:not([data-mono]) .sd-rw{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18)}
+  html[data-theme=light]:not([data-mono]) .sd-rw em,html[data-theme=light]:not([data-mono]) .sd-rw b i,html[data-theme=light]:not([data-mono]) .sd-rw small{color:rgba(236,232,255,.72)}
+  html[data-theme=light]:not([data-mono]) .sd-rw b{color:#8cf5b0}
+  html[data-theme=light]:not([data-mono]) .sd-rwb{background:#2ee06a;color:#05170c}
+
 

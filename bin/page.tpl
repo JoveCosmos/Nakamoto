@@ -3988,6 +3988,19 @@ position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-dire
 .sd-id h3{margin:0;font-size:18px;font-weight:700;letter-spacing:-.01em;color:var(--wt);max-width:100%}
 /* the Wallet's box: the name and the read time with its refresh on one row, the time at the right end */
 .sd-idw{justify-content:flex-start;align-items:stretch}
+/* the wallet card in two halves: who (name, app, network) on the left, the rewards waiting on the right */
+.sd-strip .sd-idw{flex-direction:row;align-items:stretch;justify-content:space-between;gap:12px}
+.sd-idl{display:flex;flex-direction:column;gap:9px;min-width:0}
+.sd-rw{position:relative;z-index:1;flex:0 0 auto;align-self:center;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:2px;padding:6px 10px;border-radius:10px;
+background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.sd-rw em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(236,232,255,.72)}
+.sd-rw b{display:flex;align-items:baseline;gap:5px;font-size:17px;font-weight:800;letter-spacing:-.02em;color:#8cf5b0;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sd-rw b i{font-style:normal;font-family:var(--wmono);font-size:8.5px;font-weight:400;letter-spacing:.14em;color:rgba(236,232,255,.65)}
+.sd-rw small{font-size:10px;color:rgba(236,232,255,.6)}
+.sd-rwb{height:20px;margin-top:2px;padding:0 12px;border-radius:6px;border:0;background:#2ee06a;color:#05170c;font:700 11px var(--wsans);cursor:pointer;box-shadow:0 6px 14px -8px rgba(46,224,106,.9)}
+.sd-rwb:hover{background:#52ea88}
+.sd-idw:has(.sd-rw)::after{display:none}
+.sd-rwb:focus-visible{outline:2px solid #fff;outline-offset:2px}
 /* the wallet card: a solid violet card in the strip's first cell - AtomOne's orbit rings rising from its
    corner, a light from the top left - the one hard colour of the strip, the same in day and night */
 .sd-idw{position:relative;overflow:hidden;color:#fff;
@@ -4055,7 +4068,7 @@ box-shadow:inset 0 2px 6px rgba(0,0,0,.6),inset 0 -1px 0 rgba(255,255,255,.05),0
 .sd-strip .sd-well{position:relative;flex:1 1 auto;align-items:center;gap:6px;margin:0;padding:6px 12px 6px;min-height:46px;box-sizing:border-box}
 .sd-strip .sd-well.mtr{padding-bottom:14px}
 .sd-strip .sd-well>b{font-size:22px}
-.sd-well>i.u{flex:0 0 auto;align-self:baseline;margin-top:auto;font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;color:var(--wf);padding-bottom:3px}
+.sd-well>i.u{flex:0 0 auto;align-self:center;margin-top:6px;font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;color:var(--wf);padding-bottom:0}
 .sd-wx{flex:0 1 auto;min-width:0;margin-left:auto;padding-left:10px;border-left:1px solid rgba(255,255,255,.09);display:flex;flex-direction:column;align-items:flex-end;
 font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
 .sd-wx b{font-family:var(--wsans);font-size:14px;font-weight:700;letter-spacing:-.01em;text-transform:none;color:var(--ws);font-variant-numeric:tabular-nums}

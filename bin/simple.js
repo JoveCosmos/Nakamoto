@@ -232,18 +232,20 @@
     var aprm = mine ? '<i class="sd-m apr" style="background:' + rampCss() + '"><u style="left:' + (Math.max(0, Math.min(1, at || 0)) * 100).toFixed(1) + '%"></u></i>' : null;
     return (
       /* the wallet card: its name, the address, the wallet app and the network */
-      '<div class="sd-id sd-idw"><div class=sd-top><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3></div>' + wmeta() + '</div>' +
+      '<div class="sd-id sd-idw"><div class=sd-idl><div class=sd-top><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3></div>' + wmeta() + '</div>' +
+        /* the rewards waiting, on the card's right side, with the door to claim them */
+        (window.__REW != null ? '<div class=sd-rw><em>Rewards</em><b>' + fmt(rew) + '<i>ATONE</i></b>' +
+          (rew >= 1 ? '<button class=sd-rwb type=button data-act=claim title="Claim your staking rewards">Claim</button>' : '<small>nothing waiting</small>') + '</div>' : '') + '</div>' +
       /* Total's gauge is the wallet split three ways - staked, available, rewards */
       ro("Total", pos ? fmt(tot) : "\u2014", "", pos ? '<i class="sd-m mix">' +
         [[stk, "var(--sv-amber)"], [liq, "var(--sv-violet)"], [rew, "var(--sv-green)"]].map(function(q){
           return q[0] > 0 ? '<s style="flex:' + q[0] + ' 1 0;background:' + q[1] + '"></s>' : ''; }).join("") + '</i>' : null, "var(--wt)", "", false, pos ? "ATONE" : "") +
       ro("Staked", pos ? fmt(stk) : "\u2014", "", pos ? stk / (tot || 1) : null, "var(--sv-amber)", "", false, pos ? "ATONE" : "") +
       /* Available: ATONE, and in its own compartment the PHOTON that pays the fees */
-      ro("Available", bal ? fmt(liq) : "\u2014", "", pos ? liq / (tot || 1) : null, "var(--sv-violet)", "", false, bal ? "ATONE" : "",
-         bal ? '<span class="sd-wx pho"><b>' + fmt(bal.uphoton) + '</b>PHOTON</span>' : "") +
-      ro("Rewards", window.__REW != null ? fmt(rew) : "\u2014", "", pos ? rew / (tot || 1) : null, "var(--sv-green)",
-         rew >= 1 ? '<button class=sd-act type=button data-act=claim title="Claim your staking rewards">Claim</button>' : "", false, window.__REW != null ? "ATONE" : "") +
-      ro("APR", mine ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", aprm, "", "", false, ""));
+      ro("Available", bal ? fmt(liq) : "\u2014", "", pos ? liq / (tot || 1) : null, "var(--sv-violet)", "", false, bal ? "ATONE" : "") +
+      ro("APR", mine ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", aprm, "", "", false, "") +
+      /* PHOTON, AtomOne's fee token, in its own box */
+      ro("Photon", bal ? '<span class=sv-pho>' + fmt(bal.uphoton) + '</span>' : "\u2014", "", null, "var(--sv-pho)", "", false, bal ? "for fees" : ""));
   }
   function drawOver(){
     var pos = window.__POS, S = setStats(), bal = window.__BAL;
@@ -262,7 +264,7 @@
           '<li style="--sc:#2ee06a"><b>Redelegate</b><span>to the best earning place, in single signature</span></li>' +
         '</ol>';
     } else if(!pos.rows.length){
-      h = '<div class=sv-none><h3>Nothing staked yet</h3><p class=sd-fine>so nothing to move: Stake, beside, is the way in</p></div>';
+      h = '<div class=sv-none><h3>No stake on AtomOne</h3></div>';
     } else if(!(pos.free > 0)){
       h = '<div class=sv-ph><h3>Everything is under cooldown</h3>' + tag("a", "21 days") + '</div>' +
         fig("Your APR", pct(pos.rate), "on " + pos.rows.length + " validators", heat(pos.rate).fill) +
