@@ -940,6 +940,12 @@ rememberGridH();
      key the live vector uses) so a stake crossing never opens the wrong card. */
   var VDBY = {}; VD.forEach(function(d){ if(d.op) VDBY[String(d.op).slice(-6)] = d; });
   window.__VDBY = VDBY;
+  /* the validators outside the active set, by the same short id: an inactive one (not jailed) may be
+     staked to or redelegated to from the lists' closing row, and its moves need its operator */
+  window.__INACT = {};
+  (D.inactive || []).forEach(function(v){ if(v[5] && !VDBY[v[3]]) window.__INACT[v[3]] = { id: v[3], m: v[0], t: v[1], c: v[2], jailed: !!v[4], op: v[5] }; });
+  function inactOk(id){ var x = window.__INACT[id]; return x && !x.jailed ? x : null; }
+  window.__inactOk = inactOk;
   /* a refresh brings a new detail list: the same map, refilled, so every holder of it reads the new rows */
   window.__setVD = function(list){ VD = list || []; for(var k in VDBY) delete VDBY[k]; VD.forEach(function(d){ if(d.op) VDBY[String(d.op).slice(-6)] = d; }); };
   /* other sections open a card by the validator's id (the wallet's delegation rows) */
@@ -1345,9 +1351,14 @@ rememberGridH();
       window.__AMULTI = list; window.__ACUR = null;
       who.textContent = list.length === 1 ? list[0].m : list.length + " validators";
       var lg = document.getElementById("alogo"), mo = document.getElementById("amono"), am = document.getElementById("amany");
-      if(lg) { lg.removeAttribute("src"); lg.style.display = "none"; }
-      if(mo){ mo.style.display = "flex"; mo.style.background = "#1f1a3a"; mo.textContent = String(list.length); }
-      if(am){ am.hidden = false; am.innerHTML = list.slice(0, 12).map(function(v){
+      /* one validator wears its own face, as on its card; several wear the count */
+      var one = list.length === 1 ? list[0] : null;
+      if(lg){ if(one && one.av){ lg.src = "assets/val/" + one.id + ".jpg"; lg.style.display = ""; } else { lg.removeAttribute("src"); lg.style.display = "none"; } }
+      if(mo){ mo.style.display = one && one.av ? "none" : "flex";
+        mo.style.background = one ? (window.__tint || function(){ return "#334"; })(one.m || "") : "#1f1a3a";
+        mo.style.color = "#fff";
+        mo.textContent = one ? (one.m || "?").trim().slice(0, 2).toUpperCase() : String(list.length); }
+      if(am){ am.hidden = !!one; am.innerHTML = one ? "" : list.slice(0, 12).map(function(v){
           return '<span>' + (v.av ? '<img src="assets/val/' + att(v.id) + '.jpg" alt="">' : '<i style="background:' + (window.__tint || function(){ return "#334"; })(v.m || "") + '">' + att((v.m || "?").trim().slice(0, 1).toUpperCase()) + '</i>') + att(v.m) + '</span>'; }).join("") +
           (list.length > 12 ? '<span class=more>+' + (list.length - 12) + ' more</span>' : ''); }
       build();
@@ -1370,7 +1381,7 @@ rememberGridH();
         } else {
           lg.removeAttribute("src"); lg.style.display = "none";
           mo.style.display = "flex";
-          mo.style.background = tint(cur.m || "");
+          mo.style.background = (window.__tint || function(){ return "#334"; })(cur.m || "");
           mo.textContent = (cur.m || "?").trim().slice(0, 2).toUpperCase();
         }
       }
@@ -1812,6 +1823,7 @@ rememberGridH();
   function chosen(opt){                            /* those ticked */
     var only = {}, n = 0;
     opt.forEach(function(v){ if(SEL[v.id]){ only[v.id] = 1; n++; } });
+    for(var id in SEL) if(!only[id] && window.__inactOk(id)){ only[id] = 1; n++; }   /* ticked in the closing row */
     return { only: only, n: n };
   }
   function logo(id, name){
@@ -1825,16 +1837,25 @@ rememberGridH();
      bonded - folded into one row that opens on a tap. Listed, never offered: they earn
      nothing while they are out. key names the list, so each keeps its own open state. */
   var IJ = {};
-  function ijRows(key, cols){
+  /* sel: the list's own ticks (STSEL or SEL) - an inactive validator can be ticked like any other,
+     a jailed one cannot; ticking one keeps the row open */
+  function ijRows(key, cols, sel){
     var L = (window.__D && window.__D.inactive) || [];
     if(!L.length) return "";
-    var open = !!IJ[key], nj = 0; L.forEach(function(v){ if(v[4]) nj++; });
+    var nj = 0, ticked = 0; L.forEach(function(v){ if(v[4]) nj++; else if(sel && sel[v[3]]) ticked++; });
+    var open = !!IJ[key] || ticked > 0;
     var h = '<tr class="ij-t' + (open ? ' open' : '') + '"><td colspan=' + cols + '><button type=button class=ij-b data-ij="' + key + '" aria-expanded=' + open + '>' +
-      '<span>Inactive and jailed validators</span><i>' + L.length + '</i><em>' + (nj ? nj + ' jailed, ' : '') + (L.length - nj) + ' inactive</em><u aria-hidden=true></u></button></td></tr>';
-    if(open) L.forEach(function(v){
-      h += '<tr class=ij-r><td colspan=' + cols + '><div class=ij-w>' + logo(v[3], v[0]) + '<span class=ij-n>' + att(v[0]) + '</span>' +
-        '<span class="ij-tag ' + (v[4] ? 'j' : 'i') + '">' + (v[4] ? 'jailed' : 'inactive') + '</span>' +
-        '<span class=ij-s>' + big(v[1]) + ' ATONE</span><span class=ij-e>earns nothing</span></div></td></tr>'; });
+      '<span>Inactive and jailed validators</span><i>' + L.length + '</i><em>' + (L.length - nj) + ' inactive, ' + nj + ' jailed' + (ticked ? ', <b>' + ticked + ' ticked</b>' : '') + '</em><u aria-hidden=true></u></button></td></tr>';
+    if(open){
+      h += '<tr class=ij-note><td colspan=' + cols + '>An inactive validator can be ticked: your stake counts toward its place in the active set, and it earns nothing until the validator is in it. A jailed one cannot be picked.</td></tr>';
+      L.forEach(function(v){
+        var can = !v[4] && !!v[5] && !!sel, on = can && !!sel[v[3]];
+        h += '<tr class="ij-r' + (on ? ' on' : '') + (can ? '' : ' no') + '"><td colspan=' + cols + '><div class=ij-w>' +
+          (can ? '<input type=checkbox data-id="' + att(v[3]) + '"' + (on ? ' checked' : '') + ' aria-label="' + att(v[0]) + ' (inactive)">' : '<span class=ij-x aria-hidden=true></span>') +
+          logo(v[3], v[0]) + '<span class=ij-n>' + att(v[0]) + '</span>' +
+          '<span class="ij-tag ' + (v[4] ? 'j' : 'i') + '">' + (v[4] ? 'jailed' : 'inactive') + '</span>' +
+          '<span class=ij-s>' + big(v[1]) + ' ATONE</span><span class=ij-e>' + (v[4] ? 'cannot be picked' : '0% while inactive') + '</span></div></td></tr>'; });
+    }
     return h;
   }
   function ijWire(el, redraw){
@@ -1953,7 +1974,7 @@ rememberGridH();
            (o.jail == null ? '<td class=dim>N/A</td>' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>') +
            (lay ? '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '\u2014') + '</s><em>→</em><b>' + pct(there) + '</b></td>' : '<td class=r2><b>' + pct(o.rate0) + '</b></td>') + '</tr>';
     });
-    h += ijRows("rd", (h.match(/<col[ >]/g) || []).length);
+    h += ijRows("rd", (h.match(/<col[ >]/g) || []).length, pos ? SEL : null);
     var top = el.scrollTop;
     el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
     ijWire(el, draw);
@@ -2053,6 +2074,9 @@ rememberGridH();
         var aft = window.__rateAfter(v.t, v.c, share);
         r.moves.push({ id: v.id, m: v.m, x: share, t: v.t, c: v.c, rank: v.rank, jail: v.jail, up: v.up, before: v.rate0, after: aft });
         earned += share * aft; });
+      /* inactive validators ticked in the closing row: their share earns nothing while they are out */
+      for(var iid in sel.only){ var ix = window.__inactOk(iid); if(ix && !opt.some(function(v){ return v.id === iid; }))
+        r.moves.push({ id: iid, m: ix.m, x: share, t: ix.t, c: ix.c, rank: null, jail: 0, up: null, before: 0, after: 0 }); }
       r.rate = earned / B;
     }
     stats(pos);
@@ -2104,7 +2128,7 @@ rememberGridH();
     var addr = window.__ADDR, VD = window.__VDBY || {};
     var pos = window.__POS, own = {}; if(pos) pos.rows.forEach(function(r){ if(r.op) own[r.id] = r.op; });
     return MSGS.map(function(m){
-      var s = VD[m.from], d = VD[m.to], src = (s && s.op) || own[m.from];
+      var s = VD[m.from], d = VD[m.to] || window.__inactOk(m.to), src = (s && s.op) || own[m.from];
       if(!src || !d || !d.op) return null;
       return { type: "cosmos-sdk/MsgBeginRedelegate", value: { delegator_address: addr, validator_src_address: src,
                validator_dst_address: d.op, amount: { denom: "uatone", amount: String(m.amt) } } };
@@ -2324,6 +2348,10 @@ rememberGridH();
   function stPlan(){
     var u = stAmount(), ids = Object.keys(STSEL), n = ids.length, share = n ? Math.floor(u / n) : 0, earned = 0, rows = [];
     if(u > 0 && n) stCands().forEach(function(v){ if(!STSEL[v.id]) return; var aft = window.__rateAfter(v.t, v.c, share); earned += share * aft; rows.push({ id: v.id, m: v.m, x: share, after: aft }); });
+    /* an inactive validator ticked in the closing row: its share earns nothing while it is out */
+    if(u > 0 && n) ids.forEach(function(id){ var x = window.__inactOk(id); if(x) rows.push({ id: id, m: x.m, x: share, after: 0 }); });
+    ids.forEach(function(id){ if(!window.__inactOk(id) && !(window.__VDBY || {})[id]) n--; });   /* a tick that no longer resolves is not counted */
+    if(n < ids.length){ share = n ? Math.floor(u / n) : 0; rows.forEach(function(r){ r.x = share; }); earned = 0; rows.forEach(function(r){ earned += share * r.after; }); }
     return { u: u, n: n, share: share, rate: u > 0 && n ? earned / (share * n) : 0, rows: rows };
   }
   function stRows(){
@@ -2339,7 +2367,7 @@ rememberGridH();
            (o.jail == null ? '<td class=dim>N/A</td>' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>') +
            '<td>' + (m ? fmt(m.x) : '\u2014') + '</td><td class=r2><b>' + pct(m ? m.after : o.rate0) + '</b></td></tr>';
     });
-    h += ijRows("st", 7);
+    h += ijRows("st", 7, STSEL);
     var top = el.scrollTop; el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
     ijWire(el, stRows);
     Array.prototype.forEach.call(el.querySelectorAll("tbody input"), function(c){
@@ -2348,7 +2376,7 @@ rememberGridH();
   function stMsgs(){
     var P = stPlan(), VD = window.__VDBY || {}, out = [];
     if(!(P.u > 0) || !P.n || P.u > stBal() || !(P.share > 0)) return [];
-    P.rows.forEach(function(r){ var d = VD[r.id]; if(!d || !d.op) return;
+    P.rows.forEach(function(r){ var d = VD[r.id] || window.__inactOk(r.id); if(!d || !d.op) return;
       out.push({ type: "cosmos-sdk/MsgDelegate", value: { delegator_address: window.__ADDR, validator_address: d.op, amount: { denom: "uatone", amount: String(Math.floor(r.x)) } } }); });
     return out;
   }

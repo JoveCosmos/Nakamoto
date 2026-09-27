@@ -150,7 +150,7 @@
   function earns(stake, rate, off, ex){
     var y = stake * rate, per = function(days){ return y * days / 365; };
     var tile = function(k, u){ return fig(k, '<span class=sd-gain>+' + one(u / 1e6) + '</span>', ex ? "ATONE" : usd(usdOf(u)) || "ATONE", "var(--sv-green)"); };
-    if(ex) return '<div class=se-ex><div class=se-hero><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE a year</i></b><small>~' + pct(rate) + ' APR</small></div>' +
+    if(ex) return '<div class=se-ex><div class=se-hero><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>~' + pct(rate) + ' APR</i></b><small>ATONE</small></div>' +
       '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div></div>';
     return '<div class=se-hero><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b>' +
         '<small>' + (usdOf(y) != null ? usd(usdOf(y)) + ' at today\'s price, ' : '') + 'at ' + pct(rate) + ' APR on ' + whole(stake) + ' ATONE</small></div>' +

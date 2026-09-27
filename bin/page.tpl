@@ -424,7 +424,7 @@ text-transform:uppercase;font-weight:700;border-radius:6px;padding:11px;text-dec
 .tgbtn:hover{background:#7cc6f0}
 .tgbtn svg{width:14px;height:14px}
 .tgbtn.off{opacity:.45;pointer-events:none}
-#apop .vnote{padding:12px 24px 18px}
+#apop .vnote{padding:12px 24px 18px;line-height:1.7}
 .notify:hover{background:#5bb3e82e;border-color:#5bb3e8;color:#9ed6f7}
 @media(max-width:620px){.notify{font-size:8px;padding:3px 8px 3px 7px;letter-spacing:.06em;margin-top:-5px}
 .notify svg{width:10px;height:10px}}
@@ -1953,24 +1953,36 @@ font-size:clamp(15px,1.4vw,18px);font-weight:600;letter-spacing:.01em;line-heigh
 .wk-tbl2 td.rk{color:var(--wf);font-size:10px}
 .wk-tbl2 td.rw{color:var(--wgreen)}
 .wk-tbl2 .ok{color:var(--wgreen)}.wk-tbl2 .warn{color:var(--wamber)}.wk-tbl2 .bad{color:var(--wburn)}.wk-tbl2 .dim{color:var(--wf)}
-/* the closing "Inactive and jailed validators" row of the stake and redelegate lists: one
-   button across the table that folds open into plain rows - listed, never offered (ij-) */
-.wk-tbl2 tr.ij-t td{height:auto;padding:0;border-bottom:0;border-top:1px solid var(--wbd2);text-align:left;overflow:visible}
-.ij-b{width:100%;display:flex;align-items:center;gap:9px;padding:9px 8px;background:transparent;border:0;cursor:pointer;
-font-family:var(--wsans);font-size:12px;color:var(--ws);text-align:left}
-.ij-b span{color:var(--wt);font-weight:600}
-.ij-b i{font-style:normal;font-family:var(--wmono);font-size:9.5px;padding:1px 7px;border:1px solid var(--wbd2);border-radius:999px;color:var(--ws)}
-.ij-b em{font-style:normal;font-size:11px;color:var(--wf);margin-left:auto}
-.ij-b u{width:7px;height:7px;border-right:1.5px solid var(--wf);border-bottom:1.5px solid var(--wf);transform:rotate(45deg);margin:-4px 4px 0 4px}
+/* the closing "Inactive and jailed validators" row of the stake and redelegate lists: a clear band
+   across the table that folds open into rows - an inactive validator can be ticked, a jailed one
+   cannot (ij-) */
+.wk-tbl2 tr.ij-t td{height:auto;padding:10px 0 6px;border-bottom:0;text-align:left;overflow:visible}
+.ij-b{width:100%;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;cursor:pointer;
+border:1px solid var(--wbd2);background:linear-gradient(90deg,rgba(255,255,255,.055),rgba(255,255,255,.02));
+font-family:var(--wsans);font-size:13px;color:var(--ws);text-align:left}
+.ij-b span{color:var(--wt);font-weight:700}
+.ij-b i{font-style:normal;font-family:var(--wmono);font-size:10.5px;font-weight:600;padding:1px 8px;border:1px solid var(--wbd2);border-radius:999px;color:var(--wt)}
+.ij-b em{font-style:normal;font-size:11.5px;color:var(--ws);margin-left:auto}.ij-b em b{color:#2ee06a;font-weight:600}
+.ij-b u{width:8px;height:8px;border-right:2px solid var(--ws);border-bottom:2px solid var(--ws);transform:rotate(45deg);margin:-4px 4px 0 6px}
 .ij-t.open .ij-b u{transform:rotate(-135deg);margin-top:3px}
-.ij-b:hover{background:rgba(255,255,255,.03)}.ij-b:hover u{border-color:var(--wt)}
-.ij-b:focus-visible{outline:2px solid var(--av);outline-offset:-2px}
+.ij-b:hover{border-color:var(--ws);background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.03))}.ij-b:hover u{border-color:var(--wt)}
+.ij-b:focus-visible{outline:2px solid var(--av);outline-offset:2px}
+.wk-tbl2 tr.ij-note td{height:auto;padding:4px 8px 8px;text-align:left;white-space:normal;font-family:var(--wsans);font-size:11.5px;line-height:1.45;color:var(--ws);border-bottom:0}
 .wk-tbl2 tr.ij-r td{text-align:left;padding:0 8px}
+.wk-tbl2 tr.ij-r.on td{background:rgba(46,224,106,.06)}
 .ij-w{display:flex;align-items:center;gap:8px;min-width:0}
-.ij-w .wk-lg{width:16px;height:16px;margin:0;opacity:.7}.ij-w .wk-lgx{line-height:16px;font-size:7px}
-.ij-n{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;font-family:var(--wsans);font-size:11.5px;color:var(--ws)}
+.ij-w input{appearance:none;-webkit-appearance:none;flex:0 0 15px;width:15px;height:15px;margin:0;border-radius:4px;border:1px solid #5a5a88;
+background:linear-gradient(180deg,#17172f,#0e0e1d);cursor:pointer;position:relative}
+.ij-w input:hover{border-color:var(--ws)}
+.ij-w input:checked{background:linear-gradient(180deg,#3cf07a,#22c65c);border-color:#2ee06a}
+.ij-w input:checked::after{content:"";position:absolute;left:4.5px;top:1.5px;width:4px;height:8px;border:solid #062012;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.ij-w input:focus-visible{outline:2px solid #2ee06a;outline-offset:2px}
+.ij-x{flex:0 0 15px;width:15px}
+.ij-w .wk-lg{width:16px;height:16px;margin:0}.ij-w .wk-lgx{line-height:16px;font-size:7px}
+.ij-r.no .ij-w .wk-lg,.ij-r.no .ij-n{opacity:.55}
+.ij-n{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;font-family:var(--wsans);font-size:12px;color:var(--wt)}
 .ij-tag{flex:0 0 auto;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;padding:1px 6px;border-radius:4px;border:1px solid currentColor}
-.ij-tag.j{color:var(--wburn)}.ij-tag.i{color:var(--wf)}
+.ij-tag.j{color:var(--wburn)}.ij-tag.i{color:var(--ws)}
 .ij-s{flex:0 0 auto;color:var(--ws)}
 .ij-e{flex:0 0 auto;color:var(--wf);font-size:10px}
 
@@ -3954,7 +3966,7 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .se-hero.sm{padding:10px 0 8px}.se-hero.sm>b{font-size:30px}
 .se-row .sd-fig>b{font-size:19px}
 /* the example (no wallet): figure and boxes centred in the panel, nothing under them */
-.se-ex{margin:auto 0;display:flex;flex-direction:column}
+.se-ex{margin:0 0 auto;padding-top:14px;display:flex;flex-direction:column}
 .se-fine{margin-top:auto;padding-top:10px;font-size:11px;line-height:1.4;color:var(--wf)}
 .se-fine+.se-fine{margin-top:4px;padding-top:0}
 .se-say{font-size:13.5px;line-height:1.5;color:var(--ws);margin-top:auto}
@@ -4932,7 +4944,7 @@ html[data-tab=connect] .l2host{display:none}
     l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.35-.1-.55-.6-.2L6.2 13.1 1.4
     11.6c-1-.3-1-1 .2-1.5l19-7.3c.85-.3 1.6.2 1.3 1.5z"/></svg>Continue in Telegram</a>
   <div class=amore id=amore hidden></div>
-  <div class=vnote>Subscribe again to change your choices, /stop to end.</div>
+  <div class=vnote>Subscribe again to change your choices.<br>/list shows every validator you watch and its alerts.<br>/stop stops all validators, /stop &lt;name&gt; stops one validator.</div>
 </div></div>
 
 <div class=pop id=gpop><div class="card vcard gcard">

@@ -274,8 +274,14 @@
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td.amt .lk svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td .sb{background:var(--line-soft)}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td .sb i{background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .ij-b{background:transparent}
+  html[data-theme=light]:not([data-mono]) .ij-b{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .ij-b em b{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .ij-b:hover{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .wk-tbl2 tr.ij-r.on td{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .ij-w input{border:1px solid var(--line-strong);background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .ij-w input:checked{background:var(--accent);border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .ij-w input:checked::after{border:solid var(--surface)}
+  html[data-theme=light]:not([data-mono]) .ij-w input:focus-visible{outline:2px solid var(--accent)}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td.ck input:checked::after{border:solid var(--surface)}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td.r2 s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) #p-home .tapnote svg{fill:none;stroke:currentColor}
