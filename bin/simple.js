@@ -191,23 +191,26 @@
     var V = VALS(), n = V.length, mine = !!(pos && pos.rows.length);
     var head = '<div class=sv-ph><h3>' + (mine ? "Where your stake sits" : "Where all stake sits") + '</h3></div>';
     if(!n) return head + '<div class=sv-upwait>Reading the set\u2026</div>';
-    /* the set as a map, rank order (largest first), each third its own tint; a validator lights by how
-       much of the stake it holds - yours with a wallet, all bonded ATONE without one */
+    /* the stake by third of the set (rank order, largest first) - yours with a wallet, all bonded ATONE
+       without one */
     var band = function(k){ return k < n / 3 ? 0 : k < 2 * n / 3 ? 1 : 2; };
-    var at = {}, x = [], amt = [0, 0, 0], out = 0, tot = 0, i, hi = 0;
+    var at = {}, x = [], amt = [0, 0, 0], out = 0, tot = 0, i;
     for(i = 0; i < n; i++){ at[V[i][3]] = i; x[i] = mine ? 0 : V[i][1]; }
     if(mine) pos.rows.forEach(function(r){ var k = at[r.id]; if(k == null || r.inactive) out += r.x; else x[k] += r.x; });
-    for(i = 0; i < n; i++){ amt[band(i)] += x[i]; tot += x[i]; if(x[i] > hi) hi = x[i]; }
+    for(i = 0; i < n; i++){ amt[band(i)] += x[i]; tot += x[i]; }
     tot += out;
-    var cells = "";
-    for(i = 0; i < n; i++){
-      var lv = x[i] > 0 && hi ? Math.sqrt(x[i] / hi) : 0;
-      cells += '<i class="fp-c b' + band(i) + (lv ? ' on' : '') + '" data-v="' + esc(V[i][3]) + '" style="--l:' + lv.toFixed(3) + '" title="#' + (i + 1) + ' ' + esc(V[i][0]) +
-        (x[i] > 0 ? ', ' + fmt(x[i]) + ' ATONE' : '') + '"></i>'; }
     var sh = function(v){ var p = tot ? v / tot * 100 : 0; return p > 0 && p < 0.1 ? "<0.1" : p.toFixed(p > 0 && p < 10 ? 1 : 0); };
     var sums = [["Largest third", amt[0], 0], ["Middle third", amt[1], 1], ["Smallest third", amt[2], 2]];
     if(out > 0) sums.push(["Inactive", out, 3]);
-    return head + '<div class=fp-map>' + cells + '</div>' +
+    /* a ring of the three thirds (and any inactive), the largest share written in its middle */
+    var segs = [[amt[0], "#ff6a3d"], [amt[1], "#ffb02e"], [amt[2], "#2ee06a"]]; if(out > 0) segs.push([out, "var(--wf)"]);
+    var R0 = 54, C = 2 * Math.PI * R0, off = 0, arcs = "", big = 0, bi = 0;
+    segs.forEach(function(q, k){ var f = tot ? q[0] / tot : 0; if(f > big){ big = f; bi = k; }
+      if(f > 0) arcs += '<circle r="' + R0 + '" cx="70" cy="70" fill="none" stroke="' + q[1] + '" stroke-width="16" stroke-dasharray="' + (f * C).toFixed(2) + ' ' + C.toFixed(2) + '" stroke-dashoffset="' + (-off * C).toFixed(2) + '"/>';
+      off += f; });
+    var names = ["of it on the largest third", "on the middle third", "on the smallest third", "on inactive validators"];
+    return head + '<div class=fp-ring><svg viewBox="0 0 140 140" aria-hidden=true><circle r="' + R0 + '" cx="70" cy="70" fill="none" class=fp-trk stroke-width="16"/>' +
+        '<g transform="rotate(-90 70 70)">' + arcs + '</g></svg><div class=fp-mid><b>' + sh(segs[bi][0]) + '%</b><small>' + names[bi] + '</small></div></div>' +
       '<div class=fp-sum>' + sums.map(function(q){ return '<div class="fp-s b' + q[2] + '"><em>' + q[0] + '</em><span class=sd-well><b>' + sh(q[1]) + '%</b></span></div>'; }).join("") + '</div>' +
       '<div class=fp-note>The bonus is split equally: the smallest third pays the most.</div>';
   }
