@@ -144,7 +144,7 @@
   }
   /* What a stake earns - money, not a ranking: a year of it as the big figure, then a day, a
      week and a month, each in ATONE with its dollars at today's price (none on testnet). Rewards
-     accrue every block, so these are today's rate carried forward, and say so. */
+     accrue every block, so these are today's rate carried forward. */
   function usdOf(u){ var p = !TN() && DD().prices && DD().prices.atone && DD().prices.atone.usd; return p ? u / 1e6 * p : null; }
   function usd(v){ return v == null ? "" : "≈ $" + (v >= 100 ? Math.round(v).toLocaleString() : v >= 1 ? v.toFixed(2) : v.toFixed(3)); }
   /* ex: the example for a visitor with no wallet - ATONE only, the rate as a single figure, no notes */
