@@ -1101,7 +1101,16 @@
      one on show (html[data-svs], which the navigation shell sets) ── */
   var pending = false;
   function screen(){ return root.getAttribute("data-svs") || "over"; }
+  /* home's one link: a connected wallet goes straight to its Dashboard, a first visit to Network */
+  function homeDoor(){
+    var a = document.querySelector(".introgo"); if(!a) return;
+    var dash = !!window.__ADDR, want = dash ? "dashboard" : "network";
+    if(a.getAttribute("data-route") === want) return;
+    a.setAttribute("data-route", want); a.setAttribute("href", "#/" + want);
+    a.firstChild.nodeValue = dash ? "Dashboard" : "Network";
+  }
   function render(){
+    homeDoor();
     drawHead();
     if(root.getAttribute("data-tab") !== "dele" || root.getAttribute("data-ui") !== "simple") return;
     var s = screen();
