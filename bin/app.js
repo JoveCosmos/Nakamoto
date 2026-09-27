@@ -2478,7 +2478,7 @@ rememberGridH();
   /* the memo the keeper reads: the strategy word, then the flags */
   var AT_WORD = { passive: "passive", below: "moderate", aggressive: "aggressive" };
   function atMemo(){ return "gata:" + (AT_WORD[atPreset()] || "moderate") + (atPick() === "selected" ? ":picks" : "") + (atRestake() ? ":restake" : ""); }
-  function atMonths(){ return AT.days >= 180 ? "6 months" : "3 months"; }
+  function atMonths(){ return AT.days >= 365 ? "12 months" : AT.days >= 180 ? "6 months" : "3 months"; }
   function atCap(){ var a = E("atcap"), n = parseFloat((a.value || "").replace(/[^0-9.]/g, "")); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
   function atMsgs(){
     var scope = atScope(), cap = atCap(), pos = window.__POS;

@@ -280,7 +280,7 @@
       (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "—", rec ? sgnA((rec.rate - rec.start.rate) * rec.staked) + " ATONE a year" : "first check pending", null, "var(--sv-green)")
          : ro("Strategy", "—", "chosen when you set it up", null, "var(--sv-violet)")) +
       ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "—", g ? "ATONE left, of the cap you signed" : "a cap you set, in all", g && a.max_tokens && pos ? Math.min(1, +a.max_tokens.amount / (pos.total || 1)) : null, "var(--sv-violet)") +
-      ro("Runs until", until || "—", g ? (since ? "activated " + since : "then it lapses on its own") : "3 or 6 months", null, "var(--sv-violet)") +
+      ro("Runs until", until || "—", g ? (since ? "activated " + since : "then it lapses on its own") : "3, 6 or 12 months", null, "var(--sv-violet)") +
       ro("Moves made", g ? String(moves) : "—", g ? (rp && rp.checked ? "checked " + window.__dayFull(rp.checked * 1000) : "not checked yet") : "", null, "var(--sv-teal)") +
       ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "—", pos && pos.rows.length ? "on " + whole(pos.total) + " ATONE" : "", pos && pos.rows.length ? heat(pos.rate).p : null, "", "", true));
     /* restake, in one line: what it has done, or who does it instead, or that it waits */
