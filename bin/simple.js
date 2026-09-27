@@ -200,7 +200,7 @@
         (x[i] > 0 ? ', ' + fmt(x[i]) + ' ATONE' : '') + '"></i>'; }
     var sh = function(v){ var p = tot ? v / tot * 100 : 0; return p > 0 && p < 0.1 ? "<0.1" : p.toFixed(p > 0 && p < 10 ? 1 : 0); };
     var sums = [["Largest third", amt[0], 0], ["Middle third", amt[1], 1], ["Smallest third", amt[2], 2]];
-    if(out > 0) sums.push(["Outside", out, 3]);
+    if(out > 0) sums.push(["Inactive", out, 3]);
     return head + '<div class=fp-map>' + cells + '</div>' +
       '<div class=fp-sum>' + sums.map(function(q){ return '<div class="fp-s b' + q[2] + '"><em>' + q[0] + '</em><span class=sd-well><b>' + sh(q[1]) + '%</b></span></div>'; }).join("") + '</div>' +
       '<div class=fp-note>The bonus is split equally: the smallest third pays the most.</div>';

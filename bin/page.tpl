@@ -2916,7 +2916,7 @@ border:1px solid color-mix(in srgb,var(--sa-v) 40%,transparent);background:linea
     border:1px solid #232342;border-radius:8px;background:linear-gradient(180deg,#0d0d1c,#09090f)}
   #p-dele #sd-mstrip{flex:0 0 auto}
   #p-dele #wbody>.wk-two{position:relative;inset:auto;flex:1 1 auto;min-height:0;height:auto;
-    grid-template-columns:max(24.2424%,300px) minmax(0,1.9fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);align-items:stretch;align-content:stretch;gap:12px}
+    grid-template-columns:max(calc((100% - 2px) * 0.242424 + 2px),280px) minmax(0,1.9fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);align-items:stretch;align-content:stretch;gap:12px}
   #p-dele #wk-mine,#p-dele #wk-plan{min-height:0}
   #p-dele #wk-mine .wk-tbl2,#p-dele #wk-plan .wk-tbl2{flex:1 1 auto;height:auto;min-height:0;max-height:none}
   /* the narrower Delegations column: its figures take less room, so the names keep theirs */
@@ -3967,9 +3967,9 @@ html[data-svs=over] #sv-over,html[data-svs=auto] #sv-auto{display:grid;grid-temp
 /* the Wallet: Your delegations on the left, Move your stake on the right - the wider column goes with it */
 .sd-wgrid{grid-template-columns:minmax(0,1fr) minmax(0,1.35fr) minmax(0,1.15fr)}
 /* the left column exactly the wallet box's width above it: 1.6 of the strip's 6.6 parts */
-@media(min-width:901px){.sd-wgrid{grid-template-columns:max(24.2424%,250px) minmax(0,1.35fr) minmax(0,1.15fr)}}
+@media(min-width:901px){.sd-wgrid{grid-template-columns:max(calc((100% - 2px) * 0.242424 + 2px),250px) minmax(0,1.35fr) minmax(0,1.15fr)}}
 /* Autopilot stands as the Overview: its first column the lead card's width above it */
-@media(min-width:901px){.sd-agrid{grid-template-columns:max(24.2424%,250px) minmax(0,1.35fr) minmax(0,1.15fr)}}
+@media(min-width:901px){.sd-agrid{grid-template-columns:max(calc((100% - 2px) * 0.242424 + 2px),250px) minmax(0,1.35fr) minmax(0,1.15fr)}}
 /* Autopilot's lead card: the wallet card's build, in Autopilot's own teal-to-violet, its orbits turning */
 .sd-ida{position:relative;overflow:hidden;color:#fff;justify-content:center;
 background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,255,.13) 45px 46px,transparent 47px 70px,rgba(255,255,255,.09) 71px 72px,transparent 73px 98px,rgba(255,255,255,.06) 99px 100px,transparent 101px 128px,rgba(255,255,255,.035) 129px 130px,transparent 131px),
