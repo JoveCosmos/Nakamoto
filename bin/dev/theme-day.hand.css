@@ -163,9 +163,6 @@
     background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,255,.13) 45px 46px,transparent 47px 70px,rgba(255,255,255,.09) 71px 72px,transparent 73px 98px,rgba(255,255,255,.06) 99px 100px,transparent 101px 128px,rgba(255,255,255,.035) 129px 130px,transparent 131px),
     radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear-gradient(140deg,#4130a0 0%,#271c6c 52%,#150f3b 100%)}
   html[data-theme=light]:not([data-mono]) .sd-idw h3,html[data-theme=light]:not([data-mono]) .sd-idw .sv-wn{color:#fff}
-  html[data-theme=light]:not([data-mono]) .sd-idw .sd-wa{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.2)}
-  html[data-theme=light]:not([data-mono]) .sd-idw .sd-wa code{color:#ece8ff}
-  html[data-theme=light]:not([data-mono]) .sd-idw .sd-wcp{color:#cfc8ff}
   html[data-theme=light]:not([data-mono]) .sd-idw .sd-wch i.app{color:#e4dfff;border-color:rgba(255,255,255,.32);background:rgba(255,255,255,.1)}
   html[data-theme=light]:not([data-mono]) .sd-idw .sd-wch i.net{color:#8ff5ec;border-color:rgba(143,245,236,.45);background:rgba(43,200,189,.14)}
   /* the strip's wells in day: a soft recess in the ivory box */

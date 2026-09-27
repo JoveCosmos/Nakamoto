@@ -4012,9 +4012,6 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
 #sd-sky .sd-off{color:rgba(236,232,255,.72)}
 .sd-idw::after{content:"";position:absolute;right:22px;bottom:18px;width:7px;height:7px;border-radius:50%;background:#e9e4ff;box-shadow:0 0 12px 2px rgba(214,206,255,.9)}
 .sd-idw h3,.sd-idw .sv-wn{color:#fff}
-.sd-idw .sd-wa{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.2)}
-.sd-idw .sd-wa code{color:#ece8ff}
-.sd-idw .sd-wcp{color:#cfc8ff}.sd-idw .sd-wcp:hover{color:#fff;background:rgba(255,255,255,.14)}
 .sd-idw .sd-wch i.app{color:#e4dfff;border-color:rgba(255,255,255,.32);background:rgba(255,255,255,.1)}
 .sd-idw .sd-wch i.net{color:#8ff5ec;border-color:rgba(143,245,236,.45);background:rgba(43,200,189,.14)}
 .sd-idw .sd-wch i.net.tn{color:#ffd58a;border-color:rgba(255,213,138,.5);background:rgba(255,176,46,.14)}
@@ -4024,13 +4021,6 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
 @media(min-width:901px){.sd-strip{grid-template-columns:minmax(0,1.6fr) repeat(5,minmax(0,1fr)) !important}}
 /* the wallet box's second and third lines: address + copy, then the wallet app and the network */
 .sd-wmeta{display:flex;flex-direction:column;align-items:flex-start;gap:5px;margin-top:-2px;min-width:0;width:100%}
-.sd-wa{display:inline-flex;align-items:center;gap:4px;max-width:100%;min-width:0;height:22px;box-sizing:border-box;padding:0 2px 0 8px;border:1px solid var(--wbd2);border-radius:7px;background:rgba(255,255,255,.025)}
-.sd-wa code{font-family:var(--wmono);font-size:11px;letter-spacing:.02em;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sd-wcp{flex:0 0 auto;width:18px;height:18px;display:grid;place-items:center;border:0;border-radius:5px;background:transparent;color:var(--wf);cursor:pointer}
-.sd-wcp svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.sd-wcp:hover{color:var(--sv-violet);background:rgba(185,176,255,.1)}
-.sd-wcp.ok{color:var(--sv-green)}
-.sd-wcp:focus-visible{outline:2px solid var(--sv-violet);outline-offset:1px}
 .sd-wch{display:flex;gap:6px;flex-wrap:wrap}
 .sd-wch i{font-style:normal;font-family:var(--wmono);font-size:8.5px;line-height:1;letter-spacing:.14em;text-transform:uppercase;padding:3px 7px;border-radius:999px;border:1px solid}
 .sd-wch i.app{color:var(--sv-violet);border-color:rgba(185,176,255,.4);background:rgba(185,176,255,.08)}

@@ -208,14 +208,12 @@
 
   function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }
 
-  /* the wallet box under its name: the address with a copy button, then the wallet app and the network
-     as two chips; with no wallet, a line and the door to connect one */
+  /* the wallet card under its name: the wallet app and the network, as two chips (the address is in the
+     top bar, with its copy button) */
   function wmeta(){
     var W = window.__WALLET, a = window.__ADDR, net = TN() ? "Testnet" : "Mainnet";
     if(!W || !a) return '';
-    return '<div class=sd-wmeta><span class=sd-wa title="' + esc(a) + '"><code>' + esc(a.slice(0, 10) + "\u2026" + a.slice(-6)) + '</code>' +
-      '<button class=sd-wcp type=button data-act=copyaddr title="Copy the address" aria-label="Copy the address"><svg viewBox="0 0 24 24" aria-hidden=true><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></span>' +
-      '<span class=sd-wch><i class=app>' + esc(W.name || "Wallet") + '</i><i class="net' + (TN() ? ' tn' : '') + '">' + net + '</i></span></div>';
+    return '<div class=sd-wmeta><span class=sd-wch><i class=app>' + esc(W.name || "Wallet") + '</i><i class="net' + (TN() ? ' tn' : '') + '">' + net + '</i></span></div>';
   }
   /* the wallet strip, one builder for Overview and Manage: the wallet box, then Total, Staked,
      Available, Rewards and APR, each figure in its engraved well */
@@ -1342,7 +1340,6 @@
       return;
     }
     if(act === "autopilot"){ var ab = E("atbtn"); if(ab) ab.click(); return; }
-    if(act === "copyaddr"){ var ad = window.__ADDR; if(ad && navigator.clipboard){ navigator.clipboard.writeText(ad).then(function(){ t.classList.add("ok"); t.title = "Copied"; setTimeout(function(){ t.classList.remove("ok"); t.title = "Copy the address"; }, 1400); }, function(){}); } return; }
     if(act === "connect"){ var cb = E("svconn"); if(cb){ ev.stopPropagation(); cb.click(); } return; }
     if(t.dataset.v && window.__vshow) window.__vshow(t.dataset.v);
   }
