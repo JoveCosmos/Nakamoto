@@ -43,6 +43,14 @@ function msgBytes(m){
   if(m.type === "cosmos-sdk/MsgWithdrawDelegationReward")
     return any("/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward", cat(
       strField(1, m.value.delegator_address), strField(2, m.value.validator_address)));
+  /* governance: follow a governor (MsgDelegateGovernor{delegator_address(1), governor_address(2)} -
+     it moves the following if one exists) or stop (MsgUndelegateGovernor{delegator_address(1)});
+     amino names as the chain registers them */
+  if(m.type === "atomone/v1/MsgDelegateGovernor")
+    return any("/atomone.gov.v1.MsgDelegateGovernor", cat(
+      strField(1, m.value.delegator_address), strField(2, m.value.governor_address)));
+  if(m.type === "atomone/v1/MsgUndelegateGovernor")
+    return any("/atomone.gov.v1.MsgUndelegateGovernor", strField(1, m.value.delegator_address));
   if(m.type === "cosmos-sdk/MsgSend"){
     var coins = []; (m.value.amount || []).forEach(function(c){ coins = coins.concat(bytesField(3, coin(c))); });
     return any("/cosmos.bank.v1beta1.MsgSend", cat(strField(1, m.value.from_address), strField(2, m.value.to_address), coins));

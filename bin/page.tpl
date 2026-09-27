@@ -4154,7 +4154,15 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin-right:-8px;p
 #sv-proplist{flex:1 1 0;min-height:0;--tc:var(--sv-teal)}
 #sv-daop{flex:0 1 auto;min-height:0;overflow-y:auto;--tc:var(--sv-teal)}
 .sv-glist{overflow-y:auto;flex:1 1 auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
-.sv-glist .sv-vr{flex:0 0 52px;grid-template-columns:28px minmax(0,1.4fr) 84px minmax(0,1fr) 90px minmax(0,1fr) 40px}
+.sv-glist .sv-vr{flex:0 0 52px;grid-template-columns:28px minmax(0,1.4fr) 84px minmax(0,1fr) 90px minmax(0,1fr) 116px}
+.sv-gact{display:grid;grid-template-columns:minmax(0,1fr) 26px;align-items:center;justify-items:end;column-gap:10px}
+.sv-gbtn{height:26px;padding:0 12px;border-radius:6px;border:1px solid rgba(43,200,189,.55);background:linear-gradient(180deg,rgba(43,200,189,.2),rgba(43,200,189,.1));
+color:#6fe3da;font:600 11.5px var(--wsans);cursor:pointer;white-space:nowrap}
+.sv-gbtn:hover{border-color:#2bc8bd;color:#a6f1eb}
+.sv-gbtn.stop{border-color:rgba(255,122,87,.5);background:transparent;color:#ff9b7a}
+.sv-gbtn.stop:hover{border-color:#ff7a57;color:#ffb89f}
+.sv-gbtn.busy{opacity:.55;cursor:progress}
+.sv-gbtn:focus-visible{outline:2px solid #2bc8bd;outline-offset:2px}
 .sv-glist .sv-vr.me{border-color:var(--sv-violet)}
 .sv-glist .sv-lgo .lg{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff}
 .sv-gst em{font-style:normal;font-family:var(--wmono);font-size:10px;padding:1px 8px;border-radius:999px;border:1px solid currentColor}

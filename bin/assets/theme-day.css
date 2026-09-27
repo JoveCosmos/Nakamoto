@@ -660,6 +660,11 @@
   html[data-theme=light]:not([data-mono]) .sd-can u.no{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .sd-can span.ok{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sd-can span.no{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .sv-gbtn{border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-gbtn:hover{border-color:var(--accent);color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sv-gbtn.stop{border-color:var(--danger-bar);background:transparent;color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .sv-gbtn.stop:hover{border-color:var(--danger-bar);color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .sv-gbtn:focus-visible{outline:2px solid var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-glist .sv-lgo .lg{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .sv-gn2 s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sv-gweb{text-decoration:none}

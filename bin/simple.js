@@ -872,7 +872,7 @@
     var c = GV.mine[a];
     if(c === undefined){ GV.mine[a] = null;
       gapi("/atomone/gov/v1/delegations/" + a).then(function(d){ GV.mine[a] = d.governor_address || ""; }).catch(function(){ GV.mine[a] = ""; })
-        .then(function(){ if(screen() === "mygov") render(); }); }
+        .then(function(){ if(screen() === "mygov" || screen() === "govs") render(); }); }
     return GV.mine[a];
   }
   function govRows(list, mine){
@@ -886,7 +886,28 @@
         '<span class=sv-gn2><b>' + (g.vp != null ? fmt(g.vp) : NA) + '</b><s>ATONE' + (sh != null ? ', ' + sh.toFixed(2) + '% of bonded' : '') + '</s></span>' +
         '<span class=sv-gn2><b>' + (g.n != null ? g.n : NA) + '</b><s>delegator' + (g.n === 1 ? '' : 's') + '</s></span>' +
         '<span class=sv-gn2><b>' + (g.since ? window.__dayFull(g.since) : NA) + '</b><s>' + (g.active ? 'active since' : 'inactive since') + '</s></span>' +
-        (g.web && /^https?:\/\//.test(g.web) ? '<a class=sv-gweb href="' + esc(g.web) + '" target=_blank rel="noopener noreferrer">site</a>' : '<span></span>') + '</div>'; }).join("") + '</div>';
+        /* two fixed slots, the button and the site link, so every row's button stands in one column */
+        '<span class=sv-gact>' + (govBtn(g, mine) || '<span></span>') +
+        (g.web && /^https?:\/\//.test(g.web) ? '<a class=sv-gweb href="' + esc(g.web) + '" target=_blank rel="noopener noreferrer">site</a>' : '<span></span>') + '</span></div>'; }).join("") + '</div>';
+  }
+  /* following a governor is one signature: Follow (Switch when another one is followed) on an active
+     governor, Stop on the one followed; nothing without a wallet, or while the reading is pending */
+  function govBtn(g, mine){
+    if(!window.__ADDR || !window.__WALLET || mine === null || mine === undefined) return '';
+    if(g.addr === mine) return '<button class="sv-gbtn stop" type=button data-act=gstop title="Stop following this governor: your stake votes only when you vote">Stop</button>';
+    if(!g.active) return '';
+    return '<button class=sv-gbtn type=button data-act=gfollow data-g="' + esc(g.addr) + '" title="' + (mine ? 'Follow this governor instead' : 'Let this governor vote for your stake when you do not vote') + '">' + (mine ? 'Switch' : 'Follow') + '</button>';
+  }
+  function govSend(t, msg){
+    if(!window.__TX || !window.__WALLET || !window.__ADDR || t.classList.contains("busy")) return;
+    var a = window.__ADDR, n = window.__notify ? window.__notify() : null;
+    t.classList.add("busy"); t.disabled = true;
+    (window.__TX.sendDirect || window.__TX.send)(window.__WALLET, [msg], "", function(){})
+      .then(function(){ if(n) n.ok();
+        /* the next block carries it: read the following and the counts again then */
+        setTimeout(function(){ delete GV.mine[a]; GV.at = 0; render(); }, 7000); })
+      .catch(function(e){ if(n) n.fail(e && e.message || String(e)); })
+      .then(function(){ t.classList.remove("busy"); t.disabled = false; });
   }
   function govEmpty(t){ return '<div class=sv-upwait>' + t + '</div>'; }
   function drawGovs(){
@@ -1216,6 +1237,8 @@
     }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
+    if(act === "gfollow"){ govSend(t, { type: "atomone/v1/MsgDelegateGovernor", value: { delegator_address: window.__ADDR, governor_address: t.dataset.g } }); return; }
+    if(act === "gstop"){ govSend(t, { type: "atomone/v1/MsgUndelegateGovernor", value: { delegator_address: window.__ADDR } }); return; }
     if(act === "bwin"){ BW = t.dataset.w === "10k" || t.dataset.w === "all" ? t.dataset.w : "100"; try{ localStorage.setItem("th_bw", BW); }catch(e){} drawAct(); return; }
     if(act === "awin"){ AW = t.dataset.w === "30d" || t.dataset.w === "all" ? t.dataset.w : "24h"; try{ localStorage.setItem("th_aw", AW); }catch(e){} drawAct(); return; }
     if(act === "pwin"){ PW = t.dataset.w === "all" ? "all" : "24h"; try{ localStorage.setItem("th_pw", PW); }catch(e){} drawProp(); return; }
