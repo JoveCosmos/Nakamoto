@@ -1715,6 +1715,9 @@ rememberGridH();
   window.__planWith = planWith;
   window.__candidates = candidates;
   window.__rateAfter = function(t, c, x){ return rateAfter(model(), t, c, x); };
+  /* new stake (a delegation, not a redelegation) also grows the bonded total, so the proportional
+     part is paid over S + added: every ATONE of it earns a little less, the reader's included */
+  window.__rateAfterNew = function(t, c, x, added){ var m = model(), S = window.__S(); if(added > 0 && S > 0) m.a = m.a * S / (S + added); return rateAfter(m, t, c, x); };
 })();
 
 /* ── the plan view ────────────────────────────────────────────────────────────
@@ -2354,7 +2357,7 @@ rememberGridH();
   function stBal(){ var b = window.__BAL; return b && b.uatone > 0 ? b.uatone : 0; }
   function stPlan(){
     var u = stAmount(), ids = Object.keys(STSEL), n = ids.length, share = n ? Math.floor(u / n) : 0, earned = 0, rows = [];
-    if(u > 0 && n) stCands().forEach(function(v){ if(!STSEL[v.id]) return; var aft = window.__rateAfter(v.t, v.c, share); earned += share * aft; rows.push({ id: v.id, m: v.m, x: share, after: aft }); });
+    if(u > 0 && n) stCands().forEach(function(v){ if(!STSEL[v.id]) return; var aft = window.__rateAfterNew(v.t, v.c, share, u); earned += share * aft; rows.push({ id: v.id, m: v.m, x: share, after: aft }); });
     /* an inactive validator ticked in the closing row: its share earns nothing while it is out */
     if(u > 0 && n) ids.forEach(function(id){ var x = window.__inactOk(id); if(x) rows.push({ id: id, m: x.m, x: share, after: 0 }); });
     ids.forEach(function(id){ if(!window.__inactOk(id) && !(window.__VDBY || {})[id]) n--; });   /* a tick that no longer resolves is not counted */
