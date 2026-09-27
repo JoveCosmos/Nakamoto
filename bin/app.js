@@ -2959,20 +2959,17 @@ rememberGridH();
   (function(){
     var here = NETC.net === "testnet" ? "testnet" : "mainnet";
     document.documentElement.setAttribute("data-net", here);
-    var m = document.getElementById("netmain"), t = document.getElementById("nettest"); if(!m || !t) return;
-    m.href = here === "testnet" ? "../" : "./"; t.href = here === "testnet" ? "./" : "testnet/";
-    (here === "testnet" ? t : m).setAttribute("aria-current", "page");
-    var btn = document.getElementById("dlive"), pop = document.getElementById("netpop"), nn = btn && btn.querySelector(".nn");
-    if(nn) nn.textContent = here === "testnet" ? "Testnet" : "Mainnet";
-    /* on a phone the height is not shown; the name is short */
-    if(nn && matchMedia("(max-width:620px)").matches) nn.textContent = here === "testnet" ? "Test" : "Main";
-    function show(on){ if(!pop || !btn) return; pop.hidden = !on; btn.setAttribute("aria-expanded", on ? "true" : "false"); if(on){ var f = pop.querySelector("a:not([aria-current])"); if(f) f.focus(); } }
-    if(btn) btn.addEventListener("click", function(ev){ ev.stopPropagation(); show(pop.hidden); });
-    document.addEventListener("click", function(ev){ if(pop && !pop.hidden && !pop.contains(ev.target)) show(false); });
-    document.addEventListener("keydown", function(ev){ if(ev.key === "Escape" && pop && !pop.hidden){ show(false); btn.focus(); } });
-    /* the other network keeps the open view; this one's row just closes the menu */
-    [m, t].forEach(function(a){ a.addEventListener("click", function(ev){ if(a.getAttribute("aria-current")){ ev.preventDefault(); show(false); return; }
-      a.href = a.getAttribute("href").split("#")[0] + location.hash; }); });
+    /* the Testnet switch: on means this is testnet; a tap slides it, then the other network loads,
+       the open view kept (the wallet reconnects there on its own) */
+    var tg = document.getElementById("nettog"); if(!tg) return;
+    var on = here === "testnet";
+    tg.setAttribute("aria-checked", on ? "true" : "false");
+    tg.title = on ? "Testnet: on. Turn off to return to mainnet" : "Testnet: off. Turn on to use AtomOne's testnet";
+    tg.addEventListener("click", function(){
+      tg.setAttribute("aria-checked", on ? "false" : "true");
+      var to = (on ? "../" : "testnet/") + location.hash;
+      setTimeout(function(){ location.href = to; }, matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 240);
+    });
   })();
   var API = NETC.api || "https://atomone-api.gatadao.com";
   var CHAIN = NETC.chain || "atomone-1";

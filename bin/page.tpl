@@ -4536,41 +4536,32 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .folder>.l1{grid-area:nav}
 /* the network switch: two links, the open network lit; testnet lights amber so a page on the
    test chain can never pass for the real one */
-/* the network, as the title's status line: under the wordmark, where the live height sat - a dot (teal
-   mainnet, amber testnet), the name, the height, a chevron; a tap opens both networks, each with its
-   chain id, the one this page is on ticked */
-.brandwrap{grid-area:brand;justify-self:start;position:relative;display:flex;align-items:center;min-width:0}
+/* Testnet as a mode (2026-09-27): mainnet is the app; a Testnet switch beside day/night, the same box.
+   On testnet the page says so - an amber band along the top edge and a TESTNET tag on the title - and
+   the switch stands on. A tap slides the knob, then the other network loads, the open view kept */
+.brandwrap{grid-area:brand;justify-self:start;display:flex;align-items:center;min-width:0}
 .brandwrap>.brand{grid-area:auto}
-.netc{position:absolute;left:38px;top:calc(50% + 5px);z-index:30}
-.netbtn{display:inline-flex;align-items:center;gap:5px;height:13px;padding:0 3px 0 0;border:0;background:none;cursor:pointer;
-font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;color:#7c7aa3;line-height:1;font-variant-numeric:tabular-nums}
-.netbtn>i{width:5px;height:5px;border-radius:50%;background:#2bc8bd;box-shadow:0 0 6px #2bc8bd}
-.netbtn .nn{text-transform:uppercase;letter-spacing:.14em;color:#6fe3da}
-.netbtn b{font-weight:400}
-.netbtn svg{width:8px;height:5px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s}
-.netbtn:hover,.netbtn[aria-expanded=true]{color:var(--ink)}
-.netbtn[aria-expanded=true] svg{transform:rotate(180deg)}
-.netbtn:focus-visible{outline:2px solid #2bc8bd;outline-offset:3px;border-radius:3px}
-html[data-net=testnet] .netbtn>i{background:#ffb02e;box-shadow:0 0 6px #ffb02e}
-html[data-net=testnet] .netbtn .nn{color:#ffc453}
-.netpop{position:absolute;left:-8px;top:calc(100% + 8px);min-width:210px;padding:5px;border-radius:12px;border:1px solid #34345c;
-background:linear-gradient(180deg,#15152b,#0e0e1d);box-shadow:0 18px 40px -12px rgba(0,0,0,.8)}
-.netpop[hidden]{display:none}
-.netpop a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--ink)}
-.netpop a:hover,.netpop a:focus-visible{background:rgba(255,255,255,.05);outline:none}
-.netpop a>i{width:7px;height:7px;border-radius:50%;background:#2bc8bd;box-shadow:0 0 8px #2bc8bd;flex:0 0 auto}
-.netpop a#nettest>i{background:#ffb02e;box-shadow:0 0 8px #ffb02e}
-.netpop a span{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto}
-.netpop a b{font-size:13px;font-weight:600}
-.netpop a small{font-family:var(--mono);font-size:9.5px;letter-spacing:.04em;color:#7c7aa3}
-.netpop a u{width:10px;height:6px;border-left:2px solid transparent;border-bottom:2px solid transparent;transform:rotate(-45deg) translate(1px,-2px)}
-.netpop a[aria-current=page]{background:rgba(43,200,189,.08)}
-.netpop a#nettest[aria-current=page]{background:rgba(255,176,46,.08)}
-.netpop a[aria-current=page] u{border-color:#6fe3da}
-.netpop a#nettest[aria-current=page] u{border-color:#ffc453}
+.bheight{position:absolute;left:0;top:100%;margin-top:1px;display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;color:#7c7aa3;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bheight i{width:4px;height:4px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green)}
+.bheight b{font-weight:400}
+.nettag{display:none;margin-left:8px;padding:2px 6px;border-radius:4px;border:1px solid rgba(255,176,46,.55);background:rgba(255,176,46,.12);color:#ffc453;
+font-style:normal;font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;line-height:1}
+html[data-net=testnet] .nettag{display:inline-block}
+html[data-net=testnet] .folder::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,#ffb02e 18%,#ffb02e 82%,transparent);box-shadow:0 0 12px rgba(255,176,46,.7);pointer-events:none}
+.nettog{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 10px 0 11px;border-radius:8px;border:1px solid var(--wbd2,#34345c);background:transparent;cursor:pointer;flex:0 0 auto;
+color:var(--ws,#c1bfdc);font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;transition:border-color .2s,color .2s}
+.nettog:hover{color:var(--wt,#f0eef8);border-color:#ffb02e}
+.ntk{position:relative;width:26px;height:14px;border-radius:999px;background:rgba(255,255,255,.1);box-shadow:inset 0 1px 2px rgba(0,0,0,.5);transition:background .22s}
+.ntk i{position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:#c1bfdc;transition:transform .22s cubic-bezier(.3,.7,.3,1),background .22s}
+.nettog[aria-checked=true]{border-color:rgba(255,176,46,.6);color:#ffc453}
+.nettog[aria-checked=true] .ntk{background:#ffb02e}
+.nettog[aria-checked=true] .ntk i{transform:translateX(12px);background:#fff}
+.nettog:focus-visible{outline:2px solid #ffb02e;outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.ntk,.ntk i{transition:none}}
 /* "testnet" hangs to the right of the height line, so the dot and the height keep their
    mainnet place (the dot under the t of AtomOne) */
-@media(max-width:620px){.netc{position:relative;left:auto;top:auto;margin-left:-6px}.netbtn{height:26px;font-size:9.5px}.netbtn b{display:none}.netpop{left:-6px}}
+.nts{display:none}
+@media(max-width:620px){.nettog{padding:0 8px;gap:6px}.nettog .ntl{display:none}.nettog .nts{display:inline}}
 .folder>.hdr-r{grid-area:right;justify-self:end;display:flex;align-items:center;gap:8px;min-width:0}
 .hdr-r .thbtn{margin-left:0;width:32px;height:32px;border-radius:8px}
 .hdr-r .sv-who{flex:0 0 auto}
@@ -4732,17 +4723,10 @@ html[data-tab=connect] .l2host{display:none}
 <div class=below id=below>
   <header class=folder>
     <div class=brandwrap>
-    <a class=brand href="#/intro" title="AtomOne"><img class=mark src="assets/atomone.svg" alt=""><span class=bw><span class=wordmark>AtomOne</span></span></a>
-    <!-- the network, as the title's own status line: live dot, name, height; a tap opens both networks -->
-    <div class=netc>
-      <button class=netbtn id=dlive type=button aria-haspopup=menu aria-expanded=false aria-controls=netpop title="Network and live height"><i></i><span class=nn>Mainnet</span><b>{{HEIGHT}}</b><svg viewBox="0 0 10 6" aria-hidden=true><path d="M1 1l4 4 4-4"/></svg></button>
-      <div class=netpop id=netpop role=menu hidden>
-        <a id=netmain role=menuitem href="./"><i></i><span><b>Mainnet</b><small>atomone-1</small></span><u aria-hidden=true></u></a>
-        <a id=nettest role=menuitem href="testnet/"><i></i><span><b>Testnet</b><small>atomone-testnet-1</small></span><u aria-hidden=true></u></a>
-      </div>
-    </div>
+    <a class=brand href="#/intro" title="AtomOne"><img class=mark src="assets/atomone.svg" alt=""><span class=bw><span class=wordmark>AtomOne</span><em class=nettag>Testnet</em><span class=bheight id=dlive title="the chain's height, live"><i></i><b>{{HEIGHT}}</b></span></span></a>
     </div>
     <div class=hdr-r>
+    <button class=nettog id=nettog type=button role=switch aria-checked=false title="Testnet: off. Turn on to use AtomOne's testnet"><span class=ntl>Testnet</span><span class=nts aria-hidden=true>Test</span><span class=ntk aria-hidden=true><i></i></span></button>
     <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
     <div class=sv-who>
       <button class="sv-btn sml pri" id=svconn type=button aria-haspopup=true aria-expanded=false>Connect wallet</button>
