@@ -168,6 +168,9 @@ def step(state, snap, quiet=False):
     samples.append({"t": now, "h": H, "miss": {c: snap["miss"][c] for c in active if c in snap["miss"]}})
     state["samples"] = samples
     state["active"] = active
+    # the rule, for the Telegram bot's "half the window" alert: it reads this file, so the two
+    # alert paths share one counter (the chain's own) and one threshold
+    state["window"], state["crit_fraction"] = W, CRIT_FRACTION
     # a fresh start records what already stands (incidents set above) without reporting it
     return [] if first else ev
 

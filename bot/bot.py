@@ -42,6 +42,10 @@ RANK_STEP = int(os.environ.get("RANK_STEP", "2"))
 # this only logs the change.
 STALE_S = int(os.environ.get("STALE_SECONDS", "300"))
 STATE  = os.path.dirname(IDFILE)
+# the validator watch (valwatch.py, the Discord path) writes each active validator's missed-block
+# counter from x/slashing every minute; the "half the window" alert reads it rather than count
+# 10,000 heights itself, so Telegram and Discord go critical on the same number
+VALWATCH = os.environ.get("VALWATCH_JSON", os.path.join(STATE, "valwatch-mainnet.json"))
 BACKUP = os.path.join(STATE, "subs.backup.db")
 API    = "https://api.telegram.org/bot" + TOKEN + "/"
 
@@ -91,7 +95,9 @@ def store():
                            # the height of the newest jailing already announced
                            ("vstate", "m", "TEXT"),
                            ("vstate", "rank_ref", "INTEGER"),
-                           ("vstate", "jail_h", "INTEGER")):
+                           ("vstate", "jail_h", "INTEGER"),
+                           # added 2026-09-27: in the half-window critical zone (NULL = not yet seen)
+                           ("vstate", "half", "INTEGER")):
         try:
             c.execute(f"ALTER TABLE {tbl} ADD COLUMN {col} {decl}")
         except sqlite3.OperationalError:
@@ -173,6 +179,19 @@ def valcons(chex):
     return hrp + "1" + "".join(CS[d] for d in data + [(pm >> 5 * (5 - i)) & 31 for i in range(6)])
 
 
+def slashing():
+    """(missed-in-window by valcons, window, the critical line) from the validator watch's
+    newest sample; None when the file is missing or its sample is over 10 minutes old"""
+    try:
+        d = json.load(open(VALWATCH))
+        smp = d["samples"][-1]
+        if time.time() - smp["t"] > 600 or not d.get("window"):
+            return None
+        return smp["miss"], int(d["window"]), int(d["window"] * float(d.get("crit_fraction", 0.5)))
+    except Exception:
+        return None
+
+
 def last_jail(op, chex):
     """height of the newest jailing of this validator in the index, 0 if none.
 
@@ -205,6 +224,7 @@ def last_jail(op, chex):
 # Alerts tell you what happened to what you own. Nothing more.
 ALERTS = {
     "d": ("Stops signing - misses %d blocks in a row" % WINDOW, "signing"),
+    "h": ("Misses half the slashing window",                    "half window"),
     "j": ("Jailed - drops out of the active set",               "jailed"),
     "r": ("Rank changes - moves %d places or more" % RANK_STEP, "rank"),
     "t": ("APR moves ±10% or more",                             "APR ±10%"),
@@ -271,8 +291,8 @@ def resolve(arg, V):
 
 
 # ── commands ────────────────────────────────────────────────────────────────
-HELP = ("Alerts for AtomOne validators: when one stops signing, is jailed, "
-        "changes rank or its APR moves.\n\n"
+HELP = ("Alerts for AtomOne validators: when one stops signing, misses half its slashing "
+        "window, is jailed, changes rank or its APR moves.\n\n"
         "Open the AtomOne app and tap the Telegram button in a validator's signing "
         "row, or the bell on the stake and redelegate cards, then choose what to hear "
         "about.\n\n"
@@ -332,6 +352,19 @@ def name(c, op, V):
     return r[0] if r and r[0] else op
 
 
+def standing(c, subs, V):
+    """what already holds for the validators just subscribed to, for the alerts chosen: an
+    alert fires on a change, so without this a new subscriber to a validator that is down or
+    past half its window would hear nothing until it recovers"""
+    out = []
+    for op, flags in subs:
+        r = c.execute("SELECT down, half FROM vstate WHERE op=?", (op,)).fetchone()
+        if not r: continue
+        if "d" in flags and r[0]: out.append("<b>%s</b> is not signing right now." % md(V[op]["m"]))
+        if "h" in flags and r[1]: out.append("<b>%s</b> has already missed half its slashing window." % md(V[op]["m"]))
+    return ("\n\nRight now:\n" + "\n".join(out)) if out else ""
+
+
 def handle(c, msg, V):
     chat = msg["chat"]["id"]
     text = (msg.get("text") or "").strip()
@@ -342,24 +375,31 @@ def handle(c, msg, V):
 
     if cmd == "/start":
         many = resolve_bits(arg, V) or resolve_many(arg, V)
+        if not many:
+            op, flags = resolve(arg, V)
+            many = [(op, flags)] if op else []
         if many:
+            # one row per chat and validator: subscribing again REPLACES that validator's
+            # choices (it is how a reader changes them), and the reply says so
+            fl, updated = many[0][1], []
             for op, flags in many:
+                old = c.execute("SELECT flags FROM sub WHERE chat=? AND op=?", (chat, op)).fetchone()
+                if old: updated.append((op, old[0] or "d"))
                 c.execute("INSERT INTO sub(chat, op, made, flags) VALUES(?,?,?,?) "
                           "ON CONFLICT(chat, op) DO UPDATE SET flags=excluded.flags",
                           (chat, op, int(time.time()), flags))
             c.commit()
-            fl = many[0][1]
-            return send(chat, "Watching %d validators:\n%s\n\n%s\n\n/stop to undo."
-                        % (len(many), "\n".join("- <b>%s</b>" % md(V[op]["m"]) for op, _ in many),
-                           "\n".join("- " + ALERTS[f][0] for f in fl if f in ALERTS)))
-        op, flags = resolve(arg, V)
-        if op:
-            c.execute("INSERT INTO sub(chat, op, made, flags) VALUES(?,?,?,?) "
-                      "ON CONFLICT(chat, op) DO UPDATE SET flags=excluded.flags",
-                      (chat, op, int(time.time()), flags))
-            c.commit()
-            return send(chat, "Watching <b>%s</b>.\n\n%s\n\n/stop to undo."
-                        % (md(V[op]["m"]), "\n".join("- " + ALERTS[f][0] for f in flags if f in ALERTS)))
+            what = "\n".join("- " + ALERTS[f][0] for f in fl if f in ALERTS)
+            if len(many) == 1:
+                op = many[0][0]
+                head = ("Updated <b>%s</b>. Its alerts are now:" if updated else "Watching <b>%s</b>.") % md(V[op]["m"])
+                if updated and updated[0][1] == fl:
+                    head = "Already watching <b>%s</b>, with the same alerts:" % md(V[op]["m"])
+            else:
+                head = "Watching %d validators:\n%s" % (len(many), "\n".join("- <b>%s</b>" % md(V[op]["m"]) for op, _ in many))
+                if updated:
+                    head += "\n\n%d of them you already watched: their alerts are replaced by these." % len(updated)
+            return send(chat, "%s\n\n%s%s\n\n/stop to undo." % (head, what, standing(c, many, V)))
         if arg:
             return send(chat, "That validator is not in the active set.")
         return send(chat, HELP)
@@ -408,14 +448,15 @@ def check(c, V):
         STALE[0] = stale
         log("index %s: newest block %s is %ss old" % ("STALE" if stale else "fresh again", height, age))
     known = height - 1                                   # the newest height whose signatures are in
+    SL = slashing()
     subs = {}
     for op, chat, fl in c.execute("SELECT op, chat, flags FROM sub").fetchall():
         subs.setdefault(op, []).append((chat, fl or "d"))
 
     for op, watchers in subs.items():
         v = V.get(op)
-        row = c.execute("SELECT down, rank, apr, jail, m, rank_ref, jail_h FROM vstate WHERE op=?", (op,)).fetchone()
-        was_down, was_rank, was_apr, was_jail, was_m, rank_ref, jail_h = row if row else (0, None, None, None, None, None, None)
+        row = c.execute("SELECT down, rank, apr, jail, m, rank_ref, jail_h, half FROM vstate WHERE op=?", (op,)).fetchone()
+        was_down, was_rank, was_apr, was_jail, was_m, rank_ref, jail_h, half = row if row else (0, None, None, None, None, None, None, None)
         m = v["m"] if v else (was_m or op)
         chex = v["chex"] if v else None
         events = []                                      # (letter, message)
@@ -444,6 +485,23 @@ def check(c, V):
                                    if down else
                                    ("<b>%s</b> is signing again.\nHeight %s." % (md(m), format(known, ",")))))
 
+        # half the slashing window: the chain's own counter, as the Discord watch reads it. In at
+        # the critical line, out below 80% of it (the same hysteresis), once each way. A validator
+        # already past the line when first watched is reported once.
+        if v and SL and re.fullmatch(r"[0-9A-Fa-f]{40}", v["chex"] or ""):
+            miss, W, crit = SL
+            n = miss.get(valcons(v["chex"]))
+            if n is not None:
+                if n >= crit and not half:
+                    events.append(("h", "<b>%s</b> has missed %s blocks.\nThat is half of the %s-block slashing window. Jailing comes at %s missed."
+                                   % (md(m), format(n, ","), format(W, ","), format(int(W * 0.95), ","))))
+                    half = 1
+                elif n < crit * 0.8 and half:
+                    events.append(("h", "<b>%s</b> is out of the critical zone.\nMissed %s of %s." % (md(m), format(n, ","), format(W, ","))))
+                    half = 0
+                elif half is None:
+                    half = 0
+
         # rank, against the rank at the last rank alert
         rank = v.get("rank") if v else was_rank
         if v and rank:
@@ -470,12 +528,12 @@ def check(c, V):
 
         if v:
             c.execute("INSERT INTO vchex(op, chex) VALUES(?,?) ON CONFLICT(op) DO UPDATE SET chex=excluded.chex", (op, v["chex"]))
-        c.execute("""INSERT INTO vstate(op, down, since, rank, apr, jail, m, rank_ref, jail_h)
-                     VALUES(?,?,?,?,?,?,?,?,?)
+        c.execute("""INSERT INTO vstate(op, down, since, rank, apr, jail, m, rank_ref, jail_h, half)
+                     VALUES(?,?,?,?,?,?,?,?,?,?)
                      ON CONFLICT(op) DO UPDATE SET down=excluded.down, since=excluded.since,
                        rank=excluded.rank, apr=excluded.apr, jail=excluded.jail, m=excluded.m,
-                       rank_ref=excluded.rank_ref, jail_h=excluded.jail_h""",
-                  (op, int(down), known, rank, apr_ref, v.get("jail", 0) if v else was_jail, m, rank_ref, jail_h))
+                       rank_ref=excluded.rank_ref, jail_h=excluded.jail_h, half=excluded.half""",
+                  (op, int(down), known, rank, apr_ref, v.get("jail", 0) if v else was_jail, m, rank_ref, jail_h, half))
         c.commit()
 
         for letter, msg in events:
@@ -491,8 +549,10 @@ def heartbeat(username):
     """bot.json: the page offers alerts only while this is fresh (collect.py checks
     'alive'), and takes the window and rank step from here so its wording matches"""
     tmp = IDFILE + ".tmp"
+    SL = slashing()
     json.dump({"username": username, "alive": int(time.time()), "window": WINDOW,
-               "rank_step": RANK_STEP}, open(tmp, "w"))
+               "rank_step": RANK_STEP, "slash_window": SL[1] if SL else None,
+               "slash_crit": SL[2] if SL else None}, open(tmp, "w"))
     os.replace(tmp, IDFILE)
 
 

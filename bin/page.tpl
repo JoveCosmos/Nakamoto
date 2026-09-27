@@ -4701,6 +4701,8 @@ html[data-tab=connect] .l2host{display:none}
   <div class=alist>
     <label class=aopt><input type=checkbox data-f=d checked>
       <span>Stops signing<i>misses 10 blocks in a row</i></span></label>
+    <label class=aopt><input type=checkbox data-f=h>
+      <span>Misses half the slashing window<i>5,000 of 10,000 blocks, jailed at 9,500</i></span></label>
     <label class=aopt><input type=checkbox data-f=j>
       <span>Jailed<i>dropped out of the active set</i></span></label>
     <label class=aopt><input type=checkbox data-f=r>
@@ -4713,7 +4715,7 @@ html[data-tab=connect] .l2host{display:none}
     l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.35-.1-.55-.6-.2L6.2 13.1 1.4
     11.6c-1-.3-1-1 .2-1.5l19-7.3c.85-.3 1.6.2 1.3 1.5z"/></svg>Continue in Telegram</a>
   <div class=amore id=amore hidden></div>
-  <div class=vnote>Change it any time with /stop.</div>
+  <div class=vnote>Subscribe again to change your choices, /stop to end.</div>
 </div></div>
 
 <div class=pop id=gpop><div class="card vcard gcard">

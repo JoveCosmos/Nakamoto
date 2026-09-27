@@ -797,7 +797,8 @@ out = {
   # page's deep link can never point at a bot that is not actually running
   "bot": BOT.get("username") if BOT_UP else None,
   # the bot's own rule, so the chooser's wording cannot drift from what it does
-  "alert": {"window": int(BOT.get("window", 10)), "rank_step": int(BOT.get("rank_step", 2))},
+  "alert": {"window": int(BOT.get("window", 10)), "rank_step": int(BOT.get("rank_step", 2)),
+            "slash_window": BOT.get("slash_window"), "slash_crit": BOT.get("slash_crit")},
   "schedule": sched,
   # HIGHEST REACHED is not simply the current value: the ratio can fall as well
   # as rise, and if it ever does, the reconstruction below stops matching the live

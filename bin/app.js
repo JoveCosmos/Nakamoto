@@ -1292,7 +1292,9 @@ rememberGridH();
       var AL = window.__ALERT || {};
       boxes.forEach(function(b){ var i = b.parentNode.querySelector("i"); if(!i) return;
         if(b.dataset.f === "d" && AL.window) i.textContent = "misses " + AL.window + " blocks in a row";
-        if(b.dataset.f === "r" && AL.rank_step) i.textContent = "moves " + AL.rank_step + " places or more"; });
+        if(b.dataset.f === "r" && AL.rank_step) i.textContent = "moves " + AL.rank_step + " places or more";
+        if(b.dataset.f === "h" && AL.slash_window && AL.slash_crit) i.textContent = AL.slash_crit.toLocaleString("en-US") + " of " +
+          AL.slash_window.toLocaleString("en-US") + " blocks, jailed at " + Math.round(AL.slash_window * .95).toLocaleString("en-US"); });
     }
     var PER = 8;                                   /* validators per link in the older form, under Telegram's 64 chars */
     /* the whole set in one link: a bitmap over each validator's small stable number (vid,
