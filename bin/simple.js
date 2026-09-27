@@ -174,7 +174,8 @@
     var read = pos ? '<span class=sv-wread>' + (window.__POSAT ? 'read ' + ago(window.__POSAT) : '') +
       '<button class=sv-rf type=button data-act=refresh title="Read the wallet again" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg></button></span>' : '';
     put("sd-wstrip",
-      '<div class=sd-id><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3><span class="sv-tag g">Self-custody</span>' + read + '</div>' +
+      /* one row: the wallet's name, and at the box's right end when it was read, with the refresh */
+      '<div class="sd-id sd-idw"><div class=sd-top><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3>' + read + '</div></div>' +
       ro("Total", pos ? fmt(tot) : "—", pos ? "ATONE in this wallet" : "connect a wallet", pos ? 1 : null, "var(--wt)") +
       ro("Staked", pos ? fmt(stk) : "—", mine ? "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s") : pos ? "nothing staked" : "", pos ? stk / (tot || 1) : null, "var(--sv-amber)") +
       ro("Available", bal ? fmt(liq) : "—", bal ? '<b class=sv-pho>' + fmt(bal.uphoton) + '</b> PHOTON for fees' : "", pos ? liq / (tot || 1) : null, "var(--sv-violet)") +

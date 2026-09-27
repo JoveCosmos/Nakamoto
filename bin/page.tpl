@@ -3790,6 +3790,13 @@ position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-dire
 .sd-id{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:7px;padding:14px 18px;min-width:0}
 .sd-id h3{margin:0;font-size:18px;font-weight:700;letter-spacing:-.01em;color:var(--wt);max-width:100%}
 .sd-id .sv-wread{font-size:11px}
+/* the Wallet's box: the name and the read time with its refresh on one row, the time at the right end */
+.sd-idw{justify-content:flex-start;align-items:stretch}
+.sd-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px;width:100%;min-width:0}
+.sd-top h3{flex:1 1 auto;min-width:min(100%,108px);overflow:hidden}
+/* wide enough: the first box takes a little more, so the name and the read time share one row */
+@media(min-width:1200px){.sd-strip{grid-template-columns:minmax(0,1.6fr) repeat(5,minmax(0,1fr)) !important}}
+.sd-top .sv-wread{flex:0 0 auto}
 .sd-ro{--rc:var(--sv-teal);position:relative;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:14px 18px 13px;min-width:0;border-left:1px solid var(--wbd)}
 .sd-ro::before{content:"";position:absolute;left:18px;right:18px;top:0;height:2px;border-radius:0 0 2px 2px;background:var(--rc);box-shadow:0 0 12px var(--rc);opacity:.85}
 .sd-ro em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
