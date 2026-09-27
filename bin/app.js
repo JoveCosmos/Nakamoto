@@ -1053,7 +1053,7 @@ rememberGridH();
     pingStart(v.chex);
     var tn = (D.net || {}).net === "testnet";
     E("fjoin").textContent  = v.joined ? dmy(v.joined) : (tn ? "N/A" : "—");
-    E("flast").textContent  = v.last_slash || (tn ? "N/A" : "never");
+    E("flast").textContent  = v.last_slash || (tn ? "N/A" : "Never");
     E("vprop").textContent  = v.prop != null ? f(v.prop) : "N/A";
     /* the note repeated what the map, the graph and the APR band already say */
     POP.open(vpop);
@@ -1867,29 +1867,37 @@ rememberGridH();
   var IJ = {};
   /* sel: the list's own ticks (STSEL or SEL) - an inactive validator can be ticked like any other,
      a jailed one cannot; ticking one keeps the row open */
+  /* the closing sections of a validator list: the inactive ones (tickable - stake there counts toward
+     the set, earning nothing until it is in), then the jailed ones at the very end (they cannot be
+     picked), each its own band that opens; each sorted by stake */
   function ijRows(key, cols, sel){
     var L = (window.__D && window.__D.inactive) || [];
     if(!L.length) return "";
-    var nj = 0, ticked = 0; L.forEach(function(v){ if(v[4]) nj++; else if(sel && sel[v[3]]) ticked++; });
-    var open = !!IJ[key] || ticked > 0;
-    var h = '<tr class="ij-t' + (open ? ' open' : '') + '"><td colspan=' + cols + '><button type=button class=ij-b data-ij="' + key + '" aria-expanded=' + open + '>' +
-      '<span>Inactive and jailed validators</span><i>' + L.length + '</i><em>' + (L.length - nj) + ' inactive, ' + nj + ' jailed' + (ticked ? ', <b>' + ticked + ' ticked</b>' : '') + '</em><u aria-hidden=true></u></button></td></tr>';
-    if(open){
-      h += '<tr class=ij-note><td colspan=' + cols + '>An inactive validator can be ticked: your stake counts toward its place in the active set, and it earns nothing until the validator is in it. A jailed one cannot be picked.</td></tr>';
-      L.forEach(function(v){
+    var by = function(a, b){ return b[1] - a[1]; };
+    var ina = L.filter(function(v){ return !v[4]; }).sort(by), jai = L.filter(function(v){ return v[4]; }).sort(by);
+    var h = "";
+    [[ina, key + "i", "Inactive validators", "can be ticked, 0% while inactive"], [jai, key + "j", "Jailed validators", "cannot be picked"]].forEach(function(g){
+      var list = g[0]; if(!list.length) return;
+      var ticked = 0; list.forEach(function(v){ if(sel && sel[v[3]]) ticked++; });
+      var open = !!IJ[g[1]] || ticked > 0;
+      h += '<tr class="ij-t' + (open ? ' open' : '') + '"><td colspan=' + cols + '><button type=button class=ij-b data-ij="' + g[1] + '" aria-expanded=' + open + '>' +
+        '<span>' + g[2] + '</span><i>' + list.length + '</i><em>' + g[3] + (ticked ? ', <b>' + ticked + ' ticked</b>' : '') + '</em><u aria-hidden=true></u></button></td></tr>';
+      if(!open) return;
+      list.forEach(function(v){
         var can = !v[4] && !!v[5] && !!sel, on = can && !!sel[v[3]];
         h += '<tr class="ij-r' + (on ? ' on' : '') + (can ? '' : ' no') + '"><td colspan=' + cols + '><div class=ij-w>' +
           (can ? '<input type=checkbox data-id="' + att(v[3]) + '"' + (on ? ' checked' : '') + ' aria-label="' + att(v[0]) + ' (inactive)">' : '<span class=ij-x aria-hidden=true></span>') +
           logo(v[3], v[0]) + '<span class=ij-n>' + att(v[0]) + '</span>' +
-          '<span class="ij-tag ' + (v[4] ? 'j' : 'i') + '">' + (v[4] ? 'jailed' : 'inactive') + '</span>' +
+          '<span class="ij-tag ' + (v[4] ? 'j' : 'i') + '">' + (v[4] ? 'Jailed' : 'Inactive') + '</span>' +
           '<span class=ij-s>' + big(v[1]) + ' ATONE</span><span class=ij-e>' + (v[4] ? 'cannot be picked' : '0% while inactive') + '</span></div></td></tr>'; });
-    }
+    });
     return h;
   }
   function ijWire(el, redraw){
-    var b = el.querySelector(".ij-b"); if(!b) return;
-    b.addEventListener("click", function(){ IJ[b.dataset.ij] = !IJ[b.dataset.ij]; redraw(); });
+    Array.prototype.forEach.call(el.querySelectorAll(".ij-b"), function(b){
+      b.addEventListener("click", function(){ IJ[b.dataset.ij] = !IJ[b.dataset.ij]; redraw(); }); });
   }
+
 
   /* ── the stat strip ── */
   function stats(pos){

@@ -136,7 +136,7 @@
     var m = meter == null ? "" : typeof meter === "string" ? meter : apr
       ? '<i class="sd-m apr" style="background:' + rampCss() + '"><u style="left:' + (Math.max(0, Math.min(1, meter)) * 100).toFixed(1) + '%"></u></i>'
       : '<i class=sd-m><s style="width:' + (meter > 0 ? Math.max(1.5, Math.min(100, meter * 100)) : 0).toFixed(1) + '%"></s></i>';
-    return '<div class=sd-ro' + (color ? ' style="--rc:' + color + '"' : '') + '>' + (act || "") + '<em>' + label + '</em><b>' + value + '</b>' +
+    return '<div class=sd-ro' + (color ? ' style="--rc:' + color + '"' : '') + '>' + (act || "") + '<em>' + label + '</em><span class=sd-well><b>' + value + '</b></span>' +
       '<small>' + (meta || "&nbsp;") + '</small>' + m + '</div>';
   }
   function fig(label, value, meta, color){
@@ -152,11 +152,11 @@
     var y = stake * rate, per = function(days){ return y * days / 365; };
     var tile = function(k, u){ return fig(k, '<span class=sd-gain>+' + one(u / 1e6) + '</span>', "ATONE", "var(--sv-green)"); };   /* ATONE, never dollars */
     /* the same block as the connected one: the figure in ATONE, the rate under it */
-    if(ex) return '<div class=se-ex><div class=se-hero><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b><small class=se-apr>' + pct(rate) + ' APR</small></div>' +
+    if(ex) return '<div class=se-ex><div class=se-hero><div class=se-card><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b><small class=se-apr>' + pct(rate) + ' APR</small></div></div>' +
       '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div></div>';
     /* the year and its three steps stand in the middle of the panel, the note at its foot */
-    return '<div class=se-mid><div class=se-hero><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b>' +
-        '<small class=se-apr>' + pct(rate) + ' APR</small></div>' +
+    return '<div class=se-mid><div class=se-hero><div class=se-card><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b>' +
+        '<small class=se-apr>' + pct(rate) + ' APR</small></div></div>' +
       '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' +
       (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + '</div>' +
       /* the way to earn more of it: the same door as Redelegate, opening the Stake card */
@@ -174,23 +174,44 @@
         /* out of the set: "Jailed" when it is, in red; otherwise "Inactive" */
         (r.inactive && ((window.__INACT || {})[r.id] || {}).jailed ? '<u class=jl>Jailed</u>' : '<u style="color:' + c.ink + '">' + (r.inactive ? "Inactive" : pct(r.rate)) + '</u>') + '</div>'; }).join("") + '</div>';
   }
+  /* Where the stake sits: the share on the largest, middle and smallest third of the active set (by
+     stake, live), and any outside it. The bonus is split equally between validators, so the smallest
+     third pays most - and stake there is what decentralizes the chain. With no wallet: all bonded ATONE */
+  function footprint(pos){
+    var V = VALS(), n = V.length, mine = !!(pos && pos.rows.length);
+    var head = '<div class=sv-ph><h3>' + (mine ? "Where your stake sits" : "Where all stake sits") + '</h3></div>';
+    if(!n) return head + '<div class=sv-upwait>Reading the set…</div>';
+    var at = {}, amt = [0, 0, 0], out = 0, tot = 0, i;
+    for(i = 0; i < n; i++) at[V[i][3]] = i;
+    var band = function(k){ return k < n / 3 ? 0 : k < 2 * n / 3 ? 1 : 2; };
+    if(mine) pos.rows.forEach(function(r){ var k = at[r.id]; if(k == null || r.inactive) out += r.x; else amt[band(k)] += r.x; tot += r.x; });
+    else for(i = 0; i < n; i++){ amt[band(i)] += V[i][1]; tot += V[i][1]; }
+    var rowsH = [["Largest third", "validators 1 to " + Math.ceil(n / 3), amt[0], "#ff6a3d"], ["Middle third", "validators " + (Math.ceil(n / 3) + 1) + " to " + Math.ceil(2 * n / 3), amt[1], "var(--sv-amber)"],
+                 ["Smallest third", "validators " + (Math.ceil(2 * n / 3) + 1) + " to " + n, amt[2], "var(--sv-green)"]];
+    if(out > 0) rowsH.push(["Outside the set", "inactive or jailed, earning nothing", out, "var(--wf)"]);
+    return head + '<div class=fp-rows>' + rowsH.map(function(r){ var sh = tot ? r[2] / tot * 100 : 0;
+      return '<div class=fp-r style="--c:' + r[3] + '"><span class=fp-k><b>' + r[0] + '</b><i>' + r[1] + '</i></span><u>' + (sh < 0.05 && sh > 0 ? "<0.1" : sh.toFixed(sh < 10 && sh > 0 ? 1 : 0)) + '%</u>' +
+        '<span class=fp-bar><s style="width:' + Math.min(100, sh).toFixed(2) + '%"></s></span><small>' + fmt(r[2]) + ' ATONE</small></div>'; }).join("") + '</div>' +
+      '<div class=fp-note>The bonus is split equally: the smallest third pays the most.</div>';
+  }
   function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }
 
   /* the wallet box under its name: the address with a copy button, then the wallet app and the network
      as two chips; with no wallet, a line and the door to connect one */
   function wmeta(){
     var W = window.__WALLET, a = window.__ADDR, net = TN() ? "Testnet" : "Mainnet";
-    if(!W || !a) return '<div class=sd-wmeta><span class=sd-wnone>Not connected</span>' +
-      '<button class=sd-wbtn type=button data-act=connect>Connect wallet</button></div>';
+    if(!W || !a) return '';
     return '<div class=sd-wmeta><span class=sd-wa title="' + esc(a) + '"><code>' + esc(a.slice(0, 10) + "\u2026" + a.slice(-6)) + '</code>' +
       '<button class=sd-wcp type=button data-act=copyaddr title="Copy the address" aria-label="Copy the address"><svg viewBox="0 0 24 24" aria-hidden=true><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></span>' +
       '<span class=sd-wch><i class=app>' + esc(W.name || "Wallet") + '</i><i class="net' + (TN() ? ' tn' : '') + '">' + net + '</i></span></div>';
   }
-  function drawOver(){
-    var pos = window.__POS, S = setStats(), bal = window.__BAL;
+  /* the wallet strip, one builder for Overview and Manage: the wallet box, then Total, Staked,
+     Available, Rewards and APR, each figure in its engraved well */
+  function wstrip(){
+    var pos = window.__POS, bal = window.__BAL;
     var mine = pos && pos.rows.length, rew = window.__REW || 0, liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0, tot = liq + stk + rew;
     var wname = (window.__WALLET && String(window.__WALLET.label || "").trim()) || "Your wallet";
-    put("sd-wstrip",
+    return (
       /* the wallet box: its name, the address, the wallet app and the network */
       '<div class="sd-id sd-idw"><div class=sd-top><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3></div>' + wmeta() + '</div>' +
       /* the Total's bar is the wallet split three ways - staked, available, rewards - not a full line */
@@ -202,6 +223,11 @@
       ro("Rewards", window.__REW != null ? fmt(rew) : "—", rew > 0 ? "ready to claim" : pos ? "nothing waiting" : "", pos ? rew / (tot || 1) : null, "var(--sv-green)",
          rew >= 1 ? '<button class=sd-act type=button data-act=claim title="Claim your staking rewards">Claim</button>' : "") +
       ro("APR", mine ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "—", mine ? "a year, on the staked ATONE" : "", mine ? heat(pos.rate).p : null, "", "", true));
+  }
+  function drawOver(){
+    var pos = window.__POS, S = setStats(), bal = window.__BAL;
+    var mine = pos && pos.rows.length, rew = window.__REW || 0, liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0, tot = liq + stk + rew;
+    put("sd-wstrip", wstrip());
 
     /* the move */
     var plan = planNow(pos), h = "", byId = {};
@@ -213,7 +239,7 @@
           '<li style="--sc:#ffb02e"><b>Connect</b><span>Reads your balance, stake.</span></li>' +
           '<li style="--sc:' + heat(S.mid).fill + '"><b>See what it earns</b><span>a day, a week, a year, in ATONE</span></li>' +
           '<li style="--sc:#2ee06a"><b>Redelegate</b><span>to the best earning place, in single signature</span></li>' +
-        '</ol><button class="sv-btn pri sd-go" type=button data-act=connect>Connect wallet</button>';
+        '</ol>';
     } else if(!pos.rows.length){
       h = '<div class=sv-none><h3>No stake on AtomOne</h3><button class="sv-btn go" type=button data-act=stake>Stake ATONE</button></div>';
     } else if(!(pos.free > 0)){
@@ -254,9 +280,7 @@
       : '<div class=sv-ph><h3>What 1,000 ATONE earns</h3></div>' + earns(1e9, S.mid, 0, true));
 
     /* the validators */
-    put("sd-list", pos && rows.length
-      ? '<div class=sv-ph><h3>Your Delegations</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total)
-      : '<div class=sv-ph><h3>' + ("Your Delegations") + '</h3></div>' + (pos ? '<div class=sv-upwait>None yet</div>' : vskel(6)));
+    put("sd-list", footprint(pos));
   }
 
   /* the plan is recomputed only when a stake moves or the position is re-read */
@@ -298,7 +322,7 @@
       : !pos.rows.length ? '<button class="sv-btn pri" type=button data-act=stake>Stake ATONE</button>'
       : '<button class="sv-btn ' + (g ? "" : "vio") + '" type=button data-act=autopilot>' + (g ? "Manage" : "Set up") + '</button>';
     put("sd-astrip",
-      '<div class=sd-id><h3>Autopilot</h3>' + (g ? tag("g", "Active") : tag("q", "Inactive")) + door + '</div>' +
+      '<div class="sd-id sd-ida"><h3>Autopilot</h3>' + (g ? tag("g", "Active") : tag("q", "Inactive")) + door + '</div>' +
       /* active: what it has earned, never the strategy behind it */
       (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "—", rec ? sgnA((rec.rate - rec.start.rate) * rec.staked) + " ATONE a year" : "first check pending", null, "var(--sv-green)")
          : ro("Strategy", "—", "chosen when you set it up", null, "var(--sv-violet)")) +
@@ -370,11 +394,13 @@
     if(!plan || !(plan.gain > 0.5) || plan.after == null)
       return h + '<div class=se-vs><div><em>Now</em><b style="color:' + hn.ink + '">' + pct(pos.rate) + '</b></div></div>' +
         '<div class=se-say>Your stake already earns the best it can today. Autopilot keeps it there: when rates change, it moves your stake for you.</div>';
+    /* the same cards as Move your stake on the Overview: Now and Best today side by side, the gain under both */
     var ha = heat(plan.after);
-    return h + '<div class=se-vs><div><em>Now</em><b style="color:' + hn.ink + '">' + pct(plan.now) + '</b></div><i aria-hidden=true>\u2192</i>' +
-        '<div><em>Best today</em><b style="color:' + ha.ink + '">' + pct(plan.after) + '</b></div></div>' +
-      '<div class="se-hero sm"><em>More a year</em><b><span class=sd-gain>+' + one(plan.gain) + '</span><i>ATONE</i></b>' +
-        (usdOf(plan.gain * 1e6) != null ? '<small>' + usd(usdOf(plan.gain * 1e6)) + ' at today\'s price</small>' : '') + '</div>' +
+    return h + '<div class="sd-figs sd-mv">' +
+        fig("Now", '<span style="color:' + hn.ink + '">' + pct(plan.now) + '</span>', "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s"), hn.fill) +
+        fig("Best today", '<span style="color:' + ha.ink + '">' + pct(plan.after) + '</span>', "where Autopilot would move it", ha.fill) +
+        fig("More a year", '<span class=sd-gain>+' + one(plan.gain) + '</span><i class=u>ATONE</i>', "at today\'s rates", "var(--sv-green)") +
+      '</div>' +
       '<div class=se-say>Autopilot moves your stake there, and again whenever rates change. You approve once.</div>';
   }
   /* With a grant: how far along it is, and what it has done - its last three moves in words */
@@ -930,7 +956,7 @@
     var L = GV.list, act = L ? L.filter(function(g){ return g.active; }) : [], vp = 0, n = 0;
     (L || []).forEach(function(g){ vp += g.vp || 0; n += g.n || 0; });
     var c = function(k, v, sub){ return '<div class="sv-card sv-span"><span class=sv-k>' + k + '</span><span class=sv-big>' + v + '</span><span class=sv-sub>' + sub + '</span></div>'; };
-    put("sv-govcards", c("Governors", L ? String(L.length) : "\u2014", L ? act.length + " active" : "reading the chain\u2026") +
+    put("sv-govcards", c("Governors", L ? String(L.length) : "\u2014", L ? "Active " + act.length : "reading the chain\u2026") +
       c("Voting power", L ? fmt(vp) : "\u2014", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(2) + "% of bonded ATONE follows a governor" : "ATONE") +
       c("Delegators", L ? String(n) : "\u2014", "wallets that follow a governor"));
     var h = '<div class=sv-ph><h3>Governors</h3><span class=sv-gkey>a delegator\'s vote goes with its governor unless it votes itself</span></div>';
@@ -1207,6 +1233,7 @@
     homeDoor();
     selfBand();
     drawHead();
+    if(root.getAttribute("data-sv") === "dashboard/self") put("sd-mstrip", wstrip());
     if(root.getAttribute("data-tab") !== "dele" || root.getAttribute("data-ui") !== "simple") return;
     var s = screen();
     if(s === "over") drawOver();
@@ -1276,6 +1303,7 @@
     ev.preventDefault(); window.__vshow(t.dataset.v);
   }
   sv.addEventListener("click", onClick);
+  var mstrip = E("sd-mstrip"); if(mstrip) mstrip.addEventListener("click", onClick);   /* Manage's copy of the strip */
   sv.addEventListener("keydown", onKey);
 
   /* the pill's two controls: the address copies, the icon disconnects - no menu */

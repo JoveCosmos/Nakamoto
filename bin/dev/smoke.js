@@ -210,7 +210,7 @@ t('shell-groups', function(){
   if(sw && l2 && innerWidth>620 && sw.getBoundingClientRect().left < l2.getBoundingClientRect().right) bad.push('switch not after the views');
   var bs=[].map.call(document.querySelectorAll('.l2vb'),function(b){ return b.textContent+(b.getAttribute('aria-disabled')==='true'?'(off)':'')+(b.getAttribute('aria-pressed')==='true'?'*':''); }).join();
   if(bs!=='Staking*,Governance') bad.push('switch '+bs);
-  if(tabs()!=='overview,autopilot,self') bad.push('staking tabs '+tabs());
+  if(tabs()!=='overview,self,autopilot') bad.push('staking tabs '+tabs());
   if(R.getAttribute('data-grp')!=='Staking') bad.push('grp '+R.getAttribute('data-grp'));
   if(!vis('sv-over') || vis('p-dele')) bad.push('overview is not the simple screen');
   document.getElementById('l2-dashboard-self').click();

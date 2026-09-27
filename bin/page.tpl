@@ -1986,7 +1986,6 @@ font-family:var(--wsans);font-size:13px;color:var(--ws);text-align:left}
 .ij-t.open .ij-b u{transform:rotate(-135deg);margin-top:3px}
 .ij-b:hover{border-color:var(--ws);background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.03))}.ij-b:hover u{border-color:var(--wt)}
 .ij-b:focus-visible{outline:2px solid var(--av);outline-offset:2px}
-.wk-tbl2 tr.ij-note td{height:auto;padding:4px 8px 8px;text-align:left;white-space:normal;font-family:var(--wsans);font-size:11.5px;line-height:1.45;color:var(--ws);border-bottom:0}
 .wk-tbl2 tr.ij-r td{text-align:left;padding:0 8px}
 .wk-tbl2 tr.ij-r.on td{background:rgba(46,224,106,.06)}
 .ij-w{display:flex;align-items:center;gap:8px;min-width:0}
@@ -2907,6 +2906,21 @@ border:1px solid color-mix(in srgb,var(--sa-v) 40%,transparent);background:linea
 /* Outcome never sets the row's height: the two lists do. contain:size sizes it as if empty, it stretches to
    the row, and its moves scroll inside it, so a long plan cannot grow the row and lift all three columns */
 @media(min-width:901px){#wk-mv{contain:size;min-height:0}#wk-mv #dstrat{flex:1 1 0;min-height:0;max-height:none}}
+/* Manage stands as the Overview does (2026-09-27): the same framed box, the wallet strip on top, and the
+   three sections taking all the height left - their lists scroll inside them. The first column is the
+   wallet box's width above it (1.6 of the strip's 6.6 parts), Redelegate and Outcome share the rest */
+@media(min-width:901px){
+  #p-dele #wbody{display:flex;flex-direction:column;justify-content:flex-start;gap:12px;padding:10px 14px;box-sizing:border-box;
+    border:1px solid #232342;border-radius:8px;background:linear-gradient(180deg,#0d0d1c,#09090f)}
+  #p-dele #sd-mstrip{flex:0 0 auto}
+  #p-dele #wbody>.wk-two{position:relative;inset:auto;flex:1 1 auto;min-height:0;height:auto;
+    grid-template-columns:max(24.2424%,300px) minmax(0,1.9fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);align-items:stretch;align-content:stretch;gap:12px}
+  #p-dele #wk-mine,#p-dele #wk-plan{min-height:0}
+  #p-dele #wk-mine .wk-tbl2,#p-dele #wk-plan .wk-tbl2{flex:1 1 auto;height:auto;min-height:0;max-height:none}
+  /* the narrower Delegations column: its figures take less room, so the names keep theirs */
+  #p-dele #dmy col:nth-child(1){width:28px!important}#p-dele #dmy col:nth-child(3){width:60px!important}
+  #p-dele #dmy col:nth-child(4){width:52px!important}#p-dele #dmy col:nth-child(5){width:50px!important}
+}
 /* the three title rows one height (the Redelegate row's, which holds the amount field), everything in
    them centred: Delegations, Redelegate and Outcome, and Stake / Unstake / Rewards, on one line */
 @media(min-width:901px){#wk-mine .wk-t1,#wk-plan .wk-t2,#wk-mv .wk-t3,#wk-mv #dmvh{height:32px;min-height:32px;max-height:32px;padding-top:0;padding-bottom:0;margin-top:0;margin-bottom:0;align-items:center;box-sizing:border-box}}
@@ -3419,7 +3433,7 @@ border-color:rgba(46,224,106,.3)}
      violet  Autopilot            teal   the set, the network
    Every tile and panel wears its meaning the way Advanced's tiles do: a gradient hairline on
    its top edge, and a heading behind a short bar of the same colour (--tc). */
-#sv{--wc:#0e0e1d;--wh:#12122a;--wi:#0a0a16;--wchip:#101024;--wbd:#232342;--wbd2:#34345c;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4;
+#sv,#sd-mstrip{--wc:#0e0e1d;--wh:#12122a;--wi:#0a0a16;--wchip:#101024;--wbd:#232342;--wbd2:#34345c;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4;
 --sv-amber:#ffb02e;--sv-green:#2ee06a;--sv-violet:#b9b0ff;--sv-teal:#2bc8bd;--sv-pho:#7fd8ff}
 .sv-screen{background:linear-gradient(180deg,#0d0d1c,#09090f);border-color:#232342}
 .sv-screen>.sv-panel,.sv-screen .sv-card,.sv-screen .sv-card:first-child,.sv-screen .sv-card+.sv-card{
@@ -3950,6 +3964,18 @@ html[data-svs=over] #sv-over,html[data-svs=auto] #sv-auto{display:grid;grid-temp
 .sd-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1.35fr) minmax(0,1fr);gap:12px;min-height:0}
 /* the Wallet: Your delegations on the left, Move your stake on the right - the wider column goes with it */
 .sd-wgrid{grid-template-columns:minmax(0,1fr) minmax(0,1.35fr) minmax(0,1.15fr)}
+/* the left column exactly the wallet box's width above it: 1.6 of the strip's 6.6 parts */
+@media(min-width:901px){.sd-wgrid{grid-template-columns:max(24.2424%,250px) minmax(0,1.35fr) minmax(0,1.15fr)}}
+/* Autopilot stands as the Overview: its first column the lead card's width above it */
+@media(min-width:901px){.sd-agrid{grid-template-columns:max(24.2424%,250px) minmax(0,1.35fr) minmax(0,1.15fr)}}
+/* Autopilot's lead card: the wallet card's build, in Autopilot's own teal-to-violet, its orbits turning */
+.sd-ida{position:relative;overflow:hidden;color:#fff;justify-content:center;
+background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,255,.13) 45px 46px,transparent 47px 70px,rgba(255,255,255,.09) 71px 72px,transparent 73px 98px,rgba(255,255,255,.06) 99px 100px,transparent 101px 128px,rgba(255,255,255,.035) 129px 130px,transparent 131px),
+radial-gradient(130% 100% at 0% 0%,rgba(143,245,236,.3),transparent 58%),linear-gradient(140deg,#0f6b67 0%,#1f3f79 55%,#1a1146 100%)}
+.sd-ida::after{content:"";position:absolute;right:22px;bottom:18px;width:7px;height:7px;border-radius:50%;background:#dffcf9;box-shadow:0 0 12px 2px rgba(143,245,236,.9)}
+.sd-ida h3{color:#fff}
+.sd-ida .sv-tag{color:#dffcf9;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.1)}
+.sd-ida .sv-tag.g{color:#8ff0b0;border-color:rgba(143,240,176,.55);background:rgba(46,224,106,.16)}
 .sd-col{background:linear-gradient(180deg,#131329,#0c0c1a);border:1px solid var(--wbd2);border-radius:12px;box-shadow:inset 0 1px 0 #ffffff08;
 position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-direction:column}
 .sd-col::before{content:"";position:absolute;left:16px;right:16px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opacity:.95;pointer-events:none}
@@ -3960,10 +3986,23 @@ position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-dire
 .sd-id h3{margin:0;font-size:18px;font-weight:700;letter-spacing:-.01em;color:var(--wt);max-width:100%}
 /* the Wallet's box: the name and the read time with its refresh on one row, the time at the right end */
 .sd-idw{justify-content:flex-start;align-items:stretch}
+/* the wallet card: a solid violet card in the strip's first cell - AtomOne's orbit rings rising from its
+   corner, a light from the top left - the one hard colour of the strip, the same in day and night */
+.sd-idw{position:relative;overflow:hidden;color:#fff;
+background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,255,.13) 45px 46px,transparent 47px 70px,rgba(255,255,255,.09) 71px 72px,transparent 73px 98px,rgba(255,255,255,.06) 99px 100px,transparent 101px 128px,rgba(255,255,255,.035) 129px 130px,transparent 131px),
+radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear-gradient(140deg,#4130a0 0%,#271c6c 52%,#150f3b 100%)}
+.sd-idw::after{content:"";position:absolute;right:22px;bottom:18px;width:7px;height:7px;border-radius:50%;background:#e9e4ff;box-shadow:0 0 12px 2px rgba(214,206,255,.9)}
+.sd-idw h3,.sd-idw .sv-wn{color:#fff}
+.sd-idw .sd-wa{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.2)}
+.sd-idw .sd-wa code{color:#ece8ff}
+.sd-idw .sd-wcp{color:#cfc8ff}.sd-idw .sd-wcp:hover{color:#fff;background:rgba(255,255,255,.14)}
+.sd-idw .sd-wch i.app{color:#e4dfff;border-color:rgba(255,255,255,.32);background:rgba(255,255,255,.1)}
+.sd-idw .sd-wch i.net{color:#8ff5ec;border-color:rgba(143,245,236,.45);background:rgba(43,200,189,.14)}
+.sd-idw .sd-wch i.net.tn{color:#ffd58a;border-color:rgba(255,213,138,.5);background:rgba(255,176,46,.14)}
 .sd-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px;width:100%;min-width:0}
 .sd-top h3{flex:1 1 auto;min-width:min(100%,108px);overflow:hidden}
 /* wide enough: the first box takes a little more, so the name and the read time share one row */
-@media(min-width:1200px){.sd-strip{grid-template-columns:minmax(0,1.6fr) repeat(5,minmax(0,1fr)) !important}}
+@media(min-width:901px){.sd-strip{grid-template-columns:minmax(0,1.6fr) repeat(5,minmax(0,1fr)) !important}}
 /* the wallet box's second and third lines: address + copy, then the wallet app and the network */
 .sd-wmeta{display:flex;flex-direction:column;align-items:flex-start;gap:5px;margin-top:-2px;min-width:0;width:100%}
 .sd-wa{display:inline-flex;align-items:center;gap:4px;max-width:100%;min-width:0;height:22px;box-sizing:border-box;padding:0 2px 0 8px;border:1px solid var(--wbd2);border-radius:7px;background:rgba(255,255,255,.025)}
@@ -3986,7 +4025,12 @@ position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-dire
 /* each box's colour is a small key before its label, as the graphs' legends are */
 .sd-ro em::before{content:"";display:inline-block;width:6px;height:6px;margin-right:7px;border-radius:2px;vertical-align:1px;background:var(--rc);box-shadow:0 0 8px var(--rc)}
 .sd-ro em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);white-space:nowrap}
-.sd-ro>b{font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.15;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* each figure sits in an engraved well: a recess in the box, lit faintly by the box's own colour at
+   its left, so the eye lands on the number (Overview, Manage and Autopilot strips alike) */
+.sd-well{display:flex;align-items:center;min-width:0;margin:5px 0 4px;padding:5px 11px 6px;border-radius:9px;border:1px solid rgba(0,0,0,.45);
+background:radial-gradient(120% 160% at 0% 50%,color-mix(in srgb,var(--rc) 13%,transparent),transparent 62%),linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.2));
+box-shadow:inset 0 2px 6px rgba(0,0,0,.6),inset 0 -1px 0 rgba(255,255,255,.05),0 1px 0 rgba(255,255,255,.05)}
+.sd-well>b{font-size:21px;font-weight:800;letter-spacing:-.02em;line-height:1.15;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .sd-ro small{font-size:11px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sd-ro small b{font-size:inherit;font-weight:700}
 .sd-m{display:block;position:relative;height:4px;border-radius:2px;background:var(--wbd);margin-top:9px}
@@ -4022,6 +4066,17 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-rs{font-size:12px;line-height:1.45;color:var(--ws);padding-left:10px;border-left:2px solid var(--sv-violet)}
 .sd-rs b{color:var(--wt)}
 .sd-go{width:100%;height:40px;flex:0 0 auto;justify-content:center}
+/* Where the stake sits: three bands of the set, each a bar in an engraved track */
+.fp-rows{display:flex;flex-direction:column;gap:11px;margin-top:4px}
+.fp-r{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;row-gap:6px}
+.fp-k{display:flex;flex-direction:column;gap:1px;min-width:0}
+.fp-k b{font-size:13px;font-weight:700;color:var(--wt)}
+.fp-k i{font-style:normal;font-family:var(--wmono);font-size:9.5px;letter-spacing:.04em;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fp-r u{text-decoration:none;font-family:var(--wmono);font-size:15px;font-weight:700;color:var(--c);font-variant-numeric:tabular-nums}
+.fp-bar{grid-column:1/-1;height:10px;border-radius:6px;overflow:hidden;background:linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,.22));box-shadow:inset 0 2px 4px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.05)}
+.fp-bar s{display:block;height:100%;border-radius:6px;background:var(--c);box-shadow:0 0 10px var(--c)}
+.fp-r small{grid-column:1/-1;margin-top:-2px;font-family:var(--wmono);font-size:10px;color:var(--ws)}
+.fp-note{margin-top:auto;padding-top:12px;font-size:11.5px;line-height:1.45;color:var(--wf)}
 .sv-btn.go.sd-go:disabled{background:rgba(255,255,255,.05);border-color:var(--wbd2);color:var(--wf);box-shadow:none;cursor:not-allowed;margin-top:auto}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}
@@ -4055,9 +4110,14 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 /* What your stake earns (Wallet) and what Autopilot would do / Your grant (Autopilot): se- */
 .sd-off{font-size:11px;color:var(--wf);margin:8px 2px 0}
 .se-hero{display:flex;flex-direction:column;gap:2px;padding:6px 0 12px}
+/* the year in its own box, as the day/week/month boxes are - both states */
+.se-card{position:relative;display:flex;flex-direction:column;gap:2px;padding:12px 18px 13px;border:1px solid var(--wbd2);border-radius:12px;overflow:hidden;
+background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%)}
+.se-card::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:2px;border-radius:0 2px 2px 0;background:var(--sv-green);box-shadow:0 0 12px var(--sv-green)}
+.se-hero:has(>.se-card){padding:0}
 .se-hero em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
-.se-hero>b{display:flex;align-items:baseline;gap:8px;font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1.05;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}
-.se-hero>b i{font-style:normal;font-family:var(--wmono);font-size:11px;font-weight:400;letter-spacing:.14em;color:var(--wf)}
+.se-hero>b,.se-card>b{display:flex;align-items:baseline;gap:8px;font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1.05;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}
+.se-hero>b i,.se-card>b i{font-style:normal;font-family:var(--wmono);font-size:11px;font-weight:400;letter-spacing:.14em;color:var(--wf)}
 .se-hero small{font-size:12px;line-height:1.35;color:var(--ws)}
 .se-hero.sm{padding:10px 0 8px}.se-hero.sm>b{font-size:30px}
 .se-row .sd-fig>b{font-size:19px}
@@ -4198,7 +4258,7 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin-right:-8px;p
 .sd-can span::before{content:"";position:absolute;left:2px;top:.55em;width:6px;height:6px;border-radius:50%;background:currentColor}
 .sd-can span.ok{color:#8ff0b0}.sd-can span.no{color:#ff9b7a}.sd-can span.dim{color:var(--wf)}
 @media(min-width:901px) and (max-height:820px){
-  .sd-ro{padding-top:10px;padding-bottom:9px}.sd-ro>b{font-size:19px}.sd-m{margin-top:6px}
+  .sd-ro{padding-top:10px;padding-bottom:9px}.sd-well{margin:4px 0 3px;padding:3px 10px 4px}.sd-well>b{font-size:18px}.sd-m{margin-top:6px}
   .sd-id{padding:10px 16px;gap:5px}.sd-id h3{font-size:16px}
   .sd-col{padding:11px 14px;gap:8px}.sd-fig{margin-left:-15px}.sd-fig>b{font-size:21px}.sd-fig small{font-size:10px}
   .sd-vr{padding-top:6px;padding-bottom:6px}.sd-go{height:36px}
@@ -4756,11 +4816,8 @@ html[data-tab=connect] .l2host{display:none}
   <section class=pane id=p-connect role=tabpanel tabindex=0><div class=shell-box><div class=shell-empty id=shellconnect></div></div></section>
   <section class=pane id=p-dele><div class=pw>
     <div class=wk-body id=wbody>
-      <!-- Self: one row above the columns that steers toward Autopilot - the reader's own gain, what it
-           takes off their hands (turning), the door. Filled by simple.js (selfBand) -->
-      <div class=sa-band id=saband><div class=sa-row><span class=sa-k>Autopilot</span><span class=sa-main id=samain>Your stake at the best rate, <b>hands-free</b></span>
-        <span class=sa-rot aria-hidden=true><span class="sa-l on">re-checks every validator every 6 hours</span><span class=sa-l>moves while you sleep</span><span class=sa-l>no charts to watch, no moves to plan</span><span class=sa-l>watches your validators around the clock</span><span class=sa-l>one signature, then it runs for months</span></span>
-        <a class=sa-go href="#/dashboard/autopilot" data-route="dashboard/autopilot">Set up<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></a></div></div>
+      <!-- Manage: the Overview's wallet strip, as it is (simple.js draws it, wstrip()) -->
+      <div class="sv-panel sd-strip" id=sd-mstrip></div>
       <div class=wk-two>
         <section class=wk-pane id=wk-mine>
           <div id=wk-acct>
@@ -4804,7 +4861,7 @@ html[data-tab=connect] .l2host{display:none}
       </section>
       <section class="sv-screen sd-scr" id=sv-auto data-sc=auto aria-label=Autopilot>
         <div class="sv-panel sd-strip" id=sd-astrip></div>
-        <div class=sd-grid>
+        <div class="sd-grid sd-agrid">
           <div class="sv-panel sd-col" id=sd-ado></div>
           <div class="sv-panel sd-col" id=sd-asky></div>
           <div class="sv-panel sd-col" id=sd-alist></div>
@@ -4980,7 +5037,7 @@ html[data-tab=connect] .l2host{display:none}
 </div></div>
 
 <div class=pop id=unpop><div class="card txcard uncard">
-  <header class=wk-txh><div><b>Unstake</b><span>atomone-1</span></div><span class=txsum id=unsum></span></header>
+  <header class=wk-txh><div><b>Unstake</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=unsum></span></header>
   <div class=unpick id=unpick></div>
   <div class=unamt>
     <div class="wk-field unfield"><input class=wk-amt2 id=unamt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to unstake"><button class=wk-max id=unmax type=button title="Everything on this validator">max <b id=unmaxv>&mdash;</b></button></div>
@@ -4993,7 +5050,7 @@ html[data-tab=connect] .l2host{display:none}
 </div></div>
 
 <div class=pop id=clpop><div class="card txcard uncard clcard" role=dialog aria-modal=true aria-labelledby=clttl>
-  <header class=wk-txh><div><b id=clttl>Claim rewards</b><span>atomone-1</span></div><span class=txsum id=clsum></span></header>
+  <header class=wk-txh><div><b id=clttl>Claim rewards</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=clsum></span></header>
   <div class=unpick id=clpick></div>
   <div class=txfee id=clfee></div>
   <div class=txstep id=clstep></div>
@@ -5001,7 +5058,7 @@ html[data-tab=connect] .l2host{display:none}
 </div></div>
 
 <div class=pop id=stpop><div class="card txcard uncard stcard">
-  <header class=wk-txh><div><b>Stake</b><span>atomone-1</span></div><span class=txsum id=stsum></span></header>
+  <header class=wk-txh><div><b>Stake</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=stsum></span></header>
   <div class="wk-tbl2 stlist" id=stlist></div>
   <div class=unamt>
     <div class="wk-field unfield"><input class=wk-amt2 id=stamt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to stake"><button class=wk-max id=stmax type=button title="Every liquid ATONE">max <b id=stmaxv>&mdash;</b></button></div>
@@ -5015,7 +5072,7 @@ html[data-tab=connect] .l2host{display:none}
 </div></div>
 
 <div class=pop id=atpop><div class="card txcard uncard atcard" role=dialog aria-modal=true aria-labelledby=atttl data-v=setup>
-  <header class=wk-txh><div><b id=atttl>Autopilot</b><span>atomone-1</span></div><span class=txsum id=atsum></span></header>
+  <header class=wk-txh><div><b id=atttl>Autopilot</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=atsum></span></header>
   <!-- a phone shows one side at a time; a wide window shows both -->
   <div class=atview role=tablist aria-label="Autopilot">
     <button type=button role=tab id=atvs aria-controls=atL aria-selected=true data-v=setup>Setup</button>

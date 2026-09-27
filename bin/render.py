@@ -219,7 +219,7 @@ for _k, _v in SHELL.items():
     TPL = TPL.replace("{{%s}}" % _k, _v)
 page = (TPL
   .replace("{{GENERATED}}", D["generated"]).replace("{{HEIGHT}}", f(D["height"]))
-  .replace("{{CHAIN}}", esc(D["chain"]))
+  .replace("{{CHAIN}}", esc(D["chain"])).replace("{{CHAIN_ID}}", esc(NETCFG["chain"]))   # the popups' chain line, per network
   .replace("{{ETA}}", f"{e['now']:.2f}").replace("{{ETA_PCT}}", f"{e['now']*100:.0f}")
   .replace("{{ETA_NEXT}}", f"{next((r['eta'] for r in D['schedule'] if r['next']), e['now']):.2f}")
   .replace("{{NOW_DATE}}", next((r["date"] for r in D["schedule"] if r["now"]), "—"))
