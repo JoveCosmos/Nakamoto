@@ -382,9 +382,8 @@
      (read once a visit from the chain's API; a proposal takes weeks) */
   function drawNet(){
     var S = setStats(), f = function(v){ return v != null ? v.toFixed(2) + "%" : "—"; };
-    /* the set's uptime over three spans: each is the average of the validators' own records */
-    put("sv-netcards", TN() ? span("30 days", NA, null, S.n) + span("90 days", NA, null, S.n) + span("Since genesis", NA, null, S.n)
-      : span("30 days", f(S.up), S.clean30, S.n) + span("90 days", f(S.up90), S.clean90, S.n) + span("Since genesis", f(S.life), S.clean, S.n));
+    /* the set's uptime over three spans now stands on the Uptime graph's rail (drawUp): the block-by-
+       block figures it replaced are the Signing tab's */
 
     drawUp(S);
   }
@@ -480,9 +479,11 @@
     put("sv-up", head +
         '<span class=sv-upwin>last ' + n + ' blocks ~' + mins + ' min</span>' +
         '<div class=sv-rt>' +
-          st("Active validators", String(last[2] || S.n), "", "var(--sv-violet)") +
-          st("This block", now.toFixed(0) + "%") +
-          st("Last " + n + " blocks", avg.toFixed(2) + "%") +
+          /* the validator set's average uptime over three spans, and how many never went to jail in each */
+          (TN() ? st("30 days", NA, "on testnet") + st("90 days", NA) + st("Since genesis", NA)
+            : st("30 days", S.up != null ? S.up.toFixed(2) + "%" : "\u2014", S.clean30 + " never jailed") +
+              st("90 days", S.up90 != null ? S.up90.toFixed(2) + "%" : "\u2014", S.clean90 + " never jailed") +
+              st("Since genesis", S.life != null ? S.life.toFixed(2) + "%" : "\u2014", S.clean + " never jailed")) +
         '</div></div>' +
       '<div class=sv-upchart>' +
         '<div class=sv-upmarks>' + marks + '</div>' +
@@ -733,19 +734,34 @@
     var lo = Infinity, hi = -Infinity;
     lines.forEach(function(l){ pts.forEach(function(p){ var v = p[l.k]; if(v < lo) lo = v; if(v > hi) hi = v; }); });
     if(lines.some(function(l){ return l.area; })) lo = Math.min(lo, 0);
-    var pad = (hi - lo) * .06 || 1; hi += pad; if(lo > 0) lo = Math.max(0, lo - pad);
+    /* a round scale: three or four steps of 1, 2, 2.5 or 5 x a power of ten, so the axis reads 0, 50M,
+       100M, 150M rather than thirds of whatever the maximum happened to be */
+    var raw = (hi - lo) / 3 || 1, mag = Math.pow(10, Math.floor(Math.log10(raw))), nm = raw / mag;
+    var step = (nm <= 1 ? 1 : nm <= 2 ? 2 : nm <= 2.5 ? 2.5 : nm <= 5 ? 5 : 10) * mag;
+    lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step; if(hi <= lo) hi = lo + step;
+    var tk = []; for(var tv = lo; tv <= hi + step / 2; tv += step) tk.push(tv);
     CH[key] = { pts: pts, lines: lines, lo: lo, hi: hi, fmt: fmtV || fmtY };
     var X = function(i){ return (i / (n - 1) * 1000).toFixed(1); }, Y = function(v){ return (300 - (v - lo) / (hi - lo) * 300).toFixed(1); };
-    var lv = [0, 1 / 3, 2 / 3, 1];
+    var lv = tk.map(function(v){ return (v - lo) / (hi - lo); });
     var svg = '<svg viewBox="0 0 1000 300" preserveAspectRatio=none aria-hidden=true>' +
       lv.slice(1).map(function(f){ var y = (300 * (1 - f)).toFixed(1); return '<line class=gl x1=0 x2=1000 y1=' + y + ' y2=' + y + '></line>'; }).join("") +
       lines.map(function(l){ var d = pts.map(function(p, i){ return (i ? "L" : "M") + X(i) + " " + Y(p[l.k]); }).join("");
         return (l.area ? '<path class="ar ' + l.cls + '" d="' + d + 'L1000 300L0 300Z"></path>' : '') + '<path class="ln ' + l.cls + '" d="' + d + '"></path>'; }).join("") + '</svg>';
     var dl = function(s){ var d = new Date(s + "T00:00:00Z"); return d.toLocaleDateString("en", { month: "short", year: "numeric", timeZone: "UTC" }); };
+    /* the date axis: over five months and more, a tick at each quarter (each half-year past three
+       years), placed where that month begins; shorter spans keep start, middle and end */
+    var days = (Date.parse(pts[n - 1].d) - Date.parse(pts[0].d)) / 864e5, gx;
+    if(days >= 150){
+      var every = days > 1100 ? 6 : 3, ticks = [], seen = {};
+      pts.forEach(function(p, i){ var m = +p.d.slice(5, 7), key = p.d.slice(0, 7); if(i && (m - 1) % every === 0 && !seen[key]){ seen[key] = 1; ticks.push(i); } });
+      gx = '<div class="sv-gx sv-gxt">' + ticks.map(function(i){ return '<span style="left:' + (i / (n - 1) * 100).toFixed(2) + '%">' + dl(pts[i].d) + '</span>'; }).join("") + '</div>';
+    } else gx = '<div class=sv-gx><span>' + dl(pts[0].d) + '</span><span>' + dl(pts[Math.floor(n / 2)].d) + '</span><span>' + dl(pts[n - 1].d) + '</span></div>';
+    /* the latest reading of each line, marked at the right end with its value */
+    var ends = lines.map(function(l){ var v = pts[n - 1][l.k], y = (1 - (v - lo) / (hi - lo)) * 100;
+      return '<i class="' + l.cls + '" style="top:' + y.toFixed(2) + '%"></i><em class="' + l.cls + '" style="top:' + y.toFixed(2) + '%">' + (fmtV || fmtY)(v) + '</em>'; }).join("");
     return '<div class=sv-lc data-ch="' + key + '">' + svg +
-      lv.map(function(f){ return '<span class=sv-ly style="bottom:' + (f * 100).toFixed(2) + '%">' + fmtY(lo + (hi - lo) * f) + '</span>'; }).join("") +
-      '<i class=sv-lcur></i><span class=sv-lcdots></span><span class=sv-lctip></span></div>' +
-      '<div class=sv-gx><span>' + dl(pts[0].d) + '</span><span>' + dl(pts[Math.floor(n / 2)].d) + '</span><span>' + dl(pts[n - 1].d) + '</span></div>';
+      lv.map(function(f, j){ return '<span class=sv-ly style="bottom:' + (f * 100).toFixed(2) + '%">' + fmtY(tk[j]) + '</span>'; }).join("") +
+      '<span class=sv-lcend>' + ends + '</span><i class=sv-lcur></i><span class=sv-lcdots></span><span class=sv-lctip></span></div>' + gx;
   }
   function lcHover(ev){
     var box = ev.target.closest ? ev.target.closest(".sv-lc[data-ch]") : null;
@@ -796,7 +812,11 @@
       return '<div class="sv-card sv-span sv-price"><span class=sv-k>' + sym + ' price</span><span class=sv-big style="color:' + col + '">' + usd(p.usd) + '</span>' +
         '<span class=sv-sub>' + (d == null ? "24 hours " + NA : Math.abs(d) < .05 ? "0.0% in 24 hours" : '<span class=' + (d >= 0 ? "up" : "dn") + '>' + (d >= 0 ? "+" : "\u2212") + Math.abs(d).toFixed(1) + '%</span> in 24 hours') +
         (cap ? ', market cap $' + (cap >= 1e9 ? (cap / 1e9).toFixed(2) + "B" : (cap / 1e6).toFixed(1) + "M") : '') + '</span></div>'; };
-    put("sv-ecocards", pc("atone", "ATONE", pr.atone, "var(--sv-amber)") + pc("photon", "PHOTON", pr.photon, "var(--sv-pho)"));
+    /* the price stands first on its token's rail: the figure in the token's colour, its day and market cap */
+    var prc = function(k, p, col){ p = p || {}; var d = p.change_24h, sup = last ? last[k] / 1e6 : null, cap = p.usd != null && sup ? p.usd * sup : null;
+      return st("Price", '<span style="color:' + col + '">' + usd(p.usd) + '</span>',
+        (d == null ? NA : '<span class=' + (d >= 0 ? "up" : "dn") + '>' + (d >= 0 ? "+" : "\u2212") + Math.abs(d).toFixed(1) + '%</span> 24h') +
+        (cap ? ', cap $' + (cap >= 1e9 ? (cap / 1e9).toFixed(2) + "B" : (cap / 1e6).toFixed(1) + "M") : ''), col); };
     if(!hist.length){ put("sv-ecoa", '<div class=sv-ph><h3>ATONE supply and stake</h3></div><div class=sv-upwait>Reading the chain…</div>'); put("sv-ecop", '<div class=sv-ph><h3>PHOTON supply</h3></div><div class=sv-upwait>Reading the chain…</div>'); return; }
     /* each supply's bottom line is its change over 30 days, against the reading nearest that day */
     var now = hist[hist.length - 1], cut = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10), was = null;
@@ -804,12 +824,12 @@
     var ch = function(k){ return was && was[k] ? ((now[k] / was[k] - 1) * 100) : null; };
     var sg = function(v){ return v == null ? "" : (v >= 0 ? "+" : "\u2212") + Math.abs(v).toFixed(1) + "% in 30 days"; };
     var M = function(v){ return v <= 0 ? "0" : (v / 1e12).toFixed(0) + "M"; };
-    put("sv-ecoa", '<div class=sv-ph><h3>ATONE</h3><span class=sv-gkey><i class=sup></i>supply<i class=bon></i>bonded</span><div class=sv-rt>' +
+    put("sv-ecoa", '<div class=sv-ph><h3>ATONE</h3><span class=sv-gkey><i class=sup></i>supply<i class=bon></i>bonded</span><div class=sv-rt>' + prc("atone", pr.atone, "var(--sv-amber)") +
       st("Uncapped supply", big(now.atone), sg(ch("atone")), "var(--sv-amber)") +
       st("Bonded", (now.bonded / now.atone * 100).toFixed(1) + "%", big(now.bonded) + " staked", "var(--sv-amber)") +
       st("Community pool", big(now.pool), "ATONE", "var(--sv-green)") + '</div></div>' +
       chart("ecoa", hist, [{ k: "atone", cls: "sup", name: "Supply" }, { k: "bonded", cls: "bon", area: true, name: "Bonded" }], M, function(v){ return big(v); }));
-    put("sv-ecop", '<div class=sv-ph><h3>PHOTON</h3><span class=sv-gkey><i class=pho></i>supply</span><div class=sv-rt>' +
+    put("sv-ecop", '<div class=sv-ph><h3>PHOTON</h3><span class=sv-gkey><i class=pho></i>supply</span><div class=sv-rt>' + prc("photon", pr.photon, "var(--sv-pho)") +
       st("Capped supply", big(now.photon), sg(ch("photon")), "var(--sv-pho)") +
       st("Mint rate", E0.conv ? E0.conv.toFixed(2) : "—", "PHOTON per ATONE burned", "var(--sv-pho)") +
       st("Community pool", big(now.pool_ph), "PHOTON", "var(--sv-green)") + '</div></div>' +

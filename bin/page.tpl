@@ -3681,7 +3681,7 @@ position:relative;overflow:hidden;min-width:0;min-height:0}
 #sv-net{justify-content:flex-start;gap:12px}
 /* the cards, then Uptime and Chain pace as two equal rows: a grid, because in a flex column the
    Uptime panel's own padding came on top of its share and Chain pace ended 26px shorter */
-html[data-svs=net] #sv-net{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) minmax(0,1fr);align-content:stretch}
+html[data-svs=net] #sv-net{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1fr);align-content:stretch}
 #sv-net>*,#sv-net>*:not(:first-child){margin-top:0}
 #sv-netcards{grid-template-columns:repeat(3,minmax(0,1fr))}
 #sv-net>.sv-up{flex:1 1 0;min-height:0}
@@ -3725,6 +3725,10 @@ background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--wt) 80%,trans
 .sv-gkey i.ok{background:rgba(43,200,189,.6)}.sv-gkey i.bad{background:#ff4d1f}.sv-gkey i.due{width:2px;height:12px;border-radius:1px;background:var(--wt)}
 .sv-gkey i.sup{background:var(--sv-amber)}.sv-gkey i.bon{background:rgba(255,176,46,.35)}.sv-gkey i.pho{background:var(--sv-pho)}
 .sv-gx{display:flex;justify-content:space-between;gap:10px;font-family:var(--wmono);font-size:9.5px;color:var(--wf);white-space:nowrap}
+/* dated ticks: each label where its month begins, with a short tick above it */
+.sv-gx.sv-gxt{display:block;position:relative;height:16px}
+.sv-gxt span{position:absolute;top:2px;transform:translateX(-50%);padding-top:4px}
+.sv-gxt span::before{content:"";position:absolute;left:50%;top:-2px;width:1px;height:5px;background:var(--wbd2)}
 .sv-gtip{color:var(--wt);overflow:hidden;text-overflow:ellipsis}
 /* Signing: names on the left, one canvas of cells on the right, scrolling together */
 .sv-grid{flex:1 1 auto;min-height:0;overflow-y:auto;display:grid;grid-template-columns:190px minmax(0,1fr);column-gap:10px;align-content:start;
@@ -3769,7 +3773,7 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .sv-bx span{position:absolute;top:0;white-space:nowrap;padding-left:4px;border-left:1px solid var(--wbd2)}
 /* Economics: two line charts */
 /* Economics as Uptime: the price cards, then ATONE and PHOTON as two full-width rows */
-html[data-svs=eco] #sv-eco{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) minmax(0,1fr);align-content:stretch}
+html[data-svs=eco] #sv-eco{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1fr);align-content:stretch}
 #sv-ecocards{grid-template-columns:repeat(2,minmax(0,1fr))}
 #sv-ecocards .sv-card{--tc:var(--sv-amber)}#sv-ecocards .sv-card+.sv-card{--tc:var(--sv-pho)}
 .sv-price .sv-sub .up{color:var(--sv-green)}.sv-price .sv-sub .dn{color:#ff6a3d}
@@ -3785,6 +3789,16 @@ html[data-svs=eco] #sv-eco{display:grid;grid-template-columns:minmax(0,1fr);grid
 .sv-ly{position:absolute;left:0;transform:translateY(50%);font-family:var(--wmono);font-size:9.5px;line-height:14px;color:var(--ws);background:var(--wc);padding:0 5px;border-radius:3px;pointer-events:none;z-index:1}
 .sv-ly:last-of-type{transform:translateY(0)}
 .sv-lc{cursor:crosshair}
+/* the latest value of each line, marked at the right end (hidden while the cursor reads the chart) */
+.sv-lcend{position:absolute;inset:0;pointer-events:none}
+.sv-lcend i{position:absolute;right:0;width:9px;height:9px;margin:-4.5px -4.5px 0 0;border-radius:50%;background:var(--wc);border:2px solid var(--sv-teal)}
+.sv-lcend em{position:absolute;right:10px;transform:translateY(-130%);font-style:normal;font-family:var(--wmono);font-size:10.5px;font-weight:600;color:var(--wt);
+background:var(--wc);padding:1px 6px;border-radius:4px;border:1px solid var(--wbd2);white-space:nowrap}
+.sv-lcend i.sup{border-color:var(--sv-amber)}.sv-lcend i.bon{border-color:rgba(255,176,46,.7)}.sv-lcend i.pho{border-color:var(--sv-pho)}.sv-lcend i.tpb{border-color:var(--sv-violet)}
+.sv-lcend em.bon{transform:translateY(30%)}
+.sv-lc.on .sv-lcend{opacity:0}
+/* Economics: four readouts stay one column (the price first), so the graphs keep their width */
+#sv-eco .sv-rail:has(>.sv-rd:nth-child(4)){display:flex;flex-direction:column;width:176px}
 .sv-lcur{position:absolute;top:0;bottom:0;width:1px;margin-left:-.5px;background:var(--wt);opacity:0;pointer-events:none}
 .sv-lc.on .sv-lcur{opacity:.45}
 .sv-lcdots{position:absolute;inset:0;pointer-events:none;display:none}
@@ -4646,7 +4660,6 @@ html[data-tab=connect] .l2host{display:none}
         </div>
       </section>
       <section class=sv-screen id=sv-net data-sc=net aria-label=Network>
-        <div class=sv-cards id=sv-netcards></div>
         <div class="sv-panel sv-up" id=sv-up></div>
         <div class=sv-row2 id=sv-netrow>
           <div class=sv-panel id=sv-pace></div>
@@ -4683,7 +4696,6 @@ html[data-tab=connect] .l2host{display:none}
         <div class=sv-panel id=sv-mygovlist></div>
       </section>
       <section class=sv-screen id=sv-eco data-sc=eco aria-label=Economics>
-        <div class=sv-cards id=sv-ecocards></div>
         <div class=sv-panel id=sv-ecoa></div>
         <div class=sv-panel id=sv-ecop></div>
       </section>
