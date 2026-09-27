@@ -2130,7 +2130,9 @@ rememberGridH();
     picks(opt, r, B, pos);
     if(c){ c.innerHTML = mv || MVHEAD + '</table>'; c.classList.toggle("none", !mv); }
     var mn = E("dmvn"); if(mn) mn.textContent = MSGS.length ? MSGS.length + (MSGS.length === 1 ? " move" : " moves") : "";
-    var me = E("dmvempty"); if(me) me.hidden = !!MSGS.length;
+    var me = E("dmvempty"); if(me){ me.hidden = !!MSGS.length;
+      /* a wallet with nothing staked has nothing to move: say so, not "select validators" */
+      me.textContent = pos && !pos.rows.length ? "No stake on AtomOne" : "Select validators and enter a stake"; }
     result(pos, r, B, sel.n);
 
     statusFoot(pos, V);
@@ -2960,7 +2962,11 @@ rememberGridH();
     var m = document.getElementById("netmain"), t = document.getElementById("nettest"); if(!m || !t) return;
     m.href = here === "testnet" ? "../" : "./"; t.href = here === "testnet" ? "./" : "testnet/";
     (here === "testnet" ? t : m).setAttribute("aria-current", "page");
-    [m, t].forEach(function(a){ a.addEventListener("click", function(){ if(a.getAttribute("aria-current")) return; a.href = a.getAttribute("href").split("#")[0] + location.hash; }); });
+    /* the thumb slides across first, then the other network loads, keeping the open view */
+    [m, t].forEach(function(a){ a.addEventListener("click", function(ev){ if(a.getAttribute("aria-current")){ ev.preventDefault(); return; }
+      var to = a.getAttribute("href").split("#")[0] + location.hash; ev.preventDefault();
+      document.documentElement.setAttribute("data-netgo", a === t ? "testnet" : "mainnet");
+      setTimeout(function(){ location.href = to; }, matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 260); }); });
   })();
   var API = NETC.api || "https://atomone-api.gatadao.com";
   var CHAIN = NETC.chain || "atomone-1";

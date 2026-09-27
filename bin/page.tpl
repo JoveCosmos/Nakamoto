@@ -4539,17 +4539,29 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .folder>.l1{grid-area:nav}
 /* the network switch: two links, the open network lit; testnet lights amber so a page on the
    test chain can never pass for the real one */
-.netsw{display:inline-flex;padding:2px;gap:2px;border-radius:9px;border:1px solid var(--wbd2,#34345c);flex:0 0 auto}
-.netsw a{height:26px;display:inline-flex;align-items:center;padding:0 10px;border-radius:7px;font-size:11.5px;font-weight:500;color:var(--ws,#c1bfdc);text-decoration:none;white-space:nowrap}
+/* the network switch, beside the wordmark: one track, both networks named, a lit thumb under the one this
+   page is on (teal mainnet, amber testnet); a tap slides it across, then the other network loads */
+.brandwrap{grid-area:brand;justify-self:start;display:flex;align-items:center;gap:16px;min-width:0}
+.brandwrap>.brand{grid-area:auto}
+.netsw{position:relative;display:inline-grid;grid-template-columns:1fr 1fr;padding:3px;border-radius:999px;border:1px solid var(--wbd2,#34345c);
+background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.15));box-shadow:inset 0 1px 3px rgba(0,0,0,.5);flex:0 0 auto}
+.netsw::before{content:"";position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:999px;
+background:linear-gradient(180deg,#3fe0d4,#1fa79d);box-shadow:0 0 14px -2px rgba(43,200,189,.8),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .24s cubic-bezier(.3,.7,.3,1),background .24s,box-shadow .24s}
+html[data-net=testnet] .netsw::before,html[data-netgo=testnet] .netsw::before{transform:translateX(100%);background:linear-gradient(180deg,#ffc453,#e8930f);box-shadow:0 0 14px -2px rgba(255,176,46,.8),inset 0 1px 0 rgba(255,255,255,.35)}
+html[data-net=testnet][data-netgo=mainnet] .netsw::before{transform:none;background:linear-gradient(180deg,#3fe0d4,#1fa79d);box-shadow:0 0 14px -2px rgba(43,200,189,.8),inset 0 1px 0 rgba(255,255,255,.35)}
+.netsw a{position:relative;z-index:1;height:24px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;border-radius:999px;
+font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ws,#c1bfdc);text-decoration:none;white-space:nowrap;transition:color .2s}
 .netsw a:hover{color:var(--wt,#f0eef8)}
-.netsw a[aria-current=page]{background:rgba(43,200,189,.2);color:var(--wt,#f0eef8);box-shadow:inset 0 0 0 1px rgba(43,200,189,.55)}
-.netsw a#nettest[aria-current=page]{background:rgba(255,176,46,.22);box-shadow:inset 0 0 0 1px rgba(255,176,46,.6)}
+.netsw a[aria-current=page]{color:#062320;font-weight:700}
+html[data-net=testnet] .netsw a[aria-current=page]{color:#2a1a00}
+html[data-netgo] .netsw a[aria-current=page]{color:var(--ws,#c1bfdc);font-weight:400}
+html[data-netgo] .netsw a:not([aria-current]){color:#101010;font-weight:700}
+@media(prefers-reduced-motion:reduce){.netsw::before{transition:none}}
 .netsw a:focus-visible{outline:2px solid #2bc8bd;outline-offset:1px}
 /* "testnet" hangs to the right of the height line, so the dot and the height keep their
    mainnet place (the dot under the t of AtomOne) */
-html[data-net=testnet] .bheight{right:auto;left:calc(22% - 2px);justify-content:flex-start;min-width:0}
-html[data-net=testnet] .bheight::after{content:"testnet";color:#ffb02e;position:absolute;left:100%;margin-left:6px;white-space:nowrap}
-@media(max-width:620px){.netsw a{padding:0 7px;font-size:10.5px}}
+.netsw .ns{display:none}
+@media(max-width:620px){.brandwrap{gap:8px}.netsw a{padding:0 8px;font-size:9px;letter-spacing:.08em;height:26px}.netsw .nl{display:none}.netsw .ns{display:inline}}
 .folder>.hdr-r{grid-area:right;justify-self:end;display:flex;align-items:center;gap:8px;min-width:0}
 .hdr-r .thbtn{margin-left:0;width:32px;height:32px;border-radius:8px}
 .hdr-r .sv-who{flex:0 0 auto}
@@ -4710,9 +4722,11 @@ html[data-tab=connect] .l2host{display:none}
 
 <div class=below id=below>
   <header class=folder>
+    <div class=brandwrap>
     <a class=brand href="#/intro" title="AtomOne"><img class=mark src="assets/atomone.svg" alt=""><span class=bw><span class=wordmark>AtomOne</span><span class=bheight id=dlive title="the chain's height, live"><i></i><b>{{HEIGHT}}</b></span></span></a>
+    <div class=netsw id=netsw role=group aria-label=Network><a id=netmain href="./" aria-label=Mainnet><span class=nl>Mainnet</span><span class=ns aria-hidden=true>Main</span></a><a id=nettest href="testnet/" aria-label=Testnet><span class=nl>Testnet</span><span class=ns aria-hidden=true>Test</span></a></div>
+    </div>
     <div class=hdr-r>
-    <div class=netsw id=netsw role=group aria-label=Network><a id=netmain href="./">Mainnet</a><a id=nettest href="testnet/">Testnet</a></div>
     <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
     <div class=sv-who>
       <button class="sv-btn sml pri" id=svconn type=button aria-haspopup=true aria-expanded=false>Connect wallet</button>
