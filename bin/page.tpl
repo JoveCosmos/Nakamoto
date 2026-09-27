@@ -3182,7 +3182,7 @@ html[data-ui=simple][data-tab=dele] .w#calc>#p-dele{display:none}
 /* Overview and Autopilot say what GATA is; Self (the three panes) says what it is for */
 html:not([data-ui=simple]) .svtag.s,html[data-ui=simple] .svtag.a{display:none}
 /* Governance: 'Non-custodial Governance' in place of the second line */
-html[data-grp=Governance] .svtag.s{display:inline-flex}html[data-grp=Governance] .svtag.a{display:none}
+html[data-sv="dashboard/governors"] .svtag.s{display:inline-flex}html[data-sv="dashboard/governors"] .svtag.a{display:none}
 .sv-who{display:flex;align-items:center;gap:9px;flex:1 1 0;justify-content:flex-end;min-width:0}
 /* connected: one pill the size of the Connect button - the wallet's mark, its address with a
    small copy glyph (one control), and a disconnect icon behind a hairline. No menu. */
@@ -3601,8 +3601,8 @@ font-family:var(--wmono);font-size:11px;font-weight:700;color:#0b0b18;background
 .sv-bw .bt{flex-wrap:nowrap}
 .sv-brand .tsfx{color:#ffb02e}
 /* the title follows the Staking | Governance switch */
-.sv-brand .grp-g,html[data-grp=Governance] .sv-brand .grp-s{display:none}
-html[data-grp=Governance] .sv-brand .grp-g{display:inline}
+.sv-brand .grp-g,html[data-sv="dashboard/governors"] .sv-brand .grp-s{display:none}
+html[data-sv="dashboard/governors"] .sv-brand .grp-g{display:inline}
 .sv-brand{gap:12px}
 /* Self has no Autopilot line: the row is kept, hidden, because its button (#atbtn) is the door
    the Autopilot screen opens the setup card through */

@@ -59,15 +59,12 @@
     },
     {
       "id": "dashboard", "label": "Dashboard", "route": "dashboard", "account": "uses", "accent": "#ffb02e",
-      "hint": "your stake, your votes",
-      "switch": "groups",
+      "hint": "your stake, your governance",
       "sub": [
-        {"id": "overview",  "label": "Overview",  "route": "wallet",  "group": "Staking", "tab": "dele", "ui": "simple", "screen": "over", "panel": "sv-over"},
-        {"id": "self",      "label": "Manage",    "route": "self",        "group": "Staking", "tab": "dele", "panel": "p-dele"},
-        {"id": "autopilot", "label": "Autopilot", "route": "autopilot", "group": "Staking", "tab": "dele", "ui": "simple", "screen": "auto", "panel": "sv-auto"},
-        {"id": "votes",     "label": "Votes",     "route": "votes",     "group": "Governance",
-         "empty": {"title": "Votes", "text": "Your votes on AtomOne proposals will be listed here."}},
-        {"id": "governors", "label": "Governors", "route": "governors", "group": "Governance", "tab": "dele", "ui": "simple", "screen": "mygov", "panel": "sv-mygov"}
+        {"id": "overview",  "label": "Overview",   "route": "wallet",     "tab": "dele", "ui": "simple", "screen": "over", "panel": "sv-over"},
+        {"id": "self",      "label": "Manage",     "route": "self",       "tab": "dele", "panel": "p-dele"},
+        {"id": "autopilot", "label": "Autopilot",  "route": "autopilot",  "tab": "dele", "ui": "simple", "screen": "auto", "panel": "sv-auto"},
+        {"id": "governors", "label": "Governance", "route": "governance", "tab": "dele", "ui": "simple", "screen": "mygov", "panel": "sv-mygov"}
       ]
     }
   ]
