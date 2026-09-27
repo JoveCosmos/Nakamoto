@@ -3789,6 +3789,10 @@ background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.01))}
 .sv-rd b{font-size:17px;font-weight:800;letter-spacing:-.015em;line-height:1.08;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}
 .sv-rd small{font-size:10px;line-height:1.2;color:var(--ws);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 @media(min-width:901px) and (max-height:820px){.sv-rd{gap:0;padding-top:2px;padding-bottom:2px}.sv-rd b{font-size:14px;line-height:1.1}.sv-rd small{font-size:9px}.sv-rd em{font-size:8px}.sv-rail{gap:4px;margin-right:-15px}}
+/* Economics stacks three readouts on each rail under two price cards, so its rails are shorter:
+   the compact readout from a taller screen down, so every bottom line (the 30-day change) shows */
+@media(min-width:901px) and (max-height:1000px){#sv-eco .sv-rd{gap:0;padding-top:2px;padding-bottom:2px}#sv-eco .sv-rd b{font-size:14px;line-height:1.1}
+#sv-eco .sv-rd small{font-size:9px}#sv-eco .sv-rd em{font-size:8px}#sv-eco .sv-rail{gap:4px}}
 @media(max-width:900px){
   .sv-rbody{grid-template-columns:minmax(0,1fr);row-gap:10px}
   .sv-rail{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin-right:0;width:auto}
