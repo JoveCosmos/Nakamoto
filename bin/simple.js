@@ -156,13 +156,7 @@
     var y = stake * rate, per = function(days){ return y * days / 365; };
     var tile = function(k, u){ return fig(k, '<span class=sd-gain>+' + one(u / 1e6) + '</span>', "ATONE", "var(--sv-green)"); };   /* ATONE, never dollars */
     /* the same block as the connected one: the figure in ATONE, the rate under it */
-    /* the example carries the spread too: the year at the lowest and highest rate a validator would pay
-       once these ATONE land there (a small one's headline falls as stake arrives), the middle marked */
-    var rg = "";
-    if(ex){ var lo = Infinity, hi = 0; VALS().forEach(function(v){ var r = window.__rateAfter ? window.__rateAfter(v[1], v[2], stake) : 0; if(r < lo) lo = r; if(r > hi) hi = r; });
-      if(hi > lo) rg = '<div class=se-rng><div class=se-rv><b>+' + one(stake * lo / 1e6) + '</b><span class=se-rl style="--at:' + ((rate - lo) / (hi - lo) * 100).toFixed(1) + '%"><i></i></span><b>+' + one(stake * hi / 1e6) + '</b></div>' +
-        '<div class=se-ra><span>' + (lo * 100).toFixed(0) + '</span><em>' + (lo * 100).toFixed(0) + ' - ' + (hi * 100).toFixed(0) + '% APR</em><span>' + (hi * 100).toFixed(0) + '</span></div></div>'; }
-    if(ex) return '<div class=se-ex><div class=se-hero><div class=se-card><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b><small class=se-apr>' + pct(rate) + ' APR, the middle of the set</small>' + rg + '</div></div>' +
+    if(ex) return '<div class=se-ex><div class=se-hero><div class=se-card><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b><small class=se-apr>' + pct(rate) + ' APR</small></div></div>' +
       '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div></div>';
     /* the year and its three steps stand in the middle of the panel, the note at its foot */
     return '<div class=se-mid><div class=se-hero><div class=se-card><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b>' +

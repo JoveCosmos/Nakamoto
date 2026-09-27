@@ -4127,17 +4127,6 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
 background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%)}
 .se-card::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:2px;border-radius:0 2px 2px 0;background:var(--sv-green);box-shadow:0 0 12px var(--sv-green)}
 .se-hero:has(>.se-card){padding:0}
-/* the example's spread: lowest and highest year either side of a line, the middle marked on it, the APR
-   range under it */
-.se-rng{margin-top:12px;padding-top:11px;border-top:1px solid var(--wbd2);display:flex;flex-direction:column;gap:5px}
-.se-rv{display:flex;align-items:center;gap:10px}
-.se-rv b{font-size:15px;font-weight:700;color:var(--sv-green);font-variant-numeric:tabular-nums;white-space:nowrap}
-.se-rl{position:relative;flex:1 1 auto;height:2px;border-radius:2px;background:linear-gradient(90deg,color-mix(in srgb,var(--sv-green) 35%,transparent),var(--sv-green))}
-.se-rl::before,.se-rl::after{content:"";position:absolute;top:50%;width:6px;height:6px;margin-top:-3px;border-top:2px solid color-mix(in srgb,var(--sv-green) 60%,transparent);border-left:2px solid color-mix(in srgb,var(--sv-green) 60%,transparent)}
-.se-rl::before{left:-1px;transform:rotate(-45deg)}.se-rl::after{right:-1px;transform:rotate(135deg);border-color:var(--sv-green)}
-.se-rl i{position:absolute;left:var(--at);top:50%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:var(--wt);box-shadow:0 0 10px var(--sv-green)}
-.se-ra{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--wmono);font-size:9px;letter-spacing:.08em;color:var(--wf)}
-.se-ra span{visibility:hidden}.se-ra em{font-style:normal;color:var(--ws)}
 
 .se-hero em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
 .se-hero>b,.se-card>b{display:flex;align-items:baseline;gap:8px;font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1.05;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}

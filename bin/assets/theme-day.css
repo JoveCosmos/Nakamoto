@@ -662,8 +662,6 @@
   html[data-theme=light]:not([data-mono]) #sd-list .sd-fig em,html[data-theme=light]:not([data-mono]) #sd-list .sd-fig small{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .se-card{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .se-card::before{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .se-rl{background:color-mix(in srgb,var(--sv-green) 35%,transparent)}
-  html[data-theme=light]:not([data-mono]) .se-rl i{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .se-tbar s{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .se-mv>div u{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sv-gkey i.sk{background:var(--accent)}
