@@ -1048,6 +1048,7 @@ rememberGridH();
      link preview than whatever capitalisation BotFather recorded */
   var BOT = (D.bot || "").toLowerCase();
   window.__BOT = BOT;
+  window.__ALERT = D.alert || {};
   window.__ACUR = null;
   function pingStart(addr){
     pingStop();
@@ -1285,6 +1286,14 @@ rememberGridH();
     var btn = document.getElementById("tgbtn"), who = document.getElementById("aval");
     if(!trg || !pop || !btn) return;
     var boxes = [].slice.call(pop.querySelectorAll(".aopt input"));
+    /* the bot publishes its own rule (window, rank step) through the build, so the wording
+       here says what it actually does */
+    function words(){
+      var AL = window.__ALERT || {};
+      boxes.forEach(function(b){ var i = b.parentNode.querySelector("i"); if(!i) return;
+        if(b.dataset.f === "d" && AL.window) i.textContent = "misses " + AL.window + " blocks in a row";
+        if(b.dataset.f === "r" && AL.rank_step) i.textContent = "moves " + AL.rank_step + " places or more"; });
+    }
     var PER = 8;                                   /* validators per link in the older form, under Telegram's 64 chars */
     /* the whole set in one link: a bitmap over each validator's small stable number (vid,
        from the build), six bits to a character of the alphabet Telegram allows - a hundred
@@ -1299,6 +1308,7 @@ rememberGridH();
       return out;
     }
     function build(){
+      words();
       var f = boxes.filter(function(b){ return b.checked; })
                    .map(function(b){ return b.dataset.f; }).join("");
       var many = window.__AMULTI, more = document.getElementById("amore");

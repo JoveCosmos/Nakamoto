@@ -190,6 +190,7 @@ VD_KEYS = ("op", "chex", "id", "vid", "m", "t", "c", "jail", "tomb", "burned", "
            "life_up", "life_n", "life_missed", "prop", "joined", "last_slash", "earn_avg", "web", "av")
 payload = json.dumps({"generated": D["generated"], "thresh": th["threshold"],
                       "bot": D.get("bot"),
+                      "alert": D.get("alert"),
                       "weekly": nk["weekly"], "schedule": D["schedule"], "eta_stats": es,
                       "vdetail": [{k: v[k] for k in VD_KEYS if k in v} for v in D["validators"]],
                       "validators": [[v["m"], v["t"], v["c"], v["op"][-6:], (v.get("jail") if TESTNET else (v.get("jail") or 0)),

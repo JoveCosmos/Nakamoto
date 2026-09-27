@@ -10,7 +10,7 @@ cannot touch it.
 A Telegram token allows exactly ONE getUpdates consumer, which is the whole
 reason this cannot live on @ChainsPingBot.
 """
-import json, os, re, sqlite3, subprocess, sys, time, urllib.parse, urllib.request
+import html, json, os, re, sqlite3, subprocess, sys, time, urllib.error, urllib.parse, urllib.request
 
 TOKEN  = os.environ.get("TG_BOT_TOKEN", "").strip()
 DSN    = os.environ["ATOMONE_APP_DSN"]
@@ -34,6 +34,20 @@ PAGE   = os.environ.get("PAGE_URL", "https://atomone.gatahub.zone/")
 # validator flapping on the boundary cannot spam a subscriber.
 WINDOW = int(os.environ.get("ALERT_WINDOW", "10"))
 CHECK  = int(os.environ.get("CHECK_SECONDS", "60"))
+# a rank alert needs a move of this many places from the rank at the last alert, so two
+# validators a few ATONE apart swapping places on every rebuild cannot spam anyone
+RANK_STEP = int(os.environ.get("RANK_STEP", "2"))
+# the index is the only feed: if its newest block is older than this, say so on the ops
+# Discord once, rather than go quiet and look like nothing is happening
+STALE_S = int(os.environ.get("STALE_SECONDS", "300"))
+STATE  = os.path.dirname(IDFILE)
+BACKUP = os.path.join(STATE, "subs.backup.db")
+# notify.py (the app's Discord sender) lives with the other services; optional here
+sys.path.insert(0, os.environ.get("BIN_DIR", "/srv/atomone-app/bin"))
+try:
+    import notify
+except Exception:
+    notify = None
 API    = "https://api.telegram.org/bot" + TOKEN + "/"
 
 if not TOKEN:
@@ -76,12 +90,20 @@ def store():
     for tbl, col, decl in (("sub", "flags", "TEXT DEFAULT 'd'"),
                            ("vstate", "rank", "INTEGER"),
                            ("vstate", "apr", "REAL"),
-                           ("vstate", "jail", "INTEGER")):
+                           ("vstate", "jail", "INTEGER"),
+                           # added 2026-09-27: the moniker, so a validator that left the set
+                           # (jailed) can still be named; the rank at the last rank alert; and
+                           # the height of the newest jailing already announced
+                           ("vstate", "m", "TEXT"),
+                           ("vstate", "rank_ref", "INTEGER"),
+                           ("vstate", "jail_h", "INTEGER")):
         try:
             c.execute(f"ALTER TABLE {tbl} ADD COLUMN {col} {decl}")
         except sqlite3.OperationalError:
             pass
     c.execute("CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY, v TEXT)")
+    # the consensus address of each watched validator, kept for when it leaves the page's data
+    c.execute("CREATE TABLE IF NOT EXISTS vchex(op TEXT PRIMARY KEY, chex TEXT)")
     c.commit()
     return c
 
@@ -109,19 +131,66 @@ def vals():
             for v in D["validators"] if v.get("op") and v.get("chex")}
 
 
-def missed_recent(chex, tip):
+def missed_recent(chex, known):
+    """Missed blocks among the WINDOW heights ending at `known`.
+
+    Who missed height h is written with block h+1 (it travels in that block's
+    last commit), so the newest block in the index never has its signatures yet.
+    `known` is therefore the tip minus one; counting up to the tip made the
+    window nine real heights long and "all 10 missed" impossible."""
     # chex reaches SQL by interpolation; it is a consensus address from our own
     # data.json, but assert the shape rather than trust the provenance
     if not re.fullmatch(r"[0-9A-Fa-f]{40}", chex or ""):
         return None
     r = sql("""SELECT count(*) FROM missed_signature
-               WHERE chain_id='%s' AND cons_addr='%s' AND height > %d""",
-            (CHAIN, chex, tip - WINDOW))
+               WHERE chain_id='%s' AND cons_addr='%s' AND height > %d AND height <= %d""",
+            (CHAIN, chex.upper(), known - WINDOW, known))
     return int(r[0][0]) if r else None
 
 
-def tip_height():
-    r = sql("SELECT max(height) FROM block WHERE chain_id='%s'", (CHAIN,))
+def tip():
+    """(newest height in the index, its age in seconds)"""
+    r = sql("""SELECT height, extract(epoch FROM now() - time)::int FROM block
+               WHERE chain_id='%s' ORDER BY height DESC LIMIT 1""", (CHAIN,))
+    try:
+        return int(r[0][0]), int(r[0][1])
+    except Exception:
+        return None, None
+
+
+CS = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
+def _polymod(v):
+    g = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3]; c = 1
+    for x in v:
+        b = c >> 25; c = (c & 0x1ffffff) << 5 ^ x
+        for i in range(5): c ^= g[i] if (b >> i) & 1 else 0
+    return c
+def valcons(chex):
+    """the bech32 consensus address slash_event.cons_addr uses, from the hex one"""
+    data, acc, bits = [], 0, 0
+    for b in bytes.fromhex(chex):
+        acc = (acc << 8) | b; bits += 8
+        while bits >= 5: bits -= 5; data.append((acc >> bits) & 31)
+    if bits: data.append((acc << (5 - bits)) & 31)
+    hrp = "atonevalcons"
+    ex = [ord(x) >> 5 for x in hrp] + [0] + [ord(x) & 31 for x in hrp]
+    pm = _polymod(ex + data + [0] * 6) ^ 1
+    return hrp + "1" + "".join(CS[d] for d in data + [(pm >> 5 * (5 - i)) & 31 for i in range(6)])
+
+
+def last_jail(op, chex):
+    """height of the newest jailing of this validator in the index, 0 if none.
+
+    Read from slash_event, not from data.json: the page lists only the active,
+    unjailed set, so a validator vanishes from it at the very moment it is
+    jailed - which is when this alert matters."""
+    if not re.fullmatch(r"atonevaloper1[0-9a-z]{38}", op or ""):
+        return None
+    cond = "operator='%s'" % op
+    if re.fullmatch(r"[0-9A-Fa-f]{40}", chex or ""):
+        cond = "(%s OR cons_addr='%s')" % (cond, valcons(chex))
+    r = sql("""SELECT coalesce(max(height), 0) FROM slash_event
+               WHERE chain_id='%s' AND kind='jailed' AND %s""", (CHAIN, cond))
     try:
         return int(r[0][0])
     except Exception:
@@ -140,10 +209,10 @@ def tip_height():
 # under the 21-day transitive-redelegation lock the latecomers could not undo it.
 # Alerts tell you what happened to what you own. Nothing more.
 ALERTS = {
-    "d": ("Stops signing - misses 10 blocks in a row", "signing"),
-    "j": ("Jailed - drops out of the active set",      "jailed"),
-    "r": ("Rank changes",                              "rank"),
-    "t": ("APR moves ±10% or more",                    "APR ±10%"),
+    "d": ("Stops signing - misses %d blocks in a row" % WINDOW, "signing"),
+    "j": ("Jailed - drops out of the active set",               "jailed"),
+    "r": ("Rank changes - moves %d places or more" % RANK_STEP, "rank"),
+    "t": ("APR moves ±10% or more",                             "APR ±10%"),
 }
 APR_STEP = {"t": 0.10}
 
@@ -207,25 +276,65 @@ def resolve(arg, V):
 
 
 # ── commands ────────────────────────────────────────────────────────────────
-HELP = ("Downtime alerts for AtomOne validators.\n\n"
-        "Open the AtomOne app, tap a validator, then tap *Alert me* - that "
-        "subscribes you to that validator.\n\n"
+HELP = ("Alerts for AtomOne validators: when one stops signing, is jailed, "
+        "changes rank or its APR moves.\n\n"
+        "Open the AtomOne app and tap the Telegram button in a validator's signing "
+        "row, or the bell on the stake and redelegate cards, then choose what to hear "
+        "about.\n\n"
         "/list - who you are watching\n"
         "/stop - unsubscribe from all\n"
-        "/stop <moniker> - unsubscribe from one\n\n" + PAGE)
+        "/stop &lt;moniker&gt; - unsubscribe from one\n\n" + PAGE)
 
 
 def md(name):
-    """A moniker is chain data. Under legacy Markdown an unbalanced _ * ` or a
-    [text](url) shape would either break the message (Telegram answers 400 and
-    the alert is lost) or render a link - the one way chain data could name a
-    destination. Escape the four characters that carry meaning."""
-    return re.sub(r"([_*`\[])", r"\\\1", str(name))
+    """A moniker is chain data, and it reaches a formatted message. Messages are
+    sent as HTML, where escaping is exact; the legacy Markdown they used to go out
+    as allows no escape inside bold, so a moniker like "[NODERS]" or "a_b" broke
+    the message (Telegram answers 400 and the alert is lost), and a [text](url)
+    shape could render a link - the one way chain data could name a destination."""
+    return html.escape(str(name), quote=False)
+
+
+GONE = set()          # chats Telegram says we can no longer reach, dropped after the pass
 
 
 def send(chat, text):
-    tg("sendMessage", chat_id=chat, text=text, parse_mode="Markdown",
-       disable_web_page_preview="true")
+    """One message. A 429 waits as long as Telegram asks and tries again; a 403 (the
+    reader blocked the bot or deleted the chat) marks the chat for removal, so its
+    subscriptions do not live on forever."""
+    body = urllib.parse.urlencode(dict(chat_id=chat, text=text, parse_mode="HTML",
+                                       disable_web_page_preview="true")).encode()
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(urllib.request.Request(API + "sendMessage", data=body), timeout=40) as r:
+                return bool(json.loads(r.read()).get("ok"))
+        except urllib.error.HTTPError as e:
+            try: d = json.loads(e.read())
+            except Exception: d = {}
+            if e.code == 429:
+                time.sleep(min(60, int((d.get("parameters") or {}).get("retry_after", 5)))); continue
+            if e.code == 403:
+                GONE.add(chat); log("chat %s is gone (%s)" % (chat, d.get("description", "403")))
+                return False
+            log("sendMessage %d: %s" % (e.code, d.get("description", "")[:200])); return False
+        except Exception as e:
+            log("sendMessage: %s" % e); time.sleep(2)
+    return False
+
+
+def drop_gone(c):
+    while GONE:
+        chat = GONE.pop()
+        c.execute("DELETE FROM sub WHERE chat=?", (chat,)); c.commit()
+        log("removed the subscriptions of chat %s" % chat)
+
+
+def name(c, op, V):
+    """a validator's moniker: from the page's data, else the last one we stored (a
+    jailed validator is no longer in the data), else its address"""
+    if op in V: return V[op]["m"]
+    r = c.execute("SELECT m FROM vstate WHERE op=?", (op,)).fetchone()
+    return r[0] if r and r[0] else op
 
 
 def handle(c, msg, V):
@@ -246,7 +355,7 @@ def handle(c, msg, V):
             c.commit()
             fl = many[0][1]
             return send(chat, "Watching %d validators:\n%s\n\n%s\n\n/stop to undo."
-                        % (len(many), "\n".join("- *%s*" % md(V[op]["m"]) for op, _ in many),
+                        % (len(many), "\n".join("- <b>%s</b>" % md(V[op]["m"]) for op, _ in many),
                            "\n".join("- " + ALERTS[f][0] for f in fl if f in ALERTS)))
         op, flags = resolve(arg, V)
         if op:
@@ -254,8 +363,8 @@ def handle(c, msg, V):
                       "ON CONFLICT(chat, op) DO UPDATE SET flags=excluded.flags",
                       (chat, op, int(time.time()), flags))
             c.commit()
-            return send(chat, "Watching *%s*.\n\n%s\n\n/stop to undo."
-                        % (V[op]["m"], "\n".join("- " + ALERTS[f][0] for f in flags if f in ALERTS)))
+            return send(chat, "Watching <b>%s</b>.\n\n%s\n\n/stop to undo."
+                        % (md(V[op]["m"]), "\n".join("- " + ALERTS[f][0] for f in flags if f in ALERTS)))
         if arg:
             return send(chat, "That validator is not in the active set.")
         return send(chat, HELP)
@@ -265,17 +374,20 @@ def handle(c, msg, V):
         if not rows:
             return send(chat, "You are not watching anyone yet.\n\n" + PAGE)
         return send(chat, "Watching:\n" + "\n".join(
-            "- *%s* — %s" % (V.get(op, {}).get("m", op),
+            "- <b>%s</b> — %s" % (md(name(c, op, V)),
                              ", ".join(ALERTS[f][1] for f in (fl or "d") if f in ALERTS))
             for op, fl in rows))
 
     if cmd == "/stop":
         if arg:
-            hit = [op for op, v in V.items() if v["m"].lower() == arg.lower()]
+            # match among what this chat watches, by today's moniker or the stored one,
+            # so a validator that has left the set can still be dropped by name
+            mine = [r[0] for r in c.execute("SELECT op FROM sub WHERE chat=?", (chat,)).fetchall()]
+            hit = [op for op in mine if name(c, op, V).lower() == arg.lower() or op == arg]
             if not hit:
-                return send(chat, "No validator by that name.")
+                return send(chat, "You are not watching a validator by that name. /list shows who you watch.")
             c.execute("DELETE FROM sub WHERE chat=? AND op=?", (chat, hit[0])); c.commit()
-            return send(chat, "Stopped watching *%s*." % V[hit[0]]["m"])
+            return send(chat, "Stopped watching <b>%s</b>." % md(name(c, hit[0], V)))
         c.execute("DELETE FROM sub WHERE chat=?", (chat,)); c.commit()
         return send(chat, "Unsubscribed from everything.")
 
@@ -283,6 +395,9 @@ def handle(c, msg, V):
 
 
 # ── the watch ───────────────────────────────────────────────────────────────
+STALE = [False]
+
+
 def check(c, V):
     """One pass over everything anyone is watching.
 
@@ -290,62 +405,87 @@ def check(c, V):
     when the value actually changes - the stored state is what makes this one
     message per transition rather than one per minute.
     """
-    tip = tip_height()
-    if tip is None:
+    height, age = tip()
+    if height is None:
         return
+    stale = age is not None and age > STALE_S
+    if stale != STALE[0]:
+        STALE[0] = stale
+        log("index %s: newest block %s is %ss old" % ("STALE" if stale else "fresh again", height, age))
+        if notify:
+            notify.send("warn" if stale else "ok",
+                        "Telegram alerts paused: the index is behind" if stale else "Telegram alerts running again",
+                        "The newest indexed block is %d s old, so signing alerts cannot be trusted." % age
+                        if stale else "", {"Height": format(height, ",")})
+    known = height - 1                                   # the newest height whose signatures are in
     subs = {}
     for op, chat, fl in c.execute("SELECT op, chat, flags FROM sub").fetchall():
         subs.setdefault(op, []).append((chat, fl or "d"))
 
     for op, watchers in subs.items():
         v = V.get(op)
-        if not v:
-            continue                                     # left the set: stay quiet
-        row = c.execute("SELECT down, rank, apr, jail FROM vstate WHERE op=?", (op,)).fetchone()
-        was_down, was_rank, was_apr, was_jail = (row if row else (0, None, None, None))
+        row = c.execute("SELECT down, rank, apr, jail, m, rank_ref, jail_h FROM vstate WHERE op=?", (op,)).fetchone()
+        was_down, was_rank, was_apr, was_jail, was_m, rank_ref, jail_h = row if row else (0, None, None, None, None, None, None)
+        m = v["m"] if v else (was_m or op)
+        chex = v["chex"] if v else None
         events = []                                      # (letter, message)
 
-        # signing
-        n = missed_recent(v["chex"], tip)
+        # jailed: from the index, whether or not the page still lists the validator
+        if chex is None:
+            r = c.execute("SELECT chex FROM vchex WHERE op=?", (op,)).fetchone()
+            chex = r[0] if r else None
+        jh = last_jail(op, chex)
+        if jh is not None:
+            if jail_h is not None and jh > jail_h:
+                events.append(("j", "<b>%s</b> was jailed at height %s.\nIt is out of the active set until it unjails."
+                               % (md(m), format(jh, ","))))
+            jail_h = jh
+
+        # signing - only while it is in the set, and only on a fresh index
         down = bool(was_down)
-        if n is not None:
-            if n >= WINDOW:  down = True
-            elif n == 0:     down = False
-            if down != bool(was_down):
-                events.append(("d", ("*%s* stopped signing.\nMissed the last %d blocks, height %s."
-                                     % (md(v["m"]), WINDOW, format(tip, ",")))
-                               if down else
-                               ("*%s* is signing again.\nHeight %s." % (md(v["m"]), format(tip, ",")))))
+        if v and not stale:
+            n = missed_recent(v["chex"], known)
+            if n is not None:
+                if n >= WINDOW:  down = True
+                elif n == 0:     down = False
+                if down != bool(was_down):
+                    events.append(("d", ("<b>%s</b> stopped signing.\nMissed the last %d blocks, height %s."
+                                         % (md(m), WINDOW, format(known, ",")))
+                                   if down else
+                                   ("<b>%s</b> is signing again.\nHeight %s." % (md(m), format(known, ",")))))
 
-        # jailed - the count only ever rises
-        jail = v.get("jail", 0)
-        if was_jail is not None and jail > was_jail:
-            events.append(("j", "*%s* was jailed.\nIt is out of the active set until it unjails."
-                           % v["m"]))
+        # rank, against the rank at the last rank alert
+        rank = v.get("rank") if v else was_rank
+        if v and rank:
+            if rank_ref is None:
+                rank_ref = rank
+            elif abs(rank - rank_ref) >= RANK_STEP:
+                events.append(("r", "<b>%s</b> moved %s %d places.\nRank %d, was %d."
+                               % (md(m), "up" if rank < rank_ref else "down", abs(rank - rank_ref), rank, rank_ref)))
+                rank_ref = rank
 
-        # rank
-        rank = v.get("rank")
-        if was_rank and rank and rank != was_rank:
-            events.append(("r", "*%s* moved %s.\nRank %d, was %d."
-                           % (md(v["m"]), "up" if rank < was_rank else "down", rank, was_rank)))
-
-        # APR, against the value at the last alert rather than the last check
-        apr, apr_ref = v.get("apr"), was_apr
-        if apr and apr_ref:
-            move = apr / apr_ref - 1
-            for letter in ("t",):
-                if abs(move) >= APR_STEP[letter]:
-                    events.append((letter, "*%s* APR %s %.1f%%.\nNow %.1f%%, was %.1f%%."
-                                   % (md(v["m"]), "rose" if move > 0 else "fell",
+        # APR, against the value at the last APR alert
+        apr = v.get("apr") if v else None
+        apr_ref = was_apr
+        if apr:
+            if not apr_ref:
+                apr_ref = apr                             # first sight: the reference
+            else:
+                move = apr / apr_ref - 1
+                if abs(move) >= APR_STEP["t"]:
+                    events.append(("t", "<b>%s</b> APR %s %.1f%%.\nNow %.1f%%, was %.1f%%."
+                                   % (md(m), "rose" if move > 0 else "fell",
                                       abs(move) * 100, apr * 100, apr_ref * 100)))
-                    apr_ref = apr                        # reset the reference
-                    break
+                    apr_ref = apr
 
-        c.execute("""INSERT INTO vstate(op, down, since, rank, apr, jail)
-                     VALUES(?,?,?,?,?,?)
+        if v:
+            c.execute("INSERT INTO vchex(op, chex) VALUES(?,?) ON CONFLICT(op) DO UPDATE SET chex=excluded.chex", (op, v["chex"]))
+        c.execute("""INSERT INTO vstate(op, down, since, rank, apr, jail, m, rank_ref, jail_h)
+                     VALUES(?,?,?,?,?,?,?,?,?)
                      ON CONFLICT(op) DO UPDATE SET down=excluded.down, since=excluded.since,
-                       rank=excluded.rank, apr=excluded.apr, jail=excluded.jail""",
-                  (op, int(down), tip, rank, apr_ref if apr else was_apr, jail))
+                       rank=excluded.rank, apr=excluded.apr, jail=excluded.jail, m=excluded.m,
+                       rank_ref=excluded.rank_ref, jail_h=excluded.jail_h""",
+                  (op, int(down), known, rank, apr_ref, v.get("jail", 0) if v else was_jail, m, rank_ref, jail_h))
         c.commit()
 
         for letter, msg in events:
@@ -353,7 +493,26 @@ def check(c, V):
                 if letter in fl:
                     send(chat, msg)
                     time.sleep(0.05)                     # well under Telegram's limit
-            log("%s: %s" % (md(v["m"]), ALERTS[letter][1]))
+            log("%s: %s" % (m, ALERTS[letter][1]))
+    drop_gone(c)
+
+
+def heartbeat(username):
+    """bot.json: the page offers alerts only while this is fresh (collect.py checks
+    'alive'), and takes the window and rank step from here so its wording matches"""
+    tmp = IDFILE + ".tmp"
+    json.dump({"username": username, "alive": int(time.time()), "window": WINDOW,
+               "rank_step": RANK_STEP}, open(tmp, "w"))
+    os.replace(tmp, IDFILE)
+
+
+def backup(c):
+    """a consistent copy of the subscriptions next to the app's state, which restic keeps"""
+    try:
+        b = sqlite3.connect(BACKUP + ".tmp"); c.backup(b); b.close()
+        os.replace(BACKUP + ".tmp", BACKUP)
+    except Exception as e:
+        log("backup: %s" % e)
 
 
 def main():
@@ -364,12 +523,10 @@ def main():
     log("running as @%s" % me["username"])
     # the page reads this to build its deep link, so the link can never point at
     # a bot that does not exist or carry a username typed from memory
-    tmp = IDFILE + ".tmp"
-    json.dump({"username": me["username"]}, open(tmp, "w"))
-    os.replace(tmp, IDFILE)
+    heartbeat(me["username"])
 
     offset = int(meta_get(c, "offset", 0))
-    last = 0
+    last = last_backup = 0
     fails = 0
     while True:
         V = vals()
@@ -389,12 +546,16 @@ def main():
                     handle(c, u["message"], V)
                 except Exception as e:
                     log("handle: %s" % e)
+        drop_gone(c)
         if time.time() - last >= CHECK:
             last = time.time()
             try:
                 check(c, V)
             except Exception as e:
                 log("check: %s" % e)
+            heartbeat(me["username"])
+        if time.time() - last_backup >= 3600:
+            last_backup = time.time(); backup(c)
 
 
 if __name__ == "__main__":

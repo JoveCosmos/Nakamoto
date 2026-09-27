@@ -676,16 +676,32 @@ def apr(t, e): return R*(1-e)/S + R*e/(N*t)
 # Telegram's 64-character start payload), so one link carries the whole set. The page and
 # the bot both read the number from data.json, so they cannot disagree.
 VIDS_PATH = os.path.join(STATE, "vids.json")
+# the dev and production builds share this file: read, number and write under one lock,
+# or two builds meeting two new validators could give both the same number
+import fcntl
+with open(VIDS_PATH + ".lock", "a") as _lk:
+    fcntl.flock(_lk, fcntl.LOCK_EX)
+    try:
+        VIDS = {k: int(n) for k, n in json.load(open(VIDS_PATH)).items()}
+    except Exception:
+        VIDS = {}
+    _next = max(VIDS.values(), default=-1) + 1
+    _new = False
+    for v in V:                               # rank order, so the first pass reads naturally
+        if v["op"] not in VIDS:
+            VIDS[v["op"]] = _next; _next += 1; _new = True
+    if _new or not os.path.exists(VIDS_PATH):
+        _t = "%s.%d.tmp" % (VIDS_PATH, os.getpid())
+        json.dump(VIDS, open(_t, "w")); os.replace(_t, VIDS_PATH)
+    fcntl.flock(_lk, fcntl.LOCK_UN)
+
+# the alert bot: offered on the page only while it is alive. It rewrites bot.json every
+# minute with 'alive'; a file from before that heartbeat existed carries none and counts.
 try:
-    VIDS = {k: int(n) for k, n in json.load(open(VIDS_PATH)).items()}
+    BOT = json.load(open(os.path.join(STATE, "bot.json")))
 except Exception:
-    VIDS = {}
-_next = max(VIDS.values(), default=-1) + 1
-for v in V:                                   # rank order, so the first pass reads naturally
-    if v["op"] not in VIDS:
-        VIDS[v["op"]] = _next; _next += 1
-_t = VIDS_PATH + ".tmp"
-json.dump(VIDS, open(_t, "w")); os.replace(_t, VIDS_PATH)
+    BOT = {}
+BOT_UP = bool(BOT.get("username")) and (BOT.get("alive") is None or time.time() - BOT["alive"] < 900)
 
 # ── Network tabs ─────────────────────────────────────────────────────────────
 # Proposers: the last 24 hours of blocks by proposer (uppercase hex, as the page's validators
@@ -779,8 +795,9 @@ out = {
           "bonus_month": EPOCH_START.strftime("%Y-%m")},
   # the alert bot writes its own username here once it has authenticated, so the
   # page's deep link can never point at a bot that is not actually running
-  "bot": (lambda f: (json.load(open(f)).get("username")
-                     if os.path.exists(f) else None))(os.path.join(STATE, "bot.json")),
+  "bot": BOT.get("username") if BOT_UP else None,
+  # the bot's own rule, so the chooser's wording cannot drift from what it does
+  "alert": {"window": int(BOT.get("window", 10)), "rank_step": int(BOT.get("rank_step", 2))},
   "schedule": sched,
   # HIGHEST REACHED is not simply the current value: the ratio can fall as well
   # as rise, and if it ever does, the reconstruction below stops matching the live

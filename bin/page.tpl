@@ -4704,7 +4704,7 @@ html[data-tab=connect] .l2host{display:none}
     <label class=aopt><input type=checkbox data-f=j>
       <span>Jailed<i>dropped out of the active set</i></span></label>
     <label class=aopt><input type=checkbox data-f=r>
-      <span>Rank changes<i>moves up or down the set</i></span></label>
+      <span>Rank changes<i>moves 2 places or more</i></span></label>
     <label class=aopt><input type=checkbox data-f=t>
       <span>APR moves &plusmn;10%</span></label>
   </div>
