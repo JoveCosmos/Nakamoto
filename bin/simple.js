@@ -212,7 +212,7 @@
         '<ol class="sv-steps col">' +
           '<li style="--sc:#ffb02e"><b>Connect</b><span>Reads your balance, stake.</span></li>' +
           '<li style="--sc:' + heat(S.mid).fill + '"><b>See what it earns</b><span>a day, a week, a year, in ATONE</span></li>' +
-          '<li style="--sc:#2ee06a"><b>Redelegate</b><span>to the best APR and uptime, in one signature</span></li>' +
+          '<li style="--sc:#2ee06a"><b>Redelegate</b><span>to the best earning place, in single signature</span></li>' +
         '</ol><button class="sv-btn pri sd-go" type=button data-act=connect>Connect wallet</button>';
     } else if(!pos.rows.length){
       h = '<div class=sv-none><h3>No stake on AtomOne</h3><button class="sv-btn go" type=button data-act=stake>Stake ATONE</button></div>';
