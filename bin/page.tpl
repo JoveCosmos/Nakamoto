@@ -4039,6 +4039,7 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .se-row .sd-fig>b{font-size:19px}
 /* a little air under the big figures: the year's line, and each box's bottom line */
 .se-hero small{margin-top:7px}
+.se-hero small.se-apr{color:var(--wf)}   /* the rate under the year, in the shade of its "A year" label */
 .se-row .sd-fig small{margin-top:4px}
 /* the example (no wallet): figure and boxes centred in the panel, nothing under them */
 .se-ex{margin:0 0 auto;padding-top:14px;display:flex;flex-direction:column}

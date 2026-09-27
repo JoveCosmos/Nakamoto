@@ -155,7 +155,7 @@
       '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div></div>';
     /* the year and its three steps stand in the middle of the panel, the note at its foot */
     return '<div class=se-mid><div class=se-hero><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b>' +
-        '<small>' + (usdOf(y) != null ? usd(usdOf(y)) + ' at today\'s price, ' : '') + 'at ' + pct(rate) + ' APR on ' + whole(stake) + ' ATONE</small></div>' +
+        '<small class=se-apr>' + pct(rate) + ' APR</small></div>' +
       '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' +
       (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + '</div>' +
       '<div class=se-fine>Today\'s rate carried forward. Rewards build up every block and wait for you to claim them.</div>';
