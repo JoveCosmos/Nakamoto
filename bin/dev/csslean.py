@@ -27,7 +27,7 @@ css = m.group(1)
 # ── known tokens: every word any markup, script or generator can put in a class or an id ──
 markup = tpl[:m.start()] + tpl[m.end():]
 srcs = [markup]
-for f in ["app.js", "simple.js", "shell.js", "boot.js", "tx.js", "render.py", "shellgen.py", "shell.json"]:
+for f in ["app.js", "simple.js", "shell.js", "boot.js", "tx.js", "render.py", "shellgen.py", "shell.json", "constitution.py"]:
     p = os.path.join(BIN, f)
     if os.path.exists(p): srcs.append(open(p, encoding="utf-8").read())
 KNOWN = set()
