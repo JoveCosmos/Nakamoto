@@ -4037,6 +4037,9 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .se-hero small{font-size:12px;line-height:1.35;color:var(--ws)}
 .se-hero.sm{padding:10px 0 8px}.se-hero.sm>b{font-size:30px}
 .se-row .sd-fig>b{font-size:19px}
+/* a little air under the big figures: the year's line, and each box's bottom line */
+.se-hero small{margin-top:7px}
+.se-row .sd-fig small{margin-top:4px}
 /* the example (no wallet): figure and boxes centred in the panel, nothing under them */
 .se-ex{margin:0 0 auto;padding-top:14px;display:flex;flex-direction:column}
 .se-fine{margin-top:auto;padding-top:10px;font-size:11px;line-height:1.4;color:var(--wf)}
