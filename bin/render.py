@@ -91,7 +91,7 @@ if _w2c is not None:
 else:
     CAPSUB = "not while it falls" if _w2f else "at the floor: not while C &lt; 3&times;"
     CAPSUB2 = "not while falling"
-STEPLINE = ("Rising now" if th["rising"] else "Falling now" if (_w2f or 0) > 0 else "Held at the floor now") + f" ({th['ratio']:.2f}&times;)"
+STEPLINE = ("Rising now" if th["rising"] else "Falling now" if (_w2f or 0) > 0 else "Held at the floor now") + f" (c = {th['ratio']:.2f}&times;)"
 sched = "".join(
     f"<tr class='wk {'now' if r['now'] else 'next' if r['next'] else 'past' if r['past'] else 'fut'}'"
     f" tabindex=0 role=button data-w='{r['week']}' data-d='{esc(r['iso'])}' data-e='{_eta_attr(r)}'"
@@ -231,7 +231,7 @@ page = (TPL
   .replace("{{STEP}}", f"{e['step']:.2f}")
   # testnet has no indexed proposals: who could halt it is read from the stake itself
   .replace("{{NK}}", str(nk["proposals"]) if nk["proposals"] is not None else (str(nk["stake"]) if TESTNET and nk.get("stake") else "N/A")).replace("{{NK_STAKE}}", str(nk["stake"]))
-  .replace("{{RATIO}}", f"{th['ratio']:.2f}").replace("{{THRESH}}", f"{th['threshold']:.2f}")
+  .replace("{{RATIO}}", f"{th['ratio']:.2f}").replace("{{THRESH}}", f"{th['threshold']:.2f}").replace("{{THRESH_N}}", f"{th['threshold']:g}")
   .replace("{{TRIPS}}", f"{th['threshold'] - 0.01:.2f}")
   .replace("{{TRIPS_C}}", str(int(round((th['threshold'] - 0.01) * 100))))
   .replace("{{HIGH}}", f(M(th["high_avg"]))).replace("{{LOW}}", f(M(th["low_avg"])))
