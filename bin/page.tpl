@@ -3933,6 +3933,8 @@ html[data-svs=over] #sv-over,html[data-svs=auto] #sv-auto{display:grid;grid-temp
 /* the left column a little wider than it was (.95 / 1.55), so Move your stake's title, its +APR pill and
    "N moves, 1 signature" share one line; the middle panel has room to give */
 .sd-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1.35fr) minmax(0,1fr);gap:12px;min-height:0}
+/* the Wallet: Your delegations on the left, Move your stake on the right - the wider column goes with it */
+.sd-wgrid{grid-template-columns:minmax(0,1fr) minmax(0,1.35fr) minmax(0,1.15fr)}
 .sd-col{background:linear-gradient(180deg,#131329,#0c0c1a);border:1px solid var(--wbd2);border-radius:12px;box-shadow:inset 0 1px 0 #ffffff08;
 position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-direction:column}
 .sd-col::before{content:"";position:absolute;left:16px;right:16px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--tc,#6f66c8),transparent);opacity:.95;pointer-events:none}
@@ -4009,6 +4011,8 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-mv .sd-fig{margin-left:0;padding:10px 14px 10px 16px;border-left:1px solid var(--wbd2);border-radius:10px}
 .sd-mv .sd-fig::before{top:10px;bottom:10px}
 .sd-mv .sd-fig:last-child{grid-column:1/-1}
+.sd-mv .sd-fig{align-items:center;text-align:center}
+.sd-mv .sd-fig>b{justify-content:center}
 /* the boxes stand where the centred block put them (equal room above the block and below it); the
    year rises into the middle of the room between the title and the boxes: the hero takes its own
    height plus half the spare room and centres itself in it, the ::after spacer the other half */
@@ -4728,10 +4732,10 @@ html[data-tab=connect] .l2host{display:none}
     <main class=sv-main>
       <section class="sv-screen sd-scr" id=sv-over data-sc=over aria-label=Wallet>
         <div class="sv-panel sd-strip" id=sd-wstrip></div>
-        <div class=sd-grid>
-          <div class="sv-panel sd-col" id=sd-move></div>
-          <div class="sv-panel sd-col" id=sd-sky></div>
+        <div class="sd-grid sd-wgrid">
           <div class="sv-panel sd-col" id=sd-list></div>
+          <div class="sv-panel sd-col" id=sd-sky></div>
+          <div class="sv-panel sd-col" id=sd-move></div>
         </div>
       </section>
       <section class="sv-screen sd-scr" id=sv-auto data-sc=auto aria-label=Autopilot>
