@@ -645,6 +645,7 @@
   html[data-theme=light]:not([data-mono]) .sd-fig::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-fig::after{background:var(--rc)}
   html[data-theme=light]:not([data-mono]) .sd-ok{border:1px solid var(--accent);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sv-btn.go.sd-go:disabled{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .se-tbar s{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .se-mv>div u{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .sv-gkey i.sk{background:var(--accent)}

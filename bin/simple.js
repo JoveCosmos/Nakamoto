@@ -158,7 +158,9 @@
     return '<div class=se-mid><div class=se-hero><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b>' +
         '<small class=se-apr>' + pct(rate) + ' APR</small></div>' +
       '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' +
-      (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + '</div>';
+      (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + '</div>' +
+      /* the way to earn more of it: the same door as Redelegate, opening the Stake card */
+      '<button class="sv-btn go sd-go" type=button data-act=stake>Stake more</button>';
   }
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every
      one of them, largest first; the list scrolls inside its panel */
@@ -220,7 +222,8 @@
       h = '<div class=sv-ph><h3>Everything is under cooldown</h3>' + tag("a", "21 days") + '</div>' +
         fig("Your APR", pct(pos.rate), "on " + pos.rows.length + " validators", heat(pos.rate).fill) +
         fig("Free to move on", window.__dayFull ? window.__dayFull(pos.until) : "—", fmt(pos.total) + " ATONE redelegated recently", "var(--sv-amber)") +
-        '<div class=sv-note>The chain will not move it again until then.</div>';
+        /* the door stands where it always does, greyed until the stake is free */
+        '<button class="sv-btn go sd-go" type=button disabled title="' + esc("Free to move on " + (window.__dayFull ? window.__dayFull(pos.until) : "")) + '">Redelegate</button>';
     } else if(!plan || !(plan.gain > 0.5) || plan.after == null){
       h = '<div class=sv-ph><h3>Nothing to gain by moving</h3></div>' +
         fig("Your APR", '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>', "what your stake earns now", heat(pos.rate).fill) +
@@ -255,7 +258,7 @@
     /* the validators */
     put("sd-list", pos && rows.length
       ? '<div class=sv-ph><h3>Your Delegations</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total)
-      : '<div class=sv-ph><h3>' + (pos ? "Your Delegations" : "Validators") + '</h3></div>' + (pos ? '<div class=sv-upwait>None yet</div>' : vskel(6)));
+      : '<div class=sv-ph><h3>' + ("Your Delegations") + '</h3></div>' + (pos ? '<div class=sv-upwait>None yet</div>' : vskel(6)));
   }
 
   /* the plan is recomputed only when a stake moves or the position is re-read */
