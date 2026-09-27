@@ -202,11 +202,19 @@
     var sh = function(v){ var p = tot ? v / tot * 100 : 0; return p > 0 && p < 0.1 ? "<0.1" : p.toFixed(p > 0 && p < 10 ? 1 : 0); };
     var sums = [["Largest third", amt[0], 0], ["Middle third", amt[1], 1], ["Smallest third", amt[2], 2]];
     if(out > 0) sums.push(["Inactive", out, 3]);
-    /* the thirds as Move your stake shows its figures: cards, two side by side, the third under both
-       (four as two and two when some stake sits on inactive validators) */
-    var edge = ["#ff6a3d", "#ffb02e", "#2ee06a", "var(--wf)"];
-    return head + '<div class="sd-figs sd-mv' + (sums.length > 3 ? ' four' : '') + '">' + sums.map(function(q){
-      return fig(q[0], '<span class=fpt' + q[2] + '>' + sh(q[1]) + '%</span>', (q[1] >= 1e12 ? big(q[1]) : fmt(q[1])) + ' ATONE', edge[q[2]]); }).join("") + '</div>';
+    /* a stacked tower: one column, a segment per third sized by its share (largest third on top), each
+       joined by a leader to its name, share and ATONE; an empty third keeps a sliver so its label has a
+       place. The labels share the tower's height evenly, their leaders angling to their segments */
+    var MIN = 3, n2 = sums.length, fl = sums.map(function(q){ return tot ? q[1] / tot * 100 : 0; });
+    var free = 100 - MIN * n2, hs = fl.map(function(f){ return MIN + f * free / 100; }), y = 0, mids = [];
+    var segs = hs.map(function(h, k){ var top = y; y += h; mids.push(top + h / 2);
+      return '<i class="fp-seg b' + sums[k][2] + '" style="height:' + h.toFixed(2) + '%"></i>'; }).join("");
+    var labs = sums.map(function(q, k){ var at = (k + .5) / n2 * 100;
+      return '<div class="fp-lab b' + q[2] + '" style="top:' + at.toFixed(2) + '%"><em>' + q[0] + '</em><b class=fpt' + q[2] + '>' + sh(q[1]) + '%</b><small>' +
+        (q[1] >= 1e12 ? big(q[1]) : fmt(q[1])) + ' ATONE</small></div>'; }).join("");
+    var lead = '<svg class=fp-lead viewBox="0 0 100 100" preserveAspectRatio=none aria-hidden=true>' + sums.map(function(q, k){
+      return '<path class=b' + q[2] + ' d="M0 ' + mids[k].toFixed(2) + ' L40 ' + mids[k].toFixed(2) + ' L70 ' + ((k + .5) / n2 * 100).toFixed(2) + ' L100 ' + ((k + .5) / n2 * 100).toFixed(2) + '"/>'; }).join("") + '</svg>';
+    return head + '<div class=fp-tw><div class=fp-col>' + segs + '</div>' + lead + '<div class=fp-labs>' + labs + '</div></div>';
   }
 
   function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }
