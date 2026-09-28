@@ -5046,6 +5046,10 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
   background:rgba(46,224,106,.07);text-wrap:balance}
 #sv-auto .ars-how b{color:var(--sv-green)}
 #sv-auto .ars-foot{margin-top:auto;padding-top:8px}
+/* the year box a little lower under the title, on the taller windows */
+#sv-auto #sd-ars>.ars-fig:not(#z){margin-top:18px}
+@media(min-width:901px) and (max-height:1000px){#sv-auto #sd-ars>.ars-fig:not(#z){margin-top:12px}}
+@media(min-width:901px) and (max-height:700px){#sv-auto #sd-ars>.ars-fig:not(#z){margin-top:4px}}
 /* Frequency and Minimum built as the other boxes: the label with its accent line, the value, a caption - squarer */
 #sv-auto .ars-two>div:not(#z){justify-content:center;gap:4px;padding:14px 8px 15px;min-height:96px;box-sizing:border-box}
 #sv-auto .ars-two em{position:relative;padding-bottom:5px}
