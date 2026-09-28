@@ -166,13 +166,15 @@
     var steps = '<div class="sd-figs two se-row' + (on ? ' rson' : '') + '">' + tile("A day", P(1), D(1)) + tile("A week", P(7), D(7)) + tile("A month", P(365 / 12), D(365 / 12)) + '</div>';
     /* not restaking: the offer, as Move your stake offers its move - the year now and the year
        restaking, side by side, and the door (none without a wallet: it names nothing to act on) */
-    var offer = rate > 0 && !on ? '<div class=se-rsw><div class=se-rsh2><em>Restake</em><span>autocompounds your rewards</span></div>' +
-        '<div class="sd-figs sd-mv se-rs2">' + fig("Now", '<span class=sd-gain>+' + one(y / 1e6) + '</span>', "ATONE a year", "var(--sv-green)") +
-        fig("Restaking", '<span class=se-rsv>+' + one(cy / 1e6) + '</span>', "ATONE a year", "var(--sv-teal)") + '</div></div>' : '';
-    var door = !ex && !on && rate > 0 ? '<button class="sv-btn go sd-go se-rsgo" type=button data-act=restake>Restake<b>+' + one(more / 1e6) + ' ATONE a year</b></button>'
+    /* the APR the compounded year amounts to, against today's: what restaking adds to the rate */
+    var capr = Math.pow(1 + rate / 12, 12) - 1, dapr = (capr - rate) * 100;
+    var offer = rate > 0 && !on ? '<div class=se-rsw><div class=se-rsh2><h4>Enable restake</h4>' + tag("g", "+" + one(more / 1e6) + " a year") + '</div>' +
+        '<div class=se-rss><b>+' + dapr.toFixed(1) + '% APR</b>, it autocompounds your rewards</div></div>' : '';
+    var door = !ex && !on && rate > 0 ? '<button class="sv-btn go sd-go se-rsgo" type=button data-act=restake>Enable restake</button>'
       : on ? '<div class=se-rson>Restake is on: your rewards compound on their own.<button type=button class=se-rsch data-act=autopilot>Change</button></div>' : '';
-    if(ex) return '<div class=se-ex>' + year + steps + offer + '</div>';
-    return '<div class=se-mid>' + (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + year + steps + offer + '</div>' + door;
+    /* the day, week and month first, the year under them */
+    if(ex) return '<div class=se-ex>' + steps + year + offer + '</div>';
+    return '<div class=se-mid>' + (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + steps + year + offer + '</div>' + door;
   }
 
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every
@@ -199,8 +201,7 @@
     var band = function(k){ return k < n / 3 ? 0 : k < 2 * n / 3 ? 1 : 2; };
     var at = {}, x = [], amt = [0, 0, 0], out = 0, tot = 0, i;
     for(i = 0; i < n; i++){ at[V[i][3]] = i; x[i] = mine ? 0 : V[i][1]; }
-    var nOut = 0;
-    if(mine) pos.rows.forEach(function(r){ var k = at[r.id]; if(k == null || r.inactive){ out += r.x; nOut++; } else x[k] += r.x; });
+    if(mine) pos.rows.forEach(function(r){ var k = at[r.id]; if(k == null || r.inactive) out += r.x; else x[k] += r.x; });
     for(i = 0; i < n; i++){ amt[band(i)] += x[i]; tot += x[i]; }
     tot += out;
     var sh = function(v){ var p = tot ? v / tot * 100 : 0; return p > 0 && p < 0.1 ? "<0.1" : p.toFixed(p > 0 && p < 10 ? 1 : 0); };
@@ -219,14 +220,14 @@
       bars += '<i class="fp-b b' + band(i) + (x[i] > 0 ? ' on' : '') + '" data-v="' + esc(V[i][3]) + '" style="height:' + h.toFixed(1) + '%" title="#' + (i + 1) + ' ' + esc(V[i][0]) +
         (x[i] > 0 ? ', ' + fmt(x[i]) + ' ATONE' : '') + '"></i>'; }
     var cut1 = Math.ceil(n / 3), cut2 = Math.ceil(2 * n / 3);
-    var span = [cut1, cut2 - cut1, n - cut2];
+    var span = [cut1, cut2 - cut1, n - cut2, Math.ceil(n / 4)];   /* a fourth box, Inactive, only when some stake sits outside the set */
     /* each third: its coloured bracket line over the bars' span, and a box under it with its share and ATONE */
-    var br = sums.slice(0, 3).map(function(q, k){ return '<div class="fp-k b' + k + '" style="flex:' + span[k] + ' 1 0"><div class=fp-kb><em>' + q[0] + '</em><b class=fpt' + k + '>' + sh(q[1]) + '%</b><small>' +
+    /* four boxes share the width equally and take short names, so each label fits */
+    var four = sums.length > 3, short = ["Largest", "Middle", "Smallest", "Inactive"];
+    var br = sums.map(function(q, k){ return '<div class="fp-k b' + k + '" style="flex:' + (four ? 1 : span[k]) + ' 1 0"><div class=fp-kb><em>' + (four ? short[k] : q[0]) + '</em><b class=fpt' + k + '>' + sh(q[1]) + '%</b><small>' +
       (q[1] >= 1e12 ? big(q[1]) : fmt(q[1])) + ' ATONE</small></div></div>'; }).join("");
-    /* stake outside the set, said in the graph's empty top-right corner (the small validators' bars are low), in red */
-    var offh = out > 0 ? '<span class=fp-out>' + fmt(out) + ' ATONE - ' + nOut + ' validator' + (nOut === 1 ? '' : 's') + ' inactive</span>' : '';
     return head.replace('</h3></div>', '</h3>' + (mine ? tag("q", "on " + held + " of " + n + " validators") : tag("q", n + " validators")) + '</div>') +
-      '<div class=fp-bc>' + bars + offh + '</div><div class=fp-ax><span>#1 largest</span><span>smallest #' + n + '</span></div>' +
+      '<div class=fp-bc>' + bars + '</div><div class=fp-ax><span>#1 largest</span><span>smallest #' + n + '</span></div>' +
       '<div class=fp-br>' + br + '</div>';
   }
 

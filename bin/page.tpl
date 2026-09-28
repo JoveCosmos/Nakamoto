@@ -4088,15 +4088,24 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .se-rsh2{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:0 2px}
 .se-rsh2 em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--sv-teal)}
 .se-rsh2 span{font-size:11px;color:var(--ws)}
-.sd-figs.sd-mv.se-rs2{grid-template-rows:auto;flex:0 0 auto}
-.sd-figs.sd-mv.se-rs2 .sd-fig:last-child{grid-column:auto}
-.sd-figs.sd-mv.se-rs2 .sd-fig>b{font-size:28px}
-.sd-figs.sd-mv.se-rs2 .sd-fig{padding-top:8px;padding-bottom:9px}
+/* What your stake earns: the year card and its three boxes centred, each label with a green line under it,
+   as Move your stake's cards; the boxes taller */
+#sd-sky .se-card{align-items:center;text-align:center}
+#sd-sky .se-card>b{justify-content:center}
+#sv-over #sd-sky .se-row .sd-fig{align-items:center;text-align:center;padding-top:16px;padding-bottom:17px;gap:5px}
+#sd-sky .se-row .sd-fig>b{justify-content:center}
+#sd-sky :is(.se-card,.se-row .sd-fig) em{position:relative;padding-bottom:6px;margin-bottom:3px}
+#sd-sky :is(.se-card,.se-row .sd-fig) em::after{content:"";position:absolute;left:50%;bottom:0;width:26px;height:2px;margin-left:-13px;border-radius:2px;background:var(--sv-green);box-shadow:0 0 8px var(--sv-green)}
+/* the restake offer's head: a title and its tag, the APR it adds under it */
+.se-rsh2 h4{margin:0;font-size:14px;font-weight:700;color:var(--wt)}
+.se-rsh2{justify-content:flex-start}
+.se-rss{padding:0 2px;font-size:11.5px;color:var(--ws)}
+.se-rss b{color:var(--sv-teal);font-weight:700}
+@media(min-width:901px) and (max-height:1000px){#sv-over #sd-sky .se-row .sd-fig{padding-top:17px;padding-bottom:18px}}
+@media(min-width:901px) and (max-height:760px){#sv-over #sd-sky .se-row .sd-fig{padding-top:8px;padding-bottom:9px}#sd-sky :is(.se-card,.se-row .sd-fig) em{padding-bottom:4px;margin-bottom:1px}.se-rss{display:none}}
+@media(min-width:901px) and (max-height:640px){#sd-sky :is(.se-card,.se-row .sd-fig) em::after{display:none}#sd-sky :is(.se-card,.se-row .sd-fig) em{padding-bottom:0}}
 /* restaking: the day, week and month keep the line saying what restake adds */
 #sv-over .se-row.rson .sd-fig small{display:block}
-@media(min-width:901px) and (max-height:760px){#sv-over .sd-figs.sd-mv.se-rs2 .sd-fig>b{font-size:22px}#sv-over .sd-figs.sd-mv.se-rs2 .sd-fig small{display:none}
-  #sv-over .sd-figs.sd-mv.se-rs2 .sd-fig{padding-top:5px;padding-bottom:6px}#sv-over .se-rsw{padding-top:8px;gap:4px}}
-@media(min-width:901px) and (max-height:700px){#sv-over .se-rs2,#sv-over .se-rsh2 span{display:none}}
 .se-rsv{color:var(--sv-teal)}
 .se-rsm{color:var(--sv-green);font-weight:700}
 .sv-btn.go.se-rsgo{gap:8px;background:var(--sv-teal);border-color:var(--sv-teal);color:#04201e;box-shadow:0 10px 26px -14px rgba(43,200,189,.9)}
@@ -4139,11 +4148,11 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 .fp-b.b1{--c:#ffb02e}.fp-b.b2{--c:#2ee06a}
 .fp-b.on{background:linear-gradient(180deg,color-mix(in srgb,var(--c) 70%,#fff 30%),var(--c));box-shadow:0 0 8px -1px var(--c)}
 .fp-b:hover{background:var(--wt)}
-.fp-out{position:absolute;right:0;top:4px;font-size:11px;font-weight:600;color:#ff6a3d;white-space:nowrap;font-variant-numeric:tabular-nums;pointer-events:none}
 .fp-ax{display:flex;justify-content:space-between;margin-top:4px;font-family:var(--wmono);font-size:8.5px;letter-spacing:.08em;color:var(--wf)}
 .fp-br{display:flex;gap:4px;margin-top:8px}
 .fp-k{min-width:0;display:flex;flex-direction:column;padding-top:6px;border-top:2px solid #ff6a3d;--rc:#ff6a3d}
 .fp-k.b1{--rc:#ffb02e}.fp-k.b2{--rc:#2ee06a}
+.fp-k.b3{--rc:#e5484d;border-color:#e5484d}.fpt3{color:#ff6b70}
 .fp-kb{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0;padding:7px 6px 8px;text-align:center;border:1px solid var(--wbd2);border-radius:9px;
 background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 16%,transparent),transparent 65%),linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01));box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
 .fp-k.b1{border-color:#ffb02e}.fp-k.b2{border-color:#2ee06a}
@@ -4152,7 +4161,7 @@ background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 16%,
 .fp-k small{font-size:10px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:620px){.fp-bc{flex:0 0 auto;height:150px}}
 @media(min-width:901px) and (max-height:700px){#sd-list .fp-br{margin-top:5px}#sd-list .fp-k{padding-top:4px}#sd-list .fp-k b{font-size:15px}}
-.fpt0{color:#ff7a57}.fpt1{color:#ffc453}.fpt2{color:#5cf08e}.fpt3{color:var(--wf)}
+.fpt0{color:#ff7a57}.fpt1{color:#ffc453}.fpt2{color:#5cf08e}
 
 .sd-mvh{flex-wrap:nowrap;container-type:inline-size;min-height:27px}
 .sd-mvh .sv-tag{flex:0 0 auto}
@@ -4176,20 +4185,20 @@ background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 16%,
 .sd-mv .sd-fig>b{justify-content:center}
 /* Move your stake (and Autopilot's same cards): its own look - the figure large and bare, a short glowing
    rule in the card's colour under it, the card washed in that colour from below */
-.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig{gap:4px;border-left:1px solid var(--wbd2);
+.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig{gap:4px;border-left:1px solid var(--wbd2);
   background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 14%,transparent),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.008))}
-.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig::before{display:none}
-.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig::after{display:none}
-.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em{font-size:10px;letter-spacing:.2em;color:var(--ws)}
-.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig>b{font-size:38px;line-height:1}
+.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig::before{display:none}
+.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig::after{display:none}
+.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig em{font-size:10px;letter-spacing:.2em;color:var(--ws)}
+.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig>b{font-size:38px;line-height:1}
 /* the glowing line sits under the label (Now, After, Gain) */
-@media(min-width:901px) and (max-height:700px){.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em{padding-bottom:5px;margin-bottom:1px}}
-@media(min-width:901px) and (max-height:640px){#sv .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig{padding-top:4px;padding-bottom:4px;gap:2px}#sv .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig>b{font-size:24px}#sv .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig:last-child>b{font-size:26px}#sv .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em{padding-bottom:0;margin-bottom:0}#sv .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em::after{display:none}}
-.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em{position:relative;padding-bottom:7px;margin-bottom:3px}
-.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em::after{content:"";position:absolute;left:50%;bottom:0;width:34px;height:3px;margin-left:-17px;border-radius:2px;background:var(--rc);box-shadow:0 0 10px var(--rc)}
-.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig:last-child>b{font-size:40px}
-.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig small{font-size:11.5px;color:var(--ws)}
-@media(min-width:901px) and (max-height:700px){.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig>b{font-size:28px}.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig:last-child>b{font-size:30px}.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig{gap:4px}}
+@media(min-width:901px) and (max-height:700px){.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig em{padding-bottom:5px;margin-bottom:1px}}
+@media(min-width:901px) and (max-height:640px){#sv .sd-mv:is(#sd-move *,#sd-asky *) .sd-fig{padding-top:4px;padding-bottom:4px;gap:2px}#sv .sd-mv:is(#sd-move *,#sd-asky *) .sd-fig>b{font-size:24px}#sv .sd-mv:is(#sd-move *,#sd-asky *) .sd-fig:last-child>b{font-size:26px}#sv .sd-mv:is(#sd-move *,#sd-asky *) .sd-fig em{padding-bottom:0;margin-bottom:0}#sv .sd-mv:is(#sd-move *,#sd-asky *) .sd-fig em::after{display:none}}
+.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig em{position:relative;padding-bottom:7px;margin-bottom:3px}
+.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig em::after{content:"";position:absolute;left:50%;bottom:0;width:34px;height:3px;margin-left:-17px;border-radius:2px;background:var(--rc);box-shadow:0 0 10px var(--rc)}
+.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig:last-child>b{font-size:40px}
+.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig small{font-size:11.5px;color:var(--ws)}
+@media(min-width:901px) and (max-height:700px){.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig>b{font-size:28px}.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig:last-child>b{font-size:30px}.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig{gap:4px}}
 /* the boxes stand where the centred block put them (equal room above the block and below it); the
    year rises into the middle of the room between the title and the boxes: the hero takes its own
    height plus half the spare room and centres itself in it, the ::after spacer the other half */
