@@ -1,4 +1,4 @@
-// GATA authz signer - RUNS ON THE SIGNER VPS, on its own key, on its own port.
+// AtomOne Autopilot signer - RUNS ON THE SIGNER VPS, on its own key, user, port and unit.
 //
 // Two jobs, both on behalf of AtomOne delegators who AUTHORISED this account (x/authz):
 //  1. moves: MsgExec{MsgBeginRedelegate...} inside a StakeAuthorization REDELEGATE grant;
@@ -11,8 +11,8 @@
 // to stake a delegator's own liquid ATONE, whatever the keeper asks. It cannot
 // grant. Fees are PHOTON from this account's own balance.
 //
-// Independent of the payout signer: a different mnemonic, a different secret, a
-// different unit and port. Compromise of one does not reach the other.
+// Independent of the payout signer: a different mnemonic, secret, Linux user, unit and
+// port. Neither process can read the other's credentials.
 //
 //   GET  /whoami          -> { address }                       (secret required)
 //   POST /authz-exec      -> { txhash, height }                 (secret required)
@@ -26,16 +26,16 @@
 //   node server.mjs --keygen   prints a fresh 24-word mnemonic and its address, stores nothing
 //
 // Secrets arrive as systemd credentials (LoadCredentialEncrypted), never as env:
-//   $CREDENTIALS_DIRECTORY/authz_mnemonic, $CREDENTIALS_DIRECTORY/authz_secret
+//   $CREDENTIALS_DIRECTORY/autopilot_mnemonic, $CREDENTIALS_DIRECTORY/autopilot_secret
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { SigningStargateClient, GasPrice, QueryClient, setupDistributionExtension } from "@cosmjs/stargate";
-import { MsgBeginRedelegate, MsgDelegate } from "cosmjs-types/cosmos/staking/v1beta1/tx.js";
-import { MsgWithdrawDelegatorReward } from "cosmjs-types/cosmos/distribution/v1beta1/tx.js";
+import { MsgBeginRedelegate, MsgDelegate } from "cosmjs-types/cosmos/staking/v1beta1/tx";
+import { MsgWithdrawDelegatorReward } from "cosmjs-types/cosmos/distribution/v1beta1/tx";
 
-const PREFIX = "atone", CHAIN_ID = "atomone-1";
+const PREFIX = "atone", CHAIN_ID = process.env.CHAIN_ID || "atomone-1";   // testnet: atomone-testnet-1
 const GAS = process.env.ATOMONE_GAS_PRICE || "0.25uphoton";
 const RPCS = (process.env.ATOMONE_RPC || "https://atomone-rpc.gatadao.com,https://atomone-rpc.polkachu.com").split(",").map(s => s.trim()).filter(Boolean);
 const BIND = process.env.BIND || "10.9.0.2", PORT = +(process.env.PORT || 8788);
@@ -54,12 +54,12 @@ function cred(name) {
   if (!dir) throw new Error("no CREDENTIALS_DIRECTORY - run under the unit");
   return fs.readFileSync(path.join(dir, name), "utf8").trim();
 }
-const MNEMONIC = cred("authz_mnemonic"), SECRET = cred("authz_secret");
-if (!MNEMONIC || !SECRET) { console.error("authz-signer: missing credential"); process.exit(78); }
+const MNEMONIC = cred("autopilot_mnemonic"), SECRET = cred("autopilot_secret");
+if (!MNEMONIC || !SECRET) { console.error("autopilot-signer: missing credential"); process.exit(78); }
 
 async function connectFirst(rpcs, make) {
   let last;
-  for (const rpc of rpcs) { try { return await make(rpc); } catch (e) { last = e; console.error("authz-signer: rpc " + rpc + " failed: " + (e.message || e)); } }
+  for (const rpc of rpcs) { try { return await make(rpc); } catch (e) { last = e; console.error("autopilot-signer: rpc " + rpc + " failed: " + (e.message || e)); } }
   throw last || new Error("no rpc");
 }
 let clientPromise = null;
@@ -111,11 +111,11 @@ const server = http.createServer(async (req, res) => {
     const exec = { typeUrl: "/cosmos.authz.v1beta1.MsgExec", value: { grantee: sender, msgs: inner } };
     const result = await serial(() => client.signAndBroadcast(sender, [exec], "auto", typeof memo === "string" && memo.length <= 64 ? memo : "GATA autopilot"));
     const total = moves.reduce((a, m) => a + Number(m.amount), 0);
-    console.log(`authz-signer: exec granter=${granter} moves=${moves.length} uatone=${total} code=${result.code} hash=${result.transactionHash} height=${result.height}`);
+    console.log(`autopilot-signer: exec granter=${granter} moves=${moves.length} uatone=${total} code=${result.code} hash=${result.transactionHash} height=${result.height}`);
     if (result.code !== 0) return send(502, { error: "rejected", code: result.code, raw_log: result.rawLog, txhash: result.transactionHash });
     return send(200, { txhash: result.transactionHash, height: result.height, gas_used: result.gasUsed?.toString?.() });
   } catch (e) {
-    console.error("authz-signer: " + (e.message || e));
+    console.error("autopilot-signer: " + (e.message || e));
     return send(500, { error: String(e.message || e) });
   }
 });
@@ -150,10 +150,10 @@ async function restake(body, send) {
       value: MsgDelegate.encode({ delegatorAddress: granter, validatorAddress: s.validator, amount: { denom: "uatone", amount: String(s.amount) } }).finish() })))
   const exec = { typeUrl: "/cosmos.authz.v1beta1.MsgExec", value: { grantee: sender, msgs: inner } };
   const result = await serial(() => client.signAndBroadcast(sender, [exec], "auto", typeof memo === "string" && memo.length <= 64 ? memo : "GATA autopilot restake"));
-  console.log(`authz-signer: restake granter=${granter} claim=${claim.length} rewards=${rewards} staked=${staked} sent=${out} code=${result.code} hash=${result.transactionHash} height=${result.height}`);
+  console.log(`autopilot-signer: restake granter=${granter} claim=${claim.length} rewards=${rewards} staked=${staked} sent=${out} code=${result.code} hash=${result.transactionHash} height=${result.height}`);
   if (result.code !== 0) return send(502, { error: "rejected", code: result.code, raw_log: result.rawLog, txhash: result.transactionHash });
   return send(200, { txhash: result.transactionHash, height: result.height, rewards: rewards.toString(), gas_used: result.gasUsed?.toString?.() });
 }
 
-getClient().then(({ sender }) => console.log("authz-signer: signing as " + sender)).catch(e => console.error("authz-signer: " + (e.message || e)));
-server.listen(PORT, BIND, () => console.log(`authz-signer: listening on ${BIND}:${PORT}`));
+getClient().then(({ sender }) => console.log("autopilot-signer: signing as " + sender)).catch(e => console.error("autopilot-signer: " + (e.message || e)));
+server.listen(PORT, BIND, () => console.log(`autopilot-signer: listening on ${BIND}:${PORT}`));
