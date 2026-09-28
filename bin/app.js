@@ -2913,7 +2913,7 @@ rememberGridH();
     atSend([revokeMsg(REDEL)], atrevoke); });
   /* ── Restake, its own switch: the claim + delegate pair, for 12 months, capped at what the stake can earn, the
      delegate allow-list = the validators the reader stakes with (and Autopilot's list, when it runs). The keeper
-     claims and stakes on the best-paying of them; an admin acts within 48 hours. Off = both revoked. ── */
+     claims and stakes on the best-paying of them on its own (no admin step), daily, from 1 ATONE of rewards. ── */
   var rspop = E("rspop"), RS_DAYS = 365;
   function rsOn(){ var g = AT.grants || []; return g.some(function(x){ return grantType(x) === DELEG; }) && g.some(function(x){ return grantType(x) === WDRAW; }); }
   function rsAllow(){
@@ -2946,7 +2946,7 @@ rememberGridH();
       var r = pos && pos.rate > 0 ? pos.rate : 0, more = r ? pos.total * (Math.pow(1 + r / 12, 12) - 1 - r) : 0;
       body.innerHTML = (r ? '<div class=rsfig><em>A year, more</em><b>+' + fmt(more) + ' ATONE</b><small>+' + ((Math.pow(1 + r / 12, 12) - 1 - r) * 100).toFixed(1) + '% APR, auto-compounds reward</small></div>' : '') +
         '<p>Claims your rewards and stakes them again on the best-paying of the <b>' + n + '</b> validator' + (n === 1 ? '' : 's') + ' you stake with, so they earn too. GATA pays the fees and takes no share.</p>' +
-        '<p>It activates within <b>48 hours</b>; turn it off at any time. Your stake never leaves your wallet.</p>' +
+        '<p>It runs on its own once a day, whenever at least <b>1 ATONE</b> of rewards has built up; turn it off at any time. Your stake never leaves your wallet.</p>' +
         (!AT.addr ? '<p class=rshint>Opens once GATA\'s keeper is live.</p>' : !signer ? '<p class=rshint>Needs Keplr (direct signing).</p>' : !n ? '<p class=rshint>Stake with a validator first.</p>' : '');
     }
     go.textContent = on ? "Turn off" : "Turn on"; go.classList.toggle("off", on);
