@@ -217,7 +217,7 @@
     var br = sums.slice(0, 3).map(function(q, k){ return '<div class="fp-k b' + k + '" style="flex:' + span[k] + ' 1 0"><em>' + q[0] + '</em><b class=fpt' + k + '>' + sh(q[1]) + '%</b><small>' +
       (q[1] >= 1e12 ? big(q[1]) : fmt(q[1])) + ' ATONE</small></div>'; }).join("");
     return head.replace('</h3></div>', '</h3>' + (mine ? tag("q", "on " + held + " of " + n + " validators") : tag("q", n + " validators")) + '</div>') +
-      '<div class=fp-bc>' + bars + '</div><div class=fp-ax><span>#1 largest</span><span>#' + n + ' smallest</span></div>' +
+      '<div class=fp-bc>' + bars + '</div><div class=fp-ax><span>largest #1</span><span>smallest #' + n + '</span></div>' +
       '<div class=fp-br>' + br + '</div>' + (out > 0 ? '<div class=sd-off>' + fmt(out) + ' ATONE on inactive validators earns nothing</div>' : '');
   }
 
