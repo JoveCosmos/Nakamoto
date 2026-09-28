@@ -2797,7 +2797,7 @@ rememberGridH();
       /* what stands, as boxes: its validators, its cap, how long it runs; then the keeper's last word */
       st.innerHTML = '<div class=atsb><div><em>Validators</em><b>' + n + '</b><small>allowed</small></div><div><em>Cap</em><b>' + (a.max_tokens ? cap : 'None') + '</b><small>' + (a.max_tokens ? 'left to move' : 'all your stake') + '</small></div>' +
         '<div><em>Runs until</em><b>' + (g.expiration ? exp : 'You revoke') + '</b><small>' + (g.expiration ? 'then grant again' : 'no end date') + '</small></div></div>' +
-        (last ? 'Last check <b>' + window.__dayFull(last.getTime()) + '</b>' + (rp.moves && rp.moves.length ? ', <b>' + rp.moves.length + '</b> move' + (rp.moves.length === 1 ? '' : 's') + ' ' + (rp.dry ? 'planned (dry run)' : 'made') + ', <b class=g>+' + one(rp.gain || 0) + '</b> ATONE a year' : ', nothing to move') : 'The keeper has not checked this address yet') +
+        (last ? 'Last check <b>' + window.__dayFull(last.getTime()) + '</b>' + (rp.moves && rp.moves.length ? ', <b>' + rp.moves.length + '</b> move' + (rp.moves.length === 1 ? '' : 's') + ' ' + (rp.dry ? 'planned (dry run)' : 'made') + ', <b class=g>+' + one(rp.gain || 0) + '</b> ATONE a year' : ', nothing to move') : '') +
         (rp && rp.history && rp.history.length ? '<br>Moves made: <b>' + rp.history.length + '</b>, last ' + window.__dayFull(rp.history[0].at * 1000) : '') +
         (AT_EDIT ? '<br><span class=g>Changing it:</span> the terms below replace these when you sign.' : '');
     }
