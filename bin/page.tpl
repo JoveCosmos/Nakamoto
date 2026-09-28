@@ -4371,6 +4371,8 @@ html #sv-over .sd-wgrid>#sd-sky>.sv-ph h3::before{background-image:url("data:ima
 html #sv-over .sd-wgrid>#sd-move>.sv-ph h3::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23d6d0ff%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%208h14l-4-4M20%2016H6l4%204%22/%3E%3C/svg%3E")!important}
 html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){background-image:linear-gradient(90deg,#ffffff,#d9d3ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 html #sv-over .sd-wgrid>.sd-col>.sv-ph .sv-tag:not(#z){color:var(--ws)!important;border-color:var(--wbd2)!important;background:rgba(255,255,255,.04)!important;font-weight:600}
+/* Concentration's subtitle on one row */
+@media(min-width:700px){#cpop .kp-h p:not(#z){white-space:nowrap;font-size:12px;letter-spacing:-.005em}}
 .sv-btn.go.sd-go:disabled{background:rgba(255,255,255,.05);border-color:var(--wbd2);color:var(--wf);box-shadow:none;cursor:not-allowed;margin-top:auto}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}
@@ -5440,7 +5442,7 @@ html[data-tab=connect] .l2host{display:none}
   <div class=kp-h>
     <button class=backq id=backq type=button aria-label="Back to the bonus share">&larr; <span class=lc>&eta;</span></button>
     <span class="disc dc"><svg class=kg aria-hidden=true><use href="#g-c"/></svg></span>
-    <div><h2>Concentration</h2><p>How much more the largest third holds than the smallest</p></div></div>
+    <div><h2>Concentration</h2><p>How much more the largest third holds than the smallest third average</p></div></div>
   <div class=kp-b>
     <div class=kp-eq>
       <div class=kp-hv><em>Largest third</em><b><span data-kp=HIGH>{{HIGH}}</span></b><small>average of <span data-kp=GROUP>{{GROUP}}</span></small></div>
