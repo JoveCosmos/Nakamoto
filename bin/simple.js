@@ -232,8 +232,9 @@
     var br = sums.map(function(q, k){ return '<div class="fp-k b' + k + '" style="flex:' + (four ? 1 : span[k]) + ' 1 0"><div class=fp-kb><em>' + (four ? short[k] : q[0]) + '</em><b class=fpt' + k + '>' + sh(q[1]) + '%</b><small title="' + fmt(q[1]) + ' ATONE">' +
       (q[1] >= 1e10 ? big(q[1]) : fmt(q[1])) + '<i> ATONE</i></small></div></div>'; }).join("");
     return head.replace('</h3></div>', '</h3>' + (mine ? tag("q", held + (held === 1 ? " Validator" : " Validators"), "your stake is on " + held + " of the " + n + " validators") : tag("q", n + " Validators")) + '</div>') +
-      '<div class=fp-ax><span>#1 largest</span><span>smallest #' + n + '</span></div><div class=fp-bc>' + bars + '</div>' +
-      '<div class=fp-br>' + br + '</div>';
+      /* the thirds' boxes first, their coloured lines under them over the bars' spans; the graph under them */
+      '<div class=fp-br>' + br + '</div>' +
+      '<div class=fp-ax><span>#1 largest</span><span>smallest #' + n + '</span></div><div class=fp-bc>' + bars + '</div>';
   }
 
   function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }

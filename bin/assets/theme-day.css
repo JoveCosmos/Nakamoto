@@ -721,6 +721,10 @@
   html[data-theme=light]:not([data-mono]) .fp-kb{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .fp-k.b1{border-color:var(--amber-bar)}
   html[data-theme=light]:not([data-mono]) .fp-k.b2{border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-list .fp-k:not(#z){border-bottom:2px solid var(--kc,var(--danger-bar))}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-list .fp-k.b1{--kc:var(--warn)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-list .fp-k.b2{--kc:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-list .fp-k.b3{--kc:var(--faint)}
   html[data-theme=light]:not([data-mono]) .fpt0{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .fpt1{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) .fpt2{color:var(--accent)}

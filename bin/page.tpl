@@ -4322,6 +4322,12 @@ background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 16%,
 .fp-k small{max-width:100%;font-size:9px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}.fp-k small i{font-style:normal;font-size:7.5px;letter-spacing:.04em;color:var(--wf)}
 @media(max-width:620px){.fp-bc{flex:0 0 auto;height:150px}}
 @media(min-width:901px) and (max-height:700px){#sd-list .fp-br{margin-top:5px}#sd-list .fp-k{padding-top:4px}#sd-list .fp-k b{font-size:15px}}
+/* boxes above the graph: each third's line along the boxes' foot, the axis 10px under it */
+#sv-over #sd-list .fp-br{margin-top:0;order:0}
+#sv-over #sd-list .fp-k:not(#z){padding-top:0;padding-bottom:6px;border-top:0;border-bottom:2px solid var(--kc,#ff6a3d)}
+#sv-over #sd-list .fp-k.b1{--kc:#ffb02e}#sv-over #sd-list .fp-k.b2{--kc:#2ee06a}#sv-over #sd-list .fp-k.b3{--kc:#6f6d94}
+#sv-over #sd-list .fp-br+.fp-ax{margin-top:10px}
+@media(min-width:901px) and (max-height:700px){#sv-over #sd-list .fp-k:not(#z){padding-bottom:4px}#sv-over #sd-list .fp-br+.fp-ax{margin-top:6px}}
 .fpt0{color:#ff7a57}.fpt1{color:#ffc453}.fpt2{color:#5cf08e}
 
 .sd-mvh{flex-wrap:nowrap;container-type:inline-size;min-height:27px}
