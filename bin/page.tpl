@@ -4975,6 +4975,12 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 .sd-ida .sd-wch button.rsw.on:not(#z){color:#b6f5cb;border-color:rgba(143,240,176,.6);background:rgba(46,224,106,.16)}
 .sd-ida .sd-wch button.rsw:hover{border-color:rgba(255,255,255,.6)}.sd-ida .sd-wch button.rsw:focus-visible{outline:2px solid #fff;outline-offset:2px}
 #atpop .atpc em:empty{display:none}
+/* the list opens only for Choose yourself, as a second column; with Autopilot's own pick the card is the setup alone */
+.pop .card.atcard[data-pick=auto]:not(#z){width:min(560px,100%)}
+@media(min-width:861px){#atpop .atcard[data-pick=auto] .atbody:not(#z){grid-template-columns:minmax(0,1fr)}#atpop .atcard[data-pick=auto] .atL:not(#z){border-right:0}
+  .pop .card.atcard[data-pick=auto]:not(#z){height:auto;max-height:100%}}
+.atcard[data-pick=auto] .atR{display:none!important}
+.atcard[data-pick=auto] .atview{display:none!important}
 /* the setup's validator count: Redelegate's live count, at the right of the list's title */
 #atpop .atrt:not(#z){display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
 #atpop .atrh,#atpop .atrt:not(#z){width:100%}
@@ -5596,8 +5602,8 @@ html[data-tab=connect] .l2host{display:none}
       <div class=atform id=atform>
         <div class=atrow><span class=atlab><i>2</i>Validators<small>which validators it may use</small></span>
           <div class="atpre at2">
-            <label class=atpc><input type=radio name=atpick value=selected><b>Choose yourself</b><em id=atn2></em><small class=atd>you pick each one</small></label>
             <label class=atpc><input type=radio name=atpick value=auto checked><b>Autopilot</b><em id=atna></em><small class=atd>the best-paying, never jailed</small></label>
+            <label class=atpc><input type=radio name=atpick value=selected><b>Choose yourself</b><em id=atn2></em><small class=atd>you pick each one</small></label>
           </div></div>
         <div class=atrow><span class=atlab><i>3</i>Stake<small>the most it may move</small></span>
           <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>

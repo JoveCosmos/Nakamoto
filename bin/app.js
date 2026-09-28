@@ -2723,7 +2723,7 @@ rememberGridH();
     var n2 = E("atn2"); if(n2) n2.textContent = sel ? sel + " selected" : AT_MIN + " to " + AT_MAX + " validators";
     var n = view ? Object.keys(atGrantIds()).length : atPick() === "auto" ? auto : sel;
     /* live, as Redelegate's: the number, then what it counts */
-    var c = E("atcount"); if(c) c.innerHTML = view ? "<b>" + n + "</b>allowed" : atPick() === "auto" ? "<b>" + auto + "</b>picked by Autopilot"
+    var c = E("atcount"); if(c) c.innerHTML = view ? "<b>" + n + "</b>allowed" : atPick() === "auto" ? ""
       : "<b>" + sel + "</b>selected" + (sel < AT_MIN || sel > AT_MAX ? ", " + AT_MIN + " to " + AT_MAX : "");
     var vn = E("atvn"); if(vn) vn.textContent = n;
   }
@@ -2767,6 +2767,8 @@ rememberGridH();
   }
   function atState(){
     var pos = window.__POS, cap = atCap(), scope = atScope(), view = atViewing();
+    /* the list is shown for Choose yourself (and for a standing grant's own list), hidden for Autopilot's pick */
+    if(atcard){ var pk = view ? "selected" : atPick(); atcard.setAttribute("data-pick", pk); if(pk === "auto" && atcard.getAttribute("data-v") === "vals") atView("setup"); }
     atCounts();
     /* why it matters: stake left alone goes idle when its validator drops out of the set */
     var idl = E("atidle"), iv = window.__idleAtone ? window.__idleAtone() : "";
