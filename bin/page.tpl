@@ -4144,13 +4144,6 @@ box-shadow:inset 0 2px 6px rgba(0,0,0,.6),inset 0 -1px 0 rgba(255,255,255,.05),0
 .sd-strip .sd-ro em{margin-bottom:7px}
 .sd-strip .sd-well{position:relative;flex:1 1 auto;align-items:center;gap:6px;margin:0;padding:6px 12px 6px;min-height:46px;box-sizing:border-box}
 .sd-strip .sd-well.mtr{padding-bottom:14px}
-/* the strip's five boxes share one fill, laid on the strip so it runs across them as one whole: a light violet
-   (Autopilot's a light teal, after its card), no rings, no seams; the wallet card keeps its own face over it */
-.sd-strip:not(#z){background:radial-gradient(60% 140% at 30% 0%,rgba(255,255,255,.14),transparent 70%),linear-gradient(100deg,#6a5ad6 0%,#5646bd 45%,#43349e 100%);border-color:rgba(160,150,255,.35)}
-.sd-strip:not(#z):has(.sd-ida){background:radial-gradient(60% 140% at 30% 0%,rgba(255,255,255,.14),transparent 70%),linear-gradient(100deg,#23978f 0%,#236f9c 50%,#2f4596 100%);border-color:rgba(143,245,236,.35)}
-#p-dele #sd-mstrip.sd-strip{background:radial-gradient(60% 140% at 30% 0%,rgba(255,255,255,.14),transparent 70%),linear-gradient(100deg,#6a5ad6 0%,#5646bd 45%,#43349e 100%);border-color:rgba(160,150,255,.35)}
-.sd-strip .sd-ro{background:none;border-left:0}
-.sd-strip .sd-ro em{color:rgba(255,255,255,.8)}
 .sd-strip .sd-well>b{font-size:22px}
 .sd-well>i.u{flex:0 0 auto;align-self:center;margin-top:6px;font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;color:var(--wf);padding-bottom:0}
 .sd-wx{flex:0 1 auto;min-width:0;margin-left:auto;padding-left:10px;border-left:1px solid rgba(255,255,255,.09);display:flex;flex-direction:column;align-items:flex-end;
@@ -4737,6 +4730,8 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .folder>.l1{grid-area:nav}
 /* the network switch: two links, the open network lit; testnet lights amber so a page on the
    test chain can never pass for the real one */
+/* the wallet lives in the Dashboard: its Connect button and pill show only there; every other section reads */
+html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 /* the network switch: two small engraved keys in a recessed track, the wallet pill's height (32px) and its
    mono type; the open network's key lit from within (teal mainnet, amber testnet) */
 .netsw{display:inline-flex;align-items:center;height:32px;box-sizing:border-box;padding:3px;gap:3px;border-radius:10px;flex:0 0 auto;

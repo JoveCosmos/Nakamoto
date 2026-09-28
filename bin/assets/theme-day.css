@@ -682,11 +682,6 @@
   html[data-theme=light]:not([data-mono]) .sd-m.mix{background:none}
   html[data-theme=light]:not([data-mono]) .sd-m.mix s{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-m.apr u{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .sd-strip:not(#z){background:var(--accent);border-color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sd-strip:not(#z):has(.sd-ida){background:var(--accent);border-color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) #p-dele #sd-mstrip.sd-strip{background:var(--accent);border-color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro{background:none}
-  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro em{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .sd-wx{border-left:1px solid var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sd-strip .sd-well>.sd-m{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sd-fig{background:var(--surface-2)}
@@ -1070,18 +1065,6 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.q{color:#fff;border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14)}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:#ffe1d8;border-color:rgba(255,160,130,.7);background:rgba(200,50,20,.45)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-hero>.se-card{background:linear-gradient(90deg,rgba(200,120,0,.1),#fbf9f3 70%)}
-  /* the strip's one fill and its boxes keep their night face in day */
-  html[data-theme=light]:not([data-mono]) .sd-strip:not(#z){background:radial-gradient(60% 140% at 30% 0%,rgba(255,255,255,.14),transparent 70%),linear-gradient(100deg,#6a5ad6 0%,#5646bd 45%,#43349e 100%);border-color:rgba(160,150,255,.35)}
-  html[data-theme=light]:not([data-mono]) .sd-strip:not(#z):has(.sd-ida){background:radial-gradient(60% 140% at 30% 0%,rgba(255,255,255,.14),transparent 70%),linear-gradient(100deg,#23978f 0%,#236f9c 50%,#2f4596 100%);border-color:rgba(143,245,236,.35)}
-  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro{--sv-amber:#ffb02e;--sv-green:#2ee06a;--sv-violet:#b9b0ff;--sv-teal:#2bc8bd;--sv-pho:#7fd8ff;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4;--wbd:#232342;color:#f0eef8;background:none;border-left:0}
-  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro em{color:rgba(255,255,255,.8)}
-  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro .sd-well{border-color:rgba(0,0,0,.45);
-    background:radial-gradient(120% 160% at 0% 50%,color-mix(in srgb,var(--rc) 13%,transparent),transparent 62%),linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.2));
-    box-shadow:inset 0 2px 6px rgba(0,0,0,.6),inset 0 -1px 0 rgba(255,255,255,.05),0 1px 0 rgba(255,255,255,.05)}
-  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro .sd-well>.sd-m:not(.apr){background:rgba(255,255,255,.12)}
-  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro .sd-well>b{color:#f0eef8}
-  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro .sv-pho{color:#7fd8ff}
-  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro .sd-well>i.u{color:#8f8db4}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:#fff;border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14)}
   /* tags on a fill and the Enable restake band keep their night face in day */
   html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.34)}
@@ -1091,5 +1074,4 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2{border-color:transparent;background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#13603b,#0d3f2d 58%,#0f1f24)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2 h4{color:#fff}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2 h4::before{background:rgba(255,255,255,.9)}
-  html[data-theme=light]:not([data-mono]) #p-dele #sd-mstrip.sd-strip{background:radial-gradient(60% 140% at 30% 0%,rgba(255,255,255,.14),transparent 70%),linear-gradient(100deg,#6a5ad6 0%,#5646bd 45%,#43349e 100%);border-color:rgba(160,150,255,.35)}
 

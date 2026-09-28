@@ -83,9 +83,8 @@
   }
   function mix(c, to, k){ var m = /(\d+),\s*(\d+),\s*(\d+)/.exec(c); if(!m) return c;
     return "rgb(" + [m[1], m[2], m[3]].map(function(x){ return Math.round(+x + (to - x) * k); }).join(",") + ")"; }
-  /* night: the night ramp whatever the theme (the strip's boxes are violet in day too) */
-  function heat(r, night){
-    var u = heatU(r), day = !night && root.getAttribute("data-theme") === "light", L = window.lum || function(){ return "rgb(255,176,46)"; };
+  function heat(r){
+    var u = heatU(r), day = root.getAttribute("data-theme") === "light", L = window.lum || function(){ return "rgb(255,176,46)"; };
     /* type keeps the fill's hue, lifted toward white: the low end reads as a cool lavender,
        not as the rose of a warning, and the top stops at gold short of plain white */
     var fill = L(.16 + .84 * u), ink = mix(L(.16 + .84 * Math.min(u, .9)), 255, .34);
@@ -256,7 +255,7 @@
       ro("Available", bal ? fmt(liq) : "\u2014", "", null, "var(--sv-violet)", "", false, bal ? "ATONE" : "") +
       ro("Photon", bal ? '<span class=sv-pho>' + fmt(bal.uphoton) + '</span>' : "\u2014", "", null, "var(--sv-pho)", "", false, "") +
       ro("Staked", pos ? fmt(stk) : "\u2014", "", null, "var(--sv-amber)", "", false, pos ? "ATONE" : "") +
-      ro("APR", mine ? '<span style="color:' + heat(pos.rate, 1).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)", "", false, "") +
+      ro("APR", mine ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)", "", false, "") +
       ro("Rewards", window.__REW != null ? fmt(rew) : "\u2014", "", null, "var(--sv-green)", "", false, window.__REW != null ? "ATONE" : ""));
   }
   function drawOver(){
@@ -366,7 +365,7 @@
       ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "\u2014", "", null, "var(--sv-violet)", "", false, g && a.max_tokens ? "ATONE" : "") +
       ro("Runs until", until || "\u2014", "", null, "var(--sv-violet)") +
       ro("Moves made", g ? String(moves) : "\u2014", "", null, "var(--sv-teal)") +
-      ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate, 1).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)"));
+      ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)"));
     /* restake, in one line: what it has done, or who does it instead, or that it waits */
     function restakeLine(){
       var rs = rp && rp.restake, ot = at && at.others;
@@ -972,8 +971,11 @@
         (g.web && /^https?:\/\//.test(g.web) ? '<a class=sv-gweb href="' + esc(g.web) + '" target=_blank rel="noopener noreferrer">site</a>' : '<span></span>') + '</span></div>'; }).join("") + '</div>';
   }
   /* following a governor is one signature: Follow (Switch when another one is followed) on an active
-     governor, Stop on the one followed; nothing without a wallet, or while the reading is pending */
+     governor, Stop on the one followed; nothing without a wallet, while the reading is pending, or
+     outside the Dashboard */
+  /* the Governance section only reads: following is done from the Dashboard's Governance tab */
   function govBtn(g, mine){
+    if(screen() !== "mygov") return '';
     if(!window.__ADDR || !window.__WALLET || mine === null || mine === undefined) return '';
     if(g.addr === mine) return '<button class="sv-gbtn stop" type=button data-act=gstop title="Stop following this governor: your stake votes only when you vote">Stop</button>';
     if(!g.active) return '';
