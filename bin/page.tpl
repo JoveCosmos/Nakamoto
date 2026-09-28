@@ -4082,22 +4082,24 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 #sv-over .se-mid::after,#sv-over .se-ex::after{display:none}
 #sv-over .se-row{margin-top:0}
 /* the restake card: one wide figure under the three boxes, in teal */
-.se-rs{flex:0 0 auto;margin:0;padding:9px 14px 10px 16px;border-left:1px solid var(--wbd2);border-radius:10px}
-.se-rs::before{top:10px;bottom:10px}
-.se-rs>b{font-size:21px}
-.se-rs .se-rsm{color:var(--sv-green);font-weight:700}
+/* the restake row: a line with the year and what it adds, then its day, week and month in teal */
+.se-rsw{display:flex;flex-direction:column;gap:5px;flex:0 0 auto}
+.se-rsh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:0 2px}
+.se-rsh em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--sv-teal)}
+.se-rsh span{font-size:11px;color:var(--ws);white-space:nowrap;font-variant-numeric:tabular-nums}
+.se-rsh b{color:var(--sv-green);font-weight:700}
+.se-rsv{color:var(--sv-teal)}
 /* a short window has no room for it under the boxes: the doors must stand in the panel */
 /* short windows keep the restake card: one line, the doors and the boxes a touch tighter */
 @media(min-width:901px) and (max-height:760px){
-  #sv-over .se-rs{padding:6px 12px 6px 14px}#sv-over .se-rs>b{font-size:17px}#sv-over .se-rs small{display:none}
-  #sv-over .se-rs>b::after{content:attr(data-more);margin-left:8px;font-size:11px;font-weight:600;color:var(--sv-green)}}
+  #sv-over .se-rsr .sd-fig small{display:none}#sv-over .se-rsr .sd-fig{padding-top:4px;padding-bottom:5px}}
 /* shorter still: the year card and its boxes compact, so both doors stand inside the panel */
 @media(min-width:901px) and (max-height:700px){
   #sv-over .se-card{padding:8px 14px 9px}#sv-over .se-card>b{font-size:30px}
   #sv-over .se-row .sd-fig{padding-top:5px;padding-bottom:6px}#sv-over .se-row .sd-fig>b{font-size:17px}
   #sv-over .sd-go2 .sd-go,#sv-over #sd-move .sd-go{height:34px}}
 @media(min-width:901px) and (max-height:700px){#sv-over .se-row .sd-fig small{display:none}#sv-over .se-mid,#sv-over .se-ex{gap:6px}}
-@media(min-width:901px) and (max-height:640px){#sv-over .se-card small.se-apr{display:none}#sv-over .se-rs{padding-top:4px;padding-bottom:4px}#sv-over .sd-go2 .sd-go{height:32px}}
+@media(min-width:901px) and (max-height:640px){#sv-over .se-card small.se-apr{display:none}#sv-over .se-card em{display:none}#sv-over .se-rsw{gap:3px}#sv-over .se-rsh span{display:none}#sv-over .se-row .sd-fig>b{font-size:15px}#sv-over .se-row .sd-fig{padding-top:3px;padding-bottom:3px}#sv-over .sd-go2 .sd-go{height:32px}}
 @media(min-width:901px) and (max-height:640px){
   #sv-over .se-card{padding:6px 14px 7px;gap:0}#sv-over .se-card>b{font-size:26px}#sv-over .se-card em{font-size:8px}
   #sv-over .se-mid,#sv-over .se-ex{gap:6px}#sv-over .se-row .sd-fig{padding-top:4px;padding-bottom:4px}

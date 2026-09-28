@@ -158,8 +158,11 @@
     /* restaking monthly: the rewards claimed and staked again each month earn too - a year of it against
        the plain year (today's rate carried forward, compounded twelve times) */
     var cy = stake * (Math.pow(1 + rate / 12, 12) - 1), more = cy - y;
-    var rst = rate > 0 ? '<div class="sd-fig se-rs" style="--rc:var(--sv-teal)"><em>Restake monthly</em><b data-more="+' + one(more / 1e6) + ' more"><span class=sd-gain>+' + one(cy / 1e6) + '</span><i class=u>ATONE a year</i></b>' +
-      '<small><span class=se-rsm>+' + one(more / 1e6) + '</span> more than leaving rewards unclaimed</small></div>' : '';
+    /* the restaked year as the plain one is shown: a day, a week, a month - each its share of the
+       compounded year - under a line with the year and what restaking adds */
+    var rtile = function(k, u){ return fig(k, '<span class=se-rsv>+' + one(u / 1e6) + '</span>', "ATONE", "var(--sv-teal)"); };
+    var rst = rate > 0 ? '<div class=se-rsw><div class=se-rsh><em>Restake monthly</em><span>+' + one(cy / 1e6) + ' ATONE a year, <b>+' + one(more / 1e6) + '</b> more</span></div>' +
+      '<div class="sd-figs two se-row se-rsr">' + rtile("A day", cy / 365) + rtile("A week", cy * 7 / 365) + rtile("A month", cy / 12) + '</div></div>' : '';
     /* the same block as the connected one: the figure in ATONE, the rate under it */
     if(ex) return '<div class=se-ex><div class=se-hero><div class=se-card><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b><small class=se-apr>' + pct(rate) + ' APR</small></div></div>' +
       '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' + rst + '</div>';
