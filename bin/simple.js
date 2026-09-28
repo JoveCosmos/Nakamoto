@@ -421,7 +421,7 @@
         : '<button class="sv-btn go sd-go ap-go" type=button data-act=autopilot>Activate Autopilot</button>';
       put("sd-alist", '<div class=sv-ph><h3>Validators</h3></div><div class=ap-act><b>Activate Autopilot</b>' +
         '<span>' + (!pos ? 'Connect a wallet, then choose the validators Autopilot may use.' : !pos.rows.length ? 'Stake some ATONE first; Autopilot then keeps it with the better payers.'
-          : 'Choose the validators it may use. It keeps your stake with the best of them, and lists them here.') + '</span>' + go +
+          : 'Choose the validators it may use. It keeps your stake with the best of them, monitors them and lists them here.') + '</span>' + go +
         '<em class=ap-48s>Autopilot activates within 48 hours of your grant.</em></div>');
       put("sd-ars", restakePanel(pos, at));
       return;
