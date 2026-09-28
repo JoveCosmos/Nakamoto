@@ -1543,9 +1543,9 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
   :is(#sv-over,#sv-auto) .sd-col>.sv-ph,#sv-auto .sd-col>.sv-ph{min-height:32px}
   /* Stake (Easy and Pro): every panel's title row a filled band across the panel's top - the wallet card's build
      (a light from the top left, rings from the right), each panel its own colour; the content keeps its line */
-  :is(#sv-over,#sv-auto) .sd-col>.sv-ph,#p-dele #wbody #wk-mv>.wk-ph{margin:-11px -14px 0!important;padding:5px 14px 6px!important;min-height:43px!important;height:auto!important;max-height:none!important;box-sizing:border-box;border-radius:11px 11px 0 0;border-bottom:1px solid rgba(255,255,255,.08)}
-  :is(:is(#sv-over,#sv-auto) .sd-col>.sv-ph,#p-dele #wbody #wk-mv>.wk-ph) h3{color:#fff!important}
-  :is(:is(#sv-over,#sv-auto) .sd-col>.sv-ph,#p-dele #wbody #wk-mv>.wk-ph) h3::before{background:rgba(255,255,255,.9)!important;box-shadow:0 0 10px -1px rgba(255,255,255,.7)!important}
+  :is(#sv-over,#sv-auto) .sd-col>.sv-ph{margin:-11px -14px 0!important;padding:5px 14px 6px!important;min-height:43px!important;height:auto!important;max-height:none!important;box-sizing:border-box;border-radius:11px 11px 0 0;border-bottom:1px solid rgba(255,255,255,.08)}
+  :is(#sv-over,#sv-auto) .sd-col>.sv-ph h3{color:#fff!important}
+  :is(#sv-over,#sv-auto) .sd-col>.sv-ph h3::before{background:rgba(255,255,255,.9)!important;box-shadow:0 0 10px -1px rgba(255,255,255,.7)!important}
   #sd-move .sd-mvh .sd-mvn{color:rgba(255,255,255,.72)}
   /* the content under every band starts on one line (8px under it) */
   #sv-over #sd-list .fp-bc{margin-top:0}
@@ -1576,13 +1576,12 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
 :is(#sv-over,#sv-auto) .sd-col>.sv-ph .sv-tag.se-off{color:#ffd9cf;border-color:rgba(255,140,110,.65);background:rgba(255,77,31,.32);font-weight:600;white-space:nowrap}
 /* each banded section is framed in its band's colour: a thin fill down both sides and along the foot, over the
    border, so nothing moves */
-:is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#sv-auto #sd-ado,#sv-auto #sd-asky,#sv-auto #sd-alist,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist){position:relative}
-:is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#sv-auto #sd-ado,#sv-auto #sd-asky,#sv-auto #sd-alist,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist)::after{content:"";display:block!important;position:absolute;inset:-1px;border-radius:12px;padding:0 3px 3px;background:linear-gradient(315deg,var(--bandf));pointer-events:none;z-index:2;
+:is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#sv-auto #sd-ado,#sv-auto #sd-asky,#sv-auto #sd-alist,#sv-proplist,#sv-daop,#sv-govlist){position:relative}
+:is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#sv-auto #sd-ado,#sv-auto #sd-asky,#sv-auto #sd-alist,#sv-proplist,#sv-daop,#sv-govlist)::after{content:"";display:block!important;position:absolute;inset:-1px;border-radius:12px;padding:0 3px 3px;background:linear-gradient(315deg,var(--bandf));pointer-events:none;z-index:2;
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 #sv-over #sd-list{--bandf:#0f6b67,#123a52 58%,#141633}
 #sv-over #sd-sky{--bandf:#8a5a12,#4a2f12 58%,#1f1630}
 #sv-over #sd-move{--bandf:#0a3a22,#072a19 58%,#05140d}
-#p-dele #wbody #wk-mv{--bandf:#4130a0,#271c6c 58%,#150f3b}
 #sv-proplist{--bandf:#1d4f8f,#173257 58%,#141633}
 #sv-daop{--bandf:#5f6216,#393b15 58%,#19191f}
 #sv-govlist{--bandf:#7d2e6e,#461f45 58%,#1a1230}
@@ -1607,8 +1606,6 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
 @media(max-width:900px){:is(#sv-over,#sv-auto) .sd-col>.sv-ph{margin:-14px -16px 0;padding:5px 16px 6px;min-height:43px;box-sizing:border-box;border-radius:11px 11px 0 0;border-bottom:1px solid rgba(255,255,255,.08)}
   :is(#sv-over,#sv-auto) .sd-col>.sv-ph h3{color:#fff}:is(#sv-over,#sv-auto) .sd-col>.sv-ph h3::before{background:rgba(255,255,255,.9);box-shadow:none}}
 @media(min-width:901px){
-  #p-dele #wbody #wk-mv>.wk-ph+*{margin-top:8px!important}
-  #p-dele #wbody #wk-mv>.wk-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#4130a0,#271c6c 58%,#150f3b)}
   /* the wider padding leaves the Delegations table 4px less: its figures keep their room, the name gives */
   #p-dele #wbody #dmy col:nth-child(1){width:30px!important}#p-dele #wbody #dmy col:nth-child(3){width:66px!important}
   #p-dele #wbody #dmy col:nth-child(4){width:48px!important}#p-dele #wbody #dmy col:nth-child(5){width:50px!important}
@@ -4349,6 +4346,8 @@ background:radial-gradient(55% 160% at 0% 0%,rgba(185,176,255,.14),transparent 6
 :is(#sd-wstrip,#sd-mstrip) .sd-ro:not(#z){background:none;border-left-color:rgba(255,255,255,.1)}
 :is(#sd-wstrip,#sd-mstrip) .sd-ro em:not(#z){color:rgba(255,255,255,.78)}
 .sd-strip .sd-ro .sd-well:not(#z){border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);box-shadow:none}
+/* Outcome's content starts on Delegations' and Redelegate's line */
+@media(min-width:901px){#p-dele #wbody #wk-mv>.wk-ph+*{margin-top:10px!important}}
 .sv-btn.go.sd-go:disabled{background:rgba(255,255,255,.05);border-color:var(--wbd2);color:var(--wf);box-shadow:none;cursor:not-allowed;margin-top:auto}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}
