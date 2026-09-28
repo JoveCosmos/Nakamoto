@@ -4793,7 +4793,7 @@ white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .atfee{margin:8px 0 0;padding:9px 12px;border:1px solid rgba(255,176,46,.28);border-radius:6px;background:rgba(255,176,46,.05);font-family:var(--wmono);font-size:9px;letter-spacing:.04em;color:var(--ws);line-height:1.5}
 .atfee b{color:var(--wamber);font-weight:400}
 .atnote{display:flex;align-items:center;gap:8px;margin:12px 0 0;padding:8px 10px;border-radius:6px;border:1px solid rgba(46,224,106,.28);background:rgba(46,224,106,.06);font-family:var(--wsans);font-size:11px;letter-spacing:-.005em;color:#d9f7e4;white-space:nowrap}
-.atnote span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.atnote span{min-width:0}.atnote span b{color:#fff8dc;font-weight:700}
 .atnote svg{width:15px;height:15px;flex:0 0 auto;fill:none;stroke:#2ee06a;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin:0;max-height:none}
 /* the validators: a head with the count and the quick rules, a search and a filter, the list */
 .atrh{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -4951,8 +4951,15 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 #atpop .atpre,#atpop .atrow>.wk-field,#atpop .atrow>.attime,#atpop .atrow>.atseg,#atpop .atrow>.unhint{padding-left:0;margin-left:0}
 @media(min-width:861px) and (max-height:1000px){#atpop .atrow:not(#z){padding:8px 0;gap:6px}#atpop .atidle:not(#z){margin-top:8px;padding:8px 11px;font-size:11.5px}#atpop .atlab small{display:none}}
 @media(min-width:861px) and (max-height:860px){#atpop .atpc .atd{display:none}#atpop .atnote:not(#z){margin-top:8px}#atpop .atpc:not(#z){padding-top:8px;padding-bottom:8px}}
-@media(min-width:861px) and (max-height:760px){#atpop .atidle{display:none!important}#atpop .atrow:not(#z){padding:6px 0;gap:5px}}
+@media(min-width:861px) and (max-height:760px){#atpop .atidle{display:none!important}#atpop .atrow:not(#z){padding:6px 0;gap:5px}#atpop .atnote:not(#z){margin-top:6px;padding:6px 10px}}
 @media(min-width:861px) and (max-height:640px){#atpop .atL:not(#z){overflow-y:auto}}
+/* within 48 hours: the keeper proposes, an admin acts */
+#atpop .atnote:not(#z),#atpop .atnote span:not(#z){white-space:normal;overflow:visible;text-overflow:clip;line-height:1.45}
+.ap-48{padding:9px 12px;border-radius:9px;border:1px solid rgba(43,200,214,.4);background:rgba(43,200,214,.08);font-size:12px;color:var(--ws)}
+.ap-48 b{color:#8ff5ec;font-weight:700}
+#sv-auto .ap-act .ap-48s{font-style:normal;font-size:11px;color:var(--wf)}
+.sd-ida .sd-wch i.st.rs{color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.06)}
+.sd-ida .sd-wch i.st.rs.on{color:#b6f5cb;border-color:rgba(143,240,176,.6);background:rgba(46,224,106,.16)}
 /* the setup's validator count: Redelegate's live count, at the right of the list's title */
 #atpop .atrt:not(#z){display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
 #atpop .atrh,#atpop .atrt:not(#z){width:100%}
@@ -5593,7 +5600,7 @@ html[data-tab=connect] .l2host{display:none}
         <div class=atrsnote id=atrsnote hidden></div>
         <div class=atfee id=atfee hidden></div>
       </div>
-      <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. You can revoke the grant at any time.</span></div>
+      <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. Autopilot activates within <b>48 hours</b> of your grant; you can revoke it at any time.</span></div>
     </section>
     <section class=atR id=atR aria-label="Select your validators">
       <div class=atrh><div class=atrt><b>Select your validators</b><span class=wk-seln id=atcount aria-live=polite></span></div></div>

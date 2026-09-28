@@ -365,7 +365,9 @@
     /* the strip as the Stake view's: the lead card (name and state on one line, the door under them), then five
        boxes - the figure in its well, the unit beside it, no captions and no gauges */
     put("sd-astrip",
-      '<div class="sd-id sd-ida"><div class=sd-top><h3>Autopilot</h3></div><div class=sd-wmeta><span class=sd-wch><i class="st' + (g ? ' on' : '') + '">' + (g ? "Active" : "Inactive") + '</i>' + door + '</span></div></div>' +
+      '<div class="sd-id sd-ida"><div class=sd-top><h3>Autopilot</h3></div><div class=sd-wmeta><span class=sd-wch><i class="st' + (g ? ' on' : '') + '">' + (g ? "Active" : "Inactive") + '</i>' +
+        /* restake: on only when the grant carries it */
+        '<i class="st rs' + (g && at.restake ? ' on' : '') + '">Restake ' + (g && at.restake ? 'on' : 'off') + '</i>' + door + '</span></div></div>' +
       (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "\u2014", "", null, "var(--sv-green)", "", false, rec ? "APR" : "")
          : ro("Strategy", "\u2014", "", null, "var(--sv-violet)")) +
       ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "\u2014", "", null, "var(--sv-violet)", "", false, g && a.max_tokens ? "ATONE" : "") +
@@ -383,6 +385,8 @@
     }
     if(g) put("sd-ado",
       '<div class=sv-ph><h3>Autopilot is working</h3></div>' +
+      /* the keeper proposes, an admin acts: until its first move, say when it starts */
+      (!moves ? '<div class=ap-48>Autopilot activates within <b>48 hours</b> of your grant.</div>' : '') +
       '<div class=sd-ok>Strategy is active on your stake' + (since ? ' since <b class=d>' + since + '</b>' : '') + (rec ? ', earning <b>' + sgn(rec.rate - rec.start.rate) + ' APR</b> (' + sgnA((rec.rate - rec.start.rate) * rec.staked) +
         ' ATONE a year) since Autopilot started, <b>' + sgn(rec.rate - rec.m3.rate) + '</b> over the last 3 months.' : '.') + '</div>' +
       '<div class="sd-figs two">' +
@@ -418,7 +422,8 @@
         : '<button class="sv-btn go sd-go ap-go" type=button data-act=autopilot>Activate Autopilot</button>';
       put("sd-alist", '<div class=sv-ph><h3>Validators</h3></div><div class=ap-act><b>Activate Autopilot</b>' +
         '<span>' + (!pos ? 'Connect a wallet, then choose the validators Autopilot may use.' : !pos.rows.length ? 'Stake some ATONE first; Autopilot then keeps it with the better payers.'
-          : 'Choose the validators it may use. It keeps your stake with the best of them, and lists them here.') + '</span>' + go + '</div>');
+          : 'Choose the validators it may use. It keeps your stake with the best of them, and lists them here.') + '</span>' + go +
+        '<em class=ap-48s>Autopilot activates within 48 hours of your grant.</em></div>');
       return;
     }
     var rows = pos ? pos.rows : [];
