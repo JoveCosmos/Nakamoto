@@ -53,7 +53,7 @@ ufw allow from 10.9.0.1 to any port 8788 proto tcp comment 'atomone autopilot si
 sleep 5; journalctl -u atomone-autopilot-signer -n 5 --no-pager   # expect: "signing as atone1..."
 
 # 5. hand the secret to the app box ONCE (show it, copy it into the keeper env there, clear the screen)
-systemd-creds decrypt /etc/atomone-autopilot/secret.cred -
+systemd-creds decrypt --name=autopilot_secret /etc/atomone-autopilot/secret.cred -
 
 # 6. fund the address it signs as with a little PHOTON (fees only; it never needs ATONE)
 ```
