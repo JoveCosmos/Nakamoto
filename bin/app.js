@@ -2688,7 +2688,8 @@ rememberGridH();
             '<thead><tr><th class=ck></th><th class=l>validator</th><th>90<span class=lc>d</span> uptime</th><th>APR</th></tr></thead><tbody>';
     rows.forEach(function(o){
       var d = VD[o.id], u90 = d.d90 != null ? +d.d90 : (o.up != null ? +o.up : null);
-      h += '<tr' + (o.on ? ' class=on' : '') + ' data-id="' + att(o.id) + '"><td class=ck><input type=checkbox aria-label="' + att(o.m) + '"' + (o.on ? ' checked' : '') + (view ? ' disabled' : '') + '></td>' +
+      /* Autopilot's own picks are listed, not ticked: nothing here is the reader's selection yet */
+      h += '<tr' + (o.on && !auto ? ' class=on' : '') + ' data-id="' + att(o.id) + '"><td class=ck>' + (auto ? '' : '<input type=checkbox aria-label="' + att(o.m) + '"' + (o.on ? ' checked' : '') + (view ? ' disabled' : '') + '>') + '</td>' +
            '<td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span class=nmt>' + att(o.m) + '</span>' +
              (mine[o.id] ? '<span class="attg y">yours</span>' : '') + (fit[o.id] && !ph ? '<span class="attg f">fits</span>' : '') + '</div></td>' +
            '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '—' : u90.toFixed(1) + '%') + '</td>' +
@@ -2805,8 +2806,8 @@ rememberGridH();
     var tr = ev.target.closest ? ev.target.closest("tr[data-id]") : null;
     if(!tr || atViewing()) return;
     var box = tr.querySelector("input"), on = ev.target === box ? box.checked : !tr.classList.contains("on");
-    /* from Autopilot's pick, the first tap starts the reader's own list from that pick */
-    if(atPick() === "auto"){ ATSEL = {}; atAutoIds().forEach(function(x){ ATSEL[x] = 1; }); atSetPick("selected"); }
+    /* from Autopilot's pick, a tap starts the reader's own list with that one validator: picked one by one */
+    if(atPick() === "auto"){ ATSEL = {}; atSetPick("selected"); on = true; }
     if(on && !ATSEL[tr.dataset.id] && atSelIds().length >= AT_MAX){
       atRefresh(); var hn = E("athint"); if(hn){ hn.className = "unhint bad"; hn.textContent = "At most " + AT_MAX + " validators: untick one first"; }
       return; }

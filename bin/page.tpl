@@ -4351,12 +4351,24 @@ html #sv-over .sd-wgrid:not(#z){gap:0;background:linear-gradient(180deg,#131329,
 html #sv-over .sd-wgrid>.sd-col:not(#z){background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important}
 html :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move)::before,html :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move)::after{display:none!important}
 html #sv-over .sd-wgrid>.sd-col>.sv-ph:not(#z){background:none!important;border-bottom:0!important;border-radius:0!important}
-html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){color:#f3f0ff!important;font-size:18px!important;font-weight:700;letter-spacing:-.012em;gap:10px}
-@media(min-width:901px) and (max-width:1599px){html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){font-size:17px!important}}
-@media(min-width:901px) and (max-width:1299px){html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){font-size:15.5px!important}}
-@media(max-width:900px){html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){font-size:15.5px!important}}
+html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){color:#f3f0ff!important;font-size:18px!important;font-weight:700;letter-spacing:-.012em;gap:8px}
+@media(min-width:901px) and (max-width:1599px){html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){font-size:16px!important}}
+@media(min-width:901px) and (max-width:1299px){html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){font-size:14.5px!important}}
+@media(max-width:900px){html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){font-size:15px!important}}
+/* narrower windows and phones: the tile, the gaps and the tags a step tighter, so every title stays whole */
+@media(max-width:1399px){html #sv-over .sd-wgrid>.sd-col>.sv-ph:not(#z){gap:6px}html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){gap:7px}
+  html #sv-over .sd-wgrid>.sd-col>.sv-ph h3::before{width:22px!important;height:22px!important;flex-basis:22px;background-size:13px 13px!important}
+  html #sv-over .sd-wgrid>.sd-col>.sv-ph .sv-tag:not(#z){padding-left:5px;padding-right:5px;letter-spacing:0}}
+@media(max-width:900px){html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){font-size:14px!important}}
 @media(max-width:900px){html #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn:not(#z){flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
-html #sv-over .sd-wgrid>.sd-col>.sv-ph h3::before{width:4px!important;height:18px!important;border-radius:3px!important;background:linear-gradient(180deg,#d6d0ff,#9d93f0)!important;box-shadow:0 0 10px -2px rgba(185,176,255,.6)!important;opacity:1}
+/* each title led by its own small icon tile, one soft violet for all three; the words in a gentle white-to-lavender */
+html #sv-over .sd-wgrid>.sd-col>.sv-ph h3::before{width:24px!important;height:24px!important;flex:0 0 24px;border-radius:7px!important;box-sizing:border-box;
+  border:1px solid rgba(185,176,255,.32);background-color:rgba(185,176,255,.12)!important;background-position:center!important;background-size:14px 14px!important;background-repeat:no-repeat!important;
+  box-shadow:0 0 14px -6px rgba(185,176,255,.7)!important;opacity:1}
+html #sv-over .sd-wgrid>#sd-list>.sv-ph h3::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23d6d0ff%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2020V11M12%2020V4M19%2020v-6%22/%3E%3C/svg%3E")!important}
+html #sv-over .sd-wgrid>#sd-sky>.sv-ph h3::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23d6d0ff%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%2017l6-6%204%204%208-8M15%207h6v6%22/%3E%3C/svg%3E")!important}
+html #sv-over .sd-wgrid>#sd-move>.sv-ph h3::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23d6d0ff%22%20stroke-width%3D%222.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%208h14l-4-4M20%2016H6l4%204%22/%3E%3C/svg%3E")!important}
+html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){background-image:linear-gradient(90deg,#ffffff,#d9d3ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 html #sv-over .sd-wgrid>.sd-col>.sv-ph .sv-tag:not(#z){color:var(--ws)!important;border-color:var(--wbd2)!important;background:rgba(255,255,255,.04)!important;font-weight:600}
 .sv-btn.go.sd-go:disabled{background:rgba(255,255,255,.05);border-color:var(--wbd2);color:var(--wf);box-shadow:none;cursor:not-allowed;margin-top:auto}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
