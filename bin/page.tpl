@@ -5025,7 +5025,7 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 #sv-auto .ap-cb.no b{color:#ff8a8a}#sv-auto .ap-cb.ok b{color:var(--sv-green)}
 #sv-auto .ap-cb small{font-size:10.5px;line-height:1.35;color:var(--ws);text-wrap:balance}
 @media(min-width:901px) and (max-width:1399px){#sv-auto .ap-cb b{font-size:17px}#sv-auto .ap-cb small{font-size:10px}}
-@media(min-width:901px) and (max-height:760px){#sv-auto .ap-cb small{display:none}#sv-auto .ap-cb{padding:7px 6px 8px}#sv-auto .ap-dd{gap:5px}}
+@media(min-width:901px) and (max-height:760px){#sv-auto .ap-cb{padding:5px 6px 6px;gap:2px}#sv-auto .ap-dd{gap:5px}#sv-auto .ap-cb small{font-size:9.5px;line-height:1.25}#sv-auto .ap-cb b{font-size:15px}#sv-auto .ap-cb em{padding-bottom:3px}}
 @media(max-width:700px){#sv-auto .ap-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* Restake: its figure, its fixed rules, its switch */
 #sv-auto #sd-ars{justify-content:flex-start}
