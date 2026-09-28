@@ -53,10 +53,7 @@
         .then(function(){ b.classList.remove("busy"); draw(); });
     });
   });
-  api("status").then(function(s){
-    var f = function(u){ return (Number(u) / 1e6).toLocaleString(undefined, { maximumFractionDigits: 0 }); };
-    E("foot").innerHTML = "Each address gets each token once. Testnet coins only, on " + s.chain_id + ". The faucet holds <b>" + f(s.atone) + " ATONE</b> and <b>" + f(s.photon) + " PHOTON</b>.";
-  }).catch(function(){ say("The faucet is not answering right now.", "err"); });
+  api("status").catch(function(){ say("The faucet is not answering right now.", "err"); });
   /* a wallet connected in the app before fills the address at once */
   try{ if(localStorage.getItem("th_wallet") === "Keplr") connect(true); }catch(e){}
   draw();
