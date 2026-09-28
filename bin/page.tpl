@@ -4245,9 +4245,9 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
   #sv-over .se-mid,#sv-over .se-ex{gap:6px}#sv-over .se-row .sd-fig{padding-top:4px;padding-bottom:4px}
   #sv-over .sd-col>.sv-ph{min-height:24px}}
 /* the restake offer stands at the panel's foot, level with Where your stake sits' three boxes and built as they
-   are (8px label, 18px figure, 10px line, the same padding and radius), in green; the Auto-pilot arrow at its right */
+   are (8px label, 18px figure, 10px line, the same padding and radius), in green */
 #sv-over #sd-sky .se-mid>.se-rsw,#sv-over #sd-sky .se-ex>.se-rsw{margin-top:auto;padding-top:0;gap:6px}
-#sv-over #sd-sky .se-card.se-rc2{position:relative;gap:1px;padding:7px 88px 8px;border-radius:9px;background:linear-gradient(90deg,rgba(46,224,106,.1),rgba(255,255,255,.012) 70%)}
+#sv-over #sd-sky .se-card.se-rc2{position:relative;gap:1px;padding:7px 14px 8px;border-radius:9px;background:linear-gradient(90deg,rgba(46,224,106,.1),rgba(255,255,255,.012) 70%)}
 #sv-over #sd-sky .se-card.se-rc2::before{background:var(--sv-green);box-shadow:0 0 12px var(--sv-green)}
 #sv-over #sd-sky .se-rc2 em{display:block;font-size:8px;letter-spacing:.1em;line-height:1.5}
 #sv-over #sd-sky .se-rc2>b{font-size:18px;line-height:1.5;font-weight:800;letter-spacing:-.02em}
@@ -4255,20 +4255,15 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 #sv-over #sd-sky .se-rc2 small{display:block;font-size:9px;line-height:1.5;color:var(--ws);white-space:nowrap}
 #sv-over #sd-sky .se-rc2 .se-rsv{color:var(--sv-green)}
 #sv-over #sd-sky .se-rsh2 h4::before{background:var(--sv-green);box-shadow:0 0 10px -1px var(--sv-green)}
-.se-rsgo{position:absolute;right:10px;top:50%;transform:translateY(-50%);display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 8px 0 10px;border-radius:7px;
-  border:1px solid rgba(46,224,106,.45);background:rgba(46,224,106,.1);color:var(--sv-green);font:700 10px var(--wmono);letter-spacing:.06em;cursor:pointer}
-.se-rsgo svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.se-rsgo:hover{background:rgba(46,224,106,.2)}
-.se-rsgo:focus-visible{outline:2px solid var(--sv-green);outline-offset:2px}
 @media(min-width:901px) and (max-height:700px){#sv-over #sd-sky .se-rc2>b{font-size:15px}}
 /* a short window: the day, week and month each on one line (label beside the figure), so the restake card still
    stands level with the boxes */
 @media(min-width:901px) and (max-height:640px){#sv-over #sd-sky .se-row .sd-fig{flex-direction:row;align-items:baseline;justify-content:center;gap:8px;padding-top:3px;padding-bottom:3px}
   #sv-over #sd-sky .se-row .sd-fig>em{margin:0}#sv-over #sd-sky .se-row .sd-fig::before{display:none}#sv-over #sd-sky .se-mid,#sv-over #sd-sky .se-ex{gap:4px}#sv-over #sd-sky .se-mid>.se-rsw{gap:5px}}
-/* phones: a band stays one line; the restake card's Auto-pilot arrow stands under its text, centred */
+/* phones: a band stays one line */
 @media(max-width:900px){#sv-over .sd-col>.sv-ph{flex-wrap:nowrap}#sv-over .sd-col>.sv-ph h3{min-width:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #sv-over .sd-col>.sv-ph .sv-tag{flex:0 0 auto}
-  #sv-over #sd-sky .se-rsw>.se-card.se-rc2{padding:8px 12px 10px}#sv-over #sd-sky .se-rc2 .se-rsgo{position:static;transform:none;align-self:center;margin-top:6px}}
+  #sv-over #sd-sky .se-rsw>.se-card.se-rc2{padding:8px 12px 10px}#sv-over #sd-sky .se-rc2 }
 .sv-btn.go.sd-go:disabled{background:rgba(255,255,255,.05);border-color:var(--wbd2);color:var(--wf);box-shadow:none;cursor:not-allowed;margin-top:auto}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}
@@ -4416,6 +4411,52 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gd-h{display:flex;align-items:center;gap:10px}.gd-h b{font-size:14px;color:var(--wt)}
 .gd-r p{margin:6px 0 0;font-size:12.5px;line-height:1.55;color:var(--ws)}
 .gd-note{font-size:12px;line-height:1.55;color:var(--wf)}.gd-note b{color:var(--wt)}.gd-note a{color:var(--sv-teal)}
+/* ════ Governance, in the Dashboard's parts: its figures a strip of boxes with engraved wells, each panel's
+   title a filled band of its own colour, tags that read clearly on any ground ════ */
+.gv-strip{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:0!important;border:1px solid var(--wbd);border-radius:12px;background:var(--wc);overflow:hidden}
+.gv-ro{--rc:var(--sv-teal);display:flex;flex-direction:column;min-width:0;padding:12px 14px;border-left:1px solid var(--wbd)}
+.gv-ro:first-child{border-left:0}
+.gv-ro em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);white-space:nowrap;margin-bottom:7px}
+.gv-ro em::before{content:"";display:inline-block;width:6px;height:6px;margin-right:7px;border-radius:2px;vertical-align:1px;background:var(--rc);box-shadow:0 0 8px var(--rc)}
+.gv-ro .sd-well{margin:0;padding:6px 12px;min-height:46px;box-sizing:border-box}
+.gv-ro .sd-well>b{font-size:22px}
+.gv-ro small{margin-top:7px;font-size:11px;line-height:1.4;color:var(--ws);text-wrap:balance}
+/* the bands: Proposals blue, Core DAOs olive gold, Governors rose - none shared with another panel */
+:is(#sv-proplist,#sv-daop,#sv-govlist)>.sv-ph{margin:-13px -15px 0;padding:5px 15px 6px;min-height:43px;box-sizing:border-box;flex-wrap:nowrap;border-radius:11px 11px 0 0;border-bottom:1px solid rgba(255,255,255,.08)}
+:is(#sv-proplist,#sv-daop,#sv-govlist)>.sv-ph h3{color:#fff;font-size:15px;white-space:nowrap}
+:is(#sv-proplist,#sv-daop,#sv-govlist)>.sv-ph h3::before{background:rgba(255,255,255,.9);box-shadow:none}
+:is(#sv-proplist,#sv-daop,#sv-govlist)>.sv-ph .sv-gkey{color:rgba(255,255,255,.75);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#sv-proplist>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#1d4f8f,#173257 58%,#141633)}
+#sv-daop>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#5f6216,#393b15 58%,#19191f)}
+#sv-govlist>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#7d2e6e,#461f45 58%,#1a1230)}
+/* proposals: the id a small key, the status a clear tag, the tally a firmer bar, Yes the figure */
+.gp-id{justify-self:start;padding:2px 7px;border-radius:6px;border:1px solid var(--wbd2);background:rgba(0,0,0,.25);color:var(--ws)}
+.gp-r{border-radius:9px;border-top-color:transparent;box-shadow:0 -1px 0 var(--wbd)}
+.gp-st{font-weight:600;padding:3px 9px}
+.gp-st.p{color:#c9ffdb;border-color:rgba(46,224,106,.6);background:rgba(46,224,106,.16)}
+.gp-st.r{color:#ffd6cb;border-color:rgba(255,110,70,.65);background:rgba(255,77,31,.18)}
+.gp-st.f{color:#ffe2b0;border-color:rgba(255,176,46,.6);background:rgba(255,176,46,.16)}
+.gp-st.v{color:#c8fff9;border-color:rgba(43,200,189,.65);background:rgba(43,200,189,.18)}
+.gp-st.d{color:var(--ws);border-color:var(--wbd2);background:rgba(255,255,255,.05)}
+.gp-bar{height:8px;border-radius:4px}
+.gp-v em{font-size:14px;font-weight:800}
+/* core DAOs: side by side, each under its colour line, as the thirds in Where your stake sits */
+.gd-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.gd-r{border-top:2px solid var(--sv-teal);background:linear-gradient(180deg,rgba(43,200,189,.06),transparent 60%)}
+.gd-r+.gd-r{border-top-color:var(--sv-amber);background:linear-gradient(180deg,rgba(255,176,46,.06),transparent 60%)}
+.gd-h b{font-size:15px}
+.gd-note{grid-column:1/-1}
+/* governors, read only here: the action column holds the site link alone */
+#sv-govs .sv-glist .sv-vr{grid-template-columns:28px minmax(0,1.4fr) 84px minmax(0,1fr) 90px minmax(0,1fr) 44px}
+/* the constitution reads across the whole panel */
+#sv-cons .cn-in{max-width:none;margin:0;padding:0 40px 64px}
+/* its header a sepia band across the top of the text, the Governance section's fourth colour */
+#sv-cons .cn-hd{margin:0 -40px 26px;padding:24px 40px 18px;border-bottom:1px solid rgba(255,255,255,.08);border-radius:11px 11px 0 0;
+background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#6b5a3a,#3b3226 58%,#19171d)}
+#sv-cons .cn-hd h1{color:#fff}#sv-cons .cn-hd p{color:rgba(255,255,255,.78)}#sv-cons .cn-hd p b{color:#fff}#sv-cons .cn-hd a{color:#ffe2b0}
+@media(max-width:900px){#sv-cons .cn-in{padding:0 16px 48px}#sv-cons .cn-hd{margin:0 -16px 20px;padding:18px 16px 14px}}
+@media(max-width:700px){.gv-strip{grid-template-columns:minmax(0,1fr)!important}.gv-ro{border-left:0;border-top:1px solid var(--wbd)}.gv-ro:first-child{border-top:0}
+  .gd-list{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:700px){.gp-r{grid-template-columns:34px minmax(0,1fr) auto;gap:10px}.gp-v{grid-column:2/-1}.gp-d{padding-left:12px}}
 /* Constitution (cn-): the contents on the left, the text in a reading column on the right; each
    scrolls on its own, and the contents follow what is being read */
@@ -5146,18 +5187,18 @@ html[data-tab=connect] .l2host{display:none}
         <div class=sv-panel id=sv-actlive></div>
       </section>
       <section class=sv-screen id=sv-props data-sc=props aria-label=Proposals>
-        <div class=sv-cards id=sv-propcards></div>
+        <div class="sv-cards gv-strip" id=sv-propcards></div>
         <div class=sv-panel id=sv-proplist><div class=sv-ph><h3>Proposals</h3></div><div class=sv-upwait>Reading the proposals…</div></div>
       </section>
       <section class=sv-screen id=sv-cons data-sc=cons aria-label=Constitution>
         <div class=cn-wrap id=sv-consp><div class=sv-upwait>Opening the constitution…</div></div>
       </section>
       <section class=sv-screen id=sv-daos data-sc=daos aria-label="Core DAOs">
-        <div class=sv-cards id=sv-daocards></div>
+        <div class="sv-cards gv-strip" id=sv-daocards></div>
         <div class=sv-panel id=sv-daop><div class=sv-ph><h3>Core DAOs</h3></div><div class=sv-upwait>Reading the chain…</div></div>
       </section>
       <section class=sv-screen id=sv-govs data-sc=govs aria-label=Governors>
-        <div class=sv-cards id=sv-govcards></div>
+        <div class="sv-cards gv-strip" id=sv-govcards></div>
         <div class=sv-panel id=sv-govlist><div class=sv-ph><h3>Governors</h3></div><div class=sv-upwait>Reading the governors…</div></div>
       </section>
       <section class=sv-screen id=sv-mygov data-sc=mygov aria-label="Your governor">

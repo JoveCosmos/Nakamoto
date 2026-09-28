@@ -169,10 +169,9 @@
     /* the APR the compounded year amounts to, against today's: what restaking adds to the rate */
     var capr = Math.pow(1 + rate / 12, 12) - 1, dapr = (capr - rate) * 100;
     /* the offer: the title with the APR restaking adds in its tag, and a card like the year's - what it adds a
-       year, in green, level with Where your stake sits' three boxes; its one way on is the Auto-pilot arrow */
+       year, in green, level with Where your stake sits' three boxes */
     var offer = rate > 0 && !on ? '<div class=se-rsw><div class=se-rsh2><h4>Enable restake</h4>' + tag("g", "+" + dapr.toFixed(1) + "% APR") + '</div>' +
-        '<div class="se-card se-rc2"><em>A year, more</em><b><span class=se-rsv>+' + one(more / 1e6) + '</span><i>ATONE</i></b><small>auto-compounds your rewards</small>' +
-        '<button type=button class=se-rsgo data-act=autopilot title="Set up restake in Autopilot">Auto-pilot<svg viewBox="0 0 16 16" aria-hidden=true><path d="M3 8h9M8.5 4l4 4-4 4"/></svg></button></div></div>' : '';
+        '<div class="se-card se-rc2"><em>A year, more</em><b><span class=se-rsv>+' + one(more / 1e6) + '</span><i>ATONE</i></b><small>auto-compounds your rewards</small></div></div>' : '';
     var door = on ? '<div class=se-rson>Restake is on: your rewards compound on their own.<button type=button class=se-rsch data-act=autopilot>Change</button></div>' : '';
     /* the day, week and month first, the year under them */
     if(ex) return '<div class=se-ex>' + steps + year + offer + '</div>';
@@ -1025,7 +1024,7 @@
     loadGovs();
     var L = GV.list, act = L ? L.filter(function(g){ return g.active; }) : [], vp = 0, n = 0;
     (L || []).forEach(function(g){ vp += g.vp || 0; n += g.n || 0; });
-    var c = function(k, v, sub){ return '<div class="sv-card sv-span"><span class=sv-k>' + k + '</span><span class=sv-big>' + v + '</span><span class=sv-sub>' + sub + '</span></div>'; };
+    var C = ["var(--sv-teal)", "var(--sv-violet)", "var(--sv-green)"], ci = 0, c = function(k, v, sub){ return gstat(k, v, sub, C[ci++ % 3]); };
     put("sv-govcards", c("Governors", L ? String(L.length) : "\u2014", L ? "Active " + act.length : "reading the chain\u2026") +
       c("Voting power", L ? fmt(vp) : "\u2014", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(2) + "% of bonded ATONE follows a governor" : "ATONE") +
       c("Delegators", L ? String(n) : "\u2014", "wallets that follow a governor"));
@@ -1081,11 +1080,14 @@
     var t = String(p.msgs[0]).split(".").pop(), k = PKIND[t] || t.replace(/^Msg/, "").replace(/([a-z])([A-Z])/g, "$1 $2");
     return k + (p.msgs.length > 1 ? " and " + (p.msgs.length - 1) + " more" : "");
   }
+  /* a Governance figure, as the Dashboard's strip shows one: its label with a colour key, the figure in an
+     engraved well, a line under it */
+  function gstat(k, v, sub, rc){ return '<div class=gv-ro style="--rc:' + (rc || 'var(--sv-teal)') + '"><em>' + k + '</em><div class=sd-well><b>' + v + '</b></div>' + (sub ? '<small>' + sub + '</small>' : '<small>&nbsp;</small>') + '</div>'; }
   function ptally(t){ var y = +(t.yes_count || 0), n = +(t.no_count || 0), a = +(t.abstain_count || 0), s = y + n + a; return { y: y, n: n, a: a, s: s }; }
   function pday(t){ return t && window.__dayFull ? window.__dayFull(new Date(t).getTime()) : "—"; }
   function drawProps(){
     loadProps();
-    var L = GP.list, tp = GP.tp || {}, c = function(k, v, sub){ return '<div class="sv-card sv-span"><span class=sv-k>' + k + '</span><span class=sv-big>' + v + '</span><span class=sv-sub>' + sub + '</span></div>'; };
+    var L = GP.list, tp = GP.tp || {}, C = ["var(--sv-teal)", "var(--sv-amber)", "var(--sv-green)"], ci = 0, c = function(k, v, sub){ return gstat(k, v, sub, C[ci++ % 3]); };
     var n = function(st){ return L ? L.filter(function(p){ return p.st === st; }).length : 0; }, live = L ? L.filter(function(p){ return p.st === "PROPOSAL_STATUS_VOTING_PERIOD"; }) : [];
     put("sv-propcards",
       c("Proposals", L ? String(L.length) : "—", L ? n("PROPOSAL_STATUS_PASSED") + " passed, " + n("PROPOSAL_STATUS_REJECTED") + " rejected" + (n("PROPOSAL_STATUS_FAILED") ? ", " + n("PROPOSAL_STATUS_FAILED") + " failed" : "") +
@@ -1124,7 +1126,7 @@
   function drawDaos(){
     loadProps();
     var d = GP.dao, L = GP.list, net = TN() ? "testnet" : "mainnet";
-    var c = function(k, v, sub){ return '<div class="sv-card sv-span"><span class=sv-k>' + k + '</span><span class=sv-big>' + v + '</span><span class=sv-sub>' + sub + '</span></div>'; };
+    var C = ["var(--sv-teal)", "var(--sv-amber)", "var(--sv-green)"], ci = 0, c = function(k, v, sub){ return gstat(k, v, sub, C[ci++ % 3]); };
     var who = function(a){ return !d ? "—" : a ? esc(a.slice(0, 10) + "…" + a.slice(-6)) : "Not appointed"; };
     var ext = d ? +(d.voting_period_extensions_limit || 0) : null, dur = d ? Math.round(parseInt(d.voting_period_extension_duration || "0", 10) / 86400) : null;
     put("sv-daocards", c("Steering DAO", who(d && d.steering_dao_address), d ? (d.steering_dao_address ? "on chain" : "none on " + net + " yet") : "reading the chain…") +
