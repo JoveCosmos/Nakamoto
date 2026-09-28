@@ -397,8 +397,8 @@
         '<span class=ok>strategize for a better APR, within your allow-list</span>' +
         (at && at.restake ? '<span class=ok>restake your rewards</span>' : '<span class=dim>restake rewards, if you switch it on</span>') +
       '</div><div><u class=no>It may never</u><span class=no>send or spend your ATONE</span><span class=no>unstake it</span><span class=no>hold or custody it</span></div></div>' +
-      '<div class=sd-fine>' + (at && at.split_pct > 0 ? 'GATA keeps <b>' + at.split_pct + '%</b> of the rewards it restakes for you, and charges nothing else.'
-        : 'Autopilot is <b>free</b>: GATA takes no share of your rewards.') + ' The chain enforces these limits, not us.</div>');
+      '<div class=sd-fine>' + (at && at.split_pct > 0 ? 'GATA keeps <b>' + at.split_pct + '%</b> of the rewards it restakes for you, charges nothing else and funds your transactions.'
+        : 'Autopilot is <b>free</b>: GATA takes no share of your rewards and funds your transactions.') + ' The chain enforces these limits, not us.</div>');
     /* a short window: the intro goes before anything is clipped (the heading and the two lists say it) */
     var ado = E("sd-ado"); if(ado && !g){ ado.classList.remove("tight"); if(ado.scrollHeight > ado.clientHeight + 1) ado.classList.add("tight"); }
     var rows = pos ? pos.rows : [];
