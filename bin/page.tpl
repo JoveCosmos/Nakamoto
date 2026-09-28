@@ -4286,7 +4286,6 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 /* the row under the earnings: Stake more and Claim rewards, as tall as Redelegate and on its line */
 #sv-over #sd-sky .se-cl{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;flex:0 0 auto}
 #sv-over #sd-sky .se-cl .sd-go{width:100%;margin-top:0}
-#sv-over #sd-sky .se-cl.one{grid-template-columns:minmax(0,1fr)}
 
 /* its figures a step under Move's, so a five-figure year fits its box */
 #sv-over #sd-sky .se-earn .sd-fig>b:not(#z){font-size:34px;white-space:nowrap}
