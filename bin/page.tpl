@@ -4184,7 +4184,7 @@ background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 16%,
 .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig>b{font-size:38px;line-height:1}
 /* the glowing line sits under the label (Now, After, Gain) */
 @media(min-width:901px) and (max-height:700px){.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em{padding-bottom:5px;margin-bottom:1px}}
-@media(min-width:901px) and (max-height:640px){.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig{padding-top:4px;padding-bottom:4px;gap:2px}.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig>b{font-size:24px}.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig:last-child>b{font-size:26px}.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em{padding-bottom:4px}}
+@media(min-width:901px) and (max-height:640px){.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig{padding-top:4px;padding-bottom:4px;gap:2px}.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig>b{font-size:24px}.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig:last-child>b{font-size:26px}.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em{padding-bottom:0;margin-bottom:0}.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em::after{display:none}}
 .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em{position:relative;padding-bottom:7px;margin-bottom:3px}
 .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em::after{content:"";position:absolute;left:50%;bottom:0;width:34px;height:3px;margin-left:-17px;border-radius:2px;background:var(--rc);box-shadow:0 0 10px var(--rc)}
 .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig:last-child>b{font-size:40px}
