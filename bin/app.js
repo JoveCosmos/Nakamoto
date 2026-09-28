@@ -2959,6 +2959,10 @@ rememberGridH();
   (function(){
     var here = NETC.net === "testnet" ? "testnet" : "mainnet";
     document.documentElement.setAttribute("data-net", here);
+    var m = document.getElementById("netmain"), t = document.getElementById("nettest"); if(!m || !t) return;
+    m.href = here === "testnet" ? "../" : "./"; t.href = here === "testnet" ? "./" : "testnet/";
+    (here === "testnet" ? t : m).setAttribute("aria-current", "page");
+    [m, t].forEach(function(a){ a.addEventListener("click", function(){ if(a.getAttribute("aria-current")) return; a.href = a.getAttribute("href").split("#")[0] + location.hash; }); });
   })();
   var API = NETC.api || "https://atomone-api.gatadao.com";
   var CHAIN = NETC.chain || "atomone-1";
