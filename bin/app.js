@@ -2630,7 +2630,8 @@ rememberGridH();
     if(!window.__ADDR) return Promise.resolve(null);
     return fetch("keeper/" + window.__ADDR + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
   }
-  function atPreset(){ return (document.querySelector("#atpop input[name=atstrat]:checked") || {}).value || "below"; }
+  /* no strategies: one fixed rule for Autopilot's own picks (never jailed, 95%+ uptime, the smaller validators) */
+  function atPreset(){ return "below"; }
   /* the allow-list: chosen by the reader (between AT_MIN and AT_MAX validators), or decided by
      Autopilot - the best-paying validators that fit the strategy, AT_MAX of them */
   var AT_MIN = 5, AT_MAX = 20;
@@ -2718,7 +2719,7 @@ rememberGridH();
   /* the counts: on the strategy and validator cards, over the list, on the phone's tab */
   function atCounts(){
     var auto = atAutoIds().length, sel = atSelIds().length, view = atViewing(), word = { passive: "Passive", below: "Moderate", aggressive: "Aggressive" }[atPreset()] || "Moderate";
-    var na = E("atna"); if(na) na.textContent = auto + " picked for " + word;
+    var na = E("atna"); if(na) na.textContent = auto + " picked, best-paying";
     var n2 = E("atn2"); if(n2) n2.textContent = sel ? sel + " selected" : AT_MIN + " to " + AT_MAX + " validators";
     var n = view ? Object.keys(atGrantIds()).length : atPick() === "auto" ? auto : sel;
     /* live, as Redelegate's: the number, then what it counts */
@@ -2749,7 +2750,7 @@ rememberGridH();
       /* Autopilot's own picks are listed, not ticked: nothing here is the reader's selection yet */
       h += '<tr' + (o.on && !auto ? ' class=on' : '') + ' data-id="' + att(o.id) + '"><td class=ck>' + (auto ? '' : '<input type=checkbox aria-label="' + att(o.m) + '"' + (o.on ? ' checked' : '') + (view ? ' disabled' : '') + '>') + '</td>' +
            '<td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span class=nmt>' + att(o.m) + '</span>' +
-             (mine[o.id] ? '<span class="attg y">yours</span>' : '') + (fit[o.id] && !ph ? '<span class="attg f">fits</span>' : '') + '</div></td>' +
+             (mine[o.id] ? '<span class="attg y">yours</span>' : '') + '</div></td>' +
            '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '—' : u90.toFixed(1) + '%') + '</td>' +
            '<td class=r2><b>' + pct(window.__rateAfter(o.t, o.c, 0)) + '</b></td></tr>';
     });
@@ -2786,8 +2787,8 @@ rememberGridH();
       rn.textContent = !ot ? "" : ot.all ? "Another service already restakes your rewards. Autopilot will not claim alongside it."
         : "Another service already restakes your rewards on " + mine + " of your " + (pos ? pos.rows.length : 0) + " validators. Autopilot leaves those to it."; }
     var sm = E("atsum");
-    if(sm) sm.innerHTML = view ? "Active" : !AT.addr ? '<span class=atclosed>Inactive</span>' : ok ? fmt(cap) + " ATONE<br>" + (AT_WORD[atPreset()] || "moderate") + ", " +
-      (atPick() === "selected" ? "my selection, " : "") + scope.length + " validators, " + atMonths() + (atRestake() ? ", restake" : "") : "";
+    if(sm) sm.innerHTML = view ? "Active" : !AT.addr ? '<span class=atclosed>Inactive</span>' : ok ? fmt(cap) + " ATONE<br>" +
+      (atPick() === "selected" ? "my selection, " : "") + scope.length + " validators, " + atMonths() : "";
     var fee = AT.grant ? 0 : atFee(), sl = atRestake() ? atSplitLimit() : 0, feeEl = E("atfee");
     if(feeEl){ feeEl.hidden = view || !(fee > 0 || sl > 0);
       if(sl > 0) feeEl.innerHTML = "<b>" + AT.split_pct + "%</b> of restaked rewards go to GATA - allows sending up to <b>" + fmt(sl) + " ATONE</b> to GATA over " + atMonths() + ".";
@@ -2849,7 +2850,6 @@ rememberGridH();
   if(atpop) atpop.__onclose = function(){ AT_EDIT = false; AT_OPEN++; feeSoon("at"); };
   var atcapEl = E("atcap"); if(atcapEl) atcapEl.addEventListener("input", atState);
   var atmax = E("atmax"); if(atmax) atmax.addEventListener("click", function(){ var pos = window.__POS; if(!pos || !(pos.free > 0)) return; E("atcap").value = exact(pos.free); atState(); });
-  Array.prototype.forEach.call(document.querySelectorAll("#atpop input[name=atstrat]"), function(r){ r.addEventListener("change", atRefresh); });
   /* Autopilot shows what it picked; Choose yourself, the whole set to pick from */
   Array.prototype.forEach.call(document.querySelectorAll("#atpop input[name=atpick]"), function(r){ r.addEventListener("change", atRefresh); });
   var atrs = E("atrestake"); if(atrs) atrs.addEventListener("change", atState);
@@ -2913,7 +2913,7 @@ rememberGridH();
     atSend([revokeMsg(REDEL)], atrevoke); });
   /* ── Restake, its own switch: the claim + delegate pair, for 12 months, capped at what the stake can earn, the
      delegate allow-list = the validators the reader stakes with (and Autopilot's list, when it runs). The keeper
-     claims and stakes on the best-paying of them on its own (no admin step), daily, from 1 ATONE of rewards. ── */
+     claims and stakes on the best-paying of them on its own (no admin step), every 12 hours, from 1 ATONE of rewards. ── */
   var rspop = E("rspop"), RS_DAYS = 365;
   function rsOn(){ var g = AT.grants || []; return g.some(function(x){ return grantType(x) === DELEG; }) && g.some(function(x){ return grantType(x) === WDRAW; }); }
   function rsAllow(){
@@ -2943,10 +2943,10 @@ rememberGridH();
     if(on) body.innerHTML = '<p>Restake is <b>on</b>: your rewards are claimed and staked again on the best-paying of your validators' + (until ? ', until <b>' + until + '</b>' : '') + '.</p>' +
       '<p>Turning it off revokes the permission in one signature. Autopilot, if it runs, is not affected.</p>';
     else {
-      var r = pos && pos.rate > 0 ? pos.rate : 0, more = r ? pos.total * (Math.pow(1 + r / 12, 12) - 1 - r) : 0;
-      body.innerHTML = (r ? '<div class=rsfig><em>A year, more</em><b>+' + fmt(more) + ' ATONE</b><small>+' + ((Math.pow(1 + r / 12, 12) - 1 - r) * 100).toFixed(1) + '% APR, auto-compounds reward</small></div>' : '') +
+      var r = pos && pos.rate > 0 ? pos.rate : 0, more = r ? pos.total * (Math.pow(1 + r / 730, 730) - 1 - r) : 0;
+      body.innerHTML = (r ? '<div class=rsfig><em>A year, more</em><b>+' + fmt(more) + ' ATONE</b><small>+' + ((Math.pow(1 + r / 730, 730) - 1 - r) * 100).toFixed(1) + '% APR, auto-compounds reward</small></div>' : '') +
         '<p>Claims your rewards and stakes them again on the best-paying of the <b>' + n + '</b> validator' + (n === 1 ? '' : 's') + ' you stake with, so they earn too. GATA pays the fees and takes no share.</p>' +
-        '<p>It runs on its own once a day, whenever at least <b>1 ATONE</b> of rewards has built up; turn it off at any time. Your stake never leaves your wallet.</p>' +
+        '<p>It runs on its own twice a day, every 12 hours, whenever at least <b>1 ATONE</b> of rewards has built up; turn it off at any time. Your stake never leaves your wallet.</p>' +
         (!AT.addr ? '<p class=rshint>Opens once GATA\'s keeper is live.</p>' : !signer ? '<p class=rshint>Needs Keplr (direct signing).</p>' : !n ? '<p class=rshint>Stake with a validator first.</p>' : '');
     }
     go.textContent = on ? "Turn off" : "Turn on"; go.classList.toggle("off", on);

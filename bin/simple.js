@@ -154,9 +154,9 @@
   /* ex: the example for a visitor with no wallet - ATONE only, the rate as a single figure, no notes */
   function earns(stake, rate, off, ex){
     var y = stake * rate;
-    /* restaking monthly: the rewards claimed and staked again each month earn too - the year compounded
-       twelve times at today's rate, against the plain year */
-    var cy = stake * (Math.pow(1 + rate / 12, 12) - 1), more = cy - y, dapr = (cy / (stake || 1) - rate) * 100;
+    /* restake runs every 12 hours (a fixed rule): the rewards claimed and staked again earn too - the year
+       compounded twice a day at today's rate, against the plain year */
+    var cy = stake * (Math.pow(1 + rate / 730, 730) - 1), more = cy - y, dapr = (cy / (stake || 1) - rate) * 100;
     var at = !ex && window.__atInfo ? window.__atInfo() : null, on = !!(at && at.grant && at.restake);
     /* restaking already: every figure carries the restake's effect */
     var Y = on ? cy : y, P = function(days){ return Y * days / 365; };
@@ -370,7 +370,7 @@
         (pos && pos.rows.length ? '<button type=button class="st rs rsw' + (at && at.restake ? ' on' : '') + '" data-act=restakesw title="Restake: turn it ' + (at && at.restake ? 'off' : 'on') + '">Restake ' + (at && at.restake ? 'on' : 'off') + '</button>'
           : '<i class="st rs">Restake off</i>') + door + '</span></div></div>' +
       (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "\u2014", "", null, "var(--sv-green)", "", false, rec ? "APR" : "")
-         : ro("Strategy", "\u2014", "", null, "var(--sv-violet)")) +
+         : ro("Since start", "\u2014", "", null, "var(--sv-green)")) +
       ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "\u2014", "", null, "var(--sv-violet)", "", false, g && a.max_tokens ? "ATONE" : "") +
       ro("Runs until", until || "\u2014", "", null, "var(--sv-violet)") +
       ro("Moves made", g ? String(moves) : "\u2014", "", null, "var(--sv-teal)") +
@@ -388,7 +388,7 @@
       '<div class=sv-ph><h3>Autopilot is working</h3></div>' +
       /* the keeper proposes, an admin acts: until its first move, say when it starts */
       (!moves ? '<div class=ap-48>Autopilot activates within <b>48 hours</b> of your grant.</div>' : '') +
-      '<div class=sd-ok>Strategy is active on your stake' + (since ? ' since <b class=d>' + since + '</b>' : '') + (rec ? ', earning <b>' + sgn(rec.rate - rec.start.rate) + ' APR</b> (' + sgnA((rec.rate - rec.start.rate) * rec.staked) +
+      '<div class=sd-ok>Autopilot is on for your stake' + (since ? ' since <b class=d>' + since + '</b>' : '') + (rec ? ', earning <b>' + sgn(rec.rate - rec.start.rate) + ' APR</b> (' + sgnA((rec.rate - rec.start.rate) * rec.staked) +
         ' ATONE a year) since Autopilot started, <b>' + sgn(rec.rate - rec.m3.rate) + '</b> over the last 3 months.' : '.') + '</div>' +
       '<div class="sd-figs two">' +
         fig("Since start", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.start.rate) + '</span><em class=u>APR</em>' : "—",
@@ -405,7 +405,7 @@
       put("sd-ado", '<div class=sv-ph><h3>What it does</h3>' + tag("q", "one signature") + '</div>' +
         '<div class="sd-figs sd-mv four ap-mv">' +
           fig("Keeps stake active", "24/7", idleAtone() ? idleAtone() + " ATONE idle on inactive validators" : "through a long winter or a busy month", T) +
-          fig("Strategizes", "Better APR", "within your allow-list", V) +
+          fig("Moves stake", "Better APR", "among your validators", V) +
           fig("Restakes", "Rewards", "if you switch it on", G) +
           fig("You grant", "It runs", "you revoke, it stops", A2) +
         '</div>');

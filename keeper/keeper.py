@@ -445,7 +445,8 @@ def once(c, only=None, live=None, force=False):
         try:
             if g["granter"] in paused():
                 log("granter=%s paused in the admin console: skipped" % g["granter"]); continue
-            name = preset_of(g["granter"]); P = PRESETS[name]
+            # no strategies: one fixed rule for every Autopilot (the former moderate), an admin acts on the plans
+            name = "moderate"; P = PRESETS[name]
             last = c.execute("SELECT max(at) FROM run_g WHERE granter=?", (g["granter"],)).fetchone()[0] or 0
             if not force and time.time() - last < P["every"]:
                 log("granter=%s %s: not due (every %dh)" % (g["granter"], name, P["every"] // 3600)); continue
@@ -453,13 +454,9 @@ def once(c, only=None, live=None, force=False):
             p = plan(g, rows, reds, vals, m, P)
             c.execute("INSERT INTO run_g VALUES(?,?)", (int(time.time()), g["granter"])); c.commit()
             record = rate_record(c, g["granter"], rows)
-            # restake before the moves: a redelegation pays its source's rewards out on its own,
-            # and the signer only restakes rewards still pending
-            rs = restake_step(c, g["granter"], rgs, vals, m, P, dry)
             rep = {"granter": g["granter"], "checked": int(time.time()), "dry": dry, "strategy": name, "grant": {"cap": g["cap"], "allow": len(g["allow"]) if g["allow"] else None, "expires": g["exp"]},
                    "staked": sum(r["x"] for r in rows), "now": None, "after": None, "moves": [], "last": None}
             if record: rep["record"] = record
-            if rs: rep["restake"] = rs
             hist = c.execute("SELECT at, src, dst, uatone, gain, txhash FROM move WHERE granter=? AND dry=0 ORDER BY at DESC LIMIT 10", (g["granter"],)).fetchall()
             rep["history"] = [{"at": h[0], "src": h[1], "dst": h[2], "uatone": h[3], "gain": h[4], "txhash": h[5]} for h in hist]
             if p:
@@ -488,18 +485,21 @@ def once(c, only=None, live=None, force=False):
             report(g["granter"], rep)
         except Exception as e:
             log("granter %s failed: %s" % (g["granter"], e))
-    # restake on its own: a wallet may grant the restake pair (claim + delegate) without Autopilot. Once a day its
-    # rewards are claimed and staked on the best-paying validator its delegate grant allows - its own validators -
-    # under the same checks (withdraw address, other services, the cap, the dry switch, an admin pause)
-    seen = set(g["granter"] for g in gs)
-    RS_ONLY = {"every": 86400, "min_apr": 0.0, "min_atone": 1.0, "dests": 1, "d90": 0, "restake_every": 86400}
+    # restake, its own service with fixed rules - the same for everyone, Autopilot or not: every 12 hours, from
+    # 1 ATONE of rewards, staked on the best-paying validator the wallet's delegate grant allows (its own), under the
+    # usual checks (withdraw address, other services, the cap, the dry switch, an admin pause). No admin step.
+    RS_FIXED = {"restake_every": 12 * 3600, "d90": 0}
     for granter in rgs:
-        if granter in seen or (only and granter != only): continue
+        if only and granter != only: continue
         try:
             if granter in paused():
                 log("granter=%s paused in the admin console: restake skipped" % granter); continue
-            rs = restake_step(c, granter, rgs, vals, m, RS_ONLY, dry)
-            report(granter, {"granter": granter, "checked": int(time.time()), "dry": dry, "strategy": "restake", "restake": rs or {}})
+            rs = restake_step(c, granter, rgs, vals, m, RS_FIXED, dry)
+            path = os.path.join(REPORTS, granter + ".json")
+            try: rep = json.load(open(path))
+            except Exception: rep = {"granter": granter, "strategy": "restake"}
+            rep["checked"] = int(time.time()); rep["dry"] = dry; rep["restake"] = rs or {}
+            report(granter, rep)
         except Exception as e:
             log("restake granter %s failed: %s" % (granter, e))
     c.execute("INSERT INTO run VALUES(?,?,?,?)", (int(time.time()), len(gs), acted, "dry" if dry else "live")); c.commit()

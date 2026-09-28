@@ -5593,16 +5593,10 @@ html[data-tab=connect] .l2host{display:none}
       <div class=atstate id=atstate hidden></div>
       <div class=atidle id=atidle hidden></div>
       <div class=atform id=atform>
-        <div class=atrow><span class=atlab><i>1</i>Strategy<small>how boldly it chases a better APR</small></span>
-          <div class="atpre at3">
-            <label class=atpc><input type=radio name=atstrat value=passive><b>Passive</b><em id=atn0>Safe</em><small class=atd>larger half, never jailed</small><i class=athelp tabindex=0 role=button aria-label="What Passive means" aria-describedby=attip-passive>?</i><span class=attip role=tooltip id=attip-passive><b>Passive, safe.</b> Only the larger half of the set: validators never jailed, with at least 99% uptime over 90 days and over their whole life. The steadiest record, and the lowest APR.</span></label>
-            <label class=atpc><input type=radio name=atstrat value=below checked><b>Moderate</b><em id=atn1>Less risky</em><small class=atd>smaller ones, never jailed</small><i class=athelp tabindex=0 role=button aria-label="What Moderate means" aria-describedby=attip-below>?</i><span class=attip role=tooltip id=attip-below><b>Moderate, less risky.</b> Validators with less stake than the average, never jailed, with at least 95% uptime over 90 days. Smaller validators pay more under the Nakamoto bonus; the clean record keeps the risk low.</span></label>
-            <label class=atpc><input type=radio name=atstrat value=aggressive><b>Aggressive</b><em id=atn3>Riskier</em><small class=atd>any with 50%+ uptime</small><i class=athelp tabindex=0 role=button aria-label="What Aggressive means" aria-describedby=attip-aggressive>?</i><span class=attip role=tooltip id=attip-aggressive><b>Aggressive, riskier.</b> Any validator with at least 50% uptime over 90 days, jailed before or not. It goes where the APR is highest, and accepts a higher chance of downtime or a slash on your stake.</span></label>
-          </div></div>
         <div class=atrow><span class=atlab><i>2</i>Validators<small>which validators it may use</small></span>
           <div class="atpre at2">
             <label class=atpc><input type=radio name=atpick value=selected><b>Choose yourself</b><em id=atn2></em><small class=atd>you pick each one</small></label>
-            <label class=atpc><input type=radio name=atpick value=auto checked><b>Autopilot</b><em id=atna></em><small class=atd>the best-paying that fit</small></label>
+            <label class=atpc><input type=radio name=atpick value=auto checked><b>Autopilot</b><em id=atna></em><small class=atd>the best-paying, never jailed</small></label>
           </div></div>
         <div class=atrow><span class=atlab><i>3</i>Stake<small>the most it may move</small></span>
           <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
