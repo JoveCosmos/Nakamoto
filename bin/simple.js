@@ -164,11 +164,15 @@
     /* four big boxes, as Move your stake shows its figures: a day, a week, a month and the year; the
        year carries what restake adds (or, restaking, what it already adds) */
     var rs = rate > 0 ? (on ? '<span class=se-rsl>restaking: <b>+' + one(more / 1e6) + '</b> of it from restake</span>'
-                            : '<span class=se-rsl>restake: <b>+' + one(more / 1e6) + '</b>, +' + dapr.toFixed(1) + '% APR</span>') : '';
+                            : '<span class=se-rsl>restake: <b>+' + one(more / 1e6) + '</b>, +' + dapr.toFixed(1) + '% APR</span><span class=se-rsl2>auto-compounds rewards</span>') : '';
     var A = "var(--sv-amber)";
     return '<div class="sd-figs sd-mv four se-earn">' +
       fig("A day", amt(P(1)), "ATONE", A) + fig("A week", amt(P(7)), "ATONE", A) + fig("A month", amt(P(365 / 12)), "ATONE", A) +
-      fig(on ? "A year, restaking" : "A year", amt(Y), "ATONE" + (rs ? rs : ""), A) + '</div>';
+      fig(on ? "A year, restaking" : "A year", amt(Y), "ATONE" + (rs ? rs : ""), A) + '</div>' +
+      /* the two ways on from here, as Move your stake ends on Redelegate: stake more, claim what has accrued
+         (none for the no-wallet example: they name nothing to act on) */
+      (ex ? '' : '<div class=se-doors><button class="sv-btn go sd-go se-st" type=button data-act=stake>Stake more</button>' +
+        '<button class="sv-btn sd-go se-cl" type=button data-act=claim>Claim rewards</button></div>');
   }
 
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every

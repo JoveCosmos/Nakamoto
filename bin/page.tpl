@@ -4285,6 +4285,22 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 #sd-sky .se-amt{color:var(--sv-amber)}
 #sd-sky .se-rsl{display:block;margin-top:4px;font-size:11px;color:var(--ws)}
 #sd-sky .se-rsl b{color:var(--sv-green);font-weight:700}
+/* the restake line a row lower, 'auto-compounds rewards' under it */
+#sd-sky .se-rsl:not(#z){margin-top:15px}
+#sd-sky .se-rsl2{display:block;margin-top:2px;font-size:10.5px;color:var(--wf)}
+#sv-over #sd-sky .se-earn .sd-fig:last-child small{flex:0 0 auto}
+@media(min-width:901px) and (max-height:1000px){#sd-sky .se-rsl:not(#z){margin-top:6px}}
+@media(min-width:901px) and (max-height:820px){#sd-sky .se-rsl:not(#z){margin-top:5px}}
+@media(min-width:901px) and (max-height:700px){#sd-sky .se-rsl2{display:none}#sd-sky .se-rsl:not(#z){margin-top:2px}}
+@media(min-width:901px) and (max-height:560px){#sd-sky .se-rsl:not(#z){margin-top:0;font-size:9.5px}#sv-over #sd-sky .se-earn .sd-fig:not(#z){gap:0}#sv-over #sd-sky .se-earn .sd-fig>b:not(#z){font-size:19px}#sv-over #sd-sky .se-earn .sd-fig em{padding-bottom:3px;margin-bottom:0}}
+/* Stake more and Claim rewards: Move your stake's door, side by side - Stake more filled amber, Claim outlined */
+#sd-sky .se-doors{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:0 0 auto}
+#sd-sky .se-doors .sd-go{width:100%;margin:0}
+#sd-sky .se-doors .se-st:not(#z){background:linear-gradient(180deg,#ffc453,#ffb02e);border-color:#ffb02e;color:#241300;box-shadow:0 6px 18px -8px rgba(255,176,46,.7)}
+#sd-sky .se-doors .se-st:hover{filter:brightness(1.06)}
+#sd-sky .se-doors .se-cl:not(#z){background:rgba(255,176,46,.1);border:1px solid rgba(255,176,46,.6);color:#ffd58a;box-shadow:none}
+#sd-sky .se-doors .se-cl:hover{background:rgba(255,176,46,.18)}
+#sd-sky .se-doors .sd-go:focus-visible{outline:2px solid #ffb02e;outline-offset:2px}
 @media(min-width:901px) and (max-height:700px){#sd-sky .se-rsl{margin-top:1px;font-size:10px}}
 .sv-btn.go.sd-go:disabled{background:rgba(255,255,255,.05);border-color:var(--wbd2);color:var(--wf);box-shadow:none;cursor:not-allowed;margin-top:auto}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
