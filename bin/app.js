@@ -1172,12 +1172,20 @@ rememberGridH();
     fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/mint/v1beta1/params", { cache: "no-store" }).then(function(r){ return r.json(); })
       .then(function(x){ var p = x.params || {}, g = parseFloat(p.goal_bonded), hi = parseFloat(p.inflation_max), lo = parseFloat(p.inflation_min);
         if(!(g > 0)) return;
-        var now = D.set && D.set.bonded_pct, b = box.querySelector("b"), sm = box.querySelector("small");
+        var st = D.set || {}, sup = +st.supply || 0, bon = +st.bonded || 0, b = box.querySelector("b"), sm = box.querySelector("small");
+        var tgt = g * sup, need = tgt - bon, whole = function(u){ return Math.round(u / 1e6).toLocaleString("en-US"); };
         b.textContent = (g * 100).toFixed(0) + "%";
-        var inf = D.set && D.set.inflation, atHi = inf != null && inf >= hi - 1e-6, atLo = inf != null && inf <= lo + 1e-6;
-        sm.textContent = now == null ? "of supply staked" : now < g * 100
-          ? "now " + now.toFixed(1) + "%; below it, inflation " + (atHi ? "holds at its " + (hi * 100).toFixed(0) + "% maximum" : "climbs toward " + (hi * 100).toFixed(0) + "%")
-          : "now " + now.toFixed(1) + "%; above it, inflation " + (atLo ? "holds at its " + (lo * 100).toFixed(0) + "% minimum" : "falls toward " + (lo * 100).toFixed(0) + "%");
+        sm.textContent = sup ? whole(tgt) + " ATONE" : "";
+        /* the gap, as the Concentration card states its own: from where bonding stands to the goal, and what inflation does meanwhile */
+        var mv = E("kpgoalmv"), inf = st.inflation, atHi = inf != null && inf >= hi - 1e-6, atLo = inf != null && inf <= lo + 1e-6;
+        if(mv && sup){
+          mv.hidden = false;
+          mv.innerHTML = need > 0
+            ? "To go from <b>" + (bon / sup * 100).toFixed(1) + "%</b> to <b>" + (g * 100).toFixed(0) + "%</b> staked, <b class=or>" + whole(need) + " ATONE</b> more would have to be staked." +
+              " Until then inflation " + (atHi ? "holds at its <b>" + (hi * 100).toFixed(0) + "%</b> maximum." : "climbs toward <b>" + (hi * 100).toFixed(0) + "%</b>.")
+            : "Staking is <b>" + (bon / sup * 100).toFixed(1) + "%</b>, past the <b>" + (g * 100).toFixed(0) + "%</b> goal by <b class=or>" + whole(-need) + " ATONE</b>." +
+              " Inflation " + (atLo ? "holds at its <b>" + (lo * 100).toFixed(0) + "%</b> minimum." : "falls toward <b>" + (lo * 100).toFixed(0) + "%</b>.");
+        }
         box.dataset.done = 1; }).catch(function(){});
   }
   /* the C card explains what steers eta; opened from the page it stands alone,
