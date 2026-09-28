@@ -1525,6 +1525,41 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
 #p-dele>.pw{gap:12px;width:100%;padding:0 0 16px}
 #p-dele button{font-family:inherit}
 #p-dele b{font-weight:700}
+#p-dele #sd-mstrip .sd-well>b{font-weight:800}#p-dele #sd-mstrip .sd-well>b .sv-pho{font-weight:600}   /* the strip is the Easy view's, weight and all */
+/* and its box and frame too: the Easy view's panel ground, border and top light */
+#p-dele #sd-mstrip{background:linear-gradient(180deg,#131329,#0c0c1a);border-color:#34345c;box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+@media(min-width:901px){#p-dele #wbody{box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}}
+/* Pro's three panels as Easy's: the same box (radius, border, ground, padding) and the same title - 15px,
+   white, a short bar in the panel's colour before it - at the same place */
+@media(min-width:901px){
+  #p-dele #wbody .wk-pane{border-radius:12px;border-color:#34345c;background:linear-gradient(180deg,#131329,#0c0c1a);box-shadow:inset 0 1px 0 rgba(255,255,255,.03);padding:11px 14px}
+  #p-dele #wbody .wk-pane>.wk-ph h3,#p-dele #wbody #wk-mine .wk-t1 h3{font-family:var(--wsans);font-size:15px;font-weight:700;letter-spacing:-.01em;text-transform:none;color:var(--wt,#f0eef8)}
+  #p-dele #wbody #wk-mine .wk-t1 h3::before{background:#ffb02e;box-shadow:0 0 10px -1px #ffb02e}
+  #p-dele #wbody #wk-plan .wk-t2 h3::before{background:#2ee06a;box-shadow:0 0 10px -1px #2ee06a}
+  #p-dele #wbody #wk-mv .wk-t3 h3::before{background:#b9b0ff;box-shadow:0 0 10px -1px #b9b0ff}
+  #p-dele #wbody :is(#wk-mine .wk-t1,#wk-plan .wk-t2,#wk-mv .wk-t3) h3::before{width:3px;height:15px;opacity:1}
+  /* every title on one 32px line, Easy's and Pro's alike, so the six stand at one height */
+  #p-dele #wbody .wk-pane>.wk-ph h3,#p-dele #wbody #wk-mine .wk-t1 h3,#sv-over .sd-col>.sv-ph h3{line-height:32px}
+  #sv-over .sd-col>.sv-ph{min-height:32px}
+  /* the wider padding leaves the Delegations table 4px less: its figures keep their room, the name gives */
+  #p-dele #wbody #dmy col:nth-child(1){width:30px!important}#p-dele #wbody #dmy col:nth-child(3){width:66px!important}
+  #p-dele #wbody #dmy col:nth-child(4){width:48px!important}#p-dele #wbody #dmy col:nth-child(5){width:50px!important}
+  /* and its doors a touch smaller beside the larger title */
+  #p-dele #wbody #wk-mine .wk-t1 .wk-unb{padding:0 6px;font-size:10px}
+}
+@media(min-width:901px) and (max-width:1399px){
+  #p-dele #wbody #wk-mine .wk-t1{column-gap:4px}
+  #p-dele #wbody #wk-mine .wk-t1 .wk-unb{padding:0 4px;font-size:9.5px;letter-spacing:0}
+  #p-dele #wbody #wk-mine .wk-t1 .wk-unb.wk-stb{margin-left:auto}
+}
+@media(min-width:901px) and (max-width:1399px){
+  #p-dele #wbody #dmy col:nth-child(1){width:26px!important}#p-dele #wbody #dmy col:nth-child(3){width:58px!important}
+  #p-dele #wbody #dmy col:nth-child(4){width:46px!important}#p-dele #wbody #dmy col:nth-child(5){width:38px!important}
+  #p-dele #wbody #dmy td{font-size:11px}
+}
+@media(min-width:901px) and (max-width:1299px){
+  #p-dele #wbody #wk-mine .wk-t1{flex-wrap:wrap;height:auto;max-height:none;row-gap:4px;padding-bottom:4px}
+}
 
 /* the head: who is connected, the two tabs, two icon buttons */
 

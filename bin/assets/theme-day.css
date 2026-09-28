@@ -201,6 +201,17 @@
   html[data-theme=light]:not([data-mono]) .mbtn:hover{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .mbtn[aria-pressed=true]{background:var(--amber-bar);color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) .hdr-r,html[data-theme=light]:not([data-mono]) .brandbar,html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #clpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard{--wsolid:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #p-dele #sd-mstrip{background:var(--surface-2);border-color:var(--line-strong);box-shadow:none}
+  @media(min-width:901px){
+    html[data-theme=light]:not([data-mono]) #p-dele #wbody{box-shadow:none}
+  }
+  @media(min-width:901px){
+    html[data-theme=light]:not([data-mono]) #p-dele #wbody .wk-pane{border-color:var(--line-strong);background:var(--surface-2);box-shadow:none}
+    html[data-theme=light]:not([data-mono]) #p-dele #wbody .wk-pane>.wk-ph h3,html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mine .wk-t1 h3{color:var(--wt,var(--ink))}
+    html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mine .wk-t1 h3::before{background:var(--amber-bar);box-shadow:none}
+    html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-plan .wk-t2 h3::before{background:var(--accent);box-shadow:none}
+    html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mv .wk-t3 h3::before{background:var(--accent);box-shadow:none}
+  }
   html[data-theme=light]:not([data-mono]) .wk-addr::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-ib{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) #p-dele .wk-ib svg,html[data-theme=light]:not([data-mono]) #txpop .wk-ib svg{fill:none;stroke:currentColor}
@@ -998,4 +1009,7 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .netsw a#nettest[aria-current=page]{color:#8a5200;background:#fff;box-shadow:0 1px 2px rgba(60,50,20,.2),inset 0 0 0 1px rgba(200,120,0,.4)}
   html[data-theme=light]:not([data-mono]) .se-rss{border-color:rgba(15,122,114,.35);background:linear-gradient(90deg,rgba(15,122,114,.12),rgba(15,122,114,.04));color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .se-rsh2 h4::before{background:#0f7a72;box-shadow:none}
+  /* Pro's wallet strip takes the Easy view's day tokens, so the two are identical */
+  html[data-theme=light]:not([data-mono]) #sd-mstrip{--sv-amber:var(--warn);--sv-green:var(--accent);--sv-violet:var(--accent);--sv-teal:var(--accent);--sv-pho:#1f6f9a}
+  html[data-theme=light]:not([data-mono]) #p-dele #sd-mstrip{background-color:rgb(255,253,248);border-color:rgb(227,222,211)}
 
