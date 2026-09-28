@@ -5066,6 +5066,16 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 @media(min-width:901px) and (max-height:1000px){#sv-auto #sd-ars .ars-fig>b:not(#z):not(#y){font-size:28px}#sv-auto #sd-ars .ars-fig>small:not(#z):not(#y){font-size:12px}#sv-auto #sd-ars .ars-until:not(#z):not(#y){margin-top:12px;padding-top:8px;font-size:11.5px}}
 @media(min-width:901px) and (max-height:700px){#sv-auto #sd-ars .ars-fig>b:not(#z):not(#y){font-size:22px}#sv-auto #sd-ars .ars-fig>small:not(#z):not(#y){font-size:11px}#sv-auto #sd-ars .ars-until:not(#z):not(#y){margin-top:5px;padding-top:4px;font-size:10.5px}}
 @media(min-width:901px) and (max-height:640px){#sv-auto #sd-ars .ars-fig>b:not(#z):not(#y){font-size:19px}#sv-auto #sd-ars .ars-until:not(#z):not(#y){margin-top:2px;padding-top:2px;border-top:0}}
+/* the active grant's panels: 'Your grant' in indigo (the crimson belonged to the old 'What it doesn't'); the working
+   panel's figures fill its height */
+#sv-auto #sd-asky{--bandf:#3a2f8f,#241d63 58%,#141033}
+#sv-auto #sd-asky>.sv-ph:not(#z){background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#3a2f8f,#241d63 58%,#141033)}
+#sv-auto #sd-ado>.sd-figs.two{flex:1 1 auto;min-height:0}
+/* active, shorter windows: the working summary compact, 'Your grant' keeps the latest moves that fit */
+#sv-auto #sd-asky .se-mv{min-height:0;overflow:hidden}
+@media(min-width:901px) and (max-height:1000px){#sv-auto #sd-asky .se-mv>div:nth-of-type(n+3){display:none}#sv-auto #sd-ado .sd-ok:not(#z){padding:6px 10px;font-size:12px}}
+@media(min-width:901px) and (max-height:760px){#sv-auto #sd-ado .sd-ok{display:none}#sv-auto #sd-asky .se-mv>div:nth-of-type(n+2){display:none}
+  #sv-auto #sd-ado .sd-fig:not(#z){padding-top:4px;padding-bottom:4px}#sv-auto #sd-ado .sd-fig>b:not(#z){font-size:18px}#sv-auto #sd-ado .sd-fig small{display:none}}
 /* the state pill: one shape for both, green when enabled, grey when not */
 #sv-auto #sd-ars>.sv-ph .sv-tag.ars-st:not(#z):not(#y){font-family:var(--wsans);font-size:10px;font-weight:700;letter-spacing:0;text-transform:none;padding:2px 9px;color:#e6e4f0!important;border-color:rgba(255,255,255,.35)!important;background:rgba(255,255,255,.14)!important}
 #sv-auto #sd-ars>.sv-ph .sv-tag.ars-st.on:not(#z):not(#y){color:#03230e!important;border-color:#2ee06a!important;background:#2ee06a!important}

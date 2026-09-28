@@ -839,7 +839,6 @@
   html[data-theme=light]:not([data-mono]) .atseg button[aria-pressed=true]{color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .atrsnote{border:1px solid var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .atuntil b{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .atfee{border:1px solid var(--warn-bg);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) .atnote{border:1px solid var(--accent-soft);background:var(--accent-soft);color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .atnote span b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .atnote svg{fill:none;stroke:var(--accent)}
@@ -895,6 +894,8 @@
   html[data-theme=light]:not([data-mono]) #sv-auto .ars-fig em::after{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #sv-auto .ars-two>div{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #sv-auto .ars-how{border:1px solid var(--accent);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky{--bandf:var(--accent),var(--ink) 58%,#FFFFFF}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky>.sv-ph:not(#z){background:var(--accent)}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-ars>.sv-ph .sv-tag.ars-st:not(#z):not(#y){color:var(--ink)!important;border-color:var(--accent)!important;background:var(--surface-2)!important}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-ars>.sv-ph .sv-tag.ars-st.on:not(#z):not(#y){color:#FFFFFF!important;border-color:var(--accent)!important;background:var(--accent)!important}
   html[data-theme=light]:not([data-mono]) #sv-auto .ars-until{border-top:1px solid var(--accent-soft)}
@@ -1249,4 +1250,6 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-auto .ars-until{border-top-color:rgba(22,115,58,.25)}html[data-theme=light]:not([data-mono]) #sv-auto .ars-until b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-ars>.sv-ph .sv-tag.ars-st:not(#z):not(#y){color:#fff!important;border-color:rgba(255,255,255,.4)!important;background:rgba(255,255,255,.16)!important}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-ars>.sv-ph .sv-tag.ars-st.on:not(#z):not(#y){color:#03230e!important;border-color:#2ee06a!important;background:#2ee06a!important}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky{--bandf:#3a2f8f,#241d63 58%,#141033}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#3a2f8f,#241d63 58%,#141033)}
 

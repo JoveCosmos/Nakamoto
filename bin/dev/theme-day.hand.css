@@ -328,3 +328,5 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-auto .ars-until{border-top-color:rgba(22,115,58,.25)}html[data-theme=light]:not([data-mono]) #sv-auto .ars-until b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-ars>.sv-ph .sv-tag.ars-st:not(#z):not(#y){color:#fff!important;border-color:rgba(255,255,255,.4)!important;background:rgba(255,255,255,.16)!important}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-ars>.sv-ph .sv-tag.ars-st.on:not(#z):not(#y){color:#03230e!important;border-color:#2ee06a!important;background:#2ee06a!important}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky{--bandf:#3a2f8f,#241d63 58%,#141033}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#3a2f8f,#241d63 58%,#141033)}

@@ -370,7 +370,7 @@
       (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "\u2014", "", null, "var(--sv-green)", "", false, rec ? "APR" : "")
          : ro("Since start", "\u2014", "", null, "var(--sv-green)")) +
       ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "\u2014", "", null, "var(--sv-violet)", "", false, g && a.max_tokens ? "ATONE" : "") +
-      ro("Runs until", g ? (until || "Revoked") : "\u2014", "", null, "var(--sv-violet)") +
+      ro("Runs until", g ? (until || "Until revoked") : "\u2014", "", null, "var(--sv-violet)") +
       ro("Moves made", g ? String(moves) : "\u2014", "", null, "var(--sv-teal)") +
       ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)"));
     /* restake, in one line: what it has done, or who does it instead, or that it waits */
@@ -394,8 +394,7 @@
         fig("Last 3 months", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.m3.rate) + '</span><em class=u>APR</em>' : "—",
             rec ? sgnA((rec.rate - rec.m3.rate) * rec.staked) + " ATONE a year" : "", "var(--sv-teal)") +
       '</div>' +
-      (restakeLine() ? '<div class=sd-rs>' + restakeLine() + '</div>' : '') +
-      '<div class=sd-fine>The chain enforces the grant: it may redelegate inside your allow-list, and never send, unstake or hold your ATONE.</div>');
+      '');
     else {
       /* not active: what it does and what it never does, each as Move your stake shows its figures - four big
          boxes, the same with or without a wallet - and, in place of the list, the way to switch it on */
