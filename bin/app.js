@@ -2587,14 +2587,6 @@ rememberGridH();
     }
     return out;
   }
-  /* what Autopilot itself would reach for an amount: the optimiser on its picks for the strategy, at most as many
-     destinations as the keeper moves to (passive 2, moderate 5, aggressive 8), each rate after the stake lands */
-  window.__atLift = function(amount){
-    var ids = atAutoIds(); if(!ids.length || !(amount > 0)) return null;
-    var only = {}; ids.forEach(function(id){ only[id] = 1; });
-    var r = window.__planWith(amount, { only: only, maxVals: { passive: 2, below: 5, aggressive: 8 }[atPreset()] || 5 });
-    return r && r.rate > 0 ? { after: r.rate, n: r.moves.length, picks: ids.length } : null;
-  };
   function atOps(ids){ var VD = window.__VDBY || {}, out = []; ids.forEach(function(id){ var d = VD[id]; if(d && d.op) out.push(d.op); }); return out; }
   function atSelIds(){ var VD = window.__VDBY || {}; return Object.keys(ATSEL).filter(function(id){ return VD[id] && VD[id].op; }); }
   /* a standing grant's allow-list, as the set's ids */

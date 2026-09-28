@@ -399,19 +399,14 @@
       '<div class=sd-fine>The chain enforces the grant: it may redelegate inside your allow-list, and never send, unstake or hold your ATONE.</div>');
     else {
       /* not active: what it does and what it never does, each as Move your stake shows its figures - four big
-         boxes - and, in place of the list, the way to switch it on */
-      /* Autopilot's own reach (its picks, its destinations), not Move your stake's best single move */
-      var al = pos && pos.rows.length && pos.free > 0 && window.__atLift ? window.__atLift(pos.free) : null;
-      var lift = al ? al.after - pos.rate : 0, plan = al && lift > 0 ? { gain: pos.free / 1e6 * lift } : null;
-      var rr = pos && pos.rows.length ? pos.rate : 0, radd = rr > 0 ? (Math.pow(1 + rr / 12, 12) - 1 - rr) : 0;
+         boxes, the same with or without a wallet - and, in place of the list, the way to switch it on */
       var G = "var(--sv-green)", T = "var(--sv-teal)", V = "var(--sv-violet)", R = "#ff6a6a", A2 = "var(--sv-amber)";
       put("sd-ado", '<div class=sv-ph><h3>What it does</h3>' + tag("q", "one signature") + '</div>' +
         '<div class="sd-figs sd-mv four ap-mv">' +
           fig("Keeps stake active", "24/7", idleAtone() ? idleAtone() + " ATONE idle on inactive validators" : "through a long winter or a busy month", T) +
-          fig("Strategizes", lift > 0.0005 ? '<span class=sd-gain>+' + (lift * 100).toFixed(1) + '%</span>' : "Better APR", lift > 0.0005 ? "APR, within your allow-list" : "within your allow-list", V) +
-          fig("Restakes", radd > 0 ? '<span class=sd-gain>+' + (radd * 100).toFixed(1) + '%</span>' : "Rewards", radd > 0 ? "APR, if you switch it on" : "if you switch it on", G) +
-          (plan && plan.gain > 0.5 ? fig("More a year", '<span class=sd-gain>+' + one(plan.gain) + '</span>', "ATONE, at today's rates", G)
-                                   : fig("You approve", "Once", "it runs while you rest", A2)) +
+          fig("Strategizes", "Better APR", "within your allow-list", V) +
+          fig("Restakes", "Rewards", "if you switch it on", G) +
+          fig("You approve", "Once", "it runs while you rest", A2) +
         '</div>');
       var share = at && at.split_pct > 0;
       put("sd-asky", '<div class=sv-ph><h3>What it doesn\'t</h3>' + tag("q", "enforced on chain") + '</div>' +
