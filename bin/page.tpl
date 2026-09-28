@@ -5606,7 +5606,7 @@ html[data-tab=connect] .l2host{display:none}
         <div class=atrsnote id=atrsnote hidden></div>
         <div class=atfee id=atfee hidden></div>
       </div>
-      <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. Autopilot activates within <b>48 hours</b> of your grant; you can revoke it at any time.</span></div>
+      <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Autopilot activates within <b>48 hours</b> of your grant; you can revoke it at any time.</span></div>
     </section>
     <section class=atR id=atR aria-label="Select your validators">
       <div class=atrh><div class=atrt><b>Select your validators</b><span class=wk-seln id=atcount aria-live=polite></span></div></div>
