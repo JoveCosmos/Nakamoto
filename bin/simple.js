@@ -402,7 +402,7 @@
       /* not active: what it does and never does, one compact panel - two rows of small boxes, centred */
       var share = at && at.split_pct > 0, ib = idleAtone();
       var cb = function(k, v, sub, c, cls){ return '<div class="ap-cb' + (cls ? ' ' + cls : '') + '" style="--rc:' + c + '"><em>' + k + '</em><b>' + v + '</b><small>' + sub + '</small></div>'; };
-      put("sd-ado", '<div class=sv-ph><h3>What Autopilot does or doesn\'t</h3></div>' +
+      put("sd-ado", '<div class=sv-ph><h3>Your Autopilot Grant</h3></div>' +
         '<div class=ap-dd><i class="ap-ln ok" aria-hidden=true></i><div class=ap-row>' +
           cb("Keeps stake active", "24/7", ib ? ib + " ATONE idle on inactive validators" : "through a long winter or a busy month", "#2bc8d6") +
           cb("Strategizes", "Better APR", "among your validators", "#b9b0ff") +
