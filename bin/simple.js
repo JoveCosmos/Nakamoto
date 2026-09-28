@@ -152,33 +152,23 @@
   function usdOf(u){ var p = !TN() && DD().prices && DD().prices.atone && DD().prices.atone.usd; return p ? u / 1e6 * p : null; }
   function usd(v){ return v == null ? "" : "≈ $" + (v >= 100 ? Math.round(v).toLocaleString() : v >= 1 ? v.toFixed(2) : v.toFixed(3)); }
   /* ex: the example for a visitor with no wallet - ATONE only, the rate as a single figure, no notes */
-  var RSP = '';   /* the Restake panel, built by earns() */
   function earns(stake, rate, off, ex){
-    var y = stake * rate, per = function(days){ return y * days / 365; };
+    var y = stake * rate;
     /* restaking monthly: the rewards claimed and staked again each month earn too - the year compounded
        twelve times at today's rate, against the plain year */
-    var cy = stake * (Math.pow(1 + rate / 12, 12) - 1), more = cy - y;
+    var cy = stake * (Math.pow(1 + rate / 12, 12) - 1), more = cy - y, dapr = (cy / (stake || 1) - rate) * 100;
     var at = !ex && window.__atInfo ? window.__atInfo() : null, on = !!(at && at.grant && at.restake);
-    /* restaking already: every figure carries the restake's effect, each with what it adds */
-    var Y = on ? cy : y, P = function(days){ return Y * days / 365; }, D = function(days){ return (cy - y) * days / 365; };
-    var tile = function(k, u, d){ return fig(k, '<span class=sd-gain>+' + one(u / 1e6) + '</span>', on ? '<span class=se-rsm>+' + one(d / 1e6) + '</span> restake' : "ATONE", "var(--sv-green)"); };
-    var year = '<div class=se-hero><div class=se-card><em>' + (on ? 'A year, restaking' : 'A year') + '</em><b><span class=sd-gain>+' + one(Y / 1e6) + '</span><i>ATONE</i></b>' +
-      /* the unit where the rate was; the rate rides in the panel's title as a tag */
-      '<small class=se-apr>ATONE' + (on ? ', <span class=se-rsm>+' + one(more / 1e6) + '</span> from restake' : '') + '</small></div></div>';
-    var steps = '<div class="sd-figs two se-row' + (on ? ' rson' : '') + '">' + tile("A day", P(1), D(1)) + tile("A week", P(7), D(7)) + tile("A month", P(365 / 12), D(365 / 12)) + '</div>';
-    /* not restaking: the offer, as Move your stake offers its move - the year now and the year
-       restaking, side by side, and the door (none without a wallet: it names nothing to act on) */
-    /* the APR the compounded year amounts to, against today's: what restaking adds to the rate */
-    var capr = Math.pow(1 + rate / 12, 12) - 1, dapr = (capr - rate) * 100;
-    /* the offer: the title with the APR restaking adds in its tag, and a card like the thirds' boxes - what it
-       adds a year, in green, level with Where your stake sits' three boxes */
-    /* Restake is its own panel under this one (sd-rs): the offer, or the note that it is on */
-    RSP = rate > 0 && !on ? '<div class=sv-ph><h3>Restake</h3>' + tag("g", "+" + dapr.toFixed(1) + "% APR") + '</div>' +
-        '<div class=se-rsb><div class="se-card se-rc2"><em>A year</em><b><span class=se-rsv>+' + one(more / 1e6) + '</span><i>ATONE</i></b><small>auto-compounds your rewards</small></div></div>'
-      : on ? '<div class=sv-ph><h3>Restake</h3></div><div class=se-rsb><div class=se-rson>Restake is on: your rewards compound on their own.<button type=button class=se-rsch data-act=autopilot>Change</button></div></div>' : '';
-    /* the day, week and month first, the year under them */
-    if(ex) return '<div class=se-ex>' + steps + year + '</div>';
-    return '<div class=se-mid>' + steps + year + '</div>';
+    /* restaking already: every figure carries the restake's effect */
+    var Y = on ? cy : y, P = function(days){ return Y * days / 365; };
+    var amt = function(u){ return '<span class=se-amt>+' + one(u / 1e6) + '</span>'; };
+    /* four big boxes, as Move your stake shows its figures: a day, a week, a month and the year; the
+       year carries what restake adds (or, restaking, what it already adds) */
+    var rs = rate > 0 ? (on ? '<span class=se-rsl>restaking: <b>+' + one(more / 1e6) + '</b> of it from restake</span>'
+                            : '<span class=se-rsl>restake: <b>+' + one(more / 1e6) + '</b>, +' + dapr.toFixed(1) + '% APR</span>') : '';
+    var A = "var(--sv-amber)";
+    return '<div class="sd-figs sd-mv four se-earn">' +
+      fig("A day", amt(P(1)), "ATONE", A) + fig("A week", amt(P(7)), "ATONE", A) + fig("A month", amt(P(365 / 12)), "ATONE", A) +
+      fig(on ? "A year, restaking" : "A year", amt(Y), "ATONE" + (rs ? rs : ""), A) + '</div>';
   }
 
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every
@@ -232,9 +222,8 @@
     var br = sums.map(function(q, k){ return '<div class="fp-k b' + k + '" style="flex:' + (four ? 1 : span[k]) + ' 1 0"><div class=fp-kb><em>' + (four ? short[k] : q[0]) + '</em><b class=fpt' + k + '>' + sh(q[1]) + '%</b><small title="' + fmt(q[1]) + ' ATONE">' +
       (q[1] >= 1e10 ? big(q[1]) : fmt(q[1])) + '<i> ATONE</i></small></div></div>'; }).join("");
     return head.replace('</h3></div>', '</h3>' + (mine ? tag("q", held + (held === 1 ? " Validator" : " Validators"), "your stake is on " + held + " of the " + n + " validators") : tag("q", n + " Validators")) + '</div>') +
-      /* the thirds' boxes first, their coloured lines under them over the bars' spans; the graph under them */
-      '<div class=fp-br>' + br + '</div>' +
-      '<div class=fp-ax><span>#1 largest</span><span>smallest #' + n + '</span></div><div class=fp-bc>' + bars + '</div>';
+      '<div class=fp-ax><span>#1 largest</span><span>smallest #' + n + '</span></div><div class=fp-bc>' + bars + '</div>' +
+      '<div class=fp-br>' + br + '</div>';
   }
 
   function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }
@@ -323,7 +312,6 @@
           if(!(r > 0)) r = S.hi;
           return '<div class=sv-ph><h3>What 10,000 ATONE earns</h3>' + (r > 0 ? tag("a", pct(r) + " APR", "the best APR 10,000 ATONE can get today" +
             (k > 1 ? ", split across " + k + " validators" : k === 1 ? ", on one validator" : "") + ", after its own effect on their rates") : '') + '</div>' + earns(X, r, 0, true); })());
-    put("sd-rs", RSP);
 
     /* the validators */
     put("sd-list", footprint(pos));

@@ -1576,15 +1576,12 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
 #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:#ffd9cf;border-color:rgba(255,140,110,.65);background:rgba(255,77,31,.32);font-weight:600;white-space:nowrap}
 /* each banded section is framed in its band's colour: a thin fill down both sides and along the foot, over the
    border, so nothing moves */
-:is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-rs,#sv-over #sd-move,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist){position:relative}
-:is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-rs,#sv-over #sd-move,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist)::after{content:"";display:block!important;position:absolute;inset:-1px;border-radius:12px;padding:0 3px 3px;background:linear-gradient(315deg,var(--bandf));pointer-events:none;z-index:2;
+:is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist){position:relative}
+:is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist)::after{content:"";display:block!important;position:absolute;inset:-1px;border-radius:12px;padding:0 3px 3px;background:linear-gradient(315deg,var(--bandf));pointer-events:none;z-index:2;
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 #sv-over #sd-list{--bandf:#0f6b67,#123a52 58%,#141633}
 #sv-over #sd-sky{--bandf:#8a5a12,#4a2f12 58%,#1f1630}
 #sv-over #sd-move{--bandf:#0a3a22,#072a19 58%,#05140d}
-#sv-over #sd-rs{--bandf:#0b4a36,#073024 58%,#05140f}
-#sv-over #sd-rs{--tc:var(--sv-green)}   /* its top glow line, as Move your stake's */
-#sv-over #sd-rs>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.07),transparent 60%),linear-gradient(315deg,#0b4a36,#073024 58%,#05140f)}
 #p-dele #wbody #wk-mv{--bandf:#4130a0,#271c6c 58%,#150f3b}
 #sv-proplist{--bandf:#1d4f8f,#173257 58%,#141633}
 #sv-daop{--bandf:#5f6216,#393b15 58%,#19191f}
@@ -4267,24 +4264,6 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 @media(max-width:900px){#sv-over .sd-col>.sv-ph{flex-wrap:nowrap}#sv-over .sd-col>.sv-ph h3{min-width:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #sv-over .sd-col>.sv-ph .sv-tag{flex:0 0 auto}
   #sv-over #sd-rs .se-card.se-rc2{padding:8px 12px 10px}}
-/* Restake: its own panel under What your stake earns (the side panels span both rows), its card at the foot,
-   level with Where your stake sits' three boxes; gone, the earnings panel takes the whole column */
-#sd-rs:empty{display:none}
-@media(min-width:901px){#sv-over .sd-wgrid{grid-template-rows:minmax(0,1fr) auto}
-  #sv-over #sd-list{grid-column:1;grid-row:1/3}#sv-over #sd-sky{grid-column:2;grid-row:1}#sv-over #sd-rs{grid-column:2;grid-row:2}#sv-over #sd-move{grid-column:3;grid-row:1/3}
-  #sv-over .sd-wgrid:has(#sd-rs:empty) #sd-sky{grid-row:1/3}}
-#sv-over #sd-rs{justify-content:flex-start}
-/* the earnings block centred in its panel, from the band to the foot */
-#sv-over #sd-sky>:is(.se-mid,.se-ex){flex:1 1 auto;justify-content:center;padding-top:4px}
-/* a clear gap between the day, week and month and the year; the four stay centred together */
-#sv-over #sd-sky>:is(.se-mid,.se-ex){gap:16px}
-@media(min-width:901px) and (min-height:821px) and (max-height:1000px){#sv-over #sd-sky>:is(.se-mid,.se-ex){gap:10px}
-  #sv-over #sd-sky .se-row .sd-fig:not(#z){padding-top:12px;padding-bottom:13px}}
-@media(min-width:901px) and (max-height:760px){#sv-over #sd-sky>:is(.se-mid,.se-ex){gap:10px}}
-@media(min-width:901px) and (max-height:680px){#sv-over #sd-sky>:is(.se-mid,.se-ex){gap:6px}}
-@media(min-width:901px) and (max-height:560px){#sv-over #sd-sky>:is(.se-mid,.se-ex){padding-top:0}}
-#sv-over #sd-rs .se-rsb{margin-top:auto;display:flex;flex-direction:column}
-#sv-over #sd-rs .se-rson{margin:0}
 /* a short window: the day, week and month one line each, the year one line under them */
 @media(min-width:901px) and (max-height:640px){
   #sv-over #sd-sky :is(.se-mid,.se-ex){gap:4px}
@@ -4297,6 +4276,16 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
   #sv-over #sd-sky .se-row .sd-fig>em{letter-spacing:.04em;white-space:nowrap;overflow:visible}#sv-over #sd-sky .se-row .sd-fig>b{white-space:nowrap}}
 /* shorter still: every band a step lower, so both middle panels keep their content */
 @media(min-width:901px) and (max-height:560px){#sv-over .sd-col>.sv-ph:not(#z){min-height:34px!important;padding-top:1px!important;padding-bottom:2px!important}}
+/* What your stake earns: Move your stake's four big boxes, in amber; the year's box carries restake's line in green */
+#sv-over #sd-sky .se-earn{flex:1 1 auto;min-height:0}
+/* its figures a step under Move's, so a five-figure year fits its box */
+#sv-over #sd-sky .se-earn .sd-fig>b:not(#z){font-size:34px;white-space:nowrap}
+@media(min-width:901px) and (max-height:700px){#sv-over #sd-sky .se-earn .sd-fig>b:not(#z){font-size:26px}}
+@media(min-width:901px) and (max-height:640px){#sv-over #sd-sky .se-earn .sd-fig>b:not(#z){font-size:21px}}
+#sd-sky .se-amt{color:var(--sv-amber)}
+#sd-sky .se-rsl{display:block;margin-top:4px;font-size:11px;color:var(--ws)}
+#sd-sky .se-rsl b{color:var(--sv-green);font-weight:700}
+@media(min-width:901px) and (max-height:700px){#sd-sky .se-rsl{margin-top:1px;font-size:10px}}
 .sv-btn.go.sd-go:disabled{background:rgba(255,255,255,.05);border-color:var(--wbd2);color:var(--wf);box-shadow:none;cursor:not-allowed;margin-top:auto}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}
@@ -4322,12 +4311,6 @@ background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 16%,
 .fp-k small{max-width:100%;font-size:9px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}.fp-k small i{font-style:normal;font-size:7.5px;letter-spacing:.04em;color:var(--wf)}
 @media(max-width:620px){.fp-bc{flex:0 0 auto;height:150px}}
 @media(min-width:901px) and (max-height:700px){#sd-list .fp-br{margin-top:5px}#sd-list .fp-k{padding-top:4px}#sd-list .fp-k b{font-size:15px}}
-/* boxes above the graph: each third's line along the boxes' foot, the axis 10px under it */
-#sv-over #sd-list .fp-br{margin-top:0;order:0}
-#sv-over #sd-list .fp-k:not(#z){padding-top:0;padding-bottom:6px;border-top:0;border-bottom:2px solid var(--kc,#ff6a3d)}
-#sv-over #sd-list .fp-k.b1{--kc:#ffb02e}#sv-over #sd-list .fp-k.b2{--kc:#2ee06a}#sv-over #sd-list .fp-k.b3{--kc:#6f6d94}
-#sv-over #sd-list .fp-br+.fp-ax{margin-top:10px}
-@media(min-width:901px) and (max-height:700px){#sv-over #sd-list .fp-k:not(#z){padding-bottom:4px}#sv-over #sd-list .fp-br+.fp-ax{margin-top:6px}}
 .fpt0{color:#ff7a57}.fpt1{color:#ffc453}.fpt2{color:#5cf08e}
 
 .sd-mvh{flex-wrap:nowrap;container-type:inline-size;min-height:27px}
@@ -4352,20 +4335,20 @@ background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 16%,
 .sd-mv .sd-fig>b{justify-content:center}
 /* Move your stake (and Autopilot's same cards): its own look - the figure large and bare, a short glowing
    rule in the card's colour under it, the card washed in that colour from below */
-.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig{gap:4px;border-left:1px solid var(--wbd2);
+.sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig{gap:4px;border-left:1px solid var(--wbd2);
   background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 14%,transparent),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.008))}
-.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig::before{display:none}
-.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig::after{display:none}
-.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig em{font-size:10px;letter-spacing:.2em;color:var(--ws)}
-.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig>b{font-size:38px;line-height:1}
+.sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig::before{display:none}
+.sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig::after{display:none}
+.sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig em{font-size:10px;letter-spacing:.2em;color:var(--ws)}
+.sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig>b{font-size:38px;line-height:1}
 /* the glowing line sits under the label (Now, After, Gain) */
-@media(min-width:901px) and (max-height:700px){.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig em{padding-bottom:5px;margin-bottom:1px}}
-@media(min-width:901px) and (max-height:640px){#sv .sd-mv:is(#sd-move *,#sd-asky *) .sd-fig{padding-top:4px;padding-bottom:4px;gap:2px}#sv .sd-mv:is(#sd-move *,#sd-asky *) .sd-fig>b{font-size:24px}#sv .sd-mv:is(#sd-move *,#sd-asky *) .sd-fig:last-child>b{font-size:26px}#sv .sd-mv:is(#sd-move *,#sd-asky *) .sd-fig em{padding-bottom:0;margin-bottom:0}#sv .sd-mv:is(#sd-move *,#sd-asky *) .sd-fig em::after{display:none}}
-.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig em{position:relative;padding-bottom:7px;margin-bottom:3px}
-.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig em::after{content:"";position:absolute;left:50%;bottom:0;width:34px;height:3px;margin-left:-17px;border-radius:2px;background:var(--rc);box-shadow:0 0 10px var(--rc)}
-.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig:last-child>b{font-size:40px}
-.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig small{font-size:11.5px;color:var(--ws)}
-@media(min-width:901px) and (max-height:700px){.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig>b{font-size:28px}.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig:last-child>b{font-size:30px}.sd-mv:is(#sd-move *,#sd-asky *) .sd-fig{gap:4px}}
+@media(min-width:901px) and (max-height:700px){.sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig em{padding-bottom:5px;margin-bottom:1px}}
+@media(min-width:901px) and (max-height:640px){#sv .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig{padding-top:4px;padding-bottom:4px;gap:2px}#sv .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig>b{font-size:24px}#sv .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig:last-child>b{font-size:26px}#sv .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig em{padding-bottom:0;margin-bottom:0}#sv .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig em::after{display:none}}
+.sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig em{position:relative;padding-bottom:7px;margin-bottom:3px}
+.sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig em::after{content:"";position:absolute;left:50%;bottom:0;width:34px;height:3px;margin-left:-17px;border-radius:2px;background:var(--rc);box-shadow:0 0 10px var(--rc)}
+.sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig:last-child>b{font-size:40px}
+.sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig small{font-size:11.5px;color:var(--ws)}
+@media(min-width:901px) and (max-height:700px){.sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig>b{font-size:28px}.sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig:last-child>b{font-size:30px}.sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig{gap:4px}}
 /* the boxes stand where the centred block put them (equal room above the block and below it); the
    year rises into the middle of the room between the title and the boxes: the hero takes its own
    height plus half the spare room and centres itself in it, the ::after spacer the other half */
@@ -5205,7 +5188,6 @@ html[data-tab=connect] .l2host{display:none}
         <div class="sd-grid sd-wgrid">
           <div class="sv-panel sd-col" id=sd-list></div>
           <div class="sv-panel sd-col" id=sd-sky></div>
-          <div class="sv-panel sd-col" id=sd-rs></div>
           <div class="sv-panel sd-col" id=sd-move></div>
         </div>
       </section>
