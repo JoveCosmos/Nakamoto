@@ -4091,22 +4091,18 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .se-rsh2{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:0 2px}
 .se-rsh2 em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--sv-teal)}
 .se-rsh2 span{font-size:11px;color:var(--ws)}
-/* What your stake earns: the year card and its three boxes centred, each label with a green line under it,
-   as Move your stake's cards; the boxes taller */
+/* What your stake earns: the year card and its three boxes centred; the boxes taller */
 #sd-sky .se-card{align-items:center;text-align:center}
 #sd-sky .se-card>b{justify-content:center}
 #sv-over #sd-sky .se-row .sd-fig{align-items:center;text-align:center;padding-top:16px;padding-bottom:17px;gap:5px}
 #sd-sky .se-row .sd-fig>b{justify-content:center}
-#sd-sky :is(.se-card,.se-row .sd-fig) em{position:relative;padding-bottom:6px;margin-bottom:3px}
-#sd-sky :is(.se-card,.se-row .sd-fig) em::after{content:"";position:absolute;left:50%;bottom:0;width:26px;height:2px;margin-left:-13px;border-radius:2px;background:var(--sv-green);box-shadow:0 0 8px var(--sv-green)}
 /* the restake offer's head: a title and its tag, the APR it adds under it */
 .se-rsh2 h4{margin:0;font-size:14px;font-weight:700;color:var(--wt)}
 .se-rsh2{justify-content:flex-start}
 .se-rss{padding:0 2px;font-size:11.5px;color:var(--ws)}
 .se-rss b{color:var(--sv-teal);font-weight:700}
 @media(min-width:901px) and (max-height:1000px){#sv-over #sd-sky .se-row .sd-fig{padding-top:17px;padding-bottom:18px}}
-@media(min-width:901px) and (max-height:760px){#sv-over #sd-sky .se-row .sd-fig{padding-top:8px;padding-bottom:9px}#sd-sky :is(.se-card,.se-row .sd-fig) em{padding-bottom:4px;margin-bottom:1px}.se-rss{display:none}}
-@media(min-width:901px) and (max-height:640px){#sd-sky :is(.se-card,.se-row .sd-fig) em::after{display:none}#sd-sky :is(.se-card,.se-row .sd-fig) em{padding-bottom:0}}
+@media(min-width:901px) and (max-height:760px){#sv-over #sd-sky .se-row .sd-fig{padding-top:8px;padding-bottom:9px}.se-rss{display:none}}
 /* restaking: the day, week and month keep the line saying what restake adds */
 #sv-over .se-row.rson .sd-fig small{display:block}
 .se-rsv{color:var(--sv-teal)}

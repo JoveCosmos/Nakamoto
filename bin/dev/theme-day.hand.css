@@ -200,7 +200,6 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv .sd-mv:is(#sd-move *,#sd-asky *) .sd-fig{background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 12%,transparent),transparent 70%),#fbf9f3}
   html[data-theme=light]:not([data-mono]) #sv .sd-mv:is(#sd-move *,#sd-asky *) .sd-fig em::after{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-btn.go.se-rsgo{background:#0f7a72;border-color:#0f7a72;color:#fff}
-  html[data-theme=light]:not([data-mono]) #sd-sky :is(.se-card,.se-row .sd-fig) em::after{box-shadow:none}
 
   html[data-theme=light]:not([data-mono]) .fp-k.b3{border-color:#c0303a}html[data-theme=light]:not([data-mono]) .fpt3{color:#b3242e}
   /* the network keys in day: a soft recess, the open key lit in its colour */
