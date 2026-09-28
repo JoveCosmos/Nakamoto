@@ -2886,7 +2886,7 @@ rememberGridH();
     /* from Autopilot's pick, a tap starts the reader's own list with that one validator: picked one by one */
     if(atPick() === "auto"){ ATSEL = {}; atSetPick("selected"); on = true; }
     if(on && !ATSEL[tr.dataset.id] && atSelIds().length >= AT_MAX){
-      atRefresh(); var hn = E("athint"); if(hn){ hn.className = "unhint bad"; hn.textContent = "At most " + AT_MAX + " validators: untick one first"; }
+      atRefresh(); var hn = E("athint"); if(hn){ hn.className = "unhint bad"; hn.textContent = "At most " + AT_MAX + " validators: deselect one first"; }
       return; }
     if(on) ATSEL[tr.dataset.id] = 1; else delete ATSEL[tr.dataset.id];
     atRefresh();
