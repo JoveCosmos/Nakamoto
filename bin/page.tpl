@@ -4981,6 +4981,49 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
   .pop .card.atcard[data-pick=auto]:not(#z){height:auto;max-height:100%}}
 .atcard[data-pick=auto] .atR{display:none!important}
 .atcard[data-pick=auto] .atview{display:none!important}
+/* ════ Autopilot tab: Validators under the Autopilot card (its width, as Pro's panes under the wallet card), one
+   compact 'What Autopilot does' panel in the middle, Restake on the right ════ */
+@media(min-width:901px){
+  #sv-auto .sd-agrid.sd-agrid:not(#z){grid-template-columns:max(calc((100% - 2px) * 0.242424 + 2px),250px) minmax(0,1.5fr) minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) minmax(0,1fr)}
+  #sv-auto #sd-alist{grid-column:1;grid-row:1/3}#sv-auto #sd-ado{grid-column:2;grid-row:1}#sv-auto #sd-asky{grid-column:2;grid-row:2}#sv-auto #sd-ars{grid-column:3;grid-row:1/3}
+  #sv-auto .sd-agrid:has(#sd-asky:empty) #sd-ado{grid-row:1/3}}
+#sv-auto #sd-asky:empty{display:none}
+#sv-auto #sd-ars{--bandf:#0b4a36,#073024 58%,#05140f;--tc:var(--sv-green);position:relative}
+#sv-auto #sd-ars>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.07),transparent 60%),linear-gradient(315deg,#0b4a36,#073024 58%,#05140f)}
+#sv-auto #sd-ars::after{content:"";display:block;position:absolute;inset:-1px;border-radius:12px;padding:0 3px 3px;background:linear-gradient(315deg,var(--bandf));pointer-events:none;z-index:2;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+/* the compact panel: two labelled rows of four small boxes, centred in the panel */
+#sv-auto .ap-dd{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;gap:8px;min-height:0}
+#sv-auto .ap-dd>u{text-decoration:none;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase}
+#sv-auto .ap-dd>u.ok{color:#8ff0b0}#sv-auto .ap-dd>u.no{color:#ff8a8a;margin-top:4px}
+#sv-auto .ap-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+#sv-auto .ap-cb{--rc:#2bc8d6;display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;padding:10px 8px 11px;min-width:0;border:1px solid var(--wbd2);border-radius:10px;
+  background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 9%,transparent),rgba(255,255,255,.012) 70%)}
+#sv-auto .ap-cb em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;padding-bottom:5px;position:relative}
+#sv-auto .ap-cb em::after{content:"";position:absolute;left:50%;bottom:0;width:24px;height:2px;margin-left:-12px;border-radius:2px;background:var(--rc)}
+#sv-auto .ap-cb b{font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--wt);white-space:nowrap}
+#sv-auto .ap-cb.no b{color:#ff8a8a}#sv-auto .ap-cb.ok b{color:var(--sv-green)}
+#sv-auto .ap-cb small{font-size:10.5px;line-height:1.35;color:var(--ws);text-wrap:balance}
+@media(min-width:901px) and (max-width:1399px){#sv-auto .ap-cb b{font-size:17px}#sv-auto .ap-cb small{font-size:10px}}
+@media(min-width:901px) and (max-height:760px){#sv-auto .ap-cb small{display:none}#sv-auto .ap-cb{padding:7px 6px 8px}#sv-auto .ap-dd{gap:5px}}
+@media(max-width:700px){#sv-auto .ap-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Restake: its figure, its fixed rules, its switch */
+#sv-auto #sd-ars{justify-content:flex-start}
+#sv-auto .ars-fig{display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:10px;padding:14px 10px;border:1px solid var(--wbd2);border-radius:10px;text-align:center;
+  background:linear-gradient(0deg,rgba(46,224,106,.1),rgba(255,255,255,.012) 70%)}
+#sv-auto .ars-fig em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ws)}
+#sv-auto .ars-fig b{font-size:30px;font-weight:800;letter-spacing:-.02em;color:var(--sv-green);white-space:nowrap}
+#sv-auto .ars-fig b i{font-style:normal;font-size:11px;font-weight:600;color:var(--wf)}
+#sv-auto .ars-fig small{font-size:11px;color:var(--ws)}
+#sv-auto .ars-rules{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--ws)}
+#sv-auto .ars-rules li{position:relative;padding-left:14px}
+#sv-auto .ars-rules li::before{content:"";position:absolute;left:2px;top:.55em;width:6px;height:6px;border-radius:50%;background:var(--sv-green)}
+#sv-auto .ars-rules b{color:var(--wt)}
+#sv-auto #sd-ars .sd-go{margin-top:auto}
+#sv-auto #sd-ars .sd-go.ars-off:not(#z){background:rgba(255,77,31,.12);border:1px solid rgba(255,110,70,.6);color:#ffb7a3;box-shadow:none}
+@media(min-width:901px) and (max-height:760px){#sv-auto .ars-fig{padding:9px 8px;margin-top:6px}#sv-auto .ars-fig b{font-size:24px}#sv-auto .ars-rules{gap:3px;margin-top:6px;font-size:11px}}
+@media(min-width:901px) and (max-height:640px){#sv-auto .ars-fig small{display:none}#sv-auto .ars-rules li:nth-child(4){display:none}}
+@media(min-width:901px) and (max-height:640px){#sv-auto .ap-act:not(#z){gap:6px;padding:4px 8px}#sv-auto .ap-act b{font-size:17px}#sv-auto .ap-act span{font-size:11.5px;line-height:1.4}#sv-auto .ap-act .ap-go:not(#z){margin-top:2px}}
 /* the setup's validator count: Redelegate's live count, at the right of the list's title */
 #atpop .atrt:not(#z){display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
 #atpop .atrh,#atpop .atrt:not(#z){width:100%}
@@ -5380,6 +5423,7 @@ html[data-tab=connect] .l2host{display:none}
           <div class="sv-panel sd-col" id=sd-ado></div>
           <div class="sv-panel sd-col" id=sd-asky></div>
           <div class="sv-panel sd-col" id=sd-alist></div>
+          <div class="sv-panel sd-col" id=sd-ars></div>
         </div>
       </section>
       <section class=sv-screen id=sv-net data-sc=net aria-label=Network>

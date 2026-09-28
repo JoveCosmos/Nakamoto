@@ -401,22 +401,22 @@
     else {
       /* not active: what it does and what it never does, each as Move your stake shows its figures - four big
          boxes, the same with or without a wallet - and, in place of the list, the way to switch it on */
-      var G = "var(--sv-green)", T = "var(--sv-teal)", V = "var(--sv-violet)", R = "#ff6a6a", A2 = "var(--sv-amber)";
-      put("sd-ado", '<div class=sv-ph><h3>What it does</h3>' + tag("q", "one signature") + '</div>' +
-        '<div class="sd-figs sd-mv four ap-mv">' +
-          fig("Keeps stake active", "24/7", idleAtone() ? idleAtone() + " ATONE idle on inactive validators" : "through a long winter or a busy month", T) +
-          fig("Moves stake", "Better APR", "among your validators", V) +
-          fig("Restakes", "Rewards", "if you switch it on", G) +
-          fig("You grant", "It runs", "you revoke, it stops", A2) +
-        '</div>');
-      var share = at && at.split_pct > 0;
-      put("sd-asky", '<div class=sv-ph><h3>What it doesn\'t</h3>' + tag("q", "enforced on chain") + '</div>' +
-        '<div class="sd-figs sd-mv four ap-mv">' +
-          fig("Send", '<span class=ap-no>Never</span>', "nor spend your ATONE", R) +
-          fig("Unstake", '<span class=ap-no>Never</span>', "your stake stays staked", R) +
-          fig("Custody", '<span class=ap-no>Never</span>', "your ATONE stays in your wallet", R) +
-          fig("GATA's share", share ? at.split_pct + '%' : '<span class=ap-ok>0%</span>', share ? "of the rewards it restakes" : "GATA funds your transactions", A2) +
-        '</div>');
+      /* not active: what it does and never does, one compact panel - two rows of small boxes, centred */
+      var share = at && at.split_pct > 0, ib = idleAtone();
+      var cb = function(k, v, sub, c, cls){ return '<div class="ap-cb' + (cls ? ' ' + cls : '') + '" style="--rc:' + c + '"><em>' + k + '</em><b>' + v + '</b><small>' + sub + '</small></div>'; };
+      put("sd-ado", '<div class=sv-ph><h3>What Autopilot does</h3>' + tag("q", "enforced on chain") + '</div>' +
+        '<div class=ap-dd><u class=ok>It does</u><div class=ap-row>' +
+          cb("Keeps stake active", "24/7", ib ? ib + " ATONE idle on inactive validators" : "through a long winter or a busy month", "#2bc8d6") +
+          cb("Moves stake", "Better APR", "among your validators", "#b9b0ff") +
+          cb("Reviewed by GATA", "48 hours", "an admin acts on each plan", "#ffb02e") +
+          cb("You grant", "It runs", "you revoke, it stops", "#2ee06a") +
+        '</div><u class=no>It never does</u><div class=ap-row>' +
+          cb("Send", "Never", "nor spend your ATONE", "#ff6a6a", "no") +
+          cb("Unstake", "Never", "your stake stays staked", "#ff6a6a", "no") +
+          cb("Custody", "Never", "it stays in your wallet", "#ff6a6a", "no") +
+          cb("GATA's share", share ? at.split_pct + "%" : "0%", "GATA funds your transactions", "#2ee06a", "ok") +
+        '</div></div>');
+      put("sd-asky", "");
       /* the validators only once it is active: until then, the way to switch it on */
       var go = !pos ? '<button class="sv-btn go sd-go ap-go" type=button data-shell-connect>Connect a wallet</button>'
         : !pos.rows.length ? '<button class="sv-btn go sd-go ap-go" type=button data-act=stake>Stake ATONE</button>'
@@ -425,8 +425,10 @@
         '<span>' + (!pos ? 'Connect a wallet, then choose the validators Autopilot may use.' : !pos.rows.length ? 'Stake some ATONE first; Autopilot then keeps it with the better payers.'
           : 'Choose the validators it may use. It keeps your stake with the best of them, and lists them here.') + '</span>' + go +
         '<em class=ap-48s>Autopilot activates within 48 hours of your grant.</em></div>');
+      put("sd-ars", restakePanel(pos, at));
       return;
     }
+    put("sd-ars", restakePanel(pos, at));
     var rows = pos ? pos.rows : [];
     put("sd-asky", g ? grantView(g, at, rp, since, until) : wouldDo(pos));
     put("sd-alist", rows.length ? '<div class=sv-ph><h3>Validators</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total, mark)
@@ -466,6 +468,19 @@
       '<div class=se-say>Autopilot moves your stake there, and again whenever rates change. You approve once.</div>';
   }
   /* With a grant: how far along it is, and what it has done - its last three moves in words */
+  /* Restake: its own service with fixed rules (every 12 hours, from 1 ATONE, on the reader's best-paying validator,
+     no admin step), its own switch - the same in every Autopilot state */
+  function restakePanel(pos, at){
+    var on = !!(at && at.restake), r = pos && pos.rows.length ? pos.rate : 0, add = r > 0 ? Math.pow(1 + r / 730, 730) - 1 - r : 0;
+    var h = '<div class=sv-ph><h3>Restake</h3>' + '<span class="sv-tag ' + (on ? 'g' : 'q') + '">' + (on ? 'on' : 'off') + '</span></div>';
+    h += '<div class=ars-fig><em>' + (on ? 'Adds a year' : 'A year, more') + '</em><b>' + (add > 0 ? '+' + fmt(pos.total * add) + '<i> ATONE</i>' : '\u2014') + '</b>' +
+      '<small>' + (add > 0 ? '+' + (add * 100).toFixed(1) + '% APR, auto-compounds reward' : 'auto-compounds reward') + '</small></div>';
+    h += '<ul class=ars-rules><li><b>Every 12 hours</b>, twice a day</li><li>From <b>1 ATONE</b> of rewards</li><li>On your <b>best-paying</b> validator</li><li>GATA pays the fees, <b>0%</b> share</li></ul>';
+    h += !pos ? '<button class="sv-btn go sd-go" type=button data-shell-connect>Connect a wallet</button>'
+      : !pos.rows.length ? '<button class="sv-btn go sd-go" type=button data-act=stake>Stake ATONE</button>'
+      : '<button class="sv-btn go sd-go' + (on ? ' ars-off' : '') + '" type=button data-act=restakesw>' + (on ? 'Turn off' : 'Turn on') + '</button>';
+    return h;
+  }
   function grantView(g, at, rp, since, until){
     var t0 = at && at.since, t1 = g.expiration ? new Date(g.expiration).getTime() : null, now = Date.now(), day = 86400000;
     var h = '<div class=sv-ph><h3>Your grant</h3></div>';

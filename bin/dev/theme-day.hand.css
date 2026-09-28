@@ -308,3 +308,12 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .ap-48 b{color:#0b5a53}html[data-theme=light]:not([data-mono]) .atnote span b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #sv .sd-ida .sd-wch i.st.rs{color:rgba(255,255,255,.75);border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.08)}
   html[data-theme=light]:not([data-mono]) #sv .sd-ida .sd-wch i.st.rs.on{color:#b6f5cb;border-color:rgba(143,240,176,.6);background:rgba(46,224,106,.18)}
+  /* Autopilot tab in day: the restake band, compact boxes on ivory */
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-ars>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.07),transparent 60%),linear-gradient(315deg,#0b4a36,#073024 58%,#05140f)}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-ars::after{background:linear-gradient(315deg,#0b4a36,#073024 58%,#05140f)}
+  html[data-theme=light]:not([data-mono]) #sv-auto .ap-cb{border-color:#e3ded3;background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 10%,transparent),#fbf9f3 70%)}
+  html[data-theme=light]:not([data-mono]) #sv-auto .ap-cb b{color:var(--ink)}html[data-theme=light]:not([data-mono]) #sv-auto .ap-cb.no b{color:#b3261e}html[data-theme=light]:not([data-mono]) #sv-auto .ap-cb.ok b{color:#16733a}
+  html[data-theme=light]:not([data-mono]) #sv-auto .ap-dd>u.ok{color:#16733a}html[data-theme=light]:not([data-mono]) #sv-auto .ap-dd>u.no{color:#b3261e}
+  html[data-theme=light]:not([data-mono]) #sv-auto .ars-fig{border-color:#e3ded3;background:linear-gradient(0deg,rgba(22,115,58,.1),#fbf9f3 70%)}
+  html[data-theme=light]:not([data-mono]) #sv-auto .ars-fig b{color:#16733a}html[data-theme=light]:not([data-mono]) #sv-auto .ars-rules b{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #sv-auto .ars-rules li::before{background:#16733a}
