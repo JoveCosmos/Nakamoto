@@ -4122,7 +4122,7 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 /* the restake offer: set apart below the plain year (the room left, at least 14px) - a line naming it, then
    Now and Restaking side by side as Move your stake shows its cards; the door under it */
 #sv-over .se-mid,#sv-over .se-ex{flex:1 1 auto}
-.se-rsw{display:flex;flex-direction:column;gap:8px;flex:0 0 auto;margin-top:0;padding-top:16px}
+.se-rsw{display:flex;flex-direction:column;gap:9px;flex:0 0 auto;margin-top:0;padding-top:26px}
 .se-rsh2{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:0 2px}
 .se-rsh2 em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--sv-teal)}
 .se-rsh2 span{font-size:11px;color:var(--ws)}
@@ -4134,19 +4134,21 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 /* the restake offer's head: a title and its tag, the APR it adds under it */
 .se-rsh2 h4{display:inline-flex;align-items:center;gap:9px;margin:0;font-size:14px;font-weight:700;color:var(--wt)}
 .se-rsh2 h4::before{content:"";width:3px;height:14px;border-radius:2px;background:var(--sv-teal);box-shadow:0 0 10px -1px var(--sv-teal)}   /* as the panels' titles */
-.se-rsh2{justify-content:flex-start}
+.se-rsh2{justify-content:flex-start;align-items:center}
 /* the APR restaking adds, in a teal band under the title */
 .se-rss{padding:10px 13px;border-radius:10px;border:1px solid rgba(43,200,189,.4);background:linear-gradient(90deg,rgba(43,200,189,.16),rgba(43,200,189,.05));font-size:12px;color:var(--wt)}
 .se-rss b{color:var(--sv-teal);font-weight:700}
+button.se-rss{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;font:inherit;font-size:12px;cursor:pointer;transition:border-color .15s,background .15s}
+button.se-rss:hover{border-color:#2bc8bd;background:linear-gradient(90deg,rgba(43,200,189,.24),rgba(43,200,189,.08))}
+button.se-rss:focus-visible{outline:2px solid #2bc8bd;outline-offset:2px}
+button.se-rss svg{flex:0 0 16px;width:16px;height:16px;fill:none;stroke:#6fe3da;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s}
+button.se-rss:hover svg{transform:translateX(3px)}
 @media(min-width:901px) and (max-height:1000px){#sv-over #sd-sky .se-row .sd-fig{padding-top:17px;padding-bottom:18px}}
-@media(min-width:901px) and (max-height:760px){#sv-over #sd-sky .se-row .sd-fig{padding-top:8px;padding-bottom:9px}.se-rss{display:none}}
+@media(min-width:901px) and (max-height:760px){#sv-over #sd-sky .se-row .sd-fig{padding-top:8px;padding-bottom:9px}.se-rss{padding:6px 11px;font-size:11px}}
 /* restaking: the day, week and month keep the line saying what restake adds */
 #sv-over .se-row.rson .sd-fig small{display:block}
 .se-rsv{color:var(--sv-teal)}
 .se-rsm{color:var(--sv-green);font-weight:700}
-.sv-btn.go.se-rsgo{gap:8px;background:var(--sv-teal);border-color:var(--sv-teal);color:#04201e;box-shadow:0 10px 26px -14px rgba(43,200,189,.9)}
-.sv-btn.go.se-rsgo:hover:not(:disabled){background:#4fdad0;border-color:#4fdad0;color:#04201e}
-.se-rsgo b{font-weight:600;opacity:.8}
 .se-rson{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:0 0 auto;padding:10px 12px;border-radius:10px;border:1px solid rgba(43,200,189,.4);
 background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 .se-rsch{height:24px;padding:0 10px;border-radius:6px;border:1px solid rgba(43,200,189,.55);background:transparent;color:#6fe3da;font:600 11px var(--wsans);cursor:pointer}

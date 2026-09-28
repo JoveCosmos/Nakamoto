@@ -169,9 +169,10 @@
     /* the APR the compounded year amounts to, against today's: what restaking adds to the rate */
     var capr = Math.pow(1 + rate / 12, 12) - 1, dapr = (capr - rate) * 100;
     var offer = rate > 0 && !on ? '<div class=se-rsw><div class=se-rsh2><h4>Enable restake</h4>' + tag("g", "+" + one(more / 1e6) + " a year") + '</div>' +
-        '<div class=se-rss><b>+' + dapr.toFixed(1) + '% APR</b>, it autocompounds your rewards</div></div>' : '';
-    var door = !ex && !on && rate > 0 ? '<button class="sv-btn go sd-go se-rsgo" type=button data-act=restake>Enable restake</button>'
-      : on ? '<div class=se-rson>Restake is on: your rewards compound on their own.<button type=button class=se-rsch data-act=autopilot>Change</button></div>' : '';
+        /* the band is the door: it opens Autopilot's setup with restake on (no wallet: just the band) */
+        (ex ? '<div class=se-rss>' : '<button type=button class="se-rss go" data-act=restake title="Enable restake">') + '<span><b>+' + dapr.toFixed(1) + '% APR</b>, it autocompounds your rewards</span>' +
+        (ex ? '</div>' : '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>') + '</div>' : '';
+    var door = on ? '<div class=se-rson>Restake is on: your rewards compound on their own.<button type=button class=se-rsch data-act=autopilot>Change</button></div>' : '';
     /* the day, week and month first, the year under them */
     if(ex) return '<div class=se-ex>' + steps + year + offer + '</div>';
     return '<div class=se-mid>' + (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + steps + year + offer + '</div>' + door;
