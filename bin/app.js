@@ -2615,6 +2615,7 @@ rememberGridH();
     return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/authz/v1beta1/grants/granter/" + who + "?pagination.limit=200", { cache: "no-store" })
       .then(function(r){ return r.json(); })
       .then(function(d){ var ops = {}, all = false, n = 0;
+        if(!AT.addr) return null;
         (d.grants || []).forEach(function(g){ if(g.grantee === AT.addr) return; var a = g.authorization || {};
           if(a["@type"] === "/cosmos.staking.v1beta1.StakeAuthorization" && a.authorization_type === "AUTHORIZATION_TYPE_DELEGATE"){
             var l = (a.allow_list || {}).address || []; if(!l.length) all = true; l.forEach(function(o){ ops[o] = 1; }); n++; }
@@ -2763,11 +2764,6 @@ rememberGridH();
       : scope.length < AT_MIN ? "Select at least " + AT_MIN + " validators (" + scope.length + " now)"
       : scope.length > AT_MAX ? "At most " + AT_MAX + " validators (" + scope.length + " now)" : ""; }
     var go = E("atgrant"); if(go) go.disabled = !ok;
-    var rn = E("atrsnote"), ot = AT.others;
-    if(rn){ var mine = pos ? pos.rows.filter(function(r){ var d = (window.__VDBY || {})[r.id]; return ot && d && ot.ops[d.op]; }).length : 0;
-      rn.hidden = !ot;
-      rn.textContent = !ot ? "" : ot.all ? "Another service already restakes your rewards. Autopilot will not claim alongside it."
-        : "Another service already restakes your rewards on " + mine + " of your " + (pos ? pos.rows.length : 0) + " validators. Autopilot leaves those to it."; }
     var sm = E("atsum");
     if(sm) sm.innerHTML = view ? "Active" : !AT.addr ? '<span class=atclosed>Inactive</span>' : ok ? (cap > 0 ? fmt(cap) + " ATONE cap" : "no cap") + "<br>" +
       (atPick() === "selected" ? "my selection, " : "") + scope.length + " validators, until revoked" : "";

@@ -405,12 +405,13 @@
          boxes, the same with or without a wallet - and, in place of the list, the way to switch it on */
       /* not active: what it does and never does, one compact panel - two rows of small boxes, centred */
       var ib = idleAtone();
-      var cb = function(k, v, sub, c, cls){ return '<div class="ap-cb' + (cls ? ' ' + cls : '') + '" style="--rc:' + c + '"><em>' + k + '</em><b>' + v + '</b><small>' + sub + '</small></div>'; };
+      var cb = function(k, v, sub, c, cls){ if(String(v).replace(/<[^>]*>/g, "").length > 11) v = '<span class=lvs>' + v + '</span>';
+        return '<div class="ap-cb' + (cls ? ' ' + cls : '') + '" style="--rc:' + c + '"><em>' + k + '</em><b>' + v + '</b><small>' + sub + '</small></div>'; };
       put("sd-ado", '<div class=sv-ph><h3>Your Autopilot Grant</h3></div>' +
         '<div class=ap-dd><i class="ap-ln ok" aria-hidden=true></i><div class=ap-row>' +
-          cb("Keeps stake active", "24/7", ib ? ib + " ATONE idle on inactive validators" : "through a long winter or a busy month", "#2bc8d6") +
+          cb("Redelegates", "Your Stake cap", "Among your validators", "#2ee06a") +
           cb("Strategize", "Better APR", "among your validators", "#b9b0ff") +
-          cb("Monitors", "Live", "your validators, every minute", "#2ee06a") +
+          cb("Keeps stake active", "24/7", ib ? ib + " ATONE idle on inactive validators" : "through a long winter or a busy month", "#2bc8d6") +
           cb("You grant", "It runs", "you revoke, it stops", "#2ee06a") +
         '</div><i class="ap-ln no" aria-hidden=true></i><div class=ap-row>' +
           cb("Send", "Never", "nor spend your ATONE", "#ff6a6a", "no") +
@@ -480,6 +481,16 @@
     var left = Math.max(0, Math.ceil((ex - Date.now()) / 86400000));
     return '<span class=ars-until>Runs until <b>' + (window.__dayFull ? window.__dayFull(ex) : new Date(ex).toISOString().slice(0, 10)) + '</b>, ' + left + ' day' + (left === 1 ? '' : 's') + ' left</span>';
   }
+  /* the line over the switch: what restake does - or, when another restake service already holds a delegate
+     grant for this wallet (not GATA's), that Restake leaves those validators to it */
+  function rsHow(pos, at){
+    var ot = at && at.others;
+    if(!ot) return 'Auto-compounds reward on your <b>best-paying</b> validator';
+    if(ot.all) return 'Another service restakes your rewards, so <b>Restake stays out</b>';
+    var n = pos ? pos.rows.filter(function(r){ var d = (window.__VDBY || {})[r.id]; return d && ot.ops[d.op]; }).length : 0;
+    return n ? 'Another service restakes <b>' + n + ' of your ' + pos.rows.length + '</b> validators, so Restake skips ' + (n === 1 ? 'it' : 'them')
+             : 'Auto-compounds reward on your <b>best-paying</b> validator';
+  }
   function restakePanel(pos, at){
     var on = !!(at && at.restake), r = pos && pos.rows.length ? pos.rate : 0, add = r > 0 ? Math.pow(1 + r / 730, 730) - 1 - r : 0;
     var h = '<div class=sv-ph><h3>Restake</h3>' + '<span class="sv-tag ars-st' + (on ? ' on' : '') + '">' + (on ? 'Enabled' : 'Disabled') + '</span></div>';
@@ -487,7 +498,7 @@
       (add > 0 ? '<small>ATONE, +' + (add * 100).toFixed(1) + '% APR</small>' : '') + rsUntil(at, on) + '</div>';
     /* the rules sit at the foot, over the switch */
     h += '<div class=ars-foot><div class=ars-two><div><em>Frequency</em><b>12 hours</b></div><div><em>Minimum</em><b>1 ATONE</b></div></div>' +
-      '<div class=ars-how>Auto-compounds reward on your <b>best-paying</b> validator</div></div>';
+      '<div class=ars-how>' + rsHow(pos, at) + '</div></div>';
     h += !pos ? '<button class="sv-btn go sd-go" type=button data-shell-connect>Connect a wallet</button>'
       : !pos.rows.length ? '<button class="sv-btn go sd-go" type=button data-act=stake>Stake ATONE</button>'
       : '<button class="sv-btn go sd-go' + (on ? ' ars-off' : '') + '" type=button data-act=restakesw>' + (on ? 'Disable' : 'Enable') + '</button>';

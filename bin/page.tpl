@@ -4809,7 +4809,6 @@ white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .atseg button:focus-visible{outline:2px solid var(--av);outline-offset:2px}
 /* the restake pair sits on its own in the row: as wide as its buttons, like the months */
 #atrsk{align-self:flex-start}
-.atrsnote{font-size:11.5px;line-height:1.45;color:var(--ws);padding:7px 10px;border-radius:7px;border:1px solid rgba(185,176,255,.35);background:rgba(185,176,255,.07)}
 #atrsk button{min-width:52px}
 .atuntil{font-family:var(--wmono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ws)}
 .atuntil b{font-family:var(--wsans);font-size:11.5px;font-weight:600;letter-spacing:0;text-transform:none;color:#fff8dc;margin-left:4px}
@@ -5034,6 +5033,8 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 #sv-auto .ap-cb.no b{color:#ff8a8a}#sv-auto .ap-cb.ok b{color:var(--sv-green)}
 #sv-auto .ap-cb small{font-size:10.5px;line-height:1.35;color:var(--ws);text-wrap:balance}
 @media(min-width:901px) and (max-width:1399px){#sv-auto .ap-cb b{font-size:17px}#sv-auto .ap-cb small{font-size:10px}}
+/* a long value (more than 11 characters) is set smaller inside its line, so the line keeps every box's height */
+#sv-auto .ap-cb b .lvs{font-size:.8em}
 @media(min-width:901px) and (max-height:760px){#sv-auto .ap-cb{padding:5px 6px 6px;gap:2px}#sv-auto .ap-dd{gap:5px}#sv-auto .ap-cb small{font-size:9.5px;line-height:1.25}#sv-auto .ap-cb b{font-size:15px}#sv-auto .ap-cb em{padding-bottom:3px}}
 @media(max-width:700px){#sv-auto .ap-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* Restake: its figure, its fixed rules, its switch */
@@ -5829,7 +5830,6 @@ html[data-tab=connect] .l2host{display:none}
         <div class=atrow><span class=atlab><i>3</i>Stake<small>optional cap on what it may move; empty for no cap</small></span>
           <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="no cap" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
           <span class=unhint id=athint></span></div>
-        <div class=atrsnote id=atrsnote hidden></div>
       </div>
       <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Autopilot activates within <b>48 hours</b> of your grant, You can revoke it at any time.</span></div>
     </section>
