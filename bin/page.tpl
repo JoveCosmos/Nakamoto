@@ -4087,7 +4087,7 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 /* the restake offer: set apart below the plain year (the room left, at least 14px) - a line naming it, then
    Now and Restaking side by side as Move your stake shows its cards; the door under it */
 #sv-over .se-mid,#sv-over .se-ex{flex:1 1 auto}
-.se-rsw{display:flex;flex-direction:column;gap:6px;flex:0 0 auto;margin-top:auto;padding-top:14px}
+.se-rsw{display:flex;flex-direction:column;gap:8px;flex:0 0 auto;margin-top:0;padding-top:16px}
 .se-rsh2{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:0 2px}
 .se-rsh2 em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--sv-teal)}
 .se-rsh2 span{font-size:11px;color:var(--ws)}
@@ -4097,9 +4097,11 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 #sv-over #sd-sky .se-row .sd-fig{align-items:center;text-align:center;padding-top:16px;padding-bottom:17px;gap:5px}
 #sd-sky .se-row .sd-fig>b{justify-content:center}
 /* the restake offer's head: a title and its tag, the APR it adds under it */
-.se-rsh2 h4{margin:0;font-size:14px;font-weight:700;color:var(--wt)}
+.se-rsh2 h4{display:inline-flex;align-items:center;gap:9px;margin:0;font-size:14px;font-weight:700;color:var(--wt)}
+.se-rsh2 h4::before{content:"";width:3px;height:14px;border-radius:2px;background:var(--sv-teal);box-shadow:0 0 10px -1px var(--sv-teal)}   /* as the panels' titles */
 .se-rsh2{justify-content:flex-start}
-.se-rss{padding:0 2px;font-size:11.5px;color:var(--ws)}
+/* the APR restaking adds, in a teal band under the title */
+.se-rss{padding:10px 13px;border-radius:10px;border:1px solid rgba(43,200,189,.4);background:linear-gradient(90deg,rgba(43,200,189,.16),rgba(43,200,189,.05));font-size:12px;color:var(--wt)}
 .se-rss b{color:var(--sv-teal);font-weight:700}
 @media(min-width:901px) and (max-height:1000px){#sv-over #sd-sky .se-row .sd-fig{padding-top:17px;padding-bottom:18px}}
 @media(min-width:901px) and (max-height:760px){#sv-over #sd-sky .se-row .sd-fig{padding-top:8px;padding-bottom:9px}.se-rss{display:none}}
