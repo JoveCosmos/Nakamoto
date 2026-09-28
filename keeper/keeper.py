@@ -268,6 +268,11 @@ def restake_step(c, granter, rgs, vals, m, P, dry):
             ok = "txhash" in r and "error" not in r
             c.execute("INSERT INTO restake VALUES(?,?,?,?,?,?,?,?)", (int(time.time()), granter, p["rewards"], amt, p["send"], p["stake"][0]["validator"], r.get("txhash") if ok else None, 0))
             c.commit()
+            # a failed restake alerts (it is tried again at the next 12-hour turn); while the signer is known to be
+            # down its own alert covers every delegator, so no flood
+            if not ok and not c.execute("SELECT 1 FROM alert_sent WHERE granter='_signer' AND k='down'").fetchone():
+                alert("crit", "Restake failed: " + short(granter), "The keeper tries again at the next 12-hour turn.",
+                      {"Delegator": granter, "Rewards": "{:,.4f} ATONE".format(p["rewards"] / 1e6), "Error": json.dumps(r.get("error"))[:300]})
             log("restake granter=%s rewards=%d staked=%d sent=%d -> %s" % (granter, p["rewards"], amt, p["send"], r))
         else:
             log("DRY restake granter=%s would claim %d from %d validators, stake %d on %s, send %d" % (granter, p["rewards"], len(p["claim"]), amt, p["stake"][0]["validator"][-6:], p["send"]))
@@ -558,6 +563,33 @@ def once(c, only=None, live=None, force=False):
         low_photon(c, photon)
     except Exception as e:
         log("status failed: %s" % e)
+    try:
+        signer_health(c)
+    except Exception as e:
+        log("status failed: %s" % e)
+
+SIGNER_FAILS = [0]                               # consecutive ticks the signer did not answer
+def signer_health(c):
+    """every tick: the signer answers /whoami with our address. Three missed ticks in a row -> Discord (again every
+    6 hours while it stays down); a wrong address -> Discord at once; back -> Discord once."""
+    now, url = int(time.time()), SIGNER.rsplit("/", 1)[0] + "/whoami"
+    try:
+        req = urllib.request.Request(url, headers={"x-gata-secret": SECRET})
+        with urllib.request.urlopen(req, timeout=15) as r: who = json.load(r).get("address")
+        err = None if who == GRANTEE else "it signs as %s, not %s" % (who, GRANTEE)
+    except Exception as e:
+        err = "no answer: %s" % (str(e)[:200])
+    row = c.execute("SELECT at FROM alert_sent WHERE granter='_signer' AND k='down'").fetchone()
+    if err:
+        SIGNER_FAILS[0] += 1
+        if (SIGNER_FAILS[0] >= 3 or "signs as" in err) and (not row or now - row[0] >= 6 * 3600):
+            alert("crit", "Autopilot signer not answering", "Moves and restakes cannot be signed until it is back.", {"Signer": url, "Problem": err})
+            c.execute("INSERT OR REPLACE INTO alert_sent VALUES('_signer', 'down', ?)", (now,)); c.commit()
+    else:
+        SIGNER_FAILS[0] = 0
+        if row:
+            alert("ok", "Autopilot signer back", "", {"Signer": url})
+            c.execute("DELETE FROM alert_sent WHERE granter='_signer' AND k='down'"); c.commit()
 
 LOW_PHOTON = int(float(os.environ.get("KEEPER_LOW_PHOTON", "15")) * 1e6)   # the signer pays every fee in PHOTON
 def low_photon(c, photon):
