@@ -162,7 +162,8 @@
     var Y = on ? cy : y, P = function(days){ return Y * days / 365; }, D = function(days){ return (cy - y) * days / 365; };
     var tile = function(k, u, d){ return fig(k, '<span class=sd-gain>+' + one(u / 1e6) + '</span>', on ? '<span class=se-rsm>+' + one(d / 1e6) + '</span> restake' : "ATONE", "var(--sv-green)"); };
     var year = '<div class=se-hero><div class=se-card><em>' + (on ? 'A year, restaking' : 'A year') + '</em><b><span class=sd-gain>+' + one(Y / 1e6) + '</span><i>ATONE</i></b>' +
-      '<small class=se-apr>' + (on ? '<span class=se-rsm>+' + one(more / 1e6) + '</span> from restake, ' : '') + pct(rate) + ' APR</small></div></div>';
+      /* the unit where the rate was; the rate rides in the panel's title as a tag */
+      '<small class=se-apr>ATONE' + (on ? ', <span class=se-rsm>+' + one(more / 1e6) + '</span> from restake' : '') + '</small></div></div>';
     var steps = '<div class="sd-figs two se-row' + (on ? ' rson' : '') + '">' + tile("A day", P(1), D(1)) + tile("A week", P(7), D(7)) + tile("A month", P(365 / 12), D(365 / 12)) + '</div>';
     /* not restaking: the offer, as Move your stake offers its move - the year now and the year
        restaking, side by side, and the door (none without a wallet: it names nothing to act on) */
@@ -309,8 +310,8 @@
     var aft = picks.length && plan ? plan.after : null;
     var off = 0; rows.forEach(function(r){ if(r.inactive) off += r.x; });
     put("sd-sky", mine
-      ? '<div class=sv-ph><h3>What your stake earns</h3>' + (off ? tag("r se-off", fmt(off) + " ATONE inactive earns nothing", "stake on validators outside the active set earns no rewards") : '') + '</div>' + earns(pos.total, pos.rate, off)
-      : '<div class=sv-ph><h3>What 1,000 ATONE earns</h3></div>' + earns(1e9, S.mid, 0, true));
+      ? '<div class=sv-ph><h3>What your stake earns</h3>' + (pos.rate > 0 ? tag("a", pct(pos.rate) + " APR", "what your stake earns now") : '') + '</div>' + earns(pos.total, pos.rate, off)
+      : '<div class=sv-ph><h3>What 1,000 ATONE earns</h3>' + (S.mid > 0 ? tag("a", pct(S.mid) + " APR", "the set's middle APR") : '') + '</div>' + earns(1e9, S.mid, 0, true));
 
     /* the validators */
     put("sd-list", footprint(pos));

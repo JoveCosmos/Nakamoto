@@ -4351,7 +4351,12 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .se-row .sd-fig>b{font-size:19px}
 /* a little air under the big figures: the year's line, and each box's bottom line */
 .se-hero small{margin-top:7px}
-.se-hero small.se-apr{color:var(--wf)}   /* the rate under the year, in the shade of its "A year" label */
+.se-hero small.se-apr{color:var(--wf)}   /* the unit under the year, in the shade of its "A year" label */
+/* the unit stands under the figure; a short window, with no room for that line, keeps it beside the figure */
+#sv-over #sd-sky .se-hero .se-card>b>i{display:none}
+@media(min-width:901px) and (max-height:640px){#sv-over #sd-sky .se-hero .se-card>b>i{display:inline}}
+/* the APR tag in What your stake earns' band: amber, clear on the fill */
+#sv-over #sd-sky>.sv-ph .sv-tag.a{color:#ffe2b0;border-color:rgba(255,196,90,.6);background:rgba(40,22,0,.45)}
 .se-row .sd-fig small{margin-top:4px}
 /* the example (no wallet): figure and boxes centred in the panel, nothing under them */
 /* the no-wallet example stands exactly as the connected panel does (.se-mid): boxes where the centred block
