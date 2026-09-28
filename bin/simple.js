@@ -366,8 +366,9 @@
        boxes - the figure in its well, the unit beside it, no captions and no gauges */
     put("sd-astrip",
       '<div class="sd-id sd-ida"><div class=sd-top><h3>Autopilot</h3></div><div class=sd-wmeta><span class=sd-wch><i class="st' + (g ? ' on' : '') + '">' + (g ? "Active" : "Inactive") + '</i>' +
-        /* restake: on only when the grant carries it */
-        '<i class="st rs' + (g && at.restake ? ' on' : '') + '">Restake ' + (g && at.restake ? 'on' : 'off') + '</i>' + door + '</span></div></div>' +
+        /* restake: its own switch, on whenever its grant stands - with or without Autopilot */
+        (pos && pos.rows.length ? '<button type=button class="st rs rsw' + (at && at.restake ? ' on' : '') + '" data-act=restakesw title="Restake: turn it ' + (at && at.restake ? 'off' : 'on') + '">Restake ' + (at && at.restake ? 'on' : 'off') + '</button>'
+          : '<i class="st rs">Restake off</i>') + door + '</span></div></div>' +
       (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "\u2014", "", null, "var(--sv-green)", "", false, rec ? "APR" : "")
          : ro("Strategy", "\u2014", "", null, "var(--sv-violet)")) +
       ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "\u2014", "", null, "var(--sv-violet)", "", false, g && a.max_tokens ? "ATONE" : "") +
@@ -1377,6 +1378,7 @@
       if(p && p.moves) window.__goSign();
       return;
     }
+    if(act === "restakesw"){ if(window.__rsOpen) window.__rsOpen(); return; }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
     if(act === "gfollow"){ govSend(t, { type: "atomone/v1/MsgDelegateGovernor", value: { delegator_address: window.__ADDR, governor_address: t.dataset.g } }); return; }

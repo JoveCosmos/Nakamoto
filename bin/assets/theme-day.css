@@ -872,6 +872,14 @@
   html[data-theme=light]:not([data-mono]) .ap-48 b{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sd-ida .sd-wch i.st.rs{color:var(--ink);border-color:var(--surface-2);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sd-ida .sd-wch i.st.rs.on{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .rscard .rsbody b{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .rscard .rsfig{border:1px solid var(--accent);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .rscard .rsfig b{color:var(--accent)!important}
+  html[data-theme=light]:not([data-mono]) .rscard .wk-btn.wk-go.off{background:var(--danger-bar);border-color:var(--danger-bar);color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .sd-ida .sd-wch button.rsw:not(#z){border:1px solid var(--surface-2);background:var(--surface-2);color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .sd-ida .sd-wch button.rsw.on:not(#z){color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sd-ida .sd-wch button.rsw:hover{border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sd-ida .sd-wch button.rsw:focus-visible{outline:2px solid var(--accent)}
   html[data-theme=light]:not([data-mono]) .netsw{border:1px solid var(--bg);background:var(--bg);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .netsw a{color:var(--muted);text-decoration:none}
   html[data-theme=light]:not([data-mono]) .netsw a:hover{color:var(--wt,var(--ink))}

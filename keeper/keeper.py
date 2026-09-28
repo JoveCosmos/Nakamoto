@@ -488,6 +488,20 @@ def once(c, only=None, live=None, force=False):
             report(g["granter"], rep)
         except Exception as e:
             log("granter %s failed: %s" % (g["granter"], e))
+    # restake on its own: a wallet may grant the restake pair (claim + delegate) without Autopilot. Once a day its
+    # rewards are claimed and staked on the best-paying validator its delegate grant allows - its own validators -
+    # under the same checks (withdraw address, other services, the cap, the dry switch, an admin pause)
+    seen = set(g["granter"] for g in gs)
+    RS_ONLY = {"every": 86400, "min_apr": 0.0, "min_atone": 1.0, "dests": 1, "d90": 0, "restake_every": 86400}
+    for granter in rgs:
+        if granter in seen or (only and granter != only): continue
+        try:
+            if granter in paused():
+                log("granter=%s paused in the admin console: restake skipped" % granter); continue
+            rs = restake_step(c, granter, rgs, vals, m, RS_ONLY, dry)
+            report(granter, {"granter": granter, "checked": int(time.time()), "dry": dry, "strategy": "restake", "restake": rs or {}})
+        except Exception as e:
+            log("restake granter %s failed: %s" % (granter, e))
     c.execute("INSERT INTO run VALUES(?,?,?,?)", (int(time.time()), len(gs), acted, "dry" if dry else "live")); c.commit()
     # the signer's own standing, for the page
     try:

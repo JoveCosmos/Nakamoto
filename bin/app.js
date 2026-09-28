@@ -2686,28 +2686,9 @@ rememberGridH();
     var exp = Date.now() + AT.days * 86400000;
     var msgs = [{ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
       grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: { authorization_type: "redelegate", max_tokens: { denom: "uatone", amount: String(cap) }, allow_list: scope } }, expiration: exp } } }];
-    /* restake: the keeper may claim the rewards and stake them back, only onto the same set,
-       up to the same cap, for the same time */
-    if(atRestake()){
-      msgs.push({ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
-        grant: { authorization: { type: "cosmos-sdk/GenericAuthorization", value: { msg: WDRAW } }, expiration: exp } } });
-      msgs.push({ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
-        grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: { authorization_type: "delegate", max_tokens: { denom: "uatone", amount: String(atRestakeCap()) }, allow_list: scope } }, expiration: exp } } });
-    }
-    /* the reward split, when one is set and rewards are being restaked: the send that
-       collects our share may only reach our address, only up to the period's projection */
-    var sl = atSplitLimit();
-    if(atRestake() && sl > 0) msgs.push({ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
-      grant: { authorization: { type: "cosmos-sdk/SendAuthorization", value: { spend_limit: [{ denom: "uatone", amount: String(sl) }], allow_list: [AT.split_to] } }, expiration: exp } } });
-    if(AT.grant){
-      /* replacing the grant that stands: each new grant overwrites the one of its kind, and a
-         kind the new terms leave out (restake switched off) is revoked in the same signature;
-         a change is not charged the service fee again */
-      var keep = {}, gone = {};
-      msgs.forEach(function(m){ keep[authType(m.value.grant.authorization)] = 1; });
-      (AT.grants || []).forEach(function(x){ var t = grantType(x); if(t && !keep[t]) gone[t] = 1; });
-      return Object.keys(gone).map(revokeMsg).concat(msgs);
-    }
+    /* restake is its own switch (the Autopilot card's chip): this grant never adds or removes it. A grant that
+       stands is simply overwritten by the new terms, a change is not charged the service fee again */
+    if(AT.grant) return msgs;
     /* the service fee, when one is set: paid with the grant, in the same signature */
     var fee = atFee(); if(fee > 0 && AT.fee_to) msgs.push({ type: "cosmos-sdk/MsgSend", value: { from_address: window.__ADDR, to_address: AT.fee_to, amount: [{ denom: "uatone", amount: String(fee) }] } });
     return msgs;
@@ -2928,8 +2909,65 @@ rememberGridH();
   var atgrant = E("atgrant"); if(atgrant) atgrant.addEventListener("click", function(){ atSend(atMsgs(), atgrant, atMemo()); });
   /* revoke names every grant that stands (a revoke of one that does not fails the whole tx) */
   var atrevoke = E("atrevoke"); if(atrevoke) atrevoke.addEventListener("click", function(){
-    var types = {}; (AT.grants || []).forEach(function(x){ var t = grantType(x); if(t) types[t] = 1; }); if(!types[REDEL]) types[REDEL] = 1;
-    atSend(Object.keys(types).map(revokeMsg), atrevoke); });
+    /* Autopilot's own permission only: restake keeps its own switch */
+    atSend([revokeMsg(REDEL)], atrevoke); });
+  /* ── Restake, its own switch: the claim + delegate pair, for 12 months, capped at what the stake can earn, the
+     delegate allow-list = the validators the reader stakes with (and Autopilot's list, when it runs). The keeper
+     claims and stakes on the best-paying of them; an admin acts within 48 hours. Off = both revoked. ── */
+  var rspop = E("rspop"), RS_DAYS = 365;
+  function rsOn(){ var g = AT.grants || []; return g.some(function(x){ return grantType(x) === DELEG; }) && g.some(function(x){ return grantType(x) === WDRAW; }); }
+  function rsAllow(){
+    var VD = window.__VDBY || {}, pos = window.__POS, out = {};
+    (pos ? pos.rows : []).forEach(function(r){ var d = VD[r.id]; if(!r.inactive && d && d.op) out[d.op] = 1; });
+    if(AT.grant) (((AT.grant.authorization || {}).allow_list || {}).address || []).forEach(function(op){ out[op] = 1; });
+    return Object.keys(out);
+  }
+  function rsCap(){ var pos = window.__POS; return !pos || !(pos.total > 0) ? 1000000 : Math.max(1000000, Math.ceil(pos.total * Math.max(pos.rate, .05) * (RS_DAYS / 365) * 1.5)); }
+  function rsMsgs(on){
+    if(!on){ var t = {}; (AT.grants || []).forEach(function(x){ var k = grantType(x); if(k === WDRAW || k === DELEG || k === MSEND) t[k] = 1; });
+      return Object.keys(t).map(revokeMsg); }
+    var allow = rsAllow(), exp = Date.now() + RS_DAYS * 86400000; if(!AT.addr || !allow.length) return [];
+    var m = [{ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr, grant: { authorization: { type: "cosmos-sdk/GenericAuthorization", value: { msg: WDRAW } }, expiration: exp } } },
+             { type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr, grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: { authorization_type: "delegate", max_tokens: { denom: "uatone", amount: String(rsCap()) }, allow_list: allow } }, expiration: exp } } }];
+    /* the reward split, only when one is set: the send may reach our address alone, up to the year's projection */
+    var pos = window.__POS;
+    if(AT.split_pct > 0 && AT.split_to && pos && pos.total > 0) m.push({ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
+      grant: { authorization: { type: "cosmos-sdk/SendAuthorization", value: { spend_limit: [{ denom: "uatone", amount: String(Math.ceil(pos.total * pos.rate * AT.split_pct / 100 * 1.5)) }], allow_list: [AT.split_to] } }, expiration: exp } } });
+    return m;
+  }
+  function rsDraw(){
+    var on = rsOn(), pos = window.__POS, body = E("rsbody"), go = E("rsgo"), sm = E("rssum"); if(!body || !go) return;
+    var n = rsAllow().length, signer = !!window.__WALLET && !!window.__WALLET.signDirect;
+    var dg = (AT.grants || []).filter(function(x){ return grantType(x) === DELEG; })[0], until = dg && dg.expiration ? window.__dayFull(new Date(dg.expiration).getTime()) : null;
+    if(sm) sm.innerHTML = on ? "on" : "off";
+    if(on) body.innerHTML = '<p>Restake is <b>on</b>: your rewards are claimed and staked again on the best-paying of your validators' + (until ? ', until <b>' + until + '</b>' : '') + '.</p>' +
+      '<p>Turning it off revokes the permission in one signature. Autopilot, if it runs, is not affected.</p>';
+    else {
+      var r = pos && pos.rate > 0 ? pos.rate : 0, more = r ? pos.total * (Math.pow(1 + r / 12, 12) - 1 - r) : 0;
+      body.innerHTML = (r ? '<div class=rsfig><em>A year, more</em><b>+' + fmt(more) + ' ATONE</b><small>+' + ((Math.pow(1 + r / 12, 12) - 1 - r) * 100).toFixed(1) + '% APR, auto-compounds reward</small></div>' : '') +
+        '<p>Claims your rewards and stakes them again on the best-paying of the <b>' + n + '</b> validator' + (n === 1 ? '' : 's') + ' you stake with, so they earn too. GATA pays the fees and takes no share.</p>' +
+        '<p>It activates within <b>48 hours</b>; turn it off at any time. Your stake never leaves your wallet.</p>' +
+        (!AT.addr ? '<p class=rshint>Opens once GATA\'s keeper is live.</p>' : !signer ? '<p class=rshint>Needs Keplr (direct signing).</p>' : !n ? '<p class=rshint>Stake with a validator first.</p>' : '');
+    }
+    go.textContent = on ? "Turn off" : "Turn on"; go.classList.toggle("off", on);
+    go.disabled = !signer || !AT.addr || (!on && !n) || (on && !rsMsgs(false).length);
+  }
+  window.__rsOpen = function(){
+    if(!rspop || !window.__ADDR) return;
+    rsDraw(); POP.open(rspop);
+    var tok = ++AT_OPEN;
+    atStatus().then(function(){ return atGrant(); }).then(function(r){ if(tok !== AT_OPEN || !rspop.classList.contains("on")) return; atKeep(r); rsDraw(); });
+  };
+  var rsgo = E("rsgo"); if(rsgo) rsgo.addEventListener("click", function(){
+    var on = rsOn(), msgs = rsMsgs(!on); if(!msgs.length || !window.__TX || !window.__WALLET) return;
+    rsgo.disabled = true; rsgo.classList.add("busy");
+    var n = window.__notify();
+    window.__TX.sendDirect(window.__WALLET, msgs, on ? "" : "gata:restake", function(){})
+      .then(function(){ n.ok(); POP.close(rspop); atGrant().then(function(r){ if(!atKeep(r)) return; draw(); if(window.__redraw) window.__redraw(); }); })
+      .catch(function(e){ n.fail(e && e.message || String(e)); })
+      .then(function(){ rsgo.classList.remove("busy"); rsDraw(); });
+  });
+  var rscancel = E("rscancel"); if(rscancel) rscancel.addEventListener("click", function(){ POP.close(rspop); });
   /* the wallet's Autopilot line: inactive, or active with the grant's bounds; the door reads Set up / Manage */
   function atLine(){
     var row = E("wkap"), st = E("wkaps"), b = E("atbtn"); if(!row) return;
