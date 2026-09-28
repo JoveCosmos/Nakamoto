@@ -5010,7 +5010,10 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 #sv-auto #sd-ars::after{content:"";display:block;position:absolute;inset:-1px;border-radius:12px;padding:0 3px 3px;background:linear-gradient(315deg,var(--bandf));pointer-events:none;z-index:2;
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 /* the compact panel: two labelled rows of four small boxes, centred in the panel */
-#sv-auto .ap-dd{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;gap:8px;min-height:0}
+#sv-auto .ap-dd{flex:1 1 auto;display:flex;flex-direction:column;justify-content:stretch;gap:8px;min-height:0}
+/* the two rows share the panel's height equally, each box filling its row */
+#sv-auto .ap-dd>.ap-row{flex:1 1 0;min-height:0}
+#sv-auto .ap-row>.ap-cb{justify-content:center;height:100%;box-sizing:border-box}
 #sv-auto .ap-dd>u{text-decoration:none;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase}
 #sv-auto .ap-dd>u.ok{color:#8ff0b0}#sv-auto .ap-dd>u.no{color:#ff8a8a;margin-top:4px}
 #sv-auto .ap-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}

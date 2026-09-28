@@ -404,13 +404,13 @@
       /* not active: what it does and never does, one compact panel - two rows of small boxes, centred */
       var share = at && at.split_pct > 0, ib = idleAtone();
       var cb = function(k, v, sub, c, cls){ return '<div class="ap-cb' + (cls ? ' ' + cls : '') + '" style="--rc:' + c + '"><em>' + k + '</em><b>' + v + '</b><small>' + sub + '</small></div>'; };
-      put("sd-ado", '<div class=sv-ph><h3>What Autopilot does</h3>' + tag("q", "enforced on chain") + '</div>' +
-        '<div class=ap-dd><u class=ok>It does</u><div class=ap-row>' +
+      put("sd-ado", '<div class=sv-ph><h3>What Autopilot Grant</h3>' + tag("q", "enforced on chain") + '</div>' +
+        '<div class=ap-dd><u class=ok>Does</u><div class=ap-row>' +
           cb("Keeps stake active", "24/7", ib ? ib + " ATONE idle on inactive validators" : "through a long winter or a busy month", "#2bc8d6") +
           cb("Moves stake", "Better APR", "among your validators", "#b9b0ff") +
           cb("Reviewed by GATA", "48 hours", "an admin acts on each plan", "#ffb02e") +
           cb("You grant", "It runs", "you revoke, it stops", "#2ee06a") +
-        '</div><u class=no>It never does</u><div class=ap-row>' +
+        '</div><u class=no>Never Does</u><div class=ap-row>' +
           cb("Send", "Never", "nor spend your ATONE", "#ff6a6a", "no") +
           cb("Unstake", "Never", "your stake stays staked", "#ff6a6a", "no") +
           cb("Custody", "Never", "it stays in your wallet", "#ff6a6a", "no") +
@@ -473,7 +473,7 @@
   function restakePanel(pos, at){
     var on = !!(at && at.restake), r = pos && pos.rows.length ? pos.rate : 0, add = r > 0 ? Math.pow(1 + r / 730, 730) - 1 - r : 0;
     var h = '<div class=sv-ph><h3>Restake</h3>' + '<span class="sv-tag ' + (on ? 'g' : 'q') + '">' + (on ? 'on' : 'off') + '</span></div>';
-    h += '<div class=ars-fig><em>' + (on ? 'Adds a year' : 'A year, more') + '</em><b>' + (add > 0 ? '+' + fmt(pos.total * add) + '<i> ATONE</i>' : '\u2014') + '</b>' +
+    h += '<div class=ars-fig><em>' + (on ? 'Adds a year' : 'A year') + '</em><b>' + (add > 0 ? '+' + fmt(pos.total * add) + '<i> ATONE</i>' : '\u2014') + '</b>' +
       '<small>' + (add > 0 ? '+' + (add * 100).toFixed(1) + '% APR, auto-compounds reward' : 'auto-compounds reward') + '</small></div>';
     h += '<ul class=ars-rules><li><b>Every 12 hours</b>, twice a day</li><li>From <b>1 ATONE</b> of rewards</li><li>On your <b>best-paying</b> validator</li><li>GATA pays the fees, <b>0%</b> share</li></ul>';
     h += !pos ? '<button class="sv-btn go sd-go" type=button data-shell-connect>Connect a wallet</button>'
