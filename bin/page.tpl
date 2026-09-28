@@ -4288,14 +4288,24 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 #sd-sky .se-amt{color:var(--sv-amber)}
 #sd-sky .se-rsl{display:block;margin-top:4px;font-size:11px;color:var(--ws)}
 #sd-sky .se-rsl b{color:var(--sv-green);font-weight:700}
-/* the restake line a row lower, 'auto-compounds rewards' under it */
-#sd-sky .se-rsl:not(#z){margin-top:15px}
-#sd-sky .se-rsl2{display:block;margin-top:2px;font-size:10.5px;color:var(--wf)}
-#sv-over #sd-sky .se-earn .sd-fig:last-child small{flex:0 0 auto}
-@media(min-width:901px) and (max-height:1000px){#sd-sky .se-rsl:not(#z){margin-top:6px}}
-@media(min-width:901px) and (max-height:820px){#sd-sky .se-rsl:not(#z){margin-top:5px}}
-@media(min-width:901px) and (max-height:700px){#sd-sky .se-rsl2{display:none}#sd-sky .se-rsl:not(#z){margin-top:2px}}
-@media(min-width:901px) and (max-height:560px){#sd-sky .se-rsl:not(#z){margin-top:0;font-size:9.5px}#sv-over #sd-sky .se-earn .sd-fig:not(#z){gap:0}#sv-over #sd-sky .se-earn .sd-fig>b:not(#z){font-size:19px}#sv-over #sd-sky .se-earn .sd-fig em{padding-bottom:3px;margin-bottom:0}}
+/* restake's lines at the foot of the year's box, apart from its figure, which stays level with the other boxes' */
+#sd-sky .se-earn .sd-fig{position:relative}
+/* all four boxes keep the same room at their foot for restake's lines, so their figures stay level and clear of it */
+#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:40px}
+@media(min-width:901px) and (max-height:1000px){#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:36px}}
+@media(min-width:901px) and (max-height:820px){#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:22px}}
+@media(min-width:901px) and (max-height:700px){#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:17px}}
+@media(min-width:901px) and (min-height:821px) and (max-height:1000px){#sv-over #sd-sky .se-earn .sd-fig>b:not(#z){font-size:30px}}
+@media(min-width:901px) and (max-height:600px){#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:20px}}
+#sd-sky .se-rsx{position:absolute;left:8px;right:8px;bottom:12px;text-align:center;pointer-events:none}
+#sd-sky .se-rsx .se-rsl:not(#z){margin:0}
+#sd-sky .se-rsx .se-rsl b{white-space:nowrap}
+#sd-sky .se-rsx .se-rsl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sd-sky .se-rsx{line-height:1.3}#sd-sky .se-rsx .se-rsl2{display:block;margin-top:2px;font-size:10.5px;color:var(--wf)}
+@media(min-width:901px) and (max-width:1599px){#sd-sky .se-rsx .se-rsl{font-size:10px}#sd-sky .se-rsx .se-rsl2{font-size:9.5px}}
+@media(min-width:901px) and (max-height:1000px){#sd-sky .se-rsx{bottom:9px}}
+@media(min-width:901px) and (max-height:820px){#sd-sky .se-rsx{bottom:6px}#sd-sky .se-rsx .se-rsl2{display:none}}
+@media(min-width:901px) and (max-height:700px){#sd-sky .se-rsx{bottom:4px}#sd-sky .se-rsx .se-rsl{font-size:9.5px}}
 /* Stake more and Claim rewards: Move your stake's door, side by side - Stake more filled amber, Claim outlined */
 #sd-sky .se-doors{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:0 0 auto}
 #sd-sky .se-doors .sd-go{width:100%;margin:0}
