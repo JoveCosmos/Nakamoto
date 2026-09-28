@@ -83,9 +83,8 @@
   }
   function mix(c, to, k){ var m = /(\d+),\s*(\d+),\s*(\d+)/.exec(c); if(!m) return c;
     return "rgb(" + [m[1], m[2], m[3]].map(function(x){ return Math.round(+x + (to - x) * k); }).join(",") + ")"; }
-  /* night: the night ramp whatever the theme (the wallet strip stays navy in day) */
-  function heat(r, night){
-    var u = heatU(r), day = !night && root.getAttribute("data-theme") === "light", L = window.lum || function(){ return "rgb(255,176,46)"; };
+  function heat(r){
+    var u = heatU(r), day = root.getAttribute("data-theme") === "light", L = window.lum || function(){ return "rgb(255,176,46)"; };
     /* type keeps the fill's hue, lifted toward white: the low end reads as a cool lavender,
        not as the rose of a warning, and the top stops at gold short of plain white */
     var fill = L(.16 + .84 * u), ink = mix(L(.16 + .84 * Math.min(u, .9)), 255, .34);
@@ -254,7 +253,7 @@
       ro("Available", bal ? fmt(liq) : "\u2014", "", null, "var(--sv-violet)", "", false, bal ? "ATONE" : "") +
       ro("Photon", bal ? '<span class=sv-pho>' + fmt(bal.uphoton) + '</span>' : "\u2014", "", null, "var(--sv-pho)", "", false, "") +
       ro("Staked", pos ? fmt(stk) : "\u2014", "", null, "var(--sv-amber)", "", false, pos ? "ATONE" : "") +
-      ro("APR", mine ? '<span style="color:' + heat(pos.rate, 1).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)", "", false, "") +
+      ro("APR", mine ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)", "", false, "") +
       ro("Rewards", window.__REW != null ? fmt(rew) : "\u2014", "", null, "var(--sv-green)", "", false, window.__REW != null ? "ATONE" : ""));
   }
   function drawOver(){

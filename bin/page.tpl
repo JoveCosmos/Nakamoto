@@ -4339,7 +4339,11 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 #sv-auto .ap-act .ap-go:not(#z){width:auto;min-width:200px;margin-top:6px;padding:0 22px}
 /* the strip is one surface in Outcome's violet band fill; the wallet card and the five boxes sit on it (Easy and
    Pro alike); the figures in plain boxes, not engraved */
-:is(#sd-wstrip,#p-dele #sd-mstrip).sd-strip:not(#z){position:relative;border-color:rgba(185,176,255,.3);background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#4130a0,#271c6c 58%,#150f3b)}
+#sd-wstrip.sd-strip:not(#z){position:relative;border-color:rgba(185,176,255,.3);background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#4130a0,#271c6c 58%,#150f3b)}
+/* Pro: the strip as the panels under it, a touch more lit - a faint violet glow from the wallet's corner, a cool one
+   from the far end */
+#p-dele #sd-mstrip.sd-strip:not(#z){border-color:#3a3a66;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 0 24px -12px rgba(185,176,255,.35);
+background:radial-gradient(55% 160% at 0% 0%,rgba(185,176,255,.14),transparent 60%),radial-gradient(45% 140% at 100% 110%,rgba(43,200,189,.07),transparent 60%),linear-gradient(180deg,#15152e,#0d0d1c)}
 :is(#sd-wstrip,#sd-mstrip) .sd-idw:not(#z){background:none;box-shadow:none}
 :is(#sd-wstrip,#sd-mstrip) .sd-idw::before{display:none}
 :is(#sd-wstrip,#sd-mstrip) .sd-ro:not(#z){background:none;border-left-color:rgba(255,255,255,.1)}
