@@ -330,3 +330,18 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-ars>.sv-ph .sv-tag.ars-st.on:not(#z):not(#y){color:#03230e!important;border-color:#2ee06a!important;background:#2ee06a!important}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky{--bandf:#3a2f8f,#241d63 58%,#141033}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#3a2f8f,#241d63 58%,#141033)}
+  /* Govern in day: the bands, frames and card keep their night face; plain words in ink */
+  html[data-theme=light]:not([data-mono]) .sd-idg:not(#z){background:radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.32),transparent 58%),linear-gradient(140deg,#4a3aa8 0%,#2c2170 55%,#150f3b 100%);color:#fff}
+  html[data-theme=light]:not([data-mono]) #sv-mygov #sv-mygovp>.sv-ph{background:linear-gradient(315deg,#4a3aa8,#2c2170 58%,#150f3b)}
+  html[data-theme=light]:not([data-mono]) #sv-mygov #sv-mygovlist>.sv-ph{background:linear-gradient(315deg,#7d2e6e,#461f45 58%,#1a1230)}
+  html[data-theme=light]:not([data-mono]) #sv-mygov #sd-gvote>.sv-ph{background:linear-gradient(315deg,#1d4f8f,#173257 58%,#141633)}
+  html[data-theme=light]:not([data-mono]) #sv-mygov .sd-col>.sv-ph h3{color:#fff!important}
+  html[data-theme=light]:not([data-mono]) #sv-mygov .sd-col>.sv-ph .sv-tag{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.3)}
+  html[data-theme=light]:not([data-mono]) #sv-mygov .sd-col::after{background:linear-gradient(315deg,var(--bandf))}
+  html[data-theme=light]:not([data-mono]) #sv-mygov .gv-say{color:var(--ink)}html[data-theme=light]:not([data-mono]) #sv-mygov .gv-say b{color:#4b3fb0}
+  html[data-theme=light]:not([data-mono]) #sv-mygov .gv-lp{border-color:#e3ded3;background:linear-gradient(0deg,rgba(29,79,143,.06),#fbf9f3 70%)}
+  html[data-theme=light]:not([data-mono]) #sv-mygov #sv-mygovp::after{background:linear-gradient(315deg,#4a3aa8,#2c2170 58%,#150f3b)}
+  html[data-theme=light]:not([data-mono]) #sv-mygov #sv-mygovlist::after{background:linear-gradient(315deg,#7d2e6e,#461f45 58%,#1a1230)}
+  html[data-theme=light]:not([data-mono]) #sv-mygov #sd-gvote::after{background:linear-gradient(315deg,#1d4f8f,#173257 58%,#141633)}
+  html[data-theme=light]:not([data-mono]) #sv-mygov .gv-how>div,html[data-theme=light]:not([data-mono]) #sv-mygov .gv-rules3>div{border-color:#e3ded3;background:#fbf9f3}
+  html[data-theme=light]:not([data-mono]) #sv-mygov .gv-how b,html[data-theme=light]:not([data-mono]) #sv-mygov .gv-rules3 b{color:var(--ink)}

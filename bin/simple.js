@@ -1081,17 +1081,55 @@
     put("sv-govlist", h + (GV.err && !L ? govEmpty("Could not read the governors") : !L ? govEmpty("Reading the governors\u2026")
       : !L.length ? govEmpty("No governors on AtomOne yet") : govRows(L, myGov())));
   }
+  /* ── Govern: the Dashboard's governance, built as its other tabs - a strip (the Govern card and five figures), then
+     Your governor under the card, the governors in the middle, what is being voted on now at the right ── */
+  /* no governors yet: what one is, and the chain's rules for becoming one */
+  function govNone(){
+    var R = GV.rules || {};
+    return '<p class=gv-say>No governors on AtomOne yet.</p>' +
+      '<div class=gv-rules3><div><em>To become one</em><b>' + (R.minSelf ? whole(R.minSelf) : '\u2014') + '</b><small>ATONE of its own stake</small></div>' +
+      '<div><em>Status change</em><b>' + (R.period ? Math.round(R.period / 86400) + ' days' : '\u2014') + '</b><small>at most once in</small></div>' +
+      '<div><em>Its vote</em><b>Follows</b><small>for every staker who follows it</small></div></div>' +
+      '<p class=gv-sub>A governor votes for the stake that follows it, on every proposal those stakers do not vote on themselves. The first to register appears here, ready to follow.</p>';
+  }
   function drawMyGov(){
-    loadGovs();
-    var L = GV.list, mine = myGov(), g = L && mine ? L.filter(function(x){ return x.addr === mine; })[0] : null;
+    loadGovs(); loadProps();
+    var L = GV.list, mine = myGov(), g = L && mine ? L.filter(function(x){ return x.addr === mine; })[0] : null, pos = window.__POS;
+    var act = L ? L.filter(function(x){ return x.active; }) : [], vp = 0; (L || []).forEach(function(x){ vp += x.vp || 0; });
+    var P = GP.list, live = P ? P.filter(function(p){ return p.st === "PROPOSAL_STATUS_VOTING_PERIOD"; }) : [];
+    var following = !!(window.__ADDR && mine);
+    put("sd-gstrip",
+      '<div class="sd-id sd-ida sd-idg"><div class=sd-top><h3>Govern</h3></div><div class=sd-wmeta><span class=sd-wch><i class="st' + (following ? ' on' : '') + '">' +
+        (!window.__ADDR ? 'No wallet' : mine === null || mine === undefined ? 'Reading' : following ? 'Following' : 'No governor') + '</i></span></div></div>' +
+      ro("Your governor", following ? esc(g ? g.m : mine.slice(0, 12) + "…") : "—", "", null, "var(--sv-violet)") +
+      ro("Your vote weight", pos && pos.rows.length ? fmt(pos.total) : "—", "", null, "var(--sv-amber)", "", false, pos && pos.rows.length ? "ATONE" : "") +
+      ro("Voting now", P ? String(live.length) : "—", "", null, "var(--sv-teal)", "", false, P ? (live.length === 1 ? "proposal" : "proposals") : "") +
+      ro("Governors", L ? String(act.length) : "—", "", null, "var(--sv-violet)", "", false, L ? "active" : "") +
+      ro("Follows governors", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(1) + "%" : "—", "", null, "var(--sv-green)", "", false, L && GV.bonded ? "of bonded" : ""));
+    /* Your governor: plain words, then its card when there is one */
     var h = '<div class=sv-ph><h3>Your governor</h3></div>';
-    if(!window.__ADDR) h += govEmpty("Connect a wallet to see the governor it follows");
-    else if(mine === null || (mine && !L)) h += govEmpty("Reading\u2026");
-    else if(!mine) h += '<div class=sd-ok>You follow no governor: your stake votes only when you vote.</div>';
-    else h += '<div class=sd-ok>Your stake follows <b class=d>' + esc(g ? g.m : mine) + '</b>' + (g && !g.active ? ', which is inactive: its votes do not count for you' : '') +
-      '. Its vote counts for you on any proposal you do not vote on yourself.</div>' + (g ? govRows([g], mine) : "");
+    if(!window.__ADDR) h += '<p class=gv-say>Connect a wallet to see the governor it follows.</p>';
+    else if(mine === null || (mine && !L)) h += '<p class=gv-say>Reading…</p>';
+    else if(!mine) h += '<p class=gv-say>You follow no governor: your stake votes only when you vote.</p>' +
+      '<div class=gv-how><div><em>You vote</em><b>Your vote counts</b></div><div><em>You don\'t vote</em><b>No vote is cast</b></div></div>' +
+      '<p class=gv-sub>Follow a governor and its vote counts for your stake on every proposal you do not vote on yourself.</p>';
+    else h += '<p class=gv-say>Your stake follows <b>' + esc(g ? g.m : mine) + '</b>' + (g && !g.active ? ', which is inactive: its votes do not count for you' : '') + '.</p>' +
+      '<p class=gv-sub>Its vote counts for your stake on any proposal you do not vote on yourself.</p>' + (g ? govRows([g], mine) : "");
     put("sv-mygovp", h);
-    put("sv-mygovlist", '<div class=sv-ph><h3>Governors</h3></div>' + (!L ? govEmpty("Reading the governors\u2026") : !L.length ? govEmpty("No governors on AtomOne yet") : govRows(L, mine)));
+    put("sv-mygovlist", '<div class=sv-ph><h3>Governors</h3>' + (L ? tag("q", L.length + " Governors") : '') + '</div>' +
+      (!L ? '<p class=gv-say>Reading the governors…</p>' : !L.length ? govNone() : govRows(L, mine)));
+    /* voting now: each open proposal, its yes share, when it ends; none open, the last result */
+    var v = '<div class=sv-ph><h3>Voting now</h3>' + (P ? tag("q", String(live.length)) : '') + '</div>';
+    if(!P) v += '<p class=gv-say>Reading the proposals…</p>';
+    else {
+      var card = function(p, open){ var t = ptally(p.tally), y = t.s ? t.y / t.s * 100 : 0, st = PST[p.st] || ["ended", "d"];
+        return '<a class=gv-lp href="#/governance/proposals"><span class=gv-lh><em>#' + p.id + '</em><i class="gp-st ' + st[1] + '">' + st[0] + '</i></span><b>' + esc(p.title) + '</b>' +
+          '<span class=gp-bar><i class=y style="width:' + y.toFixed(1) + '%"></i><i class=n style="width:' + (t.s ? t.n / t.s * 100 : 0).toFixed(1) + '%"></i></span>' +
+          '<small>Yes ' + y.toFixed(1) + '%, ' + (open ? 'ends ' : 'ended ') + pday(p.ve) + '</small></a>'; };
+      v += live.length ? '<div class=gv-live>' + live.map(function(p){ return card(p, true); }).join("") + '</div>'
+        : '<p class=gv-say>No proposal is open for voting.</p><u class=gv-rl>Latest results</u><div class=gv-live>' + P.slice(0, 4).map(function(p){ return card(p, false); }).join("") + '</div>';
+    }
+    put("sd-gvote", v);
   }
 
   /* ════ Proposals: every AtomOne proposal, read from the chain every 5 min (the one being voted on
@@ -1116,7 +1154,7 @@
           .then(function(){ GP.list = L; GP.tp = x[1].tally_params || x[1].params || null; GP.dao = x[2].params || null; GP.err = null; GP.at = Date.now(); });
       })
       .catch(function(e){ GP.err = (e && e.message) || "error"; })
-      .then(function(){ GP.busy = false; var sc = screen(); if(sc === "props" || sc === "daos") render(); });
+      .then(function(){ GP.busy = false; var sc = screen(); if(sc === "props" || sc === "daos" || sc === "mygov") render(); });
   }
   var PST = { PROPOSAL_STATUS_VOTING_PERIOD: ["voting", "v"], PROPOSAL_STATUS_PASSED: ["passed", "p"], PROPOSAL_STATUS_REJECTED: ["rejected", "r"],
               PROPOSAL_STATUS_FAILED: ["failed", "f"], PROPOSAL_STATUS_DEPOSIT_PERIOD: ["deposit", "d"] };

@@ -4060,7 +4060,7 @@ background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.01))}
 /* ══ Wallet and Autopilot: one frame. A readout strip lit from its top edge (who, then five
    figures, each in its own colour along the top rim and standing on a meter of its share),
    then three columns: figures hanging from the left rim, the skyline, a flat list. ══ */
-html[data-svs=over] #sv-over,html[data-svs=auto] #sv-auto{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:12px}
+html[data-svs=over] #sv-over,html[data-svs=auto] #sv-auto,html[data-svs=mygov] #sv-mygov{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:12px}
 .sd-scr>*,.sd-scr>*:not(:first-child){margin-top:0}
 /* the left column a little wider than it was (.95 / 1.55), so Move your stake's title, its +APR pill and
    "N moves, 1 signature" share one line; the middle panel has room to give */
@@ -4672,7 +4672,7 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin-right:-8px;p
   .sd-vr{padding-top:6px;padding-bottom:6px}.sd-go{height:36px}
 }
 @media(max-width:900px){
-  html[data-svs=over] #sv-over,html[data-svs=auto] #sv-auto{grid-template-rows:none}
+  html[data-svs=over] #sv-over,html[data-svs=auto] #sv-auto,html[data-svs=mygov] #sv-mygov{grid-template-rows:none}
   .sd-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
   .sd-id{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;align-items:center}
   .sd-ro{border-left:0;border-top:1px solid var(--wbd)}
@@ -5118,6 +5118,62 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 #atpop .atrs .wk-seln:not(#z){flex:0 0 auto;min-width:0;margin-left:4px;font-family:var(--wmono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ws)}
 #atpop .atrs .wk-seln b:not(#z){font-family:var(--wmono);font-size:11px;font-weight:700;letter-spacing:0;color:var(--wgreen);margin-right:5px}
 #atpop .atrs .wk-seln:empty{display:none}
+/* ════ Dashboard > Govern, built as the other tabs: the strip (its card indigo), Your governor under the card at its
+   width, the governors in the middle, what is being voted on at the right; bands and frames as Autopilot's ════ */
+@media(min-width:901px){#sv-mygov .sd-ggrid:not(#z){grid-template-columns:max(calc((100% - 2px) * 0.242424 + 2px),250px) minmax(0,1.6fr) minmax(0,1fr)}}
+#sv-mygov .sd-ggrid{min-height:0}
+.sd-idg:not(#z){background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,255,.13) 45px 46px,transparent 47px 70px,rgba(255,255,255,.09) 71px 72px,transparent 73px 98px,rgba(255,255,255,.06) 99px 100px,transparent 101px 128px,rgba(255,255,255,.035) 129px 130px,transparent 131px),
+  radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.32),transparent 58%),linear-gradient(140deg,#4a3aa8 0%,#2c2170 55%,#150f3b 100%)}
+#sv-mygov .sd-col>.sv-ph:not(#z){margin:-11px -14px 0;padding:5px 14px 6px;min-height:43px;box-sizing:border-box;flex-wrap:nowrap;border-radius:11px 11px 0 0;border-bottom:1px solid rgba(255,255,255,.08)}
+#sv-mygov .sd-col>.sv-ph h3{color:#fff!important;white-space:nowrap}
+#sv-mygov .sd-col>.sv-ph h3::before{background:rgba(255,255,255,.9)!important;box-shadow:none!important}
+#sv-mygov .sd-col>.sv-ph .sv-tag{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.34);padding:2px 7px;font-size:9px}
+#sv-mygov #sv-mygovp{--bandf:#4a3aa8,#2c2170 58%,#150f3b}#sv-mygov #sv-mygovlist{--bandf:#7d2e6e,#461f45 58%,#1a1230}#sv-mygov #sd-gvote{--bandf:#1d4f8f,#173257 58%,#141633}
+#sv-mygov #sv-mygovp>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#4a3aa8,#2c2170 58%,#150f3b)}
+#sv-mygov #sv-mygovlist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#7d2e6e,#461f45 58%,#1a1230)}
+#sv-mygov #sd-gvote>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#1d4f8f,#173257 58%,#141633)}
+#sv-mygov .sd-col{position:relative}
+#sv-mygov .sd-col::after{content:"";display:block;position:absolute;inset:-1px;border-radius:12px;padding:0 3px 3px;background:linear-gradient(315deg,var(--bandf));pointer-events:none;z-index:2;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+#sv-mygov .sd-col::before{display:none}
+/* plain words, no box */
+#sv-mygov .gv-say{margin:12px 0 0;font-size:14px;line-height:1.5;color:var(--wt)}
+#sv-mygov .gv-say b{color:#c9c2ff}
+#sv-mygov .gv-sub{margin:8px 0 0;font-size:12px;line-height:1.55;color:var(--ws)}
+/* the governors fill their panel and scroll inside it */
+#sv-mygov #sv-mygovlist .sv-glist{flex:1 1 auto;min-height:0;overflow-y:auto;margin-top:10px}
+#sv-mygov #sv-mygovp .sv-glist{margin-top:12px}
+/* voting now: each open proposal a card - its id, title, the yes/no bar, when it ends */
+#sv-mygov .gv-live{display:flex;flex-direction:column;gap:8px;margin-top:10px;min-height:0;overflow-y:auto}
+#sv-mygov .gv-lp{display:flex;flex-direction:column;gap:5px;padding:10px 12px;border:1px solid var(--wbd2);border-radius:10px;text-decoration:none;
+  background:linear-gradient(0deg,rgba(43,140,214,.08),rgba(255,255,255,.012) 70%)}
+#sv-mygov .gv-lp:hover{border-color:#5a8fd6}
+#sv-mygov .gv-lp em{font-style:normal;font-family:var(--wmono);font-size:10px;color:var(--wf)}
+#sv-mygov .gv-lp b{font-size:13px;color:var(--wt);line-height:1.35}
+#sv-mygov .gv-lp small{font-size:11px;color:var(--ws)}
+@media(max-width:900px){#sv-mygov .sd-col>.sv-ph:not(#z){margin:-14px -16px 0;padding:5px 16px 6px}}
+/* the empty states carry the facts: two boxes of what happens, the chain's rules for governors, the latest results */
+#sv-mygov .gv-how{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+#sv-mygov .gv-how>div,#sv-mygov .gv-rules3>div{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;border:1px solid var(--wbd2);border-radius:10px;text-align:center;
+  background:linear-gradient(0deg,rgba(185,176,255,.08),rgba(255,255,255,.012) 70%)}
+#sv-mygov .gv-how em,#sv-mygov .gv-rules3 em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ws);position:relative;padding-bottom:5px}
+#sv-mygov .gv-how em::after,#sv-mygov .gv-rules3 em::after{content:"";position:absolute;left:50%;bottom:0;width:24px;height:2px;margin-left:-12px;border-radius:2px;background:#b9b0ff}
+#sv-mygov .gv-how b{font-size:13px;color:var(--wt)}
+#sv-mygov .gv-rules3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+#sv-mygov .gv-rules3>div{background:linear-gradient(0deg,rgba(213,90,180,.1),rgba(255,255,255,.012) 70%);padding:16px 8px}
+#sv-mygov .gv-rules3 em::after{background:#e07ac8}
+#sv-mygov .gv-rules3 b{font-size:22px;font-weight:800;color:var(--wt)}
+#sv-mygov .gv-rules3 small{font-size:11px;color:var(--ws)}
+#sv-mygov .gv-rl{display:block;margin-top:14px;text-decoration:none;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+#sv-mygov .gv-lh{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#sv-mygov .gv-lh .gp-st{font-style:normal}
+/* the latest results: as many whole cards as the window holds, never a card cut in half */
+#sv-mygov .gv-live{overflow:hidden!important}
+#sv-mygov .gv-live>.gv-lp:nth-child(n+4){display:none}
+@media(min-width:901px) and (max-height:1100px){#sv-mygov .gv-live>.gv-lp:nth-child(n+3){display:none}}
+@media(min-width:901px) and (max-height:760px){#sv-mygov .gv-live>.gv-lp:nth-child(n+2){display:none}#sv-mygov .gv-rules3>div{padding:10px 6px}#sv-mygov .gv-rules3 b{font-size:17px}}
+@media(min-width:901px) and (max-height:640px){#sv-mygov .gv-sub{display:none}#sv-mygov .gv-rules3 small{display:none}#sv-mygov .gv-how>div{padding:7px 6px}#sv-mygov .gv-say:not(#z){margin-top:6px;font-size:12.5px}#sv-mygov .gv-rl:not(#z){margin-top:6px}#sv-mygov .gv-lp:not(#z){padding:6px 10px;gap:3px}#sv-mygov .gv-live:not(#z){margin-top:5px}}
+@media(max-width:900px){#sv-mygov .gv-live>.gv-lp:nth-child(n+3){display:none}}
 /* the setup's validator count: Redelegate's live count, at the right of the list's title */
 #atpop .atrt:not(#z){display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
 #atpop .atrh,#atpop .atrt:not(#z){width:100%}
@@ -5553,8 +5609,12 @@ html[data-tab=connect] .l2host{display:none}
         <div class=sv-panel id=sv-govlist><div class=sv-ph><h3>Governors</h3></div><div class=sv-upwait>Reading the governors…</div></div>
       </section>
       <section class=sv-screen id=sv-mygov data-sc=mygov aria-label="Your governor">
-        <div class=sv-panel id=sv-mygovp><div class=sv-ph><h3>Your governor</h3></div><div class=sv-upwait>Reading…</div></div>
-        <div class=sv-panel id=sv-mygovlist></div>
+        <div class="sv-panel sd-strip" id=sd-gstrip></div>
+        <div class="sd-grid sd-ggrid">
+          <div class="sv-panel sd-col" id=sv-mygovp><div class=sv-ph><h3>Your governor</h3></div><div class=sv-upwait>Reading…</div></div>
+          <div class="sv-panel sd-col" id=sv-mygovlist></div>
+          <div class="sv-panel sd-col" id=sd-gvote></div>
+        </div>
       </section>
       <section class=sv-screen id=sv-eco data-sc=eco aria-label=Economics>
         <div class=sv-panel id=sv-ecoa></div>
