@@ -386,13 +386,11 @@
       ro("Runs until", g ? (until || "You revoke") : "\u2014", "", null, "var(--sv-violet)") +
       ro("Moves made", g ? String(moves) : "\u2014", "", null, "var(--sv-teal)") +
       ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)"));
-    /* restake, in one line: what it has done, or who does it instead, or that it waits */
+    /* restake, in one line: what it has done, or that it waits (only our own grants count: any other service is foreign) */
     function restakeLine(){
-      var rs = rp && rp.restake, ot = at && at.others;
-      if(!(at && at.restake)) return ot ? "Another service restakes your rewards." : "";
+      var rs = rp && rp.restake;
+      if(!(at && at.restake)) return "";
       if(rs && rs.count) return "Restaked <b>" + fmt(rs.total) + " ATONE</b> of rewards in " + rs.count + " run" + (rs.count === 1 ? "" : "s") + (rs.last_at ? ", last " + window.__dayFull(rs.last_at * 1000) : "") + ".";
-      if((rs && /another service/.test(rs.skip || "")) || (ot && ot.all)) return "Another service restakes your rewards, so Autopilot leaves them to it.";
-      if(ot) return "Another service restakes your rewards on some validators; Autopilot restakes the rest.";
       return "Restake is on: rewards are staked back as they build up.";
     }
     if(g) put("sd-ado",
@@ -486,16 +484,6 @@
     var left = Math.max(0, Math.ceil((ex - Date.now()) / 86400000));
     return '<span class=ars-until>Runs until <b>' + (window.__dayFull ? window.__dayFull(ex) : new Date(ex).toISOString().slice(0, 10)) + '</b>, ' + left + ' day' + (left === 1 ? '' : 's') + ' left</span>';
   }
-  /* the line over the switch: what restake does - or, when another restake service already holds a delegate
-     grant for this wallet (not GATA's), that Restake leaves those validators to it */
-  function rsHow(pos, at){
-    var ot = at && at.others;
-    if(!ot) return 'Auto-compounds reward on your <b>best-paying</b> validator';
-    if(ot.all) return 'Another service restakes your rewards, so <b>Restake stays out</b>';
-    var n = pos ? pos.rows.filter(function(r){ var d = (window.__VDBY || {})[r.id]; return d && ot.ops[d.op]; }).length : 0;
-    return n ? 'Another service restakes <b>' + n + ' of your ' + pos.rows.length + '</b> validators, so Restake skips ' + (n === 1 ? 'it' : 'them')
-             : 'Auto-compounds reward on your <b>best-paying</b> validator';
-  }
   function restakePanel(pos, at){
     var on = !!(at && at.restake), r = pos && pos.rows.length ? pos.rate : 0, add = r > 0 ? Math.pow(1 + r / 730, 730) - 1 - r : 0;
     var h = '<div class=sv-ph><h3>Restake</h3>' + '<span class="sv-tag ars-st' + (on ? ' on' : '') + '">' + (on ? 'Enabled' : 'Disabled') + '</span></div>';
@@ -503,7 +491,7 @@
       (add > 0 ? '<small>ATONE, +' + (add * 100).toFixed(1) + '% APR</small>' : '') + rsUntil(at, on) + '</div>';
     /* the rules sit at the foot, over the switch */
     h += '<div class=ars-foot><div class=ars-two><div><em>Frequency</em><b>12 hours</b></div><div><em>Minimum</em><b>1 ATONE</b></div></div>' +
-      '<div class=ars-how>' + rsHow(pos, at) + '</div></div>';
+      '<div class=ars-how>Auto-compounds reward on your <b>best-paying</b> validator</div></div>';
     h += !pos ? CONNECT_OFF
       : !pos.rows.length ? '<button class="sv-btn go sd-go" type=button data-act=stake>Stake ATONE</button>'
       : '<button class="sv-btn go sd-go' + (on ? ' ars-off' : '') + '" type=button data-act=restakesw>' + (on ? 'Disable' : 'Enable') + '</button>';

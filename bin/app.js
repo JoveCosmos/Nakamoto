@@ -2588,7 +2588,7 @@ rememberGridH();
     return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/authz/v1beta1/grants?granter=" + who + "&grantee=" + AT.addr + "&pagination.limit=50", { cache: "no-store" })
       .then(function(r){ return r.json(); })
       .then(function(d){ var all = d.grants || [], g = null; all.forEach(function(x){ if(grantType(x) === REDEL) g = x; });
-        return Promise.all([g ? grantedAt(who) : null, atOthers(who)]).then(function(x){ return { who: who, grant: g, grants: all, since: x[0], others: x[1] }; }); })
+        return Promise.resolve(g ? grantedAt(who) : null).then(function(since){ return { who: who, grant: g, grants: all, since: since }; }); })
       .catch(function(){ return { who: who, grant: null, grants: [] }; });
   }
   /* when the standing grant was made: the chain keeps only its expiry, so the date is the
@@ -2607,22 +2607,10 @@ rememberGridH();
         return null; })
       .catch(function(){ return null; });
   }
-  function atKeep(r){ if(!r || r.who !== window.__ADDR) return false; AT.grant = r.grant; AT.grants = r.grants; AT.since = r.since || null; AT.others = r.others || null; return true; }
-  /* another service restaking for this wallet (REStake and the like: a DELEGATE grant to
-     another address, allow-listed to its validator) - Autopilot leaves those validators to it;
-     all = one names no validator, so it may restake anywhere */
-  function atOthers(who){
-    return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/authz/v1beta1/grants/granter/" + who + "?pagination.limit=200", { cache: "no-store" })
-      .then(function(r){ return r.json(); })
-      .then(function(d){ var ops = {}, all = false, n = 0;
-        if(!AT.addr) return null;
-        (d.grants || []).forEach(function(g){ if(g.grantee === AT.addr) return; var a = g.authorization || {};
-          if(a["@type"] === "/cosmos.staking.v1beta1.StakeAuthorization" && a.authorization_type === "AUTHORIZATION_TYPE_DELEGATE"){
-            var l = (a.allow_list || {}).address || []; if(!l.length) all = true; l.forEach(function(o){ ops[o] = 1; }); n++; }
-          else if(a["@type"] === "/cosmos.authz.v1beta1.GenericAuthorization" && (a.msg === WDRAW || a.msg === DELEG)){ all = true; n++; } });
-        return n ? { ops: ops, all: all, services: n } : null; })
-      .catch(function(){ return null; });
-  }
+  function atKeep(r){ if(!r || r.who !== window.__ADDR) return false; AT.grant = r.grant; AT.grants = r.grants; AT.since = r.since || null; return true; }
+  /* only grants to our own address (atGrant asks for exactly those) are Autopilot's or Restake's; every other
+     authz grant the wallet made - restake bots, any validator's service, GATA's validator included - is foreign
+     and ignored: GATA's validator is one validator like any other in this app */
   function atReport(){
     if(!window.__ADDR) return Promise.resolve(null);
     return fetch("keeper/" + window.__ADDR + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
@@ -2987,7 +2975,7 @@ rememberGridH();
   };
   /* what stands between this reader and the keeper, for the simple view to state */
   window.__atInfo = function(){ return { addr: AT.addr, dry: AT.dry, grant: AT.grant, grants: AT.grants || [],
-    days: AT.days, report: AT.report, since: AT.since || null, others: AT.others || null,
+    days: AT.days, report: AT.report, since: AT.since || null,
     restake: (AT.grants || []).some(function(x){ return grantType(x) === DELEG; }) }; };
   window.__planDraw = draw;
   draw();

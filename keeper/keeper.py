@@ -199,50 +199,26 @@ def restake_grants():
                 cap = a.get("max_tokens")
                 r["stake"] = {"allow": (a.get("allow_list") or {}).get("address") or [],
                               "cap": int(cap["amount"]) if cap and cap.get("denom") == "uatone" else None}
-            elif t == "/cosmos.bank.v1beta1.SendAuthorization":
-                r["send"] = sum(int(x["amount"]) for x in a.get("spend_limit", []) if x.get("denom") == "uatone")
         key = d.get("pagination", {}).get("next_key")
         if not key: break
     return {k: v for k, v in out.items() if v.get("claim") and v.get("stake")}
 
-def others_claiming(granter):
-    """validators another service already restakes for this granter. On AtomOne a restake
-    bot (REStake and the like) needs only a StakeAuthorization DELEGATE allow-listed to its
-    validator: delegating to a validator first pays that validator's pending rewards out, so
-    'delegate the pending amount' restakes them. If we claimed first, such a bot would stake
-    that amount out of the granter's liquid ATONE - so those validators are left to it.
-    None = another service may claim or delegate without naming validators: stay out."""
-    d = get("/cosmos/authz/v1beta1/grants/granter/%s?pagination.limit=200" % granter)
-    ops, who, now = set(), set(), time.gmtime()
-    for g in d.get("grants", []):
-        if g.get("grantee") == GRANTEE: continue
-        exp = g.get("expiration")
-        if exp and time.strptime(exp[:19], "%Y-%m-%dT%H:%M:%S") < now: continue
-        a = g.get("authorization", {})
-        if a.get("@type") == "/cosmos.authz.v1beta1.GenericAuthorization" and a.get("msg") in (WDRAW_URL, "/cosmos.staking.v1beta1.MsgDelegate"):
-            return None, sorted(who | {g["grantee"]})
-        if a.get("@type") == "/cosmos.staking.v1beta1.StakeAuthorization" and a.get("authorization_type") == "AUTHORIZATION_TYPE_DELEGATE":
-            allow = (a.get("allow_list") or {}).get("address") or []
-            if not allow: return None, sorted(who | {g["grantee"]})
-            ops |= set(allow); who.add(g["grantee"])
-    return ops, sorted(who)
-
 def plan_restake(c, granter, rg, vals, m, P):  # noqa: C901
-    """what a restake would do now: claim every reward we may (not those another service
-    claims), stake it on the best validator of the DELEGATE allow-list, less the split"""
+    """what a restake would do now: claim the wallet's rewards (largest first) and stake them all on the best
+    validator of the DELEGATE allow-list. Only grants to our own address count: any other authz grant the
+    wallet made (restake bots, any validator's service, GATA's validator included) is foreign and ignored -
+    GATA's validator is one validator like any other here."""
     last = c.execute("SELECT max(at) FROM restake WHERE granter=?", (granter,)).fetchone()[0] or 0
     if time.time() - last < P.get("restake_every", 86400): return {"skip": "not due"}
     wa = get("/cosmos/distribution/v1beta1/delegators/%s/withdraw_address" % granter).get("withdraw_address")
     if wa != granter: return {"skip": "rewards are paid to another address"}
-    cov, who = others_claiming(granter)
-    if cov is None: return {"skip": "another service claims these rewards", "others": who}
     # the largest rewards first, at most MAX_CLAIM validators a transaction, and no more than
     # the DELEGATE cap can take back in: what is claimed is all staked, nothing left idle
     pend = []
     for r in get("/cosmos/distribution/v1beta1/delegators/%s/rewards" % granter).get("rewards", []):
         v = r["validator_address"]
         amt = sum(int(float(x["amount"])) for x in r.get("reward", []) if x.get("denom") == "uatone")
-        if amt > 0 and v not in cov: pend.append((amt, v))
+        if amt > 0: pend.append((amt, v))
     pend.sort(reverse=True)
     cap = rg["stake"]["cap"]
     rewards, claim = 0, []
@@ -250,7 +226,7 @@ def plan_restake(c, granter, rg, vals, m, P):  # noqa: C901
         if len(claim) >= MAX_CLAIM: break
         if cap is not None and claim and rewards + amt > cap: continue
         rewards += amt; claim.append(v)
-    out = {"rewards": rewards, "pending_all": sum(a for a, _ in pend), "others": who, "covered": sorted(cov)}
+    out = {"rewards": rewards, "pending_all": sum(a for a, _ in pend)}
     if rewards < MIN_RESTAKE * 1e6: out["skip"] = "below %g ATONE" % MIN_RESTAKE; return out
     send = 0   # GATA takes no share, ever: a restake stakes every claimed reward back, it never sends
     stake = rewards - send
