@@ -24,7 +24,8 @@
   function signIn(){
     var err = E("err"); err.textContent = "";
     if(!window.keplr){ err.textContent = "Keplr is not installed in this browser."; return; }
-    var chain = CHAIN.mainnet, addr, text;
+    /* signed on the network the console is switched to: its operators are that network's list */
+    var chain = CHAIN[NET], addr, text;
     window.keplr.enable(chain).then(function(){ return window.keplr.getKey(chain); })
       .then(function(k){ addr = k.bech32Address; return api("challenge"); })
       .then(function(c){ text = c.text; return window.keplr.signArbitrary(chain, addr, text); })
@@ -42,6 +43,11 @@
     api("me").then(function(m){
       E("gate").hidden = true; E("app").hidden = false; E("out").hidden = false; E("test").hidden = false;
       E("who").textContent = short(m.address);
+      var nets = m.nets || ["mainnet"];
+      if(nets.indexOf(NET) < 0) NET = nets[0];
+      Array.prototype.forEach.call(document.querySelectorAll("#net button"), function(x){
+        x.setAttribute("aria-pressed", x.dataset.net === NET); x.disabled = nets.indexOf(x.dataset.net) < 0;
+        x.title = x.disabled ? "This wallet is not an operator on " + x.dataset.net : ""; });
       load(); setInterval(load, 30000);
     }).catch(function(){ E("gate").hidden = false; E("app").hidden = true; });
   }

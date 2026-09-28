@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """adminapi: the operator console's backend - loopback only, behind nginx at /admin-api/.
 
-Sign-in is a Keplr signArbitrary (ADR-36) of a one-time challenge: this service rebuilds the
-sign document, checks the secp256k1 signature against the public key, derives the address
-from that key, and admits it only if it is in ADMIN_ADDRESSES. Nothing is sent on chain. A
+Sign-in is a Keplr signArbitrary (ADR-36) of a one-time challenge, signed on the network the
+console is switched to: this service rebuilds the sign document, checks the secp256k1 signature
+against the public key, derives the address from that key, and admits it only if it is an
+operator on some network. Operators are listed per network - ADMIN_ADDRESSES_MAINNET and
+ADMIN_ADDRESSES_TESTNET (ADMIN_ADDRESSES, the older single list, counts for mainnet when the
+mainnet list is unset) - and every read and action checks the list of the network it is for. Nothing is sent on chain. A
 session is an HMAC-signed cookie (12 hours, HttpOnly, Secure, SameSite=Strict, path
 /admin-api) keyed by STATE_DIR/admin-secret (created 0600 on first start).
 
@@ -37,7 +40,11 @@ from cryptography.exceptions import InvalidSignature
 BIND, PORT = os.environ.get("ADMIN_BIND", "127.0.0.1"), int(os.environ.get("ADMIN_PORT", "8790"))
 STATE_DIR = os.environ.get("STATE_DIR", "/srv/atomone-app/state")
 WEB = {"mainnet": os.environ.get("WEB_MAINNET", "/srv/atomone-app/web"), "testnet": os.environ.get("WEB_TESTNET", "/srv/atomone-app/web/testnet")}
-ADMINS = {a.strip() for a in os.environ.get("ADMIN_ADDRESSES", "").split(",") if a.strip()}
+def _list(v): return {a.strip() for a in (v or "").split(",") if a.strip()}
+ADMINS_BY = {"mainnet": _list(os.environ.get("ADMIN_ADDRESSES_MAINNET") or os.environ.get("ADMIN_ADDRESSES")),
+             "testnet": _list(os.environ.get("ADMIN_ADDRESSES_TESTNET"))}
+ADMINS = ADMINS_BY["mainnet"] | ADMINS_BY["testnet"]
+def nets_of(a): return [n for n in ("mainnet", "testnet") if a in ADMINS_BY[n]]
 SESSION_S = 12 * 3600
 LOCK = threading.Lock()
 CHALLENGES = {}          # nonce -> expiry
@@ -185,10 +192,11 @@ class H(BaseHTTPRequestHandler):
             return self.reply(200, {"text": "Sign in to the GATA AtomOne admin console.\nNothing is sent on chain.\nNonce: %s\nIssued: %s" % (n, time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))})
         a = self.who()
         if not a: return self.reply(401, {"error": "sign in"})
-        if u.path == "/admin-api/me": return self.reply(200, {"address": a})
+        if u.path == "/admin-api/me": return self.reply(200, {"address": a, "nets": nets_of(a)})
         if u.path == "/admin-api/overview":
             net = (q.get("net") or ["mainnet"])[0]
             if net not in WEB: return self.reply(400, {"error": "net"})
+            if a not in ADMINS_BY[net]: return self.reply(403, {"error": "this wallet is not an operator on " + net})
             return self.reply(200, overview(net))
         return self.reply(404, {"error": "not found"})
 
@@ -209,13 +217,14 @@ class H(BaseHTTPRequestHandler):
                 notify.send("warn", "Admin sign-in refused", "A wallet that is not an operator tried to sign in.", {"Wallet": addr})
                 return self.reply(403, {"error": "this wallet is not an operator"})
             log("sign-in %s" % addr)
-            notify.send("info", "Admin signed in", "", {"Operator": addr})
+            notify.send("info", "Admin signed in", "", {"Operator": addr, "Networks": ", ".join(nets_of(addr))})
             return self.reply(200, {"address": addr}, cookie=token(addr))
         if u.path == "/admin-api/logout": return self.reply(200, {}, cookie="")
         a = self.who()
         if not a: return self.reply(401, {"error": "sign in"})
         net = b.get("net", "mainnet")
         if net not in WEB: return self.reply(400, {"error": "net"})
+        if a not in ADMINS_BY[net]: return self.reply(403, {"error": "this wallet is not an operator on " + net})
         if u.path == "/admin-api/decide":
             g, act, note = str(b.get("granter", "")), str(b.get("action", "")), str(b.get("note", "")).strip()[:500]
             if not (g.startswith("atone1") and len(g) == 44): return self.reply(400, {"error": "granter"})
@@ -274,5 +283,5 @@ class H(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     if not ADMINS: log("no ADMIN_ADDRESSES: nobody can sign in")
-    log("listening on %s:%d, %d operator(s)" % (BIND, PORT, len(ADMINS)))
+    log("listening on %s:%d, operators: %d mainnet, %d testnet" % (BIND, PORT, len(ADMINS_BY["mainnet"]), len(ADMINS_BY["testnet"])))
     ThreadingHTTPServer((BIND, PORT), H).serve_forever()
