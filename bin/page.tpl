@@ -4276,6 +4276,12 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 #sv-over #sd-rs{justify-content:flex-start}
 /* the earnings block centred in its panel, from the band to the foot */
 #sv-over #sd-sky>:is(.se-mid,.se-ex){flex:1 1 auto;justify-content:center;padding-top:4px}
+/* a clear gap between the day, week and month and the year; the four stay centred together */
+#sv-over #sd-sky>:is(.se-mid,.se-ex){gap:16px}
+@media(min-width:901px) and (min-height:821px) and (max-height:1000px){#sv-over #sd-sky>:is(.se-mid,.se-ex){gap:10px}
+  #sv-over #sd-sky .se-row .sd-fig:not(#z){padding-top:12px;padding-bottom:13px}}
+@media(min-width:901px) and (max-height:760px){#sv-over #sd-sky>:is(.se-mid,.se-ex){gap:10px}}
+@media(min-width:901px) and (max-height:680px){#sv-over #sd-sky>:is(.se-mid,.se-ex){gap:6px}}
 @media(min-width:901px) and (max-height:560px){#sv-over #sd-sky>:is(.se-mid,.se-ex){padding-top:0}}
 #sv-over #sd-rs .se-rsb{margin-top:auto;display:flex;flex-direction:column}
 #sv-over #sd-rs .se-rson{margin:0}
