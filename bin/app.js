@@ -2347,7 +2347,7 @@ rememberGridH();
     if(mx) mx.textContent = r ? exact(r.x, 2) : "\u2014";
     var over = r && u > r.x, ok = r && u > 0 && !over;
     if(fld) fld.classList.toggle("bad", !!over);
-    if(hint){ hint.className = "unhint" + (over ? " bad" : ""); hint.textContent = over ? "more than sits on " + r.m : (r ? "of " + exact(r.x) + " on " + r.m : ""); }
+    if(hint){ hint.className = "unhint" + (over ? " bad" : ""); hint.textContent = over ? "" : (r ? "of " + exact(r.x) + " on " + r.m : ""); }   /* over what sits there: the box turns red, no words */
     if(go) go.disabled = !ok || !window.__WALLET;
     if(sm) sm.innerHTML = ok ? fmt(u) + " ATONE<br>from " + (UNSEL === "*" ? unMsgs().length + " validators" : att(r.m)) : "";
     var until = new Date(Date.now() + 21 * 86400000);
