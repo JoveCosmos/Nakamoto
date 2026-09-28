@@ -5046,15 +5046,24 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
   background:rgba(46,224,106,.07);text-wrap:balance}
 #sv-auto .ars-how b{color:var(--sv-green)}
 #sv-auto .ars-foot{margin-top:auto;padding-top:8px}
+/* windows 821 to 1000px tall (a 1440x900 browser): the whole panel a step tighter so the switch stays in */
+@media(min-width:901px) and (min-height:821px) and (max-height:1000px){
+  #sv-auto #sd-ars>.ars-fig:not(#z):not(#y){margin-top:8px;padding-top:6px;padding-bottom:7px}
+  #sv-auto #sd-ars .ars-fig>b:not(#z):not(#y){font-size:22px;line-height:1.2}
+  #sv-auto #sd-ars .ars-how:not(#z):not(#y){padding:5px 8px;font-size:10.5px;line-height:1.3}
+  #sv-auto #sd-ars .sd-go:not(#z):not(#y){height:36px}}
+/* the state pill: one shape for both, green when enabled, grey when not */
+#sv-auto #sd-ars>.sv-ph .sv-tag.ars-st:not(#z):not(#y){font-family:var(--wsans);font-size:10px;font-weight:700;letter-spacing:0;text-transform:none;padding:2px 9px;color:#e6e4f0!important;border-color:rgba(255,255,255,.35)!important;background:rgba(255,255,255,.14)!important}
+#sv-auto #sd-ars>.sv-ph .sv-tag.ars-st.on:not(#z):not(#y){color:#03230e!important;border-color:#2ee06a!important;background:#2ee06a!important}
 /* enabled: the grant's expiry, inside the year box under a fine rule */
 #sv-auto .ars-until{display:block;margin-top:6px;padding-top:6px;border-top:1px solid rgba(46,224,106,.25);width:88%;font-size:11px;color:var(--ws)}
 #sv-auto #sd-ars .ars-until b:not(#z){font-size:inherit;letter-spacing:0;line-height:inherit;color:var(--wt);font-weight:700;display:inline}
 @media(min-width:901px) and (max-height:700px){#sv-auto .ars-until{margin-top:3px;padding-top:3px;font-size:10px}}
 /* enabled (the expiry line in the year box): the rules below a step tighter so it all stays in the panel */
-@media(min-width:901px) and (max-height:1000px){#sv-auto #sd-ars:has(.ars-until) .ars-two small{display:none}#sv-auto #sd-ars:has(.ars-until) .ars-two>div:not(#z){padding:7px 6px 8px}
-  #sv-auto #sd-ars:has(.ars-until)>.ars-fig:not(#z){margin-top:6px;padding-top:6px;padding-bottom:7px}#sv-auto #sd-ars:has(.ars-until) .ars-fig>b:not(#z){font-size:22px}
-  #sv-auto #sd-ars:has(.ars-until) .ars-how:not(#z){padding:5px 8px}}
-@media(min-width:901px) and (max-height:640px){#sv-auto #sd-ars:has(.ars-until) .ars-fig>small{display:none}#sv-auto #sd-ars:has(.ars-until) .ars-two>div:not(#z){padding:2px 6px}#sv-auto #sd-ars:has(.ars-until) .ars-how:not(#z){padding:3px 6px;font-size:9.5px}#sv-auto #sd-ars:has(.ars-until) .ars-until{border-top:0;margin-top:0;padding-top:0}}
+@media(min-width:901px) and (max-height:1000px){#sv-auto #sd-ars .ars-two small{display:none}#sv-auto #sd-ars .ars-two>div:not(#z){padding:7px 6px 8px}
+  #sv-auto #sd-ars>.ars-fig:not(#z){margin-top:6px;padding-top:6px;padding-bottom:7px}#sv-auto #sd-ars .ars-fig>b:not(#z){font-size:22px}
+  #sv-auto #sd-ars .ars-how:not(#z){padding:5px 8px}}
+@media(min-width:901px) and (max-height:640px){#sv-auto #sd-ars .ars-fig>small{display:none}#sv-auto #sd-ars .ars-two>div:not(#z){padding:2px 6px}#sv-auto #sd-ars .ars-how:not(#z){padding:3px 6px;font-size:9.5px}#sv-auto #sd-ars .ars-until{border-top:0;margin-top:0;padding-top:0}}
 /* the year box a little lower under the title, on the taller windows */
 #sv-auto #sd-ars>.ars-fig:not(#z){margin-top:18px}
 @media(min-width:901px) and (max-height:1000px){#sv-auto #sd-ars>.ars-fig:not(#z){margin-top:12px}}

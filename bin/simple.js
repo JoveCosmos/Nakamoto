@@ -470,7 +470,7 @@
      no admin step), its own switch - the same in every Autopilot state */
   /* enabled: when the restake grant runs out, inside the year box under a fine rule */
   function rsUntil(at, on){
-    if(!on) return '';
+    if(!on) return '<span class=ars-until>Runs <b>12 months</b> once enabled</span>';
     var dg = (at.grants || []).filter(function(x){ var a = x.authorization || {}; return a.authorization_type === "AUTHORIZATION_TYPE_DELEGATE"; })[0];
     var ex = dg && dg.expiration ? new Date(dg.expiration).getTime() : null; if(!ex) return '';
     var left = Math.max(0, Math.ceil((ex - Date.now()) / 86400000));
@@ -478,7 +478,7 @@
   }
   function restakePanel(pos, at){
     var on = !!(at && at.restake), r = pos && pos.rows.length ? pos.rate : 0, add = r > 0 ? Math.pow(1 + r / 730, 730) - 1 - r : 0;
-    var h = '<div class=sv-ph><h3>Restake</h3>' + '<span class="sv-tag ' + (on ? 'g' : 'q') + '">' + (on ? 'Enabled' : 'Disabled') + '</span></div>';
+    var h = '<div class=sv-ph><h3>Restake</h3>' + '<span class="sv-tag ars-st' + (on ? ' on' : '') + '">' + (on ? 'Enabled' : 'Disabled') + '</span></div>';
     h += '<div class=ars-fig><em>' + (on ? 'Adds a year' : 'A year') + '</em><b>' + (add > 0 ? '+' + fmt(pos.total * add) : '\u2014') + '</b>' +
       (add > 0 ? '<small>ATONE, +' + (add * 100).toFixed(1) + '% APR</small>' : '') + rsUntil(at, on) + '</div>';
     /* the rules sit at the foot, over the switch */
