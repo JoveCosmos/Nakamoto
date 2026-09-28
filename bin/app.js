@@ -1164,7 +1164,22 @@ rememberGridH();
 
   E("qbtn").addEventListener("click", function(){ POP.open(qpop); });
   var spop = E("spop");
-  if(spop) E("sbtn").addEventListener("click", function(){ POP.open(spop); });
+  if(spop) E("sbtn").addEventListener("click", function(){ POP.open(spop); kpGoal(); });
+  /* the staking goal, read from the chain's mint parameters when the card opens: below it inflation climbs toward
+     its maximum, above it falls toward its minimum */
+  function kpGoal(){
+    var box = E("kpgoal"); if(!box || box.dataset.done) return;
+    fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/mint/v1beta1/params", { cache: "no-store" }).then(function(r){ return r.json(); })
+      .then(function(x){ var p = x.params || {}, g = parseFloat(p.goal_bonded), hi = parseFloat(p.inflation_max), lo = parseFloat(p.inflation_min);
+        if(!(g > 0)) return;
+        var now = D.set && D.set.bonded_pct, b = box.querySelector("b"), sm = box.querySelector("small");
+        b.textContent = (g * 100).toFixed(0) + "%";
+        var inf = D.set && D.set.inflation, atHi = inf != null && inf >= hi - 1e-6, atLo = inf != null && inf <= lo + 1e-6;
+        sm.textContent = now == null ? "of supply staked" : now < g * 100
+          ? "now " + now.toFixed(1) + "%; below it, inflation " + (atHi ? "holds at its " + (hi * 100).toFixed(0) + "% maximum" : "climbs toward " + (hi * 100).toFixed(0) + "%")
+          : "now " + now.toFixed(1) + "%; above it, inflation " + (atLo ? "holds at its " + (lo * 100).toFixed(0) + "% minimum" : "falls toward " + (lo * 100).toFixed(0) + "%");
+        box.dataset.done = 1; }).catch(function(){});
+  }
   /* the C card explains what steers eta; opened from the page it stands alone,
      opened from the coefficient card it carries "fromq" (the way-back button) */
   var cpop = E("cpop"), cb = E("cbtn");

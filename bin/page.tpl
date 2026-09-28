@@ -5464,10 +5464,11 @@ html[data-tab=connect] .l2host{display:none}
       <span class=kp-bar><i style="width:{{BONDED_PCT}}%"></i></span></div>
     <div class=kp-g>
       <div class=kp-f><em>Inflation</em><b>{{INFL}}%</b><small>a year</small></div>
+      <div class=kp-f id=kpgoal><em>Staking goal</em><b>&mdash;</b><small>the share of supply the chain aims to stake</small></div>
       <div class=kp-f><em>Minted</em><b>{{MINTED}}</b><small>ATONE a year</small></div>
       <div class=kp-f><em>Reward pool</em><b>{{POOL}}</b><small>ATONE a year, to stakers</small></div>
       <div class=kp-f><em>Community pool</em><b>{{CTAKE}}</b><small>ATONE a year, {{TAX}}% tax</small></div>
-      <div class="kp-f kp-wide"><em>Delegators</em><b>{{DELEG}}</b><small>staking with {{N}} validators</small></div>
+      <div class=kp-f><em>Delegators</em><b>{{DELEG}}</b><small>staking with {{N}} validators</small></div>
     </div>
   </div>
 </div></div>
