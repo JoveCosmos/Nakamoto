@@ -847,6 +847,11 @@
     html[data-theme=light]:not([data-mono]) .atview button[aria-selected=true] b{color:#FFFFFF}
   }
   html[data-theme=light]:not([data-mono]){--l2-off:var(--faint)}
+  html[data-theme=light]:not([data-mono]) #atpop .atlab:not(#z){color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #atpop .atlab i{color:#FFFFFF;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #atpop .atidle{border:1px solid var(--accent);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #atpop .atidle b{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #atpop .atidle b.n{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .netsw{border:1px solid var(--bg);background:var(--bg);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .netsw a{color:var(--muted);text-decoration:none}
   html[data-theme=light]:not([data-mono]) .netsw a:hover{color:var(--wt,var(--ink))}
@@ -1141,4 +1146,5 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#7a1f2b,#44141d 58%,#1a0f1c)}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-alist{--bandf:#3d4a66,#262f45 58%,#141827}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-alist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#3d4a66,#262f45 58%,#141827)}
+  html[data-theme=light]:not([data-mono]) #atpop .atidle b{color:var(--ink)}html[data-theme=light]:not([data-mono]) #atpop .atidle b.n{color:#b3261e}
 

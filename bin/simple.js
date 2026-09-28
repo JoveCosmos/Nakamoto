@@ -350,6 +350,10 @@
 
   /* ── AUTOPILOT: the Wallet's frame - the strip, then what it does, the skyline of what it
      would manage (the allow-list capped in violet once a grant stands), and the validators ── */
+  /* ATONE sitting on validators outside the active set today, earning nothing - live from the chain read */
+  function idleAtone(){ var L = (window.__D && window.__D.inactive) || [], t = 0; L.forEach(function(v){ t += +v[1] || 0; });
+    return t > 1e12 ? (t / 1e12).toFixed(1) + "M" : t > 1e9 ? Math.round(t / 1e9) + "k" : ""; }
+  window.__idleAtone = idleAtone;
   function drawAuto(){
     var pos = window.__POS, S = setStats(), at = window.__atInfo ? window.__atInfo() : null, g = at && at.grant;
     var a = g && g.authorization || {}, alist = (a.allow_list || {}).address || [], mark = null;
@@ -396,12 +400,14 @@
     else {
       /* not active: what it does and what it never does, each as Move your stake shows its figures - four big
          boxes - and, in place of the list, the way to switch it on */
-      var plan = pos && pos.rows.length && pos.free > 0 ? planNow(pos) : null, lift = plan && plan.after != null ? plan.after - plan.now : 0;
+      /* Autopilot's own reach (its picks, its destinations), not Move your stake's best single move */
+      var al = pos && pos.rows.length && pos.free > 0 && window.__atLift ? window.__atLift(pos.free) : null;
+      var lift = al ? al.after - pos.rate : 0, plan = al && lift > 0 ? { gain: pos.free / 1e6 * lift } : null;
       var rr = pos && pos.rows.length ? pos.rate : 0, radd = rr > 0 ? (Math.pow(1 + rr / 12, 12) - 1 - rr) : 0;
       var G = "var(--sv-green)", T = "var(--sv-teal)", V = "var(--sv-violet)", R = "#ff6a6a", A2 = "var(--sv-amber)";
       put("sd-ado", '<div class=sv-ph><h3>What it does</h3>' + tag("q", "one signature") + '</div>' +
         '<div class="sd-figs sd-mv four ap-mv">' +
-          fig("Monitors", "24/7", "your validators, around the clock", T) +
+          fig("Keeps it active", "24/7", idleAtone() ? "unlike the " + idleAtone() + " ATONE idle on inactive validators" : "your stake, through a long winter or a busy month", T) +
           fig("Strategizes", lift > 0.0005 ? '<span class=sd-gain>+' + (lift * 100).toFixed(1) + '%</span>' : "Better APR", lift > 0.0005 ? "APR, within your allow-list" : "within your allow-list", V) +
           fig("Restakes", radd > 0 ? '<span class=sd-gain>+' + (radd * 100).toFixed(1) + '%</span>' : "Rewards", radd > 0 ? "APR, if you switch it on" : "if you switch it on", G) +
           (plan && plan.gain > 0.5 ? fig("More a year", '<span class=sd-gain>+' + one(plan.gain) + '</span>', "ATONE, at today's rates", G)

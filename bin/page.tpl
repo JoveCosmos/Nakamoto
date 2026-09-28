@@ -4847,6 +4847,50 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
    test chain can never pass for the real one */
 /* the wallet lives in the Dashboard: its Connect button and pill show only there; every other section reads */
 html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
+/* ════ Autopilot setup, Easy mode: five numbered steps in plain words, larger controls, a short list ════ */
+#atpop .atrow:not(#z){gap:8px;padding:10px 0}
+.pop .card.atcard:not(#z){height:min(920px,100%)}
+#atpop .atlab:not(#z){display:grid;grid-template-columns:22px 1fr;column-gap:9px;align-items:center;font-family:var(--wsans);font-size:13px;font-weight:700;letter-spacing:0;text-transform:none;color:#fff8dc}
+#atpop .atlab i{grid-row:1/3;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-family:var(--wmono);font-size:10px;font-weight:700;color:#1b1440;background:var(--av);box-shadow:0 0 10px -2px var(--av)}
+#atpop .atlab small{grid-column:2;font-family:var(--wsans);font-size:11px;font-weight:400;color:var(--ws)}
+#atpop .atrow:has(.atfield) .atlab{flex:0 0 100%}
+#atpop .atpre{padding-left:31px}
+#atpop .atpc:not(#z){display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px 12px 11px 34px;position:relative;border-radius:10px;min-height:0}
+#atpop .atpc input:not(#z){position:absolute;left:11px;top:12px;width:15px;height:15px}
+#atpop .atpc b:not(#z){font-size:13.5px;font-weight:700;white-space:normal}
+#atpop .atpc em:not(#z){font-family:var(--wsans);font-size:11px;font-weight:600;letter-spacing:0}
+#atpop .atpc .atd{font-size:10.5px;line-height:1.35;color:var(--ws)}
+#atpop .athelp:not(#z){position:absolute;right:8px;top:9px}
+#atpop .atpre.at3:not(#z){grid-template-columns:minmax(0,1fr);gap:6px}
+#atpop .atpre.at3 .atpc:not(#z){display:grid;grid-template-columns:auto auto 1fr;grid-template-areas:"b e d";align-items:baseline;column-gap:10px;padding:9px 12px 9px 34px}
+#atpop .atpre.at3 .atpc b{grid-area:b}#atpop .atpre.at3 .atpc em{grid-area:e}#atpop .atpre.at3 .atpc .atd{grid-area:d;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#atpop .atpre.at3 .atpc input:not(#z){top:50%;margin-top:-7.5px}
+#atpop .athelp:not(#z),#atpop .attip{display:none!important}
+/* the reason, at the top of the setup */
+#atpop .atidle{margin:12px 0 2px;padding:10px 12px;border-radius:10px;border:1px solid rgba(43,200,214,.4);background:linear-gradient(90deg,rgba(43,200,214,.14),rgba(43,200,214,.04));font-size:12px;line-height:1.5;color:var(--ws)}
+#atpop .atidle b{color:#fff8dc;font-weight:700}#atpop .atidle b.n{color:#ff8a8a}
+#atpop .atrow>.wk-field,#atpop .atrow>.attime,#atpop .atrow>.atseg,#atpop .atrow>.unhint{margin-left:31px}
+#atpop .unfield.atfield:not(#z){width:280px;height:38px}
+#atpop .unfield.atfield input{font-size:15px}
+#atpop .atseg button:not(#z){height:30px;padding:0 16px;font-size:9.5px}
+#atpop .atuntil:not(#z){font-size:10px}
+#atpop .atrsh{margin-left:10px;font-size:11px;color:var(--ws);align-self:center}
+#atpop .atrow:has(#atrsk){flex-direction:row;flex-wrap:wrap;align-items:center}
+#atpop .atrow:has(#atrsk) .atlab{flex:0 0 100%}
+#atpop .atnote:not(#z){margin-top:14px;padding:10px 12px;font-size:12px;border-radius:9px}
+/* the list: taller rows, the name and the APR larger */
+#atpop .atrt b:not(#z){font-size:15px;font-weight:700}
+#atpop .atfind:not(#z){height:36px;font-size:13px;border-radius:9px}
+#atpop .atlist td:not(#z){height:40px;font-size:12px}
+#atpop .atlist thead th:not(#z){height:30px}
+#atpop .atlist .nmw>span.nmt:not(#z){font-size:13px;font-weight:600}
+#atpop .atlist .wk-lg,#atpop .atlist .wk-lgx{width:20px;height:20px;flex-basis:20px;line-height:20px}
+#atpop .atlist td.r2 b{font-size:13px;font-weight:700}
+#atpop .atlist .attg:not(#z){font-size:7.5px;padding:3px 6px}
+#atpop .atlist td.ck input:not(#z){width:17px;height:17px}
+/* Grant: the big green door, as Redelegate */
+#atpop .txbtns .wk-go:not(#z){min-width:180px;height:40px;font-size:13px;font-weight:700;border-radius:10px}
+@media(max-height:760px){#atpop .atrow:not(#z){padding:8px 0;gap:6px}#atpop .atpc .atd{display:none}#atpop .atlab small{display:none}#atpop .atlist td:not(#z){height:34px}}
 /* the setup's validator count: Redelegate's live count, at the right of the list's title */
 #atpop .atrt:not(#z){display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
 #atpop .atrh,#atpop .atrt:not(#z){width:100%}
@@ -5462,25 +5506,26 @@ html[data-tab=connect] .l2host{display:none}
   <div class=atbody>
     <section class=atL id=atL aria-labelledby=atttl>
       <div class=atstate id=atstate hidden></div>
+      <div class=atidle id=atidle hidden></div>
       <div class=atform id=atform>
-        <div class=atrow><span class=atlab>Strategy</span>
+        <div class=atrow><span class=atlab><i>1</i>Strategy<small>how boldly it chases a better APR</small></span>
           <div class="atpre at3">
-            <label class=atpc><input type=radio name=atstrat value=passive><b>Passive</b><em id=atn0>Safe</em><i class=athelp tabindex=0 role=button aria-label="What Passive means" aria-describedby=attip-passive>?</i><span class=attip role=tooltip id=attip-passive><b>Passive, safe.</b> Only the larger half of the set: validators never jailed, with at least 99% uptime over 90 days and over their whole life. The steadiest record, and the lowest APR.</span></label>
-            <label class=atpc><input type=radio name=atstrat value=below checked><b>Moderate</b><em id=atn1>Less risky</em><i class=athelp tabindex=0 role=button aria-label="What Moderate means" aria-describedby=attip-below>?</i><span class=attip role=tooltip id=attip-below><b>Moderate, less risky.</b> Validators with less stake than the average, never jailed, with at least 95% uptime over 90 days. Smaller validators pay more under the Nakamoto bonus; the clean record keeps the risk low.</span></label>
-            <label class=atpc><input type=radio name=atstrat value=aggressive><b>Aggressive</b><em id=atn3>Riskier</em><i class=athelp tabindex=0 role=button aria-label="What Aggressive means" aria-describedby=attip-aggressive>?</i><span class=attip role=tooltip id=attip-aggressive><b>Aggressive, riskier.</b> Any validator with at least 50% uptime over 90 days, jailed before or not. It goes where the APR is highest, and accepts a higher chance of downtime or a slash on your stake.</span></label>
+            <label class=atpc><input type=radio name=atstrat value=passive><b>Passive</b><em id=atn0>Safe</em><small class=atd>larger half, never jailed</small><i class=athelp tabindex=0 role=button aria-label="What Passive means" aria-describedby=attip-passive>?</i><span class=attip role=tooltip id=attip-passive><b>Passive, safe.</b> Only the larger half of the set: validators never jailed, with at least 99% uptime over 90 days and over their whole life. The steadiest record, and the lowest APR.</span></label>
+            <label class=atpc><input type=radio name=atstrat value=below checked><b>Moderate</b><em id=atn1>Less risky</em><small class=atd>smaller ones, never jailed</small><i class=athelp tabindex=0 role=button aria-label="What Moderate means" aria-describedby=attip-below>?</i><span class=attip role=tooltip id=attip-below><b>Moderate, less risky.</b> Validators with less stake than the average, never jailed, with at least 95% uptime over 90 days. Smaller validators pay more under the Nakamoto bonus; the clean record keeps the risk low.</span></label>
+            <label class=atpc><input type=radio name=atstrat value=aggressive><b>Aggressive</b><em id=atn3>Riskier</em><small class=atd>any with 50%+ uptime</small><i class=athelp tabindex=0 role=button aria-label="What Aggressive means" aria-describedby=attip-aggressive>?</i><span class=attip role=tooltip id=attip-aggressive><b>Aggressive, riskier.</b> Any validator with at least 50% uptime over 90 days, jailed before or not. It goes where the APR is highest, and accepts a higher chance of downtime or a slash on your stake.</span></label>
           </div></div>
-        <div class=atrow><span class=atlab>Validators</span>
+        <div class=atrow><span class=atlab><i>2</i>Validators<small>which validators it may use</small></span>
           <div class="atpre at2">
-            <label class=atpc><input type=radio name=atpick value=selected><b>Choose yourself</b><em id=atn2></em></label>
-            <label class=atpc><input type=radio name=atpick value=auto checked><b>Autopilot</b><em id=atna></em></label>
+            <label class=atpc><input type=radio name=atpick value=selected><b>Choose yourself</b><em id=atn2></em><small class=atd>you pick each one</small></label>
+            <label class=atpc><input type=radio name=atpick value=auto checked><b>Autopilot</b><em id=atna></em><small class=atd>the best-paying that fit</small></label>
           </div></div>
-        <div class=atrow><span class=atlab>Stake</span>
+        <div class=atrow><span class=atlab><i>3</i>Stake<small>the most it may move</small></span>
           <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
           <span class=unhint id=athint></span></div>
-        <div class=atrow><span class=atlab>Time</span>
+        <div class=atrow><span class=atlab><i>4</i>Time<small>how long your grant lasts</small></span>
           <div class=attime><div class=atseg id=atseg><button type=button data-d=90 aria-pressed=true>3 months</button><button type=button data-d=180 aria-pressed=false>6 months</button><button type=button data-d=365 aria-pressed=false>12 months</button></div><span class=atuntil id=atuntil></span></div></div>
-        <div class=atrow><span class=atlab>Restake</span>
-          <div class=atseg id=atrsk role=group aria-label="Restake rewards"><button type=button data-r=1 aria-pressed=false>Yes</button><button type=button data-r=0 aria-pressed=true>No</button></div><input type=checkbox id=atrestake hidden></div>
+        <div class=atrow><span class=atlab><i>5</i>Restake<small>stake your rewards back, on its own</small></span>
+          <div class=atseg id=atrsk role=group aria-label="Restake rewards"><button type=button data-r=1 aria-pressed=false>Yes</button><button type=button data-r=0 aria-pressed=true>No</button></div><input type=checkbox id=atrestake hidden><span class=atrsh>auto-compounds your rewards</span></div>
         <div class=atrsnote id=atrsnote hidden></div>
         <div class=atfee id=atfee hidden></div>
       </div>

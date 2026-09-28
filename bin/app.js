@@ -2587,6 +2587,14 @@ rememberGridH();
     }
     return out;
   }
+  /* what Autopilot itself would reach for an amount: the optimiser on its picks for the strategy, at most as many
+     destinations as the keeper moves to (passive 2, moderate 5, aggressive 8), each rate after the stake lands */
+  window.__atLift = function(amount){
+    var ids = atAutoIds(); if(!ids.length || !(amount > 0)) return null;
+    var only = {}; ids.forEach(function(id){ only[id] = 1; });
+    var r = window.__planWith(amount, { only: only, maxVals: { passive: 2, below: 5, aggressive: 8 }[atPreset()] || 5 });
+    return r && r.rate > 0 ? { after: r.rate, n: r.moves.length, picks: ids.length } : null;
+  };
   function atOps(ids){ var VD = window.__VDBY || {}, out = []; ids.forEach(function(id){ var d = VD[id]; if(d && d.op) out.push(d.op); }); return out; }
   function atSelIds(){ var VD = window.__VDBY || {}; return Object.keys(ATSEL).filter(function(id){ return VD[id] && VD[id].op; }); }
   /* a standing grant's allow-list, as the set's ids */
@@ -2682,21 +2690,19 @@ rememberGridH();
       if((view || auto) && !o.on) return false;   /* a standing grant, or Autopilot's pick: only those validators */
       /* a name matches on any letters; an operator key only from five on, or every key matches "at" */
       return !q || String(o.m).toLowerCase().indexOf(q) >= 0 || (q.length >= 5 && String(d.op).toLowerCase().indexOf(q) >= 0); });
-    var h = '<table><colgroup><col style="width:30px">' + (ph ? '' : '<col style="width:34px">') + '<col><col style="width:' + (ph ? 66 : 64) + 'px">' +
-            (ph ? '' : '<col style="width:50px">') + '<col style="width:' + (ph ? 56 : 62) + 'px"></colgroup>' +
+    /* easy: the validator, its 90-day uptime and what it pays - rank and jailings stay in Pro's lists */
+    var h = '<table><colgroup><col style="width:34px"><col><col style="width:' + (ph ? 66 : 84) + 'px"><col style="width:' + (ph ? 60 : 76) + 'px"></colgroup>' +
             /* no select-all: validators are picked one by one */
-            '<thead><tr><th class=ck></th>' + (ph ? '' : '<th>rank</th>') + '<th class=l>validator</th><th>90<span class=lc>d</span> uptime</th>' + (ph ? '' : '<th>jailed</th>') + '<th>APR</th></tr></thead><tbody>';
+            '<thead><tr><th class=ck></th><th class=l>validator</th><th>90<span class=lc>d</span> uptime</th><th>APR</th></tr></thead><tbody>';
     rows.forEach(function(o){
       var d = VD[o.id], u90 = d.d90 != null ? +d.d90 : (o.up != null ? +o.up : null);
       h += '<tr' + (o.on ? ' class=on' : '') + ' data-id="' + att(o.id) + '"><td class=ck><input type=checkbox aria-label="' + att(o.m) + '"' + (o.on ? ' checked' : '') + (view ? ' disabled' : '') + '></td>' +
-           (ph ? '' : '<td>' + o.rank + '</td>') +
            '<td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span class=nmt>' + att(o.m) + '</span>' +
              (mine[o.id] ? '<span class="attg y">yours</span>' : '') + (fit[o.id] && !ph ? '<span class="attg f">fits</span>' : '') + '</div></td>' +
            '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '—' : u90.toFixed(1) + '%') + '</td>' +
-           (ph ? '' : o.jail == null ? '<td class=dim>N/A</td>' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail + '×' : 'Never') + '</td>') +
            '<td class=r2><b>' + pct(window.__rateAfter(o.t, o.c, 0)) + '</b></td></tr>';
     });
-    if(!rows.length) h += '<tr><td class=atnone colspan=' + (ph ? 4 : 6) + '>' +
+    if(!rows.length) h += '<tr><td class=atnone colspan=4>' +
       (q ? 'No validator matches “' + att(AT_FIND.trim()) + '”.' : 'The set has not loaded yet.') + '</td></tr>';
     var top = el.scrollTop; el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
     el.classList.toggle("ro", view);
@@ -2710,6 +2716,9 @@ rememberGridH();
   function atState(){
     var pos = window.__POS, cap = atCap(), scope = atScope(), view = atViewing();
     atCounts();
+    /* why it matters: stake left alone goes idle when its validator drops out of the set */
+    var idl = E("atidle"), iv = window.__idleAtone ? window.__idleAtone() : "";
+    if(idl){ idl.hidden = view || !iv; if(iv) idl.innerHTML = "<b>Autopilot keeps your stake active</b>, through a long winter, a busy month, or when you would rather not look. Today <b class=n>" + iv + " ATONE</b> sits idle on inactive validators, earning nothing."; }
     var mx = E("atmaxv"); if(mx) mx.textContent = pos ? exact(pos.free, 2) : "—";
     var un = E("atuntil"); if(un) un.innerHTML = "until <b>" + window.__dayFull(Date.now() + AT.days * 86400000) + "</b>";
     var signer = !!window.__WALLET && !!window.__WALLET.signDirect;
