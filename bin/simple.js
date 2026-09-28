@@ -314,7 +314,15 @@
     var off = 0; rows.forEach(function(r){ if(r.inactive) off += r.x; });
     put("sd-sky", mine
       ? '<div class=sv-ph><h3>What your stake earns</h3>' + (pos.rate > 0 ? tag("a", pct(pos.rate) + " APR", "what your stake earns now") : '') + '</div>' + earns(pos.total, pos.rate, off)
-      : '<div class=sv-ph><h3>What 1,000 ATONE earns</h3>' + (S.mid > 0 ? tag("a", pct(S.mid) + " APR", "the set's middle APR") : '') + '</div>' + earns(1e9, S.mid, 0, true));
+      : (function(){
+          /* no wallet: 10,000 ATONE at the best APR it can get, as Move your stake would place it - the optimiser
+             picks up to ten validators of the live set, the stake splits equally across them, and each one's rate
+             is read after its share lands on it; the APR is their average */
+          var X = 1e10, bp = window.__planWith ? window.__planWith(X, { maxVals: 10 }) : null, k = bp && bp.moves ? bp.moves.length : 0, r = 0;
+          if(k && window.__rateAfter) bp.moves.forEach(function(q){ r += window.__rateAfter(q.t, q.c, X / k) / k; });
+          if(!(r > 0)) r = S.hi;
+          return '<div class=sv-ph><h3>What 10,000 ATONE earns</h3>' + (r > 0 ? tag("a", pct(r) + " APR", "the best APR 10,000 ATONE can get today" +
+            (k > 1 ? ", split across " + k + " validators" : k === 1 ? ", on one validator" : "") + ", after its own effect on their rates") : '') + '</div>' + earns(X, r, 0, true); })());
     put("sd-rs", RSP);
 
     /* the validators */
