@@ -937,7 +937,7 @@
        below what the chain holds (1.8M against 77M on 2026-09-26) */
     var last = hist.length ? hist[hist.length - 1] : null;
     /* the price rides in the title row: the figure in the token's colour, its day in green or red,
-       the market cap quiet beside it */
+       the market cap quiet beside it; then what the token is for (sv-trole) */
     var tp = function(k, p, col){ p = p || {}; var d = p.change_24h, sup = last ? last[k] / 1e6 : null, cap = p.usd != null && sup ? p.usd * sup : null;
       return '<span class=sv-tp><b style="color:' + col + '">' + usd(p.usd) + '</b>' +
         (d == null ? '' : '<i class=' + (d >= 0 ? "up" : "dn") + '>' + (d >= 0 ? "+" : "\u2212") + Math.abs(d).toFixed(1) + '% 24h</i>') +
@@ -949,12 +949,12 @@
     var ch = function(k){ return was && was[k] ? ((now[k] / was[k] - 1) * 100) : null; };
     var sg = function(v){ return v == null ? "" : (v >= 0 ? "+" : "\u2212") + Math.abs(v).toFixed(1) + "% in 30 days"; };
     var M = function(v){ return v <= 0 ? "0" : (v / 1e12).toFixed(0) + "M"; };
-    put("sv-ecoa", '<div class=sv-ph><h3>ATONE</h3><span class=sv-gkey><i class=sup></i>supply<i class=bon></i>bonded</span>' + tp("atone", pr.atone, "var(--sv-amber)") + '<div class=sv-rt>' +
+    put("sv-ecoa", '<div class=sv-ph><h3>ATONE</h3><span class=sv-gkey><i class=sup></i>supply<i class=bon></i>bonded</span>' + tp("atone", pr.atone, "var(--sv-amber)") + '<span class=sv-trole style="--c:var(--sv-amber)">Staking and Governance token</span><div class=sv-rt>' +
       st("Uncapped supply", big(now.atone), sg(ch("atone")), "var(--sv-amber)") +
       st("Bonded", (now.bonded / now.atone * 100).toFixed(1) + "%", big(now.bonded) + " staked", "var(--sv-amber)") +
       st("Community pool", big(now.pool), "ATONE", "var(--sv-green)") + '</div></div>' +
       chart("ecoa", hist, [{ k: "atone", cls: "sup", name: "Supply" }, { k: "bonded", cls: "bon", area: true, name: "Bonded" }], M, function(v){ return big(v); }));
-    put("sv-ecop", '<div class=sv-ph><h3>PHOTON</h3><span class=sv-tmax>1 billion max</span><span class=sv-gkey><i class=pho></i>supply</span>' + tp("photon", pr.photon, "var(--sv-pho)") + '<div class=sv-rt>' +
+    put("sv-ecop", '<div class=sv-ph><h3>PHOTON</h3><span class=sv-tmax>1 billion max</span><span class=sv-gkey><i class=pho></i>supply</span>' + tp("photon", pr.photon, "var(--sv-pho)") + '<span class=sv-trole style="--c:var(--sv-pho)">Fee Token</span><div class=sv-rt>' +
       st("Capped supply", big(now.photon), sg(ch("photon")), "var(--sv-pho)") +
       st("Mint rate", E0.conv ? E0.conv.toFixed(2) : "—", "PHOTON per ATONE burned", "var(--sv-pho)") +
       st("Community pool", big(now.pool_ph), "PHOTON", "var(--sv-green)") + '</div></div>' +

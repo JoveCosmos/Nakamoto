@@ -3975,6 +3975,10 @@ background:var(--wc);padding:1px 6px;border-radius:4px;border:1px solid var(--wb
 .sv-tp small{font-family:var(--wmono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--wf)}
 .sv-tp small u{text-decoration:none;font-size:11px;letter-spacing:.02em;color:var(--ws);margin-left:4px}
 @media(max-width:620px){.sv-tp{flex:1 1 100%;flex-wrap:wrap;row-gap:4px;margin-left:0;padding-left:0;border-left:0}}
+/* what the token is for, after the price: a quiet chip in the token's colour */
+.sv-trole{display:inline-flex;align-items:center;height:20px;margin-left:16px;padding:0 9px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c) 45%,transparent);
+  background:color-mix(in srgb,var(--c) 10%,transparent);color:var(--c);font-family:var(--wmono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
+@media(max-width:620px){.sv-trole{margin-left:0}}
 .sv-tmax{font-family:var(--wmono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sv-pho);opacity:.85;white-space:nowrap}
 .sv-lcur{position:absolute;top:0;bottom:0;width:1px;margin-left:-.5px;background:var(--wt);opacity:0;pointer-events:none}
 .sv-lc.on .sv-lcur{opacity:.45}
