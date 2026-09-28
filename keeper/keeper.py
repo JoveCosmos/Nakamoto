@@ -243,7 +243,7 @@ def plan_restake(c, granter, rg, vals, m, P):  # noqa: C901
     return out
 
 def execute_restake(granter, p):
-    body = {"granter": granter, "claim": p["claim"], "stake": [{"validator": s["validator"], "amount": str(s["amount"])} for s in p["stake"]], "memo": "GATA autopilot restake"}
+    body = {"granter": granter, "claim": p["claim"], "stake": [{"validator": s["validator"], "amount": str(s["amount"])} for s in p["stake"]], "memo": "GATA Restake"}
     if p.get("send"): body["send"] = str(p["send"])
     req = urllib.request.Request(RESTAKE_URL, data=json.dumps(body).encode(), method="POST", headers={"content-type": "application/json", "x-gata-secret": SECRET})
     try:
@@ -361,7 +361,7 @@ def plan(g, rows, reds, vals, m, P=None):
 
 # ── execution ──────────────────────────────────────────────────────────────
 def execute(granter, moves):
-    body = json.dumps({"granter": granter, "moves": [{"src": m["src"], "dst": m["dst"], "amount": str(int(m["amount"]))} for m in moves], "memo": "GATA autopilot"}).encode()
+    body = json.dumps({"granter": granter, "moves": [{"src": m["src"], "dst": m["dst"], "amount": str(int(m["amount"]))} for m in moves], "memo": "GATA Autopilot"}).encode()
     req = urllib.request.Request(SIGNER, data=body, method="POST", headers={"content-type": "application/json", "x-gata-secret": SECRET})
     try:
         with urllib.request.urlopen(req, timeout=120) as r: return json.load(r)

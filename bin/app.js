@@ -2662,8 +2662,8 @@ rememberGridH();
   /* the allow-list: the whole set, or the reader's own selection; the strategy sets the pace */
   function atScope(){ return atOps(atPick() === "selected" ? atSelIds() : atAutoIds()); }
   /* the memo the keeper reads: the strategy word, then the flags */
-  var AT_WORD = { passive: "passive", below: "moderate", aggressive: "aggressive" };
-  function atMemo(){ return "gata:" + (AT_WORD[atPreset()] || "moderate") + (atPick() === "selected" ? ":picks" : "") + (atRestake() ? ":restake" : ""); }
+  /* the memo on the reader's grant: a plain label, nothing reads it */
+  function atMemo(){ return "GATA Autopilot"; }
   function atMonths(){ return AT.days >= 365 ? "12 months" : AT.days >= 180 ? "6 months" : "3 months"; }
   function atCap(){ var a = E("atcap"), n = parseFloat((a.value || "").replace(/[^0-9.]/g, "")); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
   function atMsgs(){
@@ -2908,7 +2908,7 @@ rememberGridH();
       if(!AT.addr) throw new Error("Restake opens once GATA's keeper is live");
       var on = rsOn(), msgs = rsMsgs(!on);
       if(!msgs.length) throw new Error(on ? "Nothing to disable" : "Stake with a validator first");
-      return window.__TX.sendDirect(window.__WALLET, msgs, on ? "" : "gata:restake", function(){});
+      return window.__TX.sendDirect(window.__WALLET, msgs, on ? "" : "GATA Restake", function(){});
     })
       .then(function(){ n.ok(); return atGrant().then(function(r){ if(atKeep(r)){ draw(); if(window.__redraw) window.__redraw(); } }); })
       .catch(function(e){ n.fail(e && e.message || String(e)); })

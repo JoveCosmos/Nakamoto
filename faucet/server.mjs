@@ -58,7 +58,7 @@ if (process.argv.includes("--mint-half")) {
   const b = await balances(c, from), half = (b.uatone || 0n) / 2n;
   if (half <= 0n) { log("no ATONE to convert"); process.exit(1); }
   const msg = { typeUrl: MINT_URL, value: { toAddress: from, amount: { denom: "uatone", amount: half.toString() } } };
-  const r = await c.signAndBroadcast(from, [msg], "auto", "GATA faucet: half the ATONE to PHOTON");
+  const r = await c.signAndBroadcast(from, [msg], "auto", "");
   log("mint", half.toString(), "uatone -> code", r.code, "tx", r.transactionHash, r.code ? r.rawLog : "");
   const a = await balances(c, from); log("now", String(a.uatone || 0n), "uatone,", String(a.uphoton || 0n), "uphoton");
   process.exit(r.code ? 1 : 0);
@@ -96,7 +96,7 @@ http.createServer(async (req, res) => {
       const k = day + " " + ip; if ((S.ips[k] || 0) >= IP_DAY) return send(429, { error: "Too many requests from here today. Try tomorrow." });
       const g = GIVE[token], b = await balances(c, from);
       if ((b[g.denom] || 0n) - BigInt(g.amount) < BigInt(RESERVE[g.denom])) return send(503, { error: "The faucet is empty for " + token.toUpperCase() + " right now." });
-      const r = await c.sendTokens(from, address, [{ denom: g.denom, amount: String(g.amount) }], "auto", "GATA testnet faucet");
+      const r = await c.sendTokens(from, address, [{ denom: g.denom, amount: String(g.amount) }], "auto", "");
       log("sent", g.amount, g.denom, "to", address, "code", r.code, r.transactionHash);
       if (r.code) return send(502, { error: "The chain refused it: " + (r.rawLog || r.code) });
       (S.claims[address] = S.claims[address] || {})[token] = { at: Date.now(), tx: r.transactionHash };
