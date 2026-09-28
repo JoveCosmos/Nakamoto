@@ -4353,12 +4353,16 @@ background:radial-gradient(55% 160% at 0% 0%,rgba(185,176,255,.14),transparent 6
    colours ════ */
 /* phones: restake's line wraps in the narrow year box instead of being cut */
 @media(max-width:900px){#sd-sky .se-rsx .se-rsl:not(#z){white-space:normal;text-wrap:balance}#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:60px}}
+@media(min-width:901px){html #sv-over .sd-wgrid.sd-wgrid:not(#z){grid-template-columns:max(calc((100% - 2px) * 0.262 + 2px),280px) minmax(0,1.35fr) minmax(0,1.15fr)!important}}
 html #sv-over .sd-wgrid:not(#z){gap:0;background:linear-gradient(180deg,#131329,#0c0c1a);border:1px solid var(--wbd2);border-radius:14px;box-shadow:inset 0 1px 0 #ffffff08;overflow:hidden}
 html #sv-over .sd-wgrid>.sd-col:not(#z){background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important}
 html :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move)::before,html :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move)::after{display:none!important}
 html #sv-over .sd-wgrid>.sd-col>.sv-ph:not(#z){background:none!important;border-bottom:0!important;border-radius:0!important}
-html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z){color:var(--wt)!important}
-html #sv-over .sd-wgrid>.sd-col>.sv-ph h3::before{background:#b9b0ff!important;box-shadow:none!important;opacity:.8}
+html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){color:#f3f0ff!important;font-size:18px!important;font-weight:700;letter-spacing:-.012em;gap:10px}
+@media(min-width:901px) and (max-width:1599px){html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){font-size:17px!important}}
+@media(min-width:901px) and (max-width:1299px){html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){font-size:15.5px!important}}
+@media(max-width:900px){html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){font-size:17px!important}}
+html #sv-over .sd-wgrid>.sd-col>.sv-ph h3::before{width:4px!important;height:18px!important;border-radius:3px!important;background:linear-gradient(180deg,#d6d0ff,#9d93f0)!important;box-shadow:0 0 10px -2px rgba(185,176,255,.6)!important;opacity:1}
 html #sv-over .sd-wgrid>.sd-col>.sv-ph .sv-tag:not(#z){color:var(--ws)!important;border-color:var(--wbd2)!important;background:rgba(255,255,255,.04)!important;font-weight:600}
 .sv-btn.go.sd-go:disabled{background:rgba(255,255,255,.05);border-color:var(--wbd2);color:var(--wf);box-shadow:none;cursor:not-allowed;margin-top:auto}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}

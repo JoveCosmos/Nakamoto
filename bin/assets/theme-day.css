@@ -721,6 +721,7 @@
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid:not(#z){background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col:not(#z){background:none!important;box-shadow:none!important}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph:not(#z){background:none!important}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){color:var(--accent)!important}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph h3::before{background:var(--accent)!important;box-shadow:none!important}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph .sv-tag:not(#z){background:var(--surface-2)!important}
   html[data-theme=light]:not([data-mono]) .sv-btn.go.sd-go:disabled{background:var(--surface-2);box-shadow:none}
@@ -1166,8 +1167,10 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#p-dele #sd-mstrip).sd-strip:not(#z){border-color:var(--line-strong,#d9d3c4);box-shadow:0 0 22px -12px rgba(91,79,196,.35);background:radial-gradient(55% 160% at 0% 0%,rgba(91,79,196,.08),transparent 60%),radial-gradient(45% 140% at 100% 110%,rgba(15,122,114,.05),transparent 60%),#fffdf8}
   /* Easy as one dashboard in day: one ivory surface, plain titles, neutral tags */
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid:not(#z){background:#fffdf8;border-color:#e3ded3;box-shadow:0 1px 0 rgba(255,255,255,.8)}
-  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z){color:var(--ink)!important}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){color:var(--ink)!important}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph h3::before{background:#5b4fc4!important}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph .sv-tag:not(#z){color:#4a4466!important;border-color:#d9d3c4!important;background:rgba(60,50,20,.03)!important}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col:not(#z){background:none!important;border:0!important;box-shadow:none!important}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){color:#2a2540!important}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph h3::before{background:linear-gradient(180deg,#7a6fe0,#5b4fc4)!important;box-shadow:none!important}
 
