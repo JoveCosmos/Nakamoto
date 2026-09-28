@@ -1,0 +1,12 @@
+{
+  "name": "atomone-autopilot-signer",
+  "private": true,
+  "type": "module",
+  "version": "2.0.0",
+  "description": "AtomOne TESTNET faucet: 100 ATONE and 10 PHOTON, once per address (same pinned libraries as the signer)",
+  "dependencies": {
+    "@cosmjs/proto-signing": "0.39.0",
+    "@cosmjs/stargate": "0.39.0",
+    "cosmjs-types": "0.11.0"
+  }
+}

@@ -301,14 +301,16 @@ for _js in ("app.js", "boot.js", "tx.js", "simple.js", "shell.js"):
                     os.path.join(OUT, "." + _js + ".tmp"))
     os.chmod(os.path.join(OUT, "." + _js + ".tmp"), 0o640)
     os.replace(os.path.join(OUT, "." + _js + ".tmp"), os.path.join(OUT, _js))
-# the operator console: its own page and script (versioned by content), never linked publicly
-_chk = subprocess.run(["/usr/bin/node", "--check", os.path.join(os.path.dirname(__file__), "admin.js")], capture_output=True, text=True)
-if _chk.returncode != 0:
-    sys.exit("atomone-app: FATAL admin.js does not parse:\n%s" % _chk.stderr.strip()[-600:])
-_ajs = open(os.path.join(os.path.dirname(__file__), "admin.js"), "rb").read()
-_ah = open(os.path.join(os.path.dirname(__file__), "admin.html")).read().replace('src="admin.js"', 'src="admin.js?v=%s"' % hashlib.sha256(_ajs).hexdigest()[:10])
-for _fn, _body in (("admin.js", _ajs), ("admin.html", _ah.encode())):
-    _t = os.path.join(OUT, "." + _fn + ".tmp"); open(_t, "wb").write(_body); os.chmod(_t, 0o640); os.replace(_t, os.path.join(OUT, _fn))
+# the operator console and the testnet faucet: each its own page and script (versioned by content), shared as a
+# direct link, never linked from the app
+for _pg in ("admin", "faucet"):
+    _chk = subprocess.run(["/usr/bin/node", "--check", os.path.join(os.path.dirname(__file__), _pg + ".js")], capture_output=True, text=True)
+    if _chk.returncode != 0:
+        sys.exit("atomone-app: FATAL %s.js does not parse:\n%s" % (_pg, _chk.stderr.strip()[-600:]))
+    _ajs = open(os.path.join(os.path.dirname(__file__), _pg + ".js"), "rb").read()
+    _ah = open(os.path.join(os.path.dirname(__file__), _pg + ".html")).read().replace('src="%s.js"' % _pg, 'src="%s.js?v=%s"' % (_pg, hashlib.sha256(_ajs).hexdigest()[:10]))
+    for _fn, _body in ((_pg + ".js", _ajs), (_pg + ".html", _ah.encode())):
+        _t = os.path.join(OUT, "." + _fn + ".tmp"); open(_t, "wb").write(_body); os.chmod(_t, 0o640); os.replace(_t, os.path.join(OUT, _fn))
 # Brand marks: AtomOne and PHOTON are the official chain-registry SVGs, GATA is the
 # same mark the snapshot pages use. Published from bin/ like everything else.
 # the Constitution view's text: the official file, converted once per render into a fragment the
