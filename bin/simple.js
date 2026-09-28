@@ -156,21 +156,16 @@
     var y = stake * rate;
     /* restake runs every 12 hours (a fixed rule): the rewards claimed and staked again earn too - the year
        compounded twice a day at today's rate, against the plain year */
-    var cy = stake * (Math.pow(1 + rate / 730, 730) - 1), more = cy - y, dapr = (cy / (stake || 1) - rate) * 100;
+    var cy = stake * (Math.pow(1 + rate / 730, 730) - 1);
     var at = !ex && window.__atInfo ? window.__atInfo() : null, on = !!(at && at.grant && at.restake);
     /* restaking already: every figure carries the restake's effect */
     var Y = on ? cy : y, P = function(days){ return Y * days / 365; };
     var amt = function(u){ return '<span class=se-amt>+' + one(u / 1e6) + '</span>'; };
-    /* four big boxes, as Move your stake shows its figures: a day, a week, a month and the year; the
-       year carries what restake adds (or, restaking, what it already adds) */
-    /* restake's lines stand apart at the foot of the year's box, so its label, figure and unit sit level with the
-       other three boxes' */
-    var rs = rate > 0 ? '<div class=se-rsx>' + (on ? '<span class=se-rsl>Restaking: <b>+' + one(more / 1e6) + ' ATONE</b> of it from restake</span>'
-                            : '<span class=se-rsl>Restake: <b>+' + one(more / 1e6) + ' ATONE</b>, +' + dapr.toFixed(1) + '% APR</span><span class=se-rsl2>auto-compounds reward</span>') + '</div>' : '';
+    /* four big boxes, as Move your stake shows its figures: a day, a week, a month and the year */
     var A = "var(--sv-amber)";
     return '<div class="sd-figs sd-mv four se-earn">' +
       fig("A day", amt(P(1)), "ATONE", A) + fig("A week", amt(P(7)), "ATONE", A) + fig("A month", amt(P(365 / 12)), "ATONE", A) +
-      fig(on ? "A year, restaking" : "A year", amt(Y), "ATONE", A).replace(/<\/div>$/, rs + '</div>') + '</div>';
+      fig(on ? "A year, restaking" : "A year", amt(Y), "ATONE", A) + '</div>';
   }
 
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every
@@ -239,13 +234,18 @@
   }
   /* the wallet strip, one builder for Overview and Manage: the wallet box, then Total, Staked,
      Available, Rewards and APR, each figure in its engraved well */
+  /* the wallet card: its name, then the wallet app and the network as chips - the first box of every strip
+     that is about the connected wallet (Easy, Pro, Govern) */
+  function wcard(){
+    var wname = (window.__WALLET && String(window.__WALLET.label || "").trim()) || "Your wallet";
+    return '<div class="sd-id sd-idw"><div class=sd-idl><div class=sd-top><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3></div>' + wmeta() + '</div></div>';
+  }
   function wstrip(){
     var pos = window.__POS, bal = window.__BAL;
     var mine = pos && pos.rows.length, rew = window.__REW || 0, liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0;
-    var wname = (window.__WALLET && String(window.__WALLET.label || "").trim()) || "Your wallet";
     /* the wallet card, then five boxes - Available, Photon, Staked, APR, Rewards - each figure in its well */
     return (
-      '<div class="sd-id sd-idw"><div class=sd-idl><div class=sd-top><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3></div>' + wmeta() + '</div></div>' +
+      wcard() +
       ro("Available", bal ? fmt(liq) : "\u2014", "", null, "var(--sv-violet)", "", false, bal ? "ATONE" : "") +
       ro("Photon", bal ? '<span class=sv-pho>' + fmt(bal.uphoton) + '</span>' : "\u2014", "", null, "var(--sv-pho)", "", false, "") +
       ro("Staked", pos ? fmt(stk) : "\u2014", "", null, "var(--sv-amber)", "", false, pos ? "ATONE" : "") +
@@ -1022,21 +1022,85 @@
   function govBtn(g, mine){
     if(screen() !== "mygov") return '';
     if(!window.__ADDR || !window.__WALLET || mine === null || mine === undefined) return '';
+    if(g.addr === govAddrOf(window.__ADDR)) return '<button class=sv-gbtn type=button data-act=greg title="Change what the chain shows about your governor">Edit</button>';
     if(g.addr === mine) return '<button class="sv-gbtn stop" type=button data-act=gstop title="Stop following this governor: your stake votes only when you vote">Stop</button>';
     if(!g.active) return '';
     return '<button class=sv-gbtn type=button data-act=gfollow data-g="' + esc(g.addr) + '" title="' + (mine ? 'Follow this governor instead' : 'Let this governor vote for your stake when you do not vote') + '">' + (mine ? 'Switch' : 'Follow') + '</button>';
   }
-  function govSend(t, msg){
+  function govSend(t, msg, done){
     if(!window.__TX || !window.__WALLET || !window.__ADDR || t.classList.contains("busy")) return;
     var a = window.__ADDR, n = window.__notify ? window.__notify() : null;
     t.classList.add("busy"); t.disabled = true;
     (window.__TX.sendDirect || window.__TX.send)(window.__WALLET, [msg], "", function(){})
-      .then(function(){ if(n) n.ok();
+      .then(function(){ if(n) n.ok(); if(done) done();
         /* the next block carries it: read the following and the counts again then */
         setTimeout(function(){ delete GV.mine[a]; GV.at = 0; render(); }, 7000); })
       .catch(function(e){ if(n) n.fail(e && e.message || String(e)); })
       .then(function(){ t.classList.remove("busy"); t.disabled = false; });
   }
+  /* ── becoming a governor. A governor is the wallet's own key under the "atonegov" prefix; the chain wants
+     10,000 ATONE staked on ACTIVE validators (its min_governor_self_delegation) and caps each field in bytes.
+     Registering makes the wallet follow itself. Signed in the wallet, broadcast through our node. ── */
+  var B32 = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
+  function b32poly(v){ var G = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3], c = 1;
+    v.forEach(function(x){ var b = c >>> 25; c = ((c & 0x1ffffff) << 5) ^ x; for(var i = 0; i < 5; i++) if((b >>> i) & 1) c ^= G[i]; }); return c; }
+  function govAddrOf(a){
+    var p = a ? a.lastIndexOf("1") : -1, d = [], i; if(p < 1) return null;
+    for(i = p + 1; i < a.length; i++){ var k = B32.indexOf(a.charAt(i)); if(k < 0) return null; d.push(k); }
+    d = d.slice(0, -6);
+    var h = "atonegov", x = [], out = h + "1";
+    for(i = 0; i < h.length; i++) x.push(h.charCodeAt(i) >> 5); x.push(0); for(i = 0; i < h.length; i++) x.push(h.charCodeAt(i) & 31);
+    var c = b32poly(x.concat(d, [0, 0, 0, 0, 0, 0])) ^ 1;
+    d.forEach(function(v){ out += B32.charAt(v); }); for(i = 0; i < 6; i++) out += B32.charAt((c >>> (5 * (5 - i))) & 31);
+    return out;
+  }
+  window.__govAddrOf = govAddrOf;
+  function myGovRec(){ var ga = govAddrOf(window.__ADDR); return ga && GV.list ? GV.list.filter(function(x){ return x.addr === ga; })[0] || null : null; }
+  /* the stake the chain counts for a governor: delegations to validators in the active set */
+  function bondedStake(){ var pos = window.__POS, t = 0; if(!pos) return null; pos.rows.forEach(function(r){ if(!r.inactive) t += r.x; }); return t; }
+  /* [field, label, byte limit, placeholder, required, long] */
+  var GR_F = [["moniker", "Name", 70, "shown in every governor list", true], ["identity", "Keybase ID", 3000, "optional, 16-character key ID"],
+              ["website", "Website", 140, "optional, https://"], ["security_contact", "Security contact", 140, "optional, an e-mail address"],
+              ["details", "About", 280, "optional, what you stand for and how you vote", false, true]];
+  function grVals(){ var o = {}; GR_F.forEach(function(f){ var el = E("gr-" + f[0]); o[f[0]] = el ? el.value.trim() : ""; }); return o; }
+  function grCheck(){
+    var go = E("grgo"); if(!go) return;
+    var v = grVals(), me = myGovRec(), ok = !!v.moniker, enc = new TextEncoder();
+    GR_F.forEach(function(f){ var n = enc.encode(v[f[0]]).length, c = E("grc-" + f[0]), el = E("gr-" + f[0]);
+      if(c) c.textContent = n ? n + " / " + f[2] : ""; if(el) el.classList.toggle("bad", n > f[2]); if(n > f[2]) ok = false; });
+    if(me){
+      if(v.moniker === me.m && v.identity === me.ident && v.website === me.web && v.security_contact === me.sec && v.details === me.det) ok = false;
+    } else {
+      var need = GV.rules && GV.rules.minSelf, have = bondedStake(), enough = !!(need && have != null && have >= need), nd = E("grneed");
+      if(nd) nd.innerHTML = '<div><em>Needs</em><b>' + (need ? whole(need) : "—") + '</b><small>ATONE staked</small></div>' +
+        '<div class=' + (enough ? 'ok' : 'no') + '><em>You have</em><b>' + (have != null ? fmt(have) : "—") + '</b><small>ATONE on active validators</small></div>';
+      if(!enough) ok = false;
+    }
+    go.disabled = !ok;
+  }
+  function govForm(){
+    if(!window.__ADDR || !window.__WALLET || !GV.list) return;
+    var P = window.__POP, pop = E("grpop"), me = myGovRec(), R = GV.rules || {};
+    if(!pop){ pop = document.createElement("div"); pop.className = "pop"; pop.id = "grpop"; document.body.appendChild(pop);
+      pop.addEventListener("click", onClick); pop.addEventListener("input", grCheck); }
+    var val = function(k){ return me ? ({ moniker: me.m, identity: me.ident, website: me.web, security_contact: me.sec, details: me.det })[k] || "" : ""; };
+    pop.innerHTML = '<div class="card txcard grcard" role=dialog aria-modal=true aria-labelledby=grttl>' +
+      '<header class=wk-txh><div><b id=grttl>' + (me ? 'Edit your governor' : 'Become a governor') + '</b><span>' + esc(window.__TX ? window.__TX.CHAIN : "") + '</span></div></header>' +
+      '<div class=gr-who><em>Governor address</em><b>' + esc(govAddrOf(window.__ADDR) || "") + '</b></div>' +
+      '<div class=gr-f>' + GR_F.map(function(f){
+        return '<label class=gr-l for=gr-' + f[0] + '><span class=gr-k>' + f[1] + (f[4] ? '<i>required</i>' : '') + '<small id=grc-' + f[0] + '></small></span>' +
+          (f[5] ? '<textarea class=gr-in id=gr-' + f[0] + ' rows=3 spellcheck=true placeholder="' + esc(f[3]) + '">' + esc(val(f[0])) + '</textarea>'
+                : '<input class=gr-in id=gr-' + f[0] + ' type=text autocomplete=off spellcheck=false placeholder="' + esc(f[3]) + '" value="' + esc(val(f[0])) + '">') + '</label>'; }).join("") + '</div>' +
+      (me ? '' : '<div class=gr-need id=grneed></div>') +
+      '<p class=gr-note>' + (me ? 'The new details show once the next block carries them.'
+        : 'Your own stake follows you from the moment you register. You can go inactive, and back, at most once every ' + (R.period ? Math.round(R.period / 86400) : 28) + ' days.') +
+        ' Signed in ' + esc(window.__WALLET.name || "your wallet") + ', sent through GATA\'s node.</p>' +
+      '<div class=txbtns><button class=wk-btn type=button data-act=grclose>Cancel</button><button class="wk-btn wk-go" id=grgo type=button data-act=grsend disabled>' + (me ? 'Save' : 'Register') + '</button></div></div>';
+    if(P) P.open(pop);
+    grCheck();
+    var first = E("gr-moniker"); if(first) setTimeout(function(){ first.focus(); }, 60);
+  }
+  function grClose(){ var p = E("grpop"); if(p && window.__POP) window.__POP.close(p); }
   /* a governor's card, as a validator's: who it is, what it holds, and the chain's rules for governors */
   function govCard(addr){
     var g = (GV.list || []).filter(function(x){ return x.addr === addr; })[0]; if(!g) return;
@@ -1095,10 +1159,9 @@
     var act = L ? L.filter(function(x){ return x.active; }) : [], vp = 0; (L || []).forEach(function(x){ vp += x.vp || 0; });
     var P = GP.list, live = P ? P.filter(function(p){ return p.st === "PROPOSAL_STATUS_VOTING_PERIOD"; }) : [];
     var following = !!(window.__ADDR && mine);
-    put("sd-gstrip",
-      '<div class="sd-id sd-ida sd-idg"><div class=sd-top><h3>Govern</h3></div><div class=sd-wmeta><span class=sd-wch><i class="st' + (following ? ' on' : '') + '">' +
-        (!window.__ADDR ? 'No wallet' : mine === null || mine === undefined ? 'Reading' : following ? 'Following' : 'No governor') + '</i></span></div></div>' +
-      ro("Your governor", following ? esc(g ? g.m : mine.slice(0, 12) + "…") : "—", "", null, "var(--sv-violet)") +
+    var me = window.__ADDR ? myGovRec() : null;
+    put("sd-gstrip", wcard() +
+      ro(me ? "You govern" : "Your governor", me ? esc(me.m) : following ? esc(g ? g.m : mine.slice(0, 12) + "…") : window.__ADDR && mine === "" ? "None" : "—", "", null, "var(--sv-violet)") +
       ro("Your vote weight", pos && pos.rows.length ? fmt(pos.total) : "—", "", null, "var(--sv-amber)", "", false, pos && pos.rows.length ? "ATONE" : "") +
       ro("Voting now", P ? String(live.length) : "—", "", null, "var(--sv-teal)", "", false, P ? (live.length === 1 ? "proposal" : "proposals") : "") +
       ro("Governors", L ? String(act.length) : "—", "", null, "var(--sv-violet)", "", false, L ? "active" : "") +
@@ -1107,13 +1170,16 @@
     var h = '<div class=sv-ph><h3>Your governor</h3></div>';
     if(!window.__ADDR) h += '<p class=gv-say>Connect a wallet to see the governor it follows.</p>';
     else if(mine === null || (mine && !L)) h += '<p class=gv-say>Reading…</p>';
+    else if(me) h += '<p class=gv-say>You are a governor: <b>' + esc(me.m) + '</b>, ' + (me.active ? 'active' : 'inactive') + '. Your own stake follows you.</p>' +
+      '<p class=gv-sub>You vote for every staker who follows you, on each proposal they do not vote on themselves.</p>' + govRows([me], mine);
     else if(!mine) h += '<p class=gv-say>You follow no governor: your stake votes only when you vote.</p>' +
       '<div class=gv-how><div><em>You vote</em><b>Your vote counts</b></div><div><em>You don\'t vote</em><b>No vote is cast</b></div></div>' +
       '<p class=gv-sub>Follow a governor and its vote counts for your stake on every proposal you do not vote on yourself.</p>';
     else h += '<p class=gv-say>Your stake follows <b>' + esc(g ? g.m : mine) + '</b>' + (g && !g.active ? ', which is inactive: its votes do not count for you' : '') + '.</p>' +
       '<p class=gv-sub>Its vote counts for your stake on any proposal you do not vote on yourself.</p>' + (g ? govRows([g], mine) : "");
     put("sv-mygovp", h);
-    put("sv-mygovlist", '<div class=sv-ph><h3>Governors</h3>' + (L ? tag("q", L.length + " Governors") : '') + '</div>' +
+    var reg = L && window.__ADDR && window.__WALLET ? '<button class="sv-gbtn gr-open" type=button data-act=greg><span class=gr-lg>' + (me ? 'Edit your governor' : 'Become a governor') + '</span><span class=gr-sm>' + (me ? 'Edit' : 'Register') + '</span></button>' : '';
+    put("sv-mygovlist", '<div class=sv-ph><h3>Governors</h3>' + (L ? tag("q", L.length + " Governors") : '') + reg + '</div>' +
       (!L ? '<p class=gv-say>Reading the governors…</p>' : !L.length ? govNone() : govRows(L, mine)));
     /* voting now: each open proposal, its yes share, when it ends; none open, the last result */
     var v = '<div class=sv-ph><h3>Voting now</h3>' + (P ? tag("q", String(live.length)) : '') + '</div>';
@@ -1439,6 +1505,14 @@
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
     if(act === "gfollow"){ govSend(t, { type: "atomone/v1/MsgDelegateGovernor", value: { delegator_address: window.__ADDR, governor_address: t.dataset.g } }); return; }
+    if(act === "greg"){ govForm(); return; }
+    if(act === "grclose"){ grClose(); return; }
+    if(act === "grsend"){
+      var gv = grVals(), gd = {}, gme = myGovRec();
+      Object.keys(gv).forEach(function(k){ if(gv[k]) gd[k] = gv[k]; });
+      govSend(t, { type: gme ? "atomone/v1/MsgEditGovernor" : "atomone/v1/MsgCreateGovernor", value: { address: window.__ADDR, description: gd } }, grClose);
+      return;
+    }
     if(act === "gstop"){ govSend(t, { type: "atomone/v1/MsgUndelegateGovernor", value: { delegator_address: window.__ADDR } }); return; }
     if(act === "bwin"){ BW = t.dataset.w === "10k" || t.dataset.w === "all" ? t.dataset.w : "100"; try{ localStorage.setItem("th_bw", BW); }catch(e){} drawAct(); return; }
     if(act === "awin"){ AW = t.dataset.w === "30d" || t.dataset.w === "all" ? t.dataset.w : "24h"; try{ localStorage.setItem("th_aw", AW); }catch(e){} drawAct(); return; }

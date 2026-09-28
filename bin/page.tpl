@@ -1515,7 +1515,7 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
    top edge), Inter at 600-800, solid gradient buttons, tinted tag pills, inset
    tracks. Every class here is prefixed wk- or scoped under #p-dele, so nothing
    the calculator names can reach in - and nothing here reaches out. */
-#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard{
+#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard{
   --wsolid:rgba(14,24,38,.97);
   
   --wblue:#3B9EFF;--wcyan:#62D9FF;--wgreen:#36D399;--wamber:#FFB155;--wburn:#FF7A45;--wgold:#F5C66B;
@@ -1771,7 +1771,7 @@ html[data-tab=dele] .calclab,html[data-tab=empty] .calclab,html[data-tab=connect
 :root{--void:#06060c;--edge:#232342;--edge2:#34345c;--ink:#e6e4f0;--ink2:#a5a3c4;--ink3:#6f6d94;--faint:#3a3a54;
 --hot:#ffb02e;--burn:#ff4d1f;--cold:#6f66c8;--lit:#fff8dc;--card:#0b0b16;--card2:#111124;--inset:#0a0a14;
 --blue:#6f66c8;--cyan:#2bc8bd;--green:#2ee06a;--amber:#ffb02e}
-#sv,.hdr-r,.brandbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
+#sv,.hdr-r,.brandbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
 --wt:#e6e4f0;--ws:#a5a3c4;--wf:#6f6d94;--wblue:#6f66c8;--wcyan:#2bc8bd;--wgreen:#2ee06a;--wamber:#ffb02e;--wburn:#ff4d1f;--wgold:#ffb02e;
 --wsans:"Helvetica Neue",Helvetica,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--wmono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
 body{background:var(--void);background-image:radial-gradient(130% 62% at 50% 0%,#16162e 0%,#0a0a16 42%,var(--void) 74%)}
@@ -2212,7 +2212,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 
 /* the wallet, lifted out of the dark: lighter grounds, brighter hairlines and
    type, so the figures read without leaning in */
-#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
+#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
 
 .wk-pane{background:linear-gradient(180deg,#10101f,#0d0d1b)}
 .wk-tbl2 td{border-bottom-color:#22223c}
@@ -4284,29 +4284,9 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 @media(min-width:901px) and (max-height:700px){#sv-over #sd-sky .se-earn .sd-fig>b:not(#z){font-size:26px}}
 @media(min-width:901px) and (max-height:640px){#sv-over #sd-sky .se-earn .sd-fig>b:not(#z){font-size:21px}}
 #sd-sky .se-amt{color:var(--sv-amber)}
-#sd-sky .se-rsl{display:block;margin-top:4px;font-size:11px;color:var(--ws)}
-#sd-sky .se-rsl b{color:var(--sv-green);font-weight:700}
-/* restake's lines at the foot of the year's box, apart from its figure, which stays level with the other boxes' */
 #sd-sky .se-earn .sd-fig{position:relative}
-/* all four boxes keep the same room at their foot for restake's lines, so their figures stay level and clear of it */
-#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:40px}
-@media(min-width:901px) and (max-height:1000px){#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:36px}}
-@media(min-width:901px) and (max-height:820px){#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:32px}}
-@media(min-width:901px) and (max-height:700px){#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:28px}}
 @media(min-width:901px) and (min-height:821px) and (max-height:1000px){#sv-over #sd-sky .se-earn .sd-fig>b:not(#z){font-size:30px}}
-@media(min-width:901px) and (max-height:600px){#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:27px}}
-@media(min-width:901px) and (max-height:640px){#sd-sky .se-rsx:not(#z){bottom:3px;line-height:1.12}#sd-sky .se-rsx .se-rsl:not(#z){font-size:9px}#sd-sky .se-rsx .se-rsl2:not(#z){font-size:8.5px;margin-top:0}
-  #sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:24px}#sv-over #sd-sky .se-earn .sd-fig>b:not(#z){font-size:19px}#sv-over #sd-sky .se-earn .sd-fig em:not(#z){padding-bottom:3px;margin-bottom:0}}
-#sd-sky .se-rsx{position:absolute;left:8px;right:8px;bottom:12px;text-align:center;pointer-events:none}
-#sd-sky .se-rsx .se-rsl:not(#z){margin:0}
-#sd-sky .se-rsx .se-rsl b{white-space:nowrap}
-#sd-sky .se-rsx .se-rsl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#sd-sky .se-rsx{line-height:1.3}#sd-sky .se-rsx .se-rsl2{display:block;margin-top:2px;font-size:10.5px;color:var(--wf)}
-@media(min-width:901px) and (max-width:1599px){#sd-sky .se-rsx .se-rsl{font-size:10px}#sd-sky .se-rsx .se-rsl2{font-size:9.5px}}
-@media(min-width:901px) and (max-height:1000px){#sd-sky .se-rsx{bottom:9px}}
-@media(min-width:901px) and (max-height:820px){#sd-sky .se-rsx{bottom:6px}}
-@media(min-width:901px) and (max-height:700px){#sd-sky .se-rsx{bottom:4px}#sd-sky .se-rsx .se-rsl{font-size:9.5px}}
-@media(min-width:901px) and (max-height:700px){#sd-sky .se-rsl{margin-top:1px;font-size:10px}}
+@media(min-width:901px) and (max-height:640px){#sv-over #sd-sky .se-earn .sd-fig>b:not(#z){font-size:19px}#sv-over #sd-sky .se-earn .sd-fig em:not(#z){padding-bottom:3px;margin-bottom:0}}
 /* Autopilot's panels: bands of their own - What it does cyan, What it doesn't crimson, Validators slate */
 #sv-auto #sd-ado{--bandf:#0d6d7a,#0f3f55 58%,#101830}
 #sv-auto #sd-ado>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#0d6d7a,#0f3f55 58%,#101830)}
@@ -4334,20 +4314,46 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 
 /* Easy and Pro: the strip as the panels under it, a touch more lit - a faint violet glow from the wallet's corner, a cool one
    from the far end */
-:is(#sd-wstrip,#p-dele #sd-mstrip).sd-strip:not(#z){border-color:#3a3a66;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 0 24px -12px rgba(185,176,255,.35);
+:is(#sd-wstrip,#p-dele #sd-mstrip,#sd-gstrip).sd-strip:not(#z){border-color:#3a3a66;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 0 24px -12px rgba(185,176,255,.35);
 background:radial-gradient(55% 160% at 0% 0%,rgba(185,176,255,.14),transparent 60%),radial-gradient(45% 140% at 100% 110%,rgba(43,200,189,.07),transparent 60%),linear-gradient(180deg,#15152e,#0d0d1c)}
-:is(#sd-wstrip,#sd-mstrip) .sd-idw:not(#z){background:none;box-shadow:none}
-:is(#sd-wstrip,#sd-mstrip) .sd-idw::before{display:none}
-:is(#sd-wstrip,#sd-mstrip) .sd-ro:not(#z){background:none;border-left-color:rgba(255,255,255,.1)}
-:is(#sd-wstrip,#sd-mstrip) .sd-ro em:not(#z){color:rgba(255,255,255,.78)}
+:is(#sd-wstrip,#sd-mstrip,#sd-gstrip) .sd-idw:not(#z){background:none;box-shadow:none}
+:is(#sd-wstrip,#sd-mstrip,#sd-gstrip) .sd-idw::before{display:none}
+:is(#sd-wstrip,#sd-mstrip,#sd-gstrip) .sd-ro:not(#z){background:none;border-left-color:rgba(255,255,255,.1)}
+:is(#sd-wstrip,#sd-mstrip,#sd-gstrip) .sd-ro em:not(#z){color:rgba(255,255,255,.78)}
 .sd-strip .sd-ro .sd-well:not(#z){border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);box-shadow:none}
+/* Govern: becoming a governor. The door sits at the right of the Governors head; the form is a txcard of its own */
+.sv-ph .gr-open{margin-left:auto;flex:0 0 auto}
+.gr-open .gr-sm{display:none}
+@media(max-width:900px){.gr-open .gr-lg{display:none}.gr-open .gr-sm{display:inline}}
+#grpop .grcard{width:min(520px,calc(100vw - 32px));max-height:92svh;overflow:auto}
+.grcard .gr-who{display:flex;flex-direction:column;gap:3px;padding:14px 22px 0}
+.grcard .gr-who em,.grcard .gr-k,.grcard .gr-need em{font:normal 600 8.5px var(--wmono);letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+.grcard .gr-who b{font:500 12px var(--wmono);color:var(--ws);overflow-wrap:anywhere}
+.grcard .gr-f{display:flex;flex-direction:column;gap:11px;padding:14px 22px 4px}
+.grcard .gr-l{display:flex;flex-direction:column;gap:5px}
+.grcard .gr-k{display:flex;align-items:baseline;gap:8px}
+.grcard .gr-k i{font-style:normal;color:#b9b0ff;letter-spacing:.12em}
+.grcard .gr-k small{margin-left:auto;font-size:8.5px;letter-spacing:.08em;color:var(--wf)}
+.grcard .gr-in{width:100%;box-sizing:border-box;padding:8px 10px;border-radius:6px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#0b0b18,#0e0e1d);
+  color:var(--wt);font:13px var(--wsans);outline:none;resize:vertical;transition:border-color .15s,box-shadow .15s}
+.grcard textarea.gr-in{min-height:64px;line-height:1.45}
+.grcard .gr-in::placeholder{color:var(--wf);opacity:.75}
+.grcard .gr-in:focus{border-color:#b9b0ff;box-shadow:0 0 0 3px rgba(185,176,255,.13)}
+.grcard .gr-in.bad,.grcard .gr-in.bad:focus{border-color:var(--wburn);background:rgba(255,77,31,.1);box-shadow:0 0 0 3px rgba(255,77,31,.2)}
+.grcard .gr-need{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 22px 0}
+.grcard .gr-need>div{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px;border-radius:8px;border:1px solid var(--wbd2);background:var(--wh);text-align:center}
+.grcard .gr-need b{font:700 18px var(--wsans);color:var(--wt)}
+.grcard .gr-need small{font-size:10.5px;color:var(--wf)}
+.grcard .gr-need>div.ok{border-color:rgba(46,224,106,.45)}.grcard .gr-need>div.ok b{color:var(--wgreen)}
+.grcard .gr-need>div.no{border-color:rgba(255,122,87,.5)}.grcard .gr-need>div.no b{color:#ff9b7a}
+.grcard .gr-note{margin:12px 22px 0;font-size:11.5px;line-height:1.5;color:var(--ws)}
+.grcard .txbtns{padding:16px 22px 20px}
 /* Outcome's content starts on Delegations' and Redelegate's line */
 @media(min-width:901px){#p-dele #wbody #wk-mv>.wk-ph+*{margin-top:10px!important}}
 /* ════ Easy, one dashboard: the three panels are one surface - no borders, frames or coloured bands between them;
    every title the same plain type with one quiet bar, every title tag the same neutral pill; what sits inside keeps its
    colours ════ */
 /* phones: restake's line wraps in the narrow year box instead of being cut */
-@media(max-width:900px){#sd-sky .se-rsx .se-rsl:not(#z){white-space:normal;text-wrap:balance}#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:60px}}
 @media(min-width:901px){html #sv-over .sd-wgrid.sd-wgrid:not(#z){grid-template-columns:max(calc((100% - 2px) * 0.262 + 2px),280px) minmax(0,1.35fr) minmax(0,1.15fr)!important}}
 html #sv-over .sd-wgrid:not(#z){gap:0;background:linear-gradient(180deg,#131329,#0c0c1a);border:1px solid var(--wbd2);border-radius:14px;box-shadow:inset 0 1px 0 #ffffff08;overflow:hidden}
 html #sv-over .sd-wgrid>.sd-col:not(#z){background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important}
@@ -5122,8 +5128,6 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
    width, the governors in the middle, what is being voted on at the right; bands and frames as Autopilot's ════ */
 @media(min-width:901px){#sv-mygov .sd-ggrid:not(#z){grid-template-columns:max(calc((100% - 2px) * 0.242424 + 2px),250px) minmax(0,1.6fr) minmax(0,1fr)}}
 #sv-mygov .sd-ggrid{min-height:0}
-.sd-idg:not(#z){background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,255,.13) 45px 46px,transparent 47px 70px,rgba(255,255,255,.09) 71px 72px,transparent 73px 98px,rgba(255,255,255,.06) 99px 100px,transparent 101px 128px,rgba(255,255,255,.035) 129px 130px,transparent 131px),
-  radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.32),transparent 58%),linear-gradient(140deg,#4a3aa8 0%,#2c2170 55%,#150f3b 100%)}
 #sv-mygov .sd-col>.sv-ph:not(#z){margin:-11px -14px 0;padding:5px 14px 6px;min-height:43px;box-sizing:border-box;flex-wrap:nowrap;border-radius:11px 11px 0 0;border-bottom:1px solid rgba(255,255,255,.08)}
 #sv-mygov .sd-col>.sv-ph h3{color:#fff!important;white-space:nowrap}
 #sv-mygov .sd-col>.sv-ph h3::before{background:rgba(255,255,255,.9)!important;box-shadow:none!important}

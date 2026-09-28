@@ -51,6 +51,14 @@ function msgBytes(m){
       strField(1, m.value.delegator_address), strField(2, m.value.governor_address)));
   if(m.type === "atomone/v1/MsgUndelegateGovernor")
     return any("/atomone.gov.v1.MsgUndelegateGovernor", strField(1, m.value.delegator_address));
+  /* becoming a governor, or editing one: {address(1), description(2){moniker(1), identity(2), website(3),
+     security_contact(4), details(5)}}; the amino value leaves empty fields out, as the chain does */
+  if(m.type === "atomone/v1/MsgCreateGovernor" || m.type === "atomone/v1/MsgEditGovernor"){
+    var d = m.value.description || {};
+    return any(m.type === "atomone/v1/MsgCreateGovernor" ? "/atomone.gov.v1.MsgCreateGovernor" : "/atomone.gov.v1.MsgEditGovernor", cat(
+      strField(1, m.value.address), bytesField(2, cat(strField(1, d.moniker), strField(2, d.identity), strField(3, d.website),
+      strField(4, d.security_contact), strField(5, d.details)))));
+  }
   /* ── authz: a grant of restricted staking authority, its revocation, and execution ── */
   if(m.type === "cosmos-sdk/MsgGrant")
     return any("/cosmos.authz.v1beta1.MsgGrant", cat(
