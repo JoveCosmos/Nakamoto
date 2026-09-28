@@ -4310,6 +4310,9 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 /* Stake more and Claim rewards: Move your stake's door, side by side, in its green */
 #sd-sky .se-doors{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:0 0 auto}
 #sd-sky .se-doors .sd-go{width:100%;margin:0}
+/* Claim rewards as it first was: outlined in amber */
+#sd-sky .se-doors .se-cl:not(#z){background:rgba(255,176,46,.1);border:1px solid rgba(255,176,46,.6);color:#ffd58a;box-shadow:none}
+#sd-sky .se-doors .se-cl:hover{background:rgba(255,176,46,.18)}
 #sd-sky .se-doors .sd-go:focus-visible{outline:2px solid var(--sv-green);outline-offset:2px}
 @media(min-width:901px) and (max-height:700px){#sd-sky .se-rsl{margin-top:1px;font-size:10px}}
 /* Autopilot's panels: bands of their own - What it does cyan, What it doesn't crimson, Validators slate */
