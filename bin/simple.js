@@ -414,7 +414,7 @@
           fig("Send", '<span class=ap-no>Never</span>', "nor spend your ATONE", R) +
           fig("Unstake", '<span class=ap-no>Never</span>', "your stake stays staked", R) +
           fig("Custody", '<span class=ap-no>Never</span>', "your ATONE stays in your wallet", R) +
-          fig("GATA's share", share ? at.split_pct + '%' : '<span class=ap-ok>0%</span>', share ? "of the rewards it restakes" : "free; GATA funds your transactions", A2) +
+          fig("GATA's share", share ? at.split_pct + '%' : '<span class=ap-ok>0%</span>', share ? "of the rewards it restakes" : "GATA funds your transactions", A2) +
         '</div>');
       /* the validators only once it is active: until then, the way to switch it on */
       var go = !pos ? '<button class="sv-btn go sd-go ap-go" type=button data-shell-connect>Connect a wallet</button>'
