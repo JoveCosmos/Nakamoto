@@ -202,19 +202,23 @@
     var sh = function(v){ var p = tot ? v / tot * 100 : 0; return p > 0 && p < 0.1 ? "<0.1" : p.toFixed(p > 0 && p < 10 ? 1 : 0); };
     var sums = [["Largest third", amt[0], 0], ["Middle third", amt[1], 1], ["Smallest third", amt[2], 2]];
     if(out > 0) sums.push(["Inactive", out, 3]);
-    /* a stacked tower: one column, a segment per third sized by its share (largest third on top), each
-       joined by a leader to its name, share and ATONE; an empty third keeps a sliver so its label has a
-       place. The labels share the tower's height evenly, their leaders angling to their segments */
-    var MIN = 3, n2 = sums.length, fl = sums.map(function(q){ return tot ? q[1] / tot * 100 : 0; });
-    var free = 100 - MIN * n2, hs = fl.map(function(f){ return MIN + f * free / 100; }), y = 0, mids = [];
-    var segs = hs.map(function(h, k){ var top = y; y += h; mids.push(top + h / 2);
-      return '<i class="fp-seg b' + sums[k][2] + '" style="height:' + h.toFixed(2) + '%"></i>'; }).join("");
-    var labs = sums.map(function(q, k){ var at = (k + .5) / n2 * 100;
-      return '<div class="fp-lab b' + q[2] + '" style="top:' + at.toFixed(2) + '%"><em>' + q[0] + '</em><b class=fpt' + q[2] + '>' + sh(q[1]) + '%</b><small>' +
-        (q[1] >= 1e12 ? big(q[1]) : fmt(q[1])) + ' ATONE</small></div>'; }).join("");
-    var lead = '<svg class=fp-lead viewBox="0 0 100 100" preserveAspectRatio=none aria-hidden=true>' + sums.map(function(q, k){
-      return '<path class=b' + q[2] + ' d="M0 ' + mids[k].toFixed(2) + ' L40 ' + mids[k].toFixed(2) + ' L70 ' + ((k + .5) / n2 * 100).toFixed(2) + ' L100 ' + ((k + .5) / n2 * 100).toFixed(2) + '"/>'; }).join("") + '</svg>';
-    return head + '<div class=fp-tw><div class=fp-col>' + segs + '</div>' + lead + '<div class=fp-labs>' + labs + '</div></div>';
+    /* a barcode of the set: every validator a thin bar in rank order (largest first); the ones holding
+       the stake stand tall and bright, the rest short and dim; brackets under it mark the thirds with
+       their shares. Each bar opens its validator's card */
+    var hi = 0; for(i = 0; i < n; i++) if(x[i] > hi) hi = x[i];
+    var held = 0; for(i = 0; i < n; i++) if(x[i] > 0) held++;
+    var bars = "";
+    for(i = 0; i < n; i++){
+      var h = x[i] > 0 && hi ? (mine ? 34 + 66 * Math.sqrt(x[i] / hi) : 10 + 90 * Math.sqrt(x[i] / hi)) : 9;
+      bars += '<i class="fp-b b' + band(i) + (x[i] > 0 ? ' on' : '') + '" data-v="' + esc(V[i][3]) + '" style="height:' + h.toFixed(1) + '%" title="#' + (i + 1) + ' ' + esc(V[i][0]) +
+        (x[i] > 0 ? ', ' + fmt(x[i]) + ' ATONE' : '') + '"></i>'; }
+    var cut1 = Math.ceil(n / 3), cut2 = Math.ceil(2 * n / 3);
+    var span = [cut1, cut2 - cut1, n - cut2];
+    var br = sums.slice(0, 3).map(function(q, k){ return '<div class="fp-k b' + k + '" style="flex:' + span[k] + ' 1 0"><em>' + q[0] + '</em><b class=fpt' + k + '>' + sh(q[1]) + '%</b><small>' +
+      (q[1] >= 1e12 ? big(q[1]) : fmt(q[1])) + ' ATONE</small></div>'; }).join("");
+    return head.replace('</h3></div>', '</h3>' + (mine ? tag("q", "on " + held + " of " + n + " validators") : tag("q", n + " validators")) + '</div>') +
+      '<div class=fp-bc>' + bars + '</div><div class=fp-ax><span>#1 largest</span><span>#' + n + ' smallest</span></div>' +
+      '<div class=fp-br>' + br + '</div>' + (out > 0 ? '<div class=sd-off>' + fmt(out) + ' ATONE on inactive validators earns nothing</div>' : '');
   }
 
   function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }

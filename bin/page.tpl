@@ -4106,20 +4106,20 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 #sd-move.fill{justify-content:center;align-items:center}
 /* Where your stake sits shows its thirds as Move your stake shows its figures: cards */
 #sd-list .sd-mv .sd-fig>b{font-size:24px}
-/* the stacked tower: the column, the leaders, the labels, all one height */
-.fp-tw{position:relative;flex:1 1 auto;min-height:150px;display:grid;grid-template-columns:54px 34px minmax(0,1fr);margin-top:4px}
-.fp-col{display:flex;flex-direction:column;gap:2px;border-radius:8px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
-.fp-seg{display:block;min-height:3px;--c:#ff6a3d;background:linear-gradient(90deg,color-mix(in srgb,var(--c) 80%,#fff 20%),var(--c));box-shadow:0 0 14px -2px var(--c)}
-.fp-seg.b1{--c:#ffb02e}.fp-seg.b2{--c:#2ee06a}.fp-seg.b3{--c:#6f6d94}
-.fp-lead{width:100%;height:100%;overflow:visible}
-.fp-lead path{fill:none;stroke-width:1.2;vector-effect:non-scaling-stroke;stroke:#ff6a3d;opacity:.8}
-.fp-lead path.b1{stroke:#ffb02e}.fp-lead path.b2{stroke:#2ee06a}.fp-lead path.b3{stroke:#6f6d94}
-.fp-labs{position:relative}
-.fp-lab{position:absolute;left:6px;right:0;transform:translateY(-50%);display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;column-gap:8px}
-.fp-lab em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fp-lab b{font-size:20px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;grid-row:span 2;align-self:center}
-.fp-lab small{font-size:11px;color:var(--ws);white-space:nowrap}
-@media(max-width:620px){.fp-tw{flex:0 0 auto;height:220px}}
+/* the barcode: 100 bars in rank order, the held ones tall and bright, the thirds bracketed under it */
+.fp-bc{flex:1 1 auto;min-height:110px;display:flex;align-items:flex-end;gap:1px;margin-top:6px;padding-bottom:1px;border-bottom:1px solid var(--wbd2)}
+.fp-b{flex:1 1 0;min-width:0;border-radius:1px 1px 0 0;cursor:pointer;--c:#ff6a3d;background:color-mix(in srgb,var(--c) 30%,transparent)}
+.fp-b.b1{--c:#ffb02e}.fp-b.b2{--c:#2ee06a}
+.fp-b.on{background:linear-gradient(180deg,color-mix(in srgb,var(--c) 70%,#fff 30%),var(--c));box-shadow:0 0 8px -1px var(--c)}
+.fp-b:hover{background:var(--wt)}
+.fp-ax{display:flex;justify-content:space-between;margin-top:4px;font-family:var(--wmono);font-size:8.5px;letter-spacing:.08em;color:var(--wf)}
+.fp-br{display:flex;gap:4px;margin-top:8px}
+.fp-k{min-width:0;display:flex;flex-direction:column;gap:1px;padding-top:6px;border-top:2px solid #ff6a3d}
+.fp-k.b1{border-color:#ffb02e}.fp-k.b2{border-color:#2ee06a}
+.fp-k em{font-style:normal;font-family:var(--wmono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fp-k b{font-size:18px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.fp-k small{font-size:10px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:620px){.fp-bc{flex:0 0 auto;height:150px}}
 .fpt0{color:#ff7a57}.fpt1{color:#ffc453}.fpt2{color:#5cf08e}.fpt3{color:var(--wf)}
 
 .sd-mvh{flex-wrap:nowrap;container-type:inline-size;min-height:27px}
