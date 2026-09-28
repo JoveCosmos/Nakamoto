@@ -634,6 +634,11 @@
   html[data-theme=light]:not([data-mono]) .sd-ida{color:var(--ink);background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sd-ida::after{background:var(--accent);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-ida h3{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .sd-ida .sd-wch i.st{color:var(--accent);border-color:var(--accent);background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sd-ida .sd-wch i.st.on{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sd-ida .sd-wch button{color:#FFFFFF;border:1px solid var(--accent);background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sd-ida .sd-wch button:hover{background:var(--accent);border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sd-ida .sd-wch button:focus-visible{outline:2px solid var(--accent)}
   html[data-theme=light]:not([data-mono]) .sd-ida .sv-tag{color:var(--accent);border-color:var(--accent);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sd-ida .sv-tag.g{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .sd-col{background:var(--surface-2);box-shadow:none}
@@ -662,11 +667,10 @@
   html[data-theme=light]:not([data-mono]) .sd-fig::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-fig::after{background:var(--rc)}
   html[data-theme=light]:not([data-mono]) .sd-ok{border:1px solid var(--accent);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .se-card.se-rc2::before{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .se-rc2{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .se-rsh2 h4::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .se-rss{border:1px solid var(--accent);background:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) button.se-rss:hover{border-color:var(--accent);background:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) button.se-rss:focus-visible{outline:2px solid var(--accent)}
-  html[data-theme=light]:not([data-mono]) button.se-rss svg{fill:none;stroke:var(--accent)}
   html[data-theme=light]:not([data-mono]) .se-rson{border:1px solid var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .se-rsch{border:1px solid var(--accent);background:transparent;color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-btn.go.sd-go:disabled{background:var(--surface-2);box-shadow:none}
@@ -1013,6 +1017,9 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sd-mstrip{--sv-amber:var(--warn);--sv-green:var(--accent);--sv-violet:var(--accent);--sv-teal:var(--accent);--sv-pho:#1f6f9a}
   html[data-theme=light]:not([data-mono]) #p-dele #sd-mstrip{background-color:rgb(255,253,248);border-color:rgb(227,222,211)}
 
-  html[data-theme=light]:not([data-mono]) button.se-rss svg{stroke:#0f7a72}
   html[data-theme=light]:not([data-mono]) #sv .sd-ida .sv-tag{color:#dffcf9;border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.12)}html[data-theme=light]:not([data-mono]) #sv .sd-ida .sv-tag.g{color:#8ff0b0;border-color:rgba(143,240,176,.55);background:rgba(46,224,106,.16)}
+
+  html[data-theme=light]:not([data-mono]) #sd-sky .se-rc2{background:linear-gradient(90deg,rgba(15,122,114,.1),#fbf9f3 70%)}
+  html[data-theme=light]:not([data-mono]) #sv .sd-ida .sd-wch i.st{color:#dffcf9;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.1)}
+  html[data-theme=light]:not([data-mono]) #sv .sd-ida .sd-wch button{color:#1b1440;border-color:#d6d0ff;background:#d6d0ff}
 

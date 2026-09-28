@@ -168,10 +168,10 @@
        restaking, side by side, and the door (none without a wallet: it names nothing to act on) */
     /* the APR the compounded year amounts to, against today's: what restaking adds to the rate */
     var capr = Math.pow(1 + rate / 12, 12) - 1, dapr = (capr - rate) * 100;
-    var offer = rate > 0 && !on ? '<div class=se-rsw><div class=se-rsh2><h4>Enable restake</h4>' + tag("g", "+" + one(more / 1e6) + " a year") + '</div>' +
-        /* the band is the door: it opens Autopilot's setup with restake on (no wallet: just the band) */
-        (ex ? '<div class=se-rss>' : '<button type=button class="se-rss go" data-act=restake title="Enable restake">') + '<span><b>+' + dapr.toFixed(1) + '% APR</b>, it autocompounds your rewards</span>' +
-        (ex ? '</div>' : '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>') + '</div>' : '';
+    /* the offer: the title with the APR restaking adds in its tag, and a card like the year's - what it adds a
+       year, in teal (not a door: restake is set up in Autopilot) */
+    var offer = rate > 0 && !on ? '<div class=se-rsw><div class=se-rsh2><h4>Enable restake</h4>' + tag("g", "+" + dapr.toFixed(1) + "% APR") + '</div>' +
+        '<div class="se-card se-rc2"><em>A year, more</em><b><span class=se-rsv>+' + one(more / 1e6) + '</span><i>ATONE</i></b><small>it autocompounds your rewards</small></div></div>' : '';
     var door = on ? '<div class=se-rson>Restake is on: your rewards compound on their own.<button type=button class=se-rsch data-act=autopilot>Change</button></div>' : '';
     /* the day, week and month first, the year under them */
     if(ex) return '<div class=se-ex>' + steps + year + offer + '</div>';
@@ -352,12 +352,12 @@
     var sgn = function(d){ return (d >= 0 ? "+" : "−") + Math.abs(d * 100).toFixed(1) + "%"; }, sgnA = function(u){ return (u >= 0 ? "+" : "−") + one(Math.abs(u) / 1e6); };
     /* no wallet: no door here - the bar's Connect is the one (as the Stake view's wallet card) */
     var door = !pos ? ''
-      : !pos.rows.length ? '<button class="sv-btn pri" type=button data-act=stake>Stake ATONE</button>'
-      : '<button class="sv-btn ' + (g ? "" : "vio") + '" type=button data-act=autopilot>' + (g ? "Manage" : "Set up") + '</button>';
+      : !pos.rows.length ? '<button type=button data-act=stake>Stake ATONE</button>'
+      : '<button type=button data-act=autopilot>' + (g ? "Manage" : "Set up") + '</button>';
     /* the strip as the Stake view's: the lead card (name and state on one line, the door under them), then five
        boxes - the figure in its well, the unit beside it, no captions and no gauges */
     put("sd-astrip",
-      '<div class="sd-id sd-ida"><div class=sd-top><h3>Autopilot</h3>' + (g ? tag("g", "Active") : tag("q", "Inactive")) + '</div>' + door + '</div>' +
+      '<div class="sd-id sd-ida"><div class=sd-top><h3>Autopilot</h3></div><div class=sd-wmeta><span class=sd-wch><i class="st' + (g ? ' on' : '') + '">' + (g ? "Active" : "Inactive") + '</i>' + door + '</span></div></div>' +
       (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "\u2014", "", null, "var(--sv-green)", "", false, rec ? "APR" : "")
          : ro("Strategy", "\u2014", "", null, "var(--sv-violet)")) +
       ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "\u2014", "", null, "var(--sv-violet)", "", false, g && a.max_tokens ? "ATONE" : "") +
