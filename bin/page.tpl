@@ -4107,7 +4107,7 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 /* Where your stake sits shows its thirds as Move your stake shows its figures: cards */
 #sd-list .sd-mv .sd-fig>b{font-size:24px}
 /* the barcode: 100 bars in rank order, the held ones tall and bright, the thirds bracketed under it */
-.fp-bc{flex:1 1 auto;min-height:110px;display:flex;align-items:flex-end;gap:1px;margin-top:6px;padding-bottom:1px;border-bottom:1px solid var(--wbd2)}
+.fp-bc{flex:1 1 auto;min-height:48px;display:flex;align-items:flex-end;gap:1px;margin-top:6px;padding-bottom:1px;border-bottom:1px solid var(--wbd2)}
 .fp-b{flex:1 1 0;min-width:0;border-radius:1px 1px 0 0;cursor:pointer;--c:#ff6a3d;background:color-mix(in srgb,var(--c) 30%,transparent)}
 .fp-b.b1{--c:#ffb02e}.fp-b.b2{--c:#2ee06a}
 .fp-b.on{background:linear-gradient(180deg,color-mix(in srgb,var(--c) 70%,#fff 30%),var(--c));box-shadow:0 0 8px -1px var(--c)}
@@ -4120,6 +4120,7 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .fp-k b{font-size:18px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .fp-k small{font-size:10px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:620px){.fp-bc{flex:0 0 auto;height:150px}}
+@media(min-width:901px) and (max-height:700px){#sd-list .fp-br{margin-top:5px}#sd-list .fp-k{padding-top:4px}#sd-list .fp-k b{font-size:15px}}
 .fpt0{color:#ff7a57}.fpt1{color:#ffc453}.fpt2{color:#5cf08e}.fpt3{color:var(--wf)}
 
 .sd-mvh{flex-wrap:nowrap;container-type:inline-size;min-height:27px}
