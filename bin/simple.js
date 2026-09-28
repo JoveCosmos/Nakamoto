@@ -369,7 +369,8 @@
         door + '</span></div></div>' +
       (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "\u2014", "", null, "var(--sv-green)", "", false, rec ? "APR" : "")
          : ro("Since start", "\u2014", "", null, "var(--sv-green)")) +
-      ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "\u2014", "", null, "var(--sv-violet)", "", false, g && a.max_tokens ? "ATONE" : "") +
+      /* the stake it manages: the cap when the grant sets one, otherwise all the reader stakes */
+      ro("Stake", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : pos && pos.rows.length ? fmt(pos.total) : "\u2014") : "\u2014", "", null, "var(--sv-violet)", "", false, g && (a.max_tokens || (pos && pos.rows.length)) ? "ATONE" : "") +
       ro("Runs until", g ? (until || "Until revoked") : "\u2014", "", null, "var(--sv-violet)") +
       ro("Moves made", g ? String(moves) : "\u2014", "", null, "var(--sv-teal)") +
       ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)"));
@@ -384,10 +385,6 @@
     }
     if(g) put("sd-ado",
       '<div class=sv-ph><h3>Autopilot is working</h3></div>' +
-      /* the keeper proposes, an admin acts: until its first move, say when it starts */
-      (!moves ? '<div class=ap-48>Autopilot activates within <b>48 hours</b> of your grant.</div>' : '') +
-      '<div class=sd-ok>Autopilot is on for your stake' + (since ? ' since <b class=d>' + since + '</b>' : '') + (rec ? ', earning <b>' + sgn(rec.rate - rec.start.rate) + ' APR</b> (' + sgnA((rec.rate - rec.start.rate) * rec.staked) +
-        ' ATONE a year) since Autopilot started, <b>' + sgn(rec.rate - rec.m3.rate) + '</b> over the last 3 months.' : '.') + '</div>' +
       '<div class="sd-figs two">' +
         fig("Since start", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.start.rate) + '</span><em class=u>APR</em>' : "—",
             rec ? sgnA((rec.rate - rec.start.rate) * rec.staked) + " ATONE a year" : "from its first check", "var(--sv-green)") +
