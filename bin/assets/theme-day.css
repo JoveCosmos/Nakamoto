@@ -211,6 +211,27 @@
     html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mine .wk-t1 h3::before{background:var(--amber-bar);box-shadow:none}
     html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-plan .wk-t2 h3::before{background:var(--accent);box-shadow:none}
     html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mv .wk-t3 h3::before{background:var(--accent);box-shadow:none}
+    html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph,html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mine .wk-t1,html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-plan>.wk-ph,html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mv>.wk-ph{border-bottom:1px solid var(--surface-2)}
+    html[data-theme=light]:not([data-mono]) :is(#sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mine .wk-t1,#p-dele #wbody #wk-plan>.wk-ph,#p-dele #wbody #wk-mv>.wk-ph) h3{color:var(--ink)!important}
+    html[data-theme=light]:not([data-mono]) :is(#sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mine .wk-t1,#p-dele #wbody #wk-plan>.wk-ph,#p-dele #wbody #wk-mv>.wk-ph) h3::before{background:var(--accent)!important;box-shadow:none!important}
+    html[data-theme=light]:not([data-mono]) #sd-move .sd-mvh .sd-mvn{color:var(--ink)}
+    html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.q{color:var(--ink);border-color:var(--accent);background:var(--surface-2)}
+    html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-hero>.se-card{background:var(--warn-bg)}
+    html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:var(--danger);border-color:var(--danger-bar);background:var(--danger-bar)}
+    html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:var(--ink);border-color:var(--accent);background:var(--surface-2)}
+    html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag{color:var(--ink);border-color:var(--accent);background:var(--surface)}
+    html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag.g{color:var(--accent);border-color:var(--accent);background:var(--surface)}
+    html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:var(--danger);border-color:var(--danger-bar);background:var(--danger-bar)}
+    html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:var(--ink);border-color:var(--accent);background:var(--surface)}
+    html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2{border-bottom:1px solid var(--surface-2);background:var(--accent)}
+    html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2 h4{color:var(--ink)}
+    html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2 h4::before{background:var(--accent);box-shadow:none}
+    html[data-theme=light]:not([data-mono]) #sv-over #sd-list>.sv-ph{background:var(--accent)}
+    html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph{background:var(--amber-bar)}
+    html[data-theme=light]:not([data-mono]) #sv-over #sd-move>.sv-ph{background:var(--accent)}
+    html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mine .wk-t1{background:var(--danger-bar)}
+    html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-plan>.wk-ph{background:var(--accent)}
+    html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mv>.wk-ph{background:var(--accent)}
   }
   html[data-theme=light]:not([data-mono]) .wk-addr::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-ib{background:var(--surface-2)}
@@ -661,6 +682,11 @@
   html[data-theme=light]:not([data-mono]) .sd-m.mix{background:none}
   html[data-theme=light]:not([data-mono]) .sd-m.mix s{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-m.apr u{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-strip:not(#z){background:var(--accent);border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sd-strip:not(#z):has(.sd-ida){background:var(--accent);border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #p-dele #sd-mstrip.sd-strip{background:var(--accent);border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro{background:none}
+  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro em{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .sd-wx{border-left:1px solid var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sd-strip .sd-well>.sd-m{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sd-fig{background:var(--surface-2)}
@@ -673,6 +699,12 @@
   html[data-theme=light]:not([data-mono]) .se-rss{border:1px solid var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .se-rson{border:1px solid var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .se-rsch{border:1px solid var(--accent);background:transparent;color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-card.se-rc2{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-card.se-rc2::before{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2 h4::before{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .se-rsgo{border:1px solid var(--accent);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .se-rsgo svg{fill:none;stroke:currentColor}
+  html[data-theme=light]:not([data-mono]) .se-rsgo:hover{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .sv-btn.go.sd-go:disabled{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .fp-b{--c:var(--danger)}
   html[data-theme=light]:not([data-mono]) .fp-b.b1{--c:var(--warn)}
@@ -1012,14 +1044,52 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .netsw a[aria-current=page]{color:#0b5a53;background:#fff;box-shadow:0 1px 2px rgba(60,50,20,.2),inset 0 0 0 1px rgba(15,122,114,.35)}
   html[data-theme=light]:not([data-mono]) .netsw a#nettest[aria-current=page]{color:#8a5200;background:#fff;box-shadow:0 1px 2px rgba(60,50,20,.2),inset 0 0 0 1px rgba(200,120,0,.4)}
   html[data-theme=light]:not([data-mono]) .se-rss{border-color:rgba(15,122,114,.35);background:linear-gradient(90deg,rgba(15,122,114,.12),rgba(15,122,114,.04));color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .se-rsh2 h4::before{background:#0f7a72;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .se-rsh2 h4::before{background:var(--sv-green);box-shadow:none}
   /* Pro's wallet strip takes the Easy view's day tokens, so the two are identical */
   html[data-theme=light]:not([data-mono]) #sd-mstrip{--sv-amber:var(--warn);--sv-green:var(--accent);--sv-violet:var(--accent);--sv-teal:var(--accent);--sv-pho:#1f6f9a}
   html[data-theme=light]:not([data-mono]) #p-dele #sd-mstrip{background-color:rgb(255,253,248);border-color:rgb(227,222,211)}
 
   html[data-theme=light]:not([data-mono]) #sv .sd-ida .sv-tag{color:#dffcf9;border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.12)}html[data-theme=light]:not([data-mono]) #sv .sd-ida .sv-tag.g{color:#8ff0b0;border-color:rgba(143,240,176,.55);background:rgba(46,224,106,.16)}
 
-  html[data-theme=light]:not([data-mono]) #sd-sky .se-rc2{background:linear-gradient(90deg,rgba(15,122,114,.1),#fbf9f3 70%)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-card.se-rc2{background:linear-gradient(90deg,rgba(22,115,58,.1),#fbf9f3 70%)}html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-card.se-rc2::before{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .se-rsgo{border-color:rgba(22,115,58,.45);background:rgba(22,115,58,.08)}html[data-theme=light]:not([data-mono]) .se-rsgo:hover{background:rgba(22,115,58,.16)}
   html[data-theme=light]:not([data-mono]) #sv .sd-ida .sd-wch i.st{color:#dffcf9;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.1)}
   html[data-theme=light]:not([data-mono]) #sv .sd-ida .sd-wch button{color:#1b1440;border-color:#d6d0ff;background:#d6d0ff}
+  /* the title bands keep their fills in day, the titles white */
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-list>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#0f6b67,#123a52 58%,#141633)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#8a5a12,#4a2f12 58%,#1f1630)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-move>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#13603b,#0d3f2d 58%,#0f1f24)}
+  html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mine .wk-t1{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#7a3322,#44201a 58%,#1c1228)}
+  html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-plan>.wk-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#0e5a5a,#12394a 58%,#141633)}
+  html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mv>.wk-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#4130a0,#271c6c 58%,#150f3b)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mine .wk-t1,#p-dele #wbody #wk-plan>.wk-ph,#p-dele #wbody #wk-mv>.wk-ph) h3{color:#fff!important}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mine .wk-t1,#p-dele #wbody #wk-plan>.wk-ph,#p-dele #wbody #wk-mv>.wk-ph) h3::before{background:rgba(255,255,255,.9)!important;box-shadow:none!important}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag{color:#fff;border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14)}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.g{color:#b6f5cb;border-color:rgba(143,240,176,.55);background:rgba(46,224,106,.18)}
+  html[data-theme=light]:not([data-mono]) #sd-move .sd-mvh .sd-mvn,html[data-theme=light]:not([data-mono]) #p-dele #wk-plan>.wk-ph #dago{color:rgba(255,255,255,.72)}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.q{color:#fff;border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14)}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:#ffe1d8;border-color:rgba(255,160,130,.7);background:rgba(200,50,20,.45)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-hero>.se-card{background:linear-gradient(90deg,rgba(200,120,0,.1),#fbf9f3 70%)}
+  /* the strip's one fill and its boxes keep their night face in day */
+  html[data-theme=light]:not([data-mono]) .sd-strip:not(#z){background:radial-gradient(60% 140% at 30% 0%,rgba(255,255,255,.14),transparent 70%),linear-gradient(100deg,#6a5ad6 0%,#5646bd 45%,#43349e 100%);border-color:rgba(160,150,255,.35)}
+  html[data-theme=light]:not([data-mono]) .sd-strip:not(#z):has(.sd-ida){background:radial-gradient(60% 140% at 30% 0%,rgba(255,255,255,.14),transparent 70%),linear-gradient(100deg,#23978f 0%,#236f9c 50%,#2f4596 100%);border-color:rgba(143,245,236,.35)}
+  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro{--sv-amber:#ffb02e;--sv-green:#2ee06a;--sv-violet:#b9b0ff;--sv-teal:#2bc8bd;--sv-pho:#7fd8ff;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4;--wbd:#232342;color:#f0eef8;background:none;border-left:0}
+  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro em{color:rgba(255,255,255,.8)}
+  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro .sd-well{border-color:rgba(0,0,0,.45);
+    background:radial-gradient(120% 160% at 0% 50%,color-mix(in srgb,var(--rc) 13%,transparent),transparent 62%),linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.2));
+    box-shadow:inset 0 2px 6px rgba(0,0,0,.6),inset 0 -1px 0 rgba(255,255,255,.05),0 1px 0 rgba(255,255,255,.05)}
+  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro .sd-well>.sd-m:not(.apr){background:rgba(255,255,255,.12)}
+  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro .sd-well>b{color:#f0eef8}
+  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro .sv-pho{color:#7fd8ff}
+  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro .sd-well>i.u{color:#8f8db4}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:#fff;border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14)}
+  /* tags on a fill and the Enable restake band keep their night face in day */
+  html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.34)}
+  html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag.g{color:#c9ffdb;border-color:rgba(143,240,176,.62);background:rgba(4,30,14,.42)}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:#ffe4dc;border-color:rgba(255,150,120,.7);background:rgba(110,18,0,.55)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.34)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2{border-color:transparent;background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#13603b,#0d3f2d 58%,#0f1f24)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2 h4{color:#fff}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2 h4::before{background:rgba(255,255,255,.9)}
+  html[data-theme=light]:not([data-mono]) #p-dele #sd-mstrip.sd-strip{background:radial-gradient(60% 140% at 30% 0%,rgba(255,255,255,.14),transparent 70%),linear-gradient(100deg,#6a5ad6 0%,#5646bd 45%,#43349e 100%);border-color:rgba(160,150,255,.35)}
 

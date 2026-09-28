@@ -1541,6 +1541,65 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
   /* every title on one 32px line, Easy's and Pro's alike, so the six stand at one height */
   #p-dele #wbody .wk-pane>.wk-ph h3,#p-dele #wbody #wk-mine .wk-t1 h3,#sv-over .sd-col>.sv-ph h3,#sv-auto .sd-col>.sv-ph h3{line-height:32px}
   #sv-over .sd-col>.sv-ph,#sv-auto .sd-col>.sv-ph{min-height:32px}
+  /* Stake (Easy and Pro): every panel's title row a filled band across the panel's top - the wallet card's build
+     (a light from the top left, rings from the right), each panel its own colour; the content keeps its line */
+  #sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mine .wk-t1,#p-dele #wbody #wk-plan>.wk-ph,#p-dele #wbody #wk-mv>.wk-ph{margin:-11px -14px 0!important;padding:5px 14px 6px!important;min-height:43px!important;height:auto!important;max-height:none!important;box-sizing:border-box;border-radius:11px 11px 0 0;border-bottom:1px solid rgba(255,255,255,.08)}
+  :is(#sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mine .wk-t1,#p-dele #wbody #wk-plan>.wk-ph,#p-dele #wbody #wk-mv>.wk-ph) h3{color:#fff!important}
+  :is(#sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mine .wk-t1,#p-dele #wbody #wk-plan>.wk-ph,#p-dele #wbody #wk-mv>.wk-ph) h3::before{background:rgba(255,255,255,.9)!important;box-shadow:0 0 10px -1px rgba(255,255,255,.7)!important}
+  #sd-move .sd-mvh .sd-mvn{color:rgba(255,255,255,.72)}
+  /* the content under every band starts on one line (8px under it) */
+  #sv-over #sd-list .fp-bc{margin-top:0}
+/* the rank axis stands above the bars, the barcode under it */
+#sv-over #sd-list .fp-ax{margin:0 0 5px}
+/* a band is one line: the tag never drops under the title */
+#sv-over .sd-col>.sv-ph{flex-wrap:nowrap}#sv-over .sd-col>.sv-ph h3{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#sv-over .sd-col>.sv-ph .sv-tag{flex:0 0 auto}
+#sv-over .sd-col>.sv-ph{gap:8px}#sv-over .sd-col>.sv-ph .sv-tag{padding:4px 7px;letter-spacing:.06em}
+/* narrower windows: every panel title a step smaller, Easy, Pro and Autopilot alike, so a title and its tag share the band */
+@media(min-width:901px) and (max-width:1599px){:is(#sv-over .sd-col>.sv-ph,#sv-auto .sd-col>.sv-ph,#p-dele #wbody #wk-mine .wk-t1,#p-dele #wbody #wk-plan>.wk-ph,#p-dele #wbody #wk-mv>.wk-ph) h3{font-size:14px!important}}
+@media(min-width:901px) and (max-width:1299px){:is(#sv-over .sd-col>.sv-ph,#sv-auto .sd-col>.sv-ph,#p-dele #wbody #wk-mine .wk-t1,#p-dele #wbody #wk-plan>.wk-ph,#p-dele #wbody #wk-mv>.wk-ph) h3{font-size:13px!important}#sv-over .sd-col>.sv-ph{gap:6px}#sv-over .sd-col>.sv-ph .sv-tag{padding:4px 6px;letter-spacing:0}}
+#sv-over .sd-col>.sv-ph .sv-tag.q{color:#fff;border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14)}
+/* What your stake earns: its figures and their bars in the band's amber; restake's own figures stay green */
+#sv-over #sd-sky{--se-rs:var(--sv-green)}
+#sv-over #sd-sky :is(.se-mid,.se-ex)>:is(.se-row,.se-hero){--sv-green:var(--sv-amber)}
+#sv-over #sd-sky .se-rsm{color:var(--se-rs)}
+#sv-over #sd-sky .se-hero>.se-card{background:linear-gradient(90deg,rgba(255,176,46,.09),rgba(255,255,255,.012) 70%)}
+/* stake on inactive validators: a red tag in What your stake earns' title row */
+#sv-over .sd-col>.sv-ph .sv-tag.se-off{color:#ffd9cf;border-color:rgba(255,140,110,.65);background:rgba(255,77,31,.32);font-weight:600;white-space:nowrap}
+/* the band tags, a size smaller: one height in all three panels, the moves count a tag like the rest */
+#sv-over .sd-col>.sv-ph .sv-tag{padding:2px 7px;font-size:10px;line-height:1.35;gap:4px}
+#sv-over .sd-col>.sv-ph .sv-tag.q{font-size:8px;letter-spacing:.06em}
+#sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{margin-left:auto;min-width:0;color:#fff;border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14);display:block;overflow:hidden;text-overflow:ellipsis}
+/* tags on a fill: a dark recess and bright type, so they read clearly on any band */
+#sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.34)}
+#sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag.g{color:#c9ffdb;border-color:rgba(143,240,176,.62);background:rgba(4,30,14,.42)}
+#sv-over .sd-col>.sv-ph .sv-tag.se-off{color:#ffe4dc;border-color:rgba(255,150,120,.7);background:rgba(110,18,0,.55)}
+#sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.34)}
+/* Enable restake: its title a green band like the panels', the card joined under it */
+#sv-over #sd-sky .se-mid>.se-rsw,#sv-over #sd-sky .se-ex>.se-rsw{gap:0}
+#sv-over #sd-sky .se-rsh2{height:30px;box-sizing:border-box;padding:0 10px;gap:8px;border:1px solid var(--wbd2);border-bottom:1px solid rgba(255,255,255,.08);border-radius:9px 9px 0 0;
+background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#13603b,#0d3f2d 58%,#0f1f24)}
+#sv-over #sd-sky .se-rsh2 h4{font-size:13px;color:#fff}
+#sv-over #sd-sky .se-rsh2 h4::before{background:rgba(255,255,255,.9);box-shadow:none}
+#sv-over #sd-sky .se-rsh2 .sv-tag{padding:2px 7px;font-size:10px;line-height:1.35}
+#sv-over #sd-sky .se-rsw>.se-card.se-rc2{border-top:0;border-radius:0 0 9px 9px;padding-top:8px}
+/* the day, week, month and year sit centred between the panel's title and Enable restake */
+#sv-over #sd-sky .se-mid>.se-row:first-child,#sv-over #sd-sky .se-ex>.se-row:first-child{margin-top:auto}
+@media(min-width:901px) and (max-height:640px){#sv-over #sd-sky .se-rsh2{height:26px}}
+/* the panel's inner gap under the title is wider than the block's gap above Enable restake: the difference goes
+   under the block, so it sits at the true centre */
+/* = the panel's gap under its title less the block's gap: 10-8 over 1000px tall, 10-6 to 821, 8-6 to 641, 8-4 below */
+#sv-over #sd-sky .se-mid>.se-rsw.se-rsw,#sv-over #sd-sky .se-ex>.se-rsw.se-rsw{padding-top:2px}
+@media(min-width:901px) and (min-height:821px) and (max-height:1000px){#sv-over #sd-sky .se-mid>.se-rsw.se-rsw,#sv-over #sd-sky .se-ex>.se-rsw.se-rsw{padding-top:4px}}
+@media(min-width:901px) and (max-height:640px){#sv-over #sd-sky .se-mid>.se-rsw.se-rsw,#sv-over #sd-sky .se-ex>.se-rsw.se-rsw{padding-top:4px}}
+@media(min-width:901px) and (max-height:520px){#sv-over #sd-sky .se-mid>.se-rsw.se-rsw,#sv-over #sd-sky .se-ex>.se-rsw.se-rsw{padding-top:0}}
+  #p-dele #wbody :is(#wk-mine,#wk-plan) .wk-tbl2{margin-top:8px!important}
+  #p-dele #wbody #wk-mv>.wk-ph+*{margin-top:8px!important}
+  #sv-over #sd-list>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#0f6b67,#123a52 58%,#141633)}
+  #sv-over #sd-sky>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#8a5a12,#4a2f12 58%,#1f1630)}
+  #sv-over #sd-move>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#13603b,#0d3f2d 58%,#0f1f24)}
+  #p-dele #wbody #wk-mine .wk-t1{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#7a3322,#44201a 58%,#1c1228)}
+  #p-dele #wbody #wk-plan>.wk-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#0e5a5a,#12394a 58%,#141633)}
+  #p-dele #wbody #wk-mv>.wk-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#4130a0,#271c6c 58%,#150f3b)}
   /* the wider padding leaves the Delegations table 4px less: its figures keep their room, the name gives */
   #p-dele #wbody #dmy col:nth-child(1){width:30px!important}#p-dele #wbody #dmy col:nth-child(3){width:66px!important}
   #p-dele #wbody #dmy col:nth-child(4){width:48px!important}#p-dele #wbody #dmy col:nth-child(5){width:50px!important}
@@ -4085,6 +4144,13 @@ box-shadow:inset 0 2px 6px rgba(0,0,0,.6),inset 0 -1px 0 rgba(255,255,255,.05),0
 .sd-strip .sd-ro em{margin-bottom:7px}
 .sd-strip .sd-well{position:relative;flex:1 1 auto;align-items:center;gap:6px;margin:0;padding:6px 12px 6px;min-height:46px;box-sizing:border-box}
 .sd-strip .sd-well.mtr{padding-bottom:14px}
+/* the strip's five boxes share one fill, laid on the strip so it runs across them as one whole: a light violet
+   (Autopilot's a light teal, after its card), no rings, no seams; the wallet card keeps its own face over it */
+.sd-strip:not(#z){background:radial-gradient(60% 140% at 30% 0%,rgba(255,255,255,.14),transparent 70%),linear-gradient(100deg,#6a5ad6 0%,#5646bd 45%,#43349e 100%);border-color:rgba(160,150,255,.35)}
+.sd-strip:not(#z):has(.sd-ida){background:radial-gradient(60% 140% at 30% 0%,rgba(255,255,255,.14),transparent 70%),linear-gradient(100deg,#23978f 0%,#236f9c 50%,#2f4596 100%);border-color:rgba(143,245,236,.35)}
+#p-dele #sd-mstrip.sd-strip{background:radial-gradient(60% 140% at 30% 0%,rgba(255,255,255,.14),transparent 70%),linear-gradient(100deg,#6a5ad6 0%,#5646bd 45%,#43349e 100%);border-color:rgba(160,150,255,.35)}
+.sd-strip .sd-ro{background:none;border-left:0}
+.sd-strip .sd-ro em{color:rgba(255,255,255,.8)}
 .sd-strip .sd-well>b{font-size:22px}
 .sd-well>i.u{flex:0 0 auto;align-self:center;margin-top:6px;font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;color:var(--wf);padding-bottom:0}
 .sd-wx{flex:0 1 auto;min-width:0;margin-left:auto;padding-left:10px;border-left:1px solid rgba(255,255,255,.09);display:flex;flex-direction:column;align-items:flex-end;
@@ -4185,6 +4251,31 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
   #sv-over .se-card{padding:6px 14px 7px;gap:0}#sv-over .se-card>b{font-size:26px}#sv-over .se-card em{font-size:8px}
   #sv-over .se-mid,#sv-over .se-ex{gap:6px}#sv-over .se-row .sd-fig{padding-top:4px;padding-bottom:4px}
   #sv-over .sd-col>.sv-ph{min-height:24px}}
+/* the restake offer stands at the panel's foot, level with Where your stake sits' three boxes and built as they
+   are (8px label, 18px figure, 10px line, the same padding and radius), in green; the Auto-pilot arrow at its right */
+#sv-over #sd-sky .se-mid>.se-rsw,#sv-over #sd-sky .se-ex>.se-rsw{margin-top:auto;padding-top:0;gap:6px}
+#sv-over #sd-sky .se-card.se-rc2{position:relative;gap:1px;padding:7px 88px 8px;border-radius:9px;background:linear-gradient(90deg,rgba(46,224,106,.1),rgba(255,255,255,.012) 70%)}
+#sv-over #sd-sky .se-card.se-rc2::before{background:var(--sv-green);box-shadow:0 0 12px var(--sv-green)}
+#sv-over #sd-sky .se-rc2 em{display:block;font-size:8px;letter-spacing:.1em;line-height:1.5}
+#sv-over #sd-sky .se-rc2>b{font-size:18px;line-height:1.5;font-weight:800;letter-spacing:-.02em}
+#sv-over #sd-sky .se-rc2>b :is(span,i){line-height:1.5}#sv-over #sd-sky .se-rc2>b i{font-size:10px}
+#sv-over #sd-sky .se-rc2 small{display:block;font-size:9px;line-height:1.5;color:var(--ws);white-space:nowrap}
+#sv-over #sd-sky .se-rc2 .se-rsv{color:var(--sv-green)}
+#sv-over #sd-sky .se-rsh2 h4::before{background:var(--sv-green);box-shadow:0 0 10px -1px var(--sv-green)}
+.se-rsgo{position:absolute;right:10px;top:50%;transform:translateY(-50%);display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 8px 0 10px;border-radius:7px;
+  border:1px solid rgba(46,224,106,.45);background:rgba(46,224,106,.1);color:var(--sv-green);font:700 10px var(--wmono);letter-spacing:.06em;cursor:pointer}
+.se-rsgo svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.se-rsgo:hover{background:rgba(46,224,106,.2)}
+.se-rsgo:focus-visible{outline:2px solid var(--sv-green);outline-offset:2px}
+@media(min-width:901px) and (max-height:700px){#sv-over #sd-sky .se-rc2>b{font-size:15px}}
+/* a short window: the day, week and month each on one line (label beside the figure), so the restake card still
+   stands level with the boxes */
+@media(min-width:901px) and (max-height:640px){#sv-over #sd-sky .se-row .sd-fig{flex-direction:row;align-items:baseline;justify-content:center;gap:8px;padding-top:3px;padding-bottom:3px}
+  #sv-over #sd-sky .se-row .sd-fig>em{margin:0}#sv-over #sd-sky .se-row .sd-fig::before{display:none}#sv-over #sd-sky .se-mid,#sv-over #sd-sky .se-ex{gap:4px}#sv-over #sd-sky .se-mid>.se-rsw{gap:5px}}
+/* phones: a band stays one line; the restake card's Auto-pilot arrow stands under its text, centred */
+@media(max-width:900px){#sv-over .sd-col>.sv-ph{flex-wrap:nowrap}#sv-over .sd-col>.sv-ph h3{min-width:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #sv-over .sd-col>.sv-ph .sv-tag{flex:0 0 auto}
+  #sv-over #sd-sky .se-rsw>.se-card.se-rc2{padding:8px 12px 10px}#sv-over #sd-sky .se-rc2 .se-rsgo{position:static;transform:none;align-self:center;margin-top:6px}}
 .sv-btn.go.sd-go:disabled{background:rgba(255,255,255,.05);border-color:var(--wbd2);color:var(--wf);box-shadow:none;cursor:not-allowed;margin-top:auto}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}
@@ -4207,7 +4298,7 @@ background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 16%,
 .fp-k.b1{border-color:#ffb02e}.fp-k.b2{border-color:#2ee06a}
 .fp-k em{font-style:normal;font-family:var(--wmono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fp-k b{font-size:18px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.fp-k small{font-size:10px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fp-k small{max-width:100%;font-size:9px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}.fp-k small i{font-style:normal;font-size:7.5px;letter-spacing:.04em;color:var(--wf)}
 @media(max-width:620px){.fp-bc{flex:0 0 auto;height:150px}}
 @media(min-width:901px) and (max-height:700px){#sd-list .fp-br{margin-top:5px}#sd-list .fp-k{padding-top:4px}#sd-list .fp-k b{font-size:15px}}
 .fpt0{color:#ff7a57}.fpt1{color:#ffc453}.fpt2{color:#5cf08e}
@@ -4221,7 +4312,7 @@ background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 16%,
 @container (max-width:405px){#sd-move .sd-mvh h3{font-size:13px}#sd-move .sd-mvh .sd-mvn{font-size:9.5px}
   #sd-move .sd-mvh .sv-tag{font-size:10px;padding-left:8px;padding-right:8px}}
 @container (max-width:345px){#sd-move .sd-mvh>*+*{margin-left:-3px}#sd-move .sd-mvh h3{font-size:12.5px}#sd-move .sd-mvh .sv-tag i{display:none}#sd-move .sd-mvh .sv-tag{padding-left:6px;padding-right:6px}#sd-move .sd-mvh .sd-mvn{font-size:9px}}
-@container (max-width:300px){#sd-move .sd-mvh .sv-tag{display:none}}
+@container (max-width:300px){#sd-move .sd-mvh .sv-tag.sd-mvn{display:none}}
 .sd-mvh h3{flex:0 0 auto;white-space:nowrap}
 .sd-mvh .sd-mvn{margin-left:auto;min-width:0;font-size:11px;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
 /* Move your stake: Now and After side by side, the gain under both, inset like the button below */

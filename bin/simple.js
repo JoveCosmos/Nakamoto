@@ -83,8 +83,9 @@
   }
   function mix(c, to, k){ var m = /(\d+),\s*(\d+),\s*(\d+)/.exec(c); if(!m) return c;
     return "rgb(" + [m[1], m[2], m[3]].map(function(x){ return Math.round(+x + (to - x) * k); }).join(",") + ")"; }
-  function heat(r){
-    var u = heatU(r), day = root.getAttribute("data-theme") === "light", L = window.lum || function(){ return "rgb(255,176,46)"; };
+  /* night: the night ramp whatever the theme (the strip's boxes are violet in day too) */
+  function heat(r, night){
+    var u = heatU(r), day = !night && root.getAttribute("data-theme") === "light", L = window.lum || function(){ return "rgb(255,176,46)"; };
     /* type keeps the fill's hue, lifted toward white: the low end reads as a cool lavender,
        not as the rose of a warning, and the top stops at gold short of plain white */
     var fill = L(.16 + .84 * u), ink = mix(L(.16 + .84 * Math.min(u, .9)), 255, .34);
@@ -169,13 +170,14 @@
     /* the APR the compounded year amounts to, against today's: what restaking adds to the rate */
     var capr = Math.pow(1 + rate / 12, 12) - 1, dapr = (capr - rate) * 100;
     /* the offer: the title with the APR restaking adds in its tag, and a card like the year's - what it adds a
-       year, in teal (not a door: restake is set up in Autopilot) */
+       year, in green, level with Where your stake sits' three boxes; its one way on is the Auto-pilot arrow */
     var offer = rate > 0 && !on ? '<div class=se-rsw><div class=se-rsh2><h4>Enable restake</h4>' + tag("g", "+" + dapr.toFixed(1) + "% APR") + '</div>' +
-        '<div class="se-card se-rc2"><em>A year, more</em><b><span class=se-rsv>+' + one(more / 1e6) + '</span><i>ATONE</i></b><small>it autocompounds your rewards</small></div></div>' : '';
+        '<div class="se-card se-rc2"><em>A year, more</em><b><span class=se-rsv>+' + one(more / 1e6) + '</span><i>ATONE</i></b><small>auto-compounds your rewards</small>' +
+        '<button type=button class=se-rsgo data-act=autopilot title="Set up restake in Autopilot">Auto-pilot<svg viewBox="0 0 16 16" aria-hidden=true><path d="M3 8h9M8.5 4l4 4-4 4"/></svg></button></div></div>' : '';
     var door = on ? '<div class=se-rson>Restake is on: your rewards compound on their own.<button type=button class=se-rsch data-act=autopilot>Change</button></div>' : '';
     /* the day, week and month first, the year under them */
     if(ex) return '<div class=se-ex>' + steps + year + offer + '</div>';
-    return '<div class=se-mid>' + (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + steps + year + offer + '</div>' + door;
+    return '<div class=se-mid>' + steps + year + offer + '</div>' + door;
   }
 
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every
@@ -223,12 +225,13 @@
     var cut1 = Math.ceil(n / 3), cut2 = Math.ceil(2 * n / 3);
     var span = [cut1, cut2 - cut1, n - cut2, Math.ceil(n / 4)];   /* a fourth box, Inactive, only when some stake sits outside the set */
     /* each third: its coloured bracket line over the bars' span, and a box under it with its share and ATONE */
-    /* four boxes share the width equally and take short names, so each label fits */
+    /* four boxes share the width equally and take short names, so each label fits; amounts from 10,000 ATONE
+       shortened (12.3k, 50.6M), the whole figure in the box's title */
     var four = sums.length > 3, short = ["Largest", "Middle", "Smallest", "Inactive"];
-    var br = sums.map(function(q, k){ return '<div class="fp-k b' + k + '" style="flex:' + (four ? 1 : span[k]) + ' 1 0"><div class=fp-kb><em>' + (four ? short[k] : q[0]) + '</em><b class=fpt' + k + '>' + sh(q[1]) + '%</b><small>' +
-      (q[1] >= 1e12 ? big(q[1]) : fmt(q[1])) + ' ATONE</small></div></div>'; }).join("");
-    return head.replace('</h3></div>', '</h3>' + (mine ? tag("q", "on " + held + " of " + n + " validators") : tag("q", n + " validators")) + '</div>') +
-      '<div class=fp-bc>' + bars + '</div><div class=fp-ax><span>#1 largest</span><span>smallest #' + n + '</span></div>' +
+    var br = sums.map(function(q, k){ return '<div class="fp-k b' + k + '" style="flex:' + (four ? 1 : span[k]) + ' 1 0"><div class=fp-kb><em>' + (four ? short[k] : q[0]) + '</em><b class=fpt' + k + '>' + sh(q[1]) + '%</b><small title="' + fmt(q[1]) + ' ATONE">' +
+      (q[1] >= 1e10 ? big(q[1]) : fmt(q[1])) + '<i> ATONE</i></small></div></div>'; }).join("");
+    return head.replace('</h3></div>', '</h3>' + (mine ? tag("q", held + (held === 1 ? " Validator" : " Validators"), "your stake is on " + held + " of the " + n + " validators") : tag("q", n + " Validators")) + '</div>') +
+      '<div class=fp-ax><span>#1 largest</span><span>smallest #' + n + '</span></div><div class=fp-bc>' + bars + '</div>' +
       '<div class=fp-br>' + br + '</div>';
   }
 
@@ -253,7 +256,7 @@
       ro("Available", bal ? fmt(liq) : "\u2014", "", null, "var(--sv-violet)", "", false, bal ? "ATONE" : "") +
       ro("Photon", bal ? '<span class=sv-pho>' + fmt(bal.uphoton) + '</span>' : "\u2014", "", null, "var(--sv-pho)", "", false, "") +
       ro("Staked", pos ? fmt(stk) : "\u2014", "", null, "var(--sv-amber)", "", false, pos ? "ATONE" : "") +
-      ro("APR", mine ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)", "", false, "") +
+      ro("APR", mine ? '<span style="color:' + heat(pos.rate, 1).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)", "", false, "") +
       ro("Rewards", window.__REW != null ? fmt(rew) : "\u2014", "", null, "var(--sv-green)", "", false, window.__REW != null ? "ATONE" : ""));
   }
   function drawOver(){
@@ -293,7 +296,7 @@
       h = '<div class="sv-ph sd-mvh"><h3>Move your stake</h3>' + tag("g", "+" + (lift * 100).toFixed(1) + "%<i> APR</i>") +
         /* one wording; the row's own width decides whether the pill stays (container queries), so it never wraps */
         (function(n){ var w = n + ' move' + (n === 1 ? '' : 's');
-          return '<span class=sd-mvn title="' + w + ', 1 signature">' + w + ', 1 signature</span>'; })(plan.moves) + '</div>' +
+          return '<span class="sv-tag q sd-mvn" title="' + w + ', 1 signature">' + w + ', 1 signature</span>'; })(plan.moves) + '</div>' +
         '<div class="sd-figs sd-mv">' +
           fig("Now", '<span style="color:' + hn.ink + '">' + pct(plan.now) + '</span>', "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s"), hn.fill) +
           fig("After", '<span style="color:' + ha.ink + '">' + pct(plan.after) + '</span>', "on " + plan.picks.length + " validator" + (plan.picks.length === 1 ? "" : "s"), ha.fill) +
@@ -308,7 +311,7 @@
     var aft = picks.length && plan ? plan.after : null;
     var off = 0; rows.forEach(function(r){ if(r.inactive) off += r.x; });
     put("sd-sky", mine
-      ? '<div class=sv-ph><h3>What your stake earns</h3></div>' + earns(pos.total, pos.rate, off)
+      ? '<div class=sv-ph><h3>What your stake earns</h3>' + (off ? tag("r se-off", fmt(off) + " ATONE inactive earns nothing", "stake on validators outside the active set earns no rewards") : '') + '</div>' + earns(pos.total, pos.rate, off)
       : '<div class=sv-ph><h3>What 1,000 ATONE earns</h3></div>' + earns(1e9, S.mid, 0, true));
 
     /* the validators */
@@ -363,7 +366,7 @@
       ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "\u2014", "", null, "var(--sv-violet)", "", false, g && a.max_tokens ? "ATONE" : "") +
       ro("Runs until", until || "\u2014", "", null, "var(--sv-violet)") +
       ro("Moves made", g ? String(moves) : "\u2014", "", null, "var(--sv-teal)") +
-      ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)"));
+      ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate, 1).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)"));
     /* restake, in one line: what it has done, or who does it instead, or that it waits */
     function restakeLine(){
       var rs = rp && rp.restake, ot = at && at.others;
