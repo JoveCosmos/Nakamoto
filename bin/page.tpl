@@ -5052,6 +5052,8 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
   #sv-auto #sd-ars .ars-fig>b:not(#z):not(#y){font-size:22px;line-height:1.2}
   #sv-auto #sd-ars .ars-how:not(#z):not(#y){padding:5px 8px;font-size:10.5px;line-height:1.3}
   #sv-auto #sd-ars .sd-go:not(#z):not(#y){height:36px}}
+@media(min-width:901px) and (max-height:700px){#sv-auto #sd-ars .ars-fig>b:not(#z):not(#y){font-size:19px;line-height:1.2}#sv-auto #sd-ars>.ars-fig:not(#z):not(#y){padding-top:4px;padding-bottom:5px}}
+@media(min-width:901px) and (max-height:640px){#sv-auto #sd-ars .ars-how:not(#z):not(#y){padding:3px 6px;font-size:9.5px;line-height:1.25}#sv-auto #sd-ars .ars-two:not(#z):not(#y){margin-top:4px;gap:5px}}
 /* the state pill: one shape for both, green when enabled, grey when not */
 #sv-auto #sd-ars>.sv-ph .sv-tag.ars-st:not(#z):not(#y){font-family:var(--wsans);font-size:10px;font-weight:700;letter-spacing:0;text-transform:none;padding:2px 9px;color:#e6e4f0!important;border-color:rgba(255,255,255,.35)!important;background:rgba(255,255,255,.14)!important}
 #sv-auto #sd-ars>.sv-ph .sv-tag.ars-st.on:not(#z):not(#y){color:#03230e!important;border-color:#2ee06a!important;background:#2ee06a!important}
@@ -5063,32 +5065,29 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 @media(min-width:901px) and (max-height:1000px){#sv-auto #sd-ars .ars-two small{display:none}#sv-auto #sd-ars .ars-two>div:not(#z){padding:7px 6px 8px}
   #sv-auto #sd-ars>.ars-fig:not(#z){margin-top:6px;padding-top:6px;padding-bottom:7px}#sv-auto #sd-ars .ars-fig>b:not(#z){font-size:22px}
   #sv-auto #sd-ars .ars-how:not(#z){padding:5px 8px}}
-@media(min-width:901px) and (max-height:640px){#sv-auto #sd-ars .ars-fig>small{display:none}#sv-auto #sd-ars .ars-two>div:not(#z){padding:2px 6px}#sv-auto #sd-ars .ars-how:not(#z){padding:3px 6px;font-size:9.5px}#sv-auto #sd-ars .ars-until{border-top:0;margin-top:0;padding-top:0}}
+@media(min-width:901px) and (max-height:640px){#sv-auto #sd-ars .ars-fig>small{display:none}#sv-auto #sd-ars .ars-two>div:not(#z):not(#y){padding:4px 6px 5px;gap:2px}#sv-auto #sd-ars .ars-two b:not(#z):not(#y){font-size:14px}#sv-auto #sd-ars .ars-two em{padding-bottom:3px}#sv-auto #sd-ars .ars-how:not(#z){padding:3px 6px;font-size:9.5px}#sv-auto #sd-ars .ars-until{border-top:0;margin-top:0;padding-top:0}}
 /* the year box a little lower under the title, on the taller windows */
 #sv-auto #sd-ars>.ars-fig:not(#z){margin-top:18px}
 @media(min-width:901px) and (max-height:1000px){#sv-auto #sd-ars>.ars-fig:not(#z){margin-top:12px}}
 @media(min-width:901px) and (max-height:700px){#sv-auto #sd-ars>.ars-fig:not(#z){margin-top:4px}}
 /* Frequency and Minimum built as the other boxes: the label with its accent line, the value, a caption - squarer */
-#sv-auto .ars-two>div:not(#z){justify-content:center;gap:4px;padding:14px 8px 15px;min-height:96px;box-sizing:border-box}
+#sv-auto .ars-two>div:not(#z){justify-content:center;gap:4px;padding:10px 8px 11px;min-height:0;box-sizing:border-box}
+@media(min-width:901px) and (max-height:760px){#sv-auto .ars-two>div:not(#z):not(#y){padding:7px 6px 8px;gap:3px}#sv-auto .ars-two b:not(#z):not(#y){font-size:16px}}
 #sv-auto .ars-two em{position:relative;padding-bottom:5px}
 #sv-auto .ars-two em::after{content:"";position:absolute;left:50%;bottom:0;width:24px;height:2px;margin-left:-12px;border-radius:2px;background:var(--sv-green)}
 #sv-auto .ars-two b:not(#z){font-size:20px}
 #sv-auto .ars-two small{font-size:10.5px;color:var(--ws)}
-@media(min-width:901px) and (max-height:1000px){#sv-auto .ars-two>div:not(#z){min-height:0;padding:9px 8px 10px}}
-@media(min-width:901px) and (min-height:821px) and (max-height:1000px){#sv-auto .ars-two small{display:none}}
-@media(min-width:901px) and (max-height:760px){#sv-auto .ars-two>div:not(#z){min-height:0;padding:7px 6px 8px}#sv-auto .ars-two small{display:none}#sv-auto .ars-two b:not(#z){font-size:16px}}
-@media(min-width:901px) and (max-height:700px){#sv-auto .ars-two>div:not(#z){flex-direction:column;padding:4px 6px}#sv-auto .ars-two em{padding-bottom:3px}#sv-auto .ars-two em::after{display:none}#sv-auto .ars-two b:not(#z){font-size:14px}}
 /* narrower columns: the year box and the compounding line a step tighter */
 @media(min-width:901px) and (max-width:1599px){#sv-auto #sd-ars .ars-fig:not(#z){padding-top:9px;padding-bottom:10px}#sv-auto #sd-ars .ars-fig>b:not(#z){font-size:26px}
   #sv-auto #sd-ars .ars-how:not(#z){font-size:11px;line-height:1.35;padding:7px 8px}}
-@media(min-width:901px) and (max-height:640px){#sv-auto .ars-two>div:not(#z){flex-direction:row;align-items:baseline;justify-content:center;gap:6px;padding:4px 6px}#sv-auto .ars-two em{padding-bottom:0}#sv-auto .ars-two b:not(#z){font-size:13px}#sv-auto #sd-ars .ars-fig small:not(#z){font-size:10px;line-height:1.2}#sv-auto #sd-ars .ars-foot:not(#z){padding-top:2px}}
+
 @media(min-width:901px) and (max-height:640px){#sv-auto #sd-ars .ars-fig em:not(#z){display:none}#sv-auto #sd-ars .ars-fig:not(#z){gap:0;padding:4px 8px}
   #sv-auto #sd-ars .ars-foot:not(#z){padding-top:4px}#sv-auto #sd-ars .ars-how:not(#z){font-size:10px;line-height:1.25;padding:4px 6px}#sv-auto #sd-ars .sd-go:not(#z){margin-top:3px;height:26px}}
 #sv-auto #sd-ars .sd-go{margin-top:8px}
 #sv-auto #sd-ars .sd-go.ars-off:not(#z){background:rgba(255,77,31,.12);border:1px solid rgba(255,110,70,.6);color:#ffb7a3;box-shadow:none}
 @media(min-width:901px) and (max-height:760px){#sv-auto .ars-fig{padding:9px 8px;margin-top:6px}#sv-auto .ars-fig>b{font-size:24px}#sv-auto .ars-rules{gap:3px;margin-top:6px;font-size:11px}}
 @media(min-width:901px) and (max-height:700px){#sv-auto .ars-fig:not(#z){margin-top:4px;padding:5px 8px;gap:0}#sv-auto .ars-fig>b{font-size:20px}#sv-auto .ars-fig small{font-size:10.5px}
-  #sv-auto .ars-two:not(#z){margin-top:5px;gap:5px}#sv-auto .ars-two>div{flex-direction:row;justify-content:center;gap:6px;padding:4px 6px}#sv-auto .ars-two b{font-size:13px}
+  #sv-auto .ars-two:not(#z){margin-top:5px;gap:5px}#sv-auto .ars-two b{font-size:13px}
   #sv-auto .ars-how:not(#z){margin-top:5px;padding:5px 8px;font-size:10.5px;line-height:1.3}#sv-auto .ars-rules:not(#z){margin-top:4px;font-size:10.5px}
   #sv-auto #sd-ars .sd-go:not(#z){height:32px}#sv-auto #sd-ars>.sv-ph{margin-bottom:0!important}}
 @media(min-width:901px) and (max-height:640px){#sv-auto .ap-act:not(#z){gap:6px;padding:4px 8px}#sv-auto .ap-act b{font-size:17px}#sv-auto .ap-act span{font-size:11.5px;line-height:1.4}#sv-auto .ap-act .ap-go:not(#z){margin-top:2px}}

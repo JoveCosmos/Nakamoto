@@ -2916,7 +2916,6 @@ rememberGridH();
   /* ── Restake, its own switch: the claim + delegate pair, for 12 months, capped at what the stake can earn, the
      delegate allow-list = the validators the reader stakes with (and Autopilot's list, when it runs). The keeper
      claims and stakes on the best-paying of them on its own (no admin step), every 12 hours, from 1 ATONE of rewards. ── */
-  var RS_DAYS = 365;
   function rsOn(){ var g = AT.grants || []; return g.some(function(x){ return grantType(x) === DELEG; }) && g.some(function(x){ return grantType(x) === WDRAW; }); }
   function rsAllow(){
     var VD = window.__VDBY || {}, pos = window.__POS, out = {};
@@ -2924,17 +2923,18 @@ rememberGridH();
     if(AT.grant) (((AT.grant.authorization || {}).allow_list || {}).address || []).forEach(function(op){ out[op] = 1; });
     return Object.keys(out);
   }
-  function rsCap(){ var pos = window.__POS; return !pos || !(pos.total > 0) ? 1000000 : Math.max(1000000, Math.ceil(pos.total * Math.max(pos.rate, .05) * (RS_DAYS / 365) * 1.5)); }
   function rsMsgs(on){
     if(!on){ var t = {}; (AT.grants || []).forEach(function(x){ var k = grantType(x); if(k === WDRAW || k === DELEG || k === MSEND) t[k] = 1; });
       return Object.keys(t).map(revokeMsg); }
-    var allow = rsAllow(), exp = Date.now() + RS_DAYS * 86400000; if(!AT.addr || !allow.length) return [];
-    var m = [{ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr, grant: { authorization: { type: "cosmos-sdk/GenericAuthorization", value: { msg: WDRAW } }, expiration: exp } } },
-             { type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr, grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: { authorization_type: "delegate", max_tokens: { denom: "uatone", amount: String(rsCap()) }, allow_list: allow } }, expiration: exp } } }];
-    /* the reward split, only when one is set: the send may reach our address alone, up to the year's projection */
+    /* no end date and no amount cap: restake runs until the reader disables it (revokes). The delegate grant is still
+       allow-listed to the reader's own validators, so it can only ever stake onto them - never send or withdraw */
+    var allow = rsAllow(); if(!AT.addr || !allow.length) return [];
+    var m = [{ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr, grant: { authorization: { type: "cosmos-sdk/GenericAuthorization", value: { msg: WDRAW } } } } },
+             { type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr, grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: { authorization_type: "delegate", allow_list: allow } } } } }];
+    /* the reward split, only when one is set: the send may reach our address alone, up to a year's projection */
     var pos = window.__POS;
     if(AT.split_pct > 0 && AT.split_to && pos && pos.total > 0) m.push({ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
-      grant: { authorization: { type: "cosmos-sdk/SendAuthorization", value: { spend_limit: [{ denom: "uatone", amount: String(Math.ceil(pos.total * pos.rate * AT.split_pct / 100 * 1.5)) }], allow_list: [AT.split_to] } }, expiration: exp } } });
+      grant: { authorization: { type: "cosmos-sdk/SendAuthorization", value: { spend_limit: [{ denom: "uatone", amount: String(Math.ceil(pos.total * pos.rate * AT.split_pct / 100 * 1.5)) }], allow_list: [AT.split_to] } } } } });
     return m;
   }
   /* the Restake button acts at once: it reads what stands, builds the grant (or the revoke) and hands it to the wallet
