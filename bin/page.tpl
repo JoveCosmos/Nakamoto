@@ -4274,6 +4274,9 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
   #sv-over #sd-list{grid-column:1;grid-row:1/3}#sv-over #sd-sky{grid-column:2;grid-row:1}#sv-over #sd-rs{grid-column:2;grid-row:2}#sv-over #sd-move{grid-column:3;grid-row:1/3}
   #sv-over .sd-wgrid:has(#sd-rs:empty) #sd-sky{grid-row:1/3}}
 #sv-over #sd-rs{justify-content:flex-start}
+/* the earnings block centred in its panel, from the band to the foot */
+#sv-over #sd-sky>:is(.se-mid,.se-ex){flex:1 1 auto;justify-content:center;padding-top:4px}
+@media(min-width:901px) and (max-height:560px){#sv-over #sd-sky>:is(.se-mid,.se-ex){padding-top:0}}
 #sv-over #sd-rs .se-rsb{margin-top:auto;display:flex;flex-direction:column}
 #sv-over #sd-rs .se-rson{margin:0}
 /* a short window: the day, week and month one line each, the year one line under them */
