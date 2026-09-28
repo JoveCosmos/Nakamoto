@@ -172,7 +172,7 @@
     /* the offer: the title with the APR restaking adds in its tag, and a card like the year's - what it adds a
        year, in green, level with Where your stake sits' three boxes */
     var offer = rate > 0 && !on ? '<div class=se-rsw><div class=se-rsh2><h4>Enable restake</h4>' + tag("g", "+" + dapr.toFixed(1) + "% APR") + '</div>' +
-        '<div class="se-card se-rc2"><em>A year, more</em><b><span class=se-rsv>+' + one(more / 1e6) + '</span><i>ATONE</i></b><small>auto-compounds your rewards</small></div></div>' : '';
+        '<div class="se-card se-rc2"><em>A year</em><b><span class=se-rsv>+' + one(more / 1e6) + '</span><i>ATONE</i></b><small>auto-compounds your rewards</small></div></div>' : '';
     var door = on ? '<div class=se-rson>Restake is on: your rewards compound on their own.<button type=button class=se-rsch data-act=autopilot>Change</button></div>' : '';
     /* the day, week and month first, the year under them */
     if(ex) return '<div class=se-ex>' + steps + year + offer + '</div>';
