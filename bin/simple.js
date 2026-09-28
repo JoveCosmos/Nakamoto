@@ -1147,11 +1147,9 @@
   /* no governors yet: what one is, and the chain's rules for becoming one */
   function govNone(){
     var R = GV.rules || {};
-    return '<p class=gv-say>No governors on AtomOne yet.</p>' +
-      '<div class=gv-rules3><div><em>To become one</em><b>' + (R.minSelf ? whole(R.minSelf) : '\u2014') + '</b><small>ATONE of its own stake</small></div>' +
+    return '<div class=gv-rules3><div><em>To become one</em><b>' + (R.minSelf ? whole(R.minSelf) : '\u2014') + '</b><small>ATONE of its own stake</small></div>' +
       '<div><em>Status change</em><b>' + (R.period ? Math.round(R.period / 86400) + ' days' : '\u2014') + '</b><small>at most once in</small></div>' +
-      '<div><em>Its vote</em><b>Follows</b><small>for every staker who follows it</small></div></div>' +
-      '<p class=gv-sub>A governor votes for the stake that follows it, on every proposal those stakers do not vote on themselves. The first to register appears here, ready to follow.</p>';
+      '<div><em>Its vote</em><b>Follows</b><small>for every staker who follows it</small></div></div>';
   }
   function drawMyGov(){
     loadGovs(); loadProps();
@@ -1170,13 +1168,9 @@
     var h = '<div class=sv-ph><h3>Your governor</h3></div>';
     if(!window.__ADDR) h += '<p class=gv-say>Connect a wallet to see the governor it follows.</p>';
     else if(mine === null || (mine && !L)) h += '<p class=gv-say>Reading…</p>';
-    else if(me) h += '<p class=gv-say>You are a governor: <b>' + esc(me.m) + '</b>, ' + (me.active ? 'active' : 'inactive') + '. Your own stake follows you.</p>' +
-      '<p class=gv-sub>You vote for every staker who follows you, on each proposal they do not vote on themselves.</p>' + govRows([me], mine);
-    else if(!mine) h += '<p class=gv-say>You follow no governor: your stake votes only when you vote.</p>' +
-      '<div class=gv-how><div><em>You vote</em><b>Your vote counts</b></div><div><em>You don\'t vote</em><b>No vote is cast</b></div></div>' +
-      '<p class=gv-sub>Follow a governor and its vote counts for your stake on every proposal you do not vote on yourself.</p>';
-    else h += '<p class=gv-say>Your stake follows <b>' + esc(g ? g.m : mine) + '</b>' + (g && !g.active ? ', which is inactive: its votes do not count for you' : '') + '.</p>' +
-      '<p class=gv-sub>Its vote counts for your stake on any proposal you do not vote on yourself.</p>' + (g ? govRows([g], mine) : "");
+    else if(me) h += govRows([me], mine);
+    else if(!mine) h += '<div class=gv-how><div><em>You vote</em><b>Your vote counts</b></div><div><em>You don\'t vote</em><b>No vote is cast</b></div></div>';
+    else h += (g && !g.active ? '<p class=gv-say>Inactive: its votes do not count for you.</p>' : '') + (g ? govRows([g], mine) : '<p class=gv-say>' + esc(mine) + '</p>');
     put("sv-mygovp", h);
     var reg = L && window.__ADDR && window.__WALLET ? '<button class="sv-gbtn gr-open" type=button data-act=greg><span class=gr-lg>' + (me ? 'Edit your governor' : 'Become a governor') + '</span><span class=gr-sm>' + (me ? 'Edit' : 'Register') + '</span></button>' : '';
     put("sv-mygovlist", '<div class=sv-ph><h3>Governors</h3>' + (L ? tag("q", L.length + " Governors") : '') + reg + '</div>' +
@@ -1190,7 +1184,7 @@
           '<span class=gp-bar><i class=y style="width:' + y.toFixed(1) + '%"></i><i class=n style="width:' + (t.s ? t.n / t.s * 100 : 0).toFixed(1) + '%"></i></span>' +
           '<small>Yes ' + y.toFixed(1) + '%, ' + (open ? 'ends ' : 'ended ') + pday(p.ve) + '</small></a>'; };
       v += live.length ? '<div class=gv-live>' + live.map(function(p){ return card(p, true); }).join("") + '</div>'
-        : '<p class=gv-say>No proposal is open for voting.</p><u class=gv-rl>Latest results</u><div class=gv-live>' + P.slice(0, 4).map(function(p){ return card(p, false); }).join("") + '</div>';
+        : '<u class=gv-rl>Latest results</u><div class=gv-live>' + P.slice(0, 4).map(function(p){ return card(p, false); }).join("") + '</div>';
     }
     put("sd-gvote", v);
   }
