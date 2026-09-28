@@ -555,8 +555,25 @@ def once(c, only=None, live=None, force=False):
         s = get("/cosmos/bank/v1beta1/balances/%s" % GRANTEE)
         photon = next((int(b["amount"]) for b in s.get("balances", []) if b["denom"] == "uphoton"), 0)
         report("_status", {"grantee": GRANTEE, "checked": int(time.time()), "grants": len(gs), "dry": DRY, "photon": photon, "every": EVERY})
+        low_photon(c, photon)
     except Exception as e:
         log("status failed: %s" % e)
+
+LOW_PHOTON = int(float(os.environ.get("KEEPER_LOW_PHOTON", "15")) * 1e6)   # the signer pays every fee in PHOTON
+def low_photon(c, photon):
+    """Discord when the signer's PHOTON falls below LOW_PHOTON: once on the way down, again every 24 hours while
+    it stays low, and once when it is funded back above. One marker row ('_signer', 'low') exists while it is low."""
+    now = int(time.time())
+    row = c.execute("SELECT at FROM alert_sent WHERE granter='_signer' AND k='low'").fetchone()
+    f = {"Signer": GRANTEE, "Balance": "{:,.2f} PHOTON".format(photon / 1e6), "Alert below": "{:,.0f} PHOTON".format(LOW_PHOTON / 1e6)}
+    if photon < LOW_PHOTON:
+        if not row or now - row[0] >= 86400:
+            alert("warn", "Autopilot signer low on PHOTON: {:,.2f} left".format(photon / 1e6),
+                  "The signer pays every move and restake fee in PHOTON. Send PHOTON to its address.", f)
+            c.execute("INSERT OR REPLACE INTO alert_sent VALUES('_signer', 'low', ?)", (now,)); c.commit()
+    elif row:
+        alert("ok", "Autopilot signer PHOTON funded: {:,.2f}".format(photon / 1e6), "", f)
+        c.execute("DELETE FROM alert_sent WHERE granter='_signer' AND k='low'"); c.commit()
 
 def main():
     """Service: a tick every KEEPER_TICK (60 s); each delegator planned every 6 hours, at once when new or
