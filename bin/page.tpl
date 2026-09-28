@@ -4981,6 +4981,15 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
   .pop .card.atcard[data-pick=auto]:not(#z){height:auto;max-height:100%}}
 .atcard[data-pick=auto] .atR{display:none!important}
 .atcard[data-pick=auto] .atview{display:none!important}
+/* Choose yourself: the setup keeps its exact width and height, the list opens beside it at that height */
+@media(min-width:861px){
+  .pop .card.atcard:not(#z){height:auto;max-height:100%;width:min(560px,100%);transition:width .18s ease}
+  .pop .card.atcard[data-pick=selected]:not(#z){width:min(1040px,100%)}
+  #atpop .atcard .atbody:not(#z){grid-template-columns:minmax(0,550px) minmax(0,1fr)}
+  #atpop .atcard[data-pick=auto] .atbody:not(#z){grid-template-columns:minmax(0,1fr)}
+  #atpop .atcard[data-pick=selected] .atR:not(#z){contain:size;min-height:100%}}
+/* Grant (and Back, Revoke, Change) centred under the card */
+#atpop .atfoot:not(#z){display:flex;flex-direction:column-reverse;align-items:center;gap:6px}#atpop .atfoot .txbtns:not(#z){justify-content:center;margin:0 auto}#atpop .atfoot .atfs:not(#z){text-align:center}
 /* ════ Autopilot tab: Validators under the Autopilot card (its width, as Pro's panes under the wallet card), one
    compact 'What Autopilot does' panel in the middle, Restake on the right ════ */
 @media(min-width:901px){
