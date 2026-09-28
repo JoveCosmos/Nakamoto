@@ -217,6 +217,7 @@
     html[data-theme=light]:not([data-mono]) #sd-move .sd-mvh .sd-mvn{color:var(--ink)}
     html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.q{color:var(--ink);border-color:var(--accent);background:var(--surface-2)}
     html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-hero>.se-card{background:var(--warn-bg)}
+    html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-row .sd-fig{background:color-mix(in srgb,var(--rc) 9%,transparent)}
     html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:var(--danger);border-color:var(--danger-bar);background:var(--danger-bar)}
     html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:var(--ink);border-color:var(--accent);background:var(--surface-2)}
     html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag{color:var(--ink);border-color:var(--accent);background:var(--surface)}
@@ -1067,7 +1068,7 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
 
   html[data-theme=light]:not([data-mono]) #sv .sd-ida .sv-tag{color:#dffcf9;border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.12)}html[data-theme=light]:not([data-mono]) #sv .sd-ida .sv-tag.g{color:#8ff0b0;border-color:rgba(143,240,176,.55);background:rgba(46,224,106,.16)}
 
-  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-card.se-rc2{background:linear-gradient(90deg,rgba(22,115,58,.1),#fbf9f3 70%)}html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-card.se-rc2::before{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-card.se-rc2{background:linear-gradient(0deg,rgba(22,115,58,.1),#fbf9f3 70%)}html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-card.se-rc2::before{box-shadow:none}
   
   html[data-theme=light]:not([data-mono]) #sv .sd-ida .sd-wch i.st{color:#dffcf9;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.1)}
   html[data-theme=light]:not([data-mono]) #sv .sd-ida .sd-wch button{color:#1b1440;border-color:#d6d0ff;background:#d6d0ff}
@@ -1085,7 +1086,7 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sd-move .sd-mvh .sd-mvn,html[data-theme=light]:not([data-mono]) #p-dele #wk-plan>.wk-ph #dago{color:rgba(255,255,255,.72)}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.q{color:#fff;border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14)}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:#ffe1d8;border-color:rgba(255,160,130,.7);background:rgba(200,50,20,.45)}
-  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-hero>.se-card{background:linear-gradient(90deg,rgba(200,120,0,.1),#fbf9f3 70%)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-hero>.se-card{background:linear-gradient(0deg,rgba(200,120,0,.1),#fbf9f3 70%)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:#fff;border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14)}
   /* tags on a fill and the Enable restake band keep their night face in day */
   html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.34)}
@@ -1113,4 +1114,6 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph .sv-tag.a{color:#ffe2b0;border-color:rgba(255,196,90,.6);background:rgba(40,22,0,.45)}
   html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag.g{color:#03230e;border-color:#2ee06a;background:#2ee06a;font-weight:700}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph .sv-tag.a{color:#2a1600;border-color:#ffb02e;background:#ffb02e;font-weight:700}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-row .sd-fig{background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 10%,transparent),#fbf9f3 70%)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky :is(.se-row .sd-fig,.se-card)::before{box-shadow:none}
 

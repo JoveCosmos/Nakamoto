@@ -1562,7 +1562,10 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
 #sv-over #sd-sky{--se-rs:var(--sv-green)}
 #sv-over #sd-sky :is(.se-mid,.se-ex)>:is(.se-row,.se-hero){--sv-green:var(--sv-amber)}
 #sv-over #sd-sky .se-rsm{color:var(--se-rs)}
-#sv-over #sd-sky .se-hero>.se-card{background:linear-gradient(90deg,rgba(255,176,46,.09),rgba(255,255,255,.012) 70%)}
+#sv-over #sd-sky .se-hero>.se-card{background:linear-gradient(0deg,rgba(255,176,46,.09),rgba(255,255,255,.012) 70%)}
+/* What your stake earns and Enable restake: each box's colour line lies along its foot, the glow rising from it */
+#sv-over #sd-sky :is(.se-row .sd-fig,.se-card)::before{left:14px;right:14px;top:auto;bottom:0;width:auto;height:2px;border-radius:2px 2px 0 0}
+#sv-over #sd-sky .se-row .sd-fig{background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 9%,transparent),rgba(255,255,255,.012) 70%)}
 /* stake on inactive validators: a red tag in What your stake earns' title row */
 #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:#ffd9cf;border-color:rgba(255,140,110,.65);background:rgba(255,77,31,.32);font-weight:600;white-space:nowrap}
 /* the band tags, a size smaller: one height in all three panels, the moves count a tag like the rest */
@@ -4247,7 +4250,7 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 /* the restake offer stands at the panel's foot, level with Where your stake sits' three boxes and built as they
    are (8px label, 18px figure, 10px line, the same padding and radius), in green */
 #sv-over #sd-sky .se-mid>.se-rsw,#sv-over #sd-sky .se-ex>.se-rsw{margin-top:auto;padding-top:0;gap:6px}
-#sv-over #sd-sky .se-card.se-rc2{position:relative;gap:1px;padding:7px 14px 8px;border-radius:9px;background:linear-gradient(90deg,rgba(46,224,106,.1),rgba(255,255,255,.012) 70%)}
+#sv-over #sd-sky .se-card.se-rc2{position:relative;gap:1px;padding:7px 14px 8px;border-radius:9px;background:linear-gradient(0deg,rgba(46,224,106,.1),rgba(255,255,255,.012) 70%)}
 #sv-over #sd-sky .se-card.se-rc2::before{background:var(--sv-green);box-shadow:0 0 12px var(--sv-green)}
 #sv-over #sd-sky .se-rc2 em{display:block;font-size:8px;letter-spacing:.1em;line-height:1.5}
 #sv-over #sd-sky .se-rc2>b{font-size:18px;line-height:1.5;font-weight:800;letter-spacing:-.02em}
