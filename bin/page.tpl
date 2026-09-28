@@ -5028,10 +5028,29 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 #sv-auto .ars-rules li{position:relative;padding-left:14px}
 #sv-auto .ars-rules li::before{content:"";position:absolute;left:2px;top:.55em;width:6px;height:6px;border-radius:50%;background:var(--sv-green)}
 #sv-auto .ars-rules b{color:var(--wt)}
+/* the year's figure and its APR on one centred row */
+#sv-auto .ars-val{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:nowrap;min-width:0}
+#sv-auto .ars-val b:not(#z){font-size:24px}
+@media(min-width:901px) and (max-width:1399px){#sv-auto .ars-val b:not(#z){font-size:20px}#sv-auto .ars-apr{font-size:10.5px;padding:2px 6px}}
+@media(min-width:901px) and (max-height:700px){#sv-auto .ars-val b:not(#z){font-size:18px}}
+@media(min-width:901px) and (max-height:640px){#sv-auto .ars-fig em{display:none}#sv-auto .ars-fig:not(#z){padding:4px 8px}#sv-auto .ars-how:not(#z){font-size:10px;padding:4px 6px;line-height:1.25}#sv-auto .ars-rules{display:none}#sv-auto #sd-ars .sd-go:not(#z){height:30px}}
+#sv-auto .ars-apr{padding:2px 8px;border-radius:999px;font-size:11.5px;font-weight:700;color:#03230e;background:#2ee06a;white-space:nowrap}
+/* frequency and minimum as two small boxes, the way it compounds as one full-width box */
+#sv-auto .ars-two{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+#sv-auto .ars-two>div{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 6px;border:1px solid var(--wbd2);border-radius:10px;text-align:center;
+  background:linear-gradient(0deg,rgba(46,224,106,.07),rgba(255,255,255,.012) 70%)}
+#sv-auto .ars-two em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ws)}
+#sv-auto .ars-two b{font-size:17px;font-weight:800;color:var(--wt);white-space:nowrap}
+#sv-auto .ars-how{margin-top:8px;padding:10px 10px;border:1px solid rgba(46,224,106,.35);border-radius:10px;text-align:center;font-size:12px;line-height:1.45;color:var(--ws);
+  background:rgba(46,224,106,.07);text-wrap:balance}
+#sv-auto .ars-how b{color:var(--sv-green)}
 #sv-auto #sd-ars .sd-go{margin-top:auto}
 #sv-auto #sd-ars .sd-go.ars-off:not(#z){background:rgba(255,77,31,.12);border:1px solid rgba(255,110,70,.6);color:#ffb7a3;box-shadow:none}
 @media(min-width:901px) and (max-height:760px){#sv-auto .ars-fig{padding:9px 8px;margin-top:6px}#sv-auto .ars-fig b{font-size:24px}#sv-auto .ars-rules{gap:3px;margin-top:6px;font-size:11px}}
-@media(min-width:901px) and (max-height:640px){#sv-auto .ars-fig small{display:none}#sv-auto .ars-rules li:nth-child(4){display:none}}
+@media(min-width:901px) and (max-height:700px){#sv-auto .ars-fig:not(#z){margin-top:4px;padding:5px 8px;gap:0}#sv-auto .ars-fig b{font-size:20px}#sv-auto .ars-fig small{display:none}
+  #sv-auto .ars-two:not(#z){margin-top:5px;gap:5px}#sv-auto .ars-two>div{flex-direction:row;justify-content:center;gap:6px;padding:4px 6px}#sv-auto .ars-two b{font-size:13px}
+  #sv-auto .ars-how:not(#z){margin-top:5px;padding:5px 8px;font-size:10.5px;line-height:1.3}#sv-auto .ars-rules:not(#z){margin-top:4px;font-size:10.5px}
+  #sv-auto #sd-ars .sd-go:not(#z){height:32px}#sv-auto #sd-ars>.sv-ph{margin-bottom:0!important}}
 @media(min-width:901px) and (max-height:640px){#sv-auto .ap-act:not(#z){gap:6px;padding:4px 8px}#sv-auto .ap-act b{font-size:17px}#sv-auto .ap-act span{font-size:11.5px;line-height:1.4}#sv-auto .ap-act .ap-go:not(#z){margin-top:2px}}
 /* the setup's validator count: Redelegate's live count, at the right of the list's title */
 #atpop .atrt:not(#z){display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
