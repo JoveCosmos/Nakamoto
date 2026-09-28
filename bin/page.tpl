@@ -4998,11 +4998,11 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
   #atpop .atcard[data-pick=selected] .atR:not(#z){contain:size;min-height:100%}}
 /* Grant (and Back, Revoke, Change) centred under the card */
 #atpop .atfoot:not(#z){display:flex;flex-direction:column-reverse;align-items:center;gap:6px}#atpop .atfoot .txbtns:not(#z){justify-content:center;margin:0 auto}#atpop .atfoot .atfs:not(#z){text-align:center}
-/* ════ Autopilot tab: Validators under the Autopilot card (its width, as Pro's panes under the wallet card), one
-   compact 'What Autopilot does' panel in the middle, Restake on the right ════ */
+/* ════ Autopilot tab: Restake under the Autopilot card (its width, as Pro's panes under the wallet card), one
+   compact 'What Autopilot does' panel in the middle, Validators on the right ════ */
 @media(min-width:901px){
   #sv-auto .sd-agrid.sd-agrid:not(#z){grid-template-columns:max(calc((100% - 2px) * 0.242424 + 2px),250px) minmax(0,1.5fr) minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) minmax(0,1fr)}
-  #sv-auto #sd-alist{grid-column:1;grid-row:1/3}#sv-auto #sd-ado{grid-column:2;grid-row:1}#sv-auto #sd-asky{grid-column:2;grid-row:2}#sv-auto #sd-ars{grid-column:3;grid-row:1/3}
+  #sv-auto #sd-ars{grid-column:1;grid-row:1/3}#sv-auto #sd-ado{grid-column:2;grid-row:1}#sv-auto #sd-asky{grid-column:2;grid-row:2}#sv-auto #sd-alist{grid-column:3;grid-row:1/3}
   #sv-auto .sd-agrid:has(#sd-asky:empty) #sd-ado{grid-row:1/3}}
 #sv-auto #sd-asky:empty{display:none}
 #sv-auto #sd-ars{--bandf:#0b4a36,#073024 58%,#05140f;--tc:var(--sv-green);position:relative}
