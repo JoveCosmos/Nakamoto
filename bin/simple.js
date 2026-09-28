@@ -1034,7 +1034,7 @@
   function govBtn(g, mine){
     if(screen() !== "mygov") return '';
     if(!window.__ADDR || !window.__WALLET || mine === null || mine === undefined) return '';
-    if(g.addr === govAddrOf(window.__ADDR)) return '<button class=sv-gbtn type=button data-act=greg title="Change what the chain shows about your governor">Edit</button>';
+    if(g.addr === govAddrOf(window.__ADDR)) return !GOV_REG ? '' : '<button class=sv-gbtn type=button data-act=greg title="Change what the chain shows about your governor">Edit</button>';
     if(g.addr === mine) return '<button class="sv-gbtn stop" type=button data-act=gstop title="Stop following this governor: your stake votes only when you vote">Stop</button>';
     if(!g.active) return '';
     return '<button class=sv-gbtn type=button data-act=gfollow data-g="' + esc(g.addr) + '" title="' + (mine ? 'Follow this governor instead' : 'Let this governor vote for your stake when you do not vote') + '">' + (mine ? 'Switch' : 'Follow') + '</button>';
@@ -1053,6 +1053,8 @@
   /* ── becoming a governor. A governor is the wallet's own key under the "atonegov" prefix; the chain wants
      10,000 ATONE staked on ACTIVE validators (its min_governor_self_delegation) and caps each field in bytes.
      Registering makes the wallet follow itself. Signed in the wallet, broadcast through our node. ── */
+  /* registering and editing a governor: switched off (operator, 2026-09-28) - no door shows; the code stays */
+  var GOV_REG = false;
   var B32 = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
   function b32poly(v){ var G = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3], c = 1;
     v.forEach(function(x){ var b = c >>> 25; c = ((c & 0x1ffffff) << 5) ^ x; for(var i = 0; i < 5; i++) if((b >>> i) & 1) c ^= G[i]; }); return c; }
@@ -1184,7 +1186,7 @@
     else if(!mine) h += '<div class=gv-how><div><em>You vote</em><b>Your vote counts</b></div><div><em>You don\'t vote</em><b>No vote is cast</b></div></div>';
     else h += (g && !g.active ? '<p class=gv-say>Inactive: its votes do not count for you.</p>' : '') + (g ? govRows([g], mine) : '<p class=gv-say>' + esc(mine) + '</p>');
     put("sv-mygovp", h);
-    var reg = L && window.__ADDR && window.__WALLET ? '<button class="sv-gbtn gr-open" type=button data-act=greg><span class=gr-lg>' + (me ? 'Edit your governor' : 'Become a governor') + '</span><span class=gr-sm>' + (me ? 'Edit' : 'Register') + '</span></button>' : '';
+    var reg = GOV_REG && L && window.__ADDR && window.__WALLET ? '<button class="sv-gbtn gr-open" type=button data-act=greg><span class=gr-lg>' + (me ? 'Edit your governor' : 'Become a governor') + '</span><span class=gr-sm>' + (me ? 'Edit' : 'Register') + '</span></button>' : '';
     put("sv-mygovlist", '<div class=sv-ph><h3>Governors</h3>' + (L ? tag("q", L.length + " Governors") : '') + reg + '</div>' +
       (!L ? '<p class=gv-say>Reading the governors…</p>' : !L.length ? govNone() : govRows(L, mine)));
     /* voting now: each open proposal, its yes share, when it ends; none open, the last result */
@@ -1511,9 +1513,9 @@
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
     if(act === "gfollow"){ govSend(t, { type: "atomone/v1/MsgDelegateGovernor", value: { delegator_address: window.__ADDR, governor_address: t.dataset.g } }); return; }
-    if(act === "greg"){ govForm(); return; }
+    if(act === "greg"){ if(GOV_REG) govForm(); return; }
     if(act === "grclose"){ grClose(); return; }
-    if(act === "grsend"){
+    if(act === "grsend" && GOV_REG){
       var gv = grVals(), gd = {}, gme = myGovRec();
       Object.keys(gv).forEach(function(k){ if(gv[k]) gd[k] = gv[k]; });
       govSend(t, { type: gme ? "atomone/v1/MsgEditGovernor" : "atomone/v1/MsgCreateGovernor", value: { address: window.__ADDR, description: gd } }, grClose);
