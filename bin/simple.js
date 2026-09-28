@@ -413,7 +413,7 @@
         return '<div class="ap-cb' + (cls ? ' ' + cls : '') + '" style="--rc:' + c + '"><em>' + k + '</em><b>' + v + '</b><small>' + sub + '</small></div>'; };
       put("sd-ado", '<div class=sv-ph><h3>Your Autopilot Grant</h3></div>' +
         '<div class=ap-dd><i class="ap-ln ok" aria-hidden=true></i><div class=ap-row>' +
-          cb("Redelegates", "Your Stake cap", "Among your validators", "#2ee06a") +
+          cb("Redelegates", "Your Stake cap", "among your validators", "#2ee06a") +
           cb("Strategize", "Better APR", "among your validators", "#b9b0ff") +
           cb("Keeps stake active", "24/7", ib ? ib + " ATONE idle on inactive validators" : "through a long winter or a busy month", "#2bc8d6") +
           cb("You grant", "It runs", "you revoke, it stops", "#2ee06a") +
