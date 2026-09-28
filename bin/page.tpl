@@ -1579,15 +1579,20 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
 #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.34)}
 /* Enable restake: its title a green band like the panels', the card joined under it */
 #sv-over #sd-sky .se-mid>.se-rsw,#sv-over #sd-sky .se-ex>.se-rsw{gap:0}
-#sv-over #sd-sky .se-rsh2{height:30px;box-sizing:border-box;padding:0 10px;gap:8px;border:1px solid var(--wbd2);border-bottom:1px solid rgba(255,255,255,.08);border-radius:9px 9px 0 0;
+#sv-over #sd-sky .se-rsh2{height:43px;box-sizing:border-box;padding:0 14px;gap:8px;border:1px solid var(--wbd2);border-bottom:1px solid rgba(255,255,255,.08);border-radius:9px 9px 0 0;
 background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.07),transparent 60%),linear-gradient(315deg,#0a3a22,#072a19 58%,#05140d)}
-#sv-over #sd-sky .se-rsh2 h4{font-size:13px;color:#fff}
+#sv-over #sd-sky .se-rsh2 h4{font-size:15px;color:#fff}
+#sv-over #sd-sky .se-rsh2 h4::before{height:15px}
+@media(min-width:901px) and (max-width:1599px){#sv-over #sd-sky .se-rsh2 h4{font-size:14px}}
+@media(min-width:901px) and (max-width:1299px){#sv-over #sd-sky .se-rsh2 h4{font-size:13px}}
 #sv-over #sd-sky .se-rsh2 h4::before{background:rgba(255,255,255,.9);box-shadow:none}
 #sv-over #sd-sky .se-rsh2 .sv-tag{padding:2px 7px;font-size:10px;line-height:1.35}
 #sv-over #sd-sky .se-rsw>.se-card.se-rc2{border-top:0;border-radius:0 0 9px 9px;padding-top:8px}
 /* the day, week, month and year sit centred between the panel's title and Enable restake */
 #sv-over #sd-sky .se-mid>.se-row:first-child,#sv-over #sd-sky .se-ex>.se-row:first-child{margin-top:auto}
-@media(min-width:901px) and (max-height:640px){#sv-over #sd-sky .se-rsh2{height:26px}}
+@media(min-width:901px) and (max-height:760px){#sv-over #sd-sky .se-rsh2{height:36px}}
+@media(min-width:901px) and (max-height:640px){#sv-over #sd-sky .se-rsh2{height:30px}}
+@media(min-width:901px) and (max-height:610px){#sv-over #sd-sky .se-rsh2{height:27px}}
 /* the panel's inner gap under the title is wider than the block's gap above Enable restake: the difference goes
    under the block, so it sits at the true centre */
 /* = the panel's gap under its title less the block's gap: 10-8 over 1000px tall, 10-6 to 821, 8-6 to 641, 8-4 below */
