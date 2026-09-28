@@ -2611,7 +2611,7 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .pop .card.stcard::before{background:linear-gradient(90deg,transparent,var(--wgreen),transparent)}
 .stcard .txsum{color:var(--wgreen)}
 
-.stcard .stlist{margin:12px 20px 0;max-height:216px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;flex:0 0 auto}
+.stcard .stlist{margin:12px 20px 0;max-height:max(100px,calc(84vh - 322px));max-height:max(100px,calc(84svh - 322px));overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;flex:0 0 auto}
 .stcard .stlist table{width:100%;border-collapse:collapse;table-layout:fixed}
 .stcard .stlist thead th{font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:400;color:#c1bfdc;text-align:right;white-space:nowrap;padding:8px 5px 7px;background:linear-gradient(180deg,#151530,#0f0f22);border-top:1px solid var(--wbd2);border-bottom:1px solid var(--wbd2);position:sticky;top:0;z-index:1}
 .stcard .stlist thead th:first-child{border-left:1px solid var(--wbd2);border-radius:5px 0 0 5px}
@@ -4105,9 +4105,9 @@ position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-dire
 .sd-idl{display:flex;flex-direction:column;gap:9px;min-width:0}
 /* the wallet card: the one hard colour of the strip, the same in day and night */
 .sd-idw{position:relative;overflow:hidden;color:#fff;
-background:radial-gradient(120% 130% at 0% 0%,rgba(160,146,255,.5),transparent 55%),radial-gradient(80% 110% at 100% 115%,rgba(43,200,189,.2),transparent 60%),
-linear-gradient(150deg,#3b2c96 0%,#221868 45%,#120c35 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 0 1px rgba(255,255,255,.06)}
-/* the wallet card: deep indigo lit from the top left, a faint teal from the foot, ribbons of light sweeping across it, a few
+background:radial-gradient(120% 130% at 0% 0%,rgba(1,215,235,.42),transparent 55%),radial-gradient(80% 110% at 100% 115%,rgba(1,215,235,.16),transparent 60%),
+linear-gradient(150deg,#02358a 0%,#00205f 45%,#001347 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 0 1px rgba(255,255,255,.06)}
+/* the wallet card: PHOTON's colours - its deep navy lit by its cyan from the top left, faintly from the foot, ribbons of light sweeping across it, a few
    faint stars */
 .sd-idw::before{content:"";position:absolute;inset:0;pointer-events:none;background:url(assets/silk.svg) center/100% 100% no-repeat}
 .sd-idw::after{display:none}

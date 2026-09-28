@@ -1876,12 +1876,12 @@ rememberGridH();
     var by = function(a, b){ return b[1] - a[1]; };
     var ina = L.filter(function(v){ return !v[4]; }).sort(by), jai = L.filter(function(v){ return v[4]; }).sort(by);
     var h = "";
-    [[ina, key + "i", "Inactive validators", "can be ticked, 0% while inactive"], [jai, key + "j", "Jailed validators", "cannot be picked"]].forEach(function(g){
+    [[ina, key + "i", "Inactive validators", "can be selected, 0% while inactive"], [jai, key + "j", "Jailed validators", "cannot be picked"]].forEach(function(g){
       var list = g[0]; if(!list.length) return;
       var ticked = 0; list.forEach(function(v){ if(sel && sel[v[3]]) ticked++; });
       var open = !!IJ[g[1]] || ticked > 0;
       h += '<tr class="ij-t' + (open ? ' open' : '') + '"><td colspan=' + cols + '><button type=button class=ij-b data-ij="' + g[1] + '" aria-expanded=' + open + '>' +
-        '<span>' + g[2] + '</span><i>' + list.length + '</i><em>' + g[3] + (ticked ? ', <b>' + ticked + ' ticked</b>' : '') + '</em><u aria-hidden=true></u></button></td></tr>';
+        '<span>' + g[2] + '</span><i>' + list.length + '</i><em>' + g[3] + (ticked ? ', <b>' + ticked + ' selected</b>' : '') + '</em><u aria-hidden=true></u></button></td></tr>';
       if(!open) return;
       list.forEach(function(v){
         var can = !v[4] && !!v[5] && !!sel, on = can && !!sel[v[3]];
