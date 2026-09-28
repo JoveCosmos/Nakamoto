@@ -1563,6 +1563,11 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
 #sv-over #sd-sky :is(.se-mid,.se-ex)>:is(.se-row,.se-hero){--sv-green:var(--sv-amber)}
 #sv-over #sd-sky .se-rsm{color:var(--se-rs)}
 #sv-over #sd-sky .se-hero>.se-card{background:linear-gradient(0deg,rgba(255,176,46,.09),rgba(255,255,255,.012) 70%)}
+/* the day, week and month boxes a little taller (the one-line short tier keeps its size) */
+#sv-over #sd-sky .se-row .sd-fig:not(#z){padding-top:20px;padding-bottom:21px}
+@media(min-width:901px) and (max-height:1000px){#sv-over #sd-sky .se-row .sd-fig:not(#z){padding-top:21px;padding-bottom:22px}}
+@media(min-width:901px) and (max-height:760px){#sv-over #sd-sky .se-row .sd-fig:not(#z){padding-top:11px;padding-bottom:12px}}
+@media(min-width:901px) and (max-height:640px){#sv-over #sd-sky .se-row .sd-fig:not(#z){padding-top:3px;padding-bottom:3px}}
 /* What your stake earns and Enable restake: each box's colour line lies along its foot, the glow rising from it */
 #sv-over #sd-sky :is(.se-row .sd-fig,.se-card)::before{left:14px;right:14px;top:auto;bottom:0;width:auto;height:2px;border-radius:2px 2px 0 0}
 #sv-over #sd-sky .se-row .sd-fig{background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 9%,transparent),rgba(255,255,255,.012) 70%)}
