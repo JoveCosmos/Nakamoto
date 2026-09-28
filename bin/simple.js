@@ -167,14 +167,13 @@
       fig("A day", amt(P(1)), "ATONE", A) + fig("A week", amt(P(7)), "ATONE", A) + fig("A month", amt(P(365 / 12)), "ATONE", A) +
       fig(on ? "A year, restaking" : "A year", amt(Y), "ATONE", A) + '</div>' + claimRow(ex);
   }
-  /* under the four boxes, ending on the line Redelegate ends on: the rewards waiting to be claimed and the
-     Claim button (no wallet: Connect a wallet) */
+  /* under the four boxes, ending on the line Redelegate ends on: Stake more and Claim rewards (no wallet:
+     Connect a wallet) */
   function claimRow(ex){
-    var rw = window.__REW, has = !ex && rw != null && rw > 0;
     if(ex) return '<div class="se-cl one"><button class="sv-btn go sd-go" type=button data-shell-connect>Connect a wallet</button></div>';
-    return '<div class=se-cl><div class=se-rw><em>Rewards</em><b>' + (ex || rw == null ? "\u2014" : fmt(rw)) + '</b>' + (ex || rw == null ? '' : '<small>ATONE</small>') + '</div>' +
-      (ex ? '<button class="sv-btn go sd-go" type=button data-shell-connect>Connect a wallet</button>'
-          : '<button class="sv-btn go sd-go" type=button data-act=claim' + (has ? '' : ' disabled title="Nothing to claim yet"') + '>Claim</button>') + '</div>';
+    var rw = window.__REW, has = rw != null && rw > 0;
+    return '<div class=se-cl><button class="sv-btn go sd-go" type=button data-act=stake>Stake more</button>' +
+      '<button class="sv-btn go sd-go" type=button data-act=claim' + (has ? '' : ' disabled title="Nothing to claim yet"') + '>Claim rewards</button></div>';
   }
 
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every

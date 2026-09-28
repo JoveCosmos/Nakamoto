@@ -4283,15 +4283,11 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 @media(min-width:901px) and (max-height:560px){:is(#sv-over,#sv-auto) .sd-col>.sv-ph:not(#z){min-height:34px!important;padding-top:1px!important;padding-bottom:2px!important}}
 /* What your stake earns: Move your stake's four big boxes, in amber; the year's box carries restake's line in green */
 #sv-over #sd-sky .se-earn{flex:1 1 auto;min-height:0}
-/* the claim row: Rewards and Claim, as tall as Redelegate and on its line */
+/* the row under the earnings: Stake more and Claim rewards, as tall as Redelegate and on its line */
 #sv-over #sd-sky .se-cl{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;flex:0 0 auto}
 #sv-over #sd-sky .se-cl .sd-go{width:100%;margin-top:0}
 #sv-over #sd-sky .se-cl.one{grid-template-columns:minmax(0,1fr)}
-#sv-over #sd-sky .se-rw{display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;padding:0 12px;border-radius:8px;border:1px solid rgba(46,224,106,.35);
-  background:linear-gradient(180deg,rgba(46,224,106,.1),rgba(46,224,106,.04));white-space:nowrap;overflow:hidden}
-#sv-over #sd-sky .se-rw em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
-#sv-over #sd-sky .se-rw b{font-size:16px;font-weight:800;color:var(--sv-green);font-variant-numeric:tabular-nums}
-#sv-over #sd-sky .se-rw small{font-family:var(--wmono);font-size:9px;letter-spacing:.12em;color:var(--wf)}
+
 /* its figures a step under Move's, so a five-figure year fits its box */
 #sv-over #sd-sky .se-earn .sd-fig>b:not(#z){font-size:34px;white-space:nowrap}
 @media(min-width:901px) and (max-height:700px){#sv-over #sd-sky .se-earn .sd-fig>b:not(#z){font-size:26px}}
