@@ -4107,10 +4107,9 @@ position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-dire
 .sd-idw{position:relative;overflow:hidden;color:#fff;
 background:radial-gradient(120% 130% at 0% 0%,rgba(160,146,255,.5),transparent 55%),radial-gradient(80% 110% at 100% 115%,rgba(43,200,189,.2),transparent 60%),
 linear-gradient(150deg,#3b2c96 0%,#221868 45%,#120c35 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 0 1px rgba(255,255,255,.06)}
-/* the wallet card: deep indigo lit from the top left, a faint teal from the foot, Nenya, the ring of adamant, shining at its
-   right edge */
-.sd-idw::before{content:"";position:absolute;right:14px;top:50%;width:118px;height:100px;transform:translateY(-50%);pointer-events:none;
-background:url(assets/nenya.svg) center/contain no-repeat;filter:drop-shadow(0 0 14px rgba(200,210,255,.35));opacity:.95}
+/* the wallet card: deep indigo lit from the top left, a faint teal from the foot, ribbons of light sweeping across it, a few
+   faint stars */
+.sd-idw::before{content:"";position:absolute;inset:0;pointer-events:none;background:url(assets/silk.svg) center/100% 100% no-repeat}
 .sd-idw::after{display:none}
 .sd-idw>*{position:relative;z-index:1}
 .sd-idw h3,.sd-idw .sv-wn{color:#fff}
