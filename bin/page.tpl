@@ -5008,6 +5008,8 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 /* the two rows share the panel's height equally, each box filling its row */
 #sv-auto .ap-dd>.ap-row{flex:1 1 0;min-height:0}
 #sv-auto .ap-row>.ap-cb{justify-content:center;height:100%;box-sizing:border-box}
+/* every box's label and line on one level: the caption always holds two lines, so the stacks are the same height */
+#sv-auto .ap-cb small{min-height:2.7em;display:flex;align-items:flex-start;justify-content:center}
 #sv-auto .ap-dd>u{text-decoration:none;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase}
 #sv-auto .ap-dd>u.ok{color:#8ff0b0}#sv-auto .ap-dd>u.no{color:#ff8a8a;margin-top:4px}
 #sv-auto .ap-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
@@ -5054,6 +5056,9 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
   #sv-auto #sd-ars .sd-go:not(#z):not(#y){height:36px}}
 @media(min-width:901px) and (max-height:700px){#sv-auto #sd-ars .ars-fig>b:not(#z):not(#y){font-size:19px;line-height:1.2}#sv-auto #sd-ars>.ars-fig:not(#z):not(#y){padding-top:4px;padding-bottom:5px}}
 @media(min-width:901px) and (max-height:640px){#sv-auto #sd-ars .ars-how:not(#z):not(#y){padding:3px 6px;font-size:9.5px;line-height:1.25}#sv-auto #sd-ars .ars-two:not(#z):not(#y){margin-top:4px;gap:5px}}
+/* no empty middle: the year box grows into the room above the rules, its content centred in it */
+#sv-auto #sd-ars>.ars-fig:not(#z){flex:1 1 auto;justify-content:center;min-height:0}
+#sv-auto #sd-ars .ars-foot:not(#z){margin-top:0}
 /* the state pill: one shape for both, green when enabled, grey when not */
 #sv-auto #sd-ars>.sv-ph .sv-tag.ars-st:not(#z):not(#y){font-family:var(--wsans);font-size:10px;font-weight:700;letter-spacing:0;text-transform:none;padding:2px 9px;color:#e6e4f0!important;border-color:rgba(255,255,255,.35)!important;background:rgba(255,255,255,.14)!important}
 #sv-auto #sd-ars>.sv-ph .sv-tag.ars-st.on:not(#z):not(#y){color:#03230e!important;border-color:#2ee06a!important;background:#2ee06a!important}
@@ -5716,11 +5721,9 @@ html[data-tab=connect] .l2host{display:none}
             <label class=atpc><input type=radio name=atpick value=auto checked><b>Autopilot</b><em id=atna></em><small class=atd>the best-paying, never jailed</small></label>
             <label class=atpc><input type=radio name=atpick value=selected><b>Choose yourself</b><em id=atn2></em><small class=atd>you pick each one</small></label>
           </div></div>
-        <div class=atrow><span class=atlab><i>3</i>Stake<small>the most it may move</small></span>
-          <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
+        <div class=atrow><span class=atlab><i>3</i>Stake<small>optional cap on what it may move; empty for no cap</small></span>
+          <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="no cap" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
           <span class=unhint id=athint></span></div>
-        <div class=atrow><span class=atlab><i>4</i>Time<small>how long your grant lasts</small></span>
-          <div class=attime><div class=atseg id=atseg><button type=button data-d=90 aria-pressed=true>3 months</button><button type=button data-d=180 aria-pressed=false>6 months</button><button type=button data-d=365 aria-pressed=false>12 months</button></div><span class=atuntil id=atuntil></span></div></div>
         <div class=atrsnote id=atrsnote hidden></div>
         <div class=atfee id=atfee hidden></div>
       </div>

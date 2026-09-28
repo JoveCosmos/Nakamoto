@@ -2683,10 +2683,11 @@ rememberGridH();
   function atCap(){ var a = E("atcap"), n = parseFloat((a.value || "").replace(/[^0-9.]/g, "")); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
   function atMsgs(){
     var scope = atScope(), cap = atCap(), pos = window.__POS;
-    if(!AT.addr || !scope.length || !(cap > 0) || !pos) return [];
-    var exp = Date.now() + AT.days * 86400000;
+    if(!AT.addr || !scope.length || !pos) return [];
+    /* until revoked: no end date; the amount it may move is a cap only when the reader sets one */
+    var auth = { authorization_type: "redelegate", allow_list: scope }; if(cap > 0) auth.max_tokens = { denom: "uatone", amount: String(cap) };
     var msgs = [{ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
-      grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: { authorization_type: "redelegate", max_tokens: { denom: "uatone", amount: String(cap) }, allow_list: scope } }, expiration: exp } } }];
+      grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: auth } } } }];
     /* restake is its own switch (the Autopilot card's chip): this grant never adds or removes it. A grant that
        stands is simply overwritten by the new terms, a change is not charged the service fee again */
     if(AT.grant) return msgs;
@@ -2774,9 +2775,8 @@ rememberGridH();
     var idl = E("atidle"), iv = window.__idleAtone ? window.__idleAtone() : "";
     if(idl){ idl.hidden = view || !iv; if(iv) idl.innerHTML = "<b>Autopilot keeps your stake active</b>, through a long winter, a busy month, or when you would rather not look. Today <b class=n>" + iv + " ATONE</b> sits idle on inactive validators, earning nothing."; }
     var mx = E("atmaxv"); if(mx) mx.textContent = pos ? exact(pos.free, 2) : "—";
-    var un = E("atuntil"); if(un) un.innerHTML = "until <b>" + window.__dayFull(Date.now() + AT.days * 86400000) + "</b>";
     var signer = !!window.__WALLET && !!window.__WALLET.signDirect;
-    var nsc = scope.length, ok = !view && !!AT.addr && nsc >= AT_MIN && nsc <= AT_MAX && cap > 0 && signer;
+    var nsc = scope.length, ok = !view && !!AT.addr && nsc >= AT_MIN && nsc <= AT_MAX && signer;
     var hint = E("athint");
     if(hint){ hint.className = "unhint"; hint.textContent = !signer ? "Needs Keplr (direct signing)"
       : !scope.length ? (atPick() === "selected" ? "Select " + AT_MIN + " to " + AT_MAX + " validators" : "the set has not loaded yet")
@@ -2789,8 +2789,8 @@ rememberGridH();
       rn.textContent = !ot ? "" : ot.all ? "Another service already restakes your rewards. Autopilot will not claim alongside it."
         : "Another service already restakes your rewards on " + mine + " of your " + (pos ? pos.rows.length : 0) + " validators. Autopilot leaves those to it."; }
     var sm = E("atsum");
-    if(sm) sm.innerHTML = view ? "Active" : !AT.addr ? '<span class=atclosed>Inactive</span>' : ok ? fmt(cap) + " ATONE<br>" +
-      (atPick() === "selected" ? "my selection, " : "") + scope.length + " validators, " + atMonths() : "";
+    if(sm) sm.innerHTML = view ? "Active" : !AT.addr ? '<span class=atclosed>Inactive</span>' : ok ? (cap > 0 ? fmt(cap) + " ATONE cap" : "no cap") + "<br>" +
+      (atPick() === "selected" ? "my selection, " : "") + scope.length + " validators, until revoked" : "";
     var fee = AT.grant ? 0 : atFee(), sl = atRestake() ? atSplitLimit() : 0, feeEl = E("atfee");
     if(feeEl){ feeEl.hidden = view || !(fee > 0 || sl > 0);
       if(sl > 0) feeEl.innerHTML = "<b>" + AT.split_pct + "%</b> of restaked rewards go to GATA - allows sending up to <b>" + fmt(sl) + " ATONE</b> to GATA over " + atMonths() + ".";

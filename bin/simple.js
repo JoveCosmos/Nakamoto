@@ -370,7 +370,7 @@
       (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "\u2014", "", null, "var(--sv-green)", "", false, rec ? "APR" : "")
          : ro("Since start", "\u2014", "", null, "var(--sv-green)")) +
       ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "\u2014", "", null, "var(--sv-violet)", "", false, g && a.max_tokens ? "ATONE" : "") +
-      ro("Runs until", until || "\u2014", "", null, "var(--sv-violet)") +
+      ro("Runs until", g ? (until || "Revoked") : "\u2014", "", null, "var(--sv-violet)") +
       ro("Moves made", g ? String(moves) : "\u2014", "", null, "var(--sv-teal)") +
       ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)"));
     /* restake, in one line: what it has done, or who does it instead, or that it waits */
@@ -405,8 +405,8 @@
       put("sd-ado", '<div class=sv-ph><h3>Your Autopilot Grant</h3></div>' +
         '<div class=ap-dd><i class="ap-ln ok" aria-hidden=true></i><div class=ap-row>' +
           cb("Keeps stake active", "24/7", ib ? ib + " ATONE idle on inactive validators" : "through a long winter or a busy month", "#2bc8d6") +
-          cb("Strategizes", "Better APR", "among your validators", "#b9b0ff") +
-          cb("Restakes", "Rewards", "if you switch it on", "#2ee06a") +
+          cb("Strategize", "Better APR", "among your validators", "#b9b0ff") +
+          cb("Monitors", "Live", "your validators, every minute", "#2ee06a") +
           cb("You grant", "It runs", "you revoke, it stops", "#2ee06a") +
         '</div><i class="ap-ln no" aria-hidden=true></i><div class=ap-row>' +
           cb("Send", "Never", "nor spend your ATONE", "#ff6a6a", "no") +
