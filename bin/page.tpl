@@ -4974,6 +4974,7 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 .sd-ida .sd-wch button.rsw:not(#z){cursor:pointer;font-style:normal;font-family:var(--wmono);font-size:8.5px;line-height:1;letter-spacing:.14em;text-transform:uppercase;padding:3px 7px;border-radius:999px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);height:auto}
 .sd-ida .sd-wch button.rsw.on:not(#z){color:#b6f5cb;border-color:rgba(143,240,176,.6);background:rgba(46,224,106,.16)}
 .sd-ida .sd-wch button.rsw:hover{border-color:rgba(255,255,255,.6)}.sd-ida .sd-wch button.rsw:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#atpop .atpc em:empty{display:none}
 /* the setup's validator count: Redelegate's live count, at the right of the list's title */
 #atpop .atrt:not(#z){display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
 #atpop .atrh,#atpop .atrt:not(#z){width:100%}

@@ -2719,7 +2719,7 @@ rememberGridH();
   /* the counts: on the strategy and validator cards, over the list, on the phone's tab */
   function atCounts(){
     var auto = atAutoIds().length, sel = atSelIds().length, view = atViewing(), word = { passive: "Passive", below: "Moderate", aggressive: "Aggressive" }[atPreset()] || "Moderate";
-    var na = E("atna"); if(na) na.textContent = auto + " picked, best-paying";
+    var na = E("atna"); if(na) na.textContent = "";
     var n2 = E("atn2"); if(n2) n2.textContent = sel ? sel + " selected" : AT_MIN + " to " + AT_MAX + " validators";
     var n = view ? Object.keys(atGrantIds()).length : atPick() === "auto" ? auto : sel;
     /* live, as Redelegate's: the number, then what it counts */
