@@ -205,11 +205,13 @@
     /* a barcode of the set: every validator a thin bar in rank order (largest first); the ones holding
        the stake stand tall and bright, the rest short and dim; brackets under it mark the thirds with
        their shares. Each bar opens its validator's card */
-    var hi = 0; for(i = 0; i < n; i++) if(x[i] > hi) hi = x[i];
+    /* every bar is its validator's own stake - the shape of the set - dim; the ones holding the reader's
+       stake light up (no wallet: the whole set lit) */
+    var hi = 0; for(i = 0; i < n; i++) if(V[i][1] > hi) hi = V[i][1];
     var held = 0; for(i = 0; i < n; i++) if(x[i] > 0) held++;
     var bars = "";
     for(i = 0; i < n; i++){
-      var h = x[i] > 0 && hi ? (mine ? 34 + 66 * Math.sqrt(x[i] / hi) : 10 + 90 * Math.sqrt(x[i] / hi)) : 9;
+      var h = hi ? 8 + 92 * Math.sqrt(V[i][1] / hi) : 8;
       bars += '<i class="fp-b b' + band(i) + (x[i] > 0 ? ' on' : '') + '" data-v="' + esc(V[i][3]) + '" style="height:' + h.toFixed(1) + '%" title="#' + (i + 1) + ' ' + esc(V[i][0]) +
         (x[i] > 0 ? ', ' + fmt(x[i]) + ' ATONE' : '') + '"></i>'; }
     var cut1 = Math.ceil(n / 3), cut2 = Math.ceil(2 * n / 3);
@@ -217,7 +219,7 @@
     var br = sums.slice(0, 3).map(function(q, k){ return '<div class="fp-k b' + k + '" style="flex:' + span[k] + ' 1 0"><em>' + q[0] + '</em><b class=fpt' + k + '>' + sh(q[1]) + '%</b><small>' +
       (q[1] >= 1e12 ? big(q[1]) : fmt(q[1])) + ' ATONE</small></div>'; }).join("");
     return head.replace('</h3></div>', '</h3>' + (mine ? tag("q", "on " + held + " of " + n + " validators") : tag("q", n + " validators")) + '</div>') +
-      '<div class=fp-bc>' + bars + '</div><div class=fp-ax><span>largest #1</span><span>smallest #' + n + '</span></div>' +
+      '<div class=fp-bc>' + bars + '</div><div class=fp-ax><span>#1 largest</span><span>smallest #' + n + '</span></div>' +
       '<div class=fp-br>' + br + '</div>' + (out > 0 ? '<div class=sd-off>' + fmt(out) + ' ATONE on inactive validators earns nothing</div>' : '');
   }
 
