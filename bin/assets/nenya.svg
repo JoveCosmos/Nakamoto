@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 120" width="140" height="120">
+  <defs>
+    <linearGradient id="mf" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8f96c4"/><stop offset=".22" stop-color="#ffffff"/><stop offset=".45" stop-color="#b7bde0"/>
+      <stop offset=".62" stop-color="#f4f6ff"/><stop offset=".82" stop-color="#9aa1cc"/><stop offset="1" stop-color="#e6e9ff"/>
+    </linearGradient>
+    <linearGradient id="mb" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5a5f8e"/><stop offset=".5" stop-color="#9ca3cf"/><stop offset="1" stop-color="#5a5f8e"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".95"/><stop offset=".35" stop-color="#dfe6ff" stop-opacity=".45"/><stop offset="1" stop-color="#b9c4ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gem" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#e8eeff"/><stop offset="1" stop-color="#b8c3f2"/>
+    </linearGradient>
+  </defs>
+  <!-- the far side of the band, behind the stone -->
+  <path d="M26 78 A44 17 0 0 1 114 78" fill="none" stroke="url(#mb)" stroke-width="6" stroke-linecap="round" opacity=".85"/>
+  <!-- the light the stone gives -->
+  <circle cx="70" cy="50" r="34" fill="url(#glow)"/>
+  <!-- the setting -->
+  <path d="M58 62 L64 54 L76 54 L82 62 Z" fill="url(#mf)" opacity=".95"/>
+  <!-- the stone: adamant, cut -->
+  <path d="M60 46 L66 38 L74 38 L80 46 L70 60 Z" fill="url(#gem)" stroke="#ffffff" stroke-width=".6"/>
+  <path d="M60 46 L80 46 M66 38 L70 46 L74 38 M70 46 L70 60 M60 46 L70 60 L80 46" fill="none" stroke="#9fa9dc" stroke-width=".6" opacity=".8"/>
+  <!-- the near side of the band, in front -->
+  <path d="M26 78 A44 17 0 0 0 114 78" fill="none" stroke="url(#mf)" stroke-width="7" stroke-linecap="round"/>
+  <path d="M34 84 A40 13 0 0 0 64 94" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity=".9"/>
+  <!-- a glint on the stone -->
+  <path d="M84 30 L85.6 36.4 L92 38 L85.6 39.6 L84 46 L82.4 39.6 L76 38 L82.4 36.4 Z" fill="#ffffff"/>
+  <circle cx="84" cy="38" r="2.4" fill="#ffffff"/>
+</svg>

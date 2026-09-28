@@ -4107,10 +4107,10 @@ position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-dire
 .sd-idw{position:relative;overflow:hidden;color:#fff;
 background:radial-gradient(120% 130% at 0% 0%,rgba(160,146,255,.5),transparent 55%),radial-gradient(80% 110% at 100% 115%,rgba(43,200,189,.2),transparent 60%),
 linear-gradient(150deg,#3b2c96 0%,#221868 45%,#120c35 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 0 1px rgba(255,255,255,.06)}
-/* the wallet card: deep indigo lit from the top left, a faint teal from the foot, AtomOne's mark large and quiet at its
-   right edge - no rings, no dot */
-.sd-idw::before{content:"";position:absolute;right:-30px;top:50%;width:150px;height:150px;transform:translateY(-50%);pointer-events:none;
-background:linear-gradient(135deg,rgba(255,255,255,.2),rgba(255,255,255,.03));-webkit-mask:url(assets/atomone-mark.svg) center/contain no-repeat;mask:url(assets/atomone-mark.svg) center/contain no-repeat}
+/* the wallet card: deep indigo lit from the top left, a faint teal from the foot, Nenya, the ring of adamant, shining at its
+   right edge */
+.sd-idw::before{content:"";position:absolute;right:14px;top:50%;width:118px;height:100px;transform:translateY(-50%);pointer-events:none;
+background:url(assets/nenya.svg) center/contain no-repeat;filter:drop-shadow(0 0 14px rgba(200,210,255,.35));opacity:.95}
 .sd-idw::after{display:none}
 .sd-idw>*{position:relative;z-index:1}
 .sd-idw h3,.sd-idw .sv-wn{color:#fff}
@@ -4293,10 +4293,12 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 /* all four boxes keep the same room at their foot for restake's lines, so their figures stay level and clear of it */
 #sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:40px}
 @media(min-width:901px) and (max-height:1000px){#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:36px}}
-@media(min-width:901px) and (max-height:820px){#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:22px}}
-@media(min-width:901px) and (max-height:700px){#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:17px}}
+@media(min-width:901px) and (max-height:820px){#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:32px}}
+@media(min-width:901px) and (max-height:700px){#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:28px}}
 @media(min-width:901px) and (min-height:821px) and (max-height:1000px){#sv-over #sd-sky .se-earn .sd-fig>b:not(#z){font-size:30px}}
-@media(min-width:901px) and (max-height:600px){#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:20px}}
+@media(min-width:901px) and (max-height:600px){#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:27px}}
+@media(min-width:901px) and (max-height:640px){#sd-sky .se-rsx:not(#z){bottom:3px;line-height:1.12}#sd-sky .se-rsx .se-rsl:not(#z){font-size:9px}#sd-sky .se-rsx .se-rsl2:not(#z){font-size:8.5px;margin-top:0}
+  #sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:24px}#sv-over #sd-sky .se-earn .sd-fig>b:not(#z){font-size:19px}#sv-over #sd-sky .se-earn .sd-fig em:not(#z){padding-bottom:3px;margin-bottom:0}}
 #sd-sky .se-rsx{position:absolute;left:8px;right:8px;bottom:12px;text-align:center;pointer-events:none}
 #sd-sky .se-rsx .se-rsl:not(#z){margin:0}
 #sd-sky .se-rsx .se-rsl b{white-space:nowrap}
@@ -4304,7 +4306,7 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 #sd-sky .se-rsx{line-height:1.3}#sd-sky .se-rsx .se-rsl2{display:block;margin-top:2px;font-size:10.5px;color:var(--wf)}
 @media(min-width:901px) and (max-width:1599px){#sd-sky .se-rsx .se-rsl{font-size:10px}#sd-sky .se-rsx .se-rsl2{font-size:9.5px}}
 @media(min-width:901px) and (max-height:1000px){#sd-sky .se-rsx{bottom:9px}}
-@media(min-width:901px) and (max-height:820px){#sd-sky .se-rsx{bottom:6px}#sd-sky .se-rsx .se-rsl2{display:none}}
+@media(min-width:901px) and (max-height:820px){#sd-sky .se-rsx{bottom:6px}}
 @media(min-width:901px) and (max-height:700px){#sd-sky .se-rsx{bottom:4px}#sd-sky .se-rsx .se-rsl{font-size:9.5px}}
 /* Stake more and Claim rewards: Move your stake's door, side by side - Stake more filled amber, Claim outlined */
 #sd-sky .se-doors{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:0 0 auto}
