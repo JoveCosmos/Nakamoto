@@ -5026,8 +5026,8 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 #sv-auto .ars-fig{display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:10px;padding:14px 10px;border:1px solid var(--wbd2);border-radius:10px;text-align:center;
   background:linear-gradient(0deg,rgba(46,224,106,.1),rgba(255,255,255,.012) 70%)}
 #sv-auto .ars-fig em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ws)}
-#sv-auto .ars-fig b{font-size:30px;font-weight:800;letter-spacing:-.02em;color:var(--sv-green);white-space:nowrap}
-#sv-auto .ars-fig b i{font-style:normal;font-size:11px;font-weight:600;color:var(--wf)}
+#sv-auto .ars-fig>b{font-size:30px;font-weight:800;letter-spacing:-.02em;color:var(--sv-green);white-space:nowrap}
+#sv-auto .ars-fig>b i{font-style:normal;font-size:11px;font-weight:600;color:var(--wf)}
 #sv-auto .ars-fig small{font-size:11.5px;color:var(--ws)}
 /* as the other figure boxes: the label with its short accent line, the value, the APR on the row below */
 #sv-auto .ars-fig em{position:relative;padding-bottom:6px;margin-bottom:2px}
@@ -5046,6 +5046,15 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
   background:rgba(46,224,106,.07);text-wrap:balance}
 #sv-auto .ars-how b{color:var(--sv-green)}
 #sv-auto .ars-foot{margin-top:auto;padding-top:8px}
+/* enabled: the grant's expiry, inside the year box under a fine rule */
+#sv-auto .ars-until{display:block;margin-top:6px;padding-top:6px;border-top:1px solid rgba(46,224,106,.25);width:88%;font-size:11px;color:var(--ws)}
+#sv-auto #sd-ars .ars-until b:not(#z){font-size:inherit;letter-spacing:0;line-height:inherit;color:var(--wt);font-weight:700;display:inline}
+@media(min-width:901px) and (max-height:700px){#sv-auto .ars-until{margin-top:3px;padding-top:3px;font-size:10px}}
+/* enabled (the expiry line in the year box): the rules below a step tighter so it all stays in the panel */
+@media(min-width:901px) and (max-height:1000px){#sv-auto #sd-ars:has(.ars-until) .ars-two small{display:none}#sv-auto #sd-ars:has(.ars-until) .ars-two>div:not(#z){padding:7px 6px 8px}
+  #sv-auto #sd-ars:has(.ars-until)>.ars-fig:not(#z){margin-top:6px;padding-top:6px;padding-bottom:7px}#sv-auto #sd-ars:has(.ars-until) .ars-fig>b:not(#z){font-size:22px}
+  #sv-auto #sd-ars:has(.ars-until) .ars-how:not(#z){padding:5px 8px}}
+@media(min-width:901px) and (max-height:640px){#sv-auto #sd-ars:has(.ars-until) .ars-fig>small{display:none}#sv-auto #sd-ars:has(.ars-until) .ars-two>div:not(#z){padding:2px 6px}#sv-auto #sd-ars:has(.ars-until) .ars-how:not(#z){padding:3px 6px;font-size:9.5px}#sv-auto #sd-ars:has(.ars-until) .ars-until{border-top:0;margin-top:0;padding-top:0}}
 /* the year box a little lower under the title, on the taller windows */
 #sv-auto #sd-ars>.ars-fig:not(#z){margin-top:18px}
 @media(min-width:901px) and (max-height:1000px){#sv-auto #sd-ars>.ars-fig:not(#z){margin-top:12px}}
@@ -5061,15 +5070,15 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 @media(min-width:901px) and (max-height:760px){#sv-auto .ars-two>div:not(#z){min-height:0;padding:7px 6px 8px}#sv-auto .ars-two small{display:none}#sv-auto .ars-two b:not(#z){font-size:16px}}
 @media(min-width:901px) and (max-height:700px){#sv-auto .ars-two>div:not(#z){flex-direction:column;padding:4px 6px}#sv-auto .ars-two em{padding-bottom:3px}#sv-auto .ars-two em::after{display:none}#sv-auto .ars-two b:not(#z){font-size:14px}}
 /* narrower columns: the year box and the compounding line a step tighter */
-@media(min-width:901px) and (max-width:1599px){#sv-auto #sd-ars .ars-fig:not(#z){padding-top:9px;padding-bottom:10px}#sv-auto #sd-ars .ars-fig b:not(#z){font-size:26px}
+@media(min-width:901px) and (max-width:1599px){#sv-auto #sd-ars .ars-fig:not(#z){padding-top:9px;padding-bottom:10px}#sv-auto #sd-ars .ars-fig>b:not(#z){font-size:26px}
   #sv-auto #sd-ars .ars-how:not(#z){font-size:11px;line-height:1.35;padding:7px 8px}}
 @media(min-width:901px) and (max-height:640px){#sv-auto .ars-two>div:not(#z){flex-direction:row;align-items:baseline;justify-content:center;gap:6px;padding:4px 6px}#sv-auto .ars-two em{padding-bottom:0}#sv-auto .ars-two b:not(#z){font-size:13px}#sv-auto #sd-ars .ars-fig small:not(#z){font-size:10px;line-height:1.2}#sv-auto #sd-ars .ars-foot:not(#z){padding-top:2px}}
 @media(min-width:901px) and (max-height:640px){#sv-auto #sd-ars .ars-fig em:not(#z){display:none}#sv-auto #sd-ars .ars-fig:not(#z){gap:0;padding:4px 8px}
   #sv-auto #sd-ars .ars-foot:not(#z){padding-top:4px}#sv-auto #sd-ars .ars-how:not(#z){font-size:10px;line-height:1.25;padding:4px 6px}#sv-auto #sd-ars .sd-go:not(#z){margin-top:3px;height:26px}}
 #sv-auto #sd-ars .sd-go{margin-top:8px}
 #sv-auto #sd-ars .sd-go.ars-off:not(#z){background:rgba(255,77,31,.12);border:1px solid rgba(255,110,70,.6);color:#ffb7a3;box-shadow:none}
-@media(min-width:901px) and (max-height:760px){#sv-auto .ars-fig{padding:9px 8px;margin-top:6px}#sv-auto .ars-fig b{font-size:24px}#sv-auto .ars-rules{gap:3px;margin-top:6px;font-size:11px}}
-@media(min-width:901px) and (max-height:700px){#sv-auto .ars-fig:not(#z){margin-top:4px;padding:5px 8px;gap:0}#sv-auto .ars-fig b{font-size:20px}#sv-auto .ars-fig small{font-size:10.5px}
+@media(min-width:901px) and (max-height:760px){#sv-auto .ars-fig{padding:9px 8px;margin-top:6px}#sv-auto .ars-fig>b{font-size:24px}#sv-auto .ars-rules{gap:3px;margin-top:6px;font-size:11px}}
+@media(min-width:901px) and (max-height:700px){#sv-auto .ars-fig:not(#z){margin-top:4px;padding:5px 8px;gap:0}#sv-auto .ars-fig>b{font-size:20px}#sv-auto .ars-fig small{font-size:10.5px}
   #sv-auto .ars-two:not(#z){margin-top:5px;gap:5px}#sv-auto .ars-two>div{flex-direction:row;justify-content:center;gap:6px;padding:4px 6px}#sv-auto .ars-two b{font-size:13px}
   #sv-auto .ars-how:not(#z){margin-top:5px;padding:5px 8px;font-size:10.5px;line-height:1.3}#sv-auto .ars-rules:not(#z){margin-top:4px;font-size:10.5px}
   #sv-auto #sd-ars .sd-go:not(#z){height:32px}#sv-auto #sd-ars>.sv-ph{margin-bottom:0!important}}
