@@ -155,7 +155,15 @@ def build(cfg, tpl):
         if solo:
             l2.append(f'<div class="l2 solo" {attrs}><div class=l2trk>' + _l2tab(s, subs[0]) + "</div></div>")
         elif not groups:
-            l2.append(f'<div class=l2 {attrs}><div class=l2trk>' + "".join(_l2tab(s, v) for v in subs) + "</div></div>")
+            # a view 'under' another has no tab of its own: it is that view's second mode, reached by the
+            # mode switch that ends the row (Easy | Pro); the host's tab stays lit for it
+            l2.append(f'<div class=l2 {attrs}><div class=l2trk>' + "".join(_l2tab(s, v) for v in subs if not v.get("under")) + "</div></div>")
+            for v in subs:
+                if v.get("under"):
+                    host = next(w for w in subs if w["id"] == v["under"])
+                    l2.append(f'<div class="l2ver l2mode" data-for="{_esc(s["id"])}" data-host="{_esc(host["id"])}" role=group aria-label="{_esc(host["label"])} mode">'
+                              f'<div class=l2trk><button class=l2vb type=button data-go="{_esc(s["route"])}/{_esc(host["route"])}" data-mode="{_esc(host["id"])}">Easy</button>'
+                              f'<button class=l2vb type=button data-go="{_esc(s["route"])}/{_esc(v["route"])}" data-mode="{_esc(v["id"])}">{_esc(v["label"])}</button></div></div>')
         else:
             parts = []
             for g in groups:
@@ -174,8 +182,12 @@ def build(cfg, tpl):
                        if len(s["sub"]) > 1 or s.get("switch"))
     show_ttl = ",".join(f"html[data-sec={q(s['id'])}] [data-title-for={q(s['id'])}]" for s in secs)
     lit_l1 = ",".join(f"html[data-sec={q(s['id'])}] .l1tab[data-section={q(s['id'])}]" for s in secs)
-    lit_l2 = ",".join(f"html[data-sv={q(s['id'] + '/' + v['id'])}] .l2tab[data-key={q(s['id'] + '/' + v['id'])}]"
+    lit_l2 = ",".join(f"html[data-sv={q(s['id'] + '/' + v['id'])}] .l2tab[data-key={q(s['id'] + '/' + (v.get('under') or v['id']))}]"
                       for s in secs for v in s["sub"])
+    # the mode switch shows on its host view and on the view under it; the open one is lit
+    modes = [(s, v) for s in secs for v in s["sub"] if v.get("under")]
+    show_mode = ",".join(f"html[data-sv={q(s['id'] + '/' + x)}] .l2mode[data-for={q(s['id'])}]" for s, v in modes for x in (v["under"], v["id"]))
+    lit_mode = ",".join(f"html[data-sv={q(s['id'] + '/' + x)}] .l2mode .l2vb[data-mode={q(x)}]" for s, v in modes for x in (v["under"], v["id"]))
     show_ver = ",".join(f"html[data-sec={q(s['id'])}] .l2ver[data-for={q(s['id'])}]" for s in secs if s.get("switch"))
     grps = sorted({v["group"] for s in secs if s.get("switch") for v in s["sub"]})
     show_grp = ",".join(f"html[data-grp={q(g)}] .l2.grp .l2g[data-g={q(g)}]" for g in grps)
@@ -188,6 +200,7 @@ def build(cfg, tpl):
            f"{lit_l1}{{background:var(--tint);color:var(--l1-on);font-weight:500}}\n"
            f"{lit_l2}{{background:var(--l2-on);color:var(--l2-on-ink);font-weight:500;--l2-lit:1}}\n"
            + (f"{show_scr}{{display:flex}}\n" if show_scr else "")
+           + (f"{show_mode}{{display:inline-flex}}\n{lit_mode}{{background:var(--l2-on);color:var(--l2-on-ink);font-weight:500}}\n" if modes else "")
            + (f"{show_ver}{{display:inline-flex}}\n{show_grp}{{display:flex}}\n"
               f"{lit_ver}{{background:var(--l2-on);color:var(--l2-on-ink);font-weight:500}}\n" if show_ver else ""))
 

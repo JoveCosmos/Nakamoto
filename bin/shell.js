@@ -68,7 +68,7 @@
     Array.prototype.forEach.call(document.querySelectorAll(".l2"), function(list){
       var tabs = list.querySelectorAll(".l2tab"), hit = false;
       Array.prototype.forEach.call(tabs, function(b){
-        var on = !!s && !!v && b.dataset.key === s.id + "/" + v.id; hit = hit || on;
+        var on = !!s && !!v && b.dataset.key === s.id + "/" + (v.under || v.id); hit = hit || on;
         b.setAttribute("aria-selected", on ? "true" : "false"); b.tabIndex = on ? 0 : -1;
       });
       if(!hit && tabs.length) tabs[0].tabIndex = 0;
@@ -158,7 +158,7 @@
       R.setAttribute("data-sec", s.id); R.setAttribute("data-sv", s.id + "/" + v.id);
       if(s.switch && v.group) R.setAttribute("data-grp", v.group); else R.removeAttribute("data-grp");
       if(tab === "dele" && window.__dashView) window.__dashView(e.ui, e.screen);
-      var pn = panelOf(s, v); if(pn && pn.id !== "p-connect") pn.setAttribute("aria-labelledby", "l2-" + s.id + "-" + v.id);
+      var pn = panelOf(s, v); if(pn && pn.id !== "p-connect") pn.setAttribute("aria-labelledby", "l2-" + s.id + "-" + (v.under || v.id));   /* a mode is labelled by its host's tab */
       if(tab === "empty") fillEmpty(s, v);
       if(tab === "connect") fillConnect(s);
     }
@@ -184,6 +184,10 @@
     if(!v || !eff(s, v)) for(v = null, i = 0; i < s.sub.length; i++) if(s.sub[i].group === g && eff(s, s.sub[i])){ v = s.sub[i]; break; }
     if(v) go(s, v, "push");
   }
+  /* the Easy | Pro mode switch: each button opens its view, and the choice is remembered for the tab */
+  document.addEventListener("click", function(ev){ var b = ev.target.closest && ev.target.closest(".l2mode [data-go]"); if(!b) return;
+    try{ localStorage.setItem("th_mode", b.dataset.mode); }catch(e){}
+    window.__shellGo(b.dataset.go); });
   window.__shellGo = function(route){ var r = parse("#/" + route); if(r) r.intro ? go(null, null, "push") : go(r.s, r.v, "push"); };
 
   function activate(b){
@@ -192,7 +196,11 @@
     /* the Staking tab always opens on the map, whichever view (APR, rank, graph...) was last used */
     if(b.classList.contains("l1tab") && s.id === "staking" && window.__mapMode) window.__mapMode("color");
     if(b.classList.contains("l1tab")) go(s, cur.s === s && s.entry !== "first" ? cur.v : last(s), "push");
-    else { var v = sub(s, "id", b.dataset.sub); if(v) go(s, v, "push"); }
+    else { var v = sub(s, "id", b.dataset.sub); if(!v) return;
+      /* a tab with a second mode opens the mode last chosen (Stake: Easy or Pro) */
+      var md = null; try{ md = localStorage.getItem("th_mode"); }catch(e){}
+      var alt = md ? sub(s, "id", md) : null; if(alt && alt.under === v.id) v = alt;
+      go(s, v, "push"); }
   }
 
   /* clicks: the tabs, any [data-route] door, and the connect screen's button (links to
@@ -200,6 +208,7 @@
   document.addEventListener("click", function(ev){
     var t = ev.target.closest ? ev.target.closest(".l1tab,.l2tab,.l2vb,[data-route],[data-shell-connect]") : null;
     if(!t) return;
+    if(t.closest(".l2mode")) return;   /* the mode switch has its own handler */
     if(t.classList.contains("l2vb")){ if(t.getAttribute("aria-disabled") !== "true") openGroup(t.dataset.g); return; }
     if(t.hasAttribute("data-shell-connect")){ var c = E("svconn"); if(c) c.click(); return; }
     if(t.hasAttribute("data-route")){ ev.preventDefault(); window.__shellGo(t.getAttribute("data-route")); return; }

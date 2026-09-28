@@ -149,7 +149,7 @@ t('shell-from-config', function(){
   var bad=[];
   SECS.forEach(function(s){
     var got=[].map.call(document.querySelectorAll('.l2[data-for="'+s.id+'"] .l2tab'),function(b){ return b.textContent; }).join('|');
-    var want=s.sub.map(function(v){ return v.label; }).join('|');
+    var want=s.sub.filter(function(v){ return !v.under; }).map(function(v){ return v.label; }).join('|');   /* a mode has no tab */
     if(got!==want) bad.push(s.id+':'+got);
   });
   return (l1===want1 && !bad.length) || 'l1 '+l1+' l2 '+bad.join(' ');
@@ -200,19 +200,26 @@ t('shell-aria', function(){
    group's tabs the row shows; Self (the three panes) is Staking's third view; Governance's
    views are announced, not built, so its option and its tabs are greyed and inert */
 t('shell-groups', function(){
-  /* the Dashboard is one row of four views - Overview, Manage, Autopilot, Governance - no group switch */
+  /* the Dashboard: Stake, Autopilot, Governance; Stake has two modes, Easy and Pro, switched at the row's end */
   var R=document.documentElement, bad=[];
   function vis(id){ var e=document.getElementById(id); return !!e && e.offsetParent!==null && e.getBoundingClientRect().height>0; }
   function tabs(){ return [].filter.call(document.querySelectorAll('.l2[data-for=dashboard] .l2tab'),function(b){ return b.offsetParent!==null; }).map(function(b){ return b.dataset.sub; }).join(); }
+  try{ localStorage.removeItem('th_mode'); }catch(e){}
   go('dashboard/wallet');
-  var sw=document.querySelector('.l2ver[data-for=dashboard]');
-  if(sw && sw.offsetParent!==null) bad.push('a group switch is shown');
-  if(tabs()!=='overview,self,autopilot,governors') bad.push('tabs '+tabs());
-  if(!vis('sv-over') || vis('p-dele')) bad.push('overview is not the simple screen');
-  document.getElementById('l2-dashboard-self').click();
-  if(location.hash!=='#/dashboard/self' || !vis('p-dele') || vis('sv')) bad.push('manage is not the three panes '+location.hash);
+  if(tabs()!=='overview,autopilot,governors') bad.push('tabs '+tabs());
+  var md=document.querySelector('.l2mode[data-for=dashboard]');
+  if(!md || md.offsetParent===null) bad.push('no Easy|Pro switch on Stake');
+  if(!vis('sv-over') || vis('p-dele')) bad.push('easy is not the simple screen');
+  document.querySelector('.l2mode [data-mode=self]').click();
+  if(location.hash!=='#/dashboard/self' || !vis('p-dele') || vis('sv')) bad.push('pro is not the three panes '+location.hash);
+  if(document.getElementById('l2-dashboard-overview').getAttribute('aria-selected')!=='true') bad.push('Stake not lit in Pro');
   document.getElementById('l2-dashboard-governors').click();
   if(location.hash!=='#/dashboard/governance' || !vis('sv-mygov')) bad.push('governance page '+location.hash);
+  if(md && md.offsetParent!==null) bad.push('mode switch shown off Stake');
+  document.getElementById('l2-dashboard-overview').click();
+  if(location.hash!=='#/dashboard/self') bad.push('Stake does not reopen the last mode '+location.hash);
+  document.querySelector('.l2mode [data-mode=overview]').click();
+  try{ localStorage.removeItem('th_mode'); }catch(e){}
   go('network/uptime'); if(location.hash!=='#/network/uptime' || !vis('sv-net')) bad.push('network '+location.hash);
   go('staking/bonus');
   return !bad.length || bad.join(', ');
