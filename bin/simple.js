@@ -366,9 +366,7 @@
        boxes - the figure in its well, the unit beside it, no captions and no gauges */
     put("sd-astrip",
       '<div class="sd-id sd-ida"><div class=sd-top><h3>Autopilot</h3></div><div class=sd-wmeta><span class=sd-wch><i class="st' + (g ? ' on' : '') + '">' + (g ? "Active" : "Inactive") + '</i>' +
-        /* restake: its own switch, on whenever its grant stands - with or without Autopilot */
-        (pos && pos.rows.length ? '<button type=button class="st rs rsw' + (at && at.restake ? ' on' : '') + '" data-act=restakesw title="Restake: turn it ' + (at && at.restake ? 'off' : 'on') + '">Restake ' + (at && at.restake ? 'on' : 'off') + '</button>'
-          : '<i class="st rs">Restake off</i>') + door + '</span></div></div>' +
+        door + '</span></div></div>' +
       (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "\u2014", "", null, "var(--sv-green)", "", false, rec ? "APR" : "")
          : ro("Since start", "\u2014", "", null, "var(--sv-green)")) +
       ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "\u2014", "", null, "var(--sv-violet)", "", false, g && a.max_tokens ? "ATONE" : "") +
@@ -475,7 +473,7 @@
     var h = '<div class=sv-ph><h3>Restake</h3>' + '<span class="sv-tag ' + (on ? 'g' : 'q') + '">' + (on ? 'on' : 'off') + '</span></div>';
     h += '<div class=ars-fig><em>' + (on ? 'Adds a year' : 'A year') + '</em><b>' + (add > 0 ? '+' + fmt(pos.total * add) + '<i> ATONE</i>' : '\u2014') + '</b>' +
       '<small>' + (add > 0 ? '+' + (add * 100).toFixed(1) + '% APR, auto-compounds reward' : 'auto-compounds reward') + '</small></div>';
-    h += '<ul class=ars-rules><li><b>Every 12 hours</b>, twice a day</li><li>From <b>1 ATONE</b> of rewards</li><li>On your <b>best-paying</b> validator</li><li>GATA pays the fees, <b>0%</b> share</li></ul>';
+    h += '<ul class=ars-rules><li><b>Every 12 hours</b></li><li>Minimum restake <b>1 ATONE</b></li><li>On your <b>best-paying</b> validator</li><li>GATA pays the fees, <b>0%</b> share</li></ul>';
     h += !pos ? '<button class="sv-btn go sd-go" type=button data-shell-connect>Connect a wallet</button>'
       : !pos.rows.length ? '<button class="sv-btn go sd-go" type=button data-act=stake>Stake ATONE</button>'
       : '<button class="sv-btn go sd-go' + (on ? ' ars-off' : '') + '" type=button data-act=restakesw>' + (on ? 'Turn off' : 'Turn on') + '</button>';
