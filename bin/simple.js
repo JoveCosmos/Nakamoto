@@ -220,8 +220,9 @@
         (x[i] > 0 ? ', ' + fmt(x[i]) + ' ATONE' : '') + '"></i>'; }
     var cut1 = Math.ceil(n / 3), cut2 = Math.ceil(2 * n / 3);
     var span = [cut1, cut2 - cut1, n - cut2];
-    var br = sums.slice(0, 3).map(function(q, k){ return '<div class="fp-k b' + k + '" style="flex:' + span[k] + ' 1 0"><em>' + q[0] + '</em><b class=fpt' + k + '>' + sh(q[1]) + '%</b><small>' +
-      (q[1] >= 1e12 ? big(q[1]) : fmt(q[1])) + ' ATONE</small></div>'; }).join("");
+    /* each third: its coloured bracket line over the bars' span, and a box under it with its share and ATONE */
+    var br = sums.slice(0, 3).map(function(q, k){ return '<div class="fp-k b' + k + '" style="flex:' + span[k] + ' 1 0"><div class=fp-kb><em>' + q[0] + '</em><b class=fpt' + k + '>' + sh(q[1]) + '%</b><small>' +
+      (q[1] >= 1e12 ? big(q[1]) : fmt(q[1])) + ' ATONE</small></div></div>'; }).join("");
     /* stake outside the set, said in the graph's empty top-right corner (the small validators' bars are low), in red */
     var offh = out > 0 ? '<span class=fp-out>' + fmt(out) + ' ATONE - ' + nOut + ' validator' + (nOut === 1 ? '' : 's') + ' inactive</span>' : '';
     return head.replace('</h3></div>', '</h3>' + (mine ? tag("q", "on " + held + " of " + n + " validators") : tag("q", n + " validators")) + '</div>') +
