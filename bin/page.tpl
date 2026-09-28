@@ -4082,13 +4082,25 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 #sv-over .se-mid::after,#sv-over .se-ex::after{display:none}
 #sv-over .se-row{margin-top:0}
 /* the restake card: one wide figure under the three boxes, in teal */
-/* the restake row: a line with the year and what it adds, then its day, week and month in teal */
-.se-rsw{display:flex;flex-direction:column;gap:5px;flex:0 0 auto}
-.se-rsh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:0 2px}
-.se-rsh em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--sv-teal)}
-.se-rsh span{font-size:11px;color:var(--ws);white-space:nowrap;font-variant-numeric:tabular-nums}
-.se-rsh b{color:var(--sv-green);font-weight:700}
+/* the restake section: set apart below the plain one (it takes the room left, at least 14px), its own year
+   card in teal, then its day, week and month */
+#sv-over .se-mid,#sv-over .se-ex{flex:1 1 auto}
+.se-rsw{display:flex;flex-direction:column;gap:8px;flex:0 0 auto;margin-top:auto;padding-top:14px}
+.se-rc{padding:9px 16px 10px}
+.se-rc::before{background:var(--sv-teal);box-shadow:0 0 12px var(--sv-teal)}
+.se-rc>b{font-size:28px}
+.se-rc small{font-size:11px;color:var(--ws)}
+.se-rsm{color:var(--sv-green);font-weight:700}
 .se-rsv{color:var(--sv-teal)}
+.se-rsr .sd-fig small{display:none}   /* the restake year card says ATONE; its boxes need not */
+.se-rsr .sd-fig{padding-top:6px;padding-bottom:7px}
+@media(min-width:901px) and (max-height:1000px){#sv-over .se-card{padding-top:8px;padding-bottom:9px}#sv-over .se-card>b{font-size:30px}#sv-over .se-rc>b{font-size:22px}
+  #sv-over .se-rsw{padding-top:10px;gap:6px}#sv-over .se-mid,#sv-over .se-ex{gap:6px}#sv-over .se-row .sd-fig small{display:none}#sv-over .se-row .sd-fig{padding-top:5px;padding-bottom:6px}}
+@media(min-width:901px) and (max-height:700px){#sv-over .se-rc small{display:none}#sv-over .se-rc{padding-top:6px;padding-bottom:7px}}
+@media(min-width:901px) and (max-height:640px){#sv-over .se-rsr{display:none}#sv-over .se-rc em{display:none}#sv-over .se-rsw{padding-top:6px;gap:4px}#sv-over .se-card>b{font-size:24px}
+  #sv-over .se-row .sd-fig>b{font-size:14px}#sv-over .se-mid,#sv-over .se-ex{gap:4px}}
+/* the doors never sit on the content: the content gives way above them */
+#sv-over #sd-sky .se-mid,#sv-over #sd-sky .se-ex{min-height:min-content}
 /* a short window has no room for it under the boxes: the doors must stand in the panel */
 /* short windows keep the restake card: one line, the doors and the boxes a touch tighter */
 @media(min-width:901px) and (max-height:760px){
@@ -4099,7 +4111,7 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
   #sv-over .se-row .sd-fig{padding-top:5px;padding-bottom:6px}#sv-over .se-row .sd-fig>b{font-size:17px}
   #sv-over .sd-go2 .sd-go,#sv-over #sd-move .sd-go{height:34px}}
 @media(min-width:901px) and (max-height:700px){#sv-over .se-row .sd-fig small{display:none}#sv-over .se-mid,#sv-over .se-ex{gap:6px}}
-@media(min-width:901px) and (max-height:640px){#sv-over .se-card small.se-apr{display:none}#sv-over .se-card em{display:none}#sv-over .se-rsw{gap:3px}#sv-over .se-rsh span{display:none}#sv-over .se-row .sd-fig>b{font-size:15px}#sv-over .se-row .sd-fig{padding-top:3px;padding-bottom:3px}#sv-over .sd-go2 .sd-go{height:32px}}
+@media(min-width:901px) and (max-height:640px){#sv-over .se-card small.se-apr{display:none}#sv-over .se-card em{display:none}#sv-over .se-rsw{gap:5px;padding-top:8px}#sv-over .se-rc small{display:none}#sv-over .se-row .sd-fig>b{font-size:15px}#sv-over .se-row .sd-fig{padding-top:3px;padding-bottom:3px}#sv-over .sd-go2 .sd-go{height:32px}}
 @media(min-width:901px) and (max-height:640px){
   #sv-over .se-card{padding:6px 14px 7px;gap:0}#sv-over .se-card>b{font-size:26px}#sv-over .se-card em{font-size:8px}
   #sv-over .se-mid,#sv-over .se-ex{gap:6px}#sv-over .se-row .sd-fig{padding-top:4px;padding-bottom:4px}
@@ -4154,18 +4166,18 @@ background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 16%,
 .sd-mv.four .sd-fig:last-child{grid-column:auto}
 .sd-mv .sd-fig{align-items:center;text-align:center}
 .sd-mv .sd-fig>b{justify-content:center}
-/* Move your stake (and Autopilot's same cards): the figure large, in an engraved well like the strip's,
-   the card lit from the top by its own colour */
-:is(#sd-move,#sd-asky) .sd-mv .sd-fig{gap:6px;background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 20%,transparent),transparent 62%),linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+/* Move your stake (and Autopilot's same cards): its own look - the figure large and bare, a short glowing
+   rule in the card's colour under it, the card washed in that colour from below */
+:is(#sd-move,#sd-asky) .sd-mv .sd-fig{gap:4px;border-left:1px solid var(--wbd2);
+  background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 14%,transparent),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.008))}
+:is(#sd-move,#sd-asky) .sd-mv .sd-fig::before{display:none}
 :is(#sd-move,#sd-asky) .sd-mv .sd-fig::after{display:none}
 :is(#sd-move,#sd-asky) .sd-mv .sd-fig em{font-size:10px;letter-spacing:.2em;color:var(--ws)}
-:is(#sd-move,#sd-asky) .sd-mv .sd-fig>b{font-size:34px;line-height:1;padding:8px 16px 9px;border-radius:10px;border:1px solid rgba(0,0,0,.45);
-  background:radial-gradient(120% 160% at 50% 0%,color-mix(in srgb,var(--rc) 12%,transparent),transparent 65%),linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.2));
-  box-shadow:inset 0 2px 6px rgba(0,0,0,.6),inset 0 -1px 0 rgba(255,255,255,.05),0 1px 0 rgba(255,255,255,.05)}
-:is(#sd-move,#sd-asky) .sd-mv .sd-fig:last-child>b{font-size:36px;padding-left:22px;padding-right:22px}
+:is(#sd-move,#sd-asky) .sd-mv .sd-fig>b{position:relative;font-size:38px;line-height:1;padding-bottom:9px}
+:is(#sd-move,#sd-asky) .sd-mv .sd-fig>b::after{content:"";position:absolute;left:50%;bottom:0;width:34px;height:3px;margin-left:-17px;border-radius:2px;background:var(--rc);box-shadow:0 0 10px var(--rc)}
+:is(#sd-move,#sd-asky) .sd-mv .sd-fig:last-child>b{font-size:40px}
 :is(#sd-move,#sd-asky) .sd-mv .sd-fig small{font-size:11.5px;color:var(--ws)}
-@media(min-width:901px) and (max-height:700px){:is(#sd-move,#sd-asky) .sd-mv .sd-fig>b{font-size:26px;padding:5px 12px 6px}:is(#sd-move,#sd-asky) .sd-mv .sd-fig:last-child>b{font-size:28px}:is(#sd-move,#sd-asky) .sd-mv .sd-fig{gap:4px}}
+@media(min-width:901px) and (max-height:700px){:is(#sd-move,#sd-asky) .sd-mv .sd-fig>b{font-size:28px;padding-bottom:7px}:is(#sd-move,#sd-asky) .sd-mv .sd-fig:last-child>b{font-size:30px}:is(#sd-move,#sd-asky) .sd-mv .sd-fig{gap:4px}}
 /* the boxes stand where the centred block put them (equal room above the block and below it); the
    year rises into the middle of the room between the title and the boxes: the hero takes its own
    height plus half the spare room and centres itself in it, the ::after spacer the other half */
@@ -4174,7 +4186,7 @@ background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 16%,
 .se-mid::after{content:"";flex:1 1 0}
 .se-mid+.se-fine{margin-top:0}
 /* What your stake earns (Wallet) and what Autopilot would do / Your grant (Autopilot): se- */
-.sd-off{font-size:11px;color:#ff6a3d;margin:8px 2px 0}   /* stake that earns nothing: red */
+.sd-off{font-size:11px;color:#ff6a3d;margin:0 2px 8px}   /* stake that earns nothing: red */
 .se-hero{display:flex;flex-direction:column;gap:2px;padding:6px 0 12px}
 /* the year in its own box, as the day/week/month boxes are - both states */
 .se-card{position:relative;display:flex;flex-direction:column;gap:2px;padding:12px 18px 13px;border:1px solid var(--wbd2);border-radius:12px;overflow:hidden;
@@ -4182,7 +4194,7 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .se-card::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:2px;border-radius:0 2px 2px 0;background:var(--sv-green);box-shadow:0 0 12px var(--sv-green)}
 .se-hero:has(>.se-card){padding:0}
 
-.se-hero em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+.se-hero em,.se-rc em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
 .se-hero>b,.se-card>b{display:flex;align-items:baseline;gap:8px;font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1.05;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}
 .se-hero>b i,.se-card>b i{font-style:normal;font-family:var(--wmono);font-size:11px;font-weight:400;letter-spacing:.14em;color:var(--wf)}
 .se-hero small{font-size:12px;line-height:1.35;color:var(--ws)}
@@ -4564,32 +4576,18 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .folder>.l1{grid-area:nav}
 /* the network switch: two links, the open network lit; testnet lights amber so a page on the
    test chain can never pass for the real one */
-/* Testnet as a mode (2026-09-27): mainnet is the app; a Testnet switch beside day/night, the same box.
-   On testnet the page says so - an amber band along the top edge and a TESTNET tag on the title - and
-   the switch stands on. A tap slides the knob, then the other network loads, the open view kept */
 .brandwrap{grid-area:brand;justify-self:start;display:flex;align-items:center;min-width:0}
 .brandwrap>.brand{grid-area:auto}
-.bheight{position:absolute;left:0;top:100%;margin-top:1px;display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;color:#7c7aa3;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+/* the live height under the wordmark, at its right end (as before 2026-09-27); on testnet it moves left
+   and says so */
+.bheight{position:absolute;right:0;top:100%;margin-top:1px}
+.bheight{display:inline-flex;align-items:center;justify-content:flex-end;min-width:9ch;gap:5px;font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;color:#7c7aa3;line-height:1;font-variant-numeric:tabular-nums}
 .bheight i{width:4px;height:4px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green)}
 .bheight b{font-weight:400}
-.nettag{display:none;margin-left:8px;padding:2px 6px;border-radius:4px;border:1px solid rgba(255,176,46,.55);background:rgba(255,176,46,.12);color:#ffc453;
-font-style:normal;font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;line-height:1}
-html[data-net=testnet] .nettag{display:inline-block}
-html[data-net=testnet] .folder::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,#ffb02e 18%,#ffb02e 82%,transparent);box-shadow:0 0 12px rgba(255,176,46,.7);pointer-events:none}
-.nettog{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 10px 0 11px;border-radius:8px;border:1px solid var(--wbd2,#34345c);background:transparent;cursor:pointer;flex:0 0 auto;
-color:var(--ws,#c1bfdc);font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;transition:border-color .2s,color .2s}
-.nettog:hover{color:var(--wt,#f0eef8);border-color:#ffb02e}
-.ntk{position:relative;width:26px;height:14px;border-radius:999px;background:rgba(255,255,255,.1);box-shadow:inset 0 1px 2px rgba(0,0,0,.5);transition:background .22s}
-.ntk i{position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:#c1bfdc;transition:transform .22s cubic-bezier(.3,.7,.3,1),background .22s}
-.nettog[aria-checked=true]{border-color:rgba(255,176,46,.6);color:#ffc453}
-.nettog[aria-checked=true] .ntk{background:#ffb02e}
-.nettog[aria-checked=true] .ntk i{transform:translateX(12px);background:#fff}
-.nettog:focus-visible{outline:2px solid #ffb02e;outline-offset:2px}
-@media(prefers-reduced-motion:reduce){.ntk,.ntk i{transition:none}}
+html[data-net=testnet] .bheight{right:auto;left:calc(22% - 2px);justify-content:flex-start;min-width:0}
+html[data-net=testnet] .bheight::after{content:"testnet";color:#ffb02e;position:absolute;left:100%;margin-left:6px;white-space:nowrap}
 /* "testnet" hangs to the right of the height line, so the dot and the height keep their
    mainnet place (the dot under the t of AtomOne) */
-.nts{display:none}
-@media(max-width:620px){.nettog{padding:0 8px;gap:6px}.nettog .ntl{display:none}.nettog .nts{display:inline}}
 .folder>.hdr-r{grid-area:right;justify-self:end;display:flex;align-items:center;gap:8px;min-width:0}
 .hdr-r .thbtn{margin-left:0;width:32px;height:32px;border-radius:8px}
 .hdr-r .sv-who{flex:0 0 auto}
@@ -4751,10 +4749,9 @@ html[data-tab=connect] .l2host{display:none}
 <div class=below id=below>
   <header class=folder>
     <div class=brandwrap>
-    <a class=brand href="#/intro" title="AtomOne"><img class=mark src="assets/atomone.svg" alt=""><span class=bw><span class=wordmark>AtomOne</span><em class=nettag>Testnet</em><span class=bheight id=dlive title="the chain's height, live"><i></i><b>{{HEIGHT}}</b></span></span></a>
+    <a class=brand href="#/intro" title="AtomOne"><img class=mark src="assets/atomone.svg" alt=""><span class=bw><span class=wordmark>AtomOne</span><span class=bheight id=dlive title="the chain's height, live"><i></i><b>{{HEIGHT}}</b></span></span></a>
     </div>
     <div class=hdr-r>
-    <button class=nettog id=nettog type=button role=switch aria-checked=false title="Testnet: off. Turn on to use AtomOne's testnet"><span class=ntl>Testnet</span><span class=nts aria-hidden=true>Test</span><span class=ntk aria-hidden=true><i></i></span></button>
     <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
     <div class=sv-who>
       <button class="sv-btn sml pri" id=svconn type=button aria-haspopup=true aria-expanded=false>Connect wallet</button>

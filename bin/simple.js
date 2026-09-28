@@ -159,21 +159,21 @@
        the plain year (today's rate carried forward, compounded twelve times) */
     var cy = stake * (Math.pow(1 + rate / 12, 12) - 1), more = cy - y;
     /* the restaked year as the plain one is shown: a day, a week, a month - each its share of the
-       compounded year - under a line with the year and what restaking adds */
+       compounded year - under its own year card, set apart from the plain year above */
     var rtile = function(k, u){ return fig(k, '<span class=se-rsv>+' + one(u / 1e6) + '</span>', "ATONE", "var(--sv-teal)"); };
-    var rst = rate > 0 ? '<div class=se-rsw><div class=se-rsh><em>Restake monthly</em><span>+' + one(cy / 1e6) + ' ATONE a year, <b>+' + one(more / 1e6) + '</b> more</span></div>' +
+    var rst = rate > 0 ? '<div class=se-rsw><div class="se-card se-rc"><em>Restake monthly, a year</em><b><span class=se-rsv>+' + one(cy / 1e6) + '</span><i>ATONE</i></b>' +
+        '<small><span class=se-rsm>+' + one(more / 1e6) + '</span> more than leaving rewards unclaimed</small></div>' +
       '<div class="sd-figs two se-row se-rsr">' + rtile("A day", cy / 365) + rtile("A week", cy * 7 / 365) + rtile("A month", cy / 12) + '</div></div>' : '';
     /* the same block as the connected one: the figure in ATONE, the rate under it */
     if(ex) return '<div class=se-ex><div class=se-hero><div class=se-card><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b><small class=se-apr>' + pct(rate) + ' APR</small></div></div>' +
       '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' + rst + '</div>';
     /* the year and its three steps stand in the middle of the panel, the note at its foot */
-    return '<div class=se-mid><div class=se-hero><div class=se-card><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b>' +
+    return '<div class=se-mid>' + (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + '<div class=se-hero><div class=se-card><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b>' +
         '<small class=se-apr>' + pct(rate) + ' APR</small></div></div>' +
-      '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' + rst +
-      (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + '</div>' +
-      /* two doors on one row: claim what it has earned (greyed while nothing waits), and stake more of it */
-      '<div class=sd-go2><button class="sv-btn go sd-go sd-cl" type=button data-act=claim' + ((window.__REW || 0) >= 1 ? '' : ' disabled title="No rewards waiting yet"') + '>Claim rewards</button>' +
-        '<button class="sv-btn go sd-go" type=button data-act=stake>Stake more</button></div>';
+      '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' + rst + '</div>' +
+      /* two doors on one row: stake more of it, and claim what it has earned (greyed while nothing waits) */
+      '<div class=sd-go2><button class="sv-btn go sd-go" type=button data-act=stake>Stake more</button>' +
+        '<button class="sv-btn go sd-go sd-cl" type=button data-act=claim' + ((window.__REW || 0) >= 1 ? '' : ' disabled title="No rewards waiting yet"') + '>Claim rewards</button></div>';
   }
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every
      one of them, largest first; the list scrolls inside its panel */

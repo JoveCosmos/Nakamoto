@@ -2959,17 +2959,6 @@ rememberGridH();
   (function(){
     var here = NETC.net === "testnet" ? "testnet" : "mainnet";
     document.documentElement.setAttribute("data-net", here);
-    /* the Testnet switch: on means this is testnet; a tap slides it, then the other network loads,
-       the open view kept (the wallet reconnects there on its own) */
-    var tg = document.getElementById("nettog"); if(!tg) return;
-    var on = here === "testnet";
-    tg.setAttribute("aria-checked", on ? "true" : "false");
-    tg.title = on ? "Testnet: on. Turn off to return to mainnet" : "Testnet: off. Turn on to use AtomOne's testnet";
-    tg.addEventListener("click", function(){
-      tg.setAttribute("aria-checked", on ? "false" : "true");
-      var to = (on ? "../" : "testnet/") + location.hash;
-      setTimeout(function(){ location.href = to; }, matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 240);
-    });
   })();
   var API = NETC.api || "https://atomone-api.gatadao.com";
   var CHAIN = NETC.chain || "atomone-1";

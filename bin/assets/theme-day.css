@@ -651,6 +651,7 @@
   html[data-theme=light]:not([data-mono]) .sd-fig::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-fig::after{background:var(--rc)}
   html[data-theme=light]:not([data-mono]) .sd-ok{border:1px solid var(--accent);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .se-rc::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-btn.go.sd-cl{background:transparent;color:var(--accent);border-color:var(--accent);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-btn.go.sd-cl:hover:not(:disabled){background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-btn.go.sd-go:disabled{background:var(--surface-2);box-shadow:none}
@@ -668,8 +669,8 @@
   html[data-theme=light]:not([data-mono]) .fpt0{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .fpt1{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) .fpt2{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) :is(#sd-move,#sd-asky) .sd-mv .sd-fig{background:var(--surface-2);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) :is(#sd-move,#sd-asky) .sd-mv .sd-fig>b{border:1px solid var(--bg);background:var(--bg);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) :is(#sd-move,#sd-asky) .sd-mv .sd-fig{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) :is(#sd-move,#sd-asky) .sd-mv .sd-fig>b::after{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-off{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .se-card{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .se-card::before{box-shadow:none}
@@ -764,16 +765,7 @@
   html[data-theme=light]:not([data-mono]){--l2-off:var(--faint)}
   html[data-theme=light]:not([data-mono]) .bheight{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .bheight i{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .nettag{border:1px solid var(--amber-bar);background:var(--warn-bg);color:var(--warn)}
-  html[data-theme=light]:not([data-mono])[data-net=testnet] .folder::before{background:transparent;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .nettog{border:1px solid var(--wbd2,var(--line-strong));background:transparent;color:var(--ws,var(--muted))}
-  html[data-theme=light]:not([data-mono]) .nettog:hover{color:var(--wt,var(--ink));border-color:var(--amber-bar)}
-  html[data-theme=light]:not([data-mono]) .ntk{background:var(--surface-2);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .ntk i{background:var(--line-strong)}
-  html[data-theme=light]:not([data-mono]) .nettog[aria-checked=true]{border-color:var(--amber-bar);color:var(--warn)}
-  html[data-theme=light]:not([data-mono]) .nettog[aria-checked=true] .ntk{background:var(--amber-bar)}
-  html[data-theme=light]:not([data-mono]) .nettog[aria-checked=true] .ntk i{background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .nettog:focus-visible{outline:2px solid var(--amber-bar)}
+  html[data-theme=light]:not([data-mono])[data-net=testnet] .bheight::after{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) .l1tab{background:transparent}
   html[data-theme=light]:not([data-mono]) .brandbar .tsfx.net{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .l2tab{background:transparent}
@@ -970,16 +962,8 @@
 
 radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear-gradient(140deg,#4130a0 0%,#271c6c 52%,#150f3b 100%)}
 
-  /* the Testnet switch and tag in day */
-  html[data-theme=light]:not([data-mono]) .nettog{color:var(--muted);border-color:var(--line-strong,#d9d3c4)}
-  html[data-theme=light]:not([data-mono]) .ntk{background:rgba(60,50,20,.12);box-shadow:inset 0 1px 2px rgba(60,50,20,.2)}
-  html[data-theme=light]:not([data-mono]) .ntk i{background:#fff;box-shadow:0 1px 2px rgba(60,50,20,.3)}
-  html[data-theme=light]:not([data-mono]) .nettog[aria-checked=true]{color:#a86400;border-color:rgba(200,120,0,.5)}
-  html[data-theme=light]:not([data-mono]) .nettog[aria-checked=true] .ntk{background:#e8930f}
-  html[data-theme=light]:not([data-mono]) .nettag{color:#a86400;border-color:rgba(200,120,0,.5);background:rgba(255,176,46,.14)}
   html[data-theme=light]:not([data-mono]) .bheight,html[data-theme=light]:not([data-mono]) .bheight b{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .bheight i{background:var(--accent);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .nettog[aria-checked=true] .ntk i{background:#fff}
 
 radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear-gradient(140deg,#4130a0 0%,#271c6c 52%,#150f3b 100%)}
   html[data-theme=light]:not([data-mono]) .fpt0{color:#b8401c}html[data-theme=light]:not([data-mono]) .fpt1{color:#a86400}html[data-theme=light]:not([data-mono]) .fpt2{color:#16733a}
@@ -991,10 +975,9 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .fp-b.b1{--c:#e8a024}html[data-theme=light]:not([data-mono]) .fp-b.b2{--c:#2bb35e}
   html[data-theme=light]:not([data-mono]) .fp-b.on{background:var(--c);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .fp-k{border-color:#e8603a}html[data-theme=light]:not([data-mono]) .fp-k.b1{border-color:#e8a024}html[data-theme=light]:not([data-mono]) .fp-k.b2{border-color:#2bb35e}
-  /* Move your stake's wells in day: a soft recess on the card */
-  html[data-theme=light]:not([data-mono]) #sv :is(#sd-move,#sd-asky) .sd-mv .sd-fig>b{border-color:rgba(60,50,20,.14);
-    background:radial-gradient(120% 160% at 50% 0%,color-mix(in srgb,var(--rc) 10%,transparent),transparent 65%),linear-gradient(180deg,rgba(60,50,20,.07),rgba(60,50,20,.025));
-    box-shadow:inset 0 2px 5px rgba(60,50,20,.16),inset 0 -1px 0 rgba(255,255,255,.7),0 1px 0 rgba(255,255,255,.8)}
   html[data-theme=light]:not([data-mono]) .fp-out{color:#b8401c}
   html[data-theme=light]:not([data-mono]) .fp-kb{border-color:var(--line-strong,#d9d3c4);background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 14%,transparent),transparent 65%),#fbf9f3;box-shadow:none}
+
+  html[data-theme=light]:not([data-mono]) #sv :is(#sd-move,#sd-asky) .sd-mv .sd-fig{background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 12%,transparent),transparent 70%),#fbf9f3}
+  html[data-theme=light]:not([data-mono]) #sv :is(#sd-move,#sd-asky) .sd-mv .sd-fig>b::after{box-shadow:none}
 
