@@ -5105,6 +5105,11 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
   #sv-auto .ars-how:not(#z){margin-top:5px;padding:5px 8px;font-size:10.5px;line-height:1.3}#sv-auto .ars-rules:not(#z){margin-top:4px;font-size:10.5px}
   #sv-auto #sd-ars .sd-go:not(#z){height:32px}#sv-auto #sd-ars>.sv-ph{margin-bottom:0!important}}
 @media(min-width:901px) and (max-height:640px){#sv-auto .ap-act:not(#z){gap:6px;padding:4px 8px}#sv-auto .ap-act b{font-size:17px}#sv-auto .ap-act span{font-size:11.5px;line-height:1.4}#sv-auto .ap-act .ap-go:not(#z){margin-top:2px}}
+/* the list's head is its search bar, the live count at its right end: the list takes the rest */
+#atpop .atR>.atrs:not(#z){margin-top:0}
+#atpop .atrs .wk-seln:not(#z){flex:0 0 auto;min-width:0;margin-left:4px;font-family:var(--wmono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ws)}
+#atpop .atrs .wk-seln b:not(#z){font-family:var(--wmono);font-size:11px;font-weight:700;letter-spacing:0;color:var(--wgreen);margin-right:5px}
+#atpop .atrs .wk-seln:empty{display:none}
 /* the setup's validator count: Redelegate's live count, at the right of the list's title */
 #atpop .atrt:not(#z){display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
 #atpop .atrh,#atpop .atrt:not(#z){width:100%}
@@ -5739,9 +5744,7 @@ html[data-tab=connect] .l2host{display:none}
       <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Autopilot activates within <b>48 hours</b> of your grant; you can revoke it at any time.</span></div>
     </section>
     <section class=atR id=atR aria-label="Select your validators">
-      <div class=atrh><div class=atrt><b>Select your validators</b><span class=wk-seln id=atcount aria-live=polite></span></div></div>
-      <div class=atrs><input class=atfind id=atfind type=search placeholder="Find by name or operator key" aria-label="Find a validator" autocomplete=off spellcheck=false>
-</div>
+      <div class=atrs><input class=atfind id=atfind type=search placeholder="Find by name or operator key" aria-label="Find a validator" autocomplete=off spellcheck=false><span class=wk-seln id=atcount aria-live=polite></span></div>
       <div class=atlist id=atlist></div>
     </section>
   </div>
