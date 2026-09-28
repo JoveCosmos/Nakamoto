@@ -2,14 +2,13 @@
 //
 // Two jobs, both on behalf of AtomOne delegators who AUTHORISED this account (x/authz):
 //  1. moves: MsgExec{MsgBeginRedelegate...} inside a StakeAuthorization REDELEGATE grant;
-//  2. restake: MsgExec{MsgWithdrawDelegatorReward..., MsgDelegate...[, MsgSend]} - claim the
-//     rewards, stake them back onto the grant's allow-list, and (only when a split is
-//     configured HERE) send the split to the one treasury address this host is told of.
+//  2. restake: MsgExec{MsgWithdrawDelegatorReward..., MsgDelegate...} - claim the
+//     rewards and stake them all back onto the grant's allow-list. It never sends anything anywhere.
 // The chain enforces every grant's allow-list, cap and expiry. On top, before signing a
 // restake this service reads the chain itself and refuses unless the delegator's rewards
-// are paid to the delegator's own address AND what it would stake plus send is no more
+// are paid to the delegator's own address AND what it would stake is no more
 // than the rewards pending on the validators it claims from - so it can never be used
-// to stake or send a delegator's own liquid ATONE, whatever the keeper asks. It cannot
+// to stake a delegator's own liquid ATONE, whatever the keeper asks. It cannot
 // grant. Fees are PHOTON from this account's own balance.
 //
 // Independent of the payout signer: a different mnemonic, a different secret, a
@@ -23,7 +22,7 @@
 //        { granter: "atone1...", memo?: "...",
 //          claim: [ "atonevaloper1...", ... ],
 //          stake: [ { validator: "atonevaloper1...", amount: "123456" } ],
-//          send?: "12345" }                 (to SPLIT_TO from this host's env, never from the request)
+//        }                                  (no send: a restake never sends anything anywhere)
 //   node server.mjs --keygen   prints a fresh 24-word mnemonic and its address, stores nothing
 //
 // Secrets arrive as systemd credentials (LoadCredentialEncrypted), never as env:
@@ -35,15 +34,12 @@ import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { SigningStargateClient, GasPrice, QueryClient, setupDistributionExtension } from "@cosmjs/stargate";
 import { MsgBeginRedelegate, MsgDelegate } from "cosmjs-types/cosmos/staking/v1beta1/tx.js";
 import { MsgWithdrawDelegatorReward } from "cosmjs-types/cosmos/distribution/v1beta1/tx.js";
-import { MsgSend } from "cosmjs-types/cosmos/bank/v1beta1/tx.js";
 
 const PREFIX = "atone", CHAIN_ID = "atomone-1";
 const GAS = process.env.ATOMONE_GAS_PRICE || "0.25uphoton";
 const RPCS = (process.env.ATOMONE_RPC || "https://atomone-rpc.gatadao.com,https://atomone-rpc.polkachu.com").split(",").map(s => s.trim()).filter(Boolean);
 const BIND = process.env.BIND || "10.9.0.2", PORT = +(process.env.PORT || 8788);
 const MAX_MOVES = +(process.env.MAX_MOVES || 20);
-// the treasury a restake may send the split to; unset = a restake never sends
-const SPLIT_TO = (process.env.SPLIT_TO || "").trim();
 
 if (process.argv.includes("--keygen")) {
   const w = await DirectSecp256k1HdWallet.generate(24, { prefix: PREFIX });
@@ -132,11 +128,12 @@ async function pending(query, delegator, validator) {
 }
 async function restake(body, send) {
   const { granter, claim, stake, memo } = body;
-  const out = body.send == null ? 0n : (isAmt(body.send) ? BigInt(body.send) : -1n);
+  // a restake never sends: every claimed reward is staked back, GATA takes no share
+  if (body.send != null) return send(400, { error: "a restake never sends" });
+  const out = 0n;
   if (!isAcc(granter)) return send(400, { error: "bad granter" });
   if (!Array.isArray(claim) || !claim.length || claim.length > MAX_MOVES || !claim.every(isVal) || new Set(claim).size !== claim.length) return send(400, { error: "bad claim" });
   if (!Array.isArray(stake) || stake.length > MAX_MOVES || !stake.every(s => isVal(s.validator) && isAmt(s.amount))) return send(400, { error: "bad stake" });
-  if (out < 0n || (out > 0n && !isAcc(SPLIT_TO))) return send(400, { error: "no split on this host" });
   const { client, sender, query } = await getClient();
   // rewards must come back to the delegator: otherwise the claim lands elsewhere and a
   // stake of 'the same amount' would be the delegator's own liquid ATONE
@@ -151,8 +148,6 @@ async function restake(body, send) {
     value: MsgWithdrawDelegatorReward.encode({ delegatorAddress: granter, validatorAddress: v }).finish() }))
     .concat(stake.map(s => ({ typeUrl: "/cosmos.staking.v1beta1.MsgDelegate",
       value: MsgDelegate.encode({ delegatorAddress: granter, validatorAddress: s.validator, amount: { denom: "uatone", amount: String(s.amount) } }).finish() })))
-    .concat(out > 0n ? [{ typeUrl: "/cosmos.bank.v1beta1.MsgSend",
-      value: MsgSend.encode({ fromAddress: granter, toAddress: SPLIT_TO, amount: [{ denom: "uatone", amount: out.toString() }] }).finish() }] : []);
   const exec = { typeUrl: "/cosmos.authz.v1beta1.MsgExec", value: { grantee: sender, msgs: inner } };
   const result = await serial(() => client.signAndBroadcast(sender, [exec], "auto", typeof memo === "string" && memo.length <= 64 ? memo : "GATA autopilot restake"));
   console.log(`authz-signer: restake granter=${granter} claim=${claim.length} rewards=${rewards} staked=${staked} sent=${out} code=${result.code} hash=${result.transactionHash} height=${result.height}`);

@@ -3,8 +3,7 @@
 Its own key, its own secret, its own unit and port (8788, WireGuard only). It signs
 two jobs, both `MsgExec` on behalf of delegators who granted this address: moves
 (`MsgBeginRedelegate`, inside a `StakeAuthorization REDELEGATE`) and restake
-(`MsgWithdrawDelegatorReward` + `MsgDelegate`, and a `MsgSend` of the split only when
-`SPLIT_TO` is set here). Before a restake it reads the chain itself and refuses unless the
+(`MsgWithdrawDelegatorReward` + `MsgDelegate`; it never sends anything). Before a restake it reads the chain itself and refuses unless the
 delegator's rewards come back to the delegator and what it stakes plus sends is no more
 than the rewards pending. It cannot move its own coins.
 
@@ -48,8 +47,6 @@ Nothing changes for moves. After the next `signer-pull`:
 ```bash
 cp /opt/signer-sync/dist/vps/authz-signer/server.mjs /opt/gata-authz-signer/
 chown gata-signer:gata-signer /opt/gata-authz-signer/server.mjs
-# only if a reward split is to be collected: the one treasury it may send to
-#   echo 'SPLIT_TO=atone1...' >> /etc/gata/authz-signer.env
 systemctl restart gata-authz-signer && journalctl -u gata-authz-signer -n 5 --no-pager
 ```
 

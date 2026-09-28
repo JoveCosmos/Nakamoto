@@ -217,10 +217,7 @@ def plan_restake(c, granter, rg, vals, m, P):  # noqa: C901
         rewards += amt; claim.append(v)
     out = {"rewards": rewards, "pending_all": sum(a for a, _ in pend), "others": who, "covered": sorted(cov)}
     if rewards < MIN_RESTAKE * 1e6: out["skip"] = "below %g ATONE" % MIN_RESTAKE; return out
-    send = 0
-    if SPLIT_PCT > 0 and SPLIT_TO and rg.get("send"):
-        sd = split_due(c, granter) or {}
-        send = min(sd.get("due", 0), rewards, rg["send"])
+    send = 0   # GATA takes no share, ever: a restake stakes every claimed reward back, it never sends
     stake = rewards - send
     if cap is not None and stake > cap: out["skip"] = "delegate cap used up"; return out
     best, br = None, -1
@@ -508,7 +505,7 @@ def once(c, only=None, live=None, force=False):
         s = get("/cosmos/bank/v1beta1/balances/%s" % GRANTEE)
         photon = next((int(b["amount"]) for b in s.get("balances", []) if b["denom"] == "uphoton"), 0)
         report("_status", {"grantee": GRANTEE, "checked": int(time.time()), "grants": len(gs), "dry": DRY, "photon": photon, "every": EVERY,
-                           "fee_pct": FEE_PCT, "fee_to": FEE_TO, "split_pct": SPLIT_PCT, "split_to": SPLIT_TO})
+                           })
     except Exception as e:
         log("status failed: %s" % e)
 

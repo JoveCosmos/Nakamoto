@@ -2557,28 +2557,24 @@ rememberGridH();
      The keeper's address and standing come from keeper/_status.json. The card is one
      screen: the terms on the left, the validator set on the right to choose from. ── */
   var atpop = E("atpop"), atcard = atpop && atpop.querySelector(".atcard");
-  var AT = { addr: null, dry: true, grant: null, grants: [], days: 90, fee_pct: 0, fee_to: null, report: null, who: null };
+  var AT = { addr: null, dry: true, grant: null, grants: [], days: 90, report: null, who: null };
   /* the validators the grant may use, chosen in this card - apart from the Redelegate list's
      selection (that is where stake moves now; this is where the keeper may move it later) -
      and the card's own view: a standing grant shows its terms until "Change" */
   var ATSEL = {}, AT_EDIT = false, AT_FIND = "", AT_OPEN = 0;
   function atStatus(){
     return fetch("keeper/_status.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
-      AT.addr = j && j.grantee ? j.grantee : null; AT.dry = !j || j.dry !== false; AT.fee_pct = j && j.fee_pct ? +j.fee_pct : 0; AT.fee_to = j && j.fee_to ? j.fee_to : null;
-      /* the reward split: our share of the staking rewards the restake claims (0 = free) */
-      AT.split_pct = j && j.split_pct ? +j.split_pct : 0; AT.split_to = j && j.split_to ? j.split_to : null; return j; }).catch(function(){ AT.addr = null; return null; });
+      AT.addr = j && j.grantee ? j.grantee : null; AT.dry = !j || j.dry !== false; 
+      return j; }).catch(function(){ AT.addr = null; return null; });
   }
   var REDEL = "/cosmos.staking.v1beta1.MsgBeginRedelegate", DELEG = "/cosmos.staking.v1beta1.MsgDelegate", WDRAW = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward";
-  var MSEND = "/cosmos.bank.v1beta1.MsgSend";
   function grantType(g){ var a = g && g.authorization || {};
-    if(a["@type"] === "/cosmos.bank.v1beta1.SendAuthorization") return MSEND;
     return a.msg || ({ AUTHORIZATION_TYPE_REDELEGATE: REDEL, AUTHORIZATION_TYPE_DELEGATE: DELEG })[a.authorization_type] || ""; }
   /* what a grant this card builds is for, to set against the kinds that stand */
   function authType(a){
     if(!a) return "";
     if(a.type === "cosmos-sdk/StakeAuthorization") return a.value.authorization_type === "delegate" ? DELEG : REDEL;
     if(a.type === "cosmos-sdk/GenericAuthorization") return a.value.msg;
-    if(a.type === "cosmos-sdk/SendAuthorization") return MSEND;
     return "";
   }
   function revokeMsg(t){ return { type: "cosmos-sdk/MsgRevoke", value: { granter: window.__ADDR, grantee: AT.addr, msg_type_url: t } }; }
@@ -2688,16 +2684,11 @@ rememberGridH();
     var auth = { authorization_type: "redelegate", allow_list: scope }; if(cap > 0) auth.max_tokens = { denom: "uatone", amount: String(cap) };
     var msgs = [{ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
       grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: auth } } } }];
-    /* restake is its own switch (the Autopilot card's chip): this grant never adds or removes it. A grant that
-       stands is simply overwritten by the new terms, a change is not charged the service fee again */
-    if(AT.grant) return msgs;
-    /* the service fee, when one is set: paid with the grant, in the same signature */
-    var fee = atFee(); if(fee > 0 && AT.fee_to) msgs.push({ type: "cosmos-sdk/MsgSend", value: { from_address: window.__ADDR, to_address: AT.fee_to, amount: [{ denom: "uatone", amount: String(fee) }] } });
+    /* only the redelegate permission: no send, no fee, no share for GATA - ever. A grant that stands is simply
+       overwritten by the new terms; restake is its own switch */
     return msgs;
   }
   window.__atMsgs = atMsgs;
-  /* the SendAuthorization's cap: split% of the rewards this stake is projected to earn
-     over the grant's months, at today's blended rate - never an open-ended limit */
   /* the DELEGATE grant stakes rewards back, so its cap is the rewards the period can earn
      (the whole stake at its APR, half again for margin), never the move cap: the chain cannot
      tell rewards from liquid ATONE, and this keeps what it could ever stake to that size */
@@ -2705,17 +2696,6 @@ rememberGridH();
     var pos = window.__POS;
     if(!pos || !(pos.total > 0)) return 1000000;
     return Math.max(1000000, Math.ceil(pos.total * Math.max(pos.rate, .05) * (AT.days / 365) * 1.5));
-  }
-  function atSplitLimit(){
-    var pos = window.__POS;
-    if(!(AT.split_pct > 0) || !AT.split_to || !pos || !(pos.total > 0)) return 0;
-    return Math.floor(pos.total * pos.rate * (AT.days / 365) * AT.split_pct / 100);
-  }
-  function atFee(){
-    /* 5% (or whatever _status says) of the projected yearly gain, pro-rated to the period */
-    var an = window.__ANS || {}, gain = an.gain > 0 ? an.gain : 0;
-    if(!AT.fee_pct || !(gain > 0)) return 0;
-    return Math.floor(gain * 1e6 * AT.fee_pct / 100 * AT.days / 365);
   }
   /* the counts: on the strategy and validator cards, over the list, on the phone's tab */
   function atCounts(){
@@ -2791,10 +2771,6 @@ rememberGridH();
     var sm = E("atsum");
     if(sm) sm.innerHTML = view ? "Active" : !AT.addr ? '<span class=atclosed>Inactive</span>' : ok ? (cap > 0 ? fmt(cap) + " ATONE cap" : "no cap") + "<br>" +
       (atPick() === "selected" ? "my selection, " : "") + scope.length + " validators, until revoked" : "";
-    var fee = AT.grant ? 0 : atFee(), sl = atRestake() ? atSplitLimit() : 0, feeEl = E("atfee");
-    if(feeEl){ feeEl.hidden = view || !(fee > 0 || sl > 0);
-      if(sl > 0) feeEl.innerHTML = "<b>" + AT.split_pct + "%</b> of restaked rewards go to GATA - allows sending up to <b>" + fmt(sl) + " ATONE</b> to GATA over " + atMonths() + ".";
-      else if(fee > 0) feeEl.innerHTML = "Service fee <b>" + fmt(fee) + " ATONE</b> - " + AT.fee_pct + "% of the projected gain for " + atMonths() + ", paid with the grant in the same signature."; }
     var fe = E("attxfee"), st = E("atstep"); fe.textContent = ""; st.textContent = ""; st.className = "txstep";
     feeSoon("at", fe, ok ? atMsgs : null);
   }
@@ -2924,17 +2900,13 @@ rememberGridH();
     return Object.keys(out);
   }
   function rsMsgs(on){
-    if(!on){ var t = {}; (AT.grants || []).forEach(function(x){ var k = grantType(x); if(k === WDRAW || k === DELEG || k === MSEND) t[k] = 1; });
+    if(!on){ var t = {}; (AT.grants || []).forEach(function(x){ var k = grantType(x); if(k === WDRAW || k === DELEG) t[k] = 1; });
       return Object.keys(t).map(revokeMsg); }
     /* no end date and no amount cap: restake runs until the reader disables it (revokes). The delegate grant is still
        allow-listed to the reader's own validators, so it can only ever stake onto them - never send or withdraw */
     var allow = rsAllow(); if(!AT.addr || !allow.length) return [];
     var m = [{ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr, grant: { authorization: { type: "cosmos-sdk/GenericAuthorization", value: { msg: WDRAW } } } } },
              { type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr, grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: { authorization_type: "delegate", allow_list: allow } } } } }];
-    /* the reward split, only when one is set: the send may reach our address alone, up to a year's projection */
-    var pos = window.__POS;
-    if(AT.split_pct > 0 && AT.split_to && pos && pos.total > 0) m.push({ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
-      grant: { authorization: { type: "cosmos-sdk/SendAuthorization", value: { spend_limit: [{ denom: "uatone", amount: String(Math.ceil(pos.total * pos.rate * AT.split_pct / 100 * 1.5)) }], allow_list: [AT.split_to] } } } } });
     return m;
   }
   /* the Restake button acts at once: it reads what stands, builds the grant (or the revoke) and hands it to the wallet
@@ -3017,7 +2989,7 @@ rememberGridH();
   };
   /* what stands between this reader and the keeper, for the simple view to state */
   window.__atInfo = function(){ return { addr: AT.addr, dry: AT.dry, grant: AT.grant, grants: AT.grants || [],
-    days: AT.days, split_pct: AT.split_pct || 0, report: AT.report, since: AT.since || null, others: AT.others || null,
+    days: AT.days, report: AT.report, since: AT.since || null, others: AT.others || null,
     restake: (AT.grants || []).some(function(x){ return grantType(x) === DELEG; }) }; };
   window.__planDraw = draw;
   draw();

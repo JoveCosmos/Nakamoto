@@ -4746,7 +4746,7 @@ display:flex;flex-direction:column;overflow:hidden}
 .atstate{margin:10px 0 4px;padding:10px 12px;border:1px solid rgba(46,224,106,.28);border-radius:6px;background:rgba(46,224,106,.05);font-family:var(--wmono);font-size:9px;letter-spacing:.04em;color:var(--ws);line-height:1.7}
 .atstate b{color:#fff8dc;font-weight:400}
 .atstate .g{color:var(--wgreen)}
-.atstate[hidden],.atform[hidden],.atfee[hidden]{display:none}
+.atstate[hidden],.atform[hidden]{display:none}
 /* the terms: each category's name above its controls */
 .atrow{display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:10px 0;border-top:1px solid var(--wbd)}
 .atrow:first-child{border-top:0}
@@ -4798,8 +4798,6 @@ white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #atrsk button{min-width:52px}
 .atuntil{font-family:var(--wmono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ws)}
 .atuntil b{font-family:var(--wsans);font-size:11.5px;font-weight:600;letter-spacing:0;text-transform:none;color:#fff8dc;margin-left:4px}
-.atfee{margin:8px 0 0;padding:9px 12px;border:1px solid rgba(255,176,46,.28);border-radius:6px;background:rgba(255,176,46,.05);font-family:var(--wmono);font-size:9px;letter-spacing:.04em;color:var(--ws);line-height:1.5}
-.atfee b{color:var(--wamber);font-weight:400}
 .atnote{display:flex;align-items:center;gap:8px;margin:12px 0 0;padding:8px 10px;border-radius:6px;border:1px solid rgba(46,224,106,.28);background:rgba(46,224,106,.06);font-family:var(--wsans);font-size:11px;letter-spacing:-.005em;color:#d9f7e4;white-space:nowrap}
 .atnote span{min-width:0}.atnote span b{color:#fff8dc;font-weight:700}
 .atnote svg{width:15px;height:15px;flex:0 0 auto;fill:none;stroke:#2ee06a;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin:0;max-height:none}
@@ -5739,7 +5737,6 @@ html[data-tab=connect] .l2host{display:none}
           <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="no cap" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
           <span class=unhint id=athint></span></div>
         <div class=atrsnote id=atrsnote hidden></div>
-        <div class=atfee id=atfee hidden></div>
       </div>
       <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Autopilot activates within <b>48 hours</b> of your grant, You can revoke it at any time.</span></div>
     </section>
