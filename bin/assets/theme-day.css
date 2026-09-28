@@ -713,12 +713,16 @@
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky{--tc:var(--danger)}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-alist{--tc:var(--accent)}
   html[data-theme=light]:not([data-mono]) #sv-auto .ap-mv .ap-no{color:var(--danger)}
-  html[data-theme=light]:not([data-mono]) #sd-wstrip.sd-strip:not(#z){border-color:var(--accent-soft);background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) #p-dele #sd-mstrip.sd-strip:not(#z){border-color:var(--line-strong);box-shadow:none;background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#p-dele #sd-mstrip).sd-strip:not(#z){border-color:var(--line-strong);box-shadow:none;background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-idw:not(#z){background:none;box-shadow:none}
   html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-ro:not(#z){background:none;border-left-color:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-ro em:not(#z){color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro .sd-well:not(#z){border:1px solid var(--surface-2);background:var(--surface-2);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid:not(#z){background:var(--surface-2);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col:not(#z){background:none!important;box-shadow:none!important}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph:not(#z){background:none!important}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph h3::before{background:var(--accent)!important;box-shadow:none!important}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph .sv-tag:not(#z){background:var(--surface-2)!important}
   html[data-theme=light]:not([data-mono]) .sv-btn.go.sd-go:disabled{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .fp-b{--c:var(--danger)}
   html[data-theme=light]:not([data-mono]) .fp-b.b1{--c:var(--warn)}
@@ -1150,7 +1154,6 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-alist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#3d4a66,#262f45 58%,#141827)}
   html[data-theme=light]:not([data-mono]) #atpop .atidle b{color:var(--ink)}html[data-theme=light]:not([data-mono]) #atpop .atidle b.n{color:#b3261e}
   /* Easy's strip in day: the violet in a light shade, dark type, light plain boxes */
-  html[data-theme=light]:not([data-mono]) #sd-wstrip.sd-strip:not(#z){border-color:rgba(91,79,196,.3);background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.6),transparent 60%),linear-gradient(315deg,#e4defc,#d6cef7 58%,#c3b8f0)}
   html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-ro:not(#z){background:none;border-left-color:rgba(91,79,196,.18)}
   html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-ro em:not(#z){color:#4a4466}
   html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-ro .sd-well:not(#z){border:1px solid rgba(91,79,196,.2);background:rgba(255,255,255,.55);box-shadow:none}
@@ -1160,5 +1163,11 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-idw .sd-wch i.net{color:#0b5a53;border-color:rgba(15,122,114,.4);background:rgba(15,122,114,.08)}
   html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-idw .sd-wch i.net.tn{color:#8a5200;border-color:rgba(200,120,0,.4);background:rgba(200,120,0,.08)}
   /* Pro's strip in day: the panels' ivory, a touch more lit */
-  html[data-theme=light]:not([data-mono]) #p-dele #sd-mstrip.sd-strip:not(#z){border-color:var(--line-strong,#d9d3c4);box-shadow:0 0 22px -12px rgba(91,79,196,.35);background:radial-gradient(55% 160% at 0% 0%,rgba(91,79,196,.08),transparent 60%),radial-gradient(45% 140% at 100% 110%,rgba(15,122,114,.05),transparent 60%),#fffdf8}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#p-dele #sd-mstrip).sd-strip:not(#z){border-color:var(--line-strong,#d9d3c4);box-shadow:0 0 22px -12px rgba(91,79,196,.35);background:radial-gradient(55% 160% at 0% 0%,rgba(91,79,196,.08),transparent 60%),radial-gradient(45% 140% at 100% 110%,rgba(15,122,114,.05),transparent 60%),#fffdf8}
+  /* Easy as one dashboard in day: one ivory surface, plain titles, neutral tags */
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid:not(#z){background:#fffdf8;border-color:#e3ded3;box-shadow:0 1px 0 rgba(255,255,255,.8)}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z){color:var(--ink)!important}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph h3::before{background:#5b4fc4!important}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph .sv-tag:not(#z){color:#4a4466!important;border-color:#d9d3c4!important;background:rgba(60,50,20,.03)!important}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col:not(#z){background:none!important;border:0!important;box-shadow:none!important}
 

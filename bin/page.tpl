@@ -4336,10 +4336,10 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 #sv-auto .ap-act .ap-go:not(#z){width:auto;min-width:200px;margin-top:6px;padding:0 22px}
 /* the strip is one surface in Outcome's violet band fill; the wallet card and the five boxes sit on it (Easy and
    Pro alike); the figures in plain boxes, not engraved */
-#sd-wstrip.sd-strip:not(#z){position:relative;border-color:rgba(185,176,255,.3);background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#4130a0,#271c6c 58%,#150f3b)}
-/* Pro: the strip as the panels under it, a touch more lit - a faint violet glow from the wallet's corner, a cool one
+
+/* Easy and Pro: the strip as the panels under it, a touch more lit - a faint violet glow from the wallet's corner, a cool one
    from the far end */
-#p-dele #sd-mstrip.sd-strip:not(#z){border-color:#3a3a66;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 0 24px -12px rgba(185,176,255,.35);
+:is(#sd-wstrip,#p-dele #sd-mstrip).sd-strip:not(#z){border-color:#3a3a66;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 0 24px -12px rgba(185,176,255,.35);
 background:radial-gradient(55% 160% at 0% 0%,rgba(185,176,255,.14),transparent 60%),radial-gradient(45% 140% at 100% 110%,rgba(43,200,189,.07),transparent 60%),linear-gradient(180deg,#15152e,#0d0d1c)}
 :is(#sd-wstrip,#sd-mstrip) .sd-idw:not(#z){background:none;box-shadow:none}
 :is(#sd-wstrip,#sd-mstrip) .sd-idw::before{display:none}
@@ -4348,6 +4348,18 @@ background:radial-gradient(55% 160% at 0% 0%,rgba(185,176,255,.14),transparent 6
 .sd-strip .sd-ro .sd-well:not(#z){border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);box-shadow:none}
 /* Outcome's content starts on Delegations' and Redelegate's line */
 @media(min-width:901px){#p-dele #wbody #wk-mv>.wk-ph+*{margin-top:10px!important}}
+/* ════ Easy, one dashboard: the three panels are one surface - no borders, frames or coloured bands between them;
+   every title the same plain type with one quiet bar, every title tag the same neutral pill; what sits inside keeps its
+   colours ════ */
+/* phones: restake's line wraps in the narrow year box instead of being cut */
+@media(max-width:900px){#sd-sky .se-rsx .se-rsl:not(#z){white-space:normal;text-wrap:balance}#sv-over #sd-sky .se-earn .sd-fig:not(#z){padding-bottom:60px}}
+html #sv-over .sd-wgrid:not(#z){gap:0;background:linear-gradient(180deg,#131329,#0c0c1a);border:1px solid var(--wbd2);border-radius:14px;box-shadow:inset 0 1px 0 #ffffff08;overflow:hidden}
+html #sv-over .sd-wgrid>.sd-col:not(#z){background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+html :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move)::before,html :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move)::after{display:none!important}
+html #sv-over .sd-wgrid>.sd-col>.sv-ph:not(#z){background:none!important;border-bottom:0!important;border-radius:0!important}
+html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z){color:var(--wt)!important}
+html #sv-over .sd-wgrid>.sd-col>.sv-ph h3::before{background:#b9b0ff!important;box-shadow:none!important;opacity:.8}
+html #sv-over .sd-wgrid>.sd-col>.sv-ph .sv-tag:not(#z){color:var(--ws)!important;border-color:var(--wbd2)!important;background:rgba(255,255,255,.04)!important;font-weight:600}
 .sv-btn.go.sd-go:disabled{background:rgba(255,255,255,.05);border-color:var(--wbd2);color:var(--wf);box-shadow:none;cursor:not-allowed;margin-top:auto}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}

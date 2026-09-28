@@ -406,7 +406,7 @@
           fig("Keeps stake active", "24/7", idleAtone() ? idleAtone() + " ATONE idle on inactive validators" : "through a long winter or a busy month", T) +
           fig("Strategizes", "Better APR", "within your allow-list", V) +
           fig("Restakes", "Rewards", "if you switch it on", G) +
-          fig("You approve", "Once", "it runs while you rest", A2) +
+          fig("You grant", "It runs", "you revoke, it stops", A2) +
         '</div>');
       var share = at && at.split_pct > 0;
       put("sd-asky", '<div class=sv-ph><h3>What it doesn\'t</h3>' + tag("q", "enforced on chain") + '</div>' +
