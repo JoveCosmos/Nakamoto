@@ -407,11 +407,11 @@
       var G = "var(--sv-green)", T = "var(--sv-teal)", V = "var(--sv-violet)", R = "#ff6a6a", A2 = "var(--sv-amber)";
       put("sd-ado", '<div class=sv-ph><h3>What it does</h3>' + tag("q", "one signature") + '</div>' +
         '<div class="sd-figs sd-mv four ap-mv">' +
-          fig("Keeps it active", "24/7", idleAtone() ? "unlike the " + idleAtone() + " ATONE idle on inactive validators" : "your stake, through a long winter or a busy month", T) +
+          fig("Keeps stake active", "24/7", idleAtone() ? idleAtone() + " ATONE idle on inactive validators" : "through a long winter or a busy month", T) +
           fig("Strategizes", lift > 0.0005 ? '<span class=sd-gain>+' + (lift * 100).toFixed(1) + '%</span>' : "Better APR", lift > 0.0005 ? "APR, within your allow-list" : "within your allow-list", V) +
           fig("Restakes", radd > 0 ? '<span class=sd-gain>+' + (radd * 100).toFixed(1) + '%</span>' : "Rewards", radd > 0 ? "APR, if you switch it on" : "if you switch it on", G) +
           (plan && plan.gain > 0.5 ? fig("More a year", '<span class=sd-gain>+' + one(plan.gain) + '</span>', "ATONE, at today's rates", G)
-                                   : fig("You approve", "Once", "then it runs hands-free", A2)) +
+                                   : fig("You approve", "Once", "it runs while you rest", A2)) +
         '</div>');
       var share = at && at.split_pct > 0;
       put("sd-asky", '<div class=sv-ph><h3>What it doesn\'t</h3>' + tag("q", "enforced on chain") + '</div>' +
