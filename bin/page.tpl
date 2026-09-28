@@ -3175,8 +3175,11 @@ html[data-ui=simple][data-tab=dele] .w#calc>#p-dele{display:none}
 /* the lockup on one line: the mark, the name at title size on the mark's centre line, and the
    tagline beside it - the simple views' and the advanced view's own */
 .sv-bw{display:flex;gap:10px;line-height:1;min-width:0}
-/* Overview and Autopilot say what GATA is; Self (the three panes) says what it is for */
-html:not([data-ui=simple]) .svtag.s,html[data-ui=simple] .svtag.a{display:none}
+/* the Dashboard's title per view (below) */
+/* Stake (Easy and Pro): "Decentralize and earn more"; Autopilot: "Non-custodial staking"; Governance: its own */
+.svtag.a{display:none}
+html:is([data-sv="dashboard/overview"],[data-sv="dashboard/self"]) .svtag.a{display:inline-flex}
+html:is([data-sv="dashboard/overview"],[data-sv="dashboard/self"]) .svtag.s{display:none}
 /* Governance: 'Non-custodial Governance' in place of the second line */
 html[data-sv="dashboard/governors"] .svtag.s{display:inline-flex}html[data-sv="dashboard/governors"] .svtag.a{display:none}
 .sv-who{display:flex;align-items:center;gap:9px;flex:1 1 0;justify-content:flex-end;min-width:0}
@@ -4802,7 +4805,7 @@ html[data-tab=connect] .l2host{display:none}
       <div class=bwrap data-title-for=staking><div class=bt><span class=btx><i class=nk>Nakamoto </i><i class=tsfx id=tsfx>Bonus</i></span></div></div>
       <div class=bwrap data-title-for=network><div class=bt><span class=btx><i class=nk>Network </i><i class="tsfx net tsub">Uptime</i></span></div></div>
       <div class=bwrap data-title-for=governance><div class=bt><span class=btx><i class=nk>Governance </i><i class="tsfx tsub">Proposals</i></span></div></div>
-      <span class=sv-brand data-title-for=dashboard><span class=sv-bw><span class="bt svtag s"><span class=btx><i class=nk>Non-custodial </i><i class="tsfx grp-s">staking</i><i class="tsfx grp-g">Governance</i></span></span><span class="bt svtag a"><span class=btx><i class=nk>Decentralize the chain and </i><i class=tsfx>earn more</i></span></span></span><span class=welc id=svwelc hidden></span></span>
+      <span class=sv-brand data-title-for=dashboard><span class=sv-bw><span class="bt svtag s"><span class=btx><i class=nk>Non-custodial </i><i class="tsfx grp-s">staking</i><i class="tsfx grp-g">Governance</i></span></span><span class="bt svtag a"><span class=btx><i class=nk>Decentralize and </i><i class=tsfx>earn more</i></span></span></span><span class=welc id=svwelc hidden></span></span>
       <div class=l2host>{{SHELL_L2}}</div>
     </header>
   <div class=flipbox id=flipbox>
