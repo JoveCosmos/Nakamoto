@@ -15,8 +15,10 @@ exceed the grant's remaining cap, make more than KEEPER_MAX_MOVES_PER_DAY moves 
 one granter in a day, or act at all while KEEPER_DRY=1 (the default: it only writes
 what it WOULD do).
 
-State: /srv/atomone-app/keeper/state/keeper.db (sqlite: runs, moves).
-Report per granter: /srv/atomone-app/web/keeper/<granter>.json (the page shows it).
+State: /srv/atomone-app/keeper/state/keeper.db (sqlite: runs, moves); KEEPER_STATE overrides.
+Report per granter: /srv/atomone-app/web/keeper/<granter>.json (the page shows it); KEEPER_REPORTS.
+Testnet: the same code under atomone-app-keeper-testnet with KEEPER_DATA/STATE/REPORTS/ADMIN
+and ATOMONE_API pointed at testnet.
 """
 import json, os, sqlite3, sys, time, urllib.request, urllib.error, urllib.parse
 
@@ -41,9 +43,11 @@ MIN_RESTAKE = float(os.environ.get("KEEPER_MIN_RESTAKE_ATONE", "1"))       # ski
 MAX_CLAIM = int(os.environ.get("KEEPER_MAX_CLAIM", "18"))                  # validators claimed in one transaction (the signer takes 20 messages)
 RESTAKE_URL = os.environ.get("KEEPER_RESTAKE_URL", "") or (SIGNER.rsplit("/", 1)[0] + "/authz-restake" if SIGNER else "")
 WDRAW_URL = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward"
-DATA = "/srv/atomone-app/web/data.json"
-STATE = "/srv/atomone-app/keeper/state/keeper.db"
-REPORTS = "/srv/atomone-app/web/keeper"
+# one keeper per network: testnet runs a second unit with these pointed at web/testnet
+# and its own state (mainnet keeps the defaults)
+DATA = os.environ.get("KEEPER_DATA", "/srv/atomone-app/web/data.json")
+STATE = os.environ.get("KEEPER_STATE", "/srv/atomone-app/keeper/state/keeper.db")
+REPORTS = os.environ.get("KEEPER_REPORTS", "/srv/atomone-app/web/keeper")
 LOCK_S = 21 * 86400
 TYPE_URL = "/cosmos.staking.v1beta1.MsgBeginRedelegate"
 

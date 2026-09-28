@@ -1,0 +1,36 @@
+[Unit]
+Description=AtomOne app autopilot keeper, TESTNET (signer on 127.0.0.1:8789)
+Documentation=https://atomone.gatahub.zone/
+After=network-online.target atomone-autopilot-signer-testnet.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=atomone-app
+Group=atomone-app
+EnvironmentFile=/etc/gata/atomone-app-keeper-testnet.env
+ExecStart=/usr/bin/python3 /srv/atomone-app/keeper/keeper.py
+Restart=on-failure
+RestartSec=30
+SuccessExitStatus=78
+TimeoutStopSec=20
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+ReadWritePaths=/srv/atomone-app/keeper/state-testnet /srv/atomone-app/web/testnet/keeper
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallFilter=@system-service
+UMask=0027
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=multi-user.target
