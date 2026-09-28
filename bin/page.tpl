@@ -5059,6 +5059,15 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 /* no empty middle: the year box grows into the room above the rules, its content centred in it */
 #sv-auto #sd-ars>.ars-fig:not(#z){flex:1 1 auto;justify-content:center;min-height:0}
 #sv-auto #sd-ars .ars-foot:not(#z){margin-top:0}
+/* the year box's content larger, the 'runs until' line a row lower under its rule */
+#sv-auto #sd-ars .ars-fig>em:not(#z):not(#y){font-size:10.5px;letter-spacing:.18em}
+#sv-auto #sd-ars .ars-fig>b:not(#z):not(#y){font-size:36px;line-height:1.15}
+#sv-auto #sd-ars .ars-fig>small:not(#z):not(#y){font-size:13px}
+#sv-auto #sd-ars .ars-until:not(#z):not(#y){margin-top:18px;padding-top:12px;font-size:12.5px}
+@media(min-width:901px) and (max-width:1599px){#sv-auto #sd-ars .ars-fig>b:not(#z):not(#y){font-size:32px}}
+@media(min-width:901px) and (max-height:1000px){#sv-auto #sd-ars .ars-fig>b:not(#z):not(#y){font-size:28px}#sv-auto #sd-ars .ars-fig>small:not(#z):not(#y){font-size:12px}#sv-auto #sd-ars .ars-until:not(#z):not(#y){margin-top:12px;padding-top:8px;font-size:11.5px}}
+@media(min-width:901px) and (max-height:700px){#sv-auto #sd-ars .ars-fig>b:not(#z):not(#y){font-size:22px}#sv-auto #sd-ars .ars-fig>small:not(#z):not(#y){font-size:11px}#sv-auto #sd-ars .ars-until:not(#z):not(#y){margin-top:5px;padding-top:4px;font-size:10.5px}}
+@media(min-width:901px) and (max-height:640px){#sv-auto #sd-ars .ars-fig>b:not(#z):not(#y){font-size:19px}#sv-auto #sd-ars .ars-until:not(#z):not(#y){margin-top:2px;padding-top:2px;border-top:0}}
 /* the state pill: one shape for both, green when enabled, grey when not */
 #sv-auto #sd-ars>.sv-ph .sv-tag.ars-st:not(#z):not(#y){font-family:var(--wsans);font-size:10px;font-weight:700;letter-spacing:0;text-transform:none;padding:2px 9px;color:#e6e4f0!important;border-color:rgba(255,255,255,.35)!important;background:rgba(255,255,255,.14)!important}
 #sv-auto #sd-ars>.sv-ph .sv-tag.ars-st.on:not(#z):not(#y){color:#03230e!important;border-color:#2ee06a!important;background:#2ee06a!important}

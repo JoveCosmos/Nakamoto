@@ -470,7 +470,7 @@
      no admin step), its own switch - the same in every Autopilot state */
   /* enabled: when the restake grant runs out, inside the year box under a fine rule */
   function rsUntil(at, on){
-    if(!on) return '<span class=ars-until>Runs until <b>you disable it</b></span>';
+    if(!on) return '';
     var dg = (at.grants || []).filter(function(x){ var a = x.authorization || {}; return a.authorization_type === "AUTHORIZATION_TYPE_DELEGATE"; })[0];
     var ex = dg && dg.expiration ? new Date(dg.expiration).getTime() : null; if(!ex) return '<span class=ars-until>Runs until <b>you disable it</b></span>';
     var left = Math.max(0, Math.ceil((ex - Date.now()) / 86400000));
