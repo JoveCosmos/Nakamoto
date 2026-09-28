@@ -1539,8 +1539,8 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
   #p-dele #wbody #wk-mv .wk-t3 h3::before{background:#b9b0ff;box-shadow:0 0 10px -1px #b9b0ff}
   #p-dele #wbody :is(#wk-mine .wk-t1,#wk-plan .wk-t2,#wk-mv .wk-t3) h3::before{width:3px;height:15px;opacity:1}
   /* every title on one 32px line, Easy's and Pro's alike, so the six stand at one height */
-  #p-dele #wbody .wk-pane>.wk-ph h3,#p-dele #wbody #wk-mine .wk-t1 h3,#sv-over .sd-col>.sv-ph h3{line-height:32px}
-  #sv-over .sd-col>.sv-ph{min-height:32px}
+  #p-dele #wbody .wk-pane>.wk-ph h3,#p-dele #wbody #wk-mine .wk-t1 h3,#sv-over .sd-col>.sv-ph h3,#sv-auto .sd-col>.sv-ph h3{line-height:32px}
+  #sv-over .sd-col>.sv-ph,#sv-auto .sd-col>.sv-ph{min-height:32px}
   /* the wider padding leaves the Delegations table 4px less: its figures keep their room, the name gives */
   #p-dele #wbody #dmy col:nth-child(1){width:30px!important}#p-dele #wbody #dmy col:nth-child(3){width:66px!important}
   #p-dele #wbody #dmy col:nth-child(4){width:48px!important}#p-dele #wbody #dmy col:nth-child(5){width:50px!important}
@@ -4010,6 +4010,10 @@ background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,2
 radial-gradient(130% 100% at 0% 0%,rgba(143,245,236,.3),transparent 58%),linear-gradient(140deg,#0f6b67 0%,#1f3f79 55%,#1a1146 100%)}
 .sd-ida::after{content:"";position:absolute;right:22px;bottom:18px;width:7px;height:7px;border-radius:50%;background:#dffcf9;box-shadow:0 0 12px 2px rgba(143,245,236,.9)}
 .sd-ida h3{color:#fff}
+/* the lead card as the wallet card: name and state on one line, the door compact under them */
+.sd-strip .sd-ida{justify-content:flex-start;gap:9px}
+.sd-ida .sd-top{justify-content:flex-start;gap:10px}
+.sd-ida .sv-btn{height:26px;padding:0 14px;font-size:12px}
 .sd-ida .sv-tag{color:#dffcf9;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.1)}
 .sd-ida .sv-tag.g{color:#8ff0b0;border-color:rgba(143,240,176,.55);background:rgba(46,224,106,.16)}
 .sd-col{background:linear-gradient(180deg,#131329,#0c0c1a);border:1px solid var(--wbd2);border-radius:12px;box-shadow:inset 0 1px 0 #ffffff08;

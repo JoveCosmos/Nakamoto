@@ -350,18 +350,20 @@
     var rp = at && at.report, moves = rp && rp.history ? rp.history.length : 0, rec = g && rp && rp.record && rp.record.start ? rp.record : null;
     var since = g && at.since ? window.__dayFull(at.since) : null;
     var sgn = function(d){ return (d >= 0 ? "+" : "−") + Math.abs(d * 100).toFixed(1) + "%"; }, sgnA = function(u){ return (u >= 0 ? "+" : "−") + one(Math.abs(u) / 1e6); };
-    var door = !pos ? '<button class="sv-btn pri" type=button data-act=connect>Connect wallet</button>'
+    /* no wallet: no door here - the bar's Connect is the one (as the Stake view's wallet card) */
+    var door = !pos ? ''
       : !pos.rows.length ? '<button class="sv-btn pri" type=button data-act=stake>Stake ATONE</button>'
       : '<button class="sv-btn ' + (g ? "" : "vio") + '" type=button data-act=autopilot>' + (g ? "Manage" : "Set up") + '</button>';
+    /* the strip as the Stake view's: the lead card (name and state on one line, the door under them), then five
+       boxes - the figure in its well, the unit beside it, no captions and no gauges */
     put("sd-astrip",
-      '<div class="sd-id sd-ida"><h3>Autopilot</h3>' + (g ? tag("g", "Active") : tag("q", "Inactive")) + door + '</div>' +
-      /* active: what it has earned, never the strategy behind it */
-      (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "—", rec ? sgnA((rec.rate - rec.start.rate) * rec.staked) + " ATONE a year" : "first check pending", null, "var(--sv-green)")
-         : ro("Strategy", "—", "chosen when you set it up", null, "var(--sv-violet)")) +
-      ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "—", g ? "ATONE left, of the cap you signed" : "a cap you set, in all", g && a.max_tokens && pos ? Math.min(1, +a.max_tokens.amount / (pos.total || 1)) : null, "var(--sv-violet)") +
-      ro("Runs until", until || "—", g ? (since ? "activated " + since : "then it lapses on its own") : "3, 6 or 12 months", null, "var(--sv-violet)") +
-      ro("Moves made", g ? String(moves) : "—", g ? (rp && rp.checked ? "checked " + window.__dayFull(rp.checked * 1000) : "not checked yet") : "", null, "var(--sv-teal)") +
-      ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "—", pos && pos.rows.length ? "on " + whole(pos.total) + " ATONE" : "", pos && pos.rows.length ? heat(pos.rate).p : null, "", "", true));
+      '<div class="sd-id sd-ida"><div class=sd-top><h3>Autopilot</h3>' + (g ? tag("g", "Active") : tag("q", "Inactive")) + '</div>' + door + '</div>' +
+      (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "\u2014", "", null, "var(--sv-green)", "", false, rec ? "APR" : "")
+         : ro("Strategy", "\u2014", "", null, "var(--sv-violet)")) +
+      ro("May move", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : "no cap") : "\u2014", "", null, "var(--sv-violet)", "", false, g && a.max_tokens ? "ATONE" : "") +
+      ro("Runs until", until || "\u2014", "", null, "var(--sv-violet)") +
+      ro("Moves made", g ? String(moves) : "\u2014", "", null, "var(--sv-teal)") +
+      ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)"));
     /* restake, in one line: what it has done, or who does it instead, or that it waits */
     function restakeLine(){
       var rs = rp && rp.restake, ot = at && at.others;
