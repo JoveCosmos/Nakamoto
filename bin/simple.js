@@ -170,7 +170,9 @@
   /* under the four boxes, ending on the line Redelegate ends on: Stake more and Claim rewards (no wallet:
      Connect a wallet) */
   function claimRow(ex){
-    if(ex) return '<div class="se-cl one"><button class="sv-btn go sd-go" type=button data-shell-connect>Connect a wallet</button></div>';
+    /* the example: Connect a wallet when none is connected; a connected wallet with nothing staked gets no row
+       here - Stake ATONE is in Move your stake beside it */
+    if(ex) return window.__ADDR ? '' : '<div class="se-cl one"><button class="sv-btn go sd-go" type=button data-shell-connect>Connect a wallet</button></div>';
     var rw = window.__REW, has = rw != null && rw > 0;
     return '<div class=se-cl><button class="sv-btn go sd-go" type=button data-act=stake>Stake more</button>' +
       '<button class="sv-btn go sd-go" type=button data-act=claim' + (has ? '' : ' disabled title="Nothing to claim yet"') + '>Claim rewards</button></div>';
