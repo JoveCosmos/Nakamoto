@@ -128,8 +128,9 @@
   function fillConnect(s){
     var box = E("shellconnect"), p = E("p-connect");
     if(!box) return;
-    /* no button of its own: the header's Connect wallet is always there */
-    box.innerHTML = "<h2>Connect a wallet</h2><p>" + esc(s.label) + " works from a connected wallet: Connect wallet, at the top.</p>";
+    /* its button is inert: the header's Connect wallet is the working one */
+    box.innerHTML = "<h2>Connect a wallet</h2><p>" + esc(s.label) + " works from a connected wallet.</p>" +
+      "<button class=shell-act type=button disabled aria-disabled=true tabindex=-1>Connect wallet</button>";
     if(p) p.setAttribute("aria-labelledby", "l1-" + s.id);
   }
 

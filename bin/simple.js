@@ -169,10 +169,12 @@
   }
   /* under the four boxes, ending on the line Redelegate ends on: Stake more and Claim rewards (no wallet:
      the example: none) */
+  function connectOff(cls){ return '<button class="sv-btn go sd-go' + (cls ? ' ' + cls : '') + '" type=button disabled aria-disabled=true tabindex=-1>Connect a wallet</button>'; }
+  var CONNECT_OFF = connectOff();
   function claimRow(ex){
-    /* the example gets no row: without a wallet the header's Connect wallet is the way in, and a connected
-       wallet with nothing staked has Stake ATONE in Move your stake beside it */
-    if(ex) return '';
+    /* the example: without a wallet an inert Connect a wallet (the header's is the working one); a connected
+       wallet with nothing staked gets no row - Stake ATONE is in Move your stake beside it */
+    if(ex) return window.__ADDR ? '' : '<div class="se-cl one">' + CONNECT_OFF + '</div>';
     var rw = window.__REW, has = rw != null && rw > 0;
     return '<div class=se-cl><button class="sv-btn go sd-go" type=button data-act=stake>Stake more</button>' +
       '<button class="sv-btn go sd-go" type=button data-act=claim' + (has ? '' : ' disabled title="Nothing to claim yet"') + '>Claim rewards</button></div>';
@@ -423,8 +425,8 @@
         '</div></div>');
       put("sd-asky", "");
       /* the validators only once it is active: until then, the way to switch it on */
-      /* no wallet: no button here, the header's Connect wallet is the way in */
-      var go = !pos ? ''
+      /* no wallet: an inert Connect a wallet, the header's is the working one */
+      var go = !pos ? connectOff("ap-go")
         : !pos.rows.length ? '<button class="sv-btn go sd-go ap-go" type=button data-act=stake>Stake ATONE</button>'
         : '<button class="sv-btn go sd-go ap-go" type=button data-act=autopilot>Activate Autopilot</button>';
       put("sd-alist", '<div class=sv-ph><h3>Validators</h3></div><div class=ap-act><b>Activate Autopilot</b>' +
@@ -502,7 +504,7 @@
     /* the rules sit at the foot, over the switch */
     h += '<div class=ars-foot><div class=ars-two><div><em>Frequency</em><b>12 hours</b></div><div><em>Minimum</em><b>1 ATONE</b></div></div>' +
       '<div class=ars-how>' + rsHow(pos, at) + '</div></div>';
-    h += !pos ? ''
+    h += !pos ? CONNECT_OFF
       : !pos.rows.length ? '<button class="sv-btn go sd-go" type=button data-act=stake>Stake ATONE</button>'
       : '<button class="sv-btn go sd-go' + (on ? ' ars-off' : '') + '" type=button data-act=restakesw>' + (on ? 'Disable' : 'Enable') + '</button>';
     return h;
