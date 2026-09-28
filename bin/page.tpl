@@ -4374,6 +4374,14 @@ html #sv-over .sd-wgrid>#sd-move>.sv-ph h3::before{background-image:url("data:im
 html #sv-over .sd-wgrid>#sd-list>.sv-ph .sv-tag:not(#z):not(#y){color:#8ff5ec!important;border-color:rgba(43,200,189,.55)!important;background:rgba(43,200,189,.14)!important}
 html #sv-over .sd-wgrid>#sd-sky>.sv-ph .sv-tag:not(#z):not(#y){color:#ffd58a!important;border-color:rgba(255,176,46,.55)!important;background:rgba(255,176,46,.14)!important}
 html #sv-over .sd-wgrid>#sd-move>.sv-ph .sv-tag:not(#z):not(#y){color:#9ff5bd!important;border-color:rgba(46,224,106,.55)!important;background:rgba(46,224,106,.13)!important}
+/* the Easy titles anchored: a soft glow of the section's colour behind its tile, a fine hairline under the row - bright
+   under the title, fading across the column - so each title heads its column instead of floating in it */
+html #sv-over .sd-wgrid>.sd-col>.sv-ph:not(#z){position:relative;padding-bottom:11px!important;margin-bottom:6px!important;isolation:isolate}
+html #sv-over .sd-wgrid>.sd-col>.sv-ph::before{content:"";position:absolute;left:-6px;top:50%;width:150px;height:56px;margin-top:-33px;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse 60% 55% at 30px 50%,color-mix(in srgb,var(--ttc) 26%,transparent),transparent 72%)}
+html #sv-over .sd-wgrid>.sd-col>.sv-ph::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,var(--ttc) 0%,color-mix(in srgb,var(--ttc) 45%,transparent) 32%,transparent 92%)}
+html #sv-over .sd-wgrid>#sd-list>.sv-ph{--ttc:#2bc8bd}html #sv-over .sd-wgrid>#sd-sky>.sv-ph{--ttc:#ffb02e}html #sv-over .sd-wgrid>#sd-move>.sv-ph{--ttc:#2ee06a}
 /* the title tiles filled, each in its section's colour, the icon dark on it */
 html #sv-over .sd-wgrid>#sd-list>.sv-ph h3::before{background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%230b0b19%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2020V11M12%2020V4M19%2020v-6%22/%3E%3C/svg%3E") center/14px 14px no-repeat,linear-gradient(160deg,#2bc8bd,#1a8f87)!important;border-color:transparent!important;box-shadow:0 0 14px -4px #1a8f87!important}
 html #sv-over .sd-wgrid>#sd-sky>.sv-ph h3::before{background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%230b0b19%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%2017l6-6%204%204%208-8M15%207h6v6%22/%3E%3C/svg%3E") center/14px 14px no-repeat,linear-gradient(160deg,#ffc453,#ffa31a)!important;border-color:transparent!important;box-shadow:0 0 14px -4px #ffa31a!important}

@@ -725,6 +725,11 @@
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>#sd-list>.sv-ph .sv-tag:not(#z):not(#y){color:var(--accent)!important;border-color:var(--accent)!important;background:var(--accent-soft)!important}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>#sd-sky>.sv-ph .sv-tag:not(#z):not(#y){color:var(--warn)!important;border-color:var(--amber-bar)!important;background:var(--warn-bg)!important}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>#sd-move>.sv-ph .sv-tag:not(#z):not(#y){color:var(--accent)!important;border-color:var(--accent)!important;background:var(--accent-soft)!important}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph::before{background:transparent}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph::after{background:transparent}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>#sd-list>.sv-ph{--ttc:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>#sd-sky>.sv-ph{--ttc:var(--warn)}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>#sd-move>.sv-ph{--ttc:var(--accent)}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>#sd-list>.sv-ph h3::before{background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%230b0b19%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2020V11M12%2020V4M19%2020v-6%22/%3E%3C/svg%3E") center/14px 14px no-repeat,var(--accent)!important;border-color:transparent!important;box-shadow:none!important}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>#sd-sky>.sv-ph h3::before{background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%230b0b19%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%2017l6-6%204%204%208-8M15%207h6v6%22/%3E%3C/svg%3E") center/14px 14px no-repeat,var(--amber-bar)!important;border-color:transparent!important;box-shadow:none!important}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>#sd-move>.sv-ph h3::before{background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%230b0b19%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%2018c0-6.6%204.4-10%2010-10h6M16%204l4%204-4%204%22/%3E%3C/svg%3E") center/14px 14px no-repeat,var(--accent)!important;border-color:transparent!important;box-shadow:none!important}
@@ -1229,4 +1234,7 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-auto .ars-fig{border-color:#e3ded3;background:linear-gradient(0deg,rgba(22,115,58,.1),#fbf9f3 70%)}
   html[data-theme=light]:not([data-mono]) #sv-auto .ars-fig b{color:#16733a}html[data-theme=light]:not([data-mono]) #sv-auto .ars-rules b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #sv-auto .ars-rules li::before{background:#16733a}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>#sd-list>.sv-ph{--ttc:#1a8f87}html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>#sd-sky>.sv-ph{--ttc:#d98a00}html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>#sd-move>.sv-ph{--ttc:#1f9e4f}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph::before{background:radial-gradient(ellipse 60% 55% at 30px 50%,color-mix(in srgb,var(--ttc) 20%,transparent),transparent 72%)}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph::after{background:linear-gradient(90deg,var(--ttc) 0%,color-mix(in srgb,var(--ttc) 45%,transparent) 32%,transparent 92%)}
 
