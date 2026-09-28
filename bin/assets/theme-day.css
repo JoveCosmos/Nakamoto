@@ -715,6 +715,11 @@
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky{--tc:var(--danger)}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-alist{--tc:var(--accent)}
   html[data-theme=light]:not([data-mono]) #sv-auto .ap-mv .ap-no{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#p-dele #sd-mstrip).sd-strip:not(#z){border-color:var(--accent-soft);background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-idw:not(#z){background:none;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-ro:not(#z){background:none;border-left-color:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-ro em:not(#z){color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .sd-strip .sd-ro .sd-well:not(#z){border:1px solid var(--surface-2);background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-btn.go.sd-go:disabled{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .fp-b{--c:var(--danger)}
   html[data-theme=light]:not([data-mono]) .fp-b.b1{--c:var(--warn)}
@@ -1147,4 +1152,13 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-alist{--bandf:#3d4a66,#262f45 58%,#141827}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-alist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#3d4a66,#262f45 58%,#141827)}
   html[data-theme=light]:not([data-mono]) #atpop .atidle b{color:var(--ink)}html[data-theme=light]:not([data-mono]) #atpop .atidle b.n{color:#b3261e}
+  /* the wallet strip keeps its night face in day: Outcome's violet, night tokens, plain boxes */
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#p-dele #sd-mstrip).sd-strip:not(#z){border-color:rgba(185,176,255,.3);background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#4130a0,#271c6c 58%,#150f3b)}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-ro:not(#z){--sv-amber:#ffb02e;--sv-green:#2ee06a;--sv-violet:#b9b0ff;--sv-teal:#2bc8bd;--sv-pho:#7fd8ff;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4;background:none;border-left-color:rgba(255,255,255,.1);color:#f0eef8}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-ro em:not(#z){color:rgba(255,255,255,.78)}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-ro .sd-well:not(#z){border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-ro .sd-well>b{color:#f0eef8}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-ro .sv-pho{color:#7fd8ff}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-ro .sd-well>i.u{color:#8f8db4}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-idw:not(#z){background:none}
 

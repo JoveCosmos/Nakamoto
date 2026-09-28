@@ -4334,6 +4334,14 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 #sv-auto .ap-act b{font-size:20px;font-weight:800;color:var(--wt)}
 #sv-auto .ap-act span{max-width:30ch;font-size:12.5px;line-height:1.5;color:var(--ws);text-wrap:balance}
 #sv-auto .ap-act .ap-go:not(#z){width:auto;min-width:200px;margin-top:6px;padding:0 22px}
+/* the strip is one surface in Outcome's violet band fill; the wallet card and the five boxes sit on it (Easy and
+   Pro alike); the figures in plain boxes, not engraved */
+:is(#sd-wstrip,#p-dele #sd-mstrip).sd-strip:not(#z){position:relative;border-color:rgba(185,176,255,.3);background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#4130a0,#271c6c 58%,#150f3b)}
+:is(#sd-wstrip,#sd-mstrip) .sd-idw:not(#z){background:none;box-shadow:none}
+:is(#sd-wstrip,#sd-mstrip) .sd-idw::before{display:none}
+:is(#sd-wstrip,#sd-mstrip) .sd-ro:not(#z){background:none;border-left-color:rgba(255,255,255,.1)}
+:is(#sd-wstrip,#sd-mstrip) .sd-ro em:not(#z){color:rgba(255,255,255,.78)}
+.sd-strip .sd-ro .sd-well:not(#z){border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);box-shadow:none}
 .sv-btn.go.sd-go:disabled{background:rgba(255,255,255,.05);border-color:var(--wbd2);color:var(--wf);box-shadow:none;cursor:not-allowed;margin-top:auto}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}
