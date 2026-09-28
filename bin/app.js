@@ -3028,10 +3028,12 @@ rememberGridH();
       enable: function(){ return enable(window.keplr); },
       getKey: function(){ return window.keplr.getKey(CHAIN); },
       signAmino: function(addr, doc){ return window.keplr.signAmino(CHAIN, addr, doc); },
-      /* SIGN_MODE_DIRECT: the account number travels as a Long-shaped object */
+      /* SIGN_MODE_DIRECT: the account number travels as a Long-shaped object. Keplr's injected script turns it into
+         text with toString() before signing - a plain {low, high} object became "[object Object]" and every direct
+         signature (Autopilot grant, Restake, following a governor) failed on chain. toString gives the number. */
       signDirect: function(addr, doc){ var n = parseInt(doc.accountNumber, 10);
         return window.keplr.signDirect(CHAIN, addr, { bodyBytes: doc.bodyBytes, authInfoBytes: doc.authInfoBytes, chainId: doc.chainId,
-          accountNumber: { low: n % 4294967296, high: Math.floor(n / 4294967296), unsigned: true } }); } });
+          accountNumber: { low: n % 4294967296, high: Math.floor(n / 4294967296), unsigned: true, toString: function(){ return String(n); } } }); } });
     if(window.adena && window.adena.cosmos) out.push({ name: "Adena", raw: window.adena.cosmos,
       enable: function(){ return window.adena.cosmos.enable(CHAIN).then(unwrapA); },
       getKey: function(){ return window.adena.cosmos.getKey(CHAIN).then(unwrapA); },
