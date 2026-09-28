@@ -1577,7 +1577,7 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
 /* Enable restake: its title a green band like the panels', the card joined under it */
 #sv-over #sd-sky .se-mid>.se-rsw,#sv-over #sd-sky .se-ex>.se-rsw{gap:0}
 #sv-over #sd-sky .se-rsh2{height:30px;box-sizing:border-box;padding:0 10px;gap:8px;border:1px solid var(--wbd2);border-bottom:1px solid rgba(255,255,255,.08);border-radius:9px 9px 0 0;
-background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.07),transparent 60%),linear-gradient(135deg,#0a3a22,#072a19 58%,#05140d)}
+background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.07),transparent 60%),linear-gradient(315deg,#0a3a22,#072a19 58%,#05140d)}
 #sv-over #sd-sky .se-rsh2 h4{font-size:13px;color:#fff}
 #sv-over #sd-sky .se-rsh2 h4::before{background:rgba(255,255,255,.9);box-shadow:none}
 #sv-over #sd-sky .se-rsh2 .sv-tag{padding:2px 7px;font-size:10px;line-height:1.35}
@@ -1594,12 +1594,12 @@ background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.07),transparent 6
 @media(min-width:901px) and (max-height:520px){#sv-over #sd-sky .se-mid>.se-rsw.se-rsw,#sv-over #sd-sky .se-ex>.se-rsw.se-rsw{padding-top:0}}
   #p-dele #wbody :is(#wk-mine,#wk-plan) .wk-tbl2{margin-top:8px!important}
   #p-dele #wbody #wk-mv>.wk-ph+*{margin-top:8px!important}
-  #sv-over #sd-list>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#0f6b67,#123a52 58%,#141633)}
-  #sv-over #sd-sky>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#8a5a12,#4a2f12 58%,#1f1630)}
-  #sv-over #sd-move>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.07),transparent 60%),linear-gradient(135deg,#0a3a22,#072a19 58%,#05140d)}
-  #p-dele #wbody #wk-mine .wk-t1{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#7a3322,#44201a 58%,#1c1228)}
-  #p-dele #wbody #wk-plan>.wk-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#0e5a5a,#12394a 58%,#141633)}
-  #p-dele #wbody #wk-mv>.wk-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#4130a0,#271c6c 58%,#150f3b)}
+  #sv-over #sd-list>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#0f6b67,#123a52 58%,#141633)}
+  #sv-over #sd-sky>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#8a5a12,#4a2f12 58%,#1f1630)}
+  #sv-over #sd-move>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.07),transparent 60%),linear-gradient(315deg,#0a3a22,#072a19 58%,#05140d)}
+  #p-dele #wbody #wk-mine .wk-t1{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#7a3322,#44201a 58%,#1c1228)}
+  #p-dele #wbody #wk-plan>.wk-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#0e5a5a,#12394a 58%,#141633)}
+  #p-dele #wbody #wk-mv>.wk-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#4130a0,#271c6c 58%,#150f3b)}
   /* the wider padding leaves the Delegations table 4px less: its figures keep their room, the name gives */
   #p-dele #wbody #dmy col:nth-child(1){width:30px!important}#p-dele #wbody #dmy col:nth-child(3){width:66px!important}
   #p-dele #wbody #dmy col:nth-child(4){width:48px!important}#p-dele #wbody #dmy col:nth-child(5){width:50px!important}
@@ -4434,9 +4434,9 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 :is(#sv-proplist,#sv-daop,#sv-govlist)>.sv-ph h3{color:#fff;font-size:15px;white-space:nowrap}
 :is(#sv-proplist,#sv-daop,#sv-govlist)>.sv-ph h3::before{background:rgba(255,255,255,.9);box-shadow:none}
 :is(#sv-proplist,#sv-daop,#sv-govlist)>.sv-ph .sv-gkey{color:rgba(255,255,255,.75);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#sv-proplist>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#1d4f8f,#173257 58%,#141633)}
-#sv-daop>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#5f6216,#393b15 58%,#19191f)}
-#sv-govlist>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#7d2e6e,#461f45 58%,#1a1230)}
+#sv-proplist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#1d4f8f,#173257 58%,#141633)}
+#sv-daop>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#5f6216,#393b15 58%,#19191f)}
+#sv-govlist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#7d2e6e,#461f45 58%,#1a1230)}
 /* proposals: the id a small key, the status a clear tag, the tally a firmer bar, Yes the figure */
 .gp-id{justify-self:start;padding:2px 7px;border-radius:6px;border:1px solid var(--wbd2);background:rgba(0,0,0,.25);color:var(--ws)}
 .gp-r{border-radius:9px;border-top-color:transparent;box-shadow:0 -1px 0 var(--wbd)}
@@ -4460,7 +4460,7 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 #sv-cons .cn-in{max-width:none;margin:0;padding:0 40px 64px}
 /* its header a sepia band across the top of the text, the Governance section's fourth colour */
 #sv-cons .cn-hd{margin:0 -40px 26px;padding:24px 40px 18px;border-bottom:1px solid rgba(255,255,255,.08);border-radius:11px 11px 0 0;
-background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#6b5a3a,#3b3226 58%,#19171d)}
+background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#6b5a3a,#3b3226 58%,#19171d)}
 #sv-cons .cn-hd h1{color:#fff}#sv-cons .cn-hd p{color:rgba(255,255,255,.78)}#sv-cons .cn-hd p b{color:#fff}#sv-cons .cn-hd a{color:#ffe2b0}
 @media(max-width:900px){#sv-cons .cn-in{padding:0 16px 48px}#sv-cons .cn-hd{margin:0 -16px 20px;padding:18px 16px 14px}}
 @media(max-width:700px){.gv-strip{grid-template-columns:minmax(0,1fr)!important}.gv-ro{border-left:0;border-top:1px solid var(--wbd)}.gv-ro:first-child{border-top:0}
