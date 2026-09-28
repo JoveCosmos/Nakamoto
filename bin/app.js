@@ -2949,7 +2949,7 @@ rememberGridH();
       atKeep(r);
       if(!AT.addr) throw new Error("Restake opens once GATA's keeper is live");
       var on = rsOn(), msgs = rsMsgs(!on);
-      if(!msgs.length) throw new Error(on ? "Nothing to turn off" : "Stake with a validator first");
+      if(!msgs.length) throw new Error(on ? "Nothing to disable" : "Stake with a validator first");
       return window.__TX.sendDirect(window.__WALLET, msgs, on ? "" : "gata:restake", function(){});
     })
       .then(function(){ n.ok(); return atGrant().then(function(r){ if(atKeep(r)){ draw(); if(window.__redraw) window.__redraw(); } }); })

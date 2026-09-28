@@ -406,7 +406,7 @@
         '<div class=ap-dd><u class=ok>Does</u><div class=ap-row>' +
           cb("Keeps stake active", "24/7", ib ? ib + " ATONE idle on inactive validators" : "through a long winter or a busy month", "#2bc8d6") +
           cb("Strategizes", "Better APR", "among your validators", "#b9b0ff") +
-          cb("Reviewed by GATA", "48 hours", "an admin acts on each plan", "#ffb02e") +
+          cb("Restakes", "Rewards", "if you switch it on", "#2ee06a") +
           cb("You grant", "It runs", "you revoke, it stops", "#2ee06a") +
         '</div><u class=no>Never Does</u><div class=ap-row>' +
           cb("Send", "Never", "nor spend your ATONE", "#ff6a6a", "no") +
@@ -470,15 +470,15 @@
      no admin step), its own switch - the same in every Autopilot state */
   function restakePanel(pos, at){
     var on = !!(at && at.restake), r = pos && pos.rows.length ? pos.rate : 0, add = r > 0 ? Math.pow(1 + r / 730, 730) - 1 - r : 0;
-    var h = '<div class=sv-ph><h3>Restake</h3>' + '<span class="sv-tag ' + (on ? 'g' : 'q') + '">' + (on ? 'on' : 'off') + '</span></div>';
-    h += '<div class=ars-fig><em>' + (on ? 'Adds a year' : 'A year') + '</em><div class=ars-val><b>' + (add > 0 ? '+' + fmt(pos.total * add) + '<i> ATONE</i>' : '\u2014') + '</b>' +
-      (add > 0 ? '<span class=ars-apr>+' + (add * 100).toFixed(1) + '% APR</span>' : '') + '</div></div>';
-    h += '<div class=ars-two><div><em>Frequency</em><b>12 hours</b></div><div><em>Minimum</em><b>1 ATONE</b></div></div>' +
-      '<div class=ars-how>Auto-compounds reward on your <b>best-paying</b> validator</div>' +
-      '<ul class=ars-rules><li>GATA pays the fees</li></ul>';
+    var h = '<div class=sv-ph><h3>Restake</h3>' + '<span class="sv-tag ' + (on ? 'g' : 'q') + '">' + (on ? 'Enabled' : 'Disabled') + '</span></div>';
+    h += '<div class=ars-fig><em>' + (on ? 'Adds a year' : 'A year') + '</em><b>' + (add > 0 ? '+' + fmt(pos.total * add) + '<i> ATONE</i>' : '\u2014') + '</b>' +
+      (add > 0 ? '<small>+' + (add * 100).toFixed(1) + '% APR</small>' : '') + '</div>';
+    /* the rules sit at the foot, over the switch */
+    h += '<div class=ars-foot><div class=ars-two><div><em>Frequency</em><b>12 hours</b></div><div><em>Minimum</em><b>1 ATONE</b></div></div>' +
+      '<div class=ars-how>Auto-compounds reward on your <b>best-paying</b> validator</div></div>';
     h += !pos ? '<button class="sv-btn go sd-go" type=button data-shell-connect>Connect a wallet</button>'
       : !pos.rows.length ? '<button class="sv-btn go sd-go" type=button data-act=stake>Stake ATONE</button>'
-      : '<button class="sv-btn go sd-go' + (on ? ' ars-off' : '') + '" type=button data-act=restakesw>' + (on ? 'Turn off' : 'Turn on') + '</button>';
+      : '<button class="sv-btn go sd-go' + (on ? ' ars-off' : '') + '" type=button data-act=restakesw>' + (on ? 'Disable' : 'Enable') + '</button>';
     return h;
   }
   function grantView(g, at, rp, since, until){
