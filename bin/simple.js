@@ -154,27 +154,27 @@
   /* ex: the example for a visitor with no wallet - ATONE only, the rate as a single figure, no notes */
   function earns(stake, rate, off, ex){
     var y = stake * rate, per = function(days){ return y * days / 365; };
-    var tile = function(k, u){ return fig(k, '<span class=sd-gain>+' + one(u / 1e6) + '</span>', "ATONE", "var(--sv-green)"); };   /* ATONE, never dollars */
-    /* restaking monthly: the rewards claimed and staked again each month earn too - a year of it against
-       the plain year (today's rate carried forward, compounded twelve times) */
+    /* restaking monthly: the rewards claimed and staked again each month earn too - the year compounded
+       twelve times at today's rate, against the plain year */
     var cy = stake * (Math.pow(1 + rate / 12, 12) - 1), more = cy - y;
-    /* the restaked year as the plain one is shown: a day, a week, a month - each its share of the
-       compounded year - under its own year card, set apart from the plain year above */
-    var rtile = function(k, u){ return fig(k, '<span class=se-rsv>+' + one(u / 1e6) + '</span>', "ATONE", "var(--sv-teal)"); };
-    var rst = rate > 0 ? '<div class=se-rsw><div class="se-card se-rc"><em>Restake monthly, a year</em><b><span class=se-rsv>+' + one(cy / 1e6) + '</span><i>ATONE</i></b>' +
-        '<small><span class=se-rsm>+' + one(more / 1e6) + '</span> more than leaving rewards unclaimed</small></div>' +
-      '<div class="sd-figs two se-row se-rsr">' + rtile("A day", cy / 365) + rtile("A week", cy * 7 / 365) + rtile("A month", cy / 12) + '</div></div>' : '';
-    /* the same block as the connected one: the figure in ATONE, the rate under it */
-    if(ex) return '<div class=se-ex><div class=se-hero><div class=se-card><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b><small class=se-apr>' + pct(rate) + ' APR</small></div></div>' +
-      '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' + rst + '</div>';
-    /* the year and its three steps stand in the middle of the panel, the note at its foot */
-    return '<div class=se-mid>' + (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + '<div class=se-hero><div class=se-card><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b>' +
-        '<small class=se-apr>' + pct(rate) + ' APR</small></div></div>' +
-      '<div class="sd-figs two se-row">' + tile("A day", per(1)) + tile("A week", per(7)) + tile("A month", per(365 / 12)) + '</div>' + rst + '</div>' +
-      /* two doors on one row: stake more of it, and claim what it has earned (greyed while nothing waits) */
-      '<div class=sd-go2><button class="sv-btn go sd-go" type=button data-act=stake>Stake more</button>' +
-        '<button class="sv-btn go sd-go sd-cl" type=button data-act=claim' + ((window.__REW || 0) >= 1 ? '' : ' disabled title="No rewards waiting yet"') + '>Claim rewards</button></div>';
+    var at = !ex && window.__atInfo ? window.__atInfo() : null, on = !!(at && at.grant && at.restake);
+    /* restaking already: every figure carries the restake's effect, each with what it adds */
+    var Y = on ? cy : y, P = function(days){ return Y * days / 365; }, D = function(days){ return (cy - y) * days / 365; };
+    var tile = function(k, u, d){ return fig(k, '<span class=sd-gain>+' + one(u / 1e6) + '</span>', on ? '<span class=se-rsm>+' + one(d / 1e6) + '</span> restake' : "ATONE", "var(--sv-green)"); };
+    var year = '<div class=se-hero><div class=se-card><em>' + (on ? 'A year, restaking' : 'A year') + '</em><b><span class=sd-gain>+' + one(Y / 1e6) + '</span><i>ATONE</i></b>' +
+      '<small class=se-apr>' + (on ? '<span class=se-rsm>+' + one(more / 1e6) + '</span> from restake, ' : '') + pct(rate) + ' APR</small></div></div>';
+    var steps = '<div class="sd-figs two se-row' + (on ? ' rson' : '') + '">' + tile("A day", P(1), D(1)) + tile("A week", P(7), D(7)) + tile("A month", P(365 / 12), D(365 / 12)) + '</div>';
+    /* not restaking: the offer, as Move your stake offers its move - the year now and the year
+       restaking, side by side, and the door (none without a wallet: it names nothing to act on) */
+    var offer = rate > 0 && !on ? '<div class=se-rsw><div class=se-rsh2><em>Restake</em><span>autocompounds your rewards</span></div>' +
+        '<div class="sd-figs sd-mv se-rs2">' + fig("Now", '<span class=sd-gain>+' + one(y / 1e6) + '</span>', "ATONE a year", "var(--sv-green)") +
+        fig("Restaking", '<span class=se-rsv>+' + one(cy / 1e6) + '</span>', "ATONE a year", "var(--sv-teal)") + '</div></div>' : '';
+    var door = !ex && !on && rate > 0 ? '<button class="sv-btn go sd-go se-rsgo" type=button data-act=restake>Restake<b>+' + one(more / 1e6) + ' ATONE a year</b></button>'
+      : on ? '<div class=se-rson>Restake is on: your rewards compound on their own.<button type=button class=se-rsch data-act=autopilot>Change</button></div>' : '';
+    if(ex) return '<div class=se-ex>' + year + steps + offer + '</div>';
+    return '<div class=se-mid>' + (off ? '<div class=sd-off>' + fmt(off) + ' ATONE on inactive validators earns nothing</div>' : '') + year + steps + offer + '</div>' + door;
   }
+
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every
      one of them, largest first; the list scrolls inside its panel */
   function vlist(rows, total, mark){
@@ -1352,6 +1352,8 @@
       return;
     }
     if(act === "autopilot"){ var ab = E("atbtn"); if(ab) ab.click(); return; }
+    /* restake is part of the Autopilot grant: its setup opens with restake set to Yes */
+    if(act === "restake"){ var rb = E("atbtn"); if(rb) rb.click(); setTimeout(function(){ var y = document.querySelector('#atrsk [data-r="1"]'); if(y && y.getAttribute("aria-pressed") !== "true") y.click(); }, 60); return; }
     if(act === "connect"){ var cb = E("svconn"); if(cb){ ev.stopPropagation(); cb.click(); } return; }
     if(t.dataset.v && window.__vshow) window.__vshow(t.dataset.v);
   }

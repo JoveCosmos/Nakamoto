@@ -4072,7 +4072,6 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-rs{font-size:12px;line-height:1.45;color:var(--ws);padding-left:10px;border-left:2px solid var(--sv-violet)}
 .sd-rs b{color:var(--wt)}
 .sd-go{width:100%;height:40px;flex:0 0 auto;justify-content:center}
-.sd-go2{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:0 0 auto;margin-top:auto}
 /* Overview's three panels line up as Manage's do: one title-row height, the content starting on one line;
    What your stake earns stands at the top - the year card, its three boxes 8px under it, as Move your
    stake's cards - its doors at the foot */
@@ -4082,43 +4081,52 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 #sv-over .se-mid::after,#sv-over .se-ex::after{display:none}
 #sv-over .se-row{margin-top:0}
 /* the restake card: one wide figure under the three boxes, in teal */
-/* the restake section: set apart below the plain one (it takes the room left, at least 14px), its own year
-   card in teal, then its day, week and month */
+/* the restake offer: set apart below the plain year (the room left, at least 14px) - a line naming it, then
+   Now and Restaking side by side as Move your stake shows its cards; the door under it */
 #sv-over .se-mid,#sv-over .se-ex{flex:1 1 auto}
-.se-rsw{display:flex;flex-direction:column;gap:8px;flex:0 0 auto;margin-top:auto;padding-top:14px}
-.se-rc{padding:9px 16px 10px}
-.se-rc::before{background:var(--sv-teal);box-shadow:0 0 12px var(--sv-teal)}
-.se-rc>b{font-size:28px}
-.se-rc small{font-size:11px;color:var(--ws)}
-.se-rsm{color:var(--sv-green);font-weight:700}
+.se-rsw{display:flex;flex-direction:column;gap:6px;flex:0 0 auto;margin-top:auto;padding-top:14px}
+.se-rsh2{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:0 2px}
+.se-rsh2 em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--sv-teal)}
+.se-rsh2 span{font-size:11px;color:var(--ws)}
+.sd-figs.sd-mv.se-rs2{grid-template-rows:auto;flex:0 0 auto}
+.sd-figs.sd-mv.se-rs2 .sd-fig:last-child{grid-column:auto}
+.sd-figs.sd-mv.se-rs2 .sd-fig>b{font-size:28px;padding-bottom:7px}
+.sd-figs.sd-mv.se-rs2 .sd-fig{padding-top:8px;padding-bottom:9px}
+/* restaking: the day, week and month keep the line saying what restake adds */
+#sv-over .se-row.rson .sd-fig small{display:block}
+@media(min-width:901px) and (max-height:760px){#sv-over .sd-figs.sd-mv.se-rs2 .sd-fig>b{font-size:22px;padding-bottom:5px}#sv-over .sd-figs.sd-mv.se-rs2 .sd-fig small{display:none}
+  #sv-over .sd-figs.sd-mv.se-rs2 .sd-fig{padding-top:5px;padding-bottom:6px}#sv-over .se-rsw{padding-top:8px;gap:4px}}
+@media(min-width:901px) and (max-height:700px){#sv-over .se-rs2,#sv-over .se-rsh2 span{display:none}}
 .se-rsv{color:var(--sv-teal)}
-.se-rsr .sd-fig small{display:none}   /* the restake year card says ATONE; its boxes need not */
-.se-rsr .sd-fig{padding-top:6px;padding-bottom:7px}
-@media(min-width:901px) and (max-height:1000px){#sv-over .se-card{padding-top:8px;padding-bottom:9px}#sv-over .se-card>b{font-size:30px}#sv-over .se-rc>b{font-size:22px}
+.se-rsm{color:var(--sv-green);font-weight:700}
+.sv-btn.go.se-rsgo{gap:8px;background:var(--sv-teal);border-color:var(--sv-teal);color:#04201e;box-shadow:0 10px 26px -14px rgba(43,200,189,.9)}
+.sv-btn.go.se-rsgo:hover:not(:disabled){background:#4fdad0;border-color:#4fdad0;color:#04201e}
+.se-rsgo b{font-weight:600;opacity:.8}
+.se-rson{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:0 0 auto;padding:10px 12px;border-radius:10px;border:1px solid rgba(43,200,189,.4);
+background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
+.se-rsch{height:24px;padding:0 10px;border-radius:6px;border:1px solid rgba(43,200,189,.55);background:transparent;color:#6fe3da;font:600 11px var(--wsans);cursor:pointer}
+@media(min-width:901px) and (max-height:1000px){#sv-over .se-card{padding-top:8px;padding-bottom:9px}#sv-over .se-card>b{font-size:30px}
   #sv-over .se-rsw{padding-top:10px;gap:6px}#sv-over .se-mid,#sv-over .se-ex{gap:6px}#sv-over .se-row .sd-fig small{display:none}#sv-over .se-row .sd-fig{padding-top:5px;padding-bottom:6px}}
-@media(min-width:901px) and (max-height:700px){#sv-over .se-rc small{display:none}#sv-over .se-rc{padding-top:6px;padding-bottom:7px}}
-@media(min-width:901px) and (max-height:640px){#sv-over .se-rsr{display:none}#sv-over .se-rc em{display:none}#sv-over .se-rsw{padding-top:6px;gap:4px}#sv-over .se-card>b{font-size:24px}
+@media(min-width:901px) and (max-height:700px){}
+@media(min-width:901px) and (max-height:640px){#sv-over .se-rsw{padding-top:6px;gap:4px}#sv-over .se-card>b{font-size:24px}
   #sv-over .se-row .sd-fig>b{font-size:14px}#sv-over .se-mid,#sv-over .se-ex{gap:4px}}
 /* the doors never sit on the content: the content gives way above them */
 #sv-over #sd-sky .se-mid,#sv-over #sd-sky .se-ex{min-height:min-content}
 /* a short window has no room for it under the boxes: the doors must stand in the panel */
 /* short windows keep the restake card: one line, the doors and the boxes a touch tighter */
 @media(min-width:901px) and (max-height:760px){
-  #sv-over .se-rsr .sd-fig small{display:none}#sv-over .se-rsr .sd-fig{padding-top:4px;padding-bottom:5px}}
+  }
 /* shorter still: the year card and its boxes compact, so both doors stand inside the panel */
 @media(min-width:901px) and (max-height:700px){
   #sv-over .se-card{padding:8px 14px 9px}#sv-over .se-card>b{font-size:30px}
   #sv-over .se-row .sd-fig{padding-top:5px;padding-bottom:6px}#sv-over .se-row .sd-fig>b{font-size:17px}
-  #sv-over .sd-go2 .sd-go,#sv-over #sd-move .sd-go{height:34px}}
+  #sv-over #sd-sky .sd-go,#sv-over #sd-move .sd-go{height:34px}}
 @media(min-width:901px) and (max-height:700px){#sv-over .se-row .sd-fig small{display:none}#sv-over .se-mid,#sv-over .se-ex{gap:6px}}
-@media(min-width:901px) and (max-height:640px){#sv-over .se-card small.se-apr{display:none}#sv-over .se-card em{display:none}#sv-over .se-rsw{gap:5px;padding-top:8px}#sv-over .se-rc small{display:none}#sv-over .se-row .sd-fig>b{font-size:15px}#sv-over .se-row .sd-fig{padding-top:3px;padding-bottom:3px}#sv-over .sd-go2 .sd-go{height:32px}}
+@media(min-width:901px) and (max-height:640px){#sv-over .se-card small.se-apr{display:none}#sv-over .se-card em{display:none}#sv-over .se-rsw{gap:5px;padding-top:8px}#sv-over .se-row .sd-fig>b{font-size:15px}#sv-over .se-row .sd-fig{padding-top:3px;padding-bottom:3px}#sv-over #sd-sky .sd-go{height:32px}}
 @media(min-width:901px) and (max-height:640px){
   #sv-over .se-card{padding:6px 14px 7px;gap:0}#sv-over .se-card>b{font-size:26px}#sv-over .se-card em{font-size:8px}
   #sv-over .se-mid,#sv-over .se-ex{gap:6px}#sv-over .se-row .sd-fig{padding-top:4px;padding-bottom:4px}
   #sv-over .sd-col>.sv-ph{min-height:24px}}
-.sd-go2 .sd-go{width:auto}
-.sv-btn.go.sd-cl{background:transparent;color:#5cf08e;border-color:rgba(46,224,106,.6);box-shadow:none}
-.sv-btn.go.sd-cl:hover:not(:disabled){background:rgba(46,224,106,.12);color:#8ef0b0;border-color:#2ee06a}
 .sv-btn.go.sd-go:disabled{background:rgba(255,255,255,.05);border-color:var(--wbd2);color:var(--wf);box-shadow:none;cursor:not-allowed;margin-top:auto}
 .sd-fine{font-size:11px;line-height:1.45;color:var(--wf)}
 .sd-fine b{color:var(--wt)}
@@ -4168,16 +4176,16 @@ background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 16%,
 .sd-mv .sd-fig>b{justify-content:center}
 /* Move your stake (and Autopilot's same cards): its own look - the figure large and bare, a short glowing
    rule in the card's colour under it, the card washed in that colour from below */
-:is(#sd-move,#sd-asky) .sd-mv .sd-fig{gap:4px;border-left:1px solid var(--wbd2);
+.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig{gap:4px;border-left:1px solid var(--wbd2);
   background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 14%,transparent),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.008))}
-:is(#sd-move,#sd-asky) .sd-mv .sd-fig::before{display:none}
-:is(#sd-move,#sd-asky) .sd-mv .sd-fig::after{display:none}
-:is(#sd-move,#sd-asky) .sd-mv .sd-fig em{font-size:10px;letter-spacing:.2em;color:var(--ws)}
-:is(#sd-move,#sd-asky) .sd-mv .sd-fig>b{position:relative;font-size:38px;line-height:1;padding-bottom:9px}
-:is(#sd-move,#sd-asky) .sd-mv .sd-fig>b::after{content:"";position:absolute;left:50%;bottom:0;width:34px;height:3px;margin-left:-17px;border-radius:2px;background:var(--rc);box-shadow:0 0 10px var(--rc)}
-:is(#sd-move,#sd-asky) .sd-mv .sd-fig:last-child>b{font-size:40px}
-:is(#sd-move,#sd-asky) .sd-mv .sd-fig small{font-size:11.5px;color:var(--ws)}
-@media(min-width:901px) and (max-height:700px){:is(#sd-move,#sd-asky) .sd-mv .sd-fig>b{font-size:28px;padding-bottom:7px}:is(#sd-move,#sd-asky) .sd-mv .sd-fig:last-child>b{font-size:30px}:is(#sd-move,#sd-asky) .sd-mv .sd-fig{gap:4px}}
+.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig::before{display:none}
+.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig::after{display:none}
+.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em{font-size:10px;letter-spacing:.2em;color:var(--ws)}
+.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig>b{position:relative;font-size:38px;line-height:1;padding-bottom:9px}
+.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig>b::after{content:"";position:absolute;left:50%;bottom:0;width:34px;height:3px;margin-left:-17px;border-radius:2px;background:var(--rc);box-shadow:0 0 10px var(--rc)}
+.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig:last-child>b{font-size:40px}
+.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig small{font-size:11.5px;color:var(--ws)}
+@media(min-width:901px) and (max-height:700px){.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig>b{font-size:28px;padding-bottom:7px}.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig:last-child>b{font-size:30px}.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig{gap:4px}}
 /* the boxes stand where the centred block put them (equal room above the block and below it); the
    year rises into the middle of the room between the title and the boxes: the hero takes its own
    height plus half the spare room and centres itself in it, the ::after spacer the other half */
@@ -4194,7 +4202,7 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .se-card::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:2px;border-radius:0 2px 2px 0;background:var(--sv-green);box-shadow:0 0 12px var(--sv-green)}
 .se-hero:has(>.se-card){padding:0}
 
-.se-hero em,.se-rc em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+.se-hero em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
 .se-hero>b,.se-card>b{display:flex;align-items:baseline;gap:8px;font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1.05;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}
 .se-hero>b i,.se-card>b i{font-style:normal;font-family:var(--wmono);font-size:11px;font-weight:400;letter-spacing:.14em;color:var(--wf)}
 .se-hero small{font-size:12px;line-height:1.35;color:var(--ws)}

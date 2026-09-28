@@ -188,7 +188,6 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
 
 radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear-gradient(140deg,#4130a0 0%,#271c6c 52%,#150f3b 100%)}
   html[data-theme=light]:not([data-mono]) .fpt0{color:#b8401c}html[data-theme=light]:not([data-mono]) .fpt1{color:#a86400}html[data-theme=light]:not([data-mono]) .fpt2{color:#16733a}
-  html[data-theme=light]:not([data-mono]) .sv-btn.go.sd-cl{background:transparent;color:#0f5e50;border-color:rgba(15,94,80,.5)}
   html[data-theme=light]:not([data-mono]) .sd-off{color:#b8401c}
 
   /* the barcode in day */
@@ -199,5 +198,6 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .fp-out{color:#b8401c}
   html[data-theme=light]:not([data-mono]) .fp-kb{border-color:var(--line-strong,#d9d3c4);background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 14%,transparent),transparent 65%),#fbf9f3;box-shadow:none}
 
-  html[data-theme=light]:not([data-mono]) #sv :is(#sd-move,#sd-asky) .sd-mv .sd-fig{background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 12%,transparent),transparent 70%),#fbf9f3}
-  html[data-theme=light]:not([data-mono]) #sv :is(#sd-move,#sd-asky) .sd-mv .sd-fig>b::after{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #sv .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig{background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 12%,transparent),transparent 70%),#fbf9f3}
+  html[data-theme=light]:not([data-mono]) #sv .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig>b::after{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sv-btn.go.se-rsgo{background:#0f7a72;border-color:#0f7a72;color:#fff}
