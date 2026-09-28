@@ -1391,7 +1391,7 @@
       if(p && p.moves) window.__goSign();
       return;
     }
-    if(act === "restakesw"){ if(window.__rsOpen) window.__rsOpen(); return; }
+    if(act === "restakesw"){ if(window.__rsToggle) window.__rsToggle(t); return; }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
     if(act === "gfollow"){ govSend(t, { type: "atomone/v1/MsgDelegateGovernor", value: { delegator_address: window.__ADDR, governor_address: t.dataset.g } }); return; }

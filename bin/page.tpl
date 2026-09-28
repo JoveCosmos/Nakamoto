@@ -4968,17 +4968,6 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 #sv-auto .ap-act .ap-48s{font-style:normal;font-size:11px;color:var(--wf)}
 .sd-ida .sd-wch i.st.rs{color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.06)}
 .sd-ida .sd-wch i.st.rs.on{color:#b6f5cb;border-color:rgba(143,240,176,.6);background:rgba(46,224,106,.16)}
-/* the Restake card: its own switch, apart from Autopilot */
-.pop .card.rscard{width:min(460px,94vw);max-width:460px;padding-bottom:16px}
-.rscard .rsbody{padding:14px 20px 4px;display:flex;flex-direction:column;gap:10px;font-size:12.5px;line-height:1.55;color:var(--ws)}
-.rscard .rsbody p{margin:0}.rscard .rsbody b{color:#fff8dc;font-weight:700}
-.rscard .rsfig{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px;border-radius:10px;border:1px solid rgba(46,224,106,.35);background:linear-gradient(0deg,rgba(46,224,106,.1),rgba(255,255,255,.01) 70%)}
-.rscard .rsfig em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
-.rscard .rsfig b{font-size:24px;font-weight:800;color:#2ee06a!important}
-.rscard .rsfig small{font-size:11px;color:var(--ws)}
-.rscard .rshint{font-size:11px;color:var(--wamber)}
-.rscard .txbtns{padding:12px 20px 0}
-.rscard .wk-btn.wk-go.off{background:linear-gradient(180deg,#ff6a4d,#e0432a);border-color:#ff5a3c;color:#fff}
 .sd-ida .sd-wch button.rsw:not(#z){cursor:pointer;font-style:normal;font-family:var(--wmono);font-size:8.5px;line-height:1;letter-spacing:.14em;text-transform:uppercase;padding:3px 7px;border-radius:999px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);height:auto}
 .sd-ida .sd-wch button.rsw.on:not(#z){color:#b6f5cb;border-color:rgba(143,240,176,.6);background:rgba(46,224,106,.16)}
 .sd-ida .sd-wch button.rsw:hover{border-color:rgba(255,255,255,.6)}.sd-ida .sd-wch button.rsw:focus-visible{outline:2px solid #fff;outline-offset:2px}
@@ -5690,12 +5679,6 @@ html[data-tab=connect] .l2host{display:none}
     <div class=atfs><div class=txfee id=attxfee></div><div class=txstep id=atstep></div></div>
     <div class=txbtns><button class=wk-btn id=atcancel type=button hidden>Back</button><button class="wk-btn wk-danger" id=atrevoke type=button hidden>Revoke</button><button class=wk-btn id=atedit type=button hidden>Change</button><button class="wk-btn wk-go" id=atgrant type=button disabled>Grant</button></div>
   </div>
-</div></div>
-
-<div class=pop id=rspop><div class="card txcard uncard rscard" role=dialog aria-modal=true aria-labelledby=rsttl>
-  <header class=wk-txh><div><b id=rsttl>Restake</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=rssum></span></header>
-  <div class=rsbody id=rsbody></div>
-  <div class=txbtns><button class=wk-btn id=rscancel type=button>Cancel</button><button class="wk-btn wk-go" id=rsgo type=button disabled>Turn on</button></div>
 </div></div>
 
 <div class=pop id=ipop><div class="card vcard icard">

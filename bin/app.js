@@ -2916,7 +2916,7 @@ rememberGridH();
   /* ── Restake, its own switch: the claim + delegate pair, for 12 months, capped at what the stake can earn, the
      delegate allow-list = the validators the reader stakes with (and Autopilot's list, when it runs). The keeper
      claims and stakes on the best-paying of them on its own (no admin step), every 12 hours, from 1 ATONE of rewards. ── */
-  var rspop = E("rspop"), RS_DAYS = 365;
+  var RS_DAYS = 365;
   function rsOn(){ var g = AT.grants || []; return g.some(function(x){ return grantType(x) === DELEG; }) && g.some(function(x){ return grantType(x) === WDRAW; }); }
   function rsAllow(){
     var VD = window.__VDBY || {}, pos = window.__POS, out = {};
@@ -2937,39 +2937,25 @@ rememberGridH();
       grant: { authorization: { type: "cosmos-sdk/SendAuthorization", value: { spend_limit: [{ denom: "uatone", amount: String(Math.ceil(pos.total * pos.rate * AT.split_pct / 100 * 1.5)) }], allow_list: [AT.split_to] } }, expiration: exp } } });
     return m;
   }
-  function rsDraw(){
-    var on = rsOn(), pos = window.__POS, body = E("rsbody"), go = E("rsgo"), sm = E("rssum"); if(!body || !go) return;
-    var n = rsAllow().length, signer = !!window.__WALLET && !!window.__WALLET.signDirect;
-    var dg = (AT.grants || []).filter(function(x){ return grantType(x) === DELEG; })[0], until = dg && dg.expiration ? window.__dayFull(new Date(dg.expiration).getTime()) : null;
-    if(sm) sm.innerHTML = on ? "on" : "off";
-    if(on) body.innerHTML = '<p>Restake is <b>on</b>: your rewards are claimed and staked again on the best-paying of your validators' + (until ? ', until <b>' + until + '</b>' : '') + '.</p>' +
-      '<p>Turning it off revokes the permission in one signature. Autopilot, if it runs, is not affected.</p>';
-    else {
-      var r = pos && pos.rate > 0 ? pos.rate : 0, more = r ? pos.total * (Math.pow(1 + r / 730, 730) - 1 - r) : 0;
-      body.innerHTML = (r ? '<div class=rsfig><em>A year, more</em><b>+' + fmt(more) + ' ATONE</b><small>+' + ((Math.pow(1 + r / 730, 730) - 1 - r) * 100).toFixed(1) + '% APR, auto-compounds reward</small></div>' : '') +
-        '<p>Claims your rewards and stakes them again on the best-paying of the <b>' + n + '</b> validator' + (n === 1 ? '' : 's') + ' you stake with, so they earn too. GATA pays the fees and takes no share.</p>' +
-        '<p>It runs on its own twice a day, every 12 hours, whenever at least <b>1 ATONE</b> of rewards has built up; turn it off at any time. Your stake never leaves your wallet.</p>' +
-        (!AT.addr ? '<p class=rshint>Opens once GATA\'s keeper is live.</p>' : !signer ? '<p class=rshint>Needs Keplr (direct signing).</p>' : !n ? '<p class=rshint>Stake with a validator first.</p>' : '');
-    }
-    go.textContent = on ? "Turn off" : "Turn on"; go.classList.toggle("off", on);
-    go.disabled = !signer || !AT.addr || (!on && !n) || (on && !rsMsgs(false).length);
-  }
-  window.__rsOpen = function(){
-    if(!rspop || !window.__ADDR) return;
-    rsDraw(); POP.open(rspop);
-    var tok = ++AT_OPEN;
-    atStatus().then(function(){ return atGrant(); }).then(function(r){ if(tok !== AT_OPEN || !rspop.classList.contains("on")) return; atKeep(r); rsDraw(); });
-  };
-  var rsgo = E("rsgo"); if(rsgo) rsgo.addEventListener("click", function(){
-    var on = rsOn(), msgs = rsMsgs(!on); if(!msgs.length || !window.__TX || !window.__WALLET) return;
-    rsgo.disabled = true; rsgo.classList.add("busy");
+  /* the Restake button acts at once: it reads what stands, builds the grant (or the revoke) and hands it to the wallet
+     for approval - no card in between */
+  var RS_BUSY = false;
+  window.__rsToggle = function(btn){
+    if(RS_BUSY || !window.__ADDR) return;
     var n = window.__notify();
-    window.__TX.sendDirect(window.__WALLET, msgs, on ? "" : "gata:restake", function(){})
-      .then(function(){ n.ok(); POP.close(rspop); atGrant().then(function(r){ if(!atKeep(r)) return; draw(); if(window.__redraw) window.__redraw(); }); })
+    if(!window.__TX || !window.__WALLET || !window.__WALLET.signDirect){ n.fail("Restake needs Keplr (direct signing)"); return; }
+    RS_BUSY = true; if(btn){ btn.disabled = true; btn.classList.add("busy"); }
+    atStatus().then(function(){ return atGrant(); }).then(function(r){
+      atKeep(r);
+      if(!AT.addr) throw new Error("Restake opens once GATA's keeper is live");
+      var on = rsOn(), msgs = rsMsgs(!on);
+      if(!msgs.length) throw new Error(on ? "Nothing to turn off" : "Stake with a validator first");
+      return window.__TX.sendDirect(window.__WALLET, msgs, on ? "" : "gata:restake", function(){});
+    })
+      .then(function(){ n.ok(); return atGrant().then(function(r){ if(atKeep(r)){ draw(); if(window.__redraw) window.__redraw(); } }); })
       .catch(function(e){ n.fail(e && e.message || String(e)); })
-      .then(function(){ rsgo.classList.remove("busy"); rsDraw(); });
-  });
-  var rscancel = E("rscancel"); if(rscancel) rscancel.addEventListener("click", function(){ POP.close(rspop); });
+      .then(function(){ RS_BUSY = false; if(btn){ btn.disabled = false; btn.classList.remove("busy"); } });
+  };
   /* the wallet's Autopilot line: inactive, or active with the grant's bounds; the door reads Set up / Manage */
   function atLine(){
     var row = E("wkap"), st = E("wkaps"), b = E("atbtn"); if(!row) return;
