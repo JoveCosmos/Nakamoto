@@ -701,8 +701,6 @@
   html[data-theme=light]:not([data-mono]) .se-rsch{border:1px solid var(--accent);background:transparent;color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-rs .se-card.se-rc2{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-rs .se-card.se-rc2::before{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #sd-sky .se-doors .se-cl:not(#z){background:var(--warn-bg);border:1px solid var(--amber-bar);color:var(--warn);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #sd-sky .se-doors .se-cl:hover{background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-ado{--bandf:var(--accent),var(--accent) 58%,#FFFFFF}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-ado>.sv-ph{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky{--bandf:var(--danger),var(--danger) 58%,var(--ink)}

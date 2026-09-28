@@ -2604,11 +2604,11 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 #wk-mine .wk-t1 .wk-stb+.wk-unb{margin-left:6px}
 #wk-mine .wk-t1 .wk-foot:not(:empty)+.wk-stb{margin-left:8px}
 #wk-mine .wk-t1 .wk-stb[hidden]{display:none}
-.pop .card.stcard{width:min(520px,94vw);max-width:520px}
+.pop .card.stcard{width:min(520px,94vw);max-width:520px;max-height:92vh;max-height:92svh}
 .pop .card.stcard::before{background:linear-gradient(90deg,transparent,var(--wgreen),transparent)}
 .stcard .txsum{color:var(--wgreen)}
 
-.stcard .stlist{margin:12px 20px 0;max-height:max(100px,calc(84vh - 322px));max-height:max(100px,calc(84svh - 322px));overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;flex:0 0 auto}
+.stcard .stlist{margin:12px 20px 0;max-height:max(100px,calc(92vh - 322px));max-height:max(100px,calc(92svh - 322px));overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;flex:0 0 auto}
 .stcard .stlist table{width:100%;border-collapse:collapse;table-layout:fixed}
 .stcard .stlist thead th{font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:400;color:#c1bfdc;text-align:right;white-space:nowrap;padding:8px 5px 7px;background:linear-gradient(180deg,#151530,#0f0f22);border-top:1px solid var(--wbd2);border-bottom:1px solid var(--wbd2);position:sticky;top:0;z-index:1}
 .stcard .stlist thead th:first-child{border-left:1px solid var(--wbd2);border-radius:5px 0 0 5px}
@@ -4304,13 +4304,6 @@ background:rgba(43,200,189,.08);font-size:12px;color:var(--wt)}
 @media(min-width:901px) and (max-height:1000px){#sd-sky .se-rsx{bottom:9px}}
 @media(min-width:901px) and (max-height:820px){#sd-sky .se-rsx{bottom:6px}}
 @media(min-width:901px) and (max-height:700px){#sd-sky .se-rsx{bottom:4px}#sd-sky .se-rsx .se-rsl{font-size:9.5px}}
-/* Stake more and Claim rewards: Move your stake's door, side by side, in its green */
-#sd-sky .se-doors{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:0 0 auto}
-#sd-sky .se-doors .sd-go{width:100%;margin:0}
-/* Claim rewards as it first was: outlined in amber */
-#sd-sky .se-doors .se-cl:not(#z){background:rgba(255,176,46,.1);border:1px solid rgba(255,176,46,.6);color:#ffd58a;box-shadow:none}
-#sd-sky .se-doors .se-cl:hover{background:rgba(255,176,46,.18)}
-#sd-sky .se-doors .sd-go:focus-visible{outline:2px solid var(--sv-green);outline-offset:2px}
 @media(min-width:901px) and (max-height:700px){#sd-sky .se-rsl{margin-top:1px;font-size:10px}}
 /* Autopilot's panels: bands of their own - What it does cyan, What it doesn't crimson, Validators slate */
 #sv-auto #sd-ado{--bandf:#0d6d7a,#0f3f55 58%,#101830}
@@ -4361,7 +4354,8 @@ html #sv-over .sd-wgrid>.sd-col>.sv-ph:not(#z){background:none!important;border-
 html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){color:#f3f0ff!important;font-size:18px!important;font-weight:700;letter-spacing:-.012em;gap:10px}
 @media(min-width:901px) and (max-width:1599px){html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){font-size:17px!important}}
 @media(min-width:901px) and (max-width:1299px){html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){font-size:15.5px!important}}
-@media(max-width:900px){html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){font-size:17px!important}}
+@media(max-width:900px){html #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){font-size:15.5px!important}}
+@media(max-width:900px){html #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn:not(#z){flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 html #sv-over .sd-wgrid>.sd-col>.sv-ph h3::before{width:4px!important;height:18px!important;border-radius:3px!important;background:linear-gradient(180deg,#d6d0ff,#9d93f0)!important;box-shadow:0 0 10px -2px rgba(185,176,255,.6)!important;opacity:1}
 html #sv-over .sd-wgrid>.sd-col>.sv-ph .sv-tag:not(#z){color:var(--ws)!important;border-color:var(--wbd2)!important;background:rgba(255,255,255,.04)!important;font-weight:600}
 .sv-btn.go.sd-go:disabled{background:rgba(255,255,255,.05);border-color:var(--wbd2);color:var(--wf);box-shadow:none;cursor:not-allowed;margin-top:auto}
