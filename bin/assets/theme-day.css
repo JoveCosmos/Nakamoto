@@ -663,8 +663,8 @@
   html[data-theme=light]:not([data-mono]) .fp-k{border-top:2px solid var(--danger-bar);--rc:var(--danger)}
   html[data-theme=light]:not([data-mono]) .fp-k.b1{--rc:var(--warn)}
   html[data-theme=light]:not([data-mono]) .fp-k.b2{--rc:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .fp-k.b3{--rc:var(--danger);border-color:var(--danger-bar)}
-  html[data-theme=light]:not([data-mono]) .fpt3{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .fp-k.b3{--rc:var(--muted);border-color:var(--line-strong)}
+  html[data-theme=light]:not([data-mono]) .fpt3{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .fp-kb{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .fp-k.b1{border-color:var(--amber-bar)}
   html[data-theme=light]:not([data-mono]) .fp-k.b2{border-color:var(--accent)}
@@ -988,7 +988,7 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv .sd-mv:is(#sd-move *,#sd-asky *) .sd-fig em::after{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-btn.go.se-rsgo{background:#0f7a72;border-color:#0f7a72;color:#fff}
 
-  html[data-theme=light]:not([data-mono]) .fp-k.b3{border-color:#c0303a}html[data-theme=light]:not([data-mono]) .fpt3{color:#b3242e}
+  html[data-theme=light]:not([data-mono]) .fp-k.b3{border-color:#a8a4b8}html[data-theme=light]:not([data-mono]) .fpt3{color:#6f6c80}
   /* the network keys in day: a soft recess, the open key lit in its colour */
   html[data-theme=light]:not([data-mono]) .netsw{border-color:rgba(60,50,20,.14);background:linear-gradient(180deg,rgba(60,50,20,.07),rgba(60,50,20,.025));box-shadow:inset 0 2px 5px rgba(60,50,20,.16),inset 0 -1px 0 rgba(255,255,255,.7)}
   html[data-theme=light]:not([data-mono]) .netsw a{color:var(--muted)}
