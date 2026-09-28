@@ -211,16 +211,16 @@
     html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mine .wk-t1 h3::before{background:var(--amber-bar);box-shadow:none}
     html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-plan .wk-t2 h3::before{background:var(--accent);box-shadow:none}
     html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mv .wk-t3 h3::before{background:var(--accent);box-shadow:none}
-    html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph,html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mv>.wk-ph{border-bottom:1px solid var(--surface-2)}
-    html[data-theme=light]:not([data-mono]) :is(#sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mv>.wk-ph) h3{color:var(--ink)!important}
-    html[data-theme=light]:not([data-mono]) :is(#sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mv>.wk-ph) h3::before{background:var(--accent)!important;box-shadow:none!important}
+    html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph,html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mv>.wk-ph{border-bottom:1px solid var(--surface-2)}
+    html[data-theme=light]:not([data-mono]) :is(:is(#sv-over,#sv-auto) .sd-col>.sv-ph,#p-dele #wbody #wk-mv>.wk-ph) h3{color:var(--ink)!important}
+    html[data-theme=light]:not([data-mono]) :is(:is(#sv-over,#sv-auto) .sd-col>.sv-ph,#p-dele #wbody #wk-mv>.wk-ph) h3::before{background:var(--accent)!important;box-shadow:none!important}
     html[data-theme=light]:not([data-mono]) #sd-move .sd-mvh .sd-mvn{color:var(--ink)}
   }
-  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.q{color:var(--ink);border-color:var(--accent);background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph .sv-tag.q{color:var(--ink);border-color:var(--accent);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-hero>.se-card{background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-row .sd-fig{background:color-mix(in srgb,var(--rc) 9%,transparent)}
-  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:var(--danger);border-color:var(--danger-bar);background:var(--danger-bar)}
-  html[data-theme=light]:not([data-mono]) :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist)::after{background:var(--bandf)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph .sv-tag.se-off{color:var(--danger);border-color:var(--danger-bar);background:var(--danger-bar)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#sv-auto #sd-ado,#sv-auto #sd-asky,#sv-auto #sd-alist,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist)::after{background:var(--bandf)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-list{--bandf:var(--accent),var(--accent) 58%,var(--ink)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky{--bandf:var(--warn),var(--warn) 58%,var(--ink)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-move{--bandf:#FFFFFF,#FFFFFF 58%,#FFFFFF}
@@ -229,17 +229,17 @@
   html[data-theme=light]:not([data-mono]) #sv-daop{--bandf:var(--muted),var(--ink) 58%,var(--ink)}
   html[data-theme=light]:not([data-mono]) #sv-govlist{--bandf:var(--muted),var(--muted) 58%,var(--ink)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:var(--ink);border-color:var(--accent);background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag{color:var(--ink);border-color:var(--accent);background:var(--surface)}
-  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.g{color:var(--accent);border-color:var(--accent);background:var(--surface)}
-  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:var(--danger);border-color:var(--danger-bar);background:var(--danger-bar)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph .sv-tag{color:var(--ink);border-color:var(--accent);background:var(--surface)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph .sv-tag.g{color:var(--accent);border-color:var(--accent);background:var(--surface)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph .sv-tag.se-off{color:var(--danger);border-color:var(--danger-bar);background:var(--danger-bar)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:var(--ink);border-color:var(--accent);background:var(--surface)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-list>.sv-ph{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph{background:var(--amber-bar)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-move>.sv-ph{background:var(--surface)}
   @media(max-width:900px){
-    html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph{border-bottom:1px solid var(--surface-2)}
-    html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph h3{color:var(--ink)}
-    html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph h3::before{background:var(--accent);box-shadow:none}
+    html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph{border-bottom:1px solid var(--surface-2)}
+    html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph h3{color:var(--ink)}
+    html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph h3::before{background:var(--accent);box-shadow:none}
   }
   @media(min-width:901px){
     html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mv>.wk-ph{background:var(--accent)}
@@ -706,10 +706,16 @@
   html[data-theme=light]:not([data-mono]) .se-rsch{border:1px solid var(--accent);background:transparent;color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-rs .se-card.se-rc2{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-rs .se-card.se-rc2::before{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #sd-sky .se-doors .se-st:not(#z){background:var(--amber-bar);border-color:var(--amber-bar);color:#FFFFFF;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #sd-sky .se-doors .se-cl:not(#z){background:var(--warn-bg);border:1px solid var(--amber-bar);color:var(--warn);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #sd-sky .se-doors .se-cl:hover{background:var(--warn-bg)}
-  html[data-theme=light]:not([data-mono]) #sd-sky .se-doors .sd-go:focus-visible{outline:2px solid var(--amber-bar)}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-ado{--bandf:var(--accent),var(--accent) 58%,#FFFFFF}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-ado>.sv-ph{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky{--bandf:var(--danger),var(--danger) 58%,var(--ink)}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky>.sv-ph{background:var(--danger-bar)}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-alist{--bandf:var(--faint),var(--ink) 58%,var(--ink)}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-alist>.sv-ph{background:var(--line-strong)}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-ado{--tc:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky{--tc:var(--danger)}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-alist{--tc:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #sv-auto .ap-mv .ap-no{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .sv-btn.go.sd-go:disabled{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .fp-b{--c:var(--danger)}
   html[data-theme=light]:not([data-mono]) .fp-b.b1{--c:var(--warn)}
@@ -726,12 +732,12 @@
   html[data-theme=light]:not([data-mono]) .fpt0{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .fpt1{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) .fpt2{color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig em::after{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *,#sd-ado *) .sd-fig{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *,#sd-ado *) .sd-fig em::after{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-off{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .se-card{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .se-card::before{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.g{color:#FFFFFF;border-color:var(--accent);background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph .sv-tag.g{color:#FFFFFF;border-color:var(--accent);background:var(--accent)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph .sv-tag.a{color:#FFFFFF;border-color:var(--amber-bar);background:var(--amber-bar)}
   html[data-theme=light]:not([data-mono]) .se-tbar s{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .se-mv>div u{text-decoration:none}
@@ -1063,8 +1069,8 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .fp-k{border-color:#e8603a}html[data-theme=light]:not([data-mono]) .fp-k.b1{border-color:#e8a024}html[data-theme=light]:not([data-mono]) .fp-k.b2{border-color:#2bb35e}
   html[data-theme=light]:not([data-mono]) .fp-kb{border-color:var(--line-strong,#d9d3c4);background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 14%,transparent),transparent 65%),#fbf9f3;box-shadow:none}
 
-  html[data-theme=light]:not([data-mono]) #sv .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig{background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 12%,transparent),transparent 70%),#fbf9f3}
-  html[data-theme=light]:not([data-mono]) #sv .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *) .sd-fig em::after{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #sv .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *,#sd-ado *) .sd-fig{background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 12%,transparent),transparent 70%),#fbf9f3}
+  html[data-theme=light]:not([data-mono]) #sv .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *,#sd-ado *) .sd-fig em::after{box-shadow:none}
 
   html[data-theme=light]:not([data-mono]) .fp-k.b3{border-color:#a8a4b8}html[data-theme=light]:not([data-mono]) .fpt3{color:#6f6c80}
   /* the network keys in day: a soft recess, the open key lit in its colour */
@@ -1087,19 +1093,19 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#8a5a12,#4a2f12 58%,#1f1630)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-move>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.07),transparent 60%),linear-gradient(315deg,#0a3a22,#072a19 58%,#05140d)}
   html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mv>.wk-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#4130a0,#271c6c 58%,#150f3b)}
-  html[data-theme=light]:not([data-mono]) :is(#sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mv>.wk-ph) h3{color:#fff!important}
-  html[data-theme=light]:not([data-mono]) :is(#sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mv>.wk-ph) h3::before{background:rgba(255,255,255,.9)!important;box-shadow:none!important}
-  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag{color:#fff;border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14)}
-  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.g{color:#b6f5cb;border-color:rgba(143,240,176,.55);background:rgba(46,224,106,.18)}
+  html[data-theme=light]:not([data-mono]) :is(:is(#sv-over,#sv-auto) .sd-col>.sv-ph,#p-dele #wbody #wk-mv>.wk-ph) h3{color:#fff!important}
+  html[data-theme=light]:not([data-mono]) :is(:is(#sv-over,#sv-auto) .sd-col>.sv-ph,#p-dele #wbody #wk-mv>.wk-ph) h3::before{background:rgba(255,255,255,.9)!important;box-shadow:none!important}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph .sv-tag{color:#fff;border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph .sv-tag.g{color:#b6f5cb;border-color:rgba(143,240,176,.55);background:rgba(46,224,106,.18)}
   html[data-theme=light]:not([data-mono]) #sd-move .sd-mvh .sd-mvn{color:rgba(255,255,255,.72)}
-  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.q{color:#fff;border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14)}
-  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:#ffe1d8;border-color:rgba(255,160,130,.7);background:rgba(200,50,20,.45)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph .sv-tag.q{color:#fff;border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph .sv-tag.se-off{color:#ffe1d8;border-color:rgba(255,160,130,.7);background:rgba(200,50,20,.45)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-hero>.se-card{background:linear-gradient(0deg,rgba(200,120,0,.1),#fbf9f3 70%)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:#fff;border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14)}
   /* tags on a fill and the Enable restake band keep their night face in day */
-  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.34)}
-  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.g{color:#c9ffdb;border-color:rgba(143,240,176,.62);background:rgba(4,30,14,.42)}
-  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:#ffe4dc;border-color:rgba(255,150,120,.7);background:rgba(110,18,0,.55)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph .sv-tag{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.34)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph .sv-tag.g{color:#c9ffdb;border-color:rgba(143,240,176,.62);background:rgba(4,30,14,.42)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph .sv-tag.se-off{color:#ffe4dc;border-color:rgba(255,150,120,.7);background:rgba(110,18,0,.55)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.34)}
   /* Governance's bands and tags keep their night face in day */
   html[data-theme=light]:not([data-mono]) :is(#sv-proplist,#sv-daop,#sv-govlist)>.sv-ph h3{color:#fff}
@@ -1117,12 +1123,12 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd h1,html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd p b{color:#fff}
   html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd p{color:rgba(255,255,255,.78)}html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd a{color:#ffe2b0}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph .sv-tag.a{color:#ffe2b0;border-color:rgba(255,196,90,.6);background:rgba(40,22,0,.45)}
-  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.g{color:#03230e;border-color:#2ee06a;background:#2ee06a;font-weight:700}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over,#sv-auto) .sd-col>.sv-ph .sv-tag.g{color:#03230e;border-color:#2ee06a;background:#2ee06a;font-weight:700}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph .sv-tag.a{color:#2a1600;border-color:#ffb02e;background:#ffb02e;font-weight:700}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-row .sd-fig{background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 10%,transparent),#fbf9f3 70%)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky :is(.se-row .sd-fig,.se-card)::before{box-shadow:none}
   /* the section frames keep their band colours in day */
-  html[data-theme=light]:not([data-mono]) :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist)::after{background:linear-gradient(315deg,var(--bandf))}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#sv-auto #sd-ado,#sv-auto #sd-asky,#sv-auto #sd-alist,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist)::after{background:linear-gradient(315deg,var(--bandf))}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-list{--bandf:#0f6b67,#123a52 58%,#141633}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky{--bandf:#8a5a12,#4a2f12 58%,#1f1630}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-move{--bandf:#0a3a22,#072a19 58%,#05140d}
@@ -1130,7 +1136,12 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-proplist{--bandf:#1d4f8f,#173257 58%,#141633}
   html[data-theme=light]:not([data-mono]) #sv-daop{--bandf:#5f6216,#393b15 58%,#19191f}
   html[data-theme=light]:not([data-mono]) #sv-govlist{--bandf:#7d2e6e,#461f45 58%,#1a1230}
-  html[data-theme=light]:not([data-mono]) :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist)::after{background:linear-gradient(315deg,var(--bandf))}
-  html[data-theme=light]:not([data-mono]) #sd-sky .se-doors .se-st:not(#z){background:linear-gradient(180deg,#b86a00,#9a5800);border-color:#9a5800;color:#fff;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #sd-sky .se-doors .se-cl:not(#z){background:rgba(200,120,0,.08);border-color:rgba(154,88,0,.55);color:#8a5200}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#sv-auto #sd-ado,#sv-auto #sd-asky,#sv-auto #sd-alist,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist)::after{background:linear-gradient(315deg,var(--bandf))}
+  /* Autopilot's bands keep their night face in day */
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-ado{--bandf:#0d6d7a,#0f3f55 58%,#101830}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-ado>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#0d6d7a,#0f3f55 58%,#101830)}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky{--bandf:#7a1f2b,#44141d 58%,#1a0f1c}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#7a1f2b,#44141d 58%,#1a0f1c)}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-alist{--bandf:#3d4a66,#262f45 58%,#141827}
+  html[data-theme=light]:not([data-mono]) #sv-auto #sd-alist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#3d4a66,#262f45 58%,#141827)}
 

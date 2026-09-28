@@ -174,7 +174,7 @@
       /* the two ways on from here, as Move your stake ends on Redelegate: stake more, claim what has accrued
          (none for the no-wallet example: they name nothing to act on) */
       (ex ? '' : '<div class=se-doors><button class="sv-btn go sd-go se-st" type=button data-act=stake>Stake more</button>' +
-        '<button class="sv-btn sd-go se-cl" type=button data-act=claim>Claim rewards</button></div>');
+        '<button class="sv-btn go sd-go se-cl" type=button data-act=claim>Claim rewards</button></div>');
   }
 
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every
@@ -393,20 +393,37 @@
       '</div>' +
       (restakeLine() ? '<div class=sd-rs>' + restakeLine() + '</div>' : '') +
       '<div class=sd-fine>The chain enforces the grant: it may redelegate inside your allow-list, and never send, unstake or hold your ATONE.</div>');
-    else put("sd-ado",
-      '<div class=sv-ph><h3>What it does</h3></div>' +
-      '<div class=sv-note>It moves your stake to better-paying validators, only among the validators in <i>your</i> grant, for as long as <i>you</i> choose.</div>' +
-      '<div class=sd-can><div><u class=ok>It may</u>' +
-        /* Autopilot is GATA's service, not only the keeper: the validator watch covers the whole
-           set every minute and reaches our operators, who act through the admin console */
-        '<span class=ok>monitor your validators, around the clock</span>' +
-        '<span class=ok>strategize for a better APR, within your allow-list</span>' +
-        (at && at.restake ? '<span class=ok>restake your rewards</span>' : '<span class=dim>restake rewards, if you switch it on</span>') +
-      '</div><div><u class=no>It may never</u><span class=no>send or spend your ATONE</span><span class=no>unstake it</span><span class=no>hold or custody it</span></div></div>' +
-      '<div class=sd-fine>' + (at && at.split_pct > 0 ? 'GATA keeps <b>' + at.split_pct + '%</b> of the rewards it restakes for you, charges nothing else and funds your transactions.'
-        : 'Autopilot is <b>free</b>: GATA takes no share of your rewards and funds your transactions.') + ' The chain enforces these limits, not us.</div>');
-    /* a short window: the intro goes before anything is clipped (the heading and the two lists say it) */
-    var ado = E("sd-ado"); if(ado && !g){ ado.classList.remove("tight"); if(ado.scrollHeight > ado.clientHeight + 1) ado.classList.add("tight"); }
+    else {
+      /* not active: what it does and what it never does, each as Move your stake shows its figures - four big
+         boxes - and, in place of the list, the way to switch it on */
+      var plan = pos && pos.rows.length && pos.free > 0 ? planNow(pos) : null, lift = plan && plan.after != null ? plan.after - plan.now : 0;
+      var rr = pos && pos.rows.length ? pos.rate : 0, radd = rr > 0 ? (Math.pow(1 + rr / 12, 12) - 1 - rr) : 0;
+      var G = "var(--sv-green)", T = "var(--sv-teal)", V = "var(--sv-violet)", R = "#ff6a6a", A2 = "var(--sv-amber)";
+      put("sd-ado", '<div class=sv-ph><h3>What it does</h3>' + tag("q", "one signature") + '</div>' +
+        '<div class="sd-figs sd-mv four ap-mv">' +
+          fig("Monitors", "24/7", "your validators, around the clock", T) +
+          fig("Strategizes", lift > 0.0005 ? '<span class=sd-gain>+' + (lift * 100).toFixed(1) + '%</span>' : "Better APR", lift > 0.0005 ? "APR, within your allow-list" : "within your allow-list", V) +
+          fig("Restakes", radd > 0 ? '<span class=sd-gain>+' + (radd * 100).toFixed(1) + '%</span>' : "Rewards", radd > 0 ? "APR, if you switch it on" : "if you switch it on", G) +
+          (plan && plan.gain > 0.5 ? fig("More a year", '<span class=sd-gain>+' + one(plan.gain) + '</span>', "ATONE, at today's rates", G)
+                                   : fig("You approve", "Once", "then it runs hands-free", A2)) +
+        '</div>');
+      var share = at && at.split_pct > 0;
+      put("sd-asky", '<div class=sv-ph><h3>What it doesn\'t</h3>' + tag("q", "enforced on chain") + '</div>' +
+        '<div class="sd-figs sd-mv four ap-mv">' +
+          fig("Send", '<span class=ap-no>Never</span>', "nor spend your ATONE", R) +
+          fig("Unstake", '<span class=ap-no>Never</span>', "your stake stays staked", R) +
+          fig("Custody", '<span class=ap-no>Never</span>', "your ATONE stays in your wallet", R) +
+          fig("GATA's share", share ? at.split_pct + '%' : '<span class=ap-ok>0%</span>', share ? "of the rewards it restakes" : "free; GATA funds your transactions", A2) +
+        '</div>');
+      /* the validators only once it is active: until then, the way to switch it on */
+      var go = !pos ? '<button class="sv-btn go sd-go ap-go" type=button data-shell-connect>Connect a wallet</button>'
+        : !pos.rows.length ? '<button class="sv-btn go sd-go ap-go" type=button data-act=stake>Stake ATONE</button>'
+        : '<button class="sv-btn go sd-go ap-go" type=button data-act=autopilot>Activate Autopilot</button>';
+      put("sd-alist", '<div class=sv-ph><h3>Validators</h3></div><div class=ap-act><b>Activate Autopilot</b>' +
+        '<span>' + (!pos ? 'Connect a wallet, then choose the validators Autopilot may use.' : !pos.rows.length ? 'Stake some ATONE first; Autopilot then keeps it with the better payers.'
+          : 'Choose the validators it may use. It keeps your stake with the best of them, and lists them here.') + '</span>' + go + '</div>');
+      return;
+    }
     var rows = pos ? pos.rows : [];
     put("sd-asky", g ? grantView(g, at, rp, since, until) : wouldDo(pos));
     put("sd-alist", rows.length ? '<div class=sv-ph><h3>Validators</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total, mark)
