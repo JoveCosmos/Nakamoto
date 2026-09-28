@@ -4600,14 +4600,19 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .folder>.l1{grid-area:nav}
 /* the network switch: two links, the open network lit; testnet lights amber so a page on the
    test chain can never pass for the real one */
-/* the network switch, as it was before 2026-09-27: Mainnet | Testnet at the right, the open one lit */
-.netsw{display:inline-flex;padding:2px;gap:2px;border-radius:9px;border:1px solid var(--wbd2,#34345c);flex:0 0 auto}
-.netsw a{height:26px;display:inline-flex;align-items:center;padding:0 10px;border-radius:7px;font-size:11.5px;font-weight:500;color:var(--ws,#c1bfdc);text-decoration:none;white-space:nowrap}
+/* the network switch: two small engraved keys in a recessed track, the wallet pill's height (32px) and its
+   mono type; the open network's key lit from within (teal mainnet, amber testnet) */
+.netsw{display:inline-flex;align-items:center;height:32px;box-sizing:border-box;padding:3px;gap:3px;border-radius:10px;flex:0 0 auto;
+border:1px solid rgba(0,0,0,.45);background:linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.2));
+box-shadow:inset 0 2px 6px rgba(0,0,0,.6),inset 0 -1px 0 rgba(255,255,255,.05),0 1px 0 rgba(255,255,255,.05)}
+.netsw a{height:24px;display:inline-flex;align-items:center;padding:0 9px;border-radius:7px;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+color:#7c7aa3;text-decoration:none;white-space:nowrap;transition:color .15s,background .15s}
 .netsw a:hover{color:var(--wt,#f0eef8)}
-.netsw a[aria-current=page]{background:rgba(43,200,189,.2);color:var(--wt,#f0eef8);box-shadow:inset 0 0 0 1px rgba(43,200,189,.55)}
-.netsw a#nettest[aria-current=page]{background:rgba(255,176,46,.22);box-shadow:inset 0 0 0 1px rgba(255,176,46,.6)}
+.netsw a[aria-current=page]{color:#bff6f1;background:linear-gradient(180deg,rgba(43,200,189,.28),rgba(43,200,189,.12));box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 10px -3px rgba(43,200,189,.8)}
+.netsw a#nettest[aria-current=page]{color:#ffe2ad;background:linear-gradient(180deg,rgba(255,176,46,.3),rgba(255,176,46,.12));box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 10px -3px rgba(255,176,46,.8)}
 .netsw a:focus-visible{outline:2px solid #2bc8bd;outline-offset:1px}
-@media(max-width:620px){.netsw a{padding:0 7px;font-size:10.5px}}
+.netsw .ns{display:none}
+@media(max-width:620px){.netsw a{padding:0 7px;font-size:9px;letter-spacing:.08em}.netsw .nl{display:none}.netsw .ns{display:inline}}
 .brandwrap{grid-area:brand;justify-self:start;display:flex;align-items:center;min-width:0}
 .brandwrap>.brand{grid-area:auto}
 /* the live height under the wordmark, at its right end (as before 2026-09-27); on testnet it moves left
@@ -4784,8 +4789,8 @@ html[data-tab=connect] .l2host{display:none}
     <a class=brand href="#/intro" title="AtomOne"><img class=mark src="assets/atomone.svg" alt=""><span class=bw><span class=wordmark>AtomOne</span><span class=bheight id=dlive title="the chain's height, live"><i></i><b>{{HEIGHT}}</b></span></span></a>
     </div>
     <div class=hdr-r>
-    <div class=netsw id=netsw role=group aria-label=Network><a id=netmain href="./">Mainnet</a><a id=nettest href="testnet/">Testnet</a></div>
     <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
+    <div class=netsw id=netsw role=group aria-label=Network><a id=netmain href="./" aria-label=Mainnet><span class=nl>Mainnet</span><span class=ns aria-hidden=true>Main</span></a><a id=nettest href="testnet/" aria-label=Testnet><span class=nl>Testnet</span><span class=ns aria-hidden=true>Test</span></a></div>
     <div class=sv-who>
       <button class="sv-btn sml pri" id=svconn type=button aria-haspopup=true aria-expanded=false>Connect wallet</button>
       <div class=wpill id=svacct hidden>
