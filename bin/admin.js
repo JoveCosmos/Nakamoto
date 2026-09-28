@@ -1,11 +1,13 @@
 /* Autopilot Admin: sign in with Keplr (ADR-36 signArbitrary of a one-time challenge), then the
-   grants ledger per network - new, active, expiring, ended - with pause/resume and notes, the
-   validator watch's open incidents and the event feed. Every action goes through /admin-api,
+   decision queue per network. Every Autopilot grant waits for an operator (48 hours): Review shows
+   the keeper's plan, and Apply (exactly that plan), No move needed or Hold decides it; nothing
+   moves without it. Also the standing grants, holds, ended grants, the validator watch's open
+   incidents and the event feed. Every action goes through /admin-api,
    which checks the session and announces it on Discord. */
 (function(){
   "use strict";
   var E = function(id){ return document.getElementById(id); };
-  var NET = "mainnet", TAB = "live", DATA = null;
+  var NET = "mainnet", TAB = "waiting", DATA = null;
   var CHAIN = { mainnet: "atomone-1", testnet: "atomone-testnet-1" };
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function day(t){ return t ? new Date(t * 1000).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "N/A"; }
@@ -53,40 +55,76 @@
 
   function load(){ api("overview?net=" + NET).then(function(d){ DATA = d; draw(); }).catch(function(e){ E("grants").innerHTML = '<div class=empty>' + esc(e.message) + '</div>'; }); }
 
-  var GROUPS = { live: ["new", "active", "expiring"], new: ["new"], expiring: ["expiring"], ended: ["expired", "revoked", "used up"] };
+  /* where each delegator stands with the operators: the keeper writes it into its report (admin block) */
+  function stOf(e){ var ad = (e.report || {}).admin; return ["new", "active", "expiring"].indexOf(e.status) < 0 ? "ended" : ad ? ad.state : "planning"; }
+  var GROUPS = { waiting: ["waiting", "planning"], live: ["managed", "approved", "waiting", "planning", "held"], held: ["held"], ended: ["ended"] };
+  var OPEN = {};
+  function left(ad){ if(!ad || !ad.deadline) return null; return ad.deadline - Date.now() / 1000; }
+  function dur(s){ s = Math.abs(s); var h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return h >= 24 ? Math.floor(h / 24) + "d " + (h % 24) + "h" : h + "h " + m + "m"; }
+  function clock(ad){ var l = left(ad); if(l == null) return '<span class=sub>N/A</span>';
+    return l <= 0 ? '<b class=over>overdue ' + dur(l) + '</b>' : '<b class="' + (l < 3 * 3600 ? 'late' : l < 12 * 3600 ? 'soon' : 'ok') + '">' + dur(l) + ' left</b>'; }
+  function vn(op){ var n = (DATA.names || {})[op]; return esc(n || short(op)); }
+  function pct(r){ return r == null ? "N/A" : (r * 100).toFixed(1) + "%"; }
+  function planLine(r){ var mv = r.moves || [];
+    return mv.length ? mv.length + ' move' + (mv.length === 1 ? '' : 's') + ', +' + (r.gain || 0).toFixed(1) + ' ATONE a year<div class=sub>APR ' + pct(r.now) + ' to ' + pct(r.after) + '</div>'
+                     : 'no move<div class=sub>the stake already sits well</div>'; }
+  var SLAB = { waiting: "waiting", planning: "planning", managed: "managed", approved: "approved", held: "held", ended: "ended" };
+  function review(e){
+    var r = e.report || {}, ad = r.admin || {}, g = e.grant || {}, mv = r.moves || [], st = stOf(e);
+    var can = st !== "ended";
+    var h = '<div class=rv>';
+    h += '<div class=rvg><div><em>Staked</em><b>' + atone(r.staked) + '</b></div><div><em>Cap</em><b>' + atone(g.cap) + '</b></div>' +
+         '<div><em>Validators allowed</em><b>' + (g.allow || []).length + '</b></div><div><em>Restake</em><b>' + (g.restake ? "on" : "off") + '</b></div>' +
+         '<div><em>Grant made</em><b>' + day(ad.made || e.made) + '</b></div><div><em>Plan</em><b class=mono>' + esc(ad.plan_id || "none") + '</b></div></div>';
+    h += mv.length ? '<table class=plan><thead><tr><th>From</th><th>To</th><th class=r>ATONE</th><th class=r>Gain a year</th></tr></thead><tbody>' + mv.map(function(m){
+        return '<tr><td>' + vn(m.src) + '</td><td>' + vn(m.dst) + '</td><td class="n r">' + (m.uatone / 1e6).toLocaleString(undefined, { maximumFractionDigits: 1 }) + '</td><td class="n r">+' + (m.gain || 0).toFixed(2) + '</td></tr>'; }).join("") +
+        '</tbody></table><div class=sub>Blended APR ' + pct(r.now) + ' now, ' + pct(r.after) + ' after. ' + (r.dry === false ? 'Apply signs these moves.' : 'Dry run: Apply records them and signs nothing.') + '</div>'
+      : '<div class=empty>No move planned: the stake already sits well' + (r.checked ? ' (planned ' + ago(r.checked) + ')' : '') + '. Confirm with No move needed.</div>';
+    if(ad.applied) h += '<div class=sub>Last applied ' + ago(ad.applied.at) + (ad.applied.by ? ' by ' + esc(short(ad.applied.by)) : '') + (ad.applied.dry ? ', dry run' : ad.applied.ok ? ', tx ' + esc((ad.applied.txhash || "").slice(0, 12)) : ', FAILED: ' + esc(ad.applied.error || "")) + '</div>';
+    var decs = (ad.decisions || []).slice().reverse();
+    if(decs.length) h += '<div class=hist>' + decs.map(function(d){ return '<div><b>' + esc(d.action) + '</b> ' + esc(short(d.by)) + ' <span class=sub>' + ago(d.at) + '</span>' + (d.note ? '<div class=sub>' + esc(d.note) + '</div>' : '') + '</div>'; }).join("") + '</div>';
+    if(can) h += '<div class=acts>' +
+      (st === "held" ? '<button class="btn pri" type=button data-do=resume data-g="' + esc(e.granter) + '">Resume</button>'
+        : (mv.length ? '<button class="btn pri" type=button data-do=apply data-g="' + esc(e.granter) + '" data-pid="' + esc(ad.plan_id || "") + '"' + (st === "approved" ? ' disabled' : '') + '>' + (st === "approved" ? 'Approved, carrying out' : 'Apply this plan') + '</button>' : '') +
+          '<button class=btn type=button data-do=nomove data-g="' + esc(e.granter) + '">No move needed</button>' +
+          '<button class=btn type=button data-do=hold data-g="' + esc(e.granter) + '">Hold</button>') +
+      '<button class=btn type=button data-note="' + esc(e.granter) + '">Note</button></div>';
+    return h + '</div>';
+  }
   function draw(){
     var L = DATA.ledger || {}, G = L.grants || {}, c = L.counts || {}, k = DATA.keeper || {};
-    var n = function(s){ return c[s] || 0; };
+    var all = Object.keys(G).map(function(g){ return G[g]; });
+    var by = function(s){ return all.filter(function(e){ return stOf(e) === s; }); };
+    var wait = by("waiting").concat(by("planning")), over = wait.filter(function(e){ var l = left((e.report || {}).admin); return l != null && l <= 0; });
+    var soonest = wait.map(function(e){ return left((e.report || {}).admin); }).filter(function(x){ return x != null; }).sort(function(a, b){ return a - b; })[0];
     function ro(label, v, meta, col){ return '<div class=ro style="--rc:' + col + '"><em>' + label + '</em><b>' + v + '</b><small>' + (meta || "&nbsp;") + '</small></div>'; }
     E("strip").innerHTML =
       ro("Autopilot address", L.grantee ? short(L.grantee) : "N/A", L.grantee ? (k.dry === false ? "live" : "dry run") : "not set yet", "var(--violet)") +
-      ro("New", n("new"), "first 24 hours", "var(--teal)") +
-      ro("Active", n("active"), "settled", "var(--green)") +
-      ro("Expiring", n("expiring"), "within 7 days", "var(--amber)") +
-      ro("Ended", n("expired") + n("revoked") + n("used up"), n("revoked") + " revoked, " + n("used up") + " used up", "var(--f)") +
-      ro("Paused", DATA.admin.pauses, "skipped by the keeper", "var(--amber)") +
+      ro("Waiting", wait.length, soonest != null ? (soonest <= 0 ? "one is overdue" : "next due in " + dur(soonest)) : "nothing to decide", "var(--amber)") +
+      ro("Overdue", over.length, "48 hours passed", "var(--red)") +
+      ro("Managed", by("managed").length + by("approved").length, "decided, the keeper follows", "var(--green)") +
+      ro("On hold", by("held").length, "clock and keeper stopped", "var(--f)") +
+      ro("Restake", Object.keys(L.restake || {}).length, "wallets restaking, no admin step", "var(--teal)") +
       ro("Signer PHOTON", k.photon != null ? (k.photon / 1e6).toLocaleString(undefined, { maximumFractionDigits: 1 }) : "N/A", "pays every fee", "var(--teal)");
     E("checked").textContent = L.checked ? "ledger checked " + ago(L.checked) : "";
-    E("tabs").innerHTML = [["live", "Standing"], ["new", "New"], ["expiring", "Expiring"], ["ended", "Ended"]].map(function(t){
-      var cnt = GROUPS[t[0]].reduce(function(a, s){ return a + n(s); }, 0);
+    E("tabs").innerHTML = [["waiting", "Waiting"], ["live", "Standing"], ["held", "On hold"], ["ended", "Ended"]].map(function(t){
+      var cnt = all.filter(function(e){ return GROUPS[t[0]].indexOf(stOf(e)) >= 0; }).length;
       return '<button class=tab type=button data-tab=' + t[0] + ' aria-pressed=' + (TAB === t[0]) + '>' + t[1] + '<i>' + cnt + '</i></button>'; }).join("");
-    var rows = Object.keys(G).map(function(g){ return G[g]; }).filter(function(e){ return GROUPS[TAB].indexOf(e.status) >= 0; })
-      .sort(function(a, b){ return (b.first_seen || 0) - (a.first_seen || 0); });
+    var rows = all.filter(function(e){ return GROUPS[TAB].indexOf(stOf(e)) >= 0; })
+      .sort(TAB === "waiting" ? function(a, b){ return (left((a.report || {}).admin) || 9e9) - (left((b.report || {}).admin) || 9e9); }
+                              : function(a, b){ return (b.first_seen || 0) - (a.first_seen || 0); });
     if(!L.grantee) E("grants").innerHTML = '<div class=empty>No Autopilot address on ' + NET + ' yet: grants start arriving once the signer is installed and its address is set.</div>';
-    else if(!rows.length) E("grants").innerHTML = '<div class=empty>None.</div>';
-    else E("grants").innerHTML = '<table><thead><tr><th>Delegator</th><th>State</th><th>Terms</th><th>Autopilot</th><th></th></tr></thead><tbody>' + rows.map(function(e){
-      var g = e.grant || {}, r = e.report || {}, rec = r.record, rs = r.restake || {};
-      var st = e.status === "used up" ? "used" : e.status;
-      return '<tr><td><div class=addr>' + esc(short(e.granter)) + (e.paused ? '<span class=paused>PAUSED</span>' : '') + '</div>' +
-          '<div class=sub>since ' + day(e.made || e.first_seen) + ', ' + esc(e.strategy || "N/A") + '</div>' +
-          (e.notes && e.notes.length ? '<div class=notes>' + e.notes.slice(-3).map(function(x){ return '<div>' + esc(x.text) + ' <span class=sub>' + ago(x.at) + '</span></div>'; }).join("") + '</div>' : '') + '</td>' +
-        '<td><span class="pill st-' + st + '">' + esc(e.status) + '</span>' + (e.ended ? '<div class=sub>' + day(e.ended) + '</div>' : '') + '</td>' +
-        '<td class=n>' + atone(g.cap) + '<div class=sub>' + (g.allow || []).length + ' validators, until ' + day(g.exp) + (g.restake ? ', restake' : '') + '</div></td>' +
-        '<td class=n>' + (r.checked ? ago(r.checked) : "N/A") + '<div class=sub>' + ((r.history || []).length) + ' moves' + (rs.count ? ', ' + rs.count + ' restakes' : '') +
-          (rec && rec.start ? ', ' + ((rec.rate - rec.start.rate) * 100 >= 0 ? "+" : "") + ((rec.rate - rec.start.rate) * 100).toFixed(1) + '% APR' : '') + '</div></td>' +
-        '<td><div class=acts>' + (["new", "active", "expiring"].indexOf(e.status) >= 0
-          ? '<button class="btn sm" type=button data-pause="' + esc(e.granter) + '" data-p=' + (e.paused ? 0 : 1) + '>' + (e.paused ? "Resume" : "Pause") + '</button>' : '') +
-          '<button class="btn sm" type=button data-note="' + esc(e.granter) + '">Note</button></div></td></tr>'; }).join("") + '</tbody></table>';
+    else if(!rows.length) E("grants").innerHTML = '<div class=empty>' + (TAB === "waiting" ? 'Nothing waits for a decision.' : 'None.') + '</div>';
+    else E("grants").innerHTML = '<table><thead><tr><th>Delegator</th><th>State</th><th>' + (TAB === "waiting" ? 'Time left' : 'Grant') + '</th><th>Plan</th><th></th></tr></thead><tbody>' + rows.map(function(e){
+      var g = e.grant || {}, r = e.report || {}, ad = r.admin || {}, st = stOf(e), open = !!OPEN[e.granter];
+      return '<tr class="' + (open ? 'open' : '') + '"><td><div class=addr>' + esc(short(e.granter)) + '</div>' +
+          '<div class=sub>granted ' + day(e.made || e.first_seen) + (ad.reason === "new plan" ? ', new plan' : '') + '</div>' +
+          (e.notes && e.notes.length ? '<div class=notes>' + e.notes.slice(-2).map(function(x){ return '<div>' + esc(x.text) + ' <span class=sub>' + ago(x.at) + '</span></div>'; }).join("") + '</div>' : '') + '</td>' +
+        '<td><span class="pill st-' + st + '">' + (SLAB[st] || st) + '</span>' + (st === "ended" ? '<div class=sub>' + esc(e.status) + ' ' + day(e.ended) + '</div>' : '') + '</td>' +
+        '<td class=n>' + (TAB === "waiting" ? clock(ad) : atone(g.cap) + '<div class=sub>' + (g.allow || []).length + ' validators' + (g.restake ? ', restake' : '') + '</div>') + '</td>' +
+        '<td class=n>' + (st === "planning" ? '<span class=sub>the keeper plans within a minute</span>' : planLine(r)) + '</td>' +
+        '<td><button class="btn sm" type=button data-open="' + esc(e.granter) + '">' + (open ? 'Close' : 'Review') + '</button></td></tr>' +
+        (open ? '<tr class=rvrow><td colspan=5>' + review(e) + '</td></tr>' : ''); }).join("") + '</tbody></table>';
     var vw = DATA.valwatch || {}, inc = (vw.incidents || []).filter(function(i){ return i.down || i.crit || i.jailed || i.tomb; });
     E("vwsub").textContent = vw.checked ? vw.active + " active, checked " + ago(vw.checked) : "N/A";
     E("vw").innerHTML = inc.length ? '<div class=ev>' + inc.map(function(i){
@@ -97,10 +135,19 @@
     E("ev").innerHTML = ev.length ? ev.map(function(x){ return '<div><i class="' + esc(x.level) + '"></i><span>' + esc(x.title) + '<small>' + (x.delegator ? esc(short(x.delegator)) + ", " : "") + ago(x.at) + '</small></span></div>'; }).join("")
       : '<div class=empty>No grant events yet.</div>';
   }
+  function decide(t, action, note){
+    t.disabled = true;
+    api("decide", { net: NET, granter: t.dataset.g, action: action, plan_id: t.dataset.pid || null, note: note || "" })
+      .then(load).catch(function(e){ alert(e.message); t.disabled = false; });
+  }
   document.addEventListener("click", function(ev){
-    var t = ev.target.closest ? ev.target.closest("[data-tab],[data-pause],[data-note]") : null; if(!t) return;
+    var t = ev.target.closest ? ev.target.closest("[data-tab],[data-open],[data-do],[data-note]") : null; if(!t) return;
     if(t.dataset.tab){ TAB = t.dataset.tab; draw(); return; }
-    if(t.dataset.pause){ t.disabled = true; api("pause", { net: NET, granter: t.dataset.pause, paused: t.dataset.p === "1" }).then(load).catch(function(e){ alert(e.message); t.disabled = false; }); return; }
+    if(t.dataset.open){ OPEN[t.dataset.open] = !OPEN[t.dataset.open]; draw(); return; }
+    if(t.dataset.do === "apply"){ if(confirm("Apply this plan for " + t.dataset.g + "?\nThe keeper carries it out within a minute.")) decide(t, "apply"); return; }
+    if(t.dataset.do === "nomove"){ if(confirm("Activate " + t.dataset.g + " with no move?")) decide(t, "nomove"); return; }
+    if(t.dataset.do === "hold"){ var w = prompt("Why hold " + t.dataset.g + "? (the note goes to Discord)"); if(w && w.trim()) decide(t, "hold", w.trim()); return; }
+    if(t.dataset.do === "resume"){ decide(t, "resume"); return; }
     if(t.dataset.note){ var s = prompt("Note for " + t.dataset.note); if(s && s.trim()) api("note", { net: NET, granter: t.dataset.note, text: s.trim() }).then(load).catch(function(e){ alert(e.message); }); }
   });
   start();

@@ -52,7 +52,21 @@ td{padding:8px;border-bottom:1px solid var(--bd);vertical-align:top}
 td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
 .addr{font-family:var(--mono);font-size:11.5px}
 .pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:10.5px;font-family:var(--mono);border:1px solid currentColor}
-.st-new{color:var(--teal)}.st-active{color:var(--green)}.st-expiring{color:var(--amber)}.st-expired,.st-used{color:var(--f)}.st-revoked{color:var(--red)}
+.st-waiting,.st-planning{color:var(--amber)}.st-approved{color:var(--teal)}.st-managed{color:var(--green)}.st-held{color:var(--violet)}.st-ended{color:var(--f)}
+.over{color:var(--red)}.late{color:var(--red)}.soon{color:var(--amber)}.ok{color:var(--green)}
+tr.open>td{border-bottom:0;background:color-mix(in srgb,var(--violet) 6%,transparent)}
+tr.rvrow>td{padding:0 8px 14px;background:color-mix(in srgb,var(--violet) 6%,transparent)}
+.rv{display:flex;flex-direction:column;gap:10px;padding:12px 14px;border:1px solid var(--bd2);border-radius:10px;background:var(--c2)}
+.rvg{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.rvg div{padding:8px 10px;border:1px solid var(--bd);border-radius:8px}
+.rvg em{display:block;font-style:normal;font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--f)}
+.rvg b{display:block;font-size:13px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mono{font-family:var(--mono)}
+table.plan th.r,table.plan td.r{text-align:right}
+table.plan td{padding:6px 8px}
+.hist{display:flex;flex-direction:column;gap:6px;font-size:12px}
+.hist>div{padding-left:9px;border-left:2px solid var(--bd2)}
+.btn:disabled{opacity:.5;cursor:default}
 .paused{color:var(--amber);font-family:var(--mono);font-size:10px;margin-left:6px}
 .sub{font-size:11px;color:var(--f)}
 .acts{display:flex;gap:6px;flex-wrap:wrap}
@@ -68,7 +82,7 @@ td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowra
 .gate .panel{max-width:440px;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center;padding:28px}
 .err{color:var(--red);font-size:12.5px;min-height:18px}
 @media (max-width:900px){.strip{grid-template-columns:repeat(2,minmax(0,1fr))}.ro{border-top:1px solid var(--bd)}.grid{grid-template-columns:minmax(0,1fr)}
-.wrap{padding:14px 12px}.tbl{overflow-x:auto}}
+.wrap{padding:14px 12px}.tbl{overflow-x:auto}.rvg{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>

@@ -13,12 +13,17 @@ session is an HMAC-signed cookie (12 hours, HttpOnly, Secure, SameSite=Strict, p
     GET  /admin-api/me                       -> {address}
     GET  /admin-api/overview?net=mainnet|testnet               -> grants ledger, keeper status,
                                                                   validator incidents, events
+    POST /admin-api/decide {net, granter, action, plan_id?, note?} -> the operator's decision on a delegator:
+         apply   carry out exactly this plan (plan_id must be the keeper's current one)
+         nomove  activate with no move: the stake already sits well
+         hold    stop the clock and the keeper for this delegator (a note says why)
+         resume  lift a hold
     POST /admin-api/pause {net, granter, paused}               -> the keeper skips / resumes it
     POST /admin-api/note  {net, granter, text}
     POST /admin-api/test-alert                                 -> one Discord message
 
-Every sign-in and every action is announced on Discord. Pauses and notes live in
-STATE_DIR/admin-<net>.json (the keeper reads the pauses)."""
+Every sign-in and every action is announced on Discord. Pauses, approvals, decisions and notes live
+in STATE_DIR/admin-<net>.json; the keeper reads it and executes only an approved plan."""
 import base64, hashlib, hmac, json, os, secrets, sys, threading, time, urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -117,21 +122,37 @@ def jload(p, default):
 def admin_file(net): return os.path.join(STATE_DIR, "admin-%s.json" % net)
 
 
+def adm_load(net):
+    a = jload(admin_file(net), {})
+    for k in ("paused", "notes", "approved", "decisions"): a.setdefault(k, {})
+    return a
+
+
+def adm_save(net, a):
+    tmp = admin_file(net) + ".tmp"; json.dump(a, open(tmp, "w")); os.replace(tmp, admin_file(net))
+
+
+def short(a): return a[:12] + "\u2026" + a[-6:]
+
+
 def overview(net):
     led = jload(os.path.join(STATE_DIR, "grants-%s.json" % net), {})
-    adm = jload(admin_file(net), {"paused": {}, "notes": {}})
+    adm = adm_load(net)
     for g, e in (led.get("grants") or {}).items():
         e["paused"] = g in adm.get("paused", {})
         e["notes"] = adm.get("notes", {}).get(g, [])
         rep = jload(os.path.join(WEB[net], "keeper", g + ".json"), None)
-        if rep: e["report"] = {k: rep.get(k) for k in ("checked", "strategy", "staked", "moves", "history", "record", "restake", "split", "last")}
+        if rep: e["report"] = {k: rep.get(k) for k in ("checked", "staked", "now", "after", "gain", "moves", "history", "record", "restake", "last", "admin", "dry")}
+    # validator names for the plans (the page's own data)
+    D = jload(os.path.join(WEB[net], "data.json"), {})
+    names = {v.get("op"): v.get("m") for v in D.get("validators", []) if v.get("op")}
     vw = jload(os.path.join(STATE_DIR, "valwatch-%s.json" % net), {})
     inc = []
     for c, i in (vw.get("inc") or {}).items():
         inc.append({"cons": c, **{k: i.get(k) for k in ("down", "crit", "jailed", "tomb")}})
     return {"net": net, "ledger": led, "keeper": jload(os.path.join(WEB[net], "keeper", "_status.json"), None),
             "valwatch": {"checked": (vw.get("samples") or [{}])[-1].get("t"), "active": len(vw.get("active") or []), "incidents": inc},
-            "admin": {"pauses": len(adm.get("paused", {}))}}
+            "admin": {"pauses": len(adm.get("paused", {}))}, "names": names}
 
 
 class H(BaseHTTPRequestHandler):
@@ -195,11 +216,43 @@ class H(BaseHTTPRequestHandler):
         if not a: return self.reply(401, {"error": "sign in"})
         net = b.get("net", "mainnet")
         if net not in WEB: return self.reply(400, {"error": "net"})
+        if u.path == "/admin-api/decide":
+            g, act, note = str(b.get("granter", "")), str(b.get("action", "")), str(b.get("note", "")).strip()[:500]
+            if not (g.startswith("atone1") and len(g) == 44): return self.reply(400, {"error": "granter"})
+            if act not in ("apply", "nomove", "hold", "resume"): return self.reply(400, {"error": "action"})
+            if act == "hold" and not note: return self.reply(400, {"error": "a hold needs a note: why"})
+            rep = jload(os.path.join(WEB[net], "keeper", g + ".json"), {}) or {}
+            cur = (rep.get("admin") or {}).get("plan_id")
+            pid = b.get("plan_id") or None
+            if act == "apply":
+                if not cur or not rep.get("moves"): return self.reply(409, {"error": "there is no plan to apply: use No move needed"})
+                if pid != cur: return self.reply(409, {"error": "the plan changed since you opened it: review the new one"})
+            now = int(time.time())
+            with LOCK:
+                adm = adm_load(net)
+                if act == "apply": adm["approved"][g] = {"plan_id": cur, "by": a, "at": now}
+                if act == "nomove": adm["approved"].pop(g, None)
+                if act == "hold": adm["paused"][g] = {"by": a, "at": now}
+                if act == "resume": adm["paused"].pop(g, None)
+                adm["decisions"].setdefault(g, []).append({"action": act, "plan_id": cur if act in ("apply", "nomove") else None, "by": a, "at": now, "note": note})
+                adm["decisions"][g] = adm["decisions"][g][-50:]
+                if note: adm["notes"].setdefault(g, []).append({"by": a, "at": now, "text": note})
+                adm_save(net, adm)
+            log("decide %s %s %s by %s" % (net, g, act, a))
+            # apply is announced by the keeper once it is carried out ("strategy applied"); the rest here
+            if act == "nomove":
+                notify.send("ok", "Autopilot strategy applied: " + short(g), "No move needed: the stake already sits well. Confirmed by an operator.",
+                            {"Delegator": g, "Operator": a}, net=net)
+            elif act == "hold":
+                notify.send("warn", "Autopilot on hold: " + short(g), note, {"Delegator": g, "Operator": a}, net=net)
+            elif act == "resume":
+                notify.send("info", "Autopilot resumed: " + short(g), "", {"Delegator": g, "Operator": a}, net=net)
+            return self.reply(200, {"ok": True})
         if u.path in ("/admin-api/pause", "/admin-api/note"):
             g = str(b.get("granter", ""))
             if not (g.startswith("atone1") and len(g) == 44): return self.reply(400, {"error": "granter"})
             with LOCK:
-                adm = jload(admin_file(net), {"paused": {}, "notes": {}})
+                adm = adm_load(net)
                 if u.path.endswith("pause"):
                     if b.get("paused"): adm.setdefault("paused", {})[g] = {"by": a, "at": int(time.time())}
                     else: adm.setdefault("paused", {}).pop(g, None)
@@ -209,7 +262,7 @@ class H(BaseHTTPRequestHandler):
                     if not t: return self.reply(400, {"error": "empty note"})
                     adm.setdefault("notes", {}).setdefault(g, []).append({"by": a, "at": int(time.time()), "text": t})
                     what = "noted"
-                tmp = admin_file(net) + ".tmp"; json.dump(adm, open(tmp, "w")); os.replace(tmp, admin_file(net))
+                adm_save(net, adm)
             notify.send("info", "Autopilot %s by an operator" % what, (b.get("text") or "")[:300] if what == "noted" else "",
                         {"Delegator": g, "Operator": a}, net=net)
             return self.reply(200, {"ok": True})

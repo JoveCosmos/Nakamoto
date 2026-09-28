@@ -1,0 +1,35 @@
+[Unit]
+Description=AtomOne Autopilot grant watch, TESTNET: every grant to GATA through its life -> ledger + Discord
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=atomone-app
+Group=atomone-app
+EnvironmentFile=/etc/gata/atomone-app.env
+EnvironmentFile=-/etc/gata/atomone-app-keeper-testnet.env
+EnvironmentFile=/etc/gata/atomone-app-alerts.env
+Environment=NET=testnet
+ExecStart=/usr/bin/python3 /srv/atomone-app/bin/grantwatch.py
+Restart=always
+RestartSec=60
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateDevices=true
+RestrictAddressFamilies=AF_INET AF_INET6
+ReadWritePaths=/srv/atomone-app/state
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallFilter=@system-service
+UMask=0027
+UnsetEnvironment=ATOMONE_APP_DSN KEEPER_SECRET
+
+[Install]
+WantedBy=multi-user.target
