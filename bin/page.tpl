@@ -1543,9 +1543,9 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
   #sv-over .sd-col>.sv-ph,#sv-auto .sd-col>.sv-ph{min-height:32px}
   /* Stake (Easy and Pro): every panel's title row a filled band across the panel's top - the wallet card's build
      (a light from the top left, rings from the right), each panel its own colour; the content keeps its line */
-  #sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mine .wk-t1,#p-dele #wbody #wk-plan>.wk-ph,#p-dele #wbody #wk-mv>.wk-ph{margin:-11px -14px 0!important;padding:5px 14px 6px!important;min-height:43px!important;height:auto!important;max-height:none!important;box-sizing:border-box;border-radius:11px 11px 0 0;border-bottom:1px solid rgba(255,255,255,.08)}
-  :is(#sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mine .wk-t1,#p-dele #wbody #wk-plan>.wk-ph,#p-dele #wbody #wk-mv>.wk-ph) h3{color:#fff!important}
-  :is(#sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mine .wk-t1,#p-dele #wbody #wk-plan>.wk-ph,#p-dele #wbody #wk-mv>.wk-ph) h3::before{background:rgba(255,255,255,.9)!important;box-shadow:0 0 10px -1px rgba(255,255,255,.7)!important}
+  #sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mv>.wk-ph{margin:-11px -14px 0!important;padding:5px 14px 6px!important;min-height:43px!important;height:auto!important;max-height:none!important;box-sizing:border-box;border-radius:11px 11px 0 0;border-bottom:1px solid rgba(255,255,255,.08)}
+  :is(#sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mv>.wk-ph) h3{color:#fff!important}
+  :is(#sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mv>.wk-ph) h3::before{background:rgba(255,255,255,.9)!important;box-shadow:0 0 10px -1px rgba(255,255,255,.7)!important}
   #sd-move .sd-mvh .sd-mvn{color:rgba(255,255,255,.72)}
   /* the content under every band starts on one line (8px under it) */
   #sv-over #sd-list .fp-bc{margin-top:0}
@@ -1605,13 +1605,10 @@ background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.07),transparent
 @media(min-width:901px) and (min-height:821px) and (max-height:1000px){#sv-over #sd-sky .se-mid>.se-rsw.se-rsw,#sv-over #sd-sky .se-ex>.se-rsw.se-rsw{padding-top:4px}}
 @media(min-width:901px) and (max-height:640px){#sv-over #sd-sky .se-mid>.se-rsw.se-rsw,#sv-over #sd-sky .se-ex>.se-rsw.se-rsw{padding-top:4px}}
 @media(min-width:901px) and (max-height:520px){#sv-over #sd-sky .se-mid>.se-rsw.se-rsw,#sv-over #sd-sky .se-ex>.se-rsw.se-rsw{padding-top:0}}
-  #p-dele #wbody :is(#wk-mine,#wk-plan) .wk-tbl2{margin-top:8px!important}
   #p-dele #wbody #wk-mv>.wk-ph+*{margin-top:8px!important}
   #sv-over #sd-list>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#0f6b67,#123a52 58%,#141633)}
   #sv-over #sd-sky>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#8a5a12,#4a2f12 58%,#1f1630)}
   #sv-over #sd-move>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.07),transparent 60%),linear-gradient(315deg,#0a3a22,#072a19 58%,#05140d)}
-  #p-dele #wbody #wk-mine .wk-t1{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#7a3322,#44201a 58%,#1c1228)}
-  #p-dele #wbody #wk-plan>.wk-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#0e5a5a,#12394a 58%,#141633)}
   #p-dele #wbody #wk-mv>.wk-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#4130a0,#271c6c 58%,#150f3b)}
   /* the wider padding leaves the Delegations table 4px less: its figures keep their room, the name gives */
   #p-dele #wbody #dmy col:nth-child(1){width:30px!important}#p-dele #wbody #dmy col:nth-child(3){width:66px!important}
