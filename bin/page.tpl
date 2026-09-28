@@ -4090,11 +4090,11 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .se-rsh2 span{font-size:11px;color:var(--ws)}
 .sd-figs.sd-mv.se-rs2{grid-template-rows:auto;flex:0 0 auto}
 .sd-figs.sd-mv.se-rs2 .sd-fig:last-child{grid-column:auto}
-.sd-figs.sd-mv.se-rs2 .sd-fig>b{font-size:28px;padding-bottom:7px}
+.sd-figs.sd-mv.se-rs2 .sd-fig>b{font-size:28px}
 .sd-figs.sd-mv.se-rs2 .sd-fig{padding-top:8px;padding-bottom:9px}
 /* restaking: the day, week and month keep the line saying what restake adds */
 #sv-over .se-row.rson .sd-fig small{display:block}
-@media(min-width:901px) and (max-height:760px){#sv-over .sd-figs.sd-mv.se-rs2 .sd-fig>b{font-size:22px;padding-bottom:5px}#sv-over .sd-figs.sd-mv.se-rs2 .sd-fig small{display:none}
+@media(min-width:901px) and (max-height:760px){#sv-over .sd-figs.sd-mv.se-rs2 .sd-fig>b{font-size:22px}#sv-over .sd-figs.sd-mv.se-rs2 .sd-fig small{display:none}
   #sv-over .sd-figs.sd-mv.se-rs2 .sd-fig{padding-top:5px;padding-bottom:6px}#sv-over .se-rsw{padding-top:8px;gap:4px}}
 @media(min-width:901px) and (max-height:700px){#sv-over .se-rs2,#sv-over .se-rsh2 span{display:none}}
 .se-rsv{color:var(--sv-teal)}
@@ -4181,11 +4181,13 @@ background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 16%,
 .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig::before{display:none}
 .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig::after{display:none}
 .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em{font-size:10px;letter-spacing:.2em;color:var(--ws)}
-.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig>b{position:relative;font-size:38px;line-height:1;padding-bottom:9px}
-.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig>b::after{content:"";position:absolute;left:50%;bottom:0;width:34px;height:3px;margin-left:-17px;border-radius:2px;background:var(--rc);box-shadow:0 0 10px var(--rc)}
+.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig>b{font-size:38px;line-height:1}
+/* the glowing line sits under the label (Now, After, Gain) */
+.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em{position:relative;padding-bottom:7px;margin-bottom:3px}
+.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em::after{content:"";position:absolute;left:50%;bottom:0;width:34px;height:3px;margin-left:-17px;border-radius:2px;background:var(--rc);box-shadow:0 0 10px var(--rc)}
 .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig:last-child>b{font-size:40px}
 .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig small{font-size:11.5px;color:var(--ws)}
-@media(min-width:901px) and (max-height:700px){.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig>b{font-size:28px;padding-bottom:7px}.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig:last-child>b{font-size:30px}.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig{gap:4px}}
+@media(min-width:901px) and (max-height:700px){.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig>b{font-size:28px}.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig:last-child>b{font-size:30px}.sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig{gap:4px}}
 /* the boxes stand where the centred block put them (equal room above the block and below it); the
    year rises into the middle of the room between the title and the boxes: the hero takes its own
    height plus half the spare room and centres itself in it, the ::after spacer the other half */

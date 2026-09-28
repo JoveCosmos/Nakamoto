@@ -199,5 +199,5 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .fp-kb{border-color:var(--line-strong,#d9d3c4);background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 14%,transparent),transparent 65%),#fbf9f3;box-shadow:none}
 
   html[data-theme=light]:not([data-mono]) #sv .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig{background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 12%,transparent),transparent 70%),#fbf9f3}
-  html[data-theme=light]:not([data-mono]) #sv .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig>b::after{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #sv .sd-mv:is(#sd-move *,#sd-asky *,.se-rs2) .sd-fig em::after{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-btn.go.se-rsgo{background:#0f7a72;border-color:#0f7a72;color:#fff}
