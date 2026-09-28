@@ -2749,7 +2749,7 @@ rememberGridH();
   function atState(){
     var pos = window.__POS, cap = atCap(), scope = atScope(), view = atViewing();
     /* the list is shown for Choose yourself (and for a standing grant's own list), hidden for Autopilot's pick */
-    if(atcard){ var pk = view ? "selected" : atPick(); atcard.setAttribute("data-pick", pk); if(pk === "auto" && atcard.getAttribute("data-v") === "vals") atView("setup"); }
+    if(atcard){ var pk = view ? "selected" : atPick(); atcard.setAttribute("data-pick", pk); atcard.setAttribute("data-view", view ? "1" : "0"); if(pk === "auto" && atcard.getAttribute("data-v") === "vals") atView("setup"); }
     atCounts();
     /* why it matters: stake left alone goes idle when its validator drops out of the set */
     var idl = E("atidle"), iv = window.__idleAtone ? window.__idleAtone() : "";
@@ -2793,8 +2793,10 @@ rememberGridH();
     if(g){
       var a = g.authorization || {}, cap = a.max_tokens ? fmt(+a.max_tokens.amount) + " ATONE" : "no cap", n = ((a.allow_list || {}).address || []).length, exp = g.expiration ? window.__dayFull(new Date(g.expiration).getTime()) : "no expiry";
       var rp = AT.report, last = rp && rp.checked ? new Date(rp.checked * 1000) : null;
-      var restk = (AT.grants || []).some(function(x){ return grantType(x) === DELEG; });
-      st.innerHTML = '<span class=g>Autopilot is active' + (restk ? ', restaking rewards' : '') + '.</span> Cap left <b>' + cap + '</b>, <b>' + n + '</b> allowed validators, until <b>' + exp + '</b>.<br>' +
+      /* restake is its own switch now: this line speaks of Autopilot's grant alone */
+      /* what stands, as boxes: its validators, its cap, how long it runs; then the keeper's last word */
+      st.innerHTML = '<div class=atsb><div><em>Validators</em><b>' + n + '</b><small>allowed</small></div><div><em>Cap</em><b>' + (a.max_tokens ? cap : 'None') + '</b><small>' + (a.max_tokens ? 'left to move' : 'all your stake') + '</small></div>' +
+        '<div><em>Runs until</em><b>' + (g.expiration ? exp : 'You revoke') + '</b><small>' + (g.expiration ? 'then grant again' : 'no end date') + '</small></div></div>' +
         (last ? 'Last check <b>' + window.__dayFull(last.getTime()) + '</b>' + (rp.moves && rp.moves.length ? ', <b>' + rp.moves.length + '</b> move' + (rp.moves.length === 1 ? '' : 's') + ' ' + (rp.dry ? 'planned (dry run)' : 'made') + ', <b class=g>+' + one(rp.gain || 0) + '</b> ATONE a year' : ', nothing to move') : 'The keeper has not checked this address yet') +
         (rp && rp.history && rp.history.length ? '<br>Moves made: <b>' + rp.history.length + '</b>, last ' + window.__dayFull(rp.history[0].at * 1000) : '') +
         (AT_EDIT ? '<br><span class=g>Changing it:</span> the terms below replace these when you sign.' : '');

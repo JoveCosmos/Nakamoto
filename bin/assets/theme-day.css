@@ -920,6 +920,10 @@
   html[data-theme=light]:not([data-mono]) #sv-mygov .gv-rules3>div{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) #sv-mygov .gv-rules3 em::after{background:var(--line-strong)}
   html[data-theme=light]:not([data-mono]) #sv-mygov .gv-rl{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) #atpop .atstate:not(#z){background:none}
+  html[data-theme=light]:not([data-mono]) #atpop .atsb>div{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #atpop .atsb em::after{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #atpop .atsb b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .netsw{border:1px solid var(--bg);background:var(--bg);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .netsw a{color:var(--muted);text-decoration:none}
   html[data-theme=light]:not([data-mono]) .netsw a:hover{color:var(--wt,var(--ink))}
@@ -1287,4 +1291,6 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-mygov #sd-gvote::after{background:linear-gradient(315deg,#1d4f8f,#173257 58%,#141633)}
   html[data-theme=light]:not([data-mono]) #sv-mygov .gv-how>div,html[data-theme=light]:not([data-mono]) #sv-mygov .gv-rules3>div{border-color:#e3ded3;background:#fbf9f3}
   html[data-theme=light]:not([data-mono]) #sv-mygov .gv-how b,html[data-theme=light]:not([data-mono]) #sv-mygov .gv-rules3 b{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #atpop .atsb>div{border-color:#e3ded3;background:#fbf9f3}html[data-theme=light]:not([data-mono]) #atpop .atsb b{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #atpop .atstate:not(#z){background:none;border:0;color:var(--muted)}
 

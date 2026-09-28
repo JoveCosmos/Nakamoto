@@ -5174,6 +5174,16 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 @media(min-width:901px) and (max-height:760px){#sv-mygov .gv-live>.gv-lp:nth-child(n+2){display:none}#sv-mygov .gv-rules3>div{padding:10px 6px}#sv-mygov .gv-rules3 b{font-size:17px}}
 @media(min-width:901px) and (max-height:640px){#sv-mygov .gv-sub{display:none}#sv-mygov .gv-rules3 small{display:none}#sv-mygov .gv-how>div{padding:7px 6px}#sv-mygov .gv-say:not(#z){margin-top:6px;font-size:12.5px}#sv-mygov .gv-rl:not(#z){margin-top:6px}#sv-mygov .gv-lp:not(#z){padding:6px 10px;gap:3px}#sv-mygov .gv-live:not(#z){margin-top:5px}}
 @media(max-width:900px){#sv-mygov .gv-live>.gv-lp:nth-child(n+3){display:none}}
+/* Manage (a grant that stands, read-only): the card keeps a real height so its list shows; the status as boxes */
+@media(min-width:861px){.pop .card.atcard[data-view="1"]:not(#z){height:min(620px,100%)}#atpop .atcard[data-view="1"] .atR:not(#z){contain:none}}
+#atpop .atstate:not(#z){margin:12px 0 4px;padding:0;border:0;background:none;font-family:var(--wsans);font-size:12px;letter-spacing:0;color:var(--ws);line-height:1.5}
+#atpop .atsb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:10px}
+#atpop .atsb>div{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 6px;border:1px solid var(--wbd2);border-radius:10px;text-align:center;
+  background:linear-gradient(0deg,rgba(185,176,255,.08),rgba(255,255,255,.012) 70%)}
+#atpop .atsb em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ws);position:relative;padding-bottom:5px}
+#atpop .atsb em::after{content:"";position:absolute;left:50%;bottom:0;width:24px;height:2px;margin-left:-12px;border-radius:2px;background:#b9b0ff}
+#atpop .atsb b{font-family:var(--wsans);font-size:18px;font-weight:800;color:#fff8dc;white-space:nowrap}
+#atpop .atsb small{font-size:10.5px;color:var(--ws)}
 /* the setup's validator count: Redelegate's live count, at the right of the list's title */
 #atpop .atrt:not(#z){display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
 #atpop .atrh,#atpop .atrt:not(#z){width:100%}

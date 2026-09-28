@@ -371,7 +371,7 @@
          : ro("Since start", "\u2014", "", null, "var(--sv-green)")) +
       /* the stake it manages: the cap when the grant sets one, otherwise all the reader stakes */
       ro("Stake", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : pos && pos.rows.length ? fmt(pos.total) : "\u2014") : "\u2014", "", null, "var(--sv-violet)", "", false, g && (a.max_tokens || (pos && pos.rows.length)) ? "ATONE" : "") +
-      ro("Runs until", g ? (until || "Until revoked") : "\u2014", "", null, "var(--sv-violet)") +
+      ro("Runs until", g ? (until || "You revoke") : "\u2014", "", null, "var(--sv-violet)") +
       ro("Moves made", g ? String(moves) : "\u2014", "", null, "var(--sv-teal)") +
       ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)"));
     /* restake, in one line: what it has done, or who does it instead, or that it waits */
