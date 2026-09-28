@@ -471,8 +471,8 @@
   function restakePanel(pos, at){
     var on = !!(at && at.restake), r = pos && pos.rows.length ? pos.rate : 0, add = r > 0 ? Math.pow(1 + r / 730, 730) - 1 - r : 0;
     var h = '<div class=sv-ph><h3>Restake</h3>' + '<span class="sv-tag ' + (on ? 'g' : 'q') + '">' + (on ? 'Enabled' : 'Disabled') + '</span></div>';
-    h += '<div class=ars-fig><em>' + (on ? 'Adds a year' : 'A year') + '</em><b>' + (add > 0 ? '+' + fmt(pos.total * add) + '<i> ATONE</i>' : '\u2014') + '</b>' +
-      (add > 0 ? '<small>+' + (add * 100).toFixed(1) + '% APR</small>' : '') + '</div>';
+    h += '<div class=ars-fig><em>' + (on ? 'Adds a year' : 'A year') + '</em><b>' + (add > 0 ? '+' + fmt(pos.total * add) : '\u2014') + '</b>' +
+      (add > 0 ? '<small>ATONE, +' + (add * 100).toFixed(1) + '% APR</small>' : '') + '</div>';
     /* the rules sit at the foot, over the switch */
     h += '<div class=ars-foot><div class=ars-two><div><em>Frequency</em><b>12 hours</b><small>twice a day</small></div><div><em>Minimum</em><b>1 ATONE</b><small>of rewards a run</small></div></div>' +
       '<div class=ars-how>Auto-compounds reward on your <b>best-paying</b> validator</div></div>';
