@@ -2521,7 +2521,8 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .stcard .unamt.sttop{padding-top:10px;padding-bottom:10px}
 .uncard .unfield{width:200px;height:30px;display:inline-flex;align-items:center;padding:0 4px 0 0;border-radius:6px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#0b0b18,#0e0e1d);box-shadow:inset 0 1px 0 #ffffff06;transition:border-color .15s,box-shadow .15s}
 .uncard .unfield:focus-within{border-color:#b9b0ff;box-shadow:0 0 0 3px rgba(185,176,255,.13)}
-.uncard .unfield.bad{border-color:var(--wburn);box-shadow:0 0 0 3px rgba(255,77,31,.12)}
+.uncard .unfield.bad,.uncard .unfield.bad:focus-within{border-color:var(--wburn)!important;background:rgba(255,77,31,.1)!important;box-shadow:0 0 0 3px rgba(255,77,31,.2)!important}
+.uncard .unfield.bad input{color:#ff8a6a!important}
 .uncard .unfield input.wk-amt2{flex:1 1 auto;min-width:0;height:100%;padding:0 10px;margin:0;border:0;background:transparent;color:#fff8dc;font-family:var(--wmono);font-size:12.5px;outline:none;box-shadow:none;-webkit-appearance:none;appearance:none}
 .uncard .unfield input.wk-amt2:focus,.uncard .unfield input.wk-amt2:focus-visible{box-shadow:none;outline:none}
 .uncard .unfield input.wk-amt2::placeholder{font-family:var(--wmono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);opacity:.8}

@@ -2516,7 +2516,7 @@ rememberGridH();
     if(mx) mx.textContent = exact(bal, 2);
     var over = P.u > bal, ok = P.u > 0 && P.n > 0 && !over && P.share > 0;
     if(fld) fld.classList.toggle("bad", !!over);
-    if(hint){ hint.className = "unhint" + (over ? " bad" : ""); hint.textContent = over ? "more than the wallet holds" : (P.u > 0 && !P.n ? "Select a validator" : ""); }
+    if(hint){ hint.className = "unhint" + (over ? " bad" : ""); hint.textContent = over ? "" : (P.u > 0 && !P.n ? "Select a validator" : ""); }   /* over the balance: the box turns red, no words */
     if(go) go.disabled = !ok || !window.__WALLET;
     var sb = E("stbell"); if(sb) sb.disabled = !P.n;
     var sn = E("stseln"); if(sn) sn.innerHTML = P.n ? "<b>" + P.n + "</b>selected" : "";
