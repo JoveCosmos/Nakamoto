@@ -4927,6 +4927,20 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
 /* Grant: the big green door, as Redelegate */
 #atpop .txbtns .wk-go:not(#z){min-width:180px;height:40px;font-size:13px;font-weight:700;border-radius:10px}
 @media(max-height:760px){#atpop .atrow:not(#z){padding:8px 0;gap:6px}#atpop .atpc .atd{display:none}#atpop .atlab small{display:none}#atpop .atlist td:not(#z){height:34px}}
+/* the setup wider, the list narrower; no step numbers; the setup never scrolls - it fits, tightening on short windows */
+@media(min-width:861px){#atpop .atbody:not(#z){grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
+  #atpop .atL:not(#z){overflow:visible}
+  #atpop .atpre.at3:not(#z){grid-template-columns:repeat(3,minmax(0,1fr))}
+  #atpop .atpre.at3 .atpc:not(#z){display:flex;flex-direction:column;align-items:flex-start;padding:10px 12px 11px 34px}
+  #atpop .atpre.at3 .atpc input:not(#z){top:12px;margin-top:0}
+  #atpop .atpre.at3 .atpc .atd{text-align:left;white-space:normal}}
+#atpop .atlab i{display:none}
+#atpop .atlab:not(#z){display:flex;flex-direction:column;align-items:flex-start;gap:1px}
+#atpop .atpre,#atpop .atrow>.wk-field,#atpop .atrow>.attime,#atpop .atrow>.atseg,#atpop .atrow>.unhint{padding-left:0;margin-left:0}
+@media(min-width:861px) and (max-height:1000px){#atpop .atrow:not(#z){padding:8px 0;gap:6px}#atpop .atidle:not(#z){margin-top:8px;padding:8px 11px;font-size:11.5px}#atpop .atlab small{display:none}}
+@media(min-width:861px) and (max-height:860px){#atpop .atpc .atd{display:none}#atpop .atnote:not(#z){margin-top:8px}#atpop .atpc:not(#z){padding-top:8px;padding-bottom:8px}}
+@media(min-width:861px) and (max-height:760px){#atpop .atidle{display:none!important}#atpop .atrow:not(#z){padding:6px 0;gap:5px}}
+@media(min-width:861px) and (max-height:640px){#atpop .atL:not(#z){overflow-y:auto}}
 /* the setup's validator count: Redelegate's live count, at the right of the list's title */
 #atpop .atrt:not(#z){display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
 #atpop .atrh,#atpop .atrt:not(#z){width:100%}
