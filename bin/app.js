@@ -2484,7 +2484,7 @@ rememberGridH();
   /* the validators the grant may use, chosen in this card - apart from the Redelegate list's
      selection (that is where stake moves now; this is where the keeper may move it later) -
      and the card's own view: a standing grant shows its terms until "Change" */
-  var ATSEL = {}, AT_EDIT = false, AT_FIND = "", AT_FLT = "all", AT_OPEN = 0;
+  var ATSEL = {}, AT_EDIT = false, AT_FIND = "", AT_OPEN = 0;
   function atStatus(){
     return fetch("keeper/_status.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
       AT.addr = j && j.grantee ? j.grantee : null; AT.dry = !j || j.dry !== false; AT.fee_pct = j && j.fee_pct ? +j.fee_pct : 0; AT.fee_to = j && j.fee_to ? j.fee_to : null;
@@ -2663,8 +2663,9 @@ rememberGridH();
     var na = E("atna"); if(na) na.textContent = auto + " picked for " + word;
     var n2 = E("atn2"); if(n2) n2.textContent = sel ? sel + " selected" : AT_MIN + " to " + AT_MAX + " validators";
     var n = view ? Object.keys(atGrantIds()).length : atPick() === "auto" ? auto : sel;
-    var c = E("atcount"); if(c) c.innerHTML = view ? "<b>" + n + "</b> allowed by your grant" : atPick() === "auto" ? "<b>" + auto + "</b> picked by Autopilot, best-paying that fit " + word
-      : "<b>" + sel + "</b> selected, " + AT_MIN + " to " + AT_MAX;
+    /* live, as Redelegate's: the number, then what it counts */
+    var c = E("atcount"); if(c) c.innerHTML = view ? "<b>" + n + "</b>allowed" : atPick() === "auto" ? "<b>" + auto + "</b>picked by Autopilot"
+      : "<b>" + sel + "</b>selected" + (sel < AT_MIN || sel > AT_MAX ? ", " + AT_MIN + " to " + AT_MAX : "");
     var vn = E("atvn"); if(vn) vn.textContent = n;
   }
   /* the set, in rank order: a box per validator, what it pays, its record, and marks for the
@@ -2678,15 +2679,13 @@ rememberGridH();
     var rows = window.__candidates({ except: {}, cleanRecord: false }).filter(function(o){
       var d = VD[o.id]; if(!d || !d.op) return false;
       o.on = view ? !!allow[o.id] : auto ? !!aset[o.id] : !!ATSEL[o.id];
-      if(AT_FLT === "sel" && !o.on) return false;
+      if((view || auto) && !o.on) return false;   /* a standing grant, or Autopilot's pick: only those validators */
       /* a name matches on any letters; an operator key only from five on, or every key matches "at" */
       return !q || String(o.m).toLowerCase().indexOf(q) >= 0 || (q.length >= 5 && String(d.op).toLowerCase().indexOf(q) >= 0); });
-    /* the head's box speaks for the rows shown: checked when all are on, a dash when some are */
-    var on = 0; rows.forEach(function(o){ if(o.on) on++; }); AT_VIS = rows.map(function(o){ return o.id; });
     var h = '<table><colgroup><col style="width:30px">' + (ph ? '' : '<col style="width:34px">') + '<col><col style="width:' + (ph ? 66 : 64) + 'px">' +
             (ph ? '' : '<col style="width:50px">') + '<col style="width:' + (ph ? 56 : 62) + 'px"></colgroup>' +
-            '<thead><tr><th class=ck><input type=checkbox id=atall' + (view ? ' disabled' : '') + ' aria-label="Select every validator shown"' +
-              (rows.length && on === rows.length ? ' checked' : '') + '></th>' + (ph ? '' : '<th>rank</th>') + '<th class=l>validator</th><th>90<span class=lc>d</span> uptime</th>' + (ph ? '' : '<th>jailed</th>') + '<th>APR</th></tr></thead><tbody>';
+            /* no select-all: validators are picked one by one */
+            '<thead><tr><th class=ck></th>' + (ph ? '' : '<th>rank</th>') + '<th class=l>validator</th><th>90<span class=lc>d</span> uptime</th>' + (ph ? '' : '<th>jailed</th>') + '<th>APR</th></tr></thead><tbody>';
     rows.forEach(function(o){
       var d = VD[o.id], u90 = d.d90 != null ? +d.d90 : (o.up != null ? +o.up : null);
       h += '<tr' + (o.on ? ' class=on' : '') + ' data-id="' + att(o.id) + '"><td class=ck><input type=checkbox aria-label="' + att(o.m) + '"' + (o.on ? ' checked' : '') + (view ? ' disabled' : '') + '></td>' +
@@ -2698,13 +2697,10 @@ rememberGridH();
            '<td class=r2><b>' + pct(window.__rateAfter(o.t, o.c, 0)) + '</b></td></tr>';
     });
     if(!rows.length) h += '<tr><td class=atnone colspan=' + (ph ? 4 : 6) + '>' +
-      (q ? 'No validator matches “' + att(AT_FIND.trim()) + '”.' : AT_FLT === "sel" ? 'None selected yet.' : 'The set has not loaded yet.') + '</td></tr>';
+      (q ? 'No validator matches “' + att(AT_FIND.trim()) + '”.' : 'The set has not loaded yet.') + '</td></tr>';
     var top = el.scrollTop; el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
     el.classList.toggle("ro", view);
-    var ha = E("atall"); if(ha) ha.indeterminate = on > 0 && on < rows.length;
   }
-  var AT_VIS = [];
-  function atFltSync(){ Array.prototype.forEach.call(document.querySelectorAll("#atflt button"), function(o){ o.setAttribute("aria-pressed", o.dataset.f === AT_FLT ? "true" : "false"); }); }
   /* a phone shows one side at a time */
   function atView(v){
     if(atcard) atcard.setAttribute("data-v", v);
@@ -2770,7 +2766,7 @@ rememberGridH();
     /* no Cancel or Close: a tap outside, or Escape, closes the card. Back stays - it leaves a
        change of a standing grant without closing */
     var ac = E("atcancel"); ac.textContent = "Back"; ac.hidden = !(g && AT_EDIT);
-    atFltSync(); atRefresh();
+    atRefresh();
   }
   /* the door: the card opens at once on what is known, then re-reads the keeper and the
      chain and follows only if a grant appeared or went in the meantime */
@@ -2782,22 +2778,20 @@ rememberGridH();
     var a = E("atcap"); if(a) a.value = "";
     if(AT.grant) atFromGrant();
     else if(!atSelIds().length) Object.keys(SEL).forEach(function(id){ ATSEL[id] = 1; });   /* a first selection: the Redelegate list's */
-    AT_FLT = AT.grant || atPick() === "auto" ? "sel" : "all";
     atView("setup"); atShow(); POP.open(atpop);
     var tok = ++AT_OPEN;
     atStatus().then(function(){ return Promise.all([atGrant(), atReport()]); }).then(function(r){
       if(tok !== AT_OPEN || !atpop.classList.contains("on")) return;
       var had = !!AT.grant; if(!atKeep(r[0])) return; AT.report = r[1];
-      if(!!AT.grant !== had){ AT_EDIT = false; if(AT.grant){ atFromGrant(); AT_FLT = "sel"; } }
+      if(!!AT.grant !== had){ AT_EDIT = false; if(AT.grant) atFromGrant(); }
       atShow(); });
   });
   if(atpop) atpop.__onclose = function(){ AT_EDIT = false; AT_OPEN++; feeSoon("at"); };
   var atcapEl = E("atcap"); if(atcapEl) atcapEl.addEventListener("input", atState);
   var atmax = E("atmax"); if(atmax) atmax.addEventListener("click", function(){ var pos = window.__POS; if(!pos || !(pos.free > 0)) return; E("atcap").value = exact(pos.free); atState(); });
   Array.prototype.forEach.call(document.querySelectorAll("#atpop input[name=atstrat]"), function(r){ r.addEventListener("change", atRefresh); });
-  /* Let us decide shows what Autopilot picked; Choose yourself, the whole set to pick from */
-  Array.prototype.forEach.call(document.querySelectorAll("#atpop input[name=atpick]"), function(r){ r.addEventListener("change", function(){
-    AT_FLT = atPick() === "auto" ? "sel" : "all"; atFltSync(); atRefresh(); }); });
+  /* Autopilot shows what it picked; Choose yourself, the whole set to pick from */
+  Array.prototype.forEach.call(document.querySelectorAll("#atpop input[name=atpick]"), function(r){ r.addEventListener("change", atRefresh); });
   var atrs = E("atrestake"); if(atrs) atrs.addEventListener("change", atState);
   Array.prototype.forEach.call(document.querySelectorAll("#atrsk button"), function(b){ b.addEventListener("click", function(){
     if(!atrs || atViewing()) return; atrs.checked = b.dataset.r === "1"; atRsSync(); atState(); }); });
@@ -2807,17 +2801,6 @@ rememberGridH();
      starts a selection of the whole set less that one */
   var atlist = E("atlist");
   if(atlist) atlist.addEventListener("click", function(ev){
-    /* the head's box: every validator shown on, or every one shown off (a search or the
-       Selected filter narrows what "every" means); all of the set on is simply "All" */
-    if(ev.target.id === "atall"){
-      if(atViewing()) return;
-      var want = ev.target.checked;
-      if(atPick() === "auto"){ ATSEL = {}; atAutoIds().forEach(function(x){ ATSEL[x] = 1; }); atSetPick("selected"); }
-      /* every one shown off, or on up to the most a grant may carry */
-      AT_VIS.forEach(function(x){ if(!want) delete ATSEL[x]; else if(atSelIds().length < AT_MAX) ATSEL[x] = 1; });
-      atRefresh();
-      return;
-    }
     var tr = ev.target.closest ? ev.target.closest("tr[data-id]") : null;
     if(!tr || atViewing()) return;
     var box = tr.querySelector("input"), on = ev.target === box ? box.checked : !tr.classList.contains("on");
@@ -2834,8 +2817,6 @@ rememberGridH();
     h.addEventListener("click", function(ev){ ev.preventDefault(); ev.stopPropagation(); h.focus(); });
     h.addEventListener("keydown", function(ev){ if(ev.key === "Enter" || ev.key === " "){ ev.preventDefault(); ev.stopPropagation(); } });
   });
-  var atflt = E("atflt");
-  if(atflt) atflt.addEventListener("click", function(ev){ var b = ev.target.closest ? ev.target.closest("[data-f]") : null; if(!b) return; AT_FLT = b.dataset.f; atFltSync(); atRows(); });
   var atfind = E("atfind");
   if(atfind){
     atfind.addEventListener("input", function(){ AT_FIND = atfind.value; atRows(); });
@@ -2849,9 +2830,9 @@ rememberGridH();
   });
   /* the list's columns follow the width: a turned phone gets the wide markup */
   var atRz = 0; addEventListener("resize", function(){ if(!atpop || !atpop.classList.contains("on")) return; clearTimeout(atRz); atRz = setTimeout(atRows, 150); });
-  var atedit = E("atedit"); if(atedit) atedit.addEventListener("click", function(){ AT_EDIT = true; atFromGrant(); AT_FLT = "all"; atShow(); });
+  var atedit = E("atedit"); if(atedit) atedit.addEventListener("click", function(){ AT_EDIT = true; atFromGrant(); atShow(); });
   var atcancel = E("atcancel"); if(atcancel) atcancel.addEventListener("click", function(){
-    if(AT.grant && AT_EDIT){ AT_EDIT = false; atFromGrant(); AT_FLT = "sel"; atShow(); return; }
+    if(AT.grant && AT_EDIT){ AT_EDIT = false; atFromGrant(); atShow(); return; }
     POP.close(atpop); });
   function atSend(msgs, btn, memo){
     if(!msgs.length || !window.__TX || !window.__WALLET) return;

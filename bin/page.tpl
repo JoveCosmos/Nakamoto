@@ -4757,10 +4757,6 @@ white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .atfind{flex:1 1 auto;min-width:0;height:30px;padding:0 10px;margin:0;border-radius:6px;border:1px solid var(--wbd2);background:var(--wi);color:#fff8dc;font-family:var(--wsans);font-size:12px;outline:none;-webkit-appearance:none;appearance:none}
 .atfind::placeholder{color:var(--wf)}
 .atfind:focus{border-color:var(--av);box-shadow:0 0 0 3px rgba(185,176,255,.13)}
-.atflt{display:inline-flex;gap:3px;padding:3px;border:1px solid var(--wbd2);border-radius:6px;background:var(--wi);flex:0 0 auto}
-.atflt button{height:22px;padding:0 10px;border:0;border-radius:4px;background:transparent;color:var(--ws);font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
-.atflt button[aria-pressed=true]{background:var(--av);color:#1b1440}
-.atflt button:focus-visible{outline:2px solid var(--av);outline-offset:2px}
 /* the gutter is kept whether the list scrolls or not: "Selected" can show three rows where "All"
    shows a hundred, and a scrollbar that came and went moved every column sideways */
 .atlist{flex:1 1 auto;min-height:0;overflow-y:auto;margin-top:10px;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;overscroll-behavior:contain;scrollbar-gutter:stable}
@@ -4851,6 +4847,11 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
    test chain can never pass for the real one */
 /* the wallet lives in the Dashboard: its Connect button and pill show only there; every other section reads */
 html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
+/* the setup's validator count: Redelegate's live count, at the right of the list's title */
+#atpop .atrt:not(#z){display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+#atpop .atrh,#atpop .atrt:not(#z){width:100%}
+#atpop .atrt .wk-seln:not(#z){min-width:0;margin-left:auto;font-family:var(--wmono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ws)}
+#atpop .atrt .wk-seln b:not(#z){font-family:var(--wmono);font-size:11px;font-weight:700;letter-spacing:0;color:var(--wgreen);margin-right:5px}
 /* the network switch: two small engraved keys in a recessed track, the wallet pill's height (32px) and its
    mono type; the open network's key lit from within (teal mainnet, amber testnet) */
 .netsw{display:inline-flex;align-items:center;height:32px;box-sizing:border-box;padding:3px;gap:3px;border-radius:10px;flex:0 0 auto;
@@ -5471,7 +5472,7 @@ html[data-tab=connect] .l2host{display:none}
         <div class=atrow><span class=atlab>Validators</span>
           <div class="atpre at2">
             <label class=atpc><input type=radio name=atpick value=selected><b>Choose yourself</b><em id=atn2></em></label>
-            <label class=atpc><input type=radio name=atpick value=auto checked><b>Let us decide</b><em id=atna></em></label>
+            <label class=atpc><input type=radio name=atpick value=auto checked><b>Autopilot</b><em id=atna></em></label>
           </div></div>
         <div class=atrow><span class=atlab>Stake</span>
           <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
@@ -5486,9 +5487,9 @@ html[data-tab=connect] .l2host{display:none}
       <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your stake never leaves your wallet. You can revoke the grant at any time.</span></div>
     </section>
     <section class=atR id=atR aria-label="Select your validators">
-      <div class=atrh><div class=atrt><b>Select your validators</b><span id=atcount></span></div></div>
+      <div class=atrh><div class=atrt><b>Select your validators</b><span class=wk-seln id=atcount aria-live=polite></span></div></div>
       <div class=atrs><input class=atfind id=atfind type=search placeholder="Find by name or operator key" aria-label="Find a validator" autocomplete=off spellcheck=false>
-        <div class=atflt id=atflt role=group aria-label="Show"><button type=button data-f=all aria-pressed=true>All</button><button type=button data-f=sel aria-pressed=false>Selected</button></div></div>
+</div>
       <div class=atlist id=atlist></div>
     </section>
   </div>

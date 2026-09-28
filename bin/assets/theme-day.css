@@ -825,8 +825,6 @@
   html[data-theme=light]:not([data-mono]) .atrt b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .atfind{color:var(--ink);outline:none}
   html[data-theme=light]:not([data-mono]) .atfind:focus{box-shadow:0 0 0 3px var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .atflt button{background:transparent}
-  html[data-theme=light]:not([data-mono]) .atflt button[aria-pressed=true]{color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .atlist thead th{background:var(--surface-2);color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .atlist td{border-bottom:1px solid var(--line-soft)}
   html[data-theme=light]:not([data-mono]) .atlist tr:hover td{background:var(--surface-2)}
