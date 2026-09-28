@@ -97,9 +97,9 @@
     var by = function(s){ return all.filter(function(e){ return stOf(e) === s; }); };
     var wait = by("waiting").concat(by("planning")), over = wait.filter(function(e){ var l = left((e.report || {}).admin); return l != null && l <= 0; });
     var soonest = wait.map(function(e){ return left((e.report || {}).admin); }).filter(function(x){ return x != null; }).sort(function(a, b){ return a - b; })[0];
-    function ro(label, v, meta, col){ return '<div class=ro style="--rc:' + col + '"><em>' + label + '</em><b>' + v + '</b><small>' + (meta || "&nbsp;") + '</small></div>'; }
+    function ro(label, v, meta, col, cls){ return '<div class=ro style="--rc:' + col + '"><em>' + label + '</em><b' + (cls ? ' class=' + cls : '') + '>' + v + '</b><small>' + (meta || "&nbsp;") + '</small></div>'; }
     E("strip").innerHTML =
-      ro("Autopilot address", L.grantee ? short(L.grantee) : "N/A", L.grantee ? (k.dry === false ? "live" : "dry run") : "not set yet", "var(--violet)") +
+      ro("Autopilot address", L.grantee ? short(L.grantee) : "N/A", L.grantee ? (k.dry === false ? "live" : "dry run") : "not set yet", "var(--violet)", "addrv") +
       ro("Waiting", wait.length, soonest != null ? (soonest <= 0 ? "one is overdue" : "next due in " + dur(soonest)) : "nothing to decide", "var(--amber)") +
       ro("Overdue", over.length, "48 hours passed", "var(--red)") +
       ro("Managed", by("managed").length + by("approved").length, "decided, the keeper follows", "var(--green)") +

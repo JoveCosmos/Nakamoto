@@ -13,6 +13,7 @@
 @media (prefers-color-scheme:light){:root{--bg:#f4f2ec;--c1:#fffdf8;--c2:#f7f4ec;--bd:#e3ddd0;--bd2:#d2cabb;--t:#17161c;--s:#4d4a57;--f:#7a7686;
 --teal:#0f5e50;--amber:#9b5a0a;--green:#16733a;--violet:#5b4fc4;--red:#b3261e}}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--t);font:14px/1.45 var(--sans)}
 button{font:inherit;cursor:pointer}
 .wrap{max-width:1400px;margin:0 auto;padding:20px 24px 40px;display:flex;flex-direction:column;gap:14px}
@@ -41,6 +42,7 @@ header h1 span{color:var(--violet)}
 .ro em{display:block;font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--f)}
 .ro b{display:block;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px}
 .ro small{display:block;font-size:11px;color:var(--s);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ro b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ro b.addrv{font:600 15px/1.9 var(--mono)}
 .grid{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr);gap:14px;align-items:start}
 .tabs{display:flex;gap:4px;flex-wrap:wrap}
 .tab{height:28px;padding:0 12px;border-radius:7px;border:1px solid var(--bd);background:transparent;color:var(--s);font-size:12px}
@@ -60,7 +62,7 @@ tr.rvrow>td{padding:0 8px 14px;background:color-mix(in srgb,var(--violet) 6%,tra
 .rvg{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
 .rvg div{padding:8px 10px;border:1px solid var(--bd);border-radius:8px}
 .rvg em{display:block;font-style:normal;font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--f)}
-.rvg b{display:block;font-size:13px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rvg b{display:block;font-size:13px;margin-top:2px;overflow-wrap:anywhere}
 .mono{font-family:var(--mono)}
 table.plan th.r,table.plan td.r{text-align:right}
 table.plan td{padding:6px 8px}
@@ -82,7 +84,10 @@ table.plan td{padding:6px 8px}
 .gate .panel{max-width:440px;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center;padding:28px}
 .err{color:var(--red);font-size:12.5px;min-height:18px}
 @media (max-width:900px){.strip{grid-template-columns:repeat(2,minmax(0,1fr))}.ro{border-top:1px solid var(--bd)}.grid{grid-template-columns:minmax(0,1fr)}
-.wrap{padding:14px 12px}.tbl{overflow-x:auto}.rvg{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.wrap{padding:14px 12px}.rvg{grid-template-columns:repeat(2,minmax(0,1fr))}
+.tbl>table>thead{display:none}.tbl>table,.tbl>table>tbody,.tbl>table>tbody>tr,.tbl>table>tbody>tr>td{display:block;width:100%}
+.tbl>table>tbody>tr{padding:6px 0;border-bottom:1px solid var(--bd)}.tbl>table>tbody>tr>td{border:0;padding:3px 8px}.tbl>table>tbody>tr>td.n{white-space:normal}
+.tbl>table>tbody>tr.open{border-bottom:0}.tbl>table>tbody>tr.rvrow>td{padding:0 0 12px}}
 </style>
 </head>
 <body>
@@ -103,7 +108,7 @@ table.plan td{padding:6px 8px}
       <div class=err id=err></div>
     </div>
   </div>
-  <div id=app hidden>
+  <div id=app hidden style="display:flex;flex-direction:column;gap:14px">
     <div class="panel strip" id=strip></div>
     <div class=grid>
       <div class=panel style="--tc:var(--violet)">
