@@ -402,16 +402,16 @@
       /* not active: what it does and never does, one compact panel - two rows of small boxes, centred */
       var share = at && at.split_pct > 0, ib = idleAtone();
       var cb = function(k, v, sub, c, cls){ return '<div class="ap-cb' + (cls ? ' ' + cls : '') + '" style="--rc:' + c + '"><em>' + k + '</em><b>' + v + '</b><small>' + sub + '</small></div>'; };
-      put("sd-ado", '<div class=sv-ph><h3>What Autopilot Grant</h3>' + tag("q", "enforced on chain") + '</div>' +
-        '<div class=ap-dd><u class=ok>Does</u><div class=ap-row>' +
+      put("sd-ado", '<div class=sv-ph><h3>What Autopilot does or doesn\'t</h3></div>' +
+        '<div class=ap-dd><i class="ap-ln ok" aria-hidden=true></i><div class=ap-row>' +
           cb("Keeps stake active", "24/7", ib ? ib + " ATONE idle on inactive validators" : "through a long winter or a busy month", "#2bc8d6") +
           cb("Strategizes", "Better APR", "among your validators", "#b9b0ff") +
           cb("Restakes", "Rewards", "if you switch it on", "#2ee06a") +
           cb("You grant", "It runs", "you revoke, it stops", "#2ee06a") +
-        '</div><u class=no>Never Does</u><div class=ap-row>' +
+        '</div><i class="ap-ln no" aria-hidden=true></i><div class=ap-row>' +
           cb("Send", "Never", "nor spend your ATONE", "#ff6a6a", "no") +
           cb("Unstake", "Never", "your stake stays staked", "#ff6a6a", "no") +
-          cb("Custody", "Never", "it stays in your wallet", "#ff6a6a", "no") +
+          cb("Custody", "Never", "stays in your wallet", "#ff6a6a", "no") +
           cb("GATA's share", share ? at.split_pct + "%" : "0%", "GATA funds your transactions", "#2ee06a", "ok") +
         '</div></div>');
       put("sd-asky", "");
@@ -474,7 +474,7 @@
     h += '<div class=ars-fig><em>' + (on ? 'Adds a year' : 'A year') + '</em><b>' + (add > 0 ? '+' + fmt(pos.total * add) + '<i> ATONE</i>' : '\u2014') + '</b>' +
       (add > 0 ? '<small>+' + (add * 100).toFixed(1) + '% APR</small>' : '') + '</div>';
     /* the rules sit at the foot, over the switch */
-    h += '<div class=ars-foot><div class=ars-two><div><em>Frequency</em><b>12 hours</b></div><div><em>Minimum</em><b>1 ATONE</b></div></div>' +
+    h += '<div class=ars-foot><div class=ars-two><div><em>Frequency</em><b>12 hours</b><small>twice a day</small></div><div><em>Minimum</em><b>1 ATONE</b><small>of rewards a run</small></div></div>' +
       '<div class=ars-how>Auto-compounds reward on your <b>best-paying</b> validator</div></div>';
     h += !pos ? '<button class="sv-btn go sd-go" type=button data-shell-connect>Connect a wallet</button>'
       : !pos.rows.length ? '<button class="sv-btn go sd-go" type=button data-act=stake>Stake ATONE</button>'

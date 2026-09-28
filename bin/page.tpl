@@ -5000,6 +5000,11 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
 /* the compact panel: two labelled rows of four small boxes, centred in the panel */
 #sv-auto .ap-dd{flex:1 1 auto;display:flex;flex-direction:column;justify-content:stretch;gap:8px;min-height:0}
+/* the rows told apart by two shining lines only - green over what it does, red over what it never does */
+#sv-auto .ap-dd>.ap-ln{display:block;flex:0 0 2px;height:2px;border-radius:2px;margin:2px 0}
+#sv-auto .ap-dd>.ap-ln.ok{background:linear-gradient(90deg,transparent,#2ee06a 18%,#9ff5bd 50%,#2ee06a 82%,transparent);box-shadow:0 0 10px rgba(46,224,106,.7),0 0 22px rgba(46,224,106,.35)}
+#sv-auto .ap-dd>.ap-ln.no{background:linear-gradient(90deg,transparent,#ff5a4a 18%,#ffb0a4 50%,#ff5a4a 82%,transparent);box-shadow:0 0 10px rgba(255,90,74,.7),0 0 22px rgba(255,90,74,.35)}
+#sv-auto .ap-dd:not(#z){gap:10px}
 /* the two rows share the panel's height equally, each box filling its row */
 #sv-auto .ap-dd>.ap-row{flex:1 1 0;min-height:0}
 #sv-auto .ap-row>.ap-cb{justify-content:center;height:100%;box-sizing:border-box}
@@ -5041,8 +5046,22 @@ html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
   background:rgba(46,224,106,.07);text-wrap:balance}
 #sv-auto .ars-how b{color:var(--sv-green)}
 #sv-auto .ars-foot{margin-top:auto;padding-top:8px}
+/* Frequency and Minimum built as the other boxes: the label with its accent line, the value, a caption - squarer */
+#sv-auto .ars-two>div:not(#z){justify-content:center;gap:4px;padding:14px 8px 15px;min-height:96px;box-sizing:border-box}
+#sv-auto .ars-two em{position:relative;padding-bottom:5px}
+#sv-auto .ars-two em::after{content:"";position:absolute;left:50%;bottom:0;width:24px;height:2px;margin-left:-12px;border-radius:2px;background:var(--sv-green)}
+#sv-auto .ars-two b:not(#z){font-size:20px}
+#sv-auto .ars-two small{font-size:10.5px;color:var(--ws)}
+@media(min-width:901px) and (max-height:1000px){#sv-auto .ars-two>div:not(#z){min-height:0;padding:9px 8px 10px}}
+@media(min-width:901px) and (min-height:821px) and (max-height:1000px){#sv-auto .ars-two small{display:none}}
+@media(min-width:901px) and (max-height:760px){#sv-auto .ars-two>div:not(#z){min-height:0;padding:7px 6px 8px}#sv-auto .ars-two small{display:none}#sv-auto .ars-two b:not(#z){font-size:16px}}
+@media(min-width:901px) and (max-height:700px){#sv-auto .ars-two>div:not(#z){flex-direction:column;padding:4px 6px}#sv-auto .ars-two em{padding-bottom:3px}#sv-auto .ars-two em::after{display:none}#sv-auto .ars-two b:not(#z){font-size:14px}}
+/* narrower columns: the year box and the compounding line a step tighter */
+@media(min-width:901px) and (max-width:1599px){#sv-auto #sd-ars .ars-fig:not(#z){padding-top:9px;padding-bottom:10px}#sv-auto #sd-ars .ars-fig b:not(#z){font-size:26px}
+  #sv-auto #sd-ars .ars-how:not(#z){font-size:11px;line-height:1.35;padding:7px 8px}}
+@media(min-width:901px) and (max-height:640px){#sv-auto .ars-two>div:not(#z){flex-direction:row;align-items:baseline;justify-content:center;gap:6px;padding:4px 6px}#sv-auto .ars-two em{padding-bottom:0}#sv-auto .ars-two b:not(#z){font-size:13px}#sv-auto #sd-ars .ars-fig small:not(#z){font-size:10px;line-height:1.2}#sv-auto #sd-ars .ars-foot:not(#z){padding-top:2px}}
 @media(min-width:901px) and (max-height:640px){#sv-auto #sd-ars .ars-fig em:not(#z){display:none}#sv-auto #sd-ars .ars-fig:not(#z){gap:0;padding:4px 8px}
-  #sv-auto #sd-ars .ars-foot:not(#z){padding-top:4px}#sv-auto #sd-ars .ars-how:not(#z){font-size:10px;line-height:1.25;padding:4px 6px}#sv-auto #sd-ars .sd-go:not(#z){margin-top:5px;height:30px}}
+  #sv-auto #sd-ars .ars-foot:not(#z){padding-top:4px}#sv-auto #sd-ars .ars-how:not(#z){font-size:10px;line-height:1.25;padding:4px 6px}#sv-auto #sd-ars .sd-go:not(#z){margin-top:3px;height:26px}}
 #sv-auto #sd-ars .sd-go{margin-top:8px}
 #sv-auto #sd-ars .sd-go.ars-off:not(#z){background:rgba(255,77,31,.12);border:1px solid rgba(255,110,70,.6);color:#ffb7a3;box-shadow:none}
 @media(min-width:901px) and (max-height:760px){#sv-auto .ars-fig{padding:9px 8px;margin-top:6px}#sv-auto .ars-fig b{font-size:24px}#sv-auto .ars-rules{gap:3px;margin-top:6px;font-size:11px}}

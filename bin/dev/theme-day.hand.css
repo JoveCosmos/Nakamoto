@@ -323,3 +323,5 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-auto .ars-two>div{border-color:#e3ded3;background:linear-gradient(0deg,rgba(22,115,58,.07),#fbf9f3 70%)}
   html[data-theme=light]:not([data-mono]) #sv-auto .ars-two b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #sv-auto .ars-how{border-color:rgba(22,115,58,.35);background:rgba(22,115,58,.06)}html[data-theme=light]:not([data-mono]) #sv-auto .ars-how b{color:#16733a}
+  html[data-theme=light]:not([data-mono]) #sv-auto .ap-dd>.ap-ln.ok{background:linear-gradient(90deg,transparent,#16733a 18%,#2ee06a 50%,#16733a 82%,transparent);box-shadow:0 0 8px rgba(22,115,58,.4)}
+  html[data-theme=light]:not([data-mono]) #sv-auto .ap-dd>.ap-ln.no{background:linear-gradient(90deg,transparent,#c0391a 18%,#ff6a4d 50%,#c0391a 82%,transparent);box-shadow:0 0 8px rgba(192,57,26,.4)}
