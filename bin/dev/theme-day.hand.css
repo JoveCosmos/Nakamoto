@@ -354,3 +354,5 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .grcard .gr-need>div.ok{border-color:rgba(15,122,114,.45)}html[data-theme=light]:not([data-mono]) .grcard .gr-need>div.ok b{color:#0b5a53}
   html[data-theme=light]:not([data-mono]) .grcard .gr-need>div.no{border-color:rgba(194,65,12,.45)}html[data-theme=light]:not([data-mono]) .grcard .gr-need>div.no b{color:#b3400f}
   html[data-theme=light]:not([data-mono]) .grcard .gr-need b,html[data-theme=light]:not([data-mono]) .grcard .gr-who b{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rw{border-color:rgba(15,122,114,.35);background:linear-gradient(180deg,rgba(15,122,114,.08),rgba(15,122,114,.03))}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rw b{color:#0b5a53}
