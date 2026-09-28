@@ -4087,12 +4087,17 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .se-rs>b{font-size:21px}
 .se-rs .se-rsm{color:var(--sv-green);font-weight:700}
 /* a short window has no room for it under the boxes: the doors must stand in the panel */
-@media(min-width:901px) and (max-height:760px){#sv-over .se-rs{display:none}}
+/* short windows keep the restake card: one line, the doors and the boxes a touch tighter */
+@media(min-width:901px) and (max-height:760px){
+  #sv-over .se-rs{padding:6px 12px 6px 14px}#sv-over .se-rs>b{font-size:17px}#sv-over .se-rs small{display:none}
+  #sv-over .se-rs>b::after{content:attr(data-more);margin-left:8px;font-size:11px;font-weight:600;color:var(--sv-green)}}
 /* shorter still: the year card and its boxes compact, so both doors stand inside the panel */
 @media(min-width:901px) and (max-height:700px){
   #sv-over .se-card{padding:8px 14px 9px}#sv-over .se-card>b{font-size:30px}
   #sv-over .se-row .sd-fig{padding-top:5px;padding-bottom:6px}#sv-over .se-row .sd-fig>b{font-size:17px}
   #sv-over .sd-go2 .sd-go,#sv-over #sd-move .sd-go{height:34px}}
+@media(min-width:901px) and (max-height:700px){#sv-over .se-row .sd-fig small{display:none}#sv-over .se-mid,#sv-over .se-ex{gap:6px}}
+@media(min-width:901px) and (max-height:640px){#sv-over .se-card small.se-apr{display:none}#sv-over .se-rs{padding-top:4px;padding-bottom:4px}#sv-over .sd-go2 .sd-go{height:32px}}
 @media(min-width:901px) and (max-height:640px){
   #sv-over .se-card{padding:6px 14px 7px;gap:0}#sv-over .se-card>b{font-size:26px}#sv-over .se-card em{font-size:8px}
   #sv-over .se-mid,#sv-over .se-ex{gap:6px}#sv-over .se-row .sd-fig{padding-top:4px;padding-bottom:4px}
@@ -4143,6 +4148,18 @@ padding:2px 14px 2px 20px;border:1px solid var(--wbd2);border-left:0;border-radi
 .sd-mv.four .sd-fig:last-child{grid-column:auto}
 .sd-mv .sd-fig{align-items:center;text-align:center}
 .sd-mv .sd-fig>b{justify-content:center}
+/* Move your stake (and Autopilot's same cards): the figure large, in an engraved well like the strip's,
+   the card lit from the top by its own colour */
+:is(#sd-move,#sd-asky) .sd-mv .sd-fig{gap:6px;background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 20%,transparent),transparent 62%),linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+:is(#sd-move,#sd-asky) .sd-mv .sd-fig::after{display:none}
+:is(#sd-move,#sd-asky) .sd-mv .sd-fig em{font-size:10px;letter-spacing:.2em;color:var(--ws)}
+:is(#sd-move,#sd-asky) .sd-mv .sd-fig>b{font-size:34px;line-height:1;padding:8px 16px 9px;border-radius:10px;border:1px solid rgba(0,0,0,.45);
+  background:radial-gradient(120% 160% at 50% 0%,color-mix(in srgb,var(--rc) 12%,transparent),transparent 65%),linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.2));
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.6),inset 0 -1px 0 rgba(255,255,255,.05),0 1px 0 rgba(255,255,255,.05)}
+:is(#sd-move,#sd-asky) .sd-mv .sd-fig:last-child>b{font-size:36px;padding-left:22px;padding-right:22px}
+:is(#sd-move,#sd-asky) .sd-mv .sd-fig small{font-size:11.5px;color:var(--ws)}
+@media(min-width:901px) and (max-height:700px){:is(#sd-move,#sd-asky) .sd-mv .sd-fig>b{font-size:26px;padding:5px 12px 6px}:is(#sd-move,#sd-asky) .sd-mv .sd-fig:last-child>b{font-size:28px}:is(#sd-move,#sd-asky) .sd-mv .sd-fig{gap:4px}}
 /* the boxes stand where the centred block put them (equal room above the block and below it); the
    year rises into the middle of the room between the title and the boxes: the hero takes its own
    height plus half the spare room and centres itself in it, the ::after spacer the other half */

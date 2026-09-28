@@ -664,6 +664,8 @@
   html[data-theme=light]:not([data-mono]) .fpt0{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .fpt1{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) .fpt2{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) :is(#sd-move,#sd-asky) .sd-mv .sd-fig{background:var(--surface-2);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) :is(#sd-move,#sd-asky) .sd-mv .sd-fig>b{border:1px solid var(--bg);background:var(--bg);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sd-off{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .se-card{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .se-card::before{box-shadow:none}
@@ -985,4 +987,9 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .fp-b.b1{--c:#e8a024}html[data-theme=light]:not([data-mono]) .fp-b.b2{--c:#2bb35e}
   html[data-theme=light]:not([data-mono]) .fp-b.on{background:var(--c);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .fp-k{border-color:#e8603a}html[data-theme=light]:not([data-mono]) .fp-k.b1{border-color:#e8a024}html[data-theme=light]:not([data-mono]) .fp-k.b2{border-color:#2bb35e}
+  /* Move your stake's wells in day: a soft recess on the card */
+  html[data-theme=light]:not([data-mono]) #sv :is(#sd-move,#sd-asky) .sd-mv .sd-fig>b{border-color:rgba(60,50,20,.14);
+    background:radial-gradient(120% 160% at 50% 0%,color-mix(in srgb,var(--rc) 10%,transparent),transparent 65%),linear-gradient(180deg,rgba(60,50,20,.07),rgba(60,50,20,.025));
+    box-shadow:inset 0 2px 5px rgba(60,50,20,.16),inset 0 -1px 0 rgba(255,255,255,.7),0 1px 0 rgba(255,255,255,.8)}
+
 

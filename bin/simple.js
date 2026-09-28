@@ -158,7 +158,7 @@
     /* restaking monthly: the rewards claimed and staked again each month earn too - a year of it against
        the plain year (today's rate carried forward, compounded twelve times) */
     var cy = stake * (Math.pow(1 + rate / 12, 12) - 1), more = cy - y;
-    var rst = rate > 0 ? '<div class="sd-fig se-rs" style="--rc:var(--sv-teal)"><em>Restake monthly</em><b><span class=sd-gain>+' + one(cy / 1e6) + '</span><i class=u>ATONE a year</i></b>' +
+    var rst = rate > 0 ? '<div class="sd-fig se-rs" style="--rc:var(--sv-teal)"><em>Restake monthly</em><b data-more="+' + one(more / 1e6) + ' more"><span class=sd-gain>+' + one(cy / 1e6) + '</span><i class=u>ATONE a year</i></b>' +
       '<small><span class=se-rsm>+' + one(more / 1e6) + '</span> more than leaving rewards unclaimed</small></div>' : '';
     /* the same block as the connected one: the figure in ATONE, the rate under it */
     if(ex) return '<div class=se-ex><div class=se-hero><div class=se-card><em>A year</em><b><span class=sd-gain>+' + one(y / 1e6) + '</span><i>ATONE</i></b><small class=se-apr>' + pct(rate) + ' APR</small></div></div>' +
