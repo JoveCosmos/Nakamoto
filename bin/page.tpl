@@ -1573,6 +1573,18 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
 #sv-over #sd-sky .se-row .sd-fig{background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 9%,transparent),rgba(255,255,255,.012) 70%)}
 /* stake on inactive validators: a red tag in What your stake earns' title row */
 #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:#ffd9cf;border-color:rgba(255,140,110,.65);background:rgba(255,77,31,.32);font-weight:600;white-space:nowrap}
+/* each banded section is framed in its band's colour: a thin fill down both sides and along the foot, over the
+   border, so nothing moves */
+:is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist){position:relative}
+:is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist)::after{content:"";display:block!important;position:absolute;inset:-1px;border-radius:12px;padding:0 3px 3px;background:linear-gradient(315deg,var(--bandf));pointer-events:none;z-index:2;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+#sv-over #sd-list{--bandf:#0f6b67,#123a52 58%,#141633}
+#sv-over #sd-sky{--bandf:#8a5a12,#4a2f12 58%,#1f1630}
+#sv-over #sd-move{--bandf:#0a3a22,#072a19 58%,#05140d}
+#p-dele #wbody #wk-mv{--bandf:#4130a0,#271c6c 58%,#150f3b}
+#sv-proplist{--bandf:#1d4f8f,#173257 58%,#141633}
+#sv-daop{--bandf:#5f6216,#393b15 58%,#19191f}
+#sv-govlist{--bandf:#7d2e6e,#461f45 58%,#1a1230}
 /* the band tags, a size smaller: one height in all three panels, the moves count a tag like the rest */
 #sv-over .sd-col>.sv-ph .sv-tag{padding:2px 7px;font-size:10px;line-height:1.35;gap:4px}
 #sv-over .sd-col>.sv-ph .sv-tag.q{font-size:8px;letter-spacing:.06em}

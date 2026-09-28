@@ -219,6 +219,14 @@
     html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-hero>.se-card{background:var(--warn-bg)}
     html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-row .sd-fig{background:color-mix(in srgb,var(--rc) 9%,transparent)}
     html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:var(--danger);border-color:var(--danger-bar);background:var(--danger-bar)}
+    html[data-theme=light]:not([data-mono]) :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist)::after{background:var(--bandf)}
+    html[data-theme=light]:not([data-mono]) #sv-over #sd-list{--bandf:var(--accent),var(--accent) 58%,var(--ink)}
+    html[data-theme=light]:not([data-mono]) #sv-over #sd-sky{--bandf:var(--warn),var(--warn) 58%,var(--ink)}
+    html[data-theme=light]:not([data-mono]) #sv-over #sd-move{--bandf:#FFFFFF,#FFFFFF 58%,#FFFFFF}
+    html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mv{--bandf:var(--accent),var(--ink) 58%,#FFFFFF}
+    html[data-theme=light]:not([data-mono]) #sv-proplist{--bandf:var(--accent),var(--accent) 58%,var(--ink)}
+    html[data-theme=light]:not([data-mono]) #sv-daop{--bandf:var(--muted),var(--ink) 58%,var(--ink)}
+    html[data-theme=light]:not([data-mono]) #sv-govlist{--bandf:var(--muted),var(--muted) 58%,var(--ink)}
     html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:var(--ink);border-color:var(--accent);background:var(--surface-2)}
     html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag{color:var(--ink);border-color:var(--accent);background:var(--surface)}
     html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag.g{color:var(--accent);border-color:var(--accent);background:var(--surface)}
@@ -1112,4 +1120,13 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph .sv-tag.a{color:#2a1600;border-color:#ffb02e;background:#ffb02e;font-weight:700}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-row .sd-fig{background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 10%,transparent),#fbf9f3 70%)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky :is(.se-row .sd-fig,.se-card)::before{box-shadow:none}
+  /* the section frames keep their band colours in day */
+  html[data-theme=light]:not([data-mono]) :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist)::after{background:linear-gradient(315deg,var(--bandf))}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-list{--bandf:#0f6b67,#123a52 58%,#141633}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky{--bandf:#8a5a12,#4a2f12 58%,#1f1630}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-move{--bandf:#0a3a22,#072a19 58%,#05140d}
+  html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mv{--bandf:#4130a0,#271c6c 58%,#150f3b}
+  html[data-theme=light]:not([data-mono]) #sv-proplist{--bandf:#1d4f8f,#173257 58%,#141633}
+  html[data-theme=light]:not([data-mono]) #sv-daop{--bandf:#5f6216,#393b15 58%,#19191f}
+  html[data-theme=light]:not([data-mono]) #sv-govlist{--bandf:#7d2e6e,#461f45 58%,#1a1230}
 
