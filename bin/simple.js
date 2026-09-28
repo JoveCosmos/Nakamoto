@@ -196,7 +196,8 @@
     var band = function(k){ return k < n / 3 ? 0 : k < 2 * n / 3 ? 1 : 2; };
     var at = {}, x = [], amt = [0, 0, 0], out = 0, tot = 0, i;
     for(i = 0; i < n; i++){ at[V[i][3]] = i; x[i] = mine ? 0 : V[i][1]; }
-    if(mine) pos.rows.forEach(function(r){ var k = at[r.id]; if(k == null || r.inactive) out += r.x; else x[k] += r.x; });
+    var nOut = 0;
+    if(mine) pos.rows.forEach(function(r){ var k = at[r.id]; if(k == null || r.inactive){ out += r.x; nOut++; } else x[k] += r.x; });
     for(i = 0; i < n; i++){ amt[band(i)] += x[i]; tot += x[i]; }
     tot += out;
     var sh = function(v){ var p = tot ? v / tot * 100 : 0; return p > 0 && p < 0.1 ? "<0.1" : p.toFixed(p > 0 && p < 10 ? 1 : 0); };
@@ -218,9 +219,11 @@
     var span = [cut1, cut2 - cut1, n - cut2];
     var br = sums.slice(0, 3).map(function(q, k){ return '<div class="fp-k b' + k + '" style="flex:' + span[k] + ' 1 0"><em>' + q[0] + '</em><b class=fpt' + k + '>' + sh(q[1]) + '%</b><small>' +
       (q[1] >= 1e12 ? big(q[1]) : fmt(q[1])) + ' ATONE</small></div>'; }).join("");
+    /* stake outside the set, said in the graph's empty top-right corner (the small validators' bars are low), in red */
+    var offh = out > 0 ? '<span class=fp-out>' + fmt(out) + ' ATONE - ' + nOut + ' validator' + (nOut === 1 ? '' : 's') + ' inactive</span>' : '';
     return head.replace('</h3></div>', '</h3>' + (mine ? tag("q", "on " + held + " of " + n + " validators") : tag("q", n + " validators")) + '</div>') +
-      '<div class=fp-bc>' + bars + '</div><div class=fp-ax><span>#1 largest</span><span>smallest #' + n + '</span></div>' +
-      '<div class=fp-br>' + br + '</div>' + (out > 0 ? '<div class=sd-off>' + fmt(out) + ' ATONE on inactive validators earns nothing</div>' : '');
+      '<div class=fp-bc>' + bars + offh + '</div><div class=fp-ax><span>#1 largest</span><span>smallest #' + n + '</span></div>' +
+      '<div class=fp-br>' + br + '</div>';
   }
 
   function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }
