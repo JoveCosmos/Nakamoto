@@ -1162,37 +1162,91 @@ rememberGridH();
     var c = document.activeElement;
     if(c && c.classList && c.classList.contains("cell")){ ev.preventDefault(); vshow(+c.dataset.v); } });
 
-  E("qbtn").addEventListener("click", function(){ POP.open(qpop); });
+  E("qbtn").addEventListener("click", function(){ POP.open(qpop); kpLive(true); });
   var spop = E("spop");
-  if(spop) E("sbtn").addEventListener("click", function(){ POP.open(spop); kpGoal(); });
-  /* the staking goal, read from the chain's mint parameters when the card opens: below it inflation climbs toward
-     its maximum, above it falls toward its minimum */
-  function kpGoal(){
-    var box = E("kpgoal"); if(!box || box.dataset.done) return;
-    fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/mint/v1beta1/params", { cache: "no-store" }).then(function(r){ return r.json(); })
-      .then(function(x){ var p = x.params || {}, g = parseFloat(p.goal_bonded), hi = parseFloat(p.inflation_max), lo = parseFloat(p.inflation_min);
-        if(!(g > 0)) return;
-        var st = D.set || {}, sup = +st.supply || 0, bon = +st.bonded || 0, b = box.querySelector("b"), sm = box.querySelector("small");
-        var tgt = g * sup, need = tgt - bon, whole = function(u){ return Math.round(u / 1e6).toLocaleString("en-US"); };
-        b.textContent = (g * 100).toFixed(0) + "%";
-        sm.textContent = sup ? whole(tgt) + " ATONE" : "";
-        /* the gap, as the Concentration card states its own: from where bonding stands to the goal, and what inflation does meanwhile */
-        var mv = E("kpgoalmv"), inf = st.inflation, atHi = inf != null && inf >= hi - 1e-6, atLo = inf != null && inf <= lo + 1e-6;
-        if(mv && sup){
-          mv.hidden = false;
-          mv.innerHTML = need > 0
-            ? "To go from <b>" + (bon / sup * 100).toFixed(1) + "%</b> to <b>" + (g * 100).toFixed(0) + "%</b> staked, <b class=or>" + whole(need) + " ATONE</b> more would have to be staked." +
-              " Until then inflation " + (atHi ? "holds at its <b>" + (hi * 100).toFixed(0) + "%</b> maximum." : "climbs toward <b>" + (hi * 100).toFixed(0) + "%</b>.")
-            : "Staking is <b>" + (bon / sup * 100).toFixed(1) + "%</b>, past the <b>" + (g * 100).toFixed(0) + "%</b> goal by <b class=or>" + whole(-need) + " ATONE</b>." +
-              " Inflation " + (atLo ? "holds at its <b>" + (lo * 100).toFixed(0) + "%</b> minimum." : "falls toward <b>" + (lo * 100).toFixed(0) + "%</b>.");
-        }
-        box.dataset.done = 1; }).catch(function(){});
+  if(spop) E("sbtn").addEventListener("click", function(){ POP.open(spop); kpLive(true); });
+  /* ── the three cards (ATONE staked, Bonus share, Concentration) read live: the set as the page has it this block,
+     the chain's own figures (supply, bonded, inflation, provisions, tax, eta and its params, the mint goal) fetched
+     when a card opens and every minute while one stays open. What only the index knows (delegators, the proposer
+     Nakamoto) keeps the build's figure. ── */
+  var KPL = { at: 0, busy: false, c: null };
+  function kpOpen(){ return ["spop", "qpop", "cpop"].some(function(id){ var e = E(id); return e && e.classList.contains("on"); }); }
+  function kpChain(){
+    if(KPL.busy || (KPL.c && Date.now() - KPL.at < 60000)) return Promise.resolve();
+    KPL.busy = true;
+    var A = window.__API || "https://atomone-api.gatadao.com", g = function(p){ return fetch(A + p, { cache: "no-store" }).then(function(r){ return r.json(); }); };
+    return Promise.all([g("/cosmos/bank/v1beta1/supply/by_denom?denom=uatone"), g("/cosmos/staking/v1beta1/pool"), g("/cosmos/mint/v1beta1/inflation"),
+                        g("/cosmos/mint/v1beta1/annual_provisions"), g("/cosmos/distribution/v1beta1/params"), g("/cosmos/mint/v1beta1/params"),
+                        g("/cosmos/distribution/v1beta1/nakamoto_bonus_coefficient")])
+      .then(function(x){
+        var nb = (x[4].params || {}).nakamoto_bonus || {}, mp = x[5].params || {};
+        KPL.c = { supply: +((x[0].amount || {}).amount), bonded: +((x[1].pool || {}).bonded_tokens), infl: parseFloat(x[2].inflation), prov: parseFloat(x[3].annual_provisions),
+                  tax: parseFloat((x[4].params || {}).community_tax), step: parseFloat(nb.step), floor: parseFloat(nb.minimum_coefficient), cap: parseFloat(nb.maximum_coefficient),
+                  eta: parseFloat(x[6].coefficient), goal: parseFloat(mp.goal_bonded), imax: parseFloat(mp.inflation_max), imin: parseFloat(mp.inflation_min) };
+        KPL.at = Date.now(); })
+      .catch(function(){}).then(function(){ KPL.busy = false; });
   }
+  function kpSet(key, html){ Array.prototype.forEach.call(document.querySelectorAll('[data-kp="' + key + '"]'), function(e){ if(e.innerHTML !== html) e.innerHTML = html; }); }
+  function kpFill(){
+    var whole = function(u){ return Math.round(u / 1e6).toLocaleString("en-US"); }, TH = 3.0;
+    /* the set, this block: the rule's groups as the builder takes them (the remainder to the low group) */
+    var V = VALS.slice().sort(function(a, b){ return b[1] - a[1]; }), N = V.length;
+    if(N >= 3){
+      var S = 0; V.forEach(function(v){ S += v[1]; });
+      var MEAN = S / N, g = Math.floor(N / 3), gl = N - 2 * g, Hi = 0, Lo = 0, i;
+      for(i = 0; i < g; i++) Hi += V[i][1];
+      for(i = N - gl; i < N; i++) Lo += V[i][1];
+      var ratio = Lo ? (Hi / g) / (Lo / gl) : Infinity, rising = ratio >= TH;
+      /* the stake that must move for the ratio to reach 3x, order kept: every holding pulled toward the mean by one factor */
+      var A = Hi / g - MEAN, B = Lo / gl - MEAN, den = A - TH * B, lam = den ? MEAN * (TH - 1) / den : 1, tmin = V[N - 1][1];
+      if(tmin < MEAN) lam = Math.min(lam, MEAN / (MEAN - tmin) * 0.999);
+      lam = Math.max(0, lam);
+      var move = 0; V.forEach(function(v){ move += Math.max(0, v[1] - (MEAN + lam * (v[1] - MEAN))); });
+      kpSet("N", String(N)); kpSet("HIGH", whole(Hi / g)); kpSet("LOW", whole(Lo / gl)); kpSet("GROUP", String(g)); kpSet("GROUP_LO", String(gl));
+      kpSet("RATIO", ratio.toFixed(2)); kpSet("THRESH", TH.toFixed(2)); kpSet("MOVE", whole(move));
+      kpSet("REV_WHEN", (rising ? "&lt; " : "&ge; ") + TH.toFixed(2) + "&times;");
+      kpSet("MOVE_FROM", ratio > TH ? "Largest" : "Smallest"); kpSet("MOVE_TO", ratio > TH ? "smallest" : "largest");
+      var ru = document.querySelectorAll("#qpop .kp-ru"); if(ru.length === 2){ ru[0].classList.toggle("hot", rising); ru[1].classList.toggle("hot", !rising); }
+      var mh = E("meanhov"); if(mh) mh.setAttribute("data-tip", "The average " + whole(MEAN) + " ATONE");
+    }
+    var c = KPL.c; if(!c) return;
+    if(c.supply > 0 && c.bonded > 0){
+      var bp = c.bonded / c.supply * 100;
+      kpSet("BONDED", whole(c.bonded)); kpSet("SUPPLY", whole(c.supply)); kpSet("BONDED_PCT", bp.toFixed(1));
+      var bar = document.querySelector("#spop .kp-bar i"); if(bar) bar.style.width = bp.toFixed(1) + "%";
+    }
+    if(c.infl >= 0) kpSet("INFL", (c.infl * 100).toFixed(0));
+    if(c.prov > 0 && c.tax >= 0){ kpSet("MINTED", whole(c.prov)); kpSet("POOL", whole(c.prov * (1 - c.tax))); kpSet("CTAKE", whole(c.prov * c.tax)); kpSet("TAX", (c.tax * 100).toFixed(0)); }
+    if(c.eta >= 0){
+      var up = V.length >= 3 && document.querySelector("#qpop .kp-ru.hot") === document.querySelectorAll("#qpop .kp-ru")[0];
+      kpSet("ETA", c.eta.toFixed(2)); kpSet("ETA_PCT", (c.eta * 100).toFixed(0));
+      if(c.step > 0) kpSet("ETA_NEXT", (up ? Math.min(c.cap || 1, c.eta + c.step) : Math.max(c.floor || 0, c.eta - c.step)).toFixed(2));
+      if(c.step > 0) kpSet("STEP", c.step.toFixed(2)); if(c.floor >= 0) kpSet("FLOOR", c.floor.toFixed(2)); if(c.cap > 0) kpSet("CAP", c.cap.toFixed(2));
+    }
+    /* the staking goal: the last box, and the gap below it, stated as the Concentration card states its own */
+    var box = E("kpgoal"), mv = E("kpgoalmv");
+    if(box && c.goal > 0 && c.supply > 0){
+      var tgt = c.goal * c.supply, need = tgt - c.bonded, now = c.bonded / c.supply * 100, atHi = c.infl >= c.imax - 1e-6, atLo = c.infl <= c.imin + 1e-6;
+      /* past the goal the chain's mint rule turns inflation around, toward its minimum */
+      box.querySelector("b").textContent = (c.goal * 100).toFixed(0) + "%";
+      box.querySelector("small").textContent = need > 0 ? "past it, inflation reverses toward " + (c.imin * 100).toFixed(0) + "% minimum"
+        : atLo ? "inflation holds at its " + (c.imin * 100).toFixed(0) + "% minimum" : "inflation falls toward " + (c.imin * 100).toFixed(0) + "% minimum";
+      if(mv){ mv.hidden = false;
+        mv.innerHTML = need > 0
+          ? "To go from <b>" + now.toFixed(1) + "%</b> to <b>" + (c.goal * 100).toFixed(0) + "%</b> staked, <b class=or>" + whole(need) + " ATONE</b> more would have to be staked." +
+            " Until then inflation " + (atHi ? "holds at its <b>" + (c.imax * 100).toFixed(0) + "%</b> maximum." : "climbs toward <b>" + (c.imax * 100).toFixed(0) + "%</b>.")
+          : "Staking is <b>" + now.toFixed(1) + "%</b>, past the <b>" + (c.goal * 100).toFixed(0) + "%</b> goal by <b class=or>" + whole(-need) + " ATONE</b>." +
+            " Inflation " + (atLo ? "holds at its <b>" + (c.imin * 100).toFixed(0) + "%</b> minimum." : "falls toward <b>" + (c.imin * 100).toFixed(0) + "%</b>."); }
+    }
+  }
+  function kpLive(fetchToo){ kpFill(); if(fetchToo) kpChain().then(kpFill); }
+  /* while a card is open: the set's figures follow every block, the chain's every minute */
+  window.addEventListener("thermo:live", function(){ if(kpOpen()) kpLive(Date.now() - KPL.at > 60000); });
   /* the C card explains what steers eta; opened from the page it stands alone,
      opened from the coefficient card it carries "fromq" (the way-back button) */
   var cpop = E("cpop"), cb = E("cbtn");
   if(cb && cpop) cb.addEventListener("click", function(){
-    cpop.classList.remove("fromq"); POP.open(cpop); });
+    cpop.classList.remove("fromq"); POP.open(cpop); kpLive(true); });
 
   /* the range handles are handles only: the row titles open the cards */
 })();

@@ -5440,35 +5440,35 @@ html[data-tab=connect] .l2host{display:none}
   <div class=kp-h>
     <button class=backq id=backq type=button aria-label="Back to the bonus share">&larr; <span class=lc>&eta;</span></button>
     <span class="disc dc"><svg class=kg aria-hidden=true><use href="#g-c"/></svg></span>
-    <div><h2>Concentration</h2><p>How much more the largest third of validators holds than the smallest third, on average</p></div></div>
+    <div><h2>Concentration</h2><p>How much more the largest third holds than the smallest</p></div></div>
   <div class=kp-b>
     <div class=kp-eq>
-      <div class=kp-hv><em>Largest third</em><b>{{HIGH}}</b><small>average of {{GROUP}} validators</small></div>
+      <div class=kp-hv><em>Largest third</em><b><span data-kp=HIGH>{{HIGH}}</span></b><small>average of <span data-kp=GROUP>{{GROUP}}</span></small></div>
       <i aria-hidden=true>&divide;</i>
-      <div class=kp-hv><em>Smallest third</em><b>{{LOW}}</b><small>average of {{GROUP_LO}} validators</small></div>
+      <div class=kp-hv><em>Smallest third</em><b><span data-kp=LOW>{{LOW}}</span></b><small>average of <span data-kp=GROUP_LO>{{GROUP_LO}}</span></small></div>
       <i aria-hidden=true>=</i>
-      <div class="kp-hv kp-res"><em>Concentration</em><b class=or>{{RATIO}}&times;</b><small>times as large</small></div>
+      <div class="kp-hv kp-res"><em>Concentration</em><b class=or><span data-kp=RATIO>{{RATIO}}</span>&times;</b><small>times as large</small></div>
     </div>
     <div class="kp-g kp-g3">
-      <div class=kp-f><em><span class=lc>&eta;</span> reverses when</em><b>{{REV_WHEN}}</b></div>
+      <div class=kp-f><em><span class=lc>&eta;</span> reverses when</em><b><span data-kp=REV_WHEN>{{REV_WHEN}}</span></b></div>
       <div class=kp-f><em>Could halt the chain</em><b><span class=haltn>{{NK}}</span></b><small>validators together</small></div>
-      <div class=kp-f><em>Validators</em><b>{{N}}</b><small>in the active set</small></div>
+      <div class=kp-f><em>Validators</em><b><span data-kp=N>{{N}}</span></b><small>in the active set</small></div>
     </div>
-    <p class=kp-move>To go from <b>{{RATIO}}&times;</b> to <b>{{THRESH}}&times;</b>, <b class=or>{{MOVE}} ATONE</b> would have to move from the <span class=kp-lw>{{MOVE_FROM}}</span> third of validators to the <span class=kp-lw>{{MOVE_TO}}</span> third.</p>
+    <p class=kp-move>To go from <b><span data-kp=RATIO>{{RATIO}}</span>&times;</b> to <b><span data-kp=THRESH>{{THRESH}}</span>&times;</b>, <b class=or><span data-kp=MOVE>{{MOVE}}</span> ATONE</b> would have to move from the <span class=kp-lw><span data-kp=MOVE_FROM>{{MOVE_FROM}}</span></span> third of validators to the <span class=kp-lw><span data-kp=MOVE_TO>{{MOVE_TO}}</span></span> third.</p>
   </div>
 </div></div>
 <div class=pop id=spop><div class="card vcard kp kp-s">
   <div class=kp-h><span class="disc ds"><svg class=kg aria-hidden=true><use href="#g-s"/></svg></span>
     <div><h2>ATONE staked</h2><p>How much ATONE is bonded, and where the newly minted ATONE goes</p></div></div>
   <div class=kp-b>
-    <div class=kp-big><b class=am>{{BONDED}}</b><em>ATONE staked, <strong>{{BONDED_PCT}}%</strong> of {{SUPPLY}}</em>
+    <div class=kp-big><b class=am><span data-kp=BONDED>{{BONDED}}</span></b><em>ATONE staked, <strong><span data-kp=BONDED_PCT>{{BONDED_PCT}}</span>%</strong> of <span data-kp=SUPPLY>{{SUPPLY}}</span></em>
       <span class=kp-bar><i style="width:{{BONDED_PCT}}%"></i></span></div>
     <div class=kp-g>
-      <div class=kp-f><em>Inflation</em><b>{{INFL}}%</b><small>a year</small></div>
-      <div class=kp-f><em>Minted</em><b>{{MINTED}}</b><small>ATONE a year</small></div>
-      <div class=kp-f><em>Reward pool</em><b>{{POOL}}</b><small>ATONE a year, to stakers</small></div>
-      <div class=kp-f><em>Community pool</em><b>{{CTAKE}}</b><small>ATONE a year, {{TAX}}% tax</small></div>
-      <div class=kp-f><em>Delegators</em><b>{{DELEG}}</b><small>staking with {{N}} validators</small></div>
+      <div class=kp-f><em>Inflation</em><b><span data-kp=INFL>{{INFL}}</span>%</b><small>a year</small></div>
+      <div class=kp-f><em>Minted</em><b><span data-kp=MINTED>{{MINTED}}</span></b><small>ATONE a year</small></div>
+      <div class=kp-f><em>Reward pool</em><b><span data-kp=POOL>{{POOL}}</span></b><small>ATONE a year, to stakers</small></div>
+      <div class=kp-f><em>Community pool</em><b><span data-kp=CTAKE>{{CTAKE}}</span></b><small>ATONE a year, <span data-kp=TAX>{{TAX}}</span>% tax</small></div>
+      <div class=kp-f><em>Delegators</em><b>{{DELEG}}</b><small>staking with <span data-kp=N>{{N}}</span> validators</small></div>
       <div class=kp-f id=kpgoal><em>Staking goal</em><b>&mdash;</b><small>&nbsp;</small></div>
     </div>
     <p class=kp-move id=kpgoalmv hidden></p>
@@ -5479,27 +5479,27 @@ html[data-tab=connect] .l2host{display:none}
     <div><h2>Bonus share <span class=lc>&eta;</span></h2><p>The share of all rewards split equally between the validators</p></div></div>
   <div class=kp-b>
     <div class=kp-hero>
-      <div class=kp-hv><em>Now</em><b class=am>{{ETA}}</b><small>{{NOW_DATE}}</small></div>
+      <div class=kp-hv><em>Now</em><b class=am><span data-kp=ETA>{{ETA}}</span></b><small>{{NOW_DATE}}</small></div>
       <i class=kp-arr aria-hidden=true>&rarr;</i>
-      <div class=kp-hv><em>Projected</em><b class=gr>{{ETA_NEXT}}</b><small>{{NEXT_DATE}}</small></div>
+      <div class=kp-hv><em>Projected</em><b class=gr><span data-kp=ETA_NEXT>{{ETA_NEXT}}</span></b><small>{{NEXT_DATE}}</small></div>
     </div>
     <div class=kp-g>
-      <div class=kp-f><em>Weekly step</em><b>&plusmn; {{STEP}}</b></div>
+      <div class=kp-f><em>Weekly step</em><b>&plusmn; <span data-kp=STEP>{{STEP}}</span></b></div>
       <button class="kp-f kp-btn" id=histgo type=button aria-label="Every weekly step so far"><em>Weeks so far</em><b>{{WEEK}}<span class=kp-go>every step &rarr;</span></b></button>
-      <div class=kp-f><em>Floor</em><b>{{FLOOR}}</b><small>where it started</small></div>
-      <div class=kp-f><em>Cap</em><b>{{CAP}}</b><small>{{CAPSUB2}}</small></div>
+      <div class=kp-f><em>Floor</em><b><span data-kp=FLOOR>{{FLOOR}}</span></b><small>where it started</small></div>
+      <div class=kp-f><em>Cap</em><b><span data-kp=CAP>{{CAP}}</span></b><small>{{CAPSUB2}}</small></div>
     </div>
     <div class=kp-rule id=cgate role=button tabindex=0 aria-label="What concentration is, and where it stands">
-      <div class="kp-ru {{RISE_ON}}"><em><span class=lc>&eta;</span> rises while</em><b>C &ge; {{THRESH}}&times;</b></div>
-      <div class="kp-ru {{FALL_ON}}"><em><span class=lc>&eta;</span> falls while</em><b>C &lt; {{THRESH}}&times;</b></div>
+      <div class="kp-ru {{RISE_ON}}"><em><span class=lc>&eta;</span> rises while</em><b>C &ge; <span data-kp=THRESH>{{THRESH}}</span>&times;</b></div>
+      <div class="kp-ru {{FALL_ON}}"><em><span class=lc>&eta;</span> falls while</em><b>C &lt; <span data-kp=THRESH>{{THRESH}}</span>&times;</b></div>
       <span class=kp-rgo>Concentration &rarr;</span>
     </div>
     <div class=kp-g>
-      <div class=kp-f><em>Reward pool</em><b>{{POOL}}</b><small>ATONE a year</small></div>
-      <div class=kp-f><em>Validators</em><b>{{N}}</b><small>share the bonus equally</small></div>
+      <div class=kp-f><em>Reward pool</em><b><span data-kp=POOL>{{POOL}}</span></b><small>ATONE a year</small></div>
+      <div class=kp-f><em>Validators</em><b><span data-kp=N>{{N}}</span></b><small>share the bonus equally</small></div>
     </div>
     <ul class="bul kp-notes">
-      <li>At <b>{{ETA}}</b>, <b>{{ETA_PCT}}%</b> of all rewards are split equally between the {{N}} validators.</li>
+      <li>At <b><span data-kp=ETA>{{ETA}}</span></b>, <b><span data-kp=ETA_PCT>{{ETA_PCT}}</span>%</b> of all rewards are split equally between the <span data-kp=N>{{N}}</span> validators.</li>
       <li>When <span class=lc>&eta;</span> rises, APR rises for every validator <b class=hov id=meanhov tabindex=0 data-tip="The average {{MEAN}} ATONE">below the average stake</b>.</li>
     </ul>
   </div>
