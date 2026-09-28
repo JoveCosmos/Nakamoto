@@ -4103,13 +4103,16 @@ position:relative;padding:14px 16px;gap:10px;min-height:0;display:flex;flex-dire
 /* the wallet card: who (name, app, network) */
 .sd-strip .sd-idw{flex-direction:row;align-items:stretch;justify-content:space-between;gap:12px}
 .sd-idl{display:flex;flex-direction:column;gap:9px;min-width:0}
-/* the wallet card: a solid violet card in the strip's first cell - AtomOne's orbit rings rising from its
-   corner, a light from the top left - the one hard colour of the strip, the same in day and night */
+/* the wallet card: the one hard colour of the strip, the same in day and night */
 .sd-idw{position:relative;overflow:hidden;color:#fff;
-background:radial-gradient(circle at 104% 118%,transparent 0 44px,rgba(255,255,255,.13) 45px 46px,transparent 47px 70px,rgba(255,255,255,.09) 71px 72px,transparent 73px 98px,rgba(255,255,255,.06) 99px 100px,transparent 101px 128px,rgba(255,255,255,.035) 129px 130px,transparent 131px),
-radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear-gradient(140deg,#4130a0 0%,#271c6c 52%,#150f3b 100%)}
-
-.sd-idw::after{content:"";position:absolute;right:22px;bottom:18px;width:7px;height:7px;border-radius:50%;background:#e9e4ff;box-shadow:0 0 12px 2px rgba(214,206,255,.9)}
+background:radial-gradient(120% 130% at 0% 0%,rgba(160,146,255,.5),transparent 55%),radial-gradient(80% 110% at 100% 115%,rgba(43,200,189,.2),transparent 60%),
+linear-gradient(150deg,#3b2c96 0%,#221868 45%,#120c35 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 0 1px rgba(255,255,255,.06)}
+/* the wallet card: deep indigo lit from the top left, a faint teal from the foot, AtomOne's mark large and quiet at its
+   right edge - no rings, no dot */
+.sd-idw::before{content:"";position:absolute;right:-30px;top:50%;width:150px;height:150px;transform:translateY(-50%);pointer-events:none;
+background:linear-gradient(135deg,rgba(255,255,255,.2),rgba(255,255,255,.03));-webkit-mask:url(assets/atomone-mark.svg) center/contain no-repeat;mask:url(assets/atomone-mark.svg) center/contain no-repeat}
+.sd-idw::after{display:none}
+.sd-idw>*{position:relative;z-index:1}
 .sd-idw h3,.sd-idw .sv-wn{color:#fff}
 .sd-idw .sd-wch i.app{color:#e4dfff;border-color:rgba(255,255,255,.32);background:rgba(255,255,255,.1)}
 .sd-idw .sd-wch i.net{color:#8ff5ec;border-color:rgba(143,245,236,.45);background:rgba(43,200,189,.14)}
