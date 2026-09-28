@@ -771,6 +771,7 @@ font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--lit);bac
 border-radius:6px;padding:5px 9px;box-shadow:0 10px 24px -8px #000;opacity:0;transform:translateY(3px);pointer-events:none;
 transition:opacity .15s,transform .15s}
 .bul b.hov:hover::after,.bul b.hov:focus::after{opacity:1;transform:none}
+#meanhov::after{left:auto;right:0}   /* it sits at the line's end: the tip opens leftward, inside the card */
 .bul.bul2{border-top:0}                 /* the boxes above already draw the rule */
 .sc{font-variant:small-caps}
 b.hotc{color:var(--burn);font-weight:inherit}
@@ -5498,7 +5499,7 @@ html[data-tab=connect] .l2host{display:none}
     </div>
     <ul class="bul kp-notes">
       <li>At <b>{{ETA}}</b>, <b>{{ETA_PCT}}%</b> of all rewards are split equally between the {{N}} validators.</li>
-      <li>When <span class=lc>&eta;</span> rises, APR rises for every validator <b class=hov id=meanhov title="live average stake: {{MEAN}} ATONE">below the average stake</b>.</li>
+      <li>When <span class=lc>&eta;</span> rises, APR rises for every validator <b class=hov id=meanhov tabindex=0 data-tip="The average validator holds {{MEAN}} ATONE">below the average stake</b>.</li>
     </ul>
   </div>
 </div></div>
