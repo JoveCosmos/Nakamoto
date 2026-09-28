@@ -1577,7 +1577,7 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
 /* Enable restake: its title a green band like the panels', the card joined under it */
 #sv-over #sd-sky .se-mid>.se-rsw,#sv-over #sd-sky .se-ex>.se-rsw{gap:0}
 #sv-over #sd-sky .se-rsh2{height:30px;box-sizing:border-box;padding:0 10px;gap:8px;border:1px solid var(--wbd2);border-bottom:1px solid rgba(255,255,255,.08);border-radius:9px 9px 0 0;
-background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#13603b,#0d3f2d 58%,#0f1f24)}
+background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.07),transparent 60%),linear-gradient(135deg,#0a3a22,#072a19 58%,#05140d)}
 #sv-over #sd-sky .se-rsh2 h4{font-size:13px;color:#fff}
 #sv-over #sd-sky .se-rsh2 h4::before{background:rgba(255,255,255,.9);box-shadow:none}
 #sv-over #sd-sky .se-rsh2 .sv-tag{padding:2px 7px;font-size:10px;line-height:1.35}
@@ -1596,7 +1596,7 @@ background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 6
   #p-dele #wbody #wk-mv>.wk-ph+*{margin-top:8px!important}
   #sv-over #sd-list>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#0f6b67,#123a52 58%,#141633)}
   #sv-over #sd-sky>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#8a5a12,#4a2f12 58%,#1f1630)}
-  #sv-over #sd-move>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#13603b,#0d3f2d 58%,#0f1f24)}
+  #sv-over #sd-move>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.07),transparent 60%),linear-gradient(135deg,#0a3a22,#072a19 58%,#05140d)}
   #p-dele #wbody #wk-mine .wk-t1{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#7a3322,#44201a 58%,#1c1228)}
   #p-dele #wbody #wk-plan>.wk-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#0e5a5a,#12394a 58%,#141633)}
   #p-dele #wbody #wk-mv>.wk-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#4130a0,#271c6c 58%,#150f3b)}
@@ -4356,7 +4356,10 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 #sv-over #sd-sky .se-hero .se-card>b>i{display:none}
 @media(min-width:901px) and (max-height:640px){#sv-over #sd-sky .se-hero .se-card>b>i{display:inline}}
 /* the APR tag in What your stake earns' band: amber, clear on the fill */
-#sv-over #sd-sky>.sv-ph .sv-tag.a{color:#ffe2b0;border-color:rgba(255,196,90,.6);background:rgba(40,22,0,.45)}
+/* APR tags on a band: solid pills, dark type - the clearest thing on the fill (green on Move your stake and
+   Enable restake, amber on What your stake earns) */
+#sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag.g{color:#03230e;border-color:#2ee06a;background:#2ee06a;font-weight:700}
+#sv-over #sd-sky>.sv-ph .sv-tag.a{color:#2a1600;border-color:#ffb02e;background:#ffb02e;font-weight:700}
 .se-row .sd-fig small{margin-top:4px}
 /* the example (no wallet): figure and boxes centred in the panel, nothing under them */
 /* the no-wallet example stands exactly as the connected panel does (.se-mid): boxes where the centred block

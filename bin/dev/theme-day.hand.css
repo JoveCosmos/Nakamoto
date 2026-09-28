@@ -221,7 +221,7 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   /* the title bands keep their fills in day, the titles white */
   html[data-theme=light]:not([data-mono]) #sv-over #sd-list>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#0f6b67,#123a52 58%,#141633)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#8a5a12,#4a2f12 58%,#1f1630)}
-  html[data-theme=light]:not([data-mono]) #sv-over #sd-move>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#13603b,#0d3f2d 58%,#0f1f24)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-move>.sv-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.07),transparent 60%),linear-gradient(135deg,#0a3a22,#072a19 58%,#05140d)}
   html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mine .wk-t1{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#7a3322,#44201a 58%,#1c1228)}
   html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-plan>.wk-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#0e5a5a,#12394a 58%,#141633)}
   html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mv>.wk-ph{background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#4130a0,#271c6c 58%,#150f3b)}
@@ -239,7 +239,7 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag.g{color:#c9ffdb;border-color:rgba(143,240,176,.62);background:rgba(4,30,14,.42)}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:#ffe4dc;border-color:rgba(255,150,120,.7);background:rgba(110,18,0,.55)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.34)}
-  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2{border-color:transparent;background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(135deg,#13603b,#0d3f2d 58%,#0f1f24)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2{border-color:transparent;background:radial-gradient(90% 180% at 0% 0%,rgba(255,255,255,.07),transparent 60%),linear-gradient(135deg,#0a3a22,#072a19 58%,#05140d)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2 h4{color:#fff}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2 h4::before{background:rgba(255,255,255,.9)}
   /* Governance's bands and tags keep their night face in day */
@@ -258,3 +258,5 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd h1,html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd p b{color:#fff}
   html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd p{color:rgba(255,255,255,.78)}html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd a{color:#ffe2b0}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph .sv-tag.a{color:#ffe2b0;border-color:rgba(255,196,90,.6);background:rgba(40,22,0,.45)}
+  html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag.g{color:#03230e;border-color:#2ee06a;background:#2ee06a;font-weight:700}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph .sv-tag.a{color:#2a1600;border-color:#ffb02e;background:#ffb02e;font-weight:700}
