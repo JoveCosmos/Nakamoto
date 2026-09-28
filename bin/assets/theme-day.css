@@ -215,29 +215,35 @@
     html[data-theme=light]:not([data-mono]) :is(#sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mv>.wk-ph) h3{color:var(--ink)!important}
     html[data-theme=light]:not([data-mono]) :is(#sv-over .sd-col>.sv-ph,#p-dele #wbody #wk-mv>.wk-ph) h3::before{background:var(--accent)!important;box-shadow:none!important}
     html[data-theme=light]:not([data-mono]) #sd-move .sd-mvh .sd-mvn{color:var(--ink)}
-    html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.q{color:var(--ink);border-color:var(--accent);background:var(--surface-2)}
-    html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-hero>.se-card{background:var(--warn-bg)}
-    html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-row .sd-fig{background:color-mix(in srgb,var(--rc) 9%,transparent)}
-    html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:var(--danger);border-color:var(--danger-bar);background:var(--danger-bar)}
-    html[data-theme=light]:not([data-mono]) :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-move,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist)::after{background:var(--bandf)}
-    html[data-theme=light]:not([data-mono]) #sv-over #sd-list{--bandf:var(--accent),var(--accent) 58%,var(--ink)}
-    html[data-theme=light]:not([data-mono]) #sv-over #sd-sky{--bandf:var(--warn),var(--warn) 58%,var(--ink)}
-    html[data-theme=light]:not([data-mono]) #sv-over #sd-move{--bandf:#FFFFFF,#FFFFFF 58%,#FFFFFF}
-    html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mv{--bandf:var(--accent),var(--ink) 58%,#FFFFFF}
-    html[data-theme=light]:not([data-mono]) #sv-proplist{--bandf:var(--accent),var(--accent) 58%,var(--ink)}
-    html[data-theme=light]:not([data-mono]) #sv-daop{--bandf:var(--muted),var(--ink) 58%,var(--ink)}
-    html[data-theme=light]:not([data-mono]) #sv-govlist{--bandf:var(--muted),var(--muted) 58%,var(--ink)}
-    html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:var(--ink);border-color:var(--accent);background:var(--surface-2)}
-    html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag{color:var(--ink);border-color:var(--accent);background:var(--surface)}
-    html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag.g{color:var(--accent);border-color:var(--accent);background:var(--surface)}
-    html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:var(--danger);border-color:var(--danger-bar);background:var(--danger-bar)}
-    html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:var(--ink);border-color:var(--accent);background:var(--surface)}
-    html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2{border-bottom:1px solid var(--surface-2);background:var(--surface)}
-    html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2 h4{color:var(--ink)}
-    html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2 h4::before{background:var(--accent);box-shadow:none}
-    html[data-theme=light]:not([data-mono]) #sv-over #sd-list>.sv-ph{background:var(--accent)}
-    html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph{background:var(--amber-bar)}
-    html[data-theme=light]:not([data-mono]) #sv-over #sd-move>.sv-ph{background:var(--surface)}
+  }
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.q{color:var(--ink);border-color:var(--accent);background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-hero>.se-card{background:var(--warn-bg)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-row .sd-fig{background:color-mix(in srgb,var(--rc) 9%,transparent)}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:var(--danger);border-color:var(--danger-bar);background:var(--danger-bar)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-rs,#sv-over #sd-move,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist)::after{background:var(--bandf)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-list{--bandf:var(--accent),var(--accent) 58%,var(--ink)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky{--bandf:var(--warn),var(--warn) 58%,var(--ink)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-move{--bandf:#FFFFFF,#FFFFFF 58%,#FFFFFF}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-rs{--bandf:var(--accent),#FFFFFF 58%,#FFFFFF}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-rs>.sv-ph{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mv{--bandf:var(--accent),var(--ink) 58%,#FFFFFF}
+  html[data-theme=light]:not([data-mono]) #sv-proplist{--bandf:var(--accent),var(--accent) 58%,var(--ink)}
+  html[data-theme=light]:not([data-mono]) #sv-daop{--bandf:var(--muted),var(--ink) 58%,var(--ink)}
+  html[data-theme=light]:not([data-mono]) #sv-govlist{--bandf:var(--muted),var(--muted) 58%,var(--ink)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:var(--ink);border-color:var(--accent);background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag{color:var(--ink);border-color:var(--accent);background:var(--surface)}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.g{color:var(--accent);border-color:var(--accent);background:var(--surface)}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:var(--danger);border-color:var(--danger-bar);background:var(--danger-bar)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:var(--ink);border-color:var(--accent);background:var(--surface)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-list>.sv-ph{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph{background:var(--amber-bar)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-move>.sv-ph{background:var(--surface)}
+  @media(max-width:900px){
+    html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph{border-bottom:1px solid var(--surface-2)}
+    html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph h3{color:var(--ink)}
+    html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph h3::before{background:var(--accent);box-shadow:none}
+  }
+  @media(min-width:901px){
     html[data-theme=light]:not([data-mono]) #p-dele #wbody #wk-mv>.wk-ph{background:var(--accent)}
   }
   html[data-theme=light]:not([data-mono]) .wk-addr::before{box-shadow:none}
@@ -697,13 +703,11 @@
   html[data-theme=light]:not([data-mono]) .sd-ok{border:1px solid var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .se-card.se-rc2::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .se-rc2{background:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .se-rsh2 h4::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .se-rss{border:1px solid var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .se-rson{border:1px solid var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .se-rsch{border:1px solid var(--accent);background:transparent;color:var(--accent)}
-  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-card.se-rc2{background:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-card.se-rc2::before{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2 h4::before{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-rs .se-card.se-rc2{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-rs .se-card.se-rc2::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .sv-btn.go.sd-go:disabled{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .fp-b{--c:var(--danger)}
   html[data-theme=light]:not([data-mono]) .fp-b.b1{--c:var(--warn)}
@@ -725,7 +729,7 @@
   html[data-theme=light]:not([data-mono]) .sd-off{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .se-card{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .se-card::before{box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag.g{color:#FFFFFF;border-color:var(--accent);background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.g{color:#FFFFFF;border-color:var(--accent);background:var(--accent)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph .sv-tag.a{color:#FFFFFF;border-color:var(--amber-bar);background:var(--amber-bar)}
   html[data-theme=light]:not([data-mono]) .se-tbar s{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .se-mv>div u{text-decoration:none}
@@ -1067,14 +1071,13 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .netsw a[aria-current=page]{color:#0b5a53;background:#fff;box-shadow:0 1px 2px rgba(60,50,20,.2),inset 0 0 0 1px rgba(15,122,114,.35)}
   html[data-theme=light]:not([data-mono]) .netsw a#nettest[aria-current=page]{color:#8a5200;background:#fff;box-shadow:0 1px 2px rgba(60,50,20,.2),inset 0 0 0 1px rgba(200,120,0,.4)}
   html[data-theme=light]:not([data-mono]) .se-rss{border-color:rgba(15,122,114,.35);background:linear-gradient(90deg,rgba(15,122,114,.12),rgba(15,122,114,.04));color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .se-rsh2 h4::before{background:var(--sv-green);box-shadow:none}
   /* Pro's wallet strip takes the Easy view's day tokens, so the two are identical */
   html[data-theme=light]:not([data-mono]) #sd-mstrip{--sv-amber:var(--warn);--sv-green:var(--accent);--sv-violet:var(--accent);--sv-teal:var(--accent);--sv-pho:#1f6f9a}
   html[data-theme=light]:not([data-mono]) #p-dele #sd-mstrip{background-color:rgb(255,253,248);border-color:rgb(227,222,211)}
 
   html[data-theme=light]:not([data-mono]) #sv .sd-ida .sv-tag{color:#dffcf9;border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.12)}html[data-theme=light]:not([data-mono]) #sv .sd-ida .sv-tag.g{color:#8ff0b0;border-color:rgba(143,240,176,.55);background:rgba(46,224,106,.16)}
 
-  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-card.se-rc2{background:linear-gradient(0deg,rgba(22,115,58,.1),#fbf9f3 70%)}html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-card.se-rc2::before{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-rs .se-card.se-rc2{background:linear-gradient(0deg,rgba(22,115,58,.1),#fbf9f3 70%)}html[data-theme=light]:not([data-mono]) #sv-over #sd-rs .se-card.se-rc2::before{box-shadow:none}
   
   html[data-theme=light]:not([data-mono]) #sv .sd-ida .sd-wch i.st{color:#dffcf9;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.1)}
   html[data-theme=light]:not([data-mono]) #sv .sd-ida .sd-wch button{color:#1b1440;border-color:#d6d0ff;background:#d6d0ff}
@@ -1093,13 +1096,10 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-hero>.se-card{background:linear-gradient(0deg,rgba(200,120,0,.1),#fbf9f3 70%)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:#fff;border-color:rgba(255,255,255,.45);background:rgba(255,255,255,.14)}
   /* tags on a fill and the Enable restake band keep their night face in day */
-  html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.34)}
-  html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag.g{color:#c9ffdb;border-color:rgba(143,240,176,.62);background:rgba(4,30,14,.42)}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.34)}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.g{color:#c9ffdb;border-color:rgba(143,240,176,.62);background:rgba(4,30,14,.42)}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.se-off{color:#ffe4dc;border-color:rgba(255,150,120,.7);background:rgba(110,18,0,.55)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-move .sd-mvh .sv-tag.sd-mvn{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.34)}
-  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2{border-color:transparent;background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.07),transparent 60%),linear-gradient(315deg,#0a3a22,#072a19 58%,#05140d)}
-  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2 h4{color:#fff}
-  html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-rsh2 h4::before{background:rgba(255,255,255,.9)}
   /* Governance's bands and tags keep their night face in day */
   html[data-theme=light]:not([data-mono]) :is(#sv-proplist,#sv-daop,#sv-govlist)>.sv-ph h3{color:#fff}
   html[data-theme=light]:not([data-mono]) :is(#sv-proplist,#sv-daop,#sv-govlist)>.sv-ph h3::before{background:rgba(255,255,255,.9)}
@@ -1116,7 +1116,7 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd h1,html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd p b{color:#fff}
   html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd p{color:rgba(255,255,255,.78)}html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd a{color:#ffe2b0}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph .sv-tag.a{color:#ffe2b0;border-color:rgba(255,196,90,.6);background:rgba(40,22,0,.45)}
-  html[data-theme=light]:not([data-mono]) #sv-over :is(.sd-col>.sv-ph,#sd-sky .se-rsh2) .sv-tag.g{color:#03230e;border-color:#2ee06a;background:#2ee06a;font-weight:700}
+  html[data-theme=light]:not([data-mono]) #sv-over .sd-col>.sv-ph .sv-tag.g{color:#03230e;border-color:#2ee06a;background:#2ee06a;font-weight:700}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky>.sv-ph .sv-tag.a{color:#2a1600;border-color:#ffb02e;background:#ffb02e;font-weight:700}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky .se-row .sd-fig{background:linear-gradient(0deg,color-mix(in srgb,var(--rc) 10%,transparent),#fbf9f3 70%)}
   html[data-theme=light]:not([data-mono]) #sv-over #sd-sky :is(.se-row .sd-fig,.se-card)::before{box-shadow:none}
@@ -1129,4 +1129,7 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-proplist{--bandf:#1d4f8f,#173257 58%,#141633}
   html[data-theme=light]:not([data-mono]) #sv-daop{--bandf:#5f6216,#393b15 58%,#19191f}
   html[data-theme=light]:not([data-mono]) #sv-govlist{--bandf:#7d2e6e,#461f45 58%,#1a1230}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-rs{--bandf:#0b4a36,#073024 58%,#05140f}
+  html[data-theme=light]:not([data-mono]) #sv-over #sd-rs>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.07),transparent 60%),linear-gradient(315deg,#0b4a36,#073024 58%,#05140f)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-over #sd-list,#sv-over #sd-sky,#sv-over #sd-rs,#sv-over #sd-move,#p-dele #wbody #wk-mv,#sv-proplist,#sv-daop,#sv-govlist)::after{background:linear-gradient(315deg,var(--bandf))}
 

@@ -152,6 +152,7 @@
   function usdOf(u){ var p = !TN() && DD().prices && DD().prices.atone && DD().prices.atone.usd; return p ? u / 1e6 * p : null; }
   function usd(v){ return v == null ? "" : "≈ $" + (v >= 100 ? Math.round(v).toLocaleString() : v >= 1 ? v.toFixed(2) : v.toFixed(3)); }
   /* ex: the example for a visitor with no wallet - ATONE only, the rate as a single figure, no notes */
+  var RSP = '';   /* the Restake panel, built by earns() */
   function earns(stake, rate, off, ex){
     var y = stake * rate, per = function(days){ return y * days / 365; };
     /* restaking monthly: the rewards claimed and staked again each month earn too - the year compounded
@@ -169,14 +170,15 @@
        restaking, side by side, and the door (none without a wallet: it names nothing to act on) */
     /* the APR the compounded year amounts to, against today's: what restaking adds to the rate */
     var capr = Math.pow(1 + rate / 12, 12) - 1, dapr = (capr - rate) * 100;
-    /* the offer: the title with the APR restaking adds in its tag, and a card like the year's - what it adds a
-       year, in green, level with Where your stake sits' three boxes */
-    var offer = rate > 0 && !on ? '<div class=se-rsw><div class=se-rsh2><h4>Enable restake</h4>' + tag("g", "+" + dapr.toFixed(1) + "% APR") + '</div>' +
-        '<div class="se-card se-rc2"><em>A year</em><b><span class=se-rsv>+' + one(more / 1e6) + '</span><i>ATONE</i></b><small>auto-compounds your rewards</small></div></div>' : '';
-    var door = on ? '<div class=se-rson>Restake is on: your rewards compound on their own.<button type=button class=se-rsch data-act=autopilot>Change</button></div>' : '';
+    /* the offer: the title with the APR restaking adds in its tag, and a card like the thirds' boxes - what it
+       adds a year, in green, level with Where your stake sits' three boxes */
+    /* Restake is its own panel under this one (sd-rs): the offer, or the note that it is on */
+    RSP = rate > 0 && !on ? '<div class=sv-ph><h3>Restake</h3>' + tag("g", "+" + dapr.toFixed(1) + "% APR") + '</div>' +
+        '<div class=se-rsb><div class="se-card se-rc2"><em>A year</em><b><span class=se-rsv>+' + one(more / 1e6) + '</span><i>ATONE</i></b><small>auto-compounds your rewards</small></div></div>'
+      : on ? '<div class=sv-ph><h3>Restake</h3></div><div class=se-rsb><div class=se-rson>Restake is on: your rewards compound on their own.<button type=button class=se-rsch data-act=autopilot>Change</button></div></div>' : '';
     /* the day, week and month first, the year under them */
-    if(ex) return '<div class=se-ex>' + steps + year + offer + '</div>';
-    return '<div class=se-mid>' + steps + year + offer + '</div>' + door;
+    if(ex) return '<div class=se-ex>' + steps + year + '</div>';
+    return '<div class=se-mid>' + steps + year + '</div>';
   }
 
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every
@@ -312,6 +314,7 @@
     put("sd-sky", mine
       ? '<div class=sv-ph><h3>What your stake earns</h3>' + (pos.rate > 0 ? tag("a", pct(pos.rate) + " APR", "what your stake earns now") : '') + '</div>' + earns(pos.total, pos.rate, off)
       : '<div class=sv-ph><h3>What 1,000 ATONE earns</h3>' + (S.mid > 0 ? tag("a", pct(S.mid) + " APR", "the set's middle APR") : '') + '</div>' + earns(1e9, S.mid, 0, true));
+    put("sd-rs", RSP);
 
     /* the validators */
     put("sd-list", footprint(pos));
