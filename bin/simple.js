@@ -1327,6 +1327,7 @@
     L[SA.i % L.length].classList.remove("on"); SA.i++; L[SA.i % L.length].classList.add("on");
   }, 2800);
   function render(){
+    if(window.__rerate) window.__rerate();
     homeDoor();
     selfBand();
     drawHead();

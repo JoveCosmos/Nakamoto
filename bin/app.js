@@ -3060,6 +3060,15 @@ rememberGridH();
     return { total: total, free: free, locked: total - free, until: until,
              rate: total ? weighted / total : 0, rows: rows };
   }
+  /* the position's rates are read against the set as it is now, not as it was when the wallet was read: the
+     stake and the model move every block, and "Your APR" must never quote a set the page no longer shows */
+  window.__rerate = function(){
+    var p = window.__POS; if(!p || !p.rows) return;
+    var V = window.__VALS(), by = {}, i, w = 0, tot = 0;
+    for(i = 0; i < V.length; i++) by[V[i][3]] = V[i];
+    p.rows.forEach(function(r){ var v = by[r.id]; r.rate = v ? window.__rateAfter(v[1], v[2], 0) : 0; r.inactive = !v; w += r.x * r.rate; tot += r.x; });
+    p.rate = tot ? w / tot : 0;
+  };
   window.__when = when;
   var MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   function day(ms){ var t = new Date(ms); return MON[t.getUTCMonth()] + " " + t.getUTCDate(); }
