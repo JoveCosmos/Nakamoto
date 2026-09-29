@@ -5,6 +5,7 @@
 //     -p LoadCredentialEncrypted=e2e_mnemonic:/etc/atomone-autopilot-testnet/e2e-wallet.cred \
 //     -p LoadCredentialEncrypted=autopilot_mnemonic:/etc/atomone-autopilot-testnet/mnemonic.cred \
 //     /usr/bin/node $PWD/e2e.mjs <command> ...
+// E2E_KEY=<words file> uses another throwaway wallet instead of the kept one (delegate, grant, revoke).
 // (node_modules here is a symlink to /opt/atomone-faucet/node_modules, not tracked)
 //   node e2e.mjs keygen                 make the test wallet (words kept in ./test.key, 0600, never printed)
 //   node e2e.mjs fund <atone> <photon>  send from the testnet Autopilot account (needs its credential)
@@ -29,6 +30,7 @@ async function cl(words) {
 }
 const opWords = () => fs.readFileSync(process.env.CREDENTIALS_DIRECTORY + "/autopilot_mnemonic", "utf8").trim();
 const testWords = () => { const d = process.env.CREDENTIALS_DIRECTORY;
+  if (process.env.E2E_KEY) return fs.readFileSync(process.env.E2E_KEY, "utf8").trim();   // another throwaway wallet (words file, 0600)
   if (d && fs.existsSync(d + "/e2e_mnemonic")) return fs.readFileSync(d + "/e2e_mnemonic", "utf8").trim();
   return fs.readFileSync(KEY, "utf8").trim(); };
 const done = r => { console.log(cmd, "code", r.code, "tx", r.transactionHash, r.code ? r.rawLog : ""); process.exit(r.code ? 1 : 0); };
