@@ -41,7 +41,7 @@ DRY = os.environ.get("KEEPER_DRY", "1") != "0"
 EVERY = int(os.environ.get("KEEPER_EVERY", "21600"))
 MIN_GAIN_APR = float(os.environ.get("KEEPER_MIN_GAIN_APR", "0.005"))     # blended rate must rise this much
 MIN_GAIN_ATONE = float(os.environ.get("KEEPER_MIN_GAIN_ATONE", "1"))      # and pay at least this per year
-MAX_MOVES_DAY = int(os.environ.get("KEEPER_MAX_MOVES_PER_DAY", "7"))
+MAX_MOVES_DAY = int(os.environ.get("KEEPER_MAX_MOVES_PER_DAY", "20"))   # the signer takes at most 20 moves a transaction
 MAX_DESTS = int(os.environ.get("KEEPER_MAX_DESTS", "5"))                  # split across at most this many
 # restake: claim a granter's rewards and stake them back onto their allow-list. Planned and
 # reported always; executed only with KEEPER_RESTAKE=1 AND KEEPER_DRY=0
