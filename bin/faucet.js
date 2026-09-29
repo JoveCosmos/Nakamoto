@@ -14,6 +14,15 @@
   var addr = E("addr"), msg = E("msg"), btns = document.querySelectorAll(".go button"), CLAIMED = {};
   var ok = function(a){ return /^atone1[02-9ac-hj-np-z]{38}$/.test(a); };
   function say(t, cls){ msg.textContent = t; msg.className = "msg" + (cls ? " " + cls : ""); }
+  /* the sent transaction, a link to it on GATA Scan (a new tab); the hash is checked as hex before it goes in a URL */
+  function sayTx(h){
+    say("Sent. Transaction ", "ok");
+    if(!/^[0-9A-Fa-f]{64}$/.test(h || "")){ msg.textContent = "Sent. It arrives within a few seconds."; return; }
+    var a = document.createElement("a");
+    a.href = "https://explorer.gatahub.zone/atomone-testnet/txs/" + h.toUpperCase(); a.target = "_blank"; a.rel = "noopener";
+    a.textContent = h.slice(0, 12) + "\u2026";
+    msg.appendChild(a); msg.appendChild(document.createTextNode(" It arrives within a few seconds."));
+  }
   function api(path, body){
     return fetch("/faucet-api/" + path, body ? { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) } : { cache: "no-store" })
       .then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.error || ("HTTP " + r.status)); return j; }); });
@@ -63,7 +72,7 @@
       var a = addr.value.trim(), t = b.dataset.token; if(!ok(a)) return;
       b.classList.add("busy"); draw(); say("Sending " + (t === "atone" ? "100 ATONE" : "10 PHOTON") + "…");
       api("request", { address: a, token: t })
-        .then(function(r){ (CLAIMED[a] = CLAIMED[a] || {})[t] = true; say("Sent. Transaction " + r.txhash.slice(0, 12) + "… It arrives within a few seconds.", "ok"); })
+        .then(function(r){ (CLAIMED[a] = CLAIMED[a] || {})[t] = true; sayTx(r.txhash); })
         .catch(function(e){ if(/already received/.test(e.message)) (CLAIMED[a] = CLAIMED[a] || {})[t] = true; say(e.message, "err"); })
         .then(function(){ b.classList.remove("busy"); draw(); });
     });
