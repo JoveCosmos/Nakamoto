@@ -175,7 +175,7 @@ def plan_id(p):
 def alert(level, title, text="", fields=None):
     log("alert", level, title)
     if notify:
-        try: notify.send(level, title, text, fields, SITE + "/admin.html", net=NET)
+        try: notify.send(level, title, text, fields, SITE + "/admin", net=NET)
         except Exception as e: log("alert failed: %s" % e)
 
 def when(t): return time.strftime("%-d %b %H:%M UTC", time.gmtime(t))

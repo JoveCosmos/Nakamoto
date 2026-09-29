@@ -302,8 +302,9 @@ for _js in ("app.js", "boot.js", "tx.js", "simple.js", "shell.js"):
     os.chmod(os.path.join(OUT, "." + _js + ".tmp"), 0o640)
     os.replace(os.path.join(OUT, "." + _js + ".tmp"), os.path.join(OUT, _js))
 # the operator console and the testnet faucet: each its own page and script (versioned by content), shared as a
-# direct link, never linked from the app
-for _pg in ("admin", "faucet"):
+# direct link (/admin, /faucet), never linked from the app. Built once, at the site root: the console switches
+# networks itself and the faucet is testnet-only, so the testnet tree gets no copies.
+for _pg in (() if TESTNET else ("admin", "faucet")):
     _chk = subprocess.run(["/usr/bin/node", "--check", os.path.join(os.path.dirname(__file__), _pg + ".js")], capture_output=True, text=True)
     if _chk.returncode != 0:
         sys.exit("atomone-app: FATAL %s.js does not parse:\n%s" % (_pg, _chk.stderr.strip()[-600:]))

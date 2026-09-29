@@ -210,7 +210,7 @@ def main():
             ev = step(L, standing())
             for level, title, text, fields in ev:
                 log(level, title, fields.get("Delegator"))
-                if not once: notify.send(level, title, text, fields, SITE + "/admin.html", net=NET)
+                if not once: notify.send(level, title, text, fields, SITE + "/admin", net=NET)
             if once:
                 print(json.dumps(L["counts"]), [e[1] for e in ev]); return
             save(L); fails = 0
