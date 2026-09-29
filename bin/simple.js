@@ -509,7 +509,7 @@
     var hist = (rp && rp.history || []).slice(-3).reverse();
     h += '<div class=se-mv><em>Last moves</em>' + (hist.length ? hist.map(function(m){
         return '<div><u>' + (window.__dayFull ? window.__dayFull(m.at * 1000) : "") + '</u><span><b>' + fmt(m.uatone) + ' ATONE</b> from ' + name(m.src) + ' to ' + name(m.dst) + '</span></div>'; }).join("")
-      : '<div class=none>No move yet: your stake already sits where it earns the most.</div>') + '</div>';
+      : '<div class=none>No move yet.</div>') + '</div>';
     return h;
   }
 
