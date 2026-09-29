@@ -386,6 +386,9 @@
   html[data-theme=light]:not([data-mono]) #p-dele #wk-mv .wk-ans .p.lock svg{fill:none;stroke:var(--warn)}
   html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-lockn{border:1px solid var(--amber-bar);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-lockn b{color:var(--warn)}
+  html[data-theme=light]:not([data-mono]) #txpop .txlockn{border:1px solid var(--amber-bar);background:var(--warn-bg)}
+  html[data-theme=light]:not([data-mono]) #txpop .txlockn b{color:var(--warn)}
+  html[data-theme=light]:not([data-mono]) #txpop .txlockn svg{fill:none;stroke:var(--warn)}
   html[data-theme=light]:not([data-mono]) #wk-plan .wk-field .wk-max:disabled{background:transparent}
   html[data-theme=light]:not([data-mono]) #wk-plan .wk-field .wk-max:disabled:hover{background:transparent}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb{border:1px solid var(--amber-bar);background:var(--surface-2)}

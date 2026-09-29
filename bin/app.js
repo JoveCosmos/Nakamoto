@@ -973,7 +973,13 @@ rememberGridH();
     POP.open(E("ipop"));
     return true;
   }
-  var igo = E("igo"); if(igo) igo.addEventListener("click", function(){ POP.closeAll(); if(window.__shellGo) window.__shellGo("dashboard/self"); });
+  /* Redelegate: this validator's stake, planned to the best places, straight to the signing card (over Pro, where
+     the plan shows); stake still in its cooldown has nothing to sign, so it only opens Pro */
+  var igo = E("igo"); if(igo) igo.addEventListener("click", function(){
+    var id = E("iun") && E("iun").dataset.v;
+    POP.closeAll(); if(window.__shellGo) window.__shellGo("dashboard/self");
+    setTimeout(function(){ if(id && window.__optFrom && window.__optFrom(id) && window.__goSign) window.__goSign(); }, 250);
+  });
   var iun = E("iun"); if(iun) iun.addEventListener("click", function(){ if(window.__unstakeFrom) window.__unstakeFrom(iun.dataset.v); });
   function vshow(i){
     var v = (VALS[i] && VDBY[VALS[i][3]]) || VD[i]; if(!v) return;
@@ -1885,7 +1891,9 @@ rememberGridH();
   function empty(t){ return '<div class=wk-empty>' + t + '</div>'; }
   function pill(cls, t){ return '<span class="wk-pl ' + cls + '">' + t + '</span>'; }
   function bar(share, cls){ return '<span class="wk-hb ' + (cls || "") + '"><i style="width:' + Math.max(1, Math.round(share * 100)) + '%"></i></span>'; }
-  function nameOf(id){ var V = window.__VALS(); for(var i = 0; i < V.length; i++) if(V[i][3] === id) return V[i][0]; return id; }
+  /* a validator's name by its short id: the active set, else one outside it (inactive, jailed), else the id itself */
+  function nameOf(id){ var V = window.__VALS(); for(var i = 0; i < V.length; i++) if(V[i][3] === id) return V[i][0];
+    var x = (window.__INACT || {})[id]; return x && x.m ? x.m : id; }
 
   /* ── what the reader chooses: an amount, and which of five to keep ──
      The model proposes its best five destinations for the amount (the two
@@ -2134,7 +2142,8 @@ rememberGridH();
       used[key] = (used[key] || 0) + (rr.entries || []).length; });
     /* the stake leaves the positions that earn least first, largest of equals first */
     var src = pos ? pos.rows.map(function(x){ srcRate[x.id] = x.rate; return { id: x.id, m: x.m, rate: x.rate, free: x.x - x.locked }; }).filter(function(x){ return x.free > 0; })
-                        .sort(function(a, b){ return (a.rate - b.rate) || (b.free - a.free); }) : [];
+                        /* a validator asked for by name (the inactive card's Redelegate) goes first of all */
+                        .sort(function(a, b){ var f = window.__SRCFIRST; return ((b.id === f) - (a.id === f)) || (a.rate - b.rate) || (b.free - a.free); }) : [];
     if(!r.moves.length) return "";
     function nm(id, m){ return '<td class="l nm"><div class=nmw>' + logo(id, m) + '<span>' + att(m) + '</span></div></td>'; }
     function gainCell(g, left){
@@ -2219,7 +2228,7 @@ rememberGridH();
 
   /* att() is the file-level escaper (defined beside POP) */
 
-  amt.addEventListener("input", function(){ draw(); });
+  amt.addEventListener("input", function(){ window.__SRCFIRST = null; draw(); });
   /* a delegation row opens its validator's card - the same card the map opens */
   var go0 = E("dgo"); if(go0) go0.addEventListener("click", function(){ if(window.__goSign) window.__goSign(); });
   var dmy = E("dmy");
@@ -2265,6 +2274,12 @@ rememberGridH();
     var nd = Object.keys(dests).length;
     E("txn").textContent = "";
     var sm = E("txsum"); if(sm) sm.innerHTML = fmt(total) + " ATONE<br>to " + nd + " validator" + (nd === 1 ? "" : "s");
+    /* stake already under cooldown, said as the Pro Redelegate title row says it, in the popup's first row */
+    var lk = E("txlockn"), pz = window.__POS;
+    if(lk){ if(pz && pz.locked >= 1e6 && window.__dayFull){
+        lk.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><b>' + fmt(pz.locked) + '</b>locked until<b>' + window.__dayFull(pz.until) + '</b>';
+        lk.title = fmt(pz.locked) + " ATONE was redelegated in the last 21 days and cannot move again until then; this redelegates the free " + fmt(pz.free);
+      } else { lk.innerHTML = ""; lk.removeAttribute("title"); } }
     var an = window.__ANS || {}, ax = E("txans");
     if(ax) ax.innerHTML = '<span class=p><i>now</i><b>' + pct(an.now || 0) + '</b></span><span class=arr>\u2192</span>' +
       '<span class="p aft' + (an.after != null && an.after < (an.now || 0) - 0.0005 ? ' neg' : '') + '"><i>after</i><b>' + (an.after != null ? pct(an.after) : '\u2014') + '</b></span>' +
@@ -2953,8 +2968,26 @@ rememberGridH();
      optimiser picks, the ticks split the amount, the moves panel prices each
      chunk from the rate it leaves to the rate it lands on. With apply=false the
      reader's own selection and amount are put back untouched. */
+  /* one validator's stake, moved to the best places: the inactive card's Redelegate. The same machinery as the
+     simple view's plan, with the budget that validator's free stake and that validator taken first; answers
+     whether there are moves to sign */
+  window.__optFrom = function(id){
+    var pos = window.__POS, row = null, k;
+    if(pos) pos.rows.forEach(function(x){ if(x.id === id) row = x; });
+    var B = row ? row.x - row.locked : 0;
+    if(!(B > 0)) return false;
+    window.__SRCFIRST = id;
+    var r = window.__planWith(B, { cleanRecord: CLEAN, maxVals: 10 });
+    if(!r.moves.length){ window.__SRCFIRST = null; return false; }
+    for(k in SEL) delete SEL[k];
+    r.moves.forEach(function(m){ SEL[m.id] = 1; });
+    amt.value = exact(B);
+    QUIET = true; draw(); QUIET = false;
+    return MSGS.length > 0;
+  };
   window.__optPlan = function(apply){
     var pos = window.__POS, B = pos ? pos.free : 0, k;
+    window.__SRCFIRST = null;
     if(!pos || !(B > 0)) return null;
     var keep = null, kamt = amt.value;
     if(!apply){ keep = {}; for(k in SEL) keep[k] = 1; }

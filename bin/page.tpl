@@ -2485,6 +2485,18 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 #wk-plan>.wk-ph .wk-lockn{height:22px;display:inline-flex;align-items:center;gap:4px;padding:0 6px;border-radius:5px;border:1px solid rgba(255,176,46,.35);background:rgba(255,176,46,.06);font-family:var(--wmono);font-size:7px;letter-spacing:.06em;text-transform:uppercase;color:var(--wamber);white-space:nowrap;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
 #wk-plan>.wk-ph .wk-lockn b{font-size:9.5px;font-weight:400;letter-spacing:0;color:#ffd58a}
 #wk-plan>.wk-ph .wk-lockn[hidden]{display:none}
+/* the same note in the Redelegate popup's first row, centred between the title and the sum: the header is three
+   columns (title | note | sum) so the note sits in the card's middle whatever the two sides measure; empty, it
+   takes no room and the row reads as before */
+#txpop .wk-txh{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px}
+#txpop .wk-txh .txsum{grid-column:3;justify-self:end;text-align:right}
+#txpop .txlockn:empty{display:none}
+#txpop .txlockn{grid-column:2;height:24px;display:inline-flex;align-items:center;gap:5px;margin:0;padding:0 8px;border-radius:6px;border:1px solid rgba(255,176,46,.35);background:rgba(255,176,46,.06);font-family:var(--wmono);font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:var(--wamber);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+#txpop .txlockn b{display:inline;font-size:10px;font-weight:400;letter-spacing:0;color:#ffd58a}
+#txpop .txlockn svg{width:11px;height:11px;flex:0 0 auto;fill:none;stroke:#ffb02e;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* a phone has no middle to spare: title and sum keep the first row, the note takes a centred line of its own */
+@media(max-width:600px){#txpop .wk-txh{grid-template-columns:minmax(0,1fr) auto;row-gap:8px}#txpop .wk-txh .txsum{grid-column:2;grid-row:1}
+  #txpop .txlockn{grid-column:1/-1;grid-row:2;justify-self:center;max-width:100%}}
 /* max with nothing to move: grey, inert */
 #wk-plan .wk-field .wk-max:disabled{opacity:.45;cursor:default;border-color:var(--wbd);background:transparent;color:var(--wf)}
 #wk-plan .wk-field .wk-max:disabled b{color:var(--wf)}
@@ -5774,7 +5786,7 @@ html[data-tab=connect] .l2host{display:none}
   </div>
 </div></div>
 <div class=pop id=txpop><div class="card txcard">
-  <header class=wk-txh><div><b>Redelegate</b><span id=txn hidden></span></div><span class=txsum id=txsum></span></header>
+  <header class=wk-txh><div><b>Redelegate</b><span id=txn hidden></span></div><span class=txlockn id=txlockn></span><span class=txsum id=txsum></span></header>
   <div class=txans id=txans></div>
   <div class=txlist id=txlist></div>
   <div class=txlock id=txlock></div>
