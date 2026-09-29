@@ -307,8 +307,10 @@ def pairs_used(reds):
     return u
 
 # ── the plan: from the lowest-earning movable positions to the best allowed ─
-def plan(g, rows, reds, vals, m, P=None):
+def plan(g, rows, reds, vals, m, P=None, room=None):
     P = P or PRESETS["moderate"]
+    room = MAX_MOVES_DAY if room is None else room
+    if room <= 0: return None
     # what each position earns today, and what it can move
     for r in rows:
         v = vals[r["op"]]; r["rate"] = rate_after(m, v["t"], v["c"], 0); r["free"] = r["x"] - r["locked"]
@@ -359,6 +361,9 @@ def plan(g, rows, reds, vals, m, P=None):
         k = (mv["src"], mv["dst"]); e = merged.setdefault(k, {"src": mv["src"], "dst": mv["dst"], "amount": 0, "gain": 0.0})
         e["amount"] += mv["amount"]; e["gain"] += mv["amount"] * (mv["to_rate"] - mv["from_rate"]) / 1e6
     out = [e for e in merged.values() if e["gain"] >= max(MIN_GAIN_ATONE, P["min_atone"])]
+    # no more moves than the keeper may make today (carry_out refuses a plan over the daily limit): the biggest
+    # gains first, the rest come in a later plan
+    out = sorted(out, key=lambda e: -e["gain"])[:room]
     if not out: return None
     after = sum(r["x"] * r["rate"] for r in rows)
     for e in out: after += e["amount"] * (e["gain"] * 1e6 / e["amount"])
@@ -502,16 +507,19 @@ def once(c, only=None, live=None, force=False):
             waiting_ap = bool(ap) and gr not in adm["paused"] and not c.execute(
                 "SELECT 1 FROM applied WHERE granter=? AND plan_id=? AND ok=1 AND ap_at=?", (gr, ap.get("plan_id"), ap.get("at", 0))).fetchone()
             last = c.execute("SELECT max(at) FROM run_g WHERE granter=?", (gr,)).fetchone()[0] or 0
-            due = force or not last or time.time() - last >= P["every"] or waiting_ap
+            # the grant as it stands: a re-grant (Change, a new cap or validator list) is planned at once, not
+            # at the next 6-hour turn, so the console never shows a plan made for the grant it replaced
+            gsig = hashlib.sha1(json.dumps([g["cap"], sorted(g["allow"] or []), g["exp"]]).encode()).hexdigest()[:12]
+            due = force or not last or time.time() - last >= P["every"] or waiting_ap or (prev or {}).get("grant_sig") != gsig
             if gr in adm["paused"]: due = False
             p = None
             if due:
                 rows, reds = position(gr, vals)
-                p = plan(g, rows, reds, vals, m, P) or {"moves": []}
+                p = plan(g, rows, reds, vals, m, P, room=MAX_MOVES_DAY - moves_today(c, gr)) or {"moves": []}
                 c.execute("INSERT INTO run_g VALUES(?,?)", (int(time.time()), gr)); c.commit()
                 record = rate_record(c, gr, rows)
                 rep = {"granter": gr, "checked": int(time.time()), "dry": dry, "strategy": name,
-                       "grant": {"cap": g["cap"], "allow": len(g["allow"]) if g["allow"] else None, "expires": g["exp"]},
+                       "grant": {"cap": g["cap"], "allow": len(g["allow"]) if g["allow"] else None, "expires": g["exp"]}, "grant_sig": gsig,
                        "staked": sum(r["x"] for r in rows), "now": p.get("now"), "after": p.get("after"), "gain": p.get("gain"),
                        "moves": [{"src": e["src"], "dst": e["dst"], "uatone": e["amount"], "gain": round(e["gain"], 3)} for e in p["moves"]], "last": None}
                 if record: rep["record"] = record
