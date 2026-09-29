@@ -10,10 +10,10 @@ OUT = os.environ.get("OUT_DIR", "/srv/atomone-app/web")
 D = json.load(open(os.path.join(OUT, "data.json")))
 TESTNET = os.environ.get("NET", "mainnet") == "testnet"
 NETCFG = ({"net": "testnet", "chain": "atomone-testnet-1", "name": "AtomOne Testnet",
-           "api": "https://atomone-testnet-api.gatadao.com", "rpc": "https://atomone-testnet-rpc.gatadao.com", "other": "../"}
+           "api": "https://atomone-testnet-api.gatadao.com", "rpc": "https://atomone-testnet-rpc.gatadao.com", "other": "../", "base": "/testnet/"}
           if TESTNET else
           {"net": "mainnet", "chain": "atomone-1", "name": "AtomOne",
-           "api": "https://atomone-api.gatadao.com", "rpc": "https://atomone-rpc.gatadao.com", "other": "testnet/"})
+           "api": "https://atomone-api.gatadao.com", "rpc": "https://atomone-rpc.gatadao.com", "other": "testnet/", "base": "/"})
 AVATARS = os.environ.get("AVATAR_DIR", "/srv/atomone-app/state/avatars")   # one cache for both networks
 
 e, s, th, nk = D["eta"], D["set"], D["rule"], D["nakamoto"]
@@ -219,7 +219,7 @@ for _k, _v in SHELL.items():
     TPL = TPL.replace("{{%s}}" % _k, _v)
 page = (TPL
   .replace("{{GENERATED}}", D["generated"]).replace("{{HEIGHT}}", f(D["height"]))
-  .replace("{{CHAIN}}", esc(D["chain"])).replace("{{CHAIN_ID}}", esc(NETCFG["chain"]))   # the popups' chain line, per network
+  .replace("{{CHAIN}}", esc(D["chain"])).replace("{{CHAIN_ID}}", esc(NETCFG["chain"])).replace("{{BASE}}", NETCFG["base"])   # the popups' chain line, per network
   .replace("{{ETA}}", f"{e['now']:.2f}").replace("{{ETA_PCT}}", f"{e['now']*100:.0f}")
   .replace("{{ETA_NEXT}}", f"{next((r['eta'] for r in D['schedule'] if r['next']), e['now']):.2f}")
   .replace("{{NOW_DATE}}", next((r["date"] for r in D["schedule"] if r["now"]), "—"))

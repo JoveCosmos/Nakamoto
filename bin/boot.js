@@ -24,7 +24,12 @@ try{(function(){
      is gone, and with it its key */
   try{ localStorage.removeItem("th_ui"); }catch(e){}
   function eff(s, v){ return v.off ? null : v; }
-  var h = (location.hash || "").replace(/^#\/?/, "").split("/"), s = null, v = null, f;
+  /* the route is the path under the app's base (clean paths since 2026-09-29); an old #/... link still counts.
+     A path that is no route (a harness page) reads as the empty route, so it lands where an empty address did */
+  var B = document.querySelector("base"), BASE = B ? B.getAttribute("href") : "/", hh = location.hash || "", pp = location.pathname;
+  var route = /^#\//.test(hh) ? hh.replace(/^#\/?/, "") : (pp.indexOf(BASE) === 0 ? pp.slice(BASE.length) : pp.replace(/^\//, ""));
+  var h = route.replace(/\/+$/, "").split("/"), s = null, v = null, f;
+  if(h[0] && h[0] !== "intro" && !sec("route", h[0])) h = [""];
   if(h[0] === "intro"){ R.setAttribute("data-tab", "intro"); return; }
   if(h[0] && (s = sec("route", h[0]))) v = s.entry === "first" ? s.sub[0] : (h[1] && sub(s, "route", h[1])) || sub(s, "id", mem[s.id]) || s.sub[0];
   /* no route in the address: the landing page is home (the intro) when the config says so */

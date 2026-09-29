@@ -1,4 +1,5 @@
 <!doctype html><html lang=en><head><meta charset=utf-8>
+<base href="{{BASE}}">
 <meta name=viewport content="width=device-width,initial-scale=1">
 <title>AtomOne Nakamoto Bonus</title>
 <link rel=icon href="assets/favicon.ico" sizes="any"><link rel=icon type="image/png" sizes="32x32" href="assets/favicon-32.png"><link rel=icon type="image/png" sizes="192x192" href="assets/favicon-192.png"><link rel=apple-touch-icon href="assets/apple-touch-icon.png"><meta name=theme-color content="#06060c">
@@ -4914,7 +4915,9 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 /* the network switch: two links, the open network lit; testnet lights amber so a page on the
    test chain can never pass for the real one */
 /* the wallet lives in the Dashboard: its Connect button and pill show only there; every other section reads */
-html:not([data-sec=dashboard]) .hdr-r .sv-who{display:none}
+/* outside the Dashboard the wallet control is not shown but keeps its room, so the day/night button and the network
+   switch never move when a section changes */
+html:not([data-sec=dashboard]) .hdr-r .sv-who{visibility:hidden;pointer-events:none}
 /* ════ Autopilot setup, Easy mode: five numbered steps in plain words, larger controls, a short list ════ */
 #atpop .atrow:not(#z){gap:8px;padding:10px 0}
 .pop .card.atcard:not(#z){height:min(920px,100%)}
@@ -5390,7 +5393,7 @@ html[data-tab=connect] .l2host{display:none}
 <div class=below id=below>
   <header class=folder>
     <div class=brandwrap>
-    <a class=brand href="#/intro" title="AtomOne"><img class=mark src="assets/atomone.svg" alt=""><span class=bw><span class=wordmark>AtomOne</span><span class=bheight id=dlive title="the chain's height, live"><i></i><b>{{HEIGHT}}</b></span></span></a>
+    <a class=brand href="./" data-route="intro" title="AtomOne"><img class=mark src="assets/atomone.svg" alt=""><span class=bw><span class=wordmark>AtomOne</span><span class=bheight id=dlive title="the chain's height, live"><i></i><b>{{HEIGHT}}</b></span></span></a>
     </div>
     <div class=hdr-r>
     <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
@@ -5539,7 +5542,7 @@ html[data-tab=connect] .l2host{display:none}
   <section class=pane id=p-intro><div class=w>
     <div class=intro>
       <h1>The chain that <em>rewards decentralization</em></h1>
-      <a class=introgo href="#/network" data-route="network">Network<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+      <a class=introgo href="network" data-route="network">Network<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
       <a class=introby href="https://gatahub.zone/" target=_blank rel="noopener noreferrer" title="GATA HUB"><span>powered by</span><img src="assets/gata.png" alt="GATA HUB"></a>
     </div>
   </div></section>

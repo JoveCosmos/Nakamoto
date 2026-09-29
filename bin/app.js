@@ -3004,9 +3004,11 @@ rememberGridH();
     var here = NETC.net === "testnet" ? "testnet" : "mainnet";
     document.documentElement.setAttribute("data-net", here);
     var m = document.getElementById("netmain"), t = document.getElementById("nettest"); if(!m || !t) return;
-    m.href = here === "testnet" ? "../" : "./"; t.href = here === "testnet" ? "./" : "testnet/";
+    m.dataset.to = here === "testnet" ? "../" : "./"; t.dataset.to = here === "testnet" ? "./" : "testnet/";
+    m.href = m.dataset.to; t.href = t.dataset.to;
     (here === "testnet" ? t : m).setAttribute("aria-current", "page");
-    [m, t].forEach(function(a){ a.addEventListener("click", function(){ if(a.getAttribute("aria-current")) return; a.href = a.getAttribute("href").split("#")[0] + location.hash; }); });
+    /* the other network opens on the same view: its base plus the open route (a clean path since 2026-09-29) */
+    [m, t].forEach(function(a){ a.addEventListener("click", function(){ if(a.getAttribute("aria-current")) return; a.href = a.dataset.to + (window.__shellPath ? window.__shellPath() : ""); }); });
   })();
   var API = NETC.api || "https://atomone-api.gatadao.com";
   var CHAIN = NETC.chain || "atomone-1";

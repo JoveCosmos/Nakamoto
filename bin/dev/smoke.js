@@ -4,6 +4,8 @@ window.dispatchEvent(new Event("resize"));
 /* no animation: a change of section (the window's fall) then completes on the spot */
 (function(){ var s=document.createElement('style'); s.textContent='*{transition:none!important;animation:none!important}'; document.head.appendChild(s); })();
 function go(r){ window.__shellGo(r); }
+var BASE=(document.querySelector('base')||{getAttribute:function(){return '/';}}).getAttribute('href');
+function at(){ return location.pathname.indexOf(BASE)===0 ? location.pathname.slice(BASE.length) : location.pathname; }
 /* the testnet page (web/testnet): its set is smaller and what only the index knows is N/A */
 var TESTNET = document.documentElement.getAttribute('data-net') === 'testnet';
 
@@ -168,8 +170,8 @@ t('shell-every-view-renders', function(){
   SECS.forEach(function(s){ s.sub.forEach(function(v){
     go(s.route+'/'+v.route);
     /* a view that is off cannot be open: its route lands on the section's first view */
-    if(v.off){ if(location.hash!=='#/'+s.route+'/'+s.sub[0].route) bad.push(s.id+'/'+v.id+' (off, opened '+location.hash+')'); return; }
-    var R=document.documentElement, ok=location.hash==='#/'+s.route+'/'+v.route && R.getAttribute('data-sv')===s.id+'/'+v.id;
+    if(v.off){ if(at()!==s.route+'/'+s.sub[0].route) bad.push(s.id+'/'+v.id+' (off, opened '+at()+')'); return; }
+    var R=document.documentElement, ok=at()===s.route+'/'+v.route && R.getAttribute('data-sv')===s.id+'/'+v.id;
     var p=document.getElementById(v.panel||'p-empty'), r=p&&p.getBoundingClientRect();
     if(!ok || !p || r.height<60 || !p.textContent.trim()) bad.push(s.id+'/'+v.id+(ok?'':' (route)')+(p?' h'+Math.round(r.height):' (no panel)'));
     if(!v.tab && document.getElementById('shellempty').textContent.indexOf(v.empty.title)<0) bad.push(s.id+'/'+v.id+' (empty state)');
@@ -211,16 +213,16 @@ t('shell-groups', function(){
   if(!md || md.offsetParent===null) bad.push('no Easy|Pro switch on Stake');
   if(!vis('sv-over') || vis('p-dele')) bad.push('easy is not the simple screen');
   document.querySelector('.l2mode [data-mode=self]').click();
-  if(location.hash!=='#/dashboard/self' || !vis('p-dele') || vis('sv')) bad.push('pro is not the three panes '+location.hash);
+  if(at()!=='dashboard/self' || !vis('p-dele') || vis('sv')) bad.push('pro is not the three panes '+at());
   if(document.getElementById('l2-dashboard-overview').getAttribute('aria-selected')!=='true') bad.push('Stake not lit in Pro');
   document.getElementById('l2-dashboard-governors').click();
-  if(location.hash!=='#/dashboard/governance' || !vis('sv-mygov')) bad.push('governance page '+location.hash);
+  if(at()!=='dashboard/governance' || !vis('sv-mygov')) bad.push('governance page '+at());
   if(md && md.offsetParent!==null) bad.push('mode switch shown off Stake');
   document.getElementById('l2-dashboard-overview').click();
-  if(location.hash!=='#/dashboard/self') bad.push('Stake does not reopen the last mode '+location.hash);
+  if(at()!=='dashboard/self') bad.push('Stake does not reopen the last mode '+at());
   document.querySelector('.l2mode [data-mode=overview]').click();
   try{ localStorage.removeItem('th_mode'); }catch(e){}
-  go('network/uptime'); if(location.hash!=='#/network/uptime' || !vis('sv-net')) bad.push('network '+location.hash);
+  go('network/uptime'); if(at()!=='network/uptime' || !vis('sv-net')) bad.push('network '+at());
   go('staking/bonus');
   return !bad.length || bad.join(', ');
 });

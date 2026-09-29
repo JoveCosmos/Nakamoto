@@ -38,13 +38,22 @@
   function last(s){ return shown(s, s.entry === "first" ? s.sub[0] : sub(s, "id", mem()[s.id]) || s.sub[0]); }
 
   /* ── routes ── */
-  function hashOf(s, v){ return s ? "#/" + s.route + "/" + v.route : "#/intro"; }
+  /* the address is a clean path under the app's base (/ or /testnet/): /staking/bonus, the intro at the base
+     itself. An old #/... link is read the same and rewritten to its path once the page is on it. */
+  var B = document.querySelector("base"), BASE = B ? B.getAttribute("href") : "/";
+  function pathOf(s, v){ return BASE + (s ? s.route + "/" + v.route : ""); }
+  function routeOf(){
+    var hh = location.hash || "", pp = location.pathname;
+    if(/^#\//.test(hh)) return hh.replace(/^#\/?/, "");
+    return (pp.indexOf(BASE) === 0 ? pp.slice(BASE.length) : pp.replace(/^\//, "")).replace(/\/+$/, "");
+  }
   function parse(h){
-    var p = (h || "").replace(/^#\/?/, "").split("/");
-    if(p[0] === "intro") return { intro: true };
+    var p = (h || "").replace(/^#?\/?/, "").replace(/\/+$/, "").split("/");
+    if(p[0] === "intro" || (!p[0] && C.home === "intro")) return { intro: true };
     var s = p[0] && sec("route", p[0]); if(!s) return null;
     return { s: s, v: (p[1] && sub(s, "route", p[1])) || last(s) };
   }
+  window.__shellPath = function(){ return cur.s ? cur.s.route + "/" + cur.v.route : ""; };
 
   function connected(){ return !!window.__ADDR; }
   function wantsConnect(s){ return s.account === "required" && !connected(); }
@@ -170,9 +179,9 @@
       else if(window.__pick){ window.__pick(tab); if(window.__state) window.__state(); if(tab === "dele" && window.__planDraw) window.__planDraw(); }
       else R.setAttribute("data-tab", tab);
     } else if(window.__state) window.__state();
-    var h = hashOf(s, v);
-    if(how === "push" && location.hash !== h) history.pushState(null, "", h);
-    else if(how === "replace" && location.hash !== h) history.replaceState(null, "", h);
+    var h = pathOf(s, v), here = location.pathname + (location.hash || "");
+    if(how === "push" && here !== h) history.pushState(null, "", h);
+    else if(here !== h) history.replaceState(null, "", h);          /* replace, or a pop that arrived by an old #/ link */
     if(s){ remember(s, v); if(s.switch && v.group) GLAST[s.id + "/" + v.group] = v; }
     if(prevS !== s || prevV !== v) toTop(s, v);
   }
@@ -189,7 +198,7 @@
   document.addEventListener("click", function(ev){ var b = ev.target.closest && ev.target.closest(".l2mode [data-go]"); if(!b) return;
     try{ localStorage.setItem("th_mode", b.dataset.mode); }catch(e){}
     window.__shellGo(b.dataset.go); });
-  window.__shellGo = function(route){ var r = parse("#/" + route); if(r) r.intro ? go(null, null, "push") : go(r.s, r.v, "push"); };
+  window.__shellGo = function(route){ var r = parse(route); if(r) r.intro ? go(null, null, "push") : go(r.s, r.v, "push"); };
 
   function activate(b){
     if(b.getAttribute("aria-disabled") === "true") return;
@@ -204,8 +213,7 @@
       go(s, v, "push"); }
   }
 
-  /* clicks: the tabs, any [data-route] door, and the connect screen's button (links to
-     #/... need nothing - the address changes and hashchange below answers it) */
+  /* clicks: the tabs, any [data-route] door, and the connect screen's button */
   document.addEventListener("click", function(ev){
     var t = ev.target.closest ? ev.target.closest(".l1tab,.l2tab,.l2vb,[data-route],[data-shell-connect]") : null;
     if(!t) return;
@@ -234,7 +242,7 @@
 
   /* back, forward, and links: the address says where to be */
   function fromAddress(){
-    var r = parse(location.hash); if(!r) return;
+    var r = parse(routeOf()); if(!r) return;
     /* Back or Forward while a card is up: the card goes with the page it was opened on */
     if(window.__POP) window.__POP.closeAll();
     if(r.intro){ if(cur.s || R.getAttribute("data-tab") !== "intro") go(null, null, "pop"); return; }

@@ -1194,7 +1194,7 @@
     if(!P) v += '<p class=gv-say>Reading the proposals…</p>';
     else {
       var card = function(p, open){ var t = ptally(p.tally), y = t.s ? t.y / t.s * 100 : 0, st = PST[p.st] || ["ended", "d"];
-        return '<a class=gv-lp href="#/governance/proposals"><span class=gv-lh><em>#' + p.id + '</em><i class="gp-st ' + st[1] + '">' + st[0] + '</i></span><b>' + esc(p.title) + '</b>' +
+        return '<a class=gv-lp href="governance/proposals" data-route="governance/proposals"><span class=gv-lh><em>#' + p.id + '</em><i class="gp-st ' + st[1] + '">' + st[0] + '</i></span><b>' + esc(p.title) + '</b>' +
           '<span class=gp-bar><i class=y style="width:' + y.toFixed(1) + '%"></i><i class=n style="width:' + (t.s ? t.n / t.s * 100 : 0).toFixed(1) + '%"></i></span>' +
           '<small>Yes ' + y.toFixed(1) + '%, ' + (open ? 'ends ' : 'ended ') + pday(p.ve) + '</small></a>'; };
       v += live.length ? '<div class=gv-live>' + live.map(function(p){ return card(p, true); }).join("") + '</div>'
