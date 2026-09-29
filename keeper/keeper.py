@@ -310,12 +310,12 @@ def pairs_used(reds):
 def plan(g, rows, reds, vals, m, P=None, room=None):
     P = P or PRESETS["moderate"]
     room = MAX_MOVES_DAY if room is None else room
-    if room <= 0: return None
     # what each position earns today, and what it can move
     for r in rows:
         v = vals[r["op"]]; r["rate"] = rate_after(m, v["t"], v["c"], 0); r["free"] = r["x"] - r["locked"]
     total = sum(r["x"] for r in rows)
-    if not total: return None
+    # the day's moves used up: no plan today, but only once every row carries its rate (the rate record reads them)
+    if room <= 0 or not total: return None
     blended = sum(r["x"] * r["rate"] for r in rows) / total
     free = [r for r in rows if r["free"] > 0]
     if not free: return None
