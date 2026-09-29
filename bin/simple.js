@@ -436,6 +436,19 @@
     }
     put("sd-ars", restakePanel(pos, at));
     var rows = pos ? pos.rows : [];
+    /* with a grant the list is the grant's own: every validator Autopilot may use, the ones holding stake first
+       (most stake on top), then the rest of the allow-list at 0, the best-paying first */
+    if(g && alist.length && pos){
+      var V = VALS(), by = {}, have = {}, zero = [];
+      V.forEach(function(v){ by[v[3]] = v; });
+      rows = pos.rows.filter(function(r){ return alist.indexOf(r.op) >= 0; });
+      rows.forEach(function(r){ have[r.id] = 1; });
+      alist.forEach(function(op){ var id = op.slice(-6), v = by[id]; if(have[id]) return; have[id] = 1;
+        zero.push({ id: id, op: op, m: v ? v[0] : (((window.__INACT || {})[id] || {}).m || "Inactive validator"), x: 0, locked: 0,
+                    rate: v ? window.__rateAfter(v[1], v[2], 0) : 0, inactive: !v }); });
+      zero.sort(function(a, b){ return b.rate - a.rate; });
+      rows = rows.concat(zero); mark = null;
+    }
     put("sd-asky", g ? grantView(g, at, rp, since, until) : wouldDo(pos));
     put("sd-alist", rows.length ? '<div class=sv-ph><h3>Validators</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total, mark)
       : '<div class=sv-ph><h3>Validators</h3></div>' + (pos ? '<div class=sv-upwait>None yet</div>' : vskel(6)));
