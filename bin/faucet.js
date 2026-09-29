@@ -39,7 +39,7 @@
       if(k.experimentalSuggestChain) return k.experimentalSuggestChain(CHAIN_INFO).then(function(){ return k.enable(CHAIN); });
       throw e; })
       .then(function(){ return k.getKey(CHAIN); })
-      .then(function(key){ addr.value = key.bech32Address; E("conn").textContent = "Connected"; say(""); check(); })
+      .then(function(key){ addr.value = key.bech32Address; var c = E("conn"); c.classList.add("on"); c.querySelector("span").textContent = "Keplr connected"; say(""); check(); })
       .catch(function(e){ if(!quiet) say(e && e.message ? e.message : String(e), "err"); });
   }
   E("conn").addEventListener("click", function(){ connect(false); });

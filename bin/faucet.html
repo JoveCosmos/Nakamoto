@@ -7,10 +7,10 @@
 <title>AtomOne Testnet Faucet</title>
 <link rel=icon href="favicon.ico">
 <style>
-:root{--bg:#09090f;--c1:#131329;--c2:#0c0c1a;--bd:#232342;--bd2:#34345c;--t:#f0eef8;--s:#c1bfdc;--f:#8f8db4;
+:root{--onv:#161038;--bg:#09090f;--c1:#131329;--c2:#0c0c1a;--bd:#232342;--bd2:#34345c;--t:#f0eef8;--s:#c1bfdc;--f:#8f8db4;
 --amber:#ffb02e;--pho:#62d9ff;--green:#2ee06a;--violet:#b9b0ff;--red:#ff6a3d;--mono:ui-monospace,"JetBrains Mono",Menlo,monospace;
 --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif}
-@media (prefers-color-scheme:light){:root{--bg:#f4f2ec;--c1:#fffdf8;--c2:#f7f4ec;--bd:#e3ddd0;--bd2:#d2cabb;--t:#17161c;--s:#4d4a57;--f:#7a7686;
+@media (prefers-color-scheme:light){:root{--onv:#ffffff;--bg:#f4f2ec;--c1:#fffdf8;--c2:#f7f4ec;--bd:#e3ddd0;--bd2:#d2cabb;--t:#17161c;--s:#4d4a57;--f:#7a7686;
 --amber:#9b5a0a;--pho:#1f6f9a;--green:#16733a;--violet:#5b4fc4;--red:#b3261e}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -20,9 +20,15 @@ body{margin:0;min-height:100vh;background:var(--bg);color:var(--t);font:14px/1.5
 h1{margin:0;font-size:21px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 h1 span{color:var(--violet)}
 .tag{font:600 9.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--amber) 55%,transparent);color:var(--amber)}
-.lbl{display:flex;align-items:center;justify-content:space-between;font:600 9px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--f)}
-.lbl button{font:600 9px var(--mono);letter-spacing:.14em;text-transform:uppercase;background:none;border:1px solid var(--bd2);color:var(--s);border-radius:999px;padding:3px 9px;cursor:pointer}
-.lbl button:hover{border-color:var(--violet);color:var(--t)}
+.lbl{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font:600 9px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--f)}
+/* the wallet: the first thing to do, so the most prominent control on the card */
+.kep{display:flex;align-items:center;justify-content:center;gap:10px;height:48px;width:100%;border-radius:10px;cursor:pointer;
+  border:1px solid var(--violet);background:var(--violet);color:var(--onv);font:700 15px var(--sans);letter-spacing:.01em;
+  box-shadow:0 6px 22px -10px color-mix(in srgb,var(--violet) 80%,transparent)}
+.kep:hover{filter:brightness(1.08)}
+.kep img{display:block;border-radius:5px}
+.kep.on{background:transparent;color:var(--green);border-color:color-mix(in srgb,var(--green) 55%,transparent);box-shadow:none;cursor:default}
+.kep:focus-visible{outline:2px solid var(--violet);outline-offset:3px}
 input{width:100%;height:42px;padding:0 12px;border-radius:9px;border:1px solid var(--bd2);background:var(--c2);color:var(--t);font:13px var(--mono);outline:none}
 input:focus{border-color:var(--violet);box-shadow:0 0 0 3px color-mix(in srgb,var(--violet) 18%,transparent)}
 input.bad{border-color:var(--red)}
@@ -34,7 +40,7 @@ input.bad{border-color:var(--red)}
 .go button.p{border-color:color-mix(in srgb,var(--pho) 55%,transparent)}.go button.p b{color:var(--pho)}
 .go button:hover:not(:disabled){background:color-mix(in srgb,var(--violet) 8%,var(--c1))}
 .go button:disabled{opacity:.45;cursor:not-allowed}
-.go button:focus-visible,.lbl button:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+.go button:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
 .msg{min-height:20px;font-size:12.5px;color:var(--s);overflow-wrap:anywhere}
 .msg.ok{color:var(--green)}.msg.err{color:var(--red)}
 .foot{font-size:11.5px;color:var(--f);border-top:1px solid var(--bd);padding-top:12px}
@@ -44,9 +50,10 @@ input.bad{border-color:var(--red)}
 <body>
 <main class=card>
   <h1>AtomOne <span>Faucet</span><i class=tag>testnet only</i></h1>
+  <button type=button class=kep id=conn><img src="assets/wallet-keplr.svg" alt="" width=20 height=20><span>Connect Keplr</span></button>
   <div>
-    <div class=lbl>Your testnet address<button type=button id=conn>Connect Keplr</button></div>
-    <input id=addr type=text placeholder="atone1..." autocomplete=off spellcheck=false aria-label="Your testnet address">
+    <div class=lbl>Your atone address</div>
+    <input id=addr type=text placeholder="atone1..." autocomplete=off spellcheck=false aria-label="Your atone address">
   </div>
   <div class=go>
     <button type=button class=a data-token=atone disabled><b>100</b><small>Request ATONE</small></button>
