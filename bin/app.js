@@ -3001,7 +3001,9 @@ rememberGridH();
     QUIET = true; draw(); QUIET = false;
     var an = window.__ANS || {};
     var out = { now: an.now || 0, after: an.after, gain: an.gain || 0, moves: MSGS.length,
-                picks: r.moves.map(function(m){ return { id: m.id, m: m.m, x: m.x }; }) };
+                picks: r.moves.map(function(m){ return { id: m.id, m: m.m, x: m.x }; }),
+                /* every move, as the signing card will list it - the one screen shows it before the click */
+                msgs: MSGS.map(function(m){ return { from: m.from, to: m.to, amt: m.amt }; }) };
     if(!apply){ for(k in SEL) delete SEL[k]; for(k in keep) SEL[k] = 1; amt.value = kamt;
                 QUIET = true; draw(); QUIET = false; }
     return out;

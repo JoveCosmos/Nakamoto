@@ -271,6 +271,7 @@
     var pos = window.__POS, S = setStats(), bal = window.__BAL;
     var mine = pos && pos.rows.length, rew = window.__REW || 0, liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0, tot = liq + stk + rew;
     put("sd-wstrip", wstrip());
+    drawMove();
 
     /* the move */
     var plan = planNow(pos), h = "", byId = {};
@@ -1464,11 +1465,185 @@
     var L = document.querySelectorAll("#saband .sa-l"); if(!L.length) return;
     L[SA.i % L.length].classList.remove("on"); SA.i++; L[SA.i % L.length].classList.add("on");
   }, 2800);
+  /* ════ ONE SCREEN (2026-09-29): at >=1100px the page is three fixed columns - YOU on the left (the
+     APR, the balances, Autopilot and Restake together), the STAGE in the middle (the only thing that
+     changes), the PATHS on the right (every destination in a fixed place, each with its live headline).
+     The paths replace the header's section tabs; they route exactly as the tabs did. ════ */
+  var PATHS = [
+    { id: "move",  route: "dashboard/wallet",     sec: "dashboard",  eb: "Your move" },
+    { id: "net",   route: "network/uptime",       sec: "network",    eb: "Network" },
+    { id: "bonus", route: "staking/bonus",        sec: "staking",    eb: "Nakamoto Bonus" },
+    { id: "gov",   route: "governance/proposals", sec: "governance", eb: "Governance" },
+    { id: "pro",   route: "dashboard/self",       sec: "dashboard",  eb: "Pro" }];
+  function pathOn(p){
+    var sec = root.getAttribute("data-sec"), sv = root.getAttribute("data-sv") || "";
+    if(p.id === "pro") return sv === "dashboard/self";
+    if(p.id === "move") return sec === "dashboard" && sv !== "dashboard/self";
+    return sec === p.sec;
+  }
+  function pathHead(id){
+    var pos = window.__POS;
+    if(id === "move"){
+      if(!window.__ADDR) return ["Connect a wallet", "and see your best move"];
+      if(!pos) return ["Reading your stake…", ""];
+      if(!pos.rows.length) return ["No stake yet", "stake ATONE to start earning"];
+      if(!(pos.free >= 1e6)) return ["Cooling down", "free to move on " + (window.__dayFull ? window.__dayFull(pos.until) : "")];
+      var pl = planNow(pos);
+      if(pl && pl.gain > 0.5 && pl.after != null) return ["+" + one(pl.gain) + " ATONE a year", "ready to move, 1 signature"];
+      return ["Earning " + pct(pos.rate), "nothing better to move to today"];
+    }
+    if(id === "net"){
+      var r = upRows(), last = r[r.length - 1];
+      if(!last) return ["Reading the chain…", ""];
+      var sg = +last[1], n = +last[2], ts = r.map(function(x){ return +x[4]; }).filter(function(t){ return t > 0; });
+      var bt = ts.length > 1 ? (ts[ts.length - 1] - ts[0]) / (ts.length - 1) / 1000 : 0;
+      return [sg >= n ? "All " + n + " signing" : sg + " of " + n + " signing", bt ? bt.toFixed(2) + " s a block, last " + r.length + " blocks" : ""];
+    }
+    if(id === "bonus"){
+      var V = VALS(), lo = Infinity, hi = 0;
+      V.forEach(function(v){ var x = window.__rateAfter ? window.__rateAfter(v[1], v[2], 0) : 0; if(x > 0){ if(x < lo) lo = x; if(x > hi) hi = x; } });
+      return hi ? [pct(lo) + " to " + pct(hi) + " APR", "the smaller the validator, the more it pays"] : ["Reading the set…", ""];
+    }
+    if(id === "gov"){
+      loadProps();
+      var P = GP.list; if(!P) return ["Reading proposals…", ""];
+      var live = P.filter(function(p){ return p.st === "PROPOSAL_STATUS_VOTING_PERIOD"; }), top = P[0];
+      var word = function(st){ return st === "PROPOSAL_STATUS_PASSED" ? "passed" : st === "PROPOSAL_STATUS_REJECTED" ? "rejected" : st === "PROPOSAL_STATUS_VOTING_PERIOD" ? "voting now" : "open"; };
+      return [live.length ? live.length + (live.length === 1 ? " vote open" : " votes open") : "No vote open", top ? "#" + top.id + " " + top.title + " " + word(top.st) : ""];
+    }
+    return ["Every control, by hand", "stake, unstake, claim, pick validators"];
+  }
+  function drawPaths(){
+    put("paths", PATHS.map(function(p){
+      var on = pathOn(p), h = pathHead(p.id);
+      return '<button class="pth' + (on ? ' on' : '') + '" type=button data-route="' + p.route + '" data-p="' + p.id + '"' + (on ? ' aria-current=page' : '') + '>' +
+        '<em>' + p.eb + '</em><b>' + esc(h[0]) + '</b>' + (h[1] ? '<small>' + esc(h[1]) + '</small>' : '') + '</button>';
+    }).join(""));
+  }
+  function youSwitch(act, name, on, sub, dis){
+    return '<div class=you-sw><div class=you-swt><b>' + name + '</b><small>' + sub + '</small></div>' +
+      '<button class="you-tg' + (on ? ' on' : '') + '" type=button role=switch aria-checked=' + (on ? 'true' : 'false') + ' aria-label="' + name + '"' +
+      (dis ? ' disabled aria-disabled=true tabindex=-1' : ' data-act=' + act) + '><i></i></button></div>';
+  }
+  function drawYou(){
+    var pos = window.__POS, bal = window.__BAL, a = window.__ADDR, mine = pos && pos.rows.length;
+    var at = window.__atInfo ? window.__atInfo() : null, auto = !!(at && at.grant), rs = !!(at && at.restake);
+    var wname = (window.__WALLET && String(window.__WALLET.label || "").trim()) || "Your wallet";
+    var row = function(k, v, u, extra){ return '<div class=you-r><span>' + k + '</span>' + (extra || '') + '<b>' + v + '</b><i>' + u + '</i></div>'; };
+    var h = '<div class=you-h><h3 title="' + esc(wname) + '">' + esc(wname) + '</h3>' + wmeta() + '</div>';
+    h += '<div class=you-apr><em>Your APR</em><b' + (mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '>' + (mine ? pct(pos.rate) : '—') + '</b>' +
+      '<small>' + (!a ? 'connect a wallet to see yours' : !pos ? 'reading…' : mine ? 'on ' + pos.rows.length + ' validator' + (pos.rows.length === 1 ? '' : 's') : 'nothing staked yet') + '</small></div>';
+    h += '<div class=you-bal>' +
+      row("Staked", pos ? fmt(pos.total) : '—', "ATONE") +
+      row("Available", bal ? fmt(bal.uatone) : '—', "ATONE") +
+      row("Rewards", window.__REW != null ? fmt(window.__REW) : '—', "ATONE",
+          a && window.__REW >= 1e5 ? '<button class=you-cl type=button data-act=claim>Claim</button>' : '') +
+      row("For fees", bal ? fmt(bal.uphoton) : '—', "PHOTON") + '</div>';
+    var rp = at && at.report, adm = rp && rp.admin, st = adm && adm.state;
+    var asub = !auto ? "your best move, every 21 days"
+      : pos && pos.locked >= 1e6 && window.__dayFull ? "on, next move after " + window.__dayFull(pos.until)
+      : st === "waiting" ? "on, with GATA for a check" : "on, watching your stake";
+    h += '<div class=you-hf><em>Hands-free</em>' +
+      youSwitch("youauto", "Autopilot", auto, asub, !a || !mine) +
+      youSwitch("restakesw", "Restake", rs, rs ? "on, rewards staked every 12 hours" : "stakes your rewards every 12 hours", !a || !mine) + '</div>';
+    put("you", h);
+  }
+  function drawOne(){ if(E("you")) drawYou(); if(E("paths")) drawPaths(); }
+  function youAuto(){
+    var at = window.__atInfo ? window.__atInfo() : null;
+    if(at && at.grant){ if(window.__shellGo) window.__shellGo("dashboard/autopilot"); }
+    else { var ab = E("atbtn"); if(ab) ab.click(); }
+  }
+
+  /* ── YOUR MOVE: the one screen's first stage. Before the click it says what moves where, in numbers;
+     after it, the 21-day cooldown the chain holds redelegated stake for; then the cycle repeats. ── */
+  function mvRows(list, cls, more){
+    var shown = list.slice(0, 5), rest = list.length - shown.length;
+    return shown.map(function(r){
+      return '<div class=mv-r><u class=' + cls + '>' + r.rank + '</u><span title="' + esc(r.name) + '">' + esc(r.name) + '</span><b>' + r.amt + '</b><i class=' + cls + '>' + r.apr + '</i></div>';
+    }).join("") + (rest > 0 ? '<div class=mv-more>and ' + rest + ' more ' + more + '</div>' : '');
+  }
+  function mvSet(src, dst){
+    var V = VALS(), n = V.length, top = V.length ? V[0][1] : 1, cut = Math.floor(n * 2 / 3);
+    var bars = V.map(function(v, i){
+      var cls = src[v[3]] ? ' s' : dst[v[3]] ? ' d' : i >= cut ? ' lo' : '';
+      return '<i class="' + cls.trim() + '" style="height:' + Math.round(6 + 94 * Math.sqrt(v[1] / top)) + '%"></i>';
+    }).join("");
+    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em><em class=g>The smallest third pays the most</em></div>' +
+      '<div class=mv-bars>' + bars + '</div><div class=mv-brk><span style="flex:' + cut + '"></span><span class=g style="flex:' + (n - cut) + '">ranks ' + (cut + 1) + ' to ' + n + '</span></div></div>';
+  }
+  function drawMove(){
+    var el = E("mv-stage"); if(!el) return;
+    var pos = window.__POS, a = window.__ADDR, S = setStats();
+    var V = VALS(), byId = {}; V.forEach(function(v, i){ byId[v[3]] = { v: v, rank: i + 1 }; });
+    var nm = function(id){ var b = byId[id]; if(b) return b.v[0]; var x = (window.__INACT || {})[id]; return x && x.m ? x.m : id; };
+    var rk = function(id){ var b = byId[id]; return b ? '#' + b.rank : 'out'; };
+    var rate = function(id, x){ var b = byId[id]; return b && window.__rateAfter ? window.__rateAfter(b.v[1], b.v[2], x || 0) : 0; };
+    var at = window.__atInfo ? window.__atInfo() : null, auto = !!(at && at.grant);
+    var day = window.__dayFull || function(){ return ""; };
+    var lo = Infinity, hi = 0; V.forEach(function(v){ var x = rate(v[3]); if(x > 0){ if(x < lo) lo = x; if(x > hi) hi = x; } });
+    var ex = hi ? '10,000 ATONE earns <b>' + one(1e4 * lo) + ' a year</b> on the largest validator and <b>' + one(1e4 * hi) + '</b> on the smallest.' : '';
+    var top = function(eb, chip, cls){ return '<div class=mv-top><em>' + eb + '</em>' + (chip ? '<span class="mv-chip ' + cls + '">' + chip + '</span>' : '') + '</div>'; };
+    var nowOn = function(){
+      /* dust a redelegation leaves behind (under 0.1 ATONE) is not a position */
+      var rows = pos.rows.filter(function(r){ return r.x >= 1e5; }).sort(function(x, y){ return y.x - x.x; });
+      return '<div class=mv-box><em>Now on</em>' + mvRows(rows.map(function(r){ return { rank: r.inactive ? 'out' : rk(r.id), name: r.m, amt: fmt(r.x), apr: r.inactive ? '0%' : pct(r.rate) }; }), 'g', 'validators') + '</div>';
+    };
+    var h;
+    if(!a){
+      h = top('Your best move') +
+        '<div class=mv-hl><b>Up to ' + (hi ? pct(hi) : '—') + ' APR</b><span>' + ex + '</span></div>' + mvSet({}, {}) +
+        '<div class=mv-act>' + CONNECT_OFF + '<span>Connect a wallet at the top: your balances, and your best move in numbers, show here.</span></div>';
+    } else if(!pos){
+      h = top('Your best move') + '<div class=mv-hl><b>Reading your stake…</b></div>';
+    } else if(!pos.rows.length){
+      h = top('Your best move', 'Nothing staked yet', 'q') +
+        '<div class=mv-hl><b>Stake to start earning</b><span>' + ex + '</span></div>' + mvSet({}, {}) +
+        '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=stake>Stake ATONE</button><span>Your ATONE stays yours: staking only delegates it.</span></div>';
+    } else {
+      var plan = pos.free >= 1e6 ? planNow(pos) : null, offer = plan && plan.gain > 0.5 && plan.after != null && plan.msgs && plan.msgs.length;
+      if(offer){
+        var fr = {}, to = {}, moved = 0;
+        plan.msgs.forEach(function(m){ fr[m.from] = (fr[m.from] || 0) + m.amt; to[m.to] = (to[m.to] || 0) + m.amt; moved += m.amt; });
+        var src = {}, dst = {};
+        var fL = Object.keys(fr).sort(function(x, y){ return fr[y] - fr[x]; }).map(function(id){ src[id] = 1; return { rank: rk(id), name: nm(id), amt: fmt(fr[id]), apr: pct(rate(id)) }; });
+        var tL = Object.keys(to).sort(function(x, y){ return to[y] - to[x]; }).map(function(id){ dst[id] = 1; return { rank: rk(id), name: nm(id), amt: '+' + fmt(to[id]), apr: pct(rate(id, to[id])) }; });
+        var lock = pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is cooling down until ' + day(pos.until) + ' and stays where it is.</div>' : '';
+        h = top('Your best move today', auto ? 'Autopilot: with GATA for a check' : 'Ready, 1 signature', 'ok') +
+          '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.now) + '</i> to <i class=g>' + pct(plan.after) + '</i> APR</span></div>' +
+          '<div class=mv-flow><div class=mv-box><em>From, ' + fL.length + ' validator' + (fL.length === 1 ? '' : 's') + '</em>' + mvRows(fL, 'a', 'validators') + '</div>' +
+          '<div class=mv-arr aria-hidden=true><svg viewBox="0 0 44 20"><path d="M2 10h38M32 3l8 7-8 7"/></svg></div>' +
+          '<div class=mv-box><em>To, ' + tL.length + ' validator' + (tL.length === 1 ? '' : 's') + '</em>' + mvRows(tL, 'g', 'validators') + '</div></div>' +
+          lock + mvSet(src, dst) +
+          '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=opt>' + (auto ? 'Or redelegate now yourself' : 'Redelegate ' + fmt(moved) + ' ATONE') + '</button>' +
+          '<span>One signature. Your ATONE stays staked and in your wallet; after the move it cools down for 21 days.</span></div>';
+      } else if(!(pos.free >= 1e6)){
+        var t1 = pos.until || Date.now(), t0 = t1 - 21 * 864e5, k = Math.min(21, Math.max(1, Math.ceil((Date.now() - t0) / 864e5)));
+        var cells = ''; for(var i = 1; i <= 21; i++) cells += '<i' + (i <= k ? ' class=on' : '') + '></i>';
+        var hist = at && at.report && at.report.history && at.report.history.length ? at.report.history[0] : null;
+        h = top(auto ? 'Moved. Autopilot is on' : 'Moved. Cooling down', 'Day ' + k + ' of 21', 'warn') +
+          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>Free to move again on <b>' + day(t1) + '</b>. It earns the whole time.</span></div>' +
+          '<div class=mv-days><div class=mv-dh><span>Cooling down</span><span>' + day(t0) + ' to ' + day(t1) + '</span></div><div class=mv-dc>' + cells + '</div>' +
+          '<small>The chain holds redelegated stake for 21 days. Nothing to do until then.</small></div>' + nowOn() +
+          (auto ? '<div class=mv-cyc><div class=done><em>' + (hist ? day(hist.at * 1000) : 'Done') + '</em><b>Moved</b></div><div class=warn><em>Until ' + day(t1) + '</em><b>Cooling down</b></div>' +
+                  '<div><em>' + day(t1) + '</em><b>Next move offered</b></div><div><em>After GATA’s check</em><b>Made for you</b></div></div>'
+                : '<div class=mv-ap><span>On ' + day(t1) + ' your next best move shows here. <b>Autopilot makes it for you</b>, every 21 days, while you sleep.</span>' +
+                  '<button class="sv-btn mv-ghost" type=button data-act=youauto>Turn on Autopilot</button></div>');
+      } else {
+        h = top('Your stake today', 'Already where it pays most', 'ok') +
+          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>No better place for this stake today. This re-checks every block and shows the move as soon as there is one.</span></div>' +
+          nowOn() + mvSet({}, {});
+      }
+    }
+    put("mv-stage", h);
+  }
+
   function render(){
     if(window.__rerate) window.__rerate();
     homeDoor();
     selfBand();
     drawHead();
+    drawOne();
     if(root.getAttribute("data-sv") === "dashboard/self") put("sd-mstrip", wstrip());
     if(root.getAttribute("data-tab") !== "dele" || root.getAttribute("data-ui") !== "simple") return;
     var s = screen();
@@ -1514,6 +1689,7 @@
       if(p && p.moves) window.__goSign();
       return;
     }
+    if(act === "youauto"){ youAuto(); return; }
     if(act === "restakesw"){ if(window.__rsToggle) window.__rsToggle(t); return; }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
@@ -1552,6 +1728,20 @@
     ev.preventDefault(); window.__vshow(t.dataset.v);
   }
   sv.addEventListener("click", onClick);
+  /* the one screen's two columns: YOU shares the dashboard's actions (claim, restake); its Autopilot
+     switch opens the setup when off and the Autopilot view when on. A PATH routes like a header tab. */
+  var youEl = E("you"), pathsEl = E("paths");
+  if(youEl) youEl.addEventListener("click", function(ev){
+    var t = ev.target.closest ? ev.target.closest("[data-act]") : null;
+    if(t && t.dataset.act === "youauto"){ youAuto(); return; }
+    onClick(ev);
+  });
+  if(pathsEl) pathsEl.addEventListener("click", function(ev){
+    var b = ev.target.closest ? ev.target.closest("[data-route]") : null;
+    if(b && window.__shellGo) window.__shellGo(b.getAttribute("data-route"));
+  });
+  /* a route change moves the lit path: the shell stamps the section and view on <html> */
+  new MutationObserver(function(){ if(E("paths")) drawPaths(); }).observe(root, { attributes: true, attributeFilter: ["data-sec", "data-sv"] });
   var mstrip = E("sd-mstrip"); if(mstrip) mstrip.addEventListener("click", onClick);   /* Manage's copy of the strip */
   sv.addEventListener("keydown", onKey);
 
