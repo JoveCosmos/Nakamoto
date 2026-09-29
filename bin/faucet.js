@@ -31,18 +31,33 @@
     api("claimed?address=" + encodeURIComponent(a)).then(function(c){ CLAIMED[a] = c; draw(); }).catch(function(){});
   }
   addr.addEventListener("input", function(){ say(""); check(); });
-  /* Keplr: fills the address (the testnet chain is offered to Keplr if it does not know it yet) */
-  function connect(quiet){
-    var k = window.keplr;
-    if(!k){ if(!quiet) say("Keplr is not installed in this browser: paste your address instead.", "err"); return; }
-    k.enable(CHAIN).catch(function(e){
-      if(k.experimentalSuggestChain) return k.experimentalSuggestChain(CHAIN_INFO).then(function(){ return k.enable(CHAIN); });
-      throw e; })
-      .then(function(){ return k.getKey(CHAIN); })
-      .then(function(key){ addr.value = key.bech32Address; var c = E("conn"); c.classList.add("on"); c.querySelector("span").textContent = "Keplr connected"; say(""); check(); })
+  /* Keplr or Adena fills the address. Keplr is offered the testnet chain if it does not know it yet; Adena's
+     cosmos surface (AtomOne built in) answers in a {status, data} envelope, unwrapped as in the app. */
+  function unwrapA(r){
+    if(r && r.status === "success") return r.data;
+    var m = (r && r.message) || "Adena refused";
+    throw new Error(/reject/i.test(m) ? "Request rejected" : m);
+  }
+  var WALLETS = {
+    Keplr: function(){ var k = window.keplr; if(!k) return null;
+      return k.enable(CHAIN).catch(function(e){
+        if(k.experimentalSuggestChain) return k.experimentalSuggestChain(CHAIN_INFO).then(function(){ return k.enable(CHAIN); });
+        throw e; }).then(function(){ return k.getKey(CHAIN); }); },
+    Adena: function(){ var a = window.adena && window.adena.cosmos; if(!a) return null;
+      return a.enable(CHAIN).then(unwrapA).then(function(){ return a.getKey(CHAIN); }).then(unwrapA); }
+  };
+  function connect(name, quiet){
+    var p = WALLETS[name]();
+    if(!p){ if(!quiet) say(name + " is not installed in this browser: paste your address instead.", "err"); return; }
+    p.then(function(key){
+        addr.value = key.bech32Address;
+        var c = E("conn"); c.textContent = name + " connected"; c.hidden = false; E("wal").hidden = true;
+        try{ localStorage.setItem("th_wallet", name); }catch(e){}
+        say(""); check(); })
       .catch(function(e){ if(!quiet) say(e && e.message ? e.message : String(e), "err"); });
   }
-  E("conn").addEventListener("click", function(){ connect(false); });
+  Array.prototype.forEach.call(document.querySelectorAll("#wal [data-w]"), function(b){
+    b.addEventListener("click", function(){ connect(b.dataset.w, false); }); });
   Array.prototype.forEach.call(btns, function(b){
     b.addEventListener("click", function(){
       var a = addr.value.trim(), t = b.dataset.token; if(!ok(a)) return;
@@ -55,6 +70,6 @@
   });
   api("status").catch(function(){ say("The faucet is not answering right now.", "err"); });
   /* a wallet connected in the app before fills the address at once */
-  try{ if(localStorage.getItem("th_wallet") === "Keplr") connect(true); }catch(e){}
+  try{ var w0 = localStorage.getItem("th_wallet"); if(WALLETS[w0]) connect(w0, true); }catch(e){}
   draw();
 })();

@@ -28,6 +28,8 @@ h1 span{color:var(--violet)}
 .kep:hover{filter:brightness(1.08)}
 .kep img{display:block;border-radius:5px}
 .kep.on{background:transparent;color:var(--green);border-color:color-mix(in srgb,var(--green) 55%,transparent);box-shadow:none;cursor:default}
+/* two wallets, equally prominent, side by side; one "connected" bar replaces them */
+.wal{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .kep:focus-visible{outline:2px solid var(--violet);outline-offset:3px}
 input{width:100%;height:42px;padding:0 12px;border-radius:9px;border:1px solid var(--bd2);background:var(--c2);color:var(--t);font:13px var(--mono);outline:none}
 input:focus{border-color:var(--violet);box-shadow:0 0 0 3px color-mix(in srgb,var(--violet) 18%,transparent)}
@@ -50,7 +52,11 @@ input.bad{border-color:var(--red)}
 <body>
 <main class=card>
   <h1>AtomOne <span>Faucet</span><i class=tag>testnet only</i></h1>
-  <button type=button class=kep id=conn><img src="assets/wallet-keplr.svg" alt="" width=20 height=20><span>Connect Keplr</span></button>
+  <div class=wal id=wal>
+    <button type=button class=kep data-w=Keplr><img src="assets/wallet-keplr.svg" alt="" width=20 height=20><span>Keplr</span></button>
+    <button type=button class=kep data-w=Adena><img src="assets/wallet-adena.svg" alt="" width=20 height=20><span>Adena</span></button>
+  </div>
+  <div class="kep on" id=conn hidden role=status></div>
   <div>
     <div class=lbl>Your atone address</div>
     <input id=addr type=text placeholder="atone1..." autocomplete=off spellcheck=false aria-label="Your atone address">
