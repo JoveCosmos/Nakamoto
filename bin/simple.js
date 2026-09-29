@@ -185,11 +185,11 @@
 
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every
      one of them, largest first; the list scrolls inside its panel */
-  function vlist(rows, total, mark){
+  function vlist(rows, total){
     rows = rows.slice().sort(function(a, b){ return b.x - a.x; });
     return '<div class=sd-list>' + rows.map(function(r){ var c = heat(r.inactive ? 0 : r.rate);
       return '<div class="sd-vr click" data-v="' + esc(r.id) + '" tabindex=0 title="Open this validator" style="--c:' + c.fill + '">' +
-        '<span class=sv-lgo>' + logo(r.id, r.m) + '</span><span class=sd-vn><b>' + esc(r.m) + (mark && mark[r.id] ? '<i class=sd-al title="in the allow-list">allowed</i>' : '') + '</b>' +
+        '<span class=sv-lgo>' + logo(r.id, r.m) + '</span><span class=sd-vn><b>' + esc(r.m) + '</b>' +
         /* the line under the name in colour: the stake in the Staked amber, its share in teal, a cooldown in violet */
         '<s><em class=a>' + fmt(r.x) + '</em> ATONE, <em class=p>' + (r.x / (total || 1) * 100).toFixed(0) + '%</em>' + (r.locked > 0 ? ', <em class=l>cooldown</em>' : '') + '</s></span>' +
         /* out of the set: "Jailed" when it is, in red; otherwise "Inactive" */
@@ -370,8 +370,7 @@
   window.__idleAtone = idleAtone;
   function drawAuto(){
     var pos = window.__POS, S = setStats(), at = window.__atInfo ? window.__atInfo() : null, g = at && at.grant;
-    var a = g && g.authorization || {}, alist = (a.allow_list || {}).address || [], mark = null;
-    if(g && alist.length){ mark = {}; var VD = window.__VDBY || {}; for(var k in VD) if(VD[k].op && alist.indexOf(VD[k].op) >= 0) mark[k] = 1; }
+    var a = g && g.authorization || {};
     var until = g && g.expiration && window.__dayFull ? window.__dayFull(new Date(g.expiration).getTime()) : null;
     var rp = at && at.report, moves = rp && rp.history ? rp.history.length : 0, rec = g && rp && rp.record && rp.record.start ? rp.record : null;
     var since = g && at.since ? window.__dayFull(at.since) : null;
@@ -442,21 +441,8 @@
     }
     put("sd-ars", restakePanel(pos, at));
     var rows = pos ? pos.rows : [];
-    /* with a grant the list is the grant's own: every validator Autopilot may use, the ones holding stake first
-       (most stake on top), then the rest of the allow-list at 0, the best-paying first */
-    if(g && alist.length && pos){
-      var V = VALS(), by = {}, have = {}, zero = [];
-      V.forEach(function(v){ by[v[3]] = v; });
-      rows = pos.rows.filter(function(r){ return alist.indexOf(r.op) >= 0; });
-      rows.forEach(function(r){ have[r.id] = 1; });
-      alist.forEach(function(op){ var id = op.slice(-6), v = by[id]; if(have[id]) return; have[id] = 1;
-        zero.push({ id: id, op: op, m: v ? v[0] : (((window.__INACT || {})[id] || {}).m || "Inactive validator"), x: 0, locked: 0,
-                    rate: v ? window.__rateAfter(v[1], v[2], 0) : 0, inactive: !v }); });
-      zero.sort(function(a, b){ return b.rate - a.rate; });
-      rows = rows.concat(zero); mark = null;
-    }
     put("sd-asky", g ? grantView(g, at, rp, since, until) : wouldDo(pos));
-    put("sd-alist", rows.length ? '<div class=sv-ph><h3>Validators</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total, mark)
+    put("sd-alist", rows.length ? '<div class=sv-ph><h3>Validators</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total)
       : '<div class=sv-ph><h3>Validators</h3></div>' + (pos ? '<div class=sv-upwait>None yet</div>' : vskel(6)));
   }
 
