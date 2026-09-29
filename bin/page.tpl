@@ -5519,6 +5519,14 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   .mv-set{flex:1 1 0;min-height:0}
   .mv-bars{min-height:0}
 }
+/* Autopilot has no choices left (no cap, no validator list): the card is what it does, and Grant / Revoke */
+#atpop .atview,#atpop #atR,#atpop #atform{display:none!important}
+#atpop .atbody{grid-template-columns:minmax(0,1fr)!important}
+#atpop .atcard,#atpop .card.atcard{max-width:560px}
+.atwhat{display:flex;flex-direction:column;gap:10px;margin:4px 0 12px}
+.atwhat>div{display:flex;flex-direction:column;gap:3px;padding:11px 13px;border:1px solid var(--wbd);border-radius:10px}
+.atwhat b{font-size:14px;font-weight:600;color:var(--wt)}
+.atwhat span{font-size:12.5px;line-height:1.45;color:var(--ws)}
 /* a laptop width: the side columns give the stage a little more, and the economics price row sits tighter */
 @media(min-width:1100px) and (max-width:1599px){
   .one{grid-template-columns:272px minmax(0,1fr) 232px;gap:14px;padding-left:18px;padding-right:18px}
@@ -5538,9 +5546,12 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth svg{display:block;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:var(--ws)}
   html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth.on svg,html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth.on .ps{color:var(--sv-teal)}
 }
-/* the narrowest desktop: the economics row drops its market cap */
+/* the narrowest desktop: the economics price row a size smaller, so it keeps every figure on one line */
 @media(min-width:1100px) and (max-width:1319px){
-  #sv-eco .sv-tp small{display:none}
+  #sv-eco .sv-tp{margin-left:8px;padding-left:8px;gap:6px;font-size:.9em}
+  #sv-eco .sv-tp small{font-size:9px;letter-spacing:.06em}
+  #sv-eco .sv-trole{margin-left:6px;padding:0 6px;font-size:8.5px;height:18px}
+  #sv-eco .sv-gkey{font-size:8.5px}
 }
 /* a short screen (a laptop at 600-780px): everything a size tighter, the switches without their line */
 @media(min-width:1100px) and (max-height:780px){
@@ -6052,7 +6063,12 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
           <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="no cap" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
           <span class=unhint id=athint></span></div>
       </div>
-      <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Autopilot activates within <b>48 hours</b> of your grant, You can revoke it at any time.</span></div>
+      <div class=atwhat id=atwhat>
+        <div><b>Your best move, made for you</b><span>Every 21 days, once your last move has cooled down, it moves your stake to the validators that pay the most.</span></div>
+        <div><b>Checked before it moves</b><span>GATA looks at every move, then the keeper makes it with one transaction. You sign once, today.</span></div>
+        <div><b>Only redelegation</b><span>It cannot send, unstake or spend your ATONE. Your stake stays staked, in your wallet.</span></div>
+      </div>
+      <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your first move is offered within <b>48 hours</b> of your grant, or when your stake's cooldown ends.</span></div>
     </section>
     <section class=atR id=atR aria-label="Select your validators">
       <div class=atrs><input class=atfind id=atfind type=search placeholder="Find by name or operator key" aria-label="Find a validator" autocomplete=off spellcheck=false><span class=wk-seln id=atcount aria-live=polite></span></div>

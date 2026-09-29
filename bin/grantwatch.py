@@ -154,7 +154,7 @@ def step(L, allg, now=None):
                      "history": ((e or {}).get("history") or [])[-20:] + [{"at": now, "what": "granted"}]}
             if not first:
                 ev.append(("info", "New Autopilot grant: " + short(gr), "An operator decides within 48 hours in the admin console. The keeper's plan follows within a minute.", {
-                    "Delegator": gr, "Cap": cap(g), "Validators": str(len(g.get("allow") or [])),
+                    "Delegator": gr, "Cap": cap(g), "Validators": str(len(g["allow"])) if g.get("allow") else "any, the rule picks",
                     "Restake": "on" if gr in on else "off", "Decide by": when((made or now) + 48 * 3600)}))
             continue
         old = e["grant"]
@@ -162,7 +162,7 @@ def step(L, allg, now=None):
             e["history"].append({"at": now, "what": "changed"})
             e["cap0"], e["warned"] = g.get("cap"), []
             ev.append(("info", "Autopilot grant changed: " + short(gr), "The delegator changed the validators or the cap. The keeper plans again.", {
-                "Delegator": gr, "Cap": cap(g), "Validators": str(len(g.get("allow") or [])), "Restake": "on" if gr in on else "off"}))
+                "Delegator": gr, "Cap": cap(g), "Validators": str(len(g["allow"])) if g.get("allow") else "any, the rule picks", "Restake": "on" if gr in on else "off"}))
         e["grant"] = g
         left = (g.get("exp") or 0) - now if g.get("exp") else None
         e["status"] = "expiring" if left is not None and left <= SOON_S else ("new" if now - e["first_seen"] < NEW_S else "active")

@@ -2682,10 +2682,12 @@ rememberGridH();
   function atMonths(){ return AT.days >= 365 ? "12 months" : AT.days >= 180 ? "6 months" : "3 months"; }
   function atCap(){ var a = E("atcap"), n = parseFloat((a.value || "").replace(/[^0-9.]/g, "")); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
   function atMsgs(){
-    var scope = atScope(), cap = atCap(), pos = window.__POS;
-    if(!AT.addr || !scope.length || !pos) return [];
-    /* until revoked: no end date; the amount it may move is a cap only when the reader sets one */
-    var auth = { authorization_type: "redelegate", allow_list: scope }; if(cap > 0) auth.max_tokens = { denom: "uatone", amount: String(cap) };
+    var pos = window.__POS;
+    if(!AT.addr || !pos) return [];
+    /* the operator's rule (2026-09-29): no cap and no validator list - the rule picks the validators (the
+       smallest 34, never passing the one above) and GATA checks every move before the keeper signs it. Until
+       revoked: no end date. The chain reads a StakeAuthorization with neither list as "any validator". */
+    var auth = { authorization_type: "redelegate" };
     var msgs = [{ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
       grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: auth } } } }];
     /* only the redelegate permission: no send, no fee, no share for GATA - ever. A grant that stands is simply
@@ -2760,16 +2762,12 @@ rememberGridH();
     if(idl){ idl.hidden = view || !iv; if(iv) idl.innerHTML = "<b>Autopilot keeps your stake active</b>, through a long winter, a busy month, or when you would rather not look. Today <b class=n>" + iv + " ATONE</b> sits idle on inactive validators, earning nothing."; }
     var mx = E("atmaxv"); if(mx) mx.textContent = pos ? exact(pos.free, 2) : "—";
     var signer = !!window.__WALLET && !!window.__WALLET.signDirect;
-    var nsc = scope.length, ok = !view && !!AT.addr && nsc >= AT_MIN && nsc <= AT_MAX && signer;
+    var ok = !view && !!AT.addr && signer;
     var hint = E("athint");
-    if(hint){ hint.className = "unhint"; hint.textContent = !signer ? "Needs Keplr (direct signing)"
-      : !scope.length ? (atPick() === "selected" ? "Select " + AT_MIN + " to " + AT_MAX + " validators" : "the set has not loaded yet")
-      : scope.length < AT_MIN ? "Select at least " + AT_MIN + " validators (" + scope.length + " now)"
-      : scope.length > AT_MAX ? "At most " + AT_MAX + " validators (" + scope.length + " now)" : ""; }
+    if(hint){ hint.className = "unhint"; hint.textContent = !signer ? "Needs Keplr (direct signing)" : ""; }
     var go = E("atgrant"); if(go) go.disabled = !ok;
     var sm = E("atsum");
-    if(sm) sm.innerHTML = view ? "Active" : !AT.addr ? '<span class=atclosed>Inactive</span>' : ok ? (cap > 0 ? fmt(cap) + " ATONE cap" : "no cap") + "<br>" +
-      (atPick() === "selected" ? "my selection, " : "") + scope.length + " validators, until revoked" : "";
+    if(sm) sm.innerHTML = view ? "Active" : !AT.addr ? '<span class=atclosed>Inactive</span>' : ok ? "until you revoke it" : "";
     var fe = E("attxfee"), st = E("atstep"); fe.textContent = ""; st.textContent = ""; st.className = "txstep";
     feeSoon("at", fe, ok ? atMsgs : null);
   }
@@ -2794,14 +2792,16 @@ rememberGridH();
       var rp = AT.report, last = rp && rp.checked ? new Date(rp.checked * 1000) : null;
       /* restake is its own switch now: this line speaks of Autopilot's grant alone */
       /* what stands, as boxes: its validators, its cap, how long it runs; then the keeper's last word */
-      st.innerHTML = '<div class=atsb><div><em>Validators</em><b>' + n + '</b><small>allowed</small></div><div><em>Cap</em><b>' + (a.max_tokens ? cap : 'None') + '</b><small>' + (a.max_tokens ? 'left to move' : 'all your stake') + '</small></div>' +
+      var hn = rp && rp.history ? rp.history.length : 0;
+      st.innerHTML = '<div class=atsb><div><em>Moves made</em><b>' + hn + '</b><small>' + (hn ? 'last ' + window.__dayFull(rp.history[0].at * 1000) : 'none yet') + '</small></div>' +
+        '<div><em>Validators</em><b>' + (n ? n : 'The rule') + '</b><small>' + (n ? 'allowed (an older grant)' : 'picks them, GATA checks') + '</small></div>' +
         '<div><em>Runs until</em><b>' + (g.expiration ? exp : 'You revoke') + '</b><small>' + (g.expiration ? 'then grant again' : 'no end date') + '</small></div></div>' +
         (last ? 'Last check <b>' + window.__dayFull(last.getTime()) + '</b>' + (rp.moves && rp.moves.length ? ', <b>' + rp.moves.length + '</b> move' + (rp.moves.length === 1 ? '' : 's') + ' planned, <b class=g>+' + one(rp.gain || 0) + '</b> ATONE a year' : ', nothing to move') : '') +
         (rp && rp.history && rp.history.length ? '<br>Moves made: <b>' + rp.history.length + '</b>, last ' + window.__dayFull(rp.history[0].at * 1000) : '') +
         (AT_EDIT ? '<br><span class=g>Changing it:</span> the terms below replace these when you sign.' : '');
     }
     E("atform").hidden = view;
-    E("atrevoke").hidden = !view; E("atedit").hidden = !view;
+    E("atrevoke").hidden = !view; E("atedit").hidden = true;   /* nothing to change: no cap, no list */
     var go = E("atgrant"); go.hidden = view; go.textContent = g ? "Update" : "Grant";
     /* no Cancel or Close: a tap outside, or Escape, closes the card. Back stays - it leaves a
        change of a standing grant without closing */
@@ -2903,11 +2903,12 @@ rememberGridH();
   function rsMsgs(on){
     if(!on){ var t = {}; (AT.grants || []).forEach(function(x){ var k = grantType(x); if(k === WDRAW || k === DELEG) t[k] = 1; });
       return Object.keys(t).map(revokeMsg); }
-    /* no end date and no amount cap: restake runs until the reader disables it (revokes). The delegate grant is still
-       allow-listed to the reader's own validators, so it can only ever stake onto them - never send or withdraw */
-    var allow = rsAllow(); if(!AT.addr || !allow.length) return [];
+    /* no end date, no amount cap, and (operator, 2026-09-29) no validator list: the rewards are compounded into the
+       highest-paying validator by the rule (the smallest first, never past the one above), not onto the reader's
+       own. The delegate grant can only ever stake - never send or withdraw */
+    if(!AT.addr) return [];
     var m = [{ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr, grant: { authorization: { type: "cosmos-sdk/GenericAuthorization", value: { msg: WDRAW } } } } },
-             { type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr, grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: { authorization_type: "delegate", allow_list: allow } } } } }];
+             { type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr, grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: { authorization_type: "delegate" } } } } }];
     return m;
   }
   /* the Restake button acts at once: it reads what stands, builds the grant (or the revoke) and hands it to the wallet
@@ -2984,6 +2985,74 @@ rememberGridH();
     amt.value = exact(B);
     QUIET = true; draw(); QUIET = false;
     return MSGS.length > 0;
+  };
+  /* THE RULE (operator, 2026-09-29), the page's copy of keeper.py plan() - the same arithmetic, so the move
+     Your move offers is the move Autopilot would make. The smallest validator first: it takes as much as it
+     can without passing the validator ranked just above it; what is left goes to the next one up, same check;
+     at most BOTTOM validators. A source gives only what keeps it at or above the one ranked just under it; a
+     validator not signing now (under UP_MIN) or tombstoned is passed over; at most 20 moves (move less rather
+     than cut); nothing while any of the wallet's stake is cooling down. Answers null or
+     { now, after, gain, moves, msgs:[{from,to,amt}] }. */
+  var BOTTOM = 34, MAXMOVES = 20, UP_MIN = 95;
+  window.__planRank = function(pos){
+    if(!pos || !pos.rows.length || !(pos.total > 0)) return null;
+    if(pos.rows.some(function(r){ return r.locked > 0; })) return null;
+    var V = window.__VALS().slice().sort(function(a, b){ return b[1] - a[1]; }), n = V.length, VD = window.__VDBY || {};
+    if(!n) return null;
+    var at = {}, i; for(i = 0; i < n; i++) at[V[i][3]] = i;
+    var bset = {}; for(i = Math.max(0, n - BOTTOM); i < n; i++) bset[V[i][3]] = 1;
+    var now = pos.rows.reduce(function(s, r){ return s + r.x * (r.inactive ? 0 : r.rate); }, 0) / pos.total;
+    var src = pos.rows.filter(function(r){ return r.x - r.locked > 0 && !bset[r.id]; }).sort(function(a, b){ return b.x - a.x; }).map(function(r){
+      var free = r.x - r.locked, give = free;
+      if(at[r.id] != null){ var j = at[r.id], under = j + 1 < n ? V[j + 1][1] : 0; give = Math.min(free, Math.max(0, Math.floor(V[j][1] - under))); }
+      return { id: r.id, give: give, rate: r.inactive ? 0 : r.rate };
+    }).filter(function(x){ return x.give >= 1e6; });
+    if(!src.length) return null;
+    var budget = src.reduce(function(s, x){ return s + x.give; }, 0);
+    var gone = {}; src.forEach(function(x){ gone[x.id] = x.give; });     /* the cautious bound: every source counted as gone */
+    var stake = function(j){ return V[j][1] - (gone[V[j][3]] || 0); };
+    var ok = function(v){ var d = VD[v[3]] || {}; return !d.tomb && (d.up == null || +d.up >= UP_MIN); };
+    var used = {}; (window.__REDS || []).forEach(function(rr){
+      var k = rr.redelegation.validator_src_address.slice(-6) + ">" + rr.redelegation.validator_dst_address.slice(-6);
+      used[k] = (used[k] || 0) + (rr.entries || []).length; });
+    function movesFor(amount){
+      var add = [], left = amount;
+      for(var j = n - 1; j > n - 1 - BOTTOM && j >= 0; j--){
+        if(left < 1e6) break;
+        if(!ok(V[j])) continue;
+        var room = j > 0 ? stake(j - 1) - stake(j) : left, x = Math.floor(Math.min(left, room));
+        if(x >= 1e6){ add.push({ id: V[j][3], amt: x }); left -= x; }
+      }
+      var out = [], si = 0, lf = src.map(function(x){ return { id: x.id, give: x.give }; });
+      add.forEach(function(d){
+        var need = d.amt;
+        while(need > 0 && si < lf.length){
+          var s = lf[si], x = Math.min(need, s.give);
+          if(x >= 1 && (used[s.id + ">" + d.id] || 0) < 7) out.push({ from: s.id, to: d.id, amt: Math.floor(x) });
+          s.give -= x; need -= x;
+          if(s.give <= 0) si++;
+        }
+      });
+      return out;
+    }
+    var out = movesFor(budget);
+    while(out.length > MAXMOVES && budget > 1e6){ budget = Math.floor(budget * 0.85); out = movesFor(budget); }
+    if(!out.length || out.length > MAXMOVES) return null;
+    var moved = {}; out.forEach(function(m){ moved[m.to] = (moved[m.to] || 0) + m.amt; });
+    var rs = {}; src.forEach(function(x){ rs[x.id] = x.rate; });
+    var rd = {}; Object.keys(moved).forEach(function(k){ var v = V[at[k]]; rd[k] = window.__rateAfter(v[1], v[2], moved[k]); });
+    var gainU = 0; out.forEach(function(m){ gainU += m.amt * (rd[m.to] - rs[m.from]); });
+    var after = now + gainU / pos.total, gain = gainU / 1e6;
+    if(gain < 1 || !(after > now)) return null;
+    return { now: now, after: after, gain: gain, moves: out.length, msgs: out,
+             picks: Object.keys(moved).map(function(k){ return { id: k, m: V[at[k]][0], x: moved[k] }; }) };
+  };
+  /* sign exactly these moves (the one screen's offer): the signing card lists them and prices them itself */
+  window.__signMoves = function(plan){
+    if(!plan || !plan.msgs || !plan.msgs.length || !window.__goSign) return;
+    MSGS = plan.msgs.map(function(m){ return { from: m.from, to: m.to, amt: m.amt }; });
+    window.__ANS = { now: plan.now, after: plan.after, gain: plan.gain };
+    window.__goSign();
   };
   window.__optPlan = function(apply){
     var pos = window.__POS, B = pos ? pos.free : 0, k;

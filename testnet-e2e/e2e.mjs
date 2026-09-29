@@ -11,6 +11,7 @@
 //   node e2e.mjs fund <atone> <photon>  send from the testnet Autopilot account (needs its credential)
 //   node e2e.mjs delegate <op,op,...> <uatone each>
 //   node e2e.mjs grant <allow,...>      Autopilot REDELEGATE + Restake WDRAW/DELEGATE to the grantee, as the page does
+//   node e2e.mjs grant-any              Autopilot REDELEGATE with no validator list (any validator)
 //   node e2e.mjs revoke                 revoke all three
 //   node e2e.mjs login <url>            sign in to the admin API as the testnet operator (needs its credential), print cookie
 import fs from "node:fs";
@@ -50,6 +51,12 @@ if (cmd === "delegate") {
   done(await c.signAndBroadcast(me, msgs, "auto", ""));
 }
 const any = (url, bytes) => ({ typeUrl: url, value: bytes });
+if (cmd === "grant-any") {
+  // Autopilot REDELEGATE with NO validator list (allow and deny both empty): does the chain take it as "any validator"?
+  const { c, me } = await cl(testWords());
+  const auth = { typeUrl: "/cosmos.staking.v1beta1.StakeAuthorization", value: StakeAuthorization.encode(StakeAuthorization.fromPartial({ authorizationType: AuthorizationType.AUTHORIZATION_TYPE_REDELEGATE })).finish() };
+  done(await c.signAndBroadcast(me, [{ typeUrl: "/cosmos.authz.v1beta1.MsgGrant", value: MsgGrant.fromPartial({ granter: me, grantee: GRANTEE, grant: { authorization: auth } }) }], "auto", "GATA Autopilot"));
+}
 if (cmd === "grant") {
   const { c, me } = await cl(testWords()); const allow = a[0].split(",");
   const stake = (t, list) => any("/cosmos.staking.v1beta1.StakeAuthorization", StakeAuthorization.encode(StakeAuthorization.fromPartial({ authorizationType: t, allowList: { address: list } })).finish());

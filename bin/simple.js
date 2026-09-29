@@ -345,7 +345,8 @@
     /* the answer changes only when a stake moves (anyone's) or the reader's position is re-read -
        not on every block */
     var key = pos.total + "/" + pos.free + "/" + (window.__LIVEV ? window.__LIVEV() : 0) + "/" + (window.__POSAT || 0);
-    if(PC.key !== key){ PC.key = key; PC.val = window.__optPlan(false); }
+    /* the operator's rule, the same arithmetic as the keeper's: what Your move offers is what Autopilot would do */
+    if(PC.key !== key){ PC.key = key; PC.val = window.__planRank ? window.__planRank(pos) : null; }
     return PC.val;
   }
   /* the reader's validators with a jailing on record, said plainly - only when there are any:
@@ -497,7 +498,7 @@
       (add > 0 ? '<small>ATONE, +' + (add * 100).toFixed(1) + '% APR</small>' : '') + rsUntil(at, on) + '</div>';
     /* the rules sit at the foot, over the switch */
     h += '<div class=ars-foot><div class=ars-two><div><em>Frequency</em><b>12 hours</b></div><div><em>Minimum</em><b>1 ATONE</b></div></div>' +
-      '<div class=ars-how>Auto-compounds reward on your <b>best-paying</b> validator</div></div>';
+      '<div class=ars-how>Auto-compounds rewards into the <b>highest-paying</b> validator</div></div>';
     h += !pos ? CONNECT_OFF
       : !pos.rows.length ? '<button class="sv-btn go sd-go" type=button data-act=stake>Stake ATONE</button>'
       : '<button class="sv-btn go sd-go' + (on ? ' ars-off' : '') + '" type=button data-act=restakesw>' + (on ? 'Disable' : 'Enable') + '</button>';
@@ -1487,7 +1488,7 @@
       if(!window.__ADDR) return ["Connect a wallet", "and see your best move"];
       if(!pos) return ["Reading your stake…", ""];
       if(!pos.rows.length) return ["No stake yet", "stake ATONE to start earning"];
-      if(!(pos.free >= 1e6)) return ["Cooling down", "free to move on " + (window.__dayFull ? window.__dayFull(pos.until) : "")];
+      if(pos.locked >= 1e6) return ["Cooling down", "free to move on " + (window.__dayFull ? window.__dayFull(pos.until) : "")];
       var pl = planNow(pos);
       if(pl && pl.gain > 0.5 && pl.after != null) return ["+" + one(pl.gain) + " ATONE a year", "ready to move, 1 signature"];
       return ["Earning " + pct(pos.rate), "nothing better to move to today"];
@@ -1550,11 +1551,8 @@
     put("you", h);
   }
   function drawOne(){ if(E("you")) drawYou(); if(E("paths")) drawPaths(); }
-  function youAuto(){
-    var at = window.__atInfo ? window.__atInfo() : null;
-    if(at && at.grant){ if(window.__shellGo) window.__shellGo("dashboard/autopilot"); }
-    else { var ab = E("atbtn"); if(ab) ab.click(); }
-  }
+  /* the Autopilot switch opens its card: off, the card grants it; on, it shows how it stands and Revoke */
+  function youAuto(){ var ab = E("atbtn"); if(ab) ab.click(); }
 
   /* ── YOUR MOVE: the one screen's first stage. Before the click it says what moves where, in numbers;
      after it, the 21-day cooldown the chain holds redelegated stake for; then the cycle repeats. ── */
@@ -1565,12 +1563,12 @@
     }).join("") + (rest > 0 ? '<div class=mv-more>and ' + rest + ' more ' + more + '</div>' : '');
   }
   function mvSet(src, dst){
-    var V = VALS(), n = V.length, top = V.length ? V[0][1] : 1, cut = Math.floor(n * 2 / 3);
+    var V = VALS(), n = V.length, top = V.length ? V[0][1] : 1, cut = Math.max(0, n - 34);   /* the rule's region: the smallest 34 */
     var bars = V.map(function(v, i){
       var cls = src[v[3]] ? ' s' : dst[v[3]] ? ' d' : i >= cut ? ' lo' : '';
       return '<i class="' + cls.trim() + '" style="height:' + Math.round(6 + 94 * Math.sqrt(v[1] / top)) + '%"></i>';
     }).join("");
-    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em><em class=g>The smallest third pays the most</em></div>' +
+    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em><em class=g>The smallest ' + (n - cut) + ' pay the most</em></div>' +
       '<div class=mv-bars>' + bars + '</div><div class=mv-brk><span style="flex:' + cut + '"></span><span class=g style="flex:' + (n - cut) + '">ranks ' + (cut + 1) + ' to ' + n + '</span></div></div>';
   }
   function drawMove(){
@@ -1612,7 +1610,7 @@
         '<div class=mv-hl><b>Stake to start earning</b><span>' + ex + '</span></div>' + mvSet({}, {}) +
         '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=stake>Stake ATONE</button><span>Your ATONE stays yours: staking only delegates it.</span></div>';
     } else {
-      var plan = pos.free >= 1e6 ? planNow(pos) : null, offer = plan && plan.gain > 0.5 && plan.after != null && plan.msgs && plan.msgs.length;
+      var plan = pos.locked >= 1e6 ? null : planNow(pos), offer = plan && plan.gain > 0.5 && plan.after != null && plan.msgs && plan.msgs.length;
       if(offer){
         var fr = {}, to = {}, moved = 0;
         plan.msgs.forEach(function(m){ fr[m.from] = (fr[m.from] || 0) + m.amt; to[m.to] = (to[m.to] || 0) + m.amt; moved += m.amt; });
@@ -1628,7 +1626,7 @@
           lock + mvSet(src, dst) +
           '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=opt>' + (auto ? 'Or redelegate now yourself' : 'Redelegate ' + fmt(moved) + ' ATONE') + '</button>' +
           '<span>One signature. Your ATONE stays staked and in your wallet; after the move it cools down for 21 days.</span></div>';
-      } else if(!(pos.free >= 1e6)){
+      } else if(pos.locked >= 1e6){
         var t1 = pos.until || Date.now(), t0 = t1 - 21 * 864e5, k = Math.min(21, Math.max(1, Math.ceil((Date.now() - t0) / 864e5)));
         var cells = ''; for(var i = 1; i <= 21; i++) cells += '<i' + (i <= k ? ' class=on' : '') + '></i>';
         var hist = at && at.report && at.report.history && at.report.history.length ? at.report.history[0] : null;
@@ -1693,11 +1691,9 @@
     var act = t.dataset.act;
     if(!act && t.dataset.gv){ govCard(t.dataset.gv); return; }
     if(act === "opt"){
-      if(!window.__optPlan || !window.__goSign) return;
-      t.classList.add("busy");
-      var p = window.__optPlan(true);
-      t.classList.remove("busy");
-      if(p && p.moves) window.__goSign();
+      /* sign exactly the moves the stage shows */
+      var pl = planNow(window.__POS);
+      if(pl && window.__signMoves) window.__signMoves(pl);
       return;
     }
     if(act === "youauto"){ youAuto(); return; }

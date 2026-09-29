@@ -109,7 +109,7 @@ def model():
     vals = {}
     for v in D["validators"]:
         vals[v["op"]] = {"op": v["op"], "m": v["m"], "t": float(v["t"]), "c": float(v["c"]), "jail": v.get("jail") or 0,
-                         "tomb": bool(v.get("tomb")), "d90": v.get("d90"), "rank": v.get("rank")}
+                         "tomb": bool(v.get("tomb")), "d90": v.get("d90"), "up": v.get("up"), "rank": v.get("rank")}
     a = (1 - eta) * R / S; b = eta * R / N
     return vals, (a, b), eta
 
@@ -172,6 +172,8 @@ def plan_id(p):
     k = sorted((m["src"], m["dst"], int(m["amount"])) for m in p["moves"])
     return hashlib.sha1(json.dumps(k).encode()).hexdigest()[:12]
 
+EMPTY_PID = plan_id({"moves": []})   # the id of "no moves": nothing for an operator to decide
+
 def alert(level, title, text="", fields=None):
     log("alert", level, title)
     if notify:
@@ -231,15 +233,20 @@ def plan_restake(c, granter, rg, vals, m, P):  # noqa: C901
     send = 0   # GATA takes no share, ever: a restake stakes every claimed reward back, it never sends
     stake = rewards - send
     if cap is not None and stake > cap: out["skip"] = "delegate cap used up"; return out
-    best, br = None, -1
-    for op in rg["stake"]["allow"]:
-        v = vals.get(op)
-        if not v or v["tomb"] or (P["d90"] and (v["d90"] is None or v["d90"] < P["d90"])): continue
-        rt = rate_after(m, v["t"], v["c"], stake)
-        if rt > br: best, br = op, rt
-    if not best or stake <= 0: out["skip"] = "no allowed validator to stake on" if not best else "delegate cap used up"; return out
-    out.update({"claim": claim, "stake": [{"validator": best, "amount": int(stake)}], "send": int(send), "rate": br,
-                "fee_uphoton": int((120000 + 60000 * (len(claim) + 2)) * 0.25)})
+    # where the rewards go: the operator's rule (2026-09-29), as for a move - the smallest validator first, up to
+    # the stake of the one above it, then the next one up - never the wallet's own validators by default. A
+    # DELEGATE grant with no validator list may use any; an older grant that names validators keeps to them
+    allow = set(rg["stake"]["allow"] or [])
+    ranked = sorted(vals.values(), key=lambda v: -v["t"])
+    def ok(v): return (not allow or v["op"] in allow) and not v["tomb"] and (v.get("up") is None or v["up"] >= UP_MIN)
+    add = fill(ranked, lambda op: vals[op]["t"], int(stake), ok)
+    if not add or stake <= 0: out["skip"] = "no validator to stake on" if not add else "delegate cap used up"; return out
+    legs = [{"validator": op, "amount": int(a)} for op, a in add.items()]
+    left = int(stake) - sum(l["amount"] for l in legs)
+    if left > 0: legs[-1]["amount"] += left            # the last leg takes the rounding: every claimed reward is staked
+    br = rate_after(m, vals[legs[0]["validator"]]["t"], vals[legs[0]["validator"]]["c"], legs[0]["amount"])
+    out.update({"claim": claim, "stake": legs, "send": int(send), "rate": br,
+                "fee_uphoton": int((120000 + 60000 * (len(claim) + 1 + len(legs))) * 0.25)})
     return out
 
 def execute_restake(granter, p):
@@ -293,7 +300,7 @@ def position(addr, vals):
     rows = []
     for d in dels:
         op, amt = d["delegation"]["validator_address"], int(d["balance"]["amount"])
-        if op not in vals or amt <= 0: continue
+        if amt <= 0: continue
         # the chain refuses ANY redelegation out of a validator that still holds an
         # unmatured redelegation in (ErrTransitiveRedelegation): the whole row is held
         rows.append({"op": op, "x": amt, "locked": amt if op in lock else 0})
@@ -306,68 +313,86 @@ def pairs_used(reds):
         u[k] = u.get(k, 0) + len(r.get("entries", []))
     return u
 
-# ── the plan: from the lowest-earning movable positions to the best allowed ─
+# ── the plan: the operator's rule (2026-09-29) ────────────────────────────
+# The smallest validator first: it takes as much as it can without passing the validator ranked just above
+# it (so its rank never changes, and it stays the best payer); what is left goes to the next one up, same
+# check; and so on, at most BOTTOM validators (1 to 34, as the amount needs). A source gives only what keeps
+# it at or above the validator ranked just under it. A validator not signing now (under UP_MIN of the recent
+# window) or tombstoned is passed over. Nothing is offered while any of the delegator's stake cools down,
+# so the offer comes back every 21 days, when the last move's cooldown clears.
+BOTTOM = int(os.environ.get("KEEPER_BOTTOM", "34"))
+UP_MIN = float(os.environ.get("KEEPER_UP_MIN", "95"))
+
+def fill(ranked, stake, amount, ok):
+    """the rule's pour: from the smallest up, each to the stake of the validator just above it; answers
+    {op: added}. ranked is largest first; stake(op) the stake as it stands; ok(v) whether v may take any"""
+    n = len(ranked); add = {}; left = amount
+    for i in range(n - 1, max(-1, n - 1 - BOTTOM), -1):
+        if left < 1_000_000: break
+        v = ranked[i]
+        if not ok(v): continue
+        room = (stake(ranked[i - 1]["op"]) - stake(v["op"])) if i > 0 else left
+        x = int(min(left, room))
+        if x >= 1_000_000: add[v["op"]] = x; left -= x
+    return add
+
 def plan(g, rows, reds, vals, m, P=None, room=None):
-    P = P or PRESETS["moderate"]
     room = MAX_MOVES_DAY if room is None else room
-    # what each position earns today, and what it can move
     for r in rows:
-        v = vals[r["op"]]; r["rate"] = rate_after(m, v["t"], v["c"], 0); r["free"] = r["x"] - r["locked"]
+        v = vals.get(r["op"])
+        r["rate"] = rate_after(m, v["t"], v["c"], 0) if v else 0.0          # outside the set: earns nothing
+        r["free"] = r["x"] - r["locked"]
     total = sum(r["x"] for r in rows)
-    # the day's moves used up: no plan today, but only once every row carries its rate (the rate record reads them)
     if room <= 0 or not total: return None
-    blended = sum(r["x"] * r["rate"] for r in rows) / total
-    free = [r for r in rows if r["free"] > 0]
-    if not free: return None
-    # candidates: allowed, clean, not where the stake already is at a better rate
-    cands = []
-    for op, v in vals.items():
-        if g["allow"] is not None and op not in g["allow"]: continue
-        if op in g["deny"] or v["tomb"]: continue
-        if v["d90"] is not None and v["d90"] < P["d90"]: continue
-        cands.append(v)
-    if not cands: return None
-    # budget: everything movable, capped by the grant
-    budget = sum(r["free"] for r in free)
+    if any(r["locked"] > 0 for r in rows): return None                     # the 21-day rhythm
+    now = sum(r["x"] * r["rate"] for r in rows) / total
+    ranked = sorted(vals.values(), key=lambda v: -v["t"]); n = len(ranked)
+    if not n: return None
+    pos_of = {v["op"]: i for i, v in enumerate(ranked)}
+    bset = {v["op"] for v in ranked[max(0, n - BOTTOM):]}
+    src = []
+    for r in sorted((r for r in rows if r["free"] > 0 and r["op"] not in bset), key=lambda r: -r["free"]):
+        if r["op"] in pos_of:
+            i = pos_of[r["op"]]; under = ranked[i + 1]["t"] if i + 1 < n else 0
+            give = min(r["free"], max(0, int(vals[r["op"]]["t"] - under)))
+        else:
+            give = r["free"]
+        if give >= 1_000_000: src.append({"op": r["op"], "give": give, "rate": r["rate"]})
+    if not src: return None
+    budget = sum(x["give"] for x in src)
     if g["cap"] is not None: budget = min(budget, g["cap"])
-    if budget <= 0: return None
-    # greedy: the stake leaves the weakest positions first and lands where the marginal
-    # rate is highest, repriced as it lands, at most MAX_DESTS destinations
+    gone = {x["op"]: x["give"] for x in src}          # the cautious bound: every source counted as gone
+    def stake(op): return vals[op]["t"] - gone.get(op, 0)
+    def ok(v): return ((g["allow"] is None or v["op"] in g["allow"]) and v["op"] not in g["deny"] and not v["tomb"]
+                       and (v.get("up") is None or v["up"] >= UP_MIN))
     used = pairs_used(reds)
-    landed = {c["op"]: 0 for c in cands}
-    src = sorted(free, key=lambda r: (r["rate"], -r["free"]))
-    moves, spent = [], 0
-    step = max(1_000_000, budget // 20)                       # 1 ATONE or 5% of the budget
-    while spent < budget:
-        s = next((r for r in src if r["free"] > 0), None)
-        if not s: break
-        best, br = None, -1
-        for c in cands:
-            if c["op"] == s["op"]: continue
-            if len(landed) and landed.get(c["op"], 0) == 0 and sum(1 for k in landed if landed[k] > 0) >= min(MAX_DESTS, P["dests"]): continue
-            if used.get((s["op"], c["op"]), 0) >= 7: continue
-            rr = rate_after(m, c["t"] + landed[c["op"]], c["c"], step)
-            if rr > br: best, br = c, rr
-        if not best or br <= s["rate"] + max(MIN_GAIN_APR, P["min_apr"]): 
-            # this source cannot be improved by the threshold: next source
-            s["free"] = 0; continue
-        x = min(step, s["free"], budget - spent)
-        moves.append({"src": s["op"], "dst": best["op"], "amount": x, "from_rate": s["rate"], "to_rate": br})
-        landed[best["op"]] += x; s["free"] -= x; spent += x
-    if not moves: return None
-    # merge per (src,dst)
-    merged = {}
-    for mv in moves:
-        k = (mv["src"], mv["dst"]); e = merged.setdefault(k, {"src": mv["src"], "dst": mv["dst"], "amount": 0, "gain": 0.0})
-        e["amount"] += mv["amount"]; e["gain"] += mv["amount"] * (mv["to_rate"] - mv["from_rate"]) / 1e6
-    out = [e for e in merged.values() if e["gain"] >= max(MIN_GAIN_ATONE, P["min_atone"])]
-    # no more moves than the keeper may make today (carry_out refuses a plan over the daily limit): the biggest
-    # gains first, the rest come in a later plan
-    out = sorted(out, key=lambda e: -e["gain"])[:room]
-    if not out: return None
-    after = sum(r["x"] * r["rate"] for r in rows)
-    for e in out: after += e["amount"] * (e["gain"] * 1e6 / e["amount"])
-    return {"moves": out, "now": blended, "after": after / total, "total": total, "gain": sum(e["gain"] for e in out)}
+    def moves_for(amount):
+        add = fill(ranked, stake, amount, ok)
+        # sources fill destinations in turn, smallest validator first: at most S + D - 1 moves, none on a pair
+        # that already holds 7 unmatured entries
+        out, si, left = [], 0, [dict(x) for x in src]
+        for op in sorted(add, key=lambda o: -pos_of[o]):
+            need = add[op]
+            while need > 0 and si < len(left):
+                s_ = left[si]; x = min(need, s_["give"])
+                if x >= 1 and used.get((s_["op"], op), 0) < 7: out.append({"src": s_["op"], "dst": op, "amount": int(x)})
+                s_["give"] -= x; need -= x
+                if s_["give"] <= 0: si += 1
+        return out
+    # more moves than the day allows: move less, never cut a plan (a cut could leave a gap in the fill)
+    moves = moves_for(budget)
+    while len(moves) > room and budget > 1_000_000:
+        budget = int(budget * 0.85); moves = moves_for(budget)
+    if not moves or len(moves) > room: return None
+    moved = {}
+    for mv in moves: moved[mv["dst"]] = moved.get(mv["dst"], 0) + mv["amount"]
+    rate_src = {x["op"]: x["rate"] for x in src}
+    rate_dst = {op: rate_after(m, vals[op]["t"], vals[op]["c"], a) for op, a in moved.items()}
+    for mv in moves: mv["gain"] = mv["amount"] * (rate_dst[mv["dst"]] - rate_src[mv["src"]]) / 1e6
+    gain = sum(mv["gain"] for mv in moves)
+    after = now + sum(mv["amount"] * (rate_dst[mv["dst"]] - rate_src[mv["src"]]) for mv in moves) / total
+    if gain < MIN_GAIN_ATONE or after <= now: return None
+    return {"moves": moves, "now": now, "after": after, "total": total, "gain": gain}
 
 # ── execution ──────────────────────────────────────────────────────────────
 def execute(granter, moves):
@@ -459,6 +484,10 @@ def gate(c, g, p, pid, adm, dry):
     reason = None
     if held: state = "held"
     elif todo and ap["plan_id"] == pid: state = "approved"
+    elif pid == EMPTY_PID:
+        # nothing to offer (the stake is cooling down, or already in place): nothing waits for an operator and
+        # no clock runs; the first offer comes when the cooldown clears (operator, 2026-09-29)
+        state = "managed"
     else:
         if not decs: reason = "activation"
         elif pid and pid not in decided: reason = "new plan"
@@ -473,7 +502,7 @@ def gate(c, g, p, pid, adm, dry):
         f["Decide by"] = when(dl)
         if p is not None and not sent(c, gr, "ready:%d:%s" % (since, pid)):
             alert("info", ("New Autopilot plan: " if reason == "new plan" else "Autopilot plan ready: ") + short(gr),
-                  "An operator reviews it in the admin console: Apply, No move needed or Hold.", f)
+                  "An operator answers it in the admin console: Yes (the keeper makes it) or No (settled by hand).", f)
         if dl - WARN_S <= now < dl and not sent(c, gr, "warn:%d" % since):
             alert("warn", "Autopilot: 3 hours left for " + short(gr), "No operator has decided on this delegator's plan yet.", f)
         if now >= dl and not sent(c, gr, "over:%d:%d" % (since, (now - dl) // OVERDUE_EVERY)):

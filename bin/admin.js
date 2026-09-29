@@ -1,6 +1,6 @@
 /* Autopilot Admin: sign in with Keplr (ADR-36 signArbitrary of a one-time challenge), then the
    decision queue per network. Every Autopilot grant waits for an operator (48 hours): Review shows
-   the keeper's plan, and Apply (exactly that plan), No move needed or Hold decides it; nothing
+   the keeper's plan, and Yes (exactly that plan) or No (you settle it by hand) decides it; nothing
    moves without it. Also the standing grants, holds, ended grants, the validator watch's open
    incidents and the event feed. Every action goes through /admin-api,
    which checks the session and announces it on Discord. */
@@ -79,22 +79,20 @@
     var r = e.report || {}, ad = r.admin || {}, g = e.grant || {}, mv = r.moves || [], st = stOf(e);
     var can = st !== "ended";
     var h = '<div class=rv>';
-    h += '<div class=rvg><div><em>Staked</em><b>' + atone(r.staked) + '</b></div><div><em>Cap</em><b>' + atone(g.cap) + '</b></div>' +
-         '<div><em>Validators allowed</em><b>' + (g.allow || []).length + '</b></div><div><em>Restake</em><b>' + (g.restake ? "on" : "off") + '</b></div>' +
+    h += '<div class=rvg><div><em>Staked</em><b>' + atone(r.staked) + '</b></div><div><em>Moves</em><b>' + mv.length + '</b></div>' +
+         '<div><em>Validators</em><b>' + ((g.allow || []).length ? (g.allow || []).length + ' allowed' : 'the rule') + '</b></div><div><em>Restake</em><b>' + (g.restake ? "on" : "off") + '</b></div>' +
          '<div><em>Grant made</em><b>' + day(ad.made || e.made) + '</b></div><div><em>Plan</em><b class=mono>' + esc(ad.plan_id || "none") + '</b></div></div>';
     h += mv.length ? '<table class=plan><thead><tr><th>From</th><th>To</th><th class=r>ATONE</th><th class=r>Gain a year</th></tr></thead><tbody>' + mv.map(function(m){
         return '<tr><td>' + vn(m.src) + '</td><td>' + vn(m.dst) + '</td><td class="n r">' + (m.uatone / 1e6).toLocaleString(undefined, { maximumFractionDigits: 1 }) + '</td><td class="n r">+' + (m.gain || 0).toFixed(2) + '</td></tr>'; }).join("") +
-        '</tbody></table><div class=sub>Blended APR ' + pct(r.now) + ' now, ' + pct(r.after) + ' after. ' + (r.dry === false ? 'Apply signs these moves.' : 'Dry run: Apply records them and signs nothing.') + '</div>'
-      : '<div class=empty>No move planned: the stake already sits well' + (r.checked ? ' (planned ' + ago(r.checked) + ')' : '') + '. Confirm with No move needed.</div>';
+        '</tbody></table><div class=sub>Blended APR ' + pct(r.now) + ' now, ' + pct(r.after) + ' after. ' + (r.dry === false ? 'Yes signs these moves; No moves nothing and you settle it by hand.' : 'Dry run: Yes records them and signs nothing.') + '</div>'
+      : '<div class=empty>Nothing to move now' + (r.checked ? ' (checked ' + ago(r.checked) + ')' : '') + ': the stake is cooling down or already in place. No clears it.</div>';
     if(ad.applied) h += '<div class=sub>Last applied ' + ago(ad.applied.at) + (ad.applied.by ? ' by ' + esc(short(ad.applied.by)) : '') + (ad.applied.dry ? ', dry run' : ad.applied.ok ? ', tx ' + esc((ad.applied.txhash || "").slice(0, 12)) : ', FAILED: ' + esc(ad.applied.error || "")) + '</div>';
     var decs = (ad.decisions || []).slice().reverse();
     if(decs.length) h += '<div class=hist>' + decs.map(function(d){ return '<div><b>' + esc(d.action) + '</b> ' + esc(short(d.by)) + ' <span class=sub>' + ago(d.at) + '</span>' + (d.note ? '<div class=sub>' + esc(d.note) + '</div>' : '') + '</div>'; }).join("") + '</div>';
     if(can) h += '<div class=acts>' +
       (st === "held" ? '<button class="btn pri" type=button data-do=resume data-g="' + esc(e.granter) + '">Resume</button>'
-        : (mv.length ? '<button class="btn pri" type=button data-do=apply data-g="' + esc(e.granter) + '" data-pid="' + esc(ad.plan_id || "") + '"' + (st === "approved" ? ' disabled' : '') + '>' + (st === "approved" ? 'Approved, carrying out' : 'Apply this plan') + '</button>' : '') +
-          '<button class=btn type=button data-do=nomove data-g="' + esc(e.granter) + '">No move needed</button>' +
-          '<button class=btn type=button data-do=hold data-g="' + esc(e.granter) + '">Hold</button>') +
-      '<button class=btn type=button data-note="' + esc(e.granter) + '">Note</button></div>';
+        : (mv.length ? '<button class="btn pri" type=button data-do=apply data-g="' + esc(e.granter) + '" data-pid="' + esc(ad.plan_id || "") + '"' + (st === "approved" ? ' disabled' : '') + '>' + (st === "approved" ? 'Yes, carrying out' : 'Yes') + '</button>' : '') +
+          '<button class=btn type=button data-do=nomove data-g="' + esc(e.granter) + '">No</button>') + '</div>';
     return h + '</div>';
   }
   function draw(){
@@ -150,8 +148,8 @@
     var t = ev.target.closest ? ev.target.closest("[data-tab],[data-open],[data-do],[data-note]") : null; if(!t) return;
     if(t.dataset.tab){ TAB = t.dataset.tab; draw(); return; }
     if(t.dataset.open){ OPEN[t.dataset.open] = !OPEN[t.dataset.open]; draw(); return; }
-    if(t.dataset.do === "apply"){ if(confirm("Apply this plan for " + t.dataset.g + "?\nThe keeper carries it out within a minute.")) decide(t, "apply"); return; }
-    if(t.dataset.do === "nomove"){ if(confirm("Activate " + t.dataset.g + " with no move?")) decide(t, "nomove"); return; }
+    if(t.dataset.do === "apply"){ if(confirm("Yes for " + t.dataset.g + "?\nThe keeper makes exactly these moves within a minute.")) decide(t, "apply"); return; }
+    if(t.dataset.do === "nomove"){ if(confirm("No for " + t.dataset.g + "?\nNothing moves; you settle it by hand.")) decide(t, "nomove"); return; }
     if(t.dataset.do === "hold"){ var w = prompt("Why hold " + t.dataset.g + "? (the note goes to Discord)"); if(w && w.trim()) decide(t, "hold", w.trim()); return; }
     if(t.dataset.do === "resume"){ decide(t, "resume"); return; }
     if(t.dataset.note){ var s = prompt("Note for " + t.dataset.note); if(s && s.trim()) api("note", { net: NET, granter: t.dataset.note, text: s.trim() }).then(load).catch(function(e){ alert(e.message); }); }

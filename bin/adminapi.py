@@ -234,7 +234,7 @@ class H(BaseHTTPRequestHandler):
             cur = (rep.get("admin") or {}).get("plan_id")
             pid = b.get("plan_id") or None
             if act == "apply":
-                if not cur or not rep.get("moves"): return self.reply(409, {"error": "there is no plan to apply: use No move needed"})
+                if not cur or not rep.get("moves"): return self.reply(409, {"error": "there is no plan to apply: answer No"})
                 if pid != cur: return self.reply(409, {"error": "the plan changed since you opened it: review the new one"})
             now = int(time.time())
             with LOCK:
@@ -250,7 +250,7 @@ class H(BaseHTTPRequestHandler):
             log("decide %s %s %s by %s" % (net, g, act, a))
             # apply is announced by the keeper once it is carried out ("strategy applied"); the rest here
             if act == "nomove":
-                notify.send("ok", "Autopilot strategy applied: " + short(g), "No move needed: the stake already sits well. Confirmed by an operator.",
+                notify.send("info", "Autopilot answered No: " + short(g), "Nothing moves; the operator settles it by hand.",
                             {"Delegator": g, "Operator": a}, net=net)
             elif act == "hold":
                 notify.send("warn", "Autopilot on hold: " + short(g), note, {"Delegator": g, "Operator": a}, net=net)
