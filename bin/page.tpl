@@ -4461,6 +4461,10 @@ background:radial-gradient(120% 90% at 50% -10%,color-mix(in srgb,var(--rc) 16%,
 .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *,#sd-ado *) .sd-fig::after{display:none}
 .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *,#sd-ado *) .sd-fig em{font-size:10px;letter-spacing:.2em;color:var(--ws)}
 .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *,#sd-ado *) .sd-fig>b{font-size:38px;line-height:1}
+/* a big box's number fits its box: never over the box's own size, and never wider than the box (--n is the value's
+   visible length, set by fig(); .68em is the widest digit run measured, 147.0% at 38px = 154px) */
+.sd-mv .sd-fig{container-type:inline-size}
+.sd-mv .sd-fig .fv{font-size:min(1em, calc(100cqi / (var(--n, 6) * .68)));white-space:nowrap}
 /* the glowing line sits under the label (Now, After, Gain) */
 @media(min-width:901px) and (max-height:700px){.sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *,#sd-ado *) .sd-fig em{padding-bottom:5px;margin-bottom:1px}}
 @media(min-width:901px) and (max-height:640px){#sv .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *,#sd-ado *) .sd-fig{padding-top:4px;padding-bottom:4px;gap:2px}#sv .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *,#sd-ado *) .sd-fig>b{font-size:24px}#sv .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *,#sd-ado *) .sd-fig:last-child>b{font-size:26px}#sv .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *,#sd-ado *) .sd-fig em{padding-bottom:0;margin-bottom:0}#sv .sd-mv:is(#sd-move *,#sd-asky *,#sd-sky *,#sd-ado *) .sd-fig em::after{display:none}}

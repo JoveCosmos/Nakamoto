@@ -143,8 +143,11 @@
       (meta ? '<small>' + meta + '</small>' : '') + '</div>';
   }
 
+  /* the figure's value sits in .fv with its visible length as --n: in the big boxes (.sd-mv) the CSS sizes it to the
+     box's width, so a long number (28,987.2) shrinks to fit instead of running out of the box on a phone */
   function fig(label, value, meta, color){
-    return '<div class=sd-fig' + (color ? ' style="--rc:' + color + '"' : '') + '><em>' + label + '</em><b>' + value + '</b>' + (meta ? '<small>' + meta + '</small>' : '') + '</div>';
+    var n = String(value).replace(/<[^>]*>/g, "").replace(/&[a-z]+;/g, "x").length;
+    return '<div class=sd-fig style="--n:' + n + (color ? ';--rc:' + color : '') + '"><em>' + label + '</em><b><span class=fv>' + value + '</span></b>' + (meta ? '<small>' + meta + '</small>' : '') + '</div>';
   }
   /* What a stake earns - money, not a ranking: a year of it as the big figure, then a day, a
      week and a month, each in ATONE with its dollars at today's price (none on testnet). Rewards
@@ -282,7 +285,7 @@
         '</ol>';
     } else if(!pos.rows.length){
       h = '<div class=sv-none><h3>No stake on AtomOne</h3><button class="sv-btn go" type=button data-act=stake>Stake ATONE</button></div>';
-    } else if(!(pos.free > 0)){
+    } else if(!(pos.free >= 1e6)){                  /* under 1 ATONE free (redelegation dust) is nothing to move */
       h = '<div class=sv-ph><h3>Everything is under cooldown</h3>' + tag("a", "21 days") + '</div>' +
         fig("Your APR", pct(pos.rate), "on " + pos.rows.length + " validators", heat(pos.rate).fill) +
         fig("Free to move on", window.__dayFull ? window.__dayFull(pos.until) : "—", fmt(pos.total) + " ATONE redelegated recently", "var(--sv-amber)") +
@@ -302,11 +305,14 @@
         /* one wording; the row's own width decides whether the pill stays (container queries), so it never wraps */
         (function(n){ var w = n + ' move' + (n === 1 ? '' : 's');
           return '<span class="sv-tag q sd-mvn" title="' + w + ', 1 signature">' + w + ', 1 signature</span>'; })(plan.moves) + '</div>' +
-        '<div class="sd-figs sd-mv">' +
+        /* stake redelegated in the last 21 days cannot move again yet: with any of it, the gain shares the bottom
+           row with a Locked box (how much, until when), and the gain says what it is made from - the free stake */
+        (function(lk){ return '<div class="sd-figs sd-mv' + (lk ? ' four' : '') + '">' +
           fig("Now", '<span style="color:' + hn.ink + '">' + pct(plan.now) + '</span>', "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s"), hn.fill) +
           fig("After", '<span style="color:' + ha.ink + '">' + pct(plan.after) + '</span>', "on " + plan.picks.length + " validator" + (plan.picks.length === 1 ? "" : "s"), ha.fill) +
-          fig("Gain", '<span class=sd-gain>+' + one(plan.gain) + '</span>', "ATONE a year", "var(--sv-green)") +
-        '</div>' +
+          fig("Gain", '<span class=sd-gain>+' + one(plan.gain) + '</span>', lk ? "a year, on " + fmt(pos.free) + " free" : "ATONE a year", "var(--sv-green)") +
+          (lk ? fig("Locked", fmt(pos.locked), "until " + (window.__dayFull ? window.__dayFull(pos.until) : "the cooldown ends"), "var(--sv-amber)") : "") +
+        '</div>'; })(pos.locked >= 1e6) +
         '<button class="sv-btn go sd-go" type=button data-act=opt>Redelegate</button>';
     }
     var op = put("sd-move", h); op.classList.toggle("fill", h.indexOf("sv-none") >= 0);
@@ -472,7 +478,7 @@
         ' Connect a wallet to see it for yours.</div>';
     }
     if(!pos.rows.length) return h + '<div class=se-say>Nothing staked yet, so nothing for it to manage.</div>';
-    if(!(pos.free > 0)) return h + '<div class=se-say>Your stake is in its 21-day cooldown until <b>' + (window.__dayFull ? window.__dayFull(pos.until) : "later") + '</b>. Autopilot can move it after that.</div>';
+    if(!(pos.free >= 1e6)) return h + '<div class=se-say>Your stake is in its 21-day cooldown until <b>' + (window.__dayFull ? window.__dayFull(pos.until) : "later") + '</b>. Autopilot can move it after that.</div>';
     var plan = planNow(pos), hn = heat(pos.rate);
     if(!plan || !(plan.gain > 0.5) || plan.after == null)
       return h + '<div class=se-vs><div><em>Now</em><b style="color:' + hn.ink + '">' + pct(pos.rate) + '</b></div></div>' +
