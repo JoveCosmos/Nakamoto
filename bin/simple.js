@@ -1470,11 +1470,11 @@
      changes), the PATHS on the right (every destination in a fixed place, each with its live headline).
      The paths replace the header's section tabs; they route exactly as the tabs did. ════ */
   var PATHS = [
-    { id: "move",  route: "dashboard/wallet",     sec: "dashboard",  eb: "Your move" },
-    { id: "net",   route: "network/uptime",       sec: "network",    eb: "Network" },
-    { id: "bonus", route: "staking/bonus",        sec: "staking",    eb: "Nakamoto Bonus" },
-    { id: "gov",   route: "governance/proposals", sec: "governance", eb: "Governance" },
-    { id: "pro",   route: "dashboard/self",       sec: "dashboard",  eb: "Pro" }];
+    { id: "move",  route: "dashboard/wallet",     sec: "dashboard",  eb: "Your move",      ps: "Move",       ic: '<path d="M4 12h14M13 6l6 6-6 6"/>' },
+    { id: "net",   route: "network/uptime",       sec: "network",    eb: "Network",        ps: "Network",    ic: '<path d="M3 12h4l3-8 4 16 3-8h4"/>' },
+    { id: "bonus", route: "staking/bonus",        sec: "staking",    eb: "Nakamoto Bonus", ps: "Bonus",      ic: '<path d="M5 20V10M10 20V6M15 20v-8M20 20V4"/>' },
+    { id: "gov",   route: "governance/proposals", sec: "governance", eb: "Governance",     ps: "Governance", ic: '<path d="M4 10l8-6 8 6M6 10v8M10 10v8M14 10v8M18 10v8M3 20h18"/>' },
+    { id: "pro",   route: "dashboard/self",       sec: "dashboard",  eb: "Pro",            ps: "Pro",        ic: '<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>' }];
   function pathOn(p){
     var sec = root.getAttribute("data-sec"), sv = root.getAttribute("data-sv") || "";
     if(p.id === "pro") return sv === "dashboard/self";
@@ -1517,6 +1517,7 @@
     put("paths", PATHS.map(function(p){
       var on = pathOn(p), h = pathHead(p.id);
       return '<button class="pth' + (on ? ' on' : '') + '" type=button data-route="' + p.route + '" data-p="' + p.id + '"' + (on ? ' aria-current=page' : '') + '>' +
+        '<svg viewBox="0 0 24 24" aria-hidden=true>' + p.ic + '</svg><i class=ps>' + p.ps + '</i>' +
         '<em>' + p.eb + '</em><b>' + esc(h[0]) + '</b>' + (h[1] ? '<small>' + esc(h[1]) + '</small>' : '') + '</button>';
     }).join(""));
   }
@@ -1589,6 +1590,16 @@
       var rows = pos.rows.filter(function(r){ return r.x >= 1e5; }).sort(function(x, y){ return y.x - x.x; });
       return '<div class=mv-box><em>Now on</em>' + mvRows(rows.map(function(r){ return { rank: r.inactive ? 'out' : rk(r.id), name: r.m, amt: fmt(r.x), apr: r.inactive ? '0%' : pct(r.rate) }; }), 'g', 'validators') + '</div>';
     };
+    var you = '';
+    if(a){
+      var bal = window.__BAL, mine = pos && pos.rows.length, rs = !!(at && at.restake);
+      you = '<div class=mv-you><div class=mv-yg>' +
+        '<div class=mv-yk><em>Your APR</em><b' + (mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '>' + (mine ? pct(pos.rate) : '\u2014') + '</b></div>' +
+        '<div class=mv-yk><em>Staked</em><b>' + (pos ? fmt(pos.total) : '\u2014') + '</b></div>' +
+        '<div class=mv-yk><em>Available</em><b>' + (bal ? fmt(bal.uatone) : '\u2014') + '</b></div>' +
+        '<div class=mv-yk><em>Rewards</em><b>' + (window.__REW != null ? fmt(window.__REW) : '\u2014') + '</b></div></div>' +
+        '<div class=mv-ysw>' + youSwitch("youauto", "Autopilot", auto, "", !mine) + youSwitch("restakesw", "Restake", rs, "", !mine) + '</div></div>';
+    }
     var h;
     if(!a){
       h = top('Your best move') +
@@ -1635,7 +1646,7 @@
           nowOn() + mvSet({}, {});
       }
     }
-    put("mv-stage", h);
+    put("mv-stage", you + h);
   }
 
   function render(){

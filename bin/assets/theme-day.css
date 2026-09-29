@@ -950,22 +950,29 @@
   html[data-theme=light]:not([data-mono]) .shell-act{background:transparent;text-decoration:none}
   html[data-theme=light]:not([data-mono]) .shell-act:disabled{box-shadow:none}
   html[data-theme=light]:not([data-mono]) [role=tabpanel]:focus{outline:none}
+  html[data-theme=light]:not([data-mono]) #you,html[data-theme=light]:not([data-mono]) #paths,html[data-theme=light]:not([data-mono]) #mv-stage{--sv-teal:var(--accent);--sv-green:var(--accent);--sv-amber:var(--warn);--sv-violet:var(--accent)}
+  html[data-theme=light]:not([data-mono])[data-svs=over] #one #sv-over{background:none;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .you-cl{background:transparent}
+  html[data-theme=light]:not([data-mono]) .you-tg i{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .mv-chip.ok{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .mv-chip.warn{background:var(--warn-bg)}
+  html[data-theme=light]:not([data-mono]) .mv-chip.q{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .mv-r u{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .mv-arr svg{fill:none}
+  html[data-theme=light]:not([data-mono]) .mv-bars i.lo{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .mv-ap{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #mv-stage .mv-ghost{background:transparent}
+  html[data-theme=light]:not([data-mono]) .mv-cyc>div.done{background:var(--accent-soft);border-color:transparent}
+  html[data-theme=light]:not([data-mono]) .mv-cyc>div.warn{background:var(--warn-bg);border-color:transparent}
   @media(min-width:1100px){
-    html[data-theme=light]:not([data-mono]) #you,html[data-theme=light]:not([data-mono]) #paths{--sv-teal:var(--accent);--sv-green:var(--accent);--sv-amber:var(--warn);--sv-violet:var(--accent)}
-    html[data-theme=light]:not([data-mono]) .you-cl{background:transparent}
-    html[data-theme=light]:not([data-mono]) .you-tg i{background:var(--accent)}
     html[data-theme=light]:not([data-mono]) .pth.on{box-shadow:inset 0 0 0 1px var(--sv-teal);background:var(--accent-soft)}
-    html[data-theme=light]:not([data-mono])[data-svs=over] #one #sv-over{background:none;box-shadow:none}
-    html[data-theme=light]:not([data-mono]) .mv-chip.ok{background:var(--accent-soft)}
-    html[data-theme=light]:not([data-mono]) .mv-chip.warn{background:var(--warn-bg)}
-    html[data-theme=light]:not([data-mono]) .mv-chip.q{background:var(--accent-soft)}
-    html[data-theme=light]:not([data-mono]) .mv-r u{text-decoration:none}
-    html[data-theme=light]:not([data-mono]) .mv-arr svg{fill:none}
-    html[data-theme=light]:not([data-mono]) .mv-bars i.lo{background:var(--accent)}
-    html[data-theme=light]:not([data-mono]) .mv-ap{background:var(--accent-soft)}
-    html[data-theme=light]:not([data-mono]) #mv-stage .mv-ghost{background:transparent}
-    html[data-theme=light]:not([data-mono]) .mv-cyc>div.done{background:var(--accent-soft);border-color:transparent}
-    html[data-theme=light]:not([data-mono]) .mv-cyc>div.warn{background:var(--warn-bg);border-color:transparent}
+  }
+  @media(min-width:1100px) and (max-width:1439px){
+    html[data-theme=light]:not([data-mono]):is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth svg{fill:none;stroke:currentColor}
+  }
+  @media(max-width:1099px){
+    html[data-theme=light]:not([data-mono]) .pth{background:transparent}
+    html[data-theme=light]:not([data-mono]) .pth svg{fill:none;stroke:currentColor}
   }
   html[data-theme=light]:not([data-mono]){--void:var(--bg);--edge:var(--line);--edge2:var(--line-strong);--ink2:var(--muted);--ink3:var(--faint);--hot:var(--warn);--burn:var(--danger);--cold:var(--accent);--lit:var(--ink);--card:var(--surface);--card2:var(--surface-2);--inset:var(--surface-sunk);--blue:var(--accent);--cyan:var(--accent);--green:var(--accent);--amber:var(--warn);--cv:var(--bg);--ce:var(--line);--ce2:var(--line-strong);--ci:var(--ink);--ci2:var(--muted);--ci3:var(--faint);--cf:var(--faint);--ch:var(--warn);--cb:var(--danger);--cc:var(--accent);--cl:var(--ink);--mono:var(--day-mono);--sans:var(--day-sans)}
   html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-dele *,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) .pop,html[data-theme=light]:not([data-mono]) .pop *,html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) #sv *,html[data-theme=light]:not([data-mono]) #you,html[data-theme=light]:not([data-mono]) #you *,html[data-theme=light]:not([data-mono]) #paths,html[data-theme=light]:not([data-mono]) #paths *,html[data-theme=light]:not([data-mono]) .hdr-r,html[data-theme=light]:not([data-mono]) .hdr-r *,html[data-theme=light]:not([data-mono]) .brandbar,html[data-theme=light]:not([data-mono]) .brandbar *{--wc:var(--surface);--wh:var(--surface-2);--wbd:var(--line);--wbd2:var(--line-strong);--wi:var(--surface-sunk);--wchip:var(--surface-2);--wt:var(--ink);--ws:var(--muted);--wf:var(--faint);--wblue:var(--accent);--wcyan:var(--accent);--wgreen:var(--accent);--wamber:var(--warn);--wburn:var(--danger);--wgold:var(--warn);--wsans:var(--day-sans);--wmono:var(--day-mono)}
