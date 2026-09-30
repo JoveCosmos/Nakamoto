@@ -1606,8 +1606,8 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
   :is(#sv-over,#sv-auto) .sd-col>.sv-ph h3{color:#fff}:is(#sv-over,#sv-auto) .sd-col>.sv-ph h3::before{background:rgba(255,255,255,.9);box-shadow:none}}
 @media(min-width:901px){
   /* the wider padding leaves the Delegations table 4px less: its figures keep their room, the name gives */
-  #p-dele #wbody #dmy col:nth-child(1){width:30px!important}#p-dele #wbody #dmy col:nth-child(3){width:66px!important}
-  #p-dele #wbody #dmy col:nth-child(4){width:48px!important}#p-dele #wbody #dmy col:nth-child(5){width:50px!important}
+  #p-dele #wbody #dmy col:nth-child(2){width:30px!important}#p-dele #wbody #dmy col:nth-child(4){width:66px!important}
+  #p-dele #wbody #dmy col:nth-child(5){width:48px!important}#p-dele #wbody #dmy col:nth-child(6){width:50px!important}
   /* and its doors a touch smaller beside the larger title */
   #p-dele #wbody #wk-mine .wk-t1 .wk-unb{padding:0 6px;font-size:10px}
 }
@@ -1617,8 +1617,8 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
   #p-dele #wbody #wk-mine .wk-t1 .wk-unb.wk-stb{margin-left:auto}
 }
 @media(min-width:901px) and (max-width:1399px){
-  #p-dele #wbody #dmy col:nth-child(1){width:26px!important}#p-dele #wbody #dmy col:nth-child(3){width:58px!important}
-  #p-dele #wbody #dmy col:nth-child(4){width:46px!important}#p-dele #wbody #dmy col:nth-child(5){width:38px!important}
+  #p-dele #wbody #dmy col:nth-child(2){width:26px!important}#p-dele #wbody #dmy col:nth-child(4){width:58px!important}
+  #p-dele #wbody #dmy col:nth-child(5){width:46px!important}#p-dele #wbody #dmy col:nth-child(6){width:38px!important}
   #p-dele #wbody #dmy td{font-size:11px}
 }
 @media(min-width:901px) and (max-width:1299px){
@@ -2193,7 +2193,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
   .wk-tbl2 table{table-layout:auto}
   .wk-tbl2 th,.wk-tbl2 td{padding:0 4px}
   .wk-tbl2 td.nm{max-width:0;width:40%}
-  #dmy th:nth-child(5),#dmy td:nth-child(5){display:none}
+  #dmy th:nth-child(6),#dmy td:nth-child(6){display:none}
 
 .wk-pf{justify-content:flex-start}
   .txcard .txrow{grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr);grid-template-areas:"f ar t" "a a a"}
@@ -3081,8 +3081,8 @@ border:1px solid color-mix(in srgb,var(--sa-v) 40%,transparent);background:linea
   #p-dele #wk-mine,#p-dele #wk-plan{min-height:0}
   #p-dele #wk-mine .wk-tbl2,#p-dele #wk-plan .wk-tbl2{flex:1 1 auto;height:auto;min-height:0;max-height:none}
   /* the narrower Delegations column: its figures take less room, so the names keep theirs */
-  #p-dele #dmy col:nth-child(1){width:28px!important}#p-dele #dmy col:nth-child(3){width:60px!important}
-  #p-dele #dmy col:nth-child(4){width:52px!important}#p-dele #dmy col:nth-child(5){width:50px!important}
+  #p-dele #dmy col:nth-child(2){width:28px!important}#p-dele #dmy col:nth-child(4){width:60px!important}
+  #p-dele #dmy col:nth-child(5){width:52px!important}#p-dele #dmy col:nth-child(6){width:50px!important}
 }
 /* the three title rows one height (the Redelegate row's, which holds the amount field), everything in
    them centred: Delegations, Redelegate and Outcome, and Stake / Unstake / Rewards, on one line */
@@ -5688,8 +5688,8 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 #one #p-dele #wk-mv .wk-ans .p:not(#z){height:auto;min-height:40px;padding:6px 10px;flex-wrap:wrap}
 #one #p-dele #wk-mv .wk-ans .p.rate:not(#z){grid-column:1/-1}
 /* Delegations has the room: its amount and APR columns stop cutting their figures */
-#one #p-dele #dmy col:nth-child(3){width:92px!important}
-#one #p-dele #dmy col:nth-child(4){width:62px!important}
+#one #p-dele #dmy col:nth-child(4){width:92px!important}
+#one #p-dele #dmy col:nth-child(5){width:62px!important}
 #one #p-dele #wk-mv .wk-moves th:not(#z){border:0;border-bottom:1px solid var(--wbd);background:none;box-shadow:none;color:var(--wf)}
 #one #p-dele #wk-mv .wk-moves thead:not(#z),#one #p-dele #wk-mv .wk-moves thead tr:not(#z),#one #p-dele #wk-mv .wk-moves:not(#z){border:0;background:none;box-shadow:none}
 #one #p-dele .wk-mvempty:not(#z){font:400 13px/1.45 var(--wsans);letter-spacing:0;text-transform:none;color:var(--ws)}
@@ -5809,12 +5809,12 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 /* a narrower laptop: the side column takes a little more, so Delegations keeps its names */
 @media(min-width:1100px) and (max-width:1599px){
   #one #p-dele .wk-two:not(#z){grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
-  #one #p-dele #dmy col:nth-child(3){width:84px!important}
-  #one #p-dele #dmy col:nth-child(5){width:50px!important}
+  #one #p-dele #dmy col:nth-child(4){width:84px!important}
+  #one #p-dele #dmy col:nth-child(6){width:50px!important}
   #one #p-dele #wk-plan>.wk-ph .wk-lockn b{display:none}         /* the lock alone; its amount is in the tooltip */
   #one #p-dele #wk-plan .wk-field:not(#z){flex:1 1 150px;min-width:0;max-width:180px}
 }
-@media(min-width:1100px){#one #p-dele #dmy col:nth-child(1){width:40px!important}}
+@media(min-width:1100px){#one #p-dele #dmy col:nth-child(2){width:40px!important}}
 /* a short screen: Outcome keeps the room its figures and button need, Delegations gives (its list scrolls) */
 @media(min-width:1100px) and (max-height:820px){
   #one #p-dele .wk-two:not(#z){grid-template-rows:minmax(150px,1fr) 294px}
@@ -5922,10 +5922,12 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #you .wk-tbl2 td:not(#z){padding:0 5px;border-bottom:1px solid var(--wbd)}
   #you .wk-tbl2 td.nm:not(#z){font-family:var(--wsans);font-weight:500;color:var(--wt)}
   #you #dmy:not(#z){flex:1 1 auto;min-height:0;overflow-y:auto}
-  #you #dmy col:nth-child(5),#you #dmy th:nth-child(5),#you #dmy td:nth-child(5){display:none}
-  #you #dmy col:nth-child(1){width:30px!important}
-  #you #dmy col:nth-child(3){width:78px!important}
-  #you #dmy col:nth-child(4){width:56px!important}
+  #you #dmy col:nth-child(6),#you #dmy th:nth-child(6),#you #dmy td:nth-child(6),
+  #you #dmy col:nth-child(2),#you #dmy th:nth-child(2),#you #dmy td:nth-child(2){display:none}   /* rewards and rank: the column is narrow */
+  #you #dmy col:nth-child(1){width:26px!important}
+  #you #dmy col:nth-child(2){width:24px!important}
+  #you #dmy col:nth-child(4){width:66px!important}
+  #you #dmy col:nth-child(5){width:54px!important}
   #you #dmy td.nm:not(#z){font-size:12.5px}
   /* the menu shows where you are */
   html[data-sv="dashboard/self"]:not([data-pro]) #you #wk-mine .wk-t1 #rdbtn:not(#z),html[data-pro=stake] #you #wk-mine .wk-t1 #stbtn:not(#z),
@@ -6157,6 +6159,17 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 #mv-stage .mv-tdis .mv-tgo:disabled:not(#z):not(#y){opacity:.45;cursor:not-allowed;filter:grayscale(1)}
 #mv-stage .mv-tdis:hover::after{content:attr(data-tip);position:absolute;right:0;top:calc(100% + 6px);z-index:4;padding:6px 10px;border-radius:8px;
   border:1px solid var(--wbd2);background:var(--wh);box-shadow:0 10px 24px -14px rgba(0,0,0,.6);font:600 12px var(--wsans);color:var(--wt);white-space:nowrap;pointer-events:none}
+/* Delegations' select-all box is Redelegate's */
+#dmy thead th.ck input{appearance:none;-webkit-appearance:none;width:15px;height:15px;margin:0;border-radius:4px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);cursor:pointer;position:relative;vertical-align:middle;transition:border-color .12s,box-shadow .12s,background .12s}
+#dmy thead th.ck input:hover{border-color:var(--ws)}
+#dmy thead th.ck input:checked{background:linear-gradient(180deg,#3cf07a,#22c65c);border-color:#2ee06a;box-shadow:0 0 0 3px rgba(46,224,106,.14)}
+#dmy thead th.ck input:checked::after{content:"";position:absolute;left:4.5px;top:1.5px;width:4px;height:8px;border:solid #062012;border-width:0 2px 2px 0;transform:rotate(45deg)}
+#dmy thead th.ck input:indeterminate{border-color:#2ee06a;background:linear-gradient(180deg,#17172f,#0e0e1d)}
+#dmy thead th.ck input:indeterminate::after{content:"";position:absolute;left:3px;right:3px;top:6px;height:2px;background:#2ee06a;border-radius:1px}
+#dmy thead th.ck input{position:relative;cursor:pointer;vertical-align:middle}
+#dmy tbody tr.on td{background:rgba(46,224,106,.045)}
+#dmy td.ck input:disabled{opacity:.35;cursor:not-allowed}
+#dmy td.ck,#dmy th.ck{text-overflow:clip;overflow:visible;padding:0 2px 0 4px}
 /* ════ STICKY HEADS (operator, 2026-09-30): a list's column titles stay on top as it scrolls, on the pane's own
    colour, so rows never show through them - Redelegate, Delegations, Outcome's moves, Stake's list, Picks ════ */
 #one #p-dele .wk-tbl2 thead th:not(#z):not(#y),#you .wk-tbl2 thead th:not(#z):not(#y),#one #p-dele #wk-mv .wk-moves thead th:not(#z):not(#y),
@@ -6739,7 +6752,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
           <span class=unhint id=athint></span></div>
       </div>
       <ul class=bn id=atwhat><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="8"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></i><span class=bn-t><b>Keeps your stake in the active set</b><small><b id=atidlen>Stake</b> sits idle on inactive validators today</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 17l5-5 4 4 7-8"/><path d="M15 8h5v5"/></svg></i><span class=bn-t><b>Keeps your APR at its best</b><small>moves only for 5 APR points or more</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Redelegates, nothing else</b><small>GATA funds your pilot, no fees for you</small></span></li></ul>
-      <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Runs every <b>12 hours</b></span></div>
+      <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Runs every <b>12 hours</b>, you can revoke anytime.</span></div>
     </section>
     <section class=atR id=atR aria-label="Select your validators">
       <div class=atrs><input class=atfind id=atfind type=search placeholder="Find by name or operator key" aria-label="Find a validator" autocomplete=off spellcheck=false><span class=wk-seln id=atcount aria-live=polite></span></div>
@@ -6756,7 +6769,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   <header class=wk-txh><div><b id=rsttl>Restake</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=rssum></span></header>
   <div class=rsbody>
     <ul class=bn><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></i><span class=bn-t><b>Compounds your rewards</b><small><b id=rsadd>your rewards</b> more a year</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 20V10M10 20V6M15 20v-8M20 20V4"/></svg></i><span class=bn-t><b>Into the best-paying validator</b><small>not back onto the same one</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Claims and stakes, nothing else</b><small>GATA funds your restake, no fees for you</small></span></li></ul>
-    <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Runs every <b>12 hours</b></span></div>
+    <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Runs every <b>12 hours</b>, minimum 1 ATONE, you can revoke anytime.</span></div>
   </div>
   <div class=rsfoot><button class="wk-btn wk-go" id=rsgo type=button>Activate</button></div>
 </div></div>

@@ -1963,6 +1963,12 @@ rememberGridH();
      does not want; the plan re-solves on what is ticked, and the growth figure
      follows every tick. */
   var SEL = {};                                    /* ids the reader has ticked */
+  /* the delegations the reader ticks as the stake to move (operator, 2026-09-30): none ticked = all free stake */
+  var SRCSEL = {};
+  function srcAny(){ var pos = window.__POS; return !!pos && pos.rows.some(function(r){ return SRCSEL[r.id] && r.x - r.locked >= 1e5; }); }
+  function srcFree(pos){ if(!pos) return 0; if(!srcAny()) return pos.free;
+    var f = 0; pos.rows.forEach(function(r){ if(SRCSEL[r.id] && r.x - r.locked >= 1e5) f += r.x - r.locked; }); return f; }
+  window.__srcFree = function(){ return srcFree(window.__POS); };
   var QUIET = false;                               /* a redraw made to be read, not to be announced */
   /* both tables are paged, never scrolled: a fixed number of rows a page */
   var LPS = 6, PPS = 6, PG = { l: 0, p: 0 };
@@ -2077,16 +2083,17 @@ rememberGridH();
     if(st) st.textContent = exact(pos.total);
     if(rw){ rw.textContent = window.__REW != null ? exact(window.__REW) : "—"; rw.className = window.__REW > 0 ? "ok" : ""; }
     var rt = E("ds-rewt"); if(rt) rt.setAttribute("aria-disabled", clRows().length ? "false" : "true");
-    if(mv){ mv.textContent = pos.free > 0 ? exact(pos.free, 2) : "0"; mv.title = pos.free > 0 ? exact(pos.free) + " ATONE can move" : "nothing can move until the cooldown ends"; mv.className = pos.free > 0 ? "" : "warn";
-      var mxb = E("amtmax"); if(mxb) mxb.disabled = !(pos.free > 0); }
+    var sf = srcFree(pos);
+    if(mv){ mv.textContent = sf > 0 ? exact(sf, 2) : "0"; mv.title = sf > 0 ? exact(sf) + " ATONE can move" + (srcAny() ? " from the ticked delegations" : "") : "nothing can move until the cooldown ends"; mv.className = sf > 0 ? "" : "warn";
+      var mxb = E("amtmax"); if(mxb) mxb.disabled = !(sf > 0); }
     var ap = E("ds-apr"); if(ap) ap.textContent = pos.rows.length ? pct(pos.rate) : "\u2014";
     if(ph){ ph.textContent = b ? exact(b.uphoton) : "—";
       ph.className = "pho" + (b && b.uphoton < 50000 ? " warn" : ""); }
   }
 
   /* ── the delegations, a page at a time ── */
-  var HEAD2 = '<table><colgroup><col style="width:30px"><col><col style="width:80px"><col style="width:50px"><col style="width:56px"></colgroup>' +
-    '<thead><tr><th class=c>rank</th><th class=l>validator</th><th>ATONE</th><th>APR</th><th>rewards</th></tr></thead><tbody>';
+  var HEAD2 = '<table><colgroup><col style="width:28px"><col style="width:30px"><col><col style="width:80px"><col style="width:50px"><col style="width:56px"></colgroup>' +
+    '<thead><tr><th class=ck></th><th class=c>rank</th><th class=l>validator</th><th>ATONE</th><th>APR</th><th>rewards</th></tr></thead><tbody>';
   function myRows(pos, V){
     var pn = E("dmyn");
     /* no wallet: the section keeps its shape - the same table, waiting - rather than
@@ -2094,20 +2101,27 @@ rememberGridH();
     if(!pos){
       if(pn) pn.textContent = ""; pager(E("dmypg"), 0, 0, LPS, "l");
       var sk = HEAD2, q;
-      for(q = 0; q < 5; q++) sk += '<tr class=skel><td class="c rk"><b></b></td><td class="l nm"><b style="width:' +
+      for(q = 0; q < 5; q++) sk += '<tr class=skel><td class=ck></td><td class="c rk"><b></b></td><td class="l nm"><b style="width:' +
         (54 + (q % 3) * 12) + '%"></b></td><td class=amt><b></b></td><td><b></b></td><td class=rw><b></b></td></tr>';
       return sk + '</tbody></table>';
     }
     if(!pos.rows.length){ if(pn) pn.textContent = ""; pager(E("dmypg"), 0, 0, LPS, "l"); return empty("No stake on AtomOne"); }
     var rows = pos.rows.slice().sort(function(a, b){ return b.x - a.x; }), h = "", k;
-    if(pn) pn.textContent = rows.length + " validator" + (rows.length === 1 ? "" : "s");
+    var nsel = 0; rows.forEach(function(r){ if(SRCSEL[r.id] && r.x - r.locked >= 1e5) nsel++; });
+    if(pn) pn.textContent = nsel ? nsel + " selected" : rows.length + " validator" + (rows.length === 1 ? "" : "s");
+    var movable = rows.filter(function(r){ return r.x - r.locked >= 1e5; });
     var slice = rows; pager(E("dmypg"), 0, 0, LPS, "l");
     var LOCK = '<i class=lk><svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></i>';
     var RB = window.__REWBY || {};
-    h += '<table><colgroup><col style="width:30px"><col><col style="width:80px"><col style="width:50px"><col style="width:56px"></colgroup><thead><tr><th class=c>rank</th><th class=l>validator</th><th>ATONE</th><th>APR</th><th>rewards</th></tr></thead><tbody>';
+    /* a box on each delegation: tick the ones to move from (stake in its cooldown cannot be ticked) */
+    h += '<table><colgroup><col style="width:28px"><col style="width:30px"><col><col style="width:80px"><col style="width:50px"><col style="width:56px"></colgroup><thead><tr><th class=ck>' +
+         (movable.length ? '<input type=checkbox class=src-all aria-label="Tick every delegation that can move"' + (movable.length && movable.every(function(r){ return SRCSEL[r.id]; }) ? ' checked' : '') + '>' : '') +
+         '</th><th class=c>rank</th><th class=l>validator</th><th>ATONE</th><th>APR</th><th>rewards</th></tr></thead><tbody>';
     for(k = 0; k < slice.length; k++){
       var rw = slice[k], rk = rankOf(V, rw.id);
-      h += '<tr' + (rw.inactive ? ' class=inactive' : '') + ' data-v="' + att(rw.id) + '" tabindex=0 title="' + (rw.inactive ? 'Not in the active set: this stake earns nothing until it is moved or unstaked' : 'Open this validator') + '"><td class="c rk">' + (rk || '\u2014') + '</td><td class="l nm">' + logo(rw.id, rw.m) + '<span>' + att(rw.m) + '</span></td>' +
+      var canSrc = rw.x - rw.locked >= 1e5, onSrc = canSrc && !!SRCSEL[rw.id];
+      h += '<tr class="' + (rw.inactive ? 'inactive' : '') + (onSrc ? ' on' : '') + '" data-v="' + att(rw.id) + '" tabindex=0 title="' + (rw.inactive ? 'Not in the active set: this stake earns nothing until it is moved or unstaked' : 'Open this validator') + '">' +
+           '<td class=ck>' + (canSrc ? '<input type=checkbox data-src="' + att(rw.id) + '"' + (onSrc ? ' checked' : '') + ' aria-label="Move from ' + att(rw.m) + '">' : '<input type=checkbox disabled aria-label="In its cooldown" title="In its 21-day cooldown: it cannot move yet">') + '</td><td class="c rk">' + (rk || '\u2014') + '</td><td class="l nm">' + logo(rw.id, rw.m) + '<span>' + att(rw.m) + '</span></td>' +
            '<td class=amt><span title="' + (rw.locked > 0 ? 'held until ' + window.__day(rw.until) : 'free to move') + '">' + fmt(rw.x) + (rw.locked > 0 ? LOCK : '') + '</span></td>' +
            /* out of the set, the APR cell names why: Jailed (red) or Inactive */
            '<td' + (rw.inactive ? ' class=st' : '') + '>' + (rw.inactive ? (((window.__INACT || {})[rw.id] || {}).jailed ? '<span class=dmj>Jailed</span>' : '<span class=dmi>Inactive</span>') : pct(rw.rate)) + '</td><td class=rw>' + (RB[rw.id] != null ? fmt(RB[rw.id]) : '\u2014') + '</td></tr>';
@@ -2222,7 +2236,8 @@ rememberGridH();
       var key = rr.redelegation.validator_src_address.slice(-6) + ">" + rr.redelegation.validator_dst_address.slice(-6);
       used[key] = (used[key] || 0) + (rr.entries || []).length; });
     /* the stake leaves the positions that earn least first, largest of equals first */
-    var src = pos ? pos.rows.map(function(x){ srcRate[x.id] = x.rate; return { id: x.id, m: x.m, rate: x.rate, free: x.x - x.locked }; }).filter(function(x){ return x.free > 0; })
+    var any = srcAny();
+    var src = pos ? pos.rows.map(function(x){ srcRate[x.id] = x.rate; return { id: x.id, m: x.m, rate: x.rate, free: x.x - x.locked }; }).filter(function(x){ return x.free > 0 && (!any || SRCSEL[x.id]); })
                         /* a validator asked for by name (the inactive card's Redelegate) goes first of all */
                         .sort(function(a, b){ var f = window.__SRCFIRST; return ((b.id === f) - (a.id === f)) || (a.rate - b.rate) || (b.free - a.free); }) : [];
     if(!r.moves.length) return "";
@@ -2314,20 +2329,28 @@ rememberGridH();
   var go0 = E("dgo"); if(go0) go0.addEventListener("click", function(){ if(window.__goSign) window.__goSign(); });
   var dmy = E("dmy");
   function rowCard(ev){
+    if(ev.target.closest && ev.target.closest("td.ck, th.ck")) return;       /* a box ticks, it does not open the card */
     var tr = ev.target.closest ? ev.target.closest("[data-v]") : null;
     if(!tr || !window.__vshow) return;
     if(ev.type === "keydown" && ev.key !== "Enter" && ev.key !== " ") return;
     ev.preventDefault(); window.__vshow(tr.getAttribute("data-v"));
   }
-  if(dmy){ dmy.addEventListener("click", rowCard); dmy.addEventListener("keydown", rowCard); }
+  if(dmy){ dmy.addEventListener("click", rowCard); dmy.addEventListener("keydown", rowCard);
+    dmy.addEventListener("change", function(ev){
+      var c = ev.target, pos = window.__POS; if(!c || c.type !== "checkbox" || !pos) return;
+      if(c.classList.contains("src-all")) pos.rows.forEach(function(r){ if(r.x - r.locked >= 1e5){ if(c.checked) SRCSEL[r.id] = 1; else delete SRCSEL[r.id]; } });
+      else if(c.dataset.src){ if(c.checked) SRCSEL[c.dataset.src] = 1; else delete SRCSEL[c.dataset.src]; }
+      /* the amount follows: never more than the ticked stake can give */
+      var f = srcFree(pos), a0 = value() * 1e6; if(a0 > f) amt.value = f > 0 ? exact(f) : "";
+      draw(); }); }
   /* the Redelegate list too: its name cells open the card, its boxes keep the tick */
   var dpk = E("dpicks"); if(dpk){ dpk.addEventListener("click", rowCard); dpk.addEventListener("keydown", rowCard); }
   /* max is what can actually move; with nothing free (all in cooldown) or no wallet it does nothing */
-  var mx = E("amtmax"); if(mx) mx.addEventListener("click", function(){ var pos = window.__POS; if(!pos || !(pos.free > 0)) return; amt.value = exact(pos.free); draw(); });
+  var mx = E("amtmax"); if(mx) mx.addEventListener("click", function(){ var pos = window.__POS, f = srcFree(pos); if(!pos || !(f > 0)) return; amt.value = exact(f); draw(); });
   /* amount presets: a share of what can move */
   Array.prototype.forEach.call(document.querySelectorAll("#amtseg button"), function(b){
     b.addEventListener("click", function(){
-      var pos = window.__POS, base = pos && pos.free > 0 ? pos.free : 10000e6;
+      var pos = window.__POS, f = srcFree(pos), base = pos && f > 0 ? f : 10000e6;
       amt.value = Math.floor(base * (+b.dataset.p) / 100 / 1e6).toLocaleString();
       Array.prototype.forEach.call(document.querySelectorAll("#amtseg button"), function(o){ o.setAttribute("aria-pressed", o === b ? "true" : "false"); });
       draw();

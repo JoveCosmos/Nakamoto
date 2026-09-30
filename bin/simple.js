@@ -1587,9 +1587,7 @@
     home();
     /* testnet only: the faucet, for the wallet the app is connected to (operator, 2026-09-30) */
     if(root.getAttribute("data-net") === "testnet") h += faucetBox(a);
-    h += '<div class=you-hf><div class=you-hfh><em>Hands-free</em><button class=qm type=button aria-label="How Autopilot and Restake work">?<span class=qm-tip role=tooltip>' +
-      '<b>Autopilot</b><span>Runs every 12 hours</span><span>Redelegates when stake inactive or for a minimum 5% APR gain</span><span>Turn it off anytime</span>' +
-      '<b>Restake</b><span>Runs every 12 hours</span><span>Claim and stake rewards minimum 1 ATONE</span><span>Turn it off anytime</span></span></button></div>' +
+    h += '<div class=you-hf><div class=you-hfh><em>Hands-free</em></div>' +
       youSwitch("youauto", "Autopilot", auto, asub, !a || !mine) +
       youSwitch("restakesw", "Restake", rs, rs ? "rewards staked every 12 hours" : "stakes your rewards every 12 hours", !a || !mine) + '</div>';
     put("you", h);
@@ -1786,6 +1784,7 @@
   };
 
   function onClick(ev){
+    if(ev.target.closest && ev.target.closest("td.ck, th.ck")) return;         /* a list's box ticks; it opens nothing */
     var t = ev.target.closest ? ev.target.closest("[data-act],[data-f],[data-v],[data-gv]") : null;
     if(!t) return;
     var act = t.dataset.act;

@@ -421,3 +421,7 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .you-fq:disabled{border-color:var(--line-strong);color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .you-fct>small a{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .you-fq.sent{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #dmy thead th.ck input{background:var(--surface-2);border-color:var(--line-strong)}
+  html[data-theme=light]:not([data-mono]) #dmy thead th.ck input:checked{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #dmy thead th.ck input:checked::after{border-color:var(--surface)}
+  html[data-theme=light]:not([data-mono]) #dmy tbody tr.on td{background:var(--accent-soft)}
