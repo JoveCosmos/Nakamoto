@@ -2017,12 +2017,14 @@ rememberGridH();
      picked), each its own band that opens; each sorted by stake */
   function ijRows(key, cols, sel){
     var L = (window.__D && window.__D.inactive) || [];
-    if(!L.length) return "";
     var by = function(a, b){ return b[1] - a[1]; };
     var ina = L.filter(function(v){ return !v[4]; }).sort(by), jai = L.filter(function(v){ return v[4]; }).sort(by);
     var h = "";
     [[ina, key + "i", "Inactive validators", "can be selected, 0% while inactive"], [jai, key + "j", "Jailed validators", "cannot be picked"]].forEach(function(g){
-      var list = g[0]; if(!list.length) return;
+      var list = g[0];
+      /* an empty group still shows, with its 0, so the list always says where inactive and jailed validators would be */
+      if(!list.length){ h += '<tr class="ij-t ij-0"><td colspan=' + cols + '><button type=button class=ij-b disabled aria-disabled=true>' +
+        '<span>' + g[2] + '</span><i>0</i><em>none right now</em></button></td></tr>'; return; }
       var ticked = 0; list.forEach(function(v){ if(sel && sel[v[3]]) ticked++; });
       var open = !!IJ[g[1]] || ticked > 0;
       h += '<tr class="ij-t' + (open ? ' open' : '') + '"><td colspan=' + cols + '><button type=button class=ij-b data-ij="' + g[1] + '" aria-expanded=' + open + '>' +

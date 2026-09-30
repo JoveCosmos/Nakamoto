@@ -6079,6 +6079,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #one #p-dele #wk-mv>.wk-ans .p b:not(#z):not(#y){font-size:12.5px}
   #one #prolist .wk-tbl2 td.nm .gtag.add:not(#z){flex:0 0 auto}
 }
+.ij-t.ij-0 .ij-b{cursor:default;opacity:.7}
 /* ════ STICKY HEADS (operator, 2026-09-30): a list's column titles stay on top as it scrolls, on the pane's own
    colour, so rows never show through them - Redelegate, Delegations, Outcome's moves, Stake's list, Picks ════ */
 #one #p-dele .wk-tbl2 thead th:not(#z):not(#y),#you .wk-tbl2 thead th:not(#z):not(#y),#one #p-dele #wk-mv .wk-moves thead th:not(#z):not(#y),
