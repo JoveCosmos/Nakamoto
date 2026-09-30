@@ -5493,6 +5493,8 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .you-swt{flex:1 1 auto;display:flex;flex-direction:column;gap:1px;min-width:0}
 .you-swt b{font-size:14px;font-weight:600;color:var(--wt)}
 .you-swt>b{display:flex;align-items:center;gap:7px}
+/* a phone: the Active/Inactive tag under the name, clear of the switch (2026-09-30) */
+@media(max-width:700px){.you-swt>b{flex-direction:column;align-items:flex-start;gap:5px}}
 .you-tag{font-style:normal;font-family:var(--wmono);font-size:9px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;line-height:1;
   padding:3px 6px;border-radius:999px;border:1px solid var(--wbd2);color:var(--wf)}
 .you-tag.on{border-color:var(--sv-teal,#2bc8bd);color:var(--sv-teal,#2bc8bd);background:rgba(43,200,189,.10)}
@@ -6159,6 +6161,12 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 #mv-stage .mv-bars i{cursor:pointer}
 #mv-stage .mv-bars i:hover{filter:brightness(.82)}
 #mv-stage .mv-top>em+.mv-tdis{margin-left:auto}
+/* a phone: the action takes its own full row under the title, never off the edge (2026-09-30) */
+@media(max-width:700px){
+  #mv-stage .mv-top:not(#z){flex-wrap:wrap;row-gap:10px}
+  #mv-stage .mv-top>.mv-tgo:not(#z),#mv-stage .mv-top>.mv-ton:not(#z),#mv-stage .mv-top>.mv-tdis:not(#z){flex:1 1 100%;margin-left:0}
+  #mv-stage .mv-top .sv-btn.go.mv-go.mv-tgo:not(#z):not(#y):not(#x){width:100%}
+}
 #mv-stage .mv-tdis{position:relative;display:inline-flex;flex:0 0 auto}
 #mv-stage .mv-tdis .mv-tgo:disabled:not(#z):not(#y){opacity:.45;cursor:not-allowed;filter:grayscale(1)}
 #mv-stage .mv-tdis:hover::after{content:attr(data-tip);position:absolute;right:0;top:calc(100% + 6px);z-index:4;padding:6px 10px;border-radius:8px;
