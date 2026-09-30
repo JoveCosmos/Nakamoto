@@ -380,7 +380,7 @@
     /* no wallet: no door here - the bar's Connect is the one (as the Stake view's wallet card) */
     var door = !pos ? ''
       : !pos.rows.length ? '<button type=button data-act=stake>Stake ATONE</button>'
-      : '<button type=button data-act=autopilot>' + (g ? "Manage" : "Set up") + '</button>';
+      : '<button type=button data-act=autopilot>' + (g ? "Revoke" : "Activate") + '</button>';
     /* the strip as the Stake view's: the lead card (name and state on one line, the door under them), then five
        boxes - the figure in its well, the unit beside it, no captions and no gauges */
     put("sd-astrip",
@@ -398,7 +398,7 @@
       var rs = rp && rp.restake;
       if(!(at && at.restake)) return "";
       if(rs && rs.count) return "Restaked <b>" + fmt(rs.total) + " ATONE</b> of rewards in " + rs.count + " run" + (rs.count === 1 ? "" : "s") + (rs.last_at ? ", last " + window.__dayFull(rs.last_at * 1000) : "") + ".";
-      return "Restake is on: rewards are staked back as they build up.";
+      return "Restake is active: rewards are staked back as they build up.";
     }
     if(g) put("sd-ado",
       '<div class=sv-ph><h3>Autopilot is working</h3></div>' +
@@ -493,7 +493,7 @@
   }
   function restakePanel(pos, at){
     var on = !!(at && at.restake), r = pos && pos.rows.length ? pos.rate : 0, add = r > 0 ? Math.pow(1 + r / 730, 730) - 1 - r : 0;
-    var h = '<div class=sv-ph><h3>Restake</h3>' + '<span class="sv-tag ars-st' + (on ? ' on' : '') + '">' + (on ? 'Enabled' : 'Disabled') + '</span></div>';
+    var h = '<div class=sv-ph><h3>Restake</h3>' + '<span class="sv-tag ars-st' + (on ? ' on' : '') + '">' + (on ? 'Active' : 'Inactive') + '</span></div>';
     h += '<div class=ars-fig><em>' + (on ? 'Adds a year' : 'A year') + '</em><b>' + (add > 0 ? '+' + fmt(pos.total * add) : '\u2014') + '</b>' +
       (add > 0 ? '<small>ATONE, +' + (add * 100).toFixed(1) + '% APR</small>' : '') + rsUntil(at, on) + '</div>';
     /* the rules sit at the foot, over the switch */
@@ -501,7 +501,7 @@
       '<div class=ars-how>Auto-compounds rewards into the <b>highest-paying</b> validator</div></div>';
     h += !pos ? CONNECT_OFF
       : !pos.rows.length ? '<button class="sv-btn go sd-go" type=button data-act=stake>Stake ATONE</button>'
-      : '<button class="sv-btn go sd-go' + (on ? ' ars-off' : '') + '" type=button data-act=restakesw>' + (on ? 'Disable' : 'Enable') + '</button>';
+      : '<button class="sv-btn go sd-go' + (on ? ' ars-off' : '') + '" type=button data-act=restakesw>' + (on ? 'Revoke' : 'Activate') + '</button>';
     return h;
   }
   function grantView(g, at, rp, since, until){
@@ -1543,7 +1543,7 @@
       row("Rewards", window.__REW != null ? fmt(window.__REW) : '—', "ATONE") +
       row("For fees", bal ? fmt(bal.uphoton) : '—', "PHOTON") + '</div>';
     var rp = at && at.report, adm = rp && rp.admin, st = adm && adm.state;
-    var asub = !auto ? "keeps your stake at the best APR" : "on, checks every 12 hours";
+    var asub = !auto ? "keeps your stake at the best APR" : "checks every 12 hours";
     /* Pro on a wide screen (operator, 2026-09-30): the wallet column holds your delegations and the action menu
        (Redelegate, Stake, Unstake, Claim) in place of the hands-free switches - the Delegations pane itself moves in */
     var proW = root.getAttribute("data-sv") === "dashboard/self" && matchMedia("(min-width:1100px)").matches;
@@ -1560,7 +1560,7 @@
       '<b>Autopilot</b><span>Runs every 12 hours</span><span>Redelegates when stake inactive or for a minimum 5% APR gain</span><span>Turn it off anytime</span>' +
       '<b>Restake</b><span>Runs every 12 hours</span><span>Claim and stake rewards minimum 1 ATONE</span><span>Turn it off anytime</span></span></button></div>' +
       youSwitch("youauto", "Autopilot", auto, asub, !a || !mine) +
-      youSwitch("restakesw", "Restake", rs, rs ? "on, rewards staked every 12 hours" : "stakes your rewards every 12 hours", !a || !mine) + '</div>';
+      youSwitch("restakesw", "Restake", rs, rs ? "rewards staked every 12 hours" : "stakes your rewards every 12 hours", !a || !mine) + '</div>';
     put("you", h);
   }
   var youEl0 = E("you"), MINE_HOME = E("wk-mine") ? E("wk-mine").parentNode : null;
@@ -1573,7 +1573,7 @@
     var r = pos && pos.rows.length ? pos.rate : 0, add = r > 0 ? Math.pow(1 + r / 730, 730) - 1 - r : 0;
     var ad = E("rsadd"); if(ad) ad.textContent = add > 0 ? "+" + fmt(pos.total * add) + " ATONE" : "Your rewards";
     var sm = E("rssum"); if(sm) sm.innerHTML = on ? '<i class="you-tag on">Active</i>' : '<i class=you-tag>Inactive</i>';
-    var b = E("rsgo"); if(b){ b.textContent = on ? "Disable" : "Enable"; b.className = "wk-btn " + (on ? "wk-danger" : "wk-go"); }
+    var b = E("rsgo"); if(b){ b.textContent = on ? "Revoke" : "Activate"; b.className = "wk-btn " + (on ? "wk-danger" : "wk-go"); }
     POP.open(el);
   }
   /* a ? opens its tip on a tap or click (hover does it on a desktop); a tap anywhere else closes it */
@@ -1687,14 +1687,14 @@
         var t1 = pos.until || Date.now(), t0 = t1 - 21 * 864e5, k = Math.min(21, Math.max(1, Math.ceil((Date.now() - t0) / 864e5)));
         var cells = ''; for(var i = 1; i <= 21; i++) cells += '<i' + (i <= k ? ' class=on' : '') + '></i>';
         var hist = at && at.report && at.report.history && at.report.history.length ? at.report.history[0] : null;
-        h = top(auto ? 'Moved. Autopilot is on' : 'Moved. Cooling down', 'Day ' + k + ' of 21', 'warn') +
+        h = top(auto ? 'Moved. Autopilot is active' : 'Moved. Cooling down', 'Day ' + k + ' of 21', 'warn') +
           '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>Free to move again on <b>' + day(t1) + '</b>.</span></div>' +
           '<div class=mv-days><div class=mv-dh><span>Cooling down</span><span>' + day(t0) + ' to ' + day(t1) + '</span></div><div class=mv-dc>' + cells + '</div>' +
           '<small>The chain holds redelegated stake for 21 days. Nothing to do until then.</small></div>' + nowOn() +
           (auto ? '<div class=mv-cyc><div class=done><em>' + (hist ? day(hist.at * 1000) : 'Done') + '</em><b>Moved</b></div><div class=warn><em>Until ' + day(t1) + '</em><b>Cooling down</b></div>' +
                   '<div><em>Every 12 hours</em><b>Checked again</b></div><div><em>5 points more</em><b>Moved for you</b></div></div>'
                 : '<div class=mv-ap><span>On ' + day(t1) + ' this stake is free again. <b>Autopilot moves it for you</b> whenever it can earn more, checking every 12 hours.</span>' +
-                  '<button class="sv-btn mv-ghost" type=button data-act=youauto>Turn on Autopilot</button></div>');
+                  '<button class="sv-btn mv-ghost" type=button data-act=youauto>Activate Autopilot</button></div>');
       } else {
         h = top('Your stake today', 'At its best', 'ok') +
           '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>No move earns it 5 APR points more today.' + (auto ? ' Autopilot checks again every 12 hours.' : ' This checks again every block.') + '</span></div>' +

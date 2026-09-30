@@ -6122,7 +6122,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
       <div class=wk-two>
         <section class=wk-pane id=wk-mine>
           <div id=wk-acct>
-          <div class=wk-ap id=wkap hidden><span class=wk-apk>Autopilot</span><span class=wk-aps id=wkaps>inactive</span><button class=wk-apb id=atbtn type=button title="Let GATA keep this stake where it earns most, inside limits you set">Set up</button></div>
+          <div class=wk-ap id=wkap hidden><span class=wk-apk>Autopilot</span><span class=wk-aps id=wkaps>Inactive</span><button class=wk-apb id=atbtn type=button title="Let GATA keep this stake where it earns most, inside limits you set">Activate</button></div>
           <header class="wk-ph wk-t1"><h3>Delegations</h3><span class=wk-pn id=dmyn></span>
             <div class=wk-foot id=dstat></div>
             <button class="wk-unb wk-rdb" id=rdbtn type=button title="Move stake between validators">Redelegate</button>
@@ -6429,7 +6429,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
     <ul class=bn><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></i><span class=bn-t><b>Compounds your rewards</b><small><b id=rsadd>your rewards</b> more a year</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 20V10M10 20V6M15 20v-8M20 20V4"/></svg></i><span class=bn-t><b>Into the best-paying validator</b><small>not back onto the same one</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Claims and stakes, nothing else</b><small>GATA funds your restake, no fees for you</small></span></li></ul>
     <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Runs every <b>12 hours</b></span></div>
   </div>
-  <div class=rsfoot><button class="wk-btn wk-go" id=rsgo type=button>Enable</button></div>
+  <div class=rsfoot><button class="wk-btn wk-go" id=rsgo type=button>Activate</button></div>
 </div></div>
 
 <div class=pop id=ipop><div class="card vcard icard">

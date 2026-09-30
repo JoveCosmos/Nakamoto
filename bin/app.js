@@ -3030,8 +3030,8 @@ rememberGridH();
     var row = E("wkap"), st = E("wkaps"), b = E("atbtn"); if(!row) return;
     var g = AT.grant, a = g && g.authorization || {};
     if(g){ var n = ((a.allow_list || {}).address || []).length, exp = g.expiration ? window.__dayFull(new Date(g.expiration).getTime()) : "no expiry";
-      st.className = "wk-aps on"; st.textContent = "active, until " + exp; st.title = n + " allowed validators"; if(b) b.textContent = "Manage"; }
-    else { st.className = "wk-aps"; st.textContent = "inactive"; if(b) b.textContent = "Set up"; }
+      st.className = "wk-aps on"; st.textContent = "Active"; st.title = "until " + exp; if(b) b.textContent = "Revoke"; }
+    else { st.className = "wk-aps"; st.textContent = "Inactive"; if(b) b.textContent = "Activate"; }
   }
   window.__atDoor = function(){
     var row = E("wkap"), b = E("atbtn"); if(!b || !row) return;
