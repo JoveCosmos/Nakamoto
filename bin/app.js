@@ -2152,7 +2152,8 @@ rememberGridH();
            (o.jail == null ? '<td class=dim>N/A</td>' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>') +
            (lay ? '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '\u2014') + '</s><em>→</em><b>' + pct(there) + '</b></td>' : '<td class=r2><b>' + pct(o.rate0) + '</b></td>') + '</tr>';
     });
-    h += ijRows("rd", (h.match(/<col[ >]/g) || []).length, pos ? SEL : null);
+    /* no inactive or jailed validators here (operator, 2026-09-30): moving stake onto one earns nothing */
+    if(SEL && typeof SEL === "object") Object.keys(SEL).forEach(function(id){ if(!(window.__VDBY || {})[id]) delete SEL[id]; });
     var top = el.scrollTop;
     el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
     ijWire(el, draw);
