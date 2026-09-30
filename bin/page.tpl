@@ -5915,7 +5915,9 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
    button hold fixed places at the foot */
 @media(min-width:1100px){
   #one #proout:not(#z):not(#y){overflow:hidden;gap:10px}
-  #one #proout .pro-brk:not(#z){flex:1 1 auto;min-height:0;overflow-y:auto;order:-1}
+  #one #proout .pro-brk:not(#z){flex:1 1 auto;min-height:0;overflow:hidden;order:-1;display:flex;flex-direction:column;gap:10px}
+  #one #proout .pro-ans:not(#z){flex:0 0 auto}
+  #one #proout .pro-brk-s{flex:1 1 auto;min-height:0;overflow-y:auto}
   #one #proout .txfee:not(#z),#one #proout .txstep:not(#z){order:1;flex:0 0 auto}
   #one #proout .txlock:not(#z):not(#y):not(#x){order:2;flex:0 0 auto;margin:0 0 2px}
   #one #proout .txbtns:not(#z):not(#y){order:3;flex:0 0 auto;margin:0}

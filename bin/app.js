@@ -2607,26 +2607,28 @@ rememberGridH();
   function proBrk(){
     var el = E("probrk"), mode = document.documentElement.getAttribute("data-pro"); if(!el) return;
     var pos = window.__POS, byOp = {}; if(pos) pos.rows.forEach(function(r){ if(r.op) byOp[r.op] = r; });
-    var VD = window.__VDBY || {}, rows = [], head = [], tot = 0, foot = "";
+    var rows = [], head = [], tot = 0, fig = ["", ""];
     var pc = function(x){ return (x * 100).toFixed(1) + "%"; };
     if(mode === "stake"){
       var P = stPlan(); head = ["Validator", "Stake", "APR", "ATONE/yr"];
       P.rows.forEach(function(r){ tot += r.x; rows.push([logo(r.id, r.m) + '<span>' + att(r.m) + '</span>', fmt(r.x), r.after ? pc(r.after) : '0%', '+' + fmt(r.x * r.after)]); });
-      foot = P.rows.length ? fmt(tot) + ' ATONE on ' + P.rows.length + ' validator' + (P.rows.length === 1 ? '' : 's') + ', about <b>+' + fmt(tot * P.rate) + '</b> ATONE a year' : '';
+      fig = ["ATONE/year", P.rows.length ? '+' + fmt(tot * P.rate) : '\u2014'];
     } else if(mode === "unstake"){
       var free = window.__day(Date.now() + 21 * 86400000); head = ["Validator", "Unstake", "Free on"];
       unMsgs().forEach(function(m){ var v = m.value, r = byOp[v.validator_address] || {}, x = +v.amount.amount; tot += x;
         rows.push([logo(r.id, r.m || "") + '<span>' + att(r.m || v.validator_address.slice(-8)) + '</span>', fmt(x), free]); });
-      foot = rows.length ? fmt(tot) + ' ATONE stops earning now and is free on ' + free : '';
+      fig = ["ATONE", rows.length ? fmt(tot) : '\u2014'];
     } else if(mode === "claim"){
       head = ["Validator", "Rewards"];
       clRows().forEach(function(r){ if(!CLSEL[r.id]) return; tot += r.x; rows.push([logo(r.id, r.m) + '<span>' + att(r.m) + '</span>', exact(r.x, 6)]); });
-      foot = rows.length ? exact(tot, 6) + ' ATONE to your available balance' : '';
+      fig = ["Rewards", rows.length ? exact(tot, 6) : '\u2014'];
     }
-    el.innerHTML = !mode ? '' : !rows.length ? '<div class=pro-brk-e>' + (mode === "claim" ? 'Select the rewards to claim' : 'Select validators and enter an amount') + '</div>' :
-      '<table class=pro-brk-t><thead><tr>' + head.map(function(h, i){ return '<th' + (i ? '' : ' class=l') + '>' + h + '</th>'; }).join('') + '</tr></thead><tbody>' +
-      rows.map(function(r){ return '<tr>' + r.map(function(c, i){ return '<td' + (i ? '' : ' class=nm') + '>' + c + '</td>'; }).join('') + '</tr>'; }).join('') +
-      '</tbody></table><div class=pro-brk-f>' + foot + '</div>';
+    /* two boxes as Redelegate's Outcome has - how many validators, and the figure that matters here - then the list */
+    var boxes = !mode ? '' : '<div class="wk-ans pro-ans"><span class="p"><i>validators</i><b' + (rows.length ? '' : ' class=dim') + '>' + (rows.length || '\u2014') + '</b></span>' +
+      '<span class="p gain"><i>' + fig[0] + '</i><b' + (rows.length ? '' : ' class=dim') + '>' + fig[1] + '</b></span></div>';
+    el.innerHTML = !mode ? '' : boxes + (!rows.length ? '<div class=pro-brk-e>' + (mode === "claim" ? 'Select the rewards to claim' : 'Select validators and enter an amount') + '</div>' :
+      '<div class=pro-brk-s><table class=pro-brk-t><thead><tr>' + head.map(function(h, i){ return '<th' + (i ? '' : ' class=l') + '>' + h + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      rows.map(function(r){ return '<tr>' + r.map(function(c, i){ return '<td' + (i ? '' : ' class=nm') + '>' + c + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>');
   }
   window.__proBrk = proBrk;
   function stState(){
