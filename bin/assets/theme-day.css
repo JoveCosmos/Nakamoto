@@ -960,9 +960,9 @@
   html[data-theme=light]:not([data-mono]) .mv-chip.q{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .mv-r u{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .mv-arr svg{fill:none}
+  html[data-theme=light]:not([data-mono]) .mv-cc.g{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .mv-bars i.lo{background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) #mv-stage .mv-go.mv-on{background:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) #mv-stage .mv-go.mv-on svg{fill:none;stroke:currentColor}
+  html[data-theme=light]:not([data-mono]) #mv-stage .mv-on svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .mv-ap{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-ghost{background:transparent}
   html[data-theme=light]:not([data-mono]) .mv-cyc>div.done{background:var(--accent-soft);border-color:transparent}
@@ -992,6 +992,20 @@
   html[data-theme=light]:not([data-mono]) #rsgo.wk-danger{background:transparent;border-color:var(--danger-bar);color:var(--danger)}
   @media(min-width:1100px) and (max-width:1599px){
     html[data-theme=light]:not([data-mono]):is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth svg{fill:none;stroke:currentColor}
+  }
+  html[data-theme=light]:not([data-mono]) #one .gv-strip:not(#z),html[data-theme=light]:not([data-mono]) #one #sd-gstrip.sd-strip:not(#z){box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #one .gv-strip .gv-ro:not(#z),html[data-theme=light]:not([data-mono]) #one #sd-gstrip .sd-ro:not(#z){background:none}
+  html[data-theme=light]:not([data-mono]) #one .gv-strip .gv-ro .sd-well:not(#z),html[data-theme=light]:not([data-mono]) #one #sd-gstrip .sd-ro .sd-well:not(#z){background:none;box-shadow:none}
+  @media(min-width:1100px){
+    html[data-theme=light]:not([data-mono]) #one #p-pays .ptab thead th{background:var(--card,var(--surface))}
+  }
+  @media(min-width:1100px){
+    html[data-theme=light]:not([data-mono]) .colh{border:1px solid var(--wbd2,var(--line-strong));background:var(--wc,var(--surface-2));color:var(--wf,var(--muted))}
+    html[data-theme=light]:not([data-mono]) .colh svg{fill:none;stroke:currentColor}
+    html[data-theme=light]:not([data-mono]) .colh:hover,html[data-theme=light]:not([data-mono]) .colh:focus-visible{border-color:var(--sv-teal,var(--accent));color:var(--sv-teal,var(--accent));outline:none}
+  }
+  @media(min-width:1100px){
+    html[data-theme=light]:not([data-mono])[data-railc] .pth svg{fill:none;stroke:currentColor}
   }
   @media(max-width:1099px){
     html[data-theme=light]:not([data-mono]) .pth{background:transparent}
@@ -1366,7 +1380,9 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-bars i.d{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-chip.ok{background:var(--accent-soft);color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-h::before{background:var(--accent);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) #mv-stage .mv-go.mv-on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #mv-stage .mv-on{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #mv-stage .mv-cc.g{border-color:var(--accent);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #mv-stage .mv-cc.g b,html[data-theme=light]:not([data-mono]) #mv-stage .mv-cc.g span{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-chip.warn{background:var(--warn-bg);color:var(--warn-ink)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-chip.q{background:var(--surface-2);color:var(--muted)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-ap,html[data-theme=light]:not([data-mono]) #mv-stage .mv-cyc>div.done{background:var(--accent-soft)}
@@ -1383,4 +1399,9 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .qm:hover,html[data-theme=light]:not([data-mono]) .qm:focus-visible{border-color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #rsgo{background:var(--accent);border-color:var(--accent);color:#fff}
   html[data-theme=light]:not([data-mono]) #rsgo.wk-danger{background:transparent;border-color:var(--danger);color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .colh{background:var(--surface);border-color:var(--line-strong);color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .colh:hover,html[data-theme=light]:not([data-mono]) .colh:focus-visible{border-color:var(--accent);color:var(--accent)}
+  /* the range bars' labels are underlined words, never boxes: the day shadow of the old .etabox box (border shorthand,
+     width included) outranked the .rlab reset on the concentration and staked labels */
+  html[data-theme=light]:not([data-mono]) .rlab .etabox:not(#z),html[data-theme=light]:not([data-mono]) .rlab .etabox:not(#z):hover{border:0;background:transparent;box-shadow:none}
 

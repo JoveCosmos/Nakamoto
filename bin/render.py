@@ -137,7 +137,7 @@ def _up(v):
             if v.get("life_up") is not None and v["life_n"] else ("N/A" if TESTNET else "&mdash;"))
 tbl_apr = "".join(
     prow(v, f"<td class={'ok' if v.get('life_up') is not None and v['life_n'] else 'dim'}>{_up(v)}</td>"
-            f"{_jail(v)}") for v in by_apr[:5])
+            f"{_jail(v)}") for v in by_apr)
 
 # ── the longest clean signing record we can actually prove ──────────────────
 # Ranked on the ratio, not the miss count: a validator that joined in June has a
@@ -157,7 +157,7 @@ tbl_up = "".join(
     # the window itself, so a record that began five weeks ago reads as five weeks
     f"<td title='{f(v['life_n'] - v['life_missed'])} blocks signed'>{_kf(v['life_n'] - v['life_missed'])}</td>"
     f"<td>{f(v['life_missed'])}</td>"
-    f"{_jail(v)}</tr>" for v in lv[:5])
+    f"{_jail(v)}</tr>" for v in lv)
 life_win = f"{f(max((v['life_n'] for v in lv), default=0))}"
 
 # ── what each validator actually earned, per epoch, uptime included ─────────
@@ -168,7 +168,7 @@ tbl_earn = "".join(
     f"<td class=rkc>{v['rank']}</td>"
     f"<td class=nm>{_vlogo(v)}<span>{esc(v['m'])}</span></td>"
     f"<td class=ok>{v['earn_avg']*100:.1f}%</td>"
-    f"<td>{v['earn_hi']*100:.0f}%</td><td>{v['earn_lo']*100:.0f}%</td></tr>" for v in ev[:5])
+    f"<td>{v['earn_hi']*100:.0f}%</td><td>{v['earn_lo']*100:.0f}%</td></tr>" for v in ev)
 earn_weeks = max((v["earn_n"] for v in ev), default=0)
 
 n_clean = sum(1 for v in by_apr

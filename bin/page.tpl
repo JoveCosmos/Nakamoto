@@ -4930,10 +4930,8 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .folder>.l1{grid-area:nav}
 /* the network switch: two links, the open network lit; testnet lights amber so a page on the
    test chain can never pass for the real one */
-/* the wallet lives in the Dashboard: its Connect button and pill show only there; every other section reads */
-/* outside the Dashboard the wallet control is not shown but keeps its room, so the day/night button and the network
-   switch never move when a section changes */
-html:not([data-sec=dashboard]) .hdr-r .sv-who{visibility:hidden;pointer-events:none}
+/* the one screen (2026-09-30): the wallet control shows on every path - the wallet column is on every path too, and it
+   can be folded away (until then it showed only in the Dashboard) */
 /* ════ Autopilot setup, Easy mode: five numbered steps in plain words, larger controls, a short list ════ */
 #atpop .atrow:not(#z){gap:8px;padding:10px 0}
 .pop .card.atcard:not(#z){height:min(920px,100%)}
@@ -5466,6 +5464,17 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-arr{display:flex;justify-content:center}
 .mv-arr svg{width:40px;height:18px;fill:none;stroke:var(--sv-teal);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .mv-lock{font-size:12.5px;color:var(--sv-amber)}
+/* 10,000 ATONE for a year, three ways: the largest validator, Autopilot, the smallest */
+.mv-cmp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.mv-cc{display:flex;flex-direction:column;gap:3px;min-width:0;padding:13px 16px 14px;border:1px solid var(--wbd);border-radius:12px}
+.mv-cc em{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+.mv-cc small{font-size:12.5px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mv-cc b{margin-top:6px;display:flex;align-items:baseline;gap:7px;font-size:24px;font-weight:700;letter-spacing:-.02em;color:var(--wt);font-variant-numeric:tabular-nums}
+.mv-cc b i{font-style:normal;font-family:var(--wmono);font-size:10px;font-weight:400;letter-spacing:.06em;color:var(--wf)}
+.mv-cc span{font-family:var(--wmono);font-size:12px;color:var(--ws)}
+.mv-cc.g{border-color:var(--sv-teal);background:rgba(43,200,189,.08)}
+.mv-cc.g b,.mv-cc.g span{color:var(--sv-teal)}
+@media(max-width:700px){.mv-cmp{grid-template-columns:minmax(0,1fr);gap:8px}.mv-cc b{font-size:20px}}
 .mv-set{display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-height:96px}
 .mv-sh{display:flex;justify-content:space-between;gap:10px}
 .mv-sh em.g{color:var(--sv-teal)}
@@ -5480,9 +5489,9 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-act>span{order:-1;margin-right:auto}   /* a note on the left, the button always on the right */
 .mv-act>span{font-size:12.5px;line-height:1.45;color:var(--ws);max-width:44ch}
 #mv-stage .mv-act .sd-go,#mv-stage .mv-go{width:auto;height:50px;padding:0 26px;font-size:15px;flex:0 0 auto}
-/* Autopilot is on: the same button, as a state - it opens the Autopilot card (where it can be turned off) */
-#mv-stage .mv-go.mv-on{gap:9px;border:1px solid var(--sv-teal);background:rgba(43,200,189,.12);color:var(--sv-teal)}
-#mv-stage .mv-go.mv-on svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+/* Autopilot is on: a statement, not a control (operator, 2026-09-30) - the switch in the You column turns it off */
+#mv-stage .mv-on{flex:0 0 auto;display:inline-flex;align-items:center;gap:10px;font-size:20px;font-weight:700;letter-spacing:-.01em;color:var(--sv-teal)}
+#mv-stage .mv-on svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .mv-days{display:flex;flex-direction:column;gap:8px;border:1px solid var(--wbd);border-radius:12px;padding:14px 16px}
 .mv-dh{display:flex;justify-content:space-between;font-size:13px;color:var(--ws)}
 .mv-dh span:first-child{font-weight:600;color:var(--wt)}
@@ -5636,17 +5645,134 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #sv-eco .sv-tp{margin-left:12px;padding-left:12px;gap:8px}
   #sv-eco .sv-trole{margin-left:8px}
 }
-/* Pro (and the old Autopilot screen) need width more than the paths need headlines: below 1600px the rail
-   folds to icons with their short names, as the phone's bar does, and Pro's three tables take the room */
+/* the paths as icons with their short names, as the phone's bar does: the old Autopilot screen below 1600px (Pro
+   keeps the full rail, operator 2026-09-30: "keep it consistent") and a rail the reader folded (html[data-railc]) */
 @media(min-width:1100px) and (max-width:1599px){
-  html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .one{grid-template-columns:minmax(0,1fr) 78px}
-  html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth{align-items:center;justify-content:center;gap:5px;padding:8px 4px;text-align:center}
+  html[data-sv="dashboard/autopilot"] .one{grid-template-columns:minmax(0,1fr) 78px}
+}
+@media(min-width:1100px) and (max-width:1599px){
+  html:is([data-sv="dashboard/autopilot"]) .pth{align-items:center;justify-content:center;gap:5px;padding:8px 4px;text-align:center}
   html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth em,
   html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth b,
   html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth small{display:none}
   html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth .ps{display:block;font-size:10.5px;color:var(--ws);max-width:100%;overflow:hidden;text-overflow:ellipsis}
   html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth svg{display:block;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:var(--ws)}
   html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth.on svg,html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth.on .ps{color:var(--sv-teal)}
+}
+/* Pro has Easy's structure (operator, 2026-09-30: "pro is still the same, its wallet structure and all"): the You
+   column on the left holds the wallet, as on every path, and the old balance strip goes. The stage holds the pick
+   list as the main pane, with Delegations over Outcome beside it. Below 1600px the paths fold to icons, as before. */
+@media(min-width:1100px){
+  html[data-sv="dashboard/self"] #one.one{grid-template-columns:300px minmax(0,1fr) 256px}
+  html[data-sv="dashboard/self"] #one #you{display:flex}
+  #one #p-dele #sd-mstrip{display:none!important}
+  #one #p-dele .wk-two:not(#z){grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1fr);align-items:stretch}
+  #one #p-dele #wk-plan:not(#z){grid-column:1;grid-row:1/3}
+  #one #p-dele #wk-mine:not(#z){grid-column:2;grid-row:1}
+  #one #p-dele #wk-mv:not(#z){grid-column:2;grid-row:2}
+  #one #p-dele .wk-two>.wk-pane:not(#z){min-height:0;flex:none}
+}
+@media(min-width:1100px) and (max-width:1599px){
+  html[data-sv="dashboard/self"] #one.one{grid-template-columns:272px minmax(0,1fr) 232px}
+  /* the lock chip keeps its lock and its amount; the words and the date stay in its tooltip */
+  #one #p-dele #wk-plan>.wk-ph .wk-lockn .w,#one #p-dele #wk-plan>.wk-ph .wk-lockn .w2,#one #p-dele #wk-plan>.wk-ph .wk-lockn b:last-of-type{display:none}
+  #one #p-dele #wk-plan>.wk-ph .wk-lockn:not(#z){flex:0 0 auto;max-width:none;overflow:visible}
+}
+/* a narrower laptop: the side column takes a little more, so Delegations keeps its names */
+@media(min-width:1100px) and (max-width:1599px){
+  #one #p-dele .wk-two:not(#z){grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
+  #one #p-dele #dmy col:nth-child(3){width:84px!important}
+  #one #p-dele #dmy col:nth-child(5){width:50px!important}
+  #one #p-dele #wk-plan>.wk-ph .wk-lockn b{display:none}         /* the lock alone; its amount is in the tooltip */
+  #one #p-dele #wk-plan .wk-field:not(#z){flex:1 1 150px;min-width:0;max-width:180px}
+}
+@media(min-width:1100px){#one #p-dele #dmy col:nth-child(1){width:40px!important}}
+/* a short screen: Outcome keeps the room its figures and button need, Delegations gives (its list scrolls) */
+@media(min-width:1100px) and (max-height:820px){
+  #one #p-dele .wk-two:not(#z){grid-template-rows:minmax(150px,1fr) 294px}
+  #one #p-dele #wk-mv .wk-ans .p:not(#z){min-height:34px;padding:4px 10px}
+  #one #p-dele #wk-mv .wk-mvempty:not(#z){display:none}
+  #one #p-dele #dgo:not(#z){height:38px;font-size:14px}
+}
+@media(min-width:1100px) and (max-height:660px){
+  #one #p-dele .wk-two:not(#z){grid-template-rows:minmax(100px,1fr) 240px}
+  #one #p-dele .wk-pane:not(#z){padding:10px 16px 12px}
+  #one #p-dele #wk-mv .wk-ans .p:not(#z){min-height:30px;padding:3px 10px}
+  #one #p-dele #dgo:not(#z){height:34px}
+}
+/* ════ FLAT PANELS (operator, 2026-09-30): the figure strips on top of the governance tabs read as the wallet column
+   does, laid out sideways - one flat panel, sections split by hairlines, a small label, the figure plain (no well), a
+   short note. Tighter than the boxes they replace, so the tab's body gets the room. ════ */
+#one .gv-strip:not(#z),#one #sd-gstrip.sd-strip:not(#z){border:1px solid var(--wbd);border-radius:14px;background:var(--wc);box-shadow:none}
+#one .gv-strip .gv-ro:not(#z),#one #sd-gstrip .sd-ro:not(#z){padding:12px 20px 13px;gap:5px;justify-content:flex-start;background:none;border-left:1px solid var(--wbd)}
+#one .gv-strip .gv-ro:first-child,#one #sd-gstrip>:first-child{border-left:0}
+#one .gv-strip .gv-ro em:not(#z),#one #sd-gstrip .sd-ro em:not(#z){margin:0;font-size:10px;letter-spacing:.16em;color:var(--wf)}
+#one .gv-strip .gv-ro em::before,#one #sd-gstrip .sd-ro em::before{display:none}
+#one .gv-strip .gv-ro .sd-well:not(#z),#one #sd-gstrip .sd-ro .sd-well:not(#z){flex:0 0 auto;min-height:0;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;align-items:baseline;gap:7px}
+#one .gv-strip .gv-ro .sd-well>b:not(#z),#one #sd-gstrip .sd-well>b:not(#z){font-size:24px;font-weight:700;line-height:1.1;letter-spacing:-.02em}
+#one .gv-strip .gv-ro .sd-well>i:not(#z),#one #sd-gstrip .sd-well>i:not(#z){margin:0;font-size:10px;letter-spacing:.06em}
+#one .gv-strip .gv-ro .sd-well>.sd-m,#one #sd-gstrip .sd-well>.sd-m{display:none}
+#one .gv-strip .gv-ro small:not(#z){margin:0;font-size:12px;line-height:1.35;color:var(--ws);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* Your governor: the wallet's name is in the wallet column (and the header), so its strip keeps only the figures */
+#one #sd-gstrip.sd-strip:not(#z){grid-template-columns:repeat(5,minmax(0,1fr))!important}
+#one #sd-gstrip>.sd-id:not(#z){display:none}
+#one #sd-gstrip>.sd-ro:nth-child(2){border-left:0}
+#one #sd-gstrip .sd-ro em:not(#z){white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* ════ PICKS (operator, 2026-09-30): the three tables list every validator and fill the stage's height, each
+   scrolling in its own card under a header that stays; nothing below them is left empty ════ */
+@media(min-width:1100px){
+  html[data-tab=pays] #one .w#calc>#p-pays{flex:1 1 auto;height:auto;max-height:none;min-height:0}
+  #one #p-pays>.pw:not(#z){height:100%;display:flex;flex-direction:column;min-height:0}
+  #one #p-pays .duotab:not(#z){flex:1 1 auto;min-height:0;height:auto;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:14px}
+  #one #p-pays .duotab>div:not(#z){min-height:0;min-width:0;display:flex;flex-direction:column;border-radius:14px;padding:12px 14px 6px}
+  #one #p-pays .duotab .ptw:not(#z){flex:1 1 0;min-height:0;overflow-y:auto;overflow-x:hidden}
+  #one #p-pays .ptab:not(#z){width:100%}
+  #one #p-pays .ptab thead th{position:sticky;top:0;z-index:1;background:var(--card,#09090f)}
+  #one #p-pays .ptab td.nm span{display:inline-block;max-width:13ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}
+  /* a narrow card keeps rank, name and its own figure; the rest come back when there is room (folded sides, a
+     wide screen) */
+  #one #p-pays .duotab>div{container-type:inline-size;container-name:pick}
+}
+@container pick (max-width:430px){
+  #one #p-pays .ptab th:nth-child(n+4),#one #p-pays .ptab td:nth-child(n+4){display:none}
+  #one #p-pays .ptab:not(#z){table-layout:fixed}
+  #one #p-pays .ptab th:nth-child(1){width:34px}
+  #one #p-pays .ptab th:nth-child(3){width:78px}
+  #one #p-pays .ptab td.nm span{max-width:calc(100% - 26px)}
+}
+/* ════ FOLDING THE SIDES (operator, 2026-09-30): the wallet column and the paths rail each fold on a click, for
+   the room governance and Pro need; both are open on every load. The wallet column folds away (the header keeps the
+   wallet), the rail folds to its icons. The handles sit in the gutters, halfway down. ════ */
+.colh{display:none}
+@media(min-width:1100px){
+  #one.one{position:relative;--yw:300px;--rw:256px;--pl:24px;--pr:24px;--g:18px}
+  html:not([data-sv="dashboard/autopilot"]) #one.one:not(#z){grid-template-columns:var(--yw) minmax(0,1fr) var(--rw)}
+  html:not([data-sv="dashboard/autopilot"]) #one>#you{grid-column:1}
+  html:not([data-sv="dashboard/autopilot"]) #one>.panes{grid-column:2}
+  html:not([data-sv="dashboard/autopilot"]) #one>#paths{grid-column:3}   /* a folded column keeps its place */
+  html[data-youc] #one.one:not(#z){--yw:0px}
+  html[data-youc] #one #you:not(#z){display:none}
+  html[data-railc] #one.one:not(#z){--rw:78px}
+  .colh{display:flex;align-items:center;justify-content:center;position:absolute;top:50%;z-index:3;width:14px;height:56px;margin-top:-28px;padding:0;
+    border:1px solid var(--wbd2,#34345c);border-radius:8px;background:var(--wc,#0e0e1d);color:var(--wf,#8f8db4);cursor:pointer}
+  .colh svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s ease}
+  .colh:hover,.colh:focus-visible{border-color:var(--sv-teal,#2bc8bd);color:var(--sv-teal,#2bc8bd);outline:none}
+  .colh-y{left:calc(var(--pl) + var(--yw) + (var(--g) - 14px) / 2)}
+  html[data-youc] .colh-y{left:calc(var(--pl) - 7px)}
+  html[data-youc] .colh-y svg{transform:rotate(180deg)}
+  .colh-r{right:calc(var(--pr) + var(--rw) + (var(--g) - 14px) / 2)}
+  .colh-r svg{transform:rotate(180deg)}
+  html[data-railc] .colh-r svg{transform:none}
+}
+@media(min-width:1100px) and (max-width:1599px){#one.one{--yw:272px;--rw:232px;--pl:18px;--pr:18px;--g:14px}}
+@media(prefers-reduced-motion:reduce){.colh svg{transition:none}}
+/* a folded rail: the paths as icons with their short names */
+@media(min-width:1100px){
+  html[data-railc] .pth{align-items:center;justify-content:center;gap:5px;padding:8px 4px;text-align:center}
+  html[data-railc] .pth em,html[data-railc] .pth b,html[data-railc] .pth small{display:none}
+  html[data-railc] .pth .ps{display:block;font-size:10.5px;color:var(--ws);max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  html[data-railc] .pth svg{display:block;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:var(--ws)}
+  html[data-railc] .pth.on svg,html[data-railc] .pth.on .ps{color:var(--sv-teal)}
 }
 /* the narrowest desktop: the economics price row a size smaller, so it keeps every figure on one line */
 @media(min-width:1100px) and (max-width:1319px){
@@ -5983,6 +6109,9 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   </div>
   </div>
   <nav class=paths id=paths aria-label=Paths></nav>
+  <!-- fold the wallet column and the paths rail (open on every load; folded only by a click) -->
+  <button class="colh colh-y" id=youc type=button aria-controls=you aria-expanded=true aria-label="Fold the wallet column"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M15 5l-7 7 7 7"/></svg></button>
+  <button class="colh colh-r" id=railc type=button aria-controls=paths aria-expanded=true aria-label="Fold the paths"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M15 5l-7 7 7 7"/></svg></button>
   </div>
 </div>
 

@@ -1534,12 +1534,11 @@
     var row = function(k, v, u, extra){ return '<div class=you-r><span>' + k + '</span>' + (extra || '') + '<b>' + v + '</b><i>' + u + '</i></div>'; };
     var h = '<div class=you-h><h3 title="' + esc(wname) + '">' + esc(wname) + '</h3>' + wmeta() + '</div>';
     h += '<div class=you-apr><em>Your APR</em><b' + (mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '>' + (mine ? pct(pos.rate) : '—') + '</b>' +
-      '<small>' + (!a ? 'connect a wallet to see yours' : !pos ? 'reading…' : mine ? 'on ' + pos.rows.length + ' validator' + (pos.rows.length === 1 ? '' : 's') : 'nothing staked yet') + '</small></div>';
+      '<small>' + (!a ? 'connect a wallet to see yours' : !pos ? 'reading…' : mine ? 'on ' + pos.rows.length + ' validator' + (pos.rows.length === 1 ? '' : 's') : 'Nothing staked') + '</small></div>';
     h += '<div class=you-bal>' +
       row("Staked", pos ? fmt(pos.total) : '—', "ATONE") +
       row("Available", bal ? fmt(bal.uatone) : '—', "ATONE") +
-      row("Rewards", window.__REW != null ? fmt(window.__REW) : '—', "ATONE",
-          a && window.__REW >= 1e5 ? '<button class=you-cl type=button data-act=claim>Claim</button>' : '') +
+      row("Rewards", window.__REW != null ? fmt(window.__REW) : '—', "ATONE") +
       row("For fees", bal ? fmt(bal.uphoton) : '—', "PHOTON") + '</div>';
     var rp = at && at.report, adm = rp && rp.admin, st = adm && adm.state;
     var asub = !auto ? "keeps your stake at the best APR" : "on, checks every 12 hours";
@@ -1609,7 +1608,18 @@
       var sp = window.__planRank({ rows: [{ id: big[3], op: window.__VDBY[big[3]].op, x: 1e10, rate: lo, locked: 0, inactive: false }], total: 1e10, locked: 0 });
       hi = sp ? sp.after : 0;
     }
-    var ex = hi ? '10,000 ATONE earns <b>' + one(1e4 * lo) + ' a year</b> on the largest validator, and <b>' + one(1e4 * hi) + '</b> moved to where the most is paid.' : '';
+    /* what 10,000 ATONE earns in a year: on the largest validator, by the rule (Autopilot), on the smallest - each APR
+       as it would be with the 10,000 on it (operator, 2026-09-30: "show smallest as well", no plain sentence) */
+    var small = V.slice().sort(function(x, y){ return x[1] - y[1]; })[0], nV = V.length;
+    var cmp = function(){
+      if(!hi || !small) return '';
+      var card = function(k, sub, r, cls){ return '<div class="mv-cc' + cls + '"><em>' + k + '</em><small>' + sub + '</small>' +
+        '<b>' + one(1e4 * r) + '<i>ATONE a year</i></b><span>' + pct(r) + ' APR</span></div>'; };
+      return '<div class=mv-cmp>' +
+        card('Largest validator', rk(big[3]) + ' ' + esc(nm(big[3])), rate(big[3], 1e10), '') +
+        card('Autopilot', '&nbsp;', hi, ' g') +
+        card('Smallest validator', rk(small[3]) + ' ' + esc(nm(small[3])), rate(small[3], 1e10), '') + '</div>';
+    };
     var top = function(eb, chip, cls){ return '<div class=mv-top><h3 class=mv-h>Your move</h3><em>' + eb + '</em>' + (chip ? '<span class="mv-chip ' + cls + '">' + chip + '</span>' : '') + '</div>'; };
     var nowOn = function(){
       /* dust a redelegation leaves behind (under 0.1 ATONE) is not a position */
@@ -1629,13 +1639,13 @@
     var h;
     if(!a){
       h = top('') +
-        '<div class=mv-hl><b>About ' + (hi ? pct(hi) : '—') + ' APR</b><span>' + ex + '</span></div>' + mvSet({}, {}) +
-        '<div class=mv-act>' + CONNECT_OFF + '<span>Connect a wallet at the top: your balances, and your best move in numbers, show here.</span></div>';
+        '<div class=mv-hl><b>About ' + (hi ? pct(hi) : '—') + ' APR</b><span>with Autopilot, for 10,000 ATONE</span></div>' + cmp() + mvSet({}, {}) +
+        '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=connect>Connect a wallet</button><span>Your balances and your own best move show here.</span></div>';
     } else if(!pos){
       h = top('') + '<div class=mv-hl><b>Reading your stake…</b></div>';
     } else if(!pos.rows.length){
-      h = top('', 'Nothing staked yet', 'q') +
-        '<div class=mv-hl><b>Stake to start earning</b><span>' + ex + '</span></div>' + mvSet({}, {}) +
+      h = top('', 'Nothing staked', 'q') +
+        '<div class=mv-hl><b>Stake to start earning</b><span>About ' + (hi ? pct(hi) : '—') + ' APR with Autopilot</span></div>' + cmp() + mvSet({}, {}) +
         '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=stake>Stake ATONE</button><span>Your ATONE stays yours: staking only delegates it.</span></div>';
     } else {
       var plan = planNow(pos), offer = plan && plan.after != null && plan.msgs && plan.msgs.length;
@@ -1653,7 +1663,7 @@
           '<div class=mv-arr aria-hidden=true><svg viewBox="0 0 44 20"><path d="M2 10h38M32 3l8 7-8 7"/></svg></div>' +
           '<div class=mv-box><em>To, ' + tL.length + ' validator' + (tL.length === 1 ? '' : 's') + '</em>' + mvRows(tL, 'g', 'validators') + '</div></div>' +
           lock + mvSet(src, dst) +
-          (auto ? '<div class=mv-act><button class="sv-btn mv-go mv-on" type=button data-act=youauto><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Autopilot On</button>' +
+          (auto ? '<div class=mv-act><b class=mv-on><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Autopilot is Active</b>' +
                   '<span>Autopilot makes this move on its next run, within 12 hours. Nothing to sign.</span></div>'
                 : '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=opt>' + (direct ? 'Grant Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE') + '</button>' +
                   (direct ? '' : '<span>One signature moves it now. Autopilot needs Keplr, which can sign it along with the move.</span>') + '</div>');
@@ -1728,6 +1738,7 @@
       return;
     }
     if(act === "youauto"){ youAuto(); return; }
+    if(act === "connect"){ var cb = E("svconn"); if(cb) cb.click(); return; }
     if(act === "restakesw"){ rsOpen(); return; }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
@@ -1769,6 +1780,17 @@
   /* the one screen's two columns: YOU shares the dashboard's actions (claim, restake); its Autopilot
      switch opens the setup when off and the Autopilot view when on. A PATH routes like a header tab. */
   var youEl = E("you"), pathsEl = E("paths");
+  /* the fold handles: an attribute on <html> each, never stored - every load starts open */
+  [["youc", "data-youc", "wallet column"], ["railc", "data-railc", "paths"]].forEach(function(f){
+    var h = E(f[0]); if(!h) return;
+    h.addEventListener("click", function(){
+      var on = !root.hasAttribute(f[1]);
+      if(on) root.setAttribute(f[1], ""); else root.removeAttribute(f[1]);
+      h.setAttribute("aria-expanded", on ? "false" : "true");
+      h.setAttribute("aria-label", (on ? "Open the " : "Fold the ") + f[2]);
+      window.dispatchEvent(new Event("resize"));      /* panes that measure their room measure again */
+    });
+  });
   if(youEl) youEl.addEventListener("click", function(ev){
     var t = ev.target.closest ? ev.target.closest("[data-act]") : null;
     if(t && t.dataset.act === "youauto"){ youAuto(); return; }
