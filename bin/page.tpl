@@ -2353,7 +2353,9 @@ html:not([data-wallet]) #wk-plan .wk-tbl2{height:calc(16px + 14 * 30px)}
 #wk-plan .wk-moves tr.stay td{color:var(--wf)}
 /* the gain rides beside a ticked validator's name */
 #dpicks td.nm .gtag{font-style:normal;font-family:var(--wmono);letter-spacing:.02em;color:var(--wgreen);border:1px solid rgba(46,224,106,.3);border-radius:3px;background:rgba(46,224,106,.06);vertical-align:middle;}
+#prolist .wk-tbl2 td.nm .gtag{font-style:normal;font-family:var(--wmono);letter-spacing:.02em;color:var(--wgreen);border:1px solid rgba(46,224,106,.3);border-radius:3px;background:rgba(46,224,106,.06);vertical-align:middle;}
 #dpicks td.nm .gtag.dim{color:var(--wf);border-color:var(--wbd2);background:transparent}
+#prolist .wk-tbl2 td.nm .gtag.dim{color:var(--wf);border-color:var(--wbd2);background:transparent}
 @media(max-width:700px){#wk-plan .wk-moves th:nth-child(3),#wk-plan .wk-moves td:nth-child(3),#wk-plan .wk-moves th:nth-child(4),#wk-plan .wk-moves td:nth-child(4),
 #wk-plan .wk-moves th:nth-child(8),#wk-plan .wk-moves td:nth-child(8),#wk-plan .wk-moves th:nth-child(9),#wk-plan .wk-moves td:nth-child(9),
 #wk-plan .wk-moves th:nth-child(10),#wk-plan .wk-moves td:nth-child(10){display:none}
@@ -2392,21 +2394,35 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
    below, a breath of space from the line above ── */
 
 #dpicks thead th,#dstrat thead th{font-size:7.5px;letter-spacing:.14em;color:#c1bfdc;padding:8px 6px 7px;background:linear-gradient(180deg,#151530,#0f0f22);border-top:1px solid var(--wbd2);border-bottom:1px solid var(--wbd2);position:sticky;top:0;z-index:1}
+#prolist .wk-tbl2 thead th{font-size:7.5px;letter-spacing:.14em;color:#c1bfdc;padding:8px 6px 7px;background:linear-gradient(180deg,#151530,#0f0f22);border-top:1px solid var(--wbd2);border-bottom:1px solid var(--wbd2);position:sticky;top:0;z-index:1}
 #dpicks thead th:first-child,#dstrat thead th:first-child{border-left:1px solid var(--wbd2);border-radius:5px 0 0 5px}
+#prolist .wk-tbl2 thead th:first-child{border-left:1px solid var(--wbd2);border-radius:5px 0 0 5px}
 #dpicks thead th:last-child,#dstrat thead th:last-child{border-right:1px solid var(--wbd2);border-radius:0 5px 5px 0;padding-right:8px}
+#prolist .wk-tbl2 thead th:last-child{border-right:1px solid var(--wbd2);border-radius:0 5px 5px 0;padding-right:8px}
 #dpicks thead th.l,#dstrat thead th.l{padding-left:4px}
-#dpicks thead th .lc{text-transform:none}   /* 90d, not 90D */
+#prolist .wk-tbl2 thead th.l{padding-left:4px}
+#dpicks thead th .lc{text-transform:none}
+#prolist .wk-tbl2 thead th .lc{text-transform:none}   /* 90d, not 90D */
 #dpicks tbody tr:first-child td,#dstrat tbody tr:first-child td{border-top:0}
+#prolist .wk-tbl2 tbody tr:first-child td{border-top:0}
 /* the head's own box: tick everyone; its word beside it */
 #dpicks thead th.ck{text-align:left;white-space:nowrap}
+#prolist .wk-tbl2 thead th.ck{text-align:left;white-space:nowrap}
 
 #dpicks thead th.ck input{appearance:none;-webkit-appearance:none;width:15px;height:15px;margin:0;border-radius:4px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);cursor:pointer;position:relative;vertical-align:middle;transition:border-color .12s,box-shadow .12s,background .12s}
+#prolist .wk-tbl2 thead th.ck input{appearance:none;-webkit-appearance:none;width:15px;height:15px;margin:0;border-radius:4px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);cursor:pointer;position:relative;vertical-align:middle;transition:border-color .12s,box-shadow .12s,background .12s}
 #dpicks thead th.ck input:hover{border-color:var(--ws)}
+#prolist .wk-tbl2 thead th.ck input:hover{border-color:var(--ws)}
 #dpicks thead th.ck input:checked{background:linear-gradient(180deg,#3cf07a,#22c65c);border-color:#2ee06a;box-shadow:0 0 0 3px rgba(46,224,106,.14)}
+#prolist .wk-tbl2 thead th.ck input:checked{background:linear-gradient(180deg,#3cf07a,#22c65c);border-color:#2ee06a;box-shadow:0 0 0 3px rgba(46,224,106,.14)}
 #dpicks thead th.ck input:checked::after{content:"";position:absolute;left:4.5px;top:1.5px;width:4px;height:8px;border:solid #062012;border-width:0 2px 2px 0;transform:rotate(45deg)}
+#prolist .wk-tbl2 thead th.ck input:checked::after{content:"";position:absolute;left:4.5px;top:1.5px;width:4px;height:8px;border:solid #062012;border-width:0 2px 2px 0;transform:rotate(45deg)}
 #dpicks thead th.ck input:indeterminate{border-color:#2ee06a;background:linear-gradient(180deg,#17172f,#0e0e1d)}
+#prolist .wk-tbl2 thead th.ck input:indeterminate{border-color:#2ee06a;background:linear-gradient(180deg,#17172f,#0e0e1d)}
 #dpicks thead th.ck input:indeterminate::after{content:"";position:absolute;left:3px;right:3px;top:6px;height:2px;background:#2ee06a;border-radius:1px}
+#prolist .wk-tbl2 thead th.ck input:indeterminate::after{content:"";position:absolute;left:3px;right:3px;top:6px;height:2px;background:#2ee06a;border-radius:1px}
 #dpicks thead th.ck label{font-family:var(--wmono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:#c1bfdc;margin-left:5px;vertical-align:middle;cursor:pointer}
+#prolist .wk-tbl2 thead th.ck label{font-family:var(--wmono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:#c1bfdc;margin-left:5px;vertical-align:middle;cursor:pointer}
 /* ── three panes in one row, all the wallet pane's height, pushed to the left:
    the wallet, Redelegate, What moves ── */
 
@@ -2427,6 +2443,7 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 #wk-mv .wk-moves td.nm .nmw>span{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--wsans);font-size:11px;color:#fff8dc}
 /* the initial-letter mark is a span too: it keeps its circle, only the name gives way */
 #wk-mv .wk-moves td.nm .nmw>span.wk-lgx,#dpicks td.nm .nmw>span.wk-lgx{flex:0 0 15px;width:15px;height:15px;line-height:15px;font-size:7px;overflow:hidden;text-align:center;font-family:var(--wmono);color:#fff}
+#prolist .wk-tbl2 td.nm .nmw>span.wk-lgx{flex:0 0 15px;width:15px;height:15px;line-height:15px;font-size:7px;overflow:hidden;text-align:center;font-family:var(--wmono);color:#fff}
 #wk-mv .wk-moves .wk-lg,#wk-mv .wk-moves .wk-lgx{width:15px;height:15px;line-height:15px;font-size:7px;margin:0;flex:0 0 auto}
 #wk-mv .wk-moves td.ar{text-align:center;color:var(--wgreen);font-size:12px;padding:0}
 #wk-mv .wk-moves td.amt{color:#fff8dc}
@@ -2454,12 +2471,16 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 /* the name cell: a flex wrapper INSIDE the cell (never the cell itself), so the name
    gives way and the gain tag keeps its place */
 #dpicks td.nm .nmw{display:flex;align-items:center;gap:6px;min-width:0}
+#prolist .wk-tbl2 td.nm .nmw{display:flex;align-items:center;gap:6px;min-width:0}
 #dpicks td.nm .nmw>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#prolist .wk-tbl2 td.nm .nmw>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #dpicks td.nm .nmw .wk-lg,#dpicks td.nm .nmw .wk-lgx{flex:0 0 auto;margin:0}
+#prolist .wk-tbl2 td.nm .nmw .wk-lg,#prolist .wk-tbl2 td.nm .nmw .wk-lgx{flex:0 0 auto;margin:0}
 
 /* rows that would not beat your rate stay in the list, quieter, their "there" in grey */
 
 #dpicks tbody tr.lt.on td{color:var(--ws)}
+#prolist .wk-tbl2 tbody tr.lt.on td{color:var(--ws)}
 /* the line lives in the title row, at its right end, as one quiet phrase */
 
 /* the line sits right under the title; the stake row follows it */
@@ -2653,6 +2674,7 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 #wk-mine,#wk-plan,#wk-mv{padding-bottom:14px}
 #wk-mine::after,#wk-plan::after,#wk-mv::after{content:"";position:absolute;left:12px;right:12px;bottom:9px;height:1px;background:linear-gradient(90deg,transparent,var(--wbd2) 10%,var(--wbd2) 90%,transparent);pointer-events:none}
 #dmy,#dpicks,#dstrat{-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 14px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 14px),transparent)}
+#prolist .wk-tbl2{-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 14px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 14px),transparent)}
 
 /* the name carries the titles' bar too (positioned, so ::first-letter still capitalises) */
 #wk-mine .wk-bh h3::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;border-radius:2px;background:currentColor;box-shadow:0 0 8px currentColor;opacity:.9}
@@ -2674,8 +2696,11 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 #p-dele #wk-mv .wk-ans .p.lock svg{width:9px;height:9px;margin:0 2px 0 0}
 #wk-mv .wk-ans .p.lock i{display:inline-flex;align-items:center}
 
-#dpicks td.r2{letter-spacing:-.02em}#dpicks td.r2 em{margin:0 2px}
+#dpicks td.r2{letter-spacing:-.02em}
+#prolist .wk-tbl2 td.r2{letter-spacing:-.02em}#dpicks td.r2 em{margin:0 2px}
+#prolist .wk-tbl2 td.r2 em{margin:0 2px}
 #dpicks thead th,#dpicks td{padding-left:5px;padding-right:5px}
+#prolist .wk-tbl2 thead th,#prolist .wk-tbl2 td{padding-left:5px;padding-right:5px}
 
 /* ── detailing: the wallet's controls share one ground (a lit gradient, an inset
    highlight, a hairline), one hover (the pane's accent), one press (a 4% shrink) ── */
@@ -2700,7 +2725,9 @@ transition:color .16s,border-color .16s,box-shadow .16s,transform .12s}
 .wk-tbl2 td.ck input:checked{background:linear-gradient(180deg,#3cf07a,#22c65c);border-color:#2ee06a;box-shadow:0 0 0 3px rgba(46,224,106,.14),0 0 10px -2px rgba(46,224,106,.7)}
 .wk-tbl2 td.ck input:checked::after{left:4.5px;top:1.5px;width:4px;height:8px}
 #dpicks tbody tr.on td{background:rgba(46,224,106,.045)}
+#prolist .wk-tbl2 tbody tr.on td{background:rgba(46,224,106,.045)}
 #dpicks tbody tr.on td:first-child{box-shadow:inset 2px 0 0 var(--wgreen)}
+#prolist .wk-tbl2 tbody tr.on td:first-child{box-shadow:inset 2px 0 0 var(--wgreen)}
 /* a delegation row is a door: the accent bar shows on hover, the name brightens */
 #dmy tbody tr[data-v]:hover td:first-child{box-shadow:inset 2px 0 0 var(--a)}
 #dmy tbody tr[data-v]:hover td.nm span{color:#fff8dc}
@@ -2806,15 +2833,28 @@ transition:filter .15s,transform .12s}
 
 /* ── the Redelegate list at its new width: taller rows, larger figures, clearer names ── */
 #dpicks thead th{font-size:8px;letter-spacing:.16em;padding:9px 7px 8px;color:#d0cee6}
+#prolist .wk-tbl2 thead th{font-size:8px;letter-spacing:.16em;padding:9px 7px 8px;color:#d0cee6}
 #dpicks thead th.ck{padding:0 0 0 6px}
+#prolist .wk-tbl2 thead th.ck{padding:0 0 0 6px}
 #dpicks td{height:32px;padding:0 7px;font-size:11px}
+#prolist .wk-tbl2 td{height:32px;padding:0 7px;font-size:11px}
 #dpicks td.nm .nmw>span{font-size:12px}
+#prolist .wk-tbl2 td.nm .nmw>span{font-size:12px}
 #dpicks td.nm .nmw .wk-lg,#dpicks td.nm .nmw>span.wk-lgx{width:17px;height:17px;line-height:17px;flex-basis:17px}
+#prolist .wk-tbl2 td.nm .nmw .wk-lg,#prolist .wk-tbl2 td.nm .nmw>span.wk-lgx{width:17px;height:17px;line-height:17px;flex-basis:17px}
 #dpicks td.r2{font-size:10.5px}
+#prolist .wk-tbl2 td.r2{font-size:10.5px}
 #dpicks td.r2 b{font-size:11.5px}
-#dpicks td.ok{color:var(--wgreen)}#dpicks td.warn{color:var(--wamber)}#dpicks td.bad{color:var(--wburn)}#dpicks td.dim{color:var(--wf)}
+#prolist .wk-tbl2 td.r2 b{font-size:11.5px}
+#dpicks td.ok{color:var(--wgreen)}
+#prolist .wk-tbl2 td.ok{color:var(--wgreen)}#dpicks td.warn{color:var(--wamber)}
+#prolist .wk-tbl2 td.warn{color:var(--wamber)}#dpicks td.bad{color:var(--wburn)}
+#prolist .wk-tbl2 td.bad{color:var(--wburn)}#dpicks td.dim{color:var(--wf)}
+#prolist .wk-tbl2 td.dim{color:var(--wf)}
 #dpicks tbody tr.lt td.ok,#dpicks tbody tr.lt td.warn,#dpicks tbody tr.lt td.bad{color:var(--wf)}
+#prolist .wk-tbl2 tbody tr.lt td.ok,#prolist .wk-tbl2 tbody tr.lt td.warn,#prolist .wk-tbl2 tbody tr.lt td.bad{color:var(--wf)}
 #dpicks td.nm .gtag{font-size:8.5px;padding:1px 5px}
+#prolist .wk-tbl2 td.nm .gtag{font-size:8.5px;padding:1px 5px}
 /* the line in the Outcome head, before the button, in the stake row's style */
 
 /* ── the account block: one framed block at the head's right, two rows - DISCONNECT over
@@ -2862,9 +2902,12 @@ transition:filter .15s,transform .12s}
 @media(max-width:700px){#wk-mine .wk-bh .wk-addrw{max-width:60%}}
 /* the gain tag follows the name, not the cell's far edge; the unit rides with it */
 #dpicks td.nm .nmw>span{flex:0 1 auto}
+#prolist .wk-tbl2 td.nm .nmw>span{flex:0 1 auto}
 
 #dpicks td.nm .gtag i{font-style:normal;color:var(--wf);margin-left:1px;letter-spacing:0}
+#prolist .wk-tbl2 td.nm .gtag i{font-style:normal;color:var(--wf);margin-left:1px;letter-spacing:0}
 #dpicks td.nm .gtag.dim i{color:var(--wf)}
+#prolist .wk-tbl2 td.nm .gtag.dim i{color:var(--wf)}
 /* the tiles: the whole figure at a quieter size */
 
 /* the tiles: the wallet's two tokens on the first row, the three staking figures beneath */
@@ -2880,10 +2923,17 @@ transition:filter .15s,transform .12s}
 /* a row that would pay less is not greyed: it reads like every other row, and only its
    "there" rate turns red to say so */
 #dpicks tbody tr.lt td,#dpicks tbody tr.lt td.nm .nmw>span,#dpicks tbody tr.lt.on td{color:inherit}
+#prolist .wk-tbl2 tbody tr.lt td,#prolist .wk-tbl2 tbody tr.lt td.nm .nmw>span,#prolist .wk-tbl2 tbody tr.lt.on td{color:inherit}
 #dpicks tbody tr.lt td{color:var(--ws)}
+#prolist .wk-tbl2 tbody tr.lt td{color:var(--ws)}
 #dpicks tbody tr.lt td.nm .nmw>span{color:#fff8dc}
-#dpicks tbody tr.lt td.ok{color:var(--wgreen)}#dpicks tbody tr.lt td.warn{color:var(--wamber)}#dpicks tbody tr.lt td.bad{color:var(--wburn)}
+#prolist .wk-tbl2 tbody tr.lt td.nm .nmw>span{color:#fff8dc}
+#dpicks tbody tr.lt td.ok{color:var(--wgreen)}
+#prolist .wk-tbl2 tbody tr.lt td.ok{color:var(--wgreen)}#dpicks tbody tr.lt td.warn{color:var(--wamber)}
+#prolist .wk-tbl2 tbody tr.lt td.warn{color:var(--wamber)}#dpicks tbody tr.lt td.bad{color:var(--wburn)}
+#prolist .wk-tbl2 tbody tr.lt td.bad{color:var(--wburn)}
 #dpicks tbody tr.lt td.r2 b{color:var(--wburn)}
+#prolist .wk-tbl2 tbody tr.lt td.r2 b{color:var(--wburn)}
 /* the line at the left of the Outcome head, after the count; the button keeps the right */
 
 #wk-mv .wk-mvh .wk-btn.wk-go{margin-left:auto}
@@ -2907,7 +2957,9 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
 
 /* in a narrow name cell the name keeps at least this much; the tag gives way instead */
 #dpicks td.nm .nmw>span{min-width:64px}
+#prolist .wk-tbl2 td.nm .nmw>span{min-width:64px}
 #dpicks td.nm .gtag{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-left:12px}
+#prolist .wk-tbl2 td.nm .gtag{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-left:12px}
 /* ── the stake field, made anew: a wide framed block with its own label, a large figure
    and MAX inside; Redelegate a full-width bar pinned to the Outcome pane's floor ── */
 
@@ -2932,6 +2984,7 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
 /* the field shares the first line with the count; the initial-letter mark keeps its circle */
 
 #dpicks td.nm .nmw>span.wk-lgx{min-width:0;flex:0 0 17px;width:17px}
+#prolist .wk-tbl2 td.nm .nmw>span.wk-lgx{min-width:0;flex:0 0 17px;width:17px}
 
 /* ── the three dial cards (eta, C, S), 2026-09-27 (kp-): a real title and one plain line, the figure the
    card is about, facts with labels one can read, sentences where the old card had code ── */
@@ -3085,7 +3138,9 @@ border:1px solid color-mix(in srgb,var(--sa-v) 40%,transparent);background:linea
 .txans .p.aft.neg b,.txans .p.gain.neg b{color:var(--wburn)}
 #wk-mv .wk-ans .p.gain:has(b.neg){--c:#ff4d1f}
 #dpicks td.nm .gtag.neg{color:var(--wburn);border-color:rgba(255,77,31,.35);background:rgba(255,77,31,.07)}
+#prolist .wk-tbl2 td.nm .gtag.neg{color:var(--wburn);border-color:rgba(255,77,31,.35);background:rgba(255,77,31,.07)}
 #dpicks td.nm .gtag.neg i{color:var(--wburn);opacity:.7}
+#prolist .wk-tbl2 td.nm .gtag.neg i{color:var(--wburn);opacity:.7}
 #wk-mv .wk-moves td.gn.neg{color:var(--wburn)}
 /* ── the amount as a chip in the Redelegate title row, the address chip's size, right
    after the word: the figure and MAX inside 24px ── */
@@ -3100,6 +3155,7 @@ background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba
 #wk-plan>.wk-ph .wk-field.need{border-color:#ffb02e;box-shadow:0 0 0 2px rgba(255,176,46,.18),inset 0 1px 0 rgba(255,255,255,.06)}
 #wk-plan>.wk-ph .wk-pre{display:none}
 #dpicks{margin-top:10px}
+#prolist .wk-tbl2{margin-top:10px}
 /* the title row must also hold the cooldown note, the clock and the refresh: below a wide
    frame the note says "locked until" and the clock steps off while the note is up */
 #wk-plan>.wk-ph .wk-lockn .w2{display:none}
@@ -3122,12 +3178,18 @@ background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba
 /* the stake column is the validator's own figure; what the plan adds is a tag at the right
    end of the name cell, against that column - its left edge moves with its size, nothing else does */
 #dpicks td.stk{white-space:nowrap;font-variant-numeric:tabular-nums;color:#fff8dc}
+#prolist .wk-tbl2 td.stk{white-space:nowrap;font-variant-numeric:tabular-nums;color:#fff8dc}
 #dpicks td.nm .gtag.add{margin-left:auto;flex:0 0 auto;overflow:visible;padding:0;border:0;background:transparent;color:var(--wgreen);font-size:10.5px;letter-spacing:.02em}
+#prolist .wk-tbl2 td.nm .gtag.add{margin-left:auto;flex:0 0 auto;overflow:visible;padding:0;border:0;background:transparent;color:var(--wgreen);font-size:10.5px;letter-spacing:.02em}
 #dpicks td.nm .nmw:has(.gtag.add)>span:not(.wk-lgx){flex:0 1 auto;margin-right:10px}
+#prolist .wk-tbl2 td.nm .nmw:has(.gtag.add)>span:not(.wk-lgx){flex:0 1 auto;margin-right:10px}
 /* a validator's name in the Redelegate list is a door to its card, like a delegation row */
 #dpicks td.nm[data-v]{cursor:pointer}
+#prolist .wk-tbl2 td.nm[data-v]{cursor:pointer}
 #dpicks td.nm[data-v]:hover .nmw>span:not(.wk-lgx){color:#fff;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--wf)}
+#prolist .wk-tbl2 td.nm[data-v]:hover .nmw>span:not(.wk-lgx){color:#fff;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--wf)}
 #dpicks td.nm[data-v]:focus-visible{outline:2px solid var(--wgreen);outline-offset:-2px;border-radius:4px}
+#prolist .wk-tbl2 td.nm[data-v]:focus-visible{outline:2px solid var(--wgreen);outline-offset:-2px;border-radius:4px}
 /* the count beside a title: its baseline on the title's, not its box centred on the box */
 #wk-mine .wk-t1 .wk-pn,#wk-mv .wk-t3 .wk-pn{position:relative;top:1px;line-height:1}
 /* the two doors read as buttons: filled, lifted on hover, pressed on tap */
@@ -3254,14 +3316,23 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
    fixed so nothing is cut; the APR pair shows whole; the plan's addition keeps room ── */
 @media(max-width:700px){
   #dpicks table{table-layout:fixed}
+#prolist .wk-tbl2 table{table-layout:fixed}
   #dpicks td.r2{white-space:nowrap;font-size:10px;padding-right:6px}
+#prolist .wk-tbl2 td.r2{white-space:nowrap;font-size:10px;padding-right:6px}
   #dpicks td.r2 s{font-size:9.5px}
+#prolist .wk-tbl2 td.r2 s{font-size:9.5px}
   #dpicks td.r2 em{font-size:9px;margin:0 1px}
+#prolist .wk-tbl2 td.r2 em{font-size:9px;margin:0 1px}
   #dpicks td.r2 b{font-size:10.5px}
+#prolist .wk-tbl2 td.r2 b{font-size:10.5px}
   #dpicks td.nm .nmw>span:not(.wk-lgx){min-width:0;flex:0 1 auto}
+#prolist .wk-tbl2 td.nm .nmw>span:not(.wk-lgx){min-width:0;flex:0 1 auto}
   #dpicks td.nm .gtag.add{flex:0 0 auto;margin-left:6px}
+#prolist .wk-tbl2 td.nm .gtag.add{flex:0 0 auto;margin-left:6px}
   #dpicks td.stk{padding:0 4px}
+#prolist .wk-tbl2 td.stk{padding:0 4px}
   #dpicks td.ck{text-overflow:clip;padding:0 2px 0 4px}
+#prolist .wk-tbl2 td.ck{text-overflow:clip;padding:0 2px 0 4px}
   /* the connect gate sits in the middle of its section; the squares with it */
 
 }
@@ -5867,7 +5938,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
    name in the sans, figures in the mono - so switching tabs moves nothing ════ */
 #prohdr{display:none}
 @media(min-width:1100px){
-  html[data-pro] #one #prohdr:not(#z){display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto;margin:0;padding:0;border:0;background:none;box-shadow:none;width:auto;max-width:none}
+  html[data-pro] #one #prohdr:not(#z){display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto;margin:0 0 0 14px;padding:0;border:0;background:none;box-shadow:none;width:auto;max-width:none}
   #one #prohdr .sttop:not(#z),#one #prohdr .unamt:not(#z){display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto;margin:0;padding:0;border:0}
   #one #prohdr .wk-field:not(#z):not(#y){flex:0 1 180px;min-width:0;max-width:180px;height:32px;margin:0;border:1px solid var(--wbd2);border-radius:10px;background:var(--wi);box-shadow:none}
   #one #prohdr .wk-amt2:not(#z){font:500 13px var(--wmono);color:var(--wt)}
@@ -5893,7 +5964,9 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 }
 /* the title, the field and the list sit at one place in every tab */
 @media(min-width:1100px){
-  #one #p-dele #wk-plan>.wk-ph h3:not(#z){min-width:0}
+  /* every tab's title takes Redelegate's width, so the field (or the count) starts where Redelegate's does */
+  #one #p-dele #wk-plan>.wk-ph h3:not(#z){min-width:0;flex:0 0 auto}
+  html[data-pro] #one #p-dele #wk-plan>.wk-ph h3:not(#z){width:var(--rdh,114px)}
   /* the amount field sits beside the title, the same in every tab; its button says MAX, the figure is the field's */
   #one #p-dele #wk-plan>.wk-ph .wk-max b{display:none}
   #one #p-dele #wk-plan>.wk-ph .wk-max:not(#z):not(#y){padding:0 9px}
@@ -5968,6 +6041,44 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 #prolist thead th.ck input:indeterminate{border-color:#2ee06a;background:linear-gradient(180deg,#17172f,#0e0e1d)}
 #prolist thead th.ck input:indeterminate::after{content:"";position:absolute;left:3px;right:3px;top:6px;height:2px;background:#2ee06a;border-radius:1px}
 #prolist thead th.ck input{position:relative;cursor:pointer;vertical-align:middle}
+/* Outcome's figures are small and sit on its title row, in every tab (operator, 2026-09-30); the body takes the rest */
+#proans{display:none}
+@media(min-width:1100px){
+  #one #p-dele #wk-mv.wk-pane:not(#z):not(#y){display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto;column-gap:12px;align-content:stretch}
+  #one #p-dele #wk-mv>.wk-ph:not(#z){grid-area:1/1/2/2}
+  #one #p-dele #wk-mv>#dans:not(#z):not(#y),#one #p-dele #wk-mv>#proans:not(#z):not(#y){grid-area:1/2/2/3;justify-self:end;align-self:start;
+    display:flex;gap:6px;margin:0;min-width:0}
+  #one #p-dele #wk-mv>.wk-moves:not(#z):not(#y),#one #p-dele #wk-mv>.wk-mvempty:not(#z):not(#y){grid-area:2/1/3/3}
+  #one #p-dele #wk-mv>#rdnote:not(#z):not(#y){grid-area:3/1/4/3}
+  #one #p-dele #wk-mv>#dgo:not(#z):not(#y){grid-area:4/1/5/3}
+  #one #p-dele #wk-mv>#proout:not(#z):not(#y){grid-area:2/1/5/3}
+  html[data-pro] #one #p-dele #wk-mv>#proans:not(#z):not(#y){display:flex!important}
+  html:not([data-pro]) #one #p-dele #wk-mv>#proans{display:none!important}
+  /* a figure is one line: the label, then the value */
+  #one #p-dele #wk-mv>.wk-ans .p:not(#z):not(#y){display:inline-flex;flex-direction:row;flex-wrap:nowrap;align-items:baseline;gap:6px;height:30px;min-height:0;padding:7px 10px 0;
+    border:1px solid var(--wbd);border-radius:8px;white-space:nowrap}
+  #one #p-dele #wk-mv>.wk-ans .p i:not(#z){font-size:8.5px;letter-spacing:.1em}
+  #one #p-dele #wk-mv>.wk-ans .p b:not(#z){font-size:13px}
+  #one #p-dele #wk-mv>.wk-ans .p .arr{margin:0 2px}
+  #one #p-dele #wk-mv>.wk-ans .p.rate i:nth-of-type(2){display:none}
+  #one #p-dele #wk-mv>.wk-ans .p.lock{display:none!important}
+}
+/* the title row reads the same in every tab: the count centred on the field's line, Outcome's figures on its title's */
+@media(min-width:1100px){
+  #one #p-dele #wk-plan>.wk-ph .wk-seln:not(#z):not(#y){align-self:center;display:inline-flex;align-items:center;height:32px;line-height:32px;margin:0}
+  #one #p-dele #wk-plan>.wk-ph .wk-seln b:not(#z){line-height:32px}
+  #one #p-dele #wk-mv>#dans:not(#z):not(#y),#one #p-dele #wk-mv>#proans:not(#z):not(#y){align-self:center;margin:0!important;padding:0!important;height:32px;align-items:center}
+  #one #p-dele #wk-mv.wk-pane:not(#z):not(#y):not(#x){row-gap:8px}
+  #one #p-dele #wk-mv>.wk-ph:not(#z):not(#y){margin:0;height:32px}
+  #one #p-dele #wk-mv>.wk-ans .p:not(#z):not(#y):not(#x){align-items:center;padding:0 10px}
+  #one #p-dele #wk-mv>.wk-ans .p.rate i{display:none}
+  #one #p-dele #wk-mv>.wk-ans .p.rate:not(#z):not(#y)::before{content:"APR";display:inline;position:static;height:auto;width:auto;background:none;opacity:1;font:400 8px var(--wmono);letter-spacing:.1em;text-transform:uppercase;color:var(--wf)}
+  /* the figures stay compact so two fit beside the title in any tab */
+  #one #p-dele #wk-mv>.wk-ans .p:not(#z):not(#y):not(#x){gap:5px;padding:0 8px}
+  #one #p-dele #wk-mv>.wk-ans .p i:not(#z):not(#y){font-size:8px;letter-spacing:.08em}
+  #one #p-dele #wk-mv>.wk-ans .p b:not(#z):not(#y){font-size:12.5px}
+  #one #prolist .wk-tbl2 td.nm .gtag.add:not(#z){flex:0 0 auto}
+}
 /* ════ STICKY HEADS (operator, 2026-09-30): a list's column titles stay on top as it scrolls, on the pane's own
    colour, so rows never show through them - Redelegate, Delegations, Outcome's moves, Stake's list, Picks ════ */
 #one #p-dele .wk-tbl2 thead th:not(#z):not(#y),#you .wk-tbl2 thead th:not(#z):not(#y),#one #p-dele #wk-mv .wk-moves thead th:not(#z):not(#y),
@@ -6269,6 +6380,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
         <section class=wk-pane id=wk-mv>
           <header class="wk-ph wk-mvh wk-t3" id=dmvh><h3>Outcome</h3><span class=wk-pn id=dmvn></span></header>
           <div class=wk-ans id=dans></div>
+          <div class="wk-ans pro-ans" id=proans></div>
           <div class=wk-moves id=dstrat></div>
           <div class=wk-mvempty id=dmvempty>Select validators and enter a stake</div>
           <div class="txlock rdnote" id=rdnote><svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Redelegated stake cannot be redelegated again for <b>21 days</b></span></div>

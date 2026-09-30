@@ -79,7 +79,7 @@ var DOCK_PARTS = {
   /* hdr: into the pane's title row, where Redelegate keeps its amount field; list: the pane's body; out: Outcome */
   stpop: { mode: "stake",   title: "Stake",         hdr: [".sttop"], list: ["#stlist"],  out: ["#stsum", "#stlock", "#stfee", "#ststep", ".txbtns"] },
   unpop: { mode: "unstake", title: "Unstake",       hdr: [".unamt"], list: ["#unpick"],  out: ["#unsum", "#unlock", "#unfee", "#unstep", ".txbtns"] },
-  clpop: { mode: "claim",   title: "Claim rewards", hdr: [],         list: ["#clpick"],  out: ["#clsum", "#clfee", "#clstep", ".txbtns"] }
+  clpop: { mode: "claim",   title: "Claim",         hdr: [],         list: ["#clpick"],  out: ["#clsum", "#clfee", "#clstep", ".txbtns"] }
 };
 function proWide(){ return document.documentElement.getAttribute("data-sv") === "dashboard/self" && matchMedia("(min-width:1100px)").matches; }
 function undock(){
@@ -87,6 +87,7 @@ function undock(){
   for(var i = DOCK.moved.length - 1; i >= 0; i--){ var m = DOCK.moved[i]; m.parent.insertBefore(m.el, m.next); }
   var L = document.getElementById("prolist"), O = document.getElementById("proout");
   if(L) L.hidden = true; if(O) O.hidden = true;
+  var H0 = document.getElementById("prohdr"); if(H0) H0.innerHTML = "";
   var h = document.querySelector("#wk-plan>.wk-ph h3"); if(h) h.textContent = "Redelegate";
   document.documentElement.removeAttribute("data-pro");
   var p = DOCK.pop; DOCK = null; proTabs();
@@ -102,10 +103,14 @@ function dock(pop){
   P.list.forEach(function(s){ mv(s, L); }); P.out.forEach(function(s){ mv(s, O); });
 
   /* the card's own classes ride along, so its parts keep the card's styling */
-  L.className = O.className = "pro-dock " + card.className.replace(/\bcard\b/, "");
+  /* the list is Redelegate's table and takes none of the card's styling; Outcome's parts keep the card's */
+  L.className = "pro-dock"; O.className = "pro-dock " + card.className.replace(/\bcard\b/, "");
   if(H) H.className = "pro-hdr " + card.className.replace(/\bcard\b/, "");
   L.hidden = O.hidden = false;
-  var h = document.querySelector("#wk-plan>.wk-ph h3"); if(h) h.textContent = P.title;
+  var h = document.querySelector("#wk-plan>.wk-ph h3");
+  /* Redelegate's title width, measured once, is the width every tab's title takes */
+  if(h && !document.documentElement.style.getPropertyValue("--rdh")) document.documentElement.style.setProperty("--rdh", h.getBoundingClientRect().width + "px");
+  if(h) h.textContent = P.title;
   document.documentElement.setAttribute("data-pro", P.mode);
   DOCK = { pop: pop, moved: moved };
   /* the list is drawn again now that it is docked: a docked list carries column titles as Redelegate's does */
@@ -2452,7 +2457,7 @@ rememberGridH();
         else if(c.checked) UNSEL[c.value] = 1; else delete UNSEL[c.value];
         unRows(); unState(); }); });
   }
-  window.__unRows = function(){ unRows(); };
+  window.__unRows = function(){ unRows(); unState(); };
   function unRow(){ var rs = unSelRows(); if(!rs.length) return null; if(rs.length === 1) return rs[0];
     var x = 0; rs.forEach(function(r){ x += r.x; }); return { id: "*", m: rs.length + " validators", x: x }; }
   function unAmount(){ var a = E("unamt"), n = parseFloat((a.value || "").replace(/[^0-9.]/g, "")); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
@@ -2462,6 +2467,8 @@ rememberGridH();
     var over = r && u > r.x, ok = r && u > 0 && !over;
     if(fld) fld.classList.toggle("bad", !!over);
     if(hint){ hint.className = "unhint" + (over ? " bad" : ""); hint.textContent = over ? "" : (r ? "of " + exact(r.x) + " on " + r.m : ""); }   /* over what sits there: the box turns red, no words */
+    /* in Pro the hint is the count, as Redelegate's "2 selected" */
+    if(hint && DOCK && DOCK.pop === unpop){ var ns = unSelRows().length; hint.className = "wk-seln"; hint.innerHTML = ns ? '<b>' + ns + '</b>selected' : ''; }
     if(go) go.disabled = !ok || !window.__WALLET;
     if(sm) sm.innerHTML = ok ? fmt(u) + " ATONE<br>from " + att(r.m) : "";
     var until = new Date(Date.now() + 21 * 86400000);
@@ -2545,6 +2552,7 @@ rememberGridH();
       var sm0 = E("clsum"), go0 = E("clsign"), n0 = 0, tot0 = 0; rows.forEach(function(r){ if(CLSEL[r.id]){ n0++; tot0 += r.x; } });
       if(sm0) sm0.innerHTML = n0 ? exact(tot0, 6) + " ATONE<br>from " + n0 + " validator" + (n0 === 1 ? "" : "s") : "";
       if(go0) go0.disabled = !n0 || !window.__WALLET;
+      var ph = E("prohdr"); if(ph) ph.innerHTML = n0 ? '<span class=wk-seln><b>' + n0 + '</b>selected</span>' : '';
       var st0 = E("clstep"); st0.textContent = ""; st0.className = "txstep";
       feeSoon("cl", E("clfee"), n0 ? clMsgs : null); proBrk();
       return;
@@ -2615,17 +2623,30 @@ rememberGridH();
   function stRows(){
     var el = E("stlist"); if(!el) return;
     var P = stPlan(), by = {}; P.rows.forEach(function(r){ by[r.id] = r; });
-    var h = '<table><colgroup><col style="width:24px"><col style="width:30px"><col><col style="width:60px"><col style="width:46px"><col style="width:64px"><col style="width:56px"></colgroup>' +
-            '<thead><tr><th class=ck><input type=checkbox class=pro-all aria-label="Tick every validator"' + (function(){ var c = stCands(); return c.length && c.every(function(o){ return STSEL[o.id]; }) ? ' checked' : ''; })() + '></th><th class=c>rank</th><th class=l>validator</th><th>90<span class=lc>d</span> uptime</th><th>jailed</th><th>stake</th><th>APR</th></tr></thead><tbody>';
-    stCands().forEach(function(o){
-      var on = !!STSEL[o.id], m = by[o.id], d = (window.__VDBY && window.__VDBY[o.id]) || {}, u90 = d.d90 != null ? +d.d90 : (o.up != null ? +o.up : null);
-      h += '<tr' + (on ? ' class=on' : '') + '><td class=ck><input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + '></td>' +
-           '<td class="c rk">' + o.rank + '</td><td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span></div></td>' +
+    /* Redelegate's very table (operator, 2026-09-30: "same to same ... each and every pixel"): its columns, widths,
+       titles and cells - rank, the name with what this stake adds, the validator's stake, its record, and APR now → there */
+    var pos = window.__POS, now = pos && pos.rows.length ? pos.rate : 0, MEAN = window.__S() / window.__VALS().length;
+    var wide = window.innerWidth > 1560 || window.innerWidth <= 900;
+    var cands = stCands(), allOn = cands.length && cands.every(function(o){ return STSEL[o.id]; });
+    var h = '<table><colgroup><col style="width:30px"><col style="width:36px"><col><col style="width:64px">' + (wide ? '<col style="width:70px">' : '') + '<col style="width:72px">' + (wide ? '<col style="width:64px">' : '') + '<col style="width:50px"><col style="width:104px"></colgroup>' +
+            '<thead><tr><th class=ck><input type=checkbox class=pro-all aria-label="Tick every validator"' + (allOn ? ' checked' : '') + '></th><th class=c>rank</th><th class=l>validator</th>' +
+            '<th title="the validator\'s stake; green below the average size, where the bonus pays">stake</th>' + (wide ? '<th title="blocks signed over every block indexed">signed</th>' : '') + '<th>90<span class=lc>d</span> uptime</th>' + (wide ? '<th title="blocks proposed">proposed</th>' : '') + '<th>jailed</th>' +
+            '<th>APR now → there</th></tr></thead><tbody>';
+    cands.forEach(function(o){
+      var on = !!STSEL[o.id], m = by[o.id], there = m ? m.after : o.rate0;
+      var d = (window.__VDBY && window.__VDBY[o.id]) || {}, u90 = d.d90 != null ? +d.d90 : (o.up != null ? +o.up : null);
+      var vp = o.t / window.__S() * 100, lu = d.life_up != null ? +d.life_up : null, pr = d.prop != null ? +d.prop : null;
+      h += '<tr class="' + (on ? 'on' : '') + '"><td class=ck><input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + '></td>' +
+           '<td class="c rk">' + o.rank + '</td><td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span>' +
+           (m && m.x > 0 ? '<em class="gtag add" title="what this stake adds">+' + fmt(m.x) + '</em>' : '') + '</div></td>' +
+           '<td class="stk" title="' + big(o.t) + ' ATONE, ' + vp.toFixed(vp < 1 ? 2 : 1) + '% of all stake; ' + (o.t < MEAN ? 'below the average size: the bonus pays here' : 'above the average size') + '">' + big(o.t) + '</td>' +
+           (wide ? '<td class="' + (lu == null ? 'dim' : lu >= 99.9 ? 'ok' : lu >= 99 ? 'warn' : 'bad') + '">' + (lu == null ? '\u2014' : lu.toFixed(2) + '%') + '</td>' : '') +
            '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '\u2014' : u90.toFixed(1) + '%') + '</td>' +
+           (wide ? '<td>' + (pr == null ? '\u2014' : pr >= 1e6 ? (pr / 1e6).toFixed(2) + 'M' : pr >= 1e3 ? (pr / 1e3).toFixed(1) + 'k' : pr) + '</td>' : '') +
            (o.jail == null ? '<td class=dim>N/A</td>' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>') +
-           '<td>' + (m ? fmt(m.x) : '\u2014') + '</td><td class=r2><b>' + pct(m ? m.after : o.rate0) + '</b></td></tr>';
+           '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '\u2014') + '</s><em>→</em><b>' + pct(there) + '</b></td></tr>';
     });
-    h += ijRows("st", 7, STSEL);
+    h += ijRows("st", (h.match(/<col[ >]/g) || []).length, STSEL);
     var top = el.scrollTop; el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
     ijWire(el, stRows);
     /* the titles row's box ticks every active validator, or none - as Redelegate's does */
@@ -2663,12 +2684,13 @@ rememberGridH();
     } else if(mode === "claim"){
       head = ["Validator", "Rewards"];
       clRows().forEach(function(r){ if(!CLSEL[r.id]) return; tot += r.x; rows.push([logo(r.id, r.m) + '<span>' + att(r.m) + '</span>', exact(r.x, 6)]); });
-      fig = ["Rewards", rows.length ? exact(tot, 6) : '\u2014'];
+      fig = ["Rewards", rows.length ? exact(tot, 4) : '\u2014'];
     }
     /* two boxes as Redelegate's Outcome has - how many validators, and the figure that matters here - then the list */
     var boxes = !mode ? '' : '<div class="wk-ans pro-ans"><span class="p"><i>validators</i><b' + (rows.length ? '' : ' class=dim') + '>' + (rows.length || '\u2014') + '</b></span>' +
       '<span class="p gain"><i>' + fig[0] + '</i><b' + (rows.length ? '' : ' class=dim') + '>' + fig[1] + '</b></span></div>';
-    el.innerHTML = !mode ? '' : boxes + (!rows.length ? '<div class=pro-brk-e>' + (mode === "claim" ? 'Select the rewards to claim' : 'Select validators and enter an amount') + '</div>' :
+    var pa = E("proans"); if(pa) pa.innerHTML = !mode ? '' : boxes.replace(/^<div class="wk-ans pro-ans">|<\/div>$/g, '');
+    el.innerHTML = !mode ? '' : (!rows.length ? '<div class=pro-brk-e>' + (mode === "claim" ? 'Select the rewards to claim' : 'Select validators and enter an amount') + '</div>' :
       '<div class=pro-brk-s><table class=pro-brk-t><thead><tr>' + head.map(function(h, i){ return '<th' + (i ? '' : ' class=l') + '>' + h + '</th>'; }).join('') + '</tr></thead><tbody>' +
       rows.map(function(r){ return '<tr>' + r.map(function(c, i){ return '<td' + (i ? '' : ' class=nm') + '>' + c + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>');
   }

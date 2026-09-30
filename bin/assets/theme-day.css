@@ -357,22 +357,32 @@
   html[data-theme=light]:not([data-mono]) #wk-plan .wk-moves td.nm{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-plan .wk-moves td.amt{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #dpicks td.nm .gtag{border-color:var(--accent-soft);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 td.nm .gtag{border-color:var(--accent-soft);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #dpicks td.nm .gtag.dim{background:transparent}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 td.nm .gtag.dim{background:transparent}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 h3::before,html[data-theme=light]:not([data-mono]) #wk-plan .wk-t2 h3::before,html[data-theme=light]:not([data-mono]) #wk-plan .wk-t3 h3::before,html[data-theme=light]:not([data-mono]) #wk-mv .wk-t3 h3::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 h3{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) #wk-plan .wk-t3 h3,html[data-theme=light]:not([data-mono]) #wk-mv .wk-t3 h3{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-plan .wk-mvh::before{background:transparent}
   html[data-theme=light]:not([data-mono]) #dpicks thead th,html[data-theme=light]:not([data-mono]) #dstrat thead th{color:var(--muted);background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 thead th{color:var(--muted);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) #dpicks thead th.ck input{background:var(--surface-2);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 thead th.ck input{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #dpicks thead th.ck input:checked{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 thead th.ck input:checked{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #dpicks thead th.ck input:checked::after{border-color:var(--surface)}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 thead th.ck input:checked::after{border-color:var(--surface)}
   html[data-theme=light]:not([data-mono]) #dpicks thead th.ck input:indeterminate{border-color:var(--accent);background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 thead th.ck input:indeterminate{border-color:var(--accent);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) #dpicks thead th.ck input:indeterminate::after{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 thead th.ck input:indeterminate::after{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) #dpicks thead th.ck label{color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 thead th.ck label{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) #wk-mv{--a:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td{border-bottom-color:var(--line-soft)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td.nm .nmw>span{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td.nm .nmw>span.wk-lgx,html[data-theme=light]:not([data-mono]) #dpicks td.nm .nmw>span.wk-lgx{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 td.nm .nmw>span.wk-lgx{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td.amt{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves tr:hover td{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.lock{--c:var(--warn)}
@@ -437,7 +447,9 @@
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td.ck input{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-tbl2 td.ck input:checked{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #dpicks tbody tr.on td{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 tbody tr.on td{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #dpicks tbody tr.on td:first-child{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 tbody tr.on td:first-child{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #dmy tbody tr[data-v]:hover td:first-child{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #dmy tbody tr[data-v]:hover td.nm span{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh h3{color:var(--ink);text-shadow:none}
@@ -450,12 +462,15 @@
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(4){--c:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5:nth-child(5){--c:var(--warn)}
   html[data-theme=light]:not([data-mono]) #dpicks thead th{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 thead th{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-b5::before{background:transparent}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addrw{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh .wk-addr em{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #dpicks tbody tr.lt td,html[data-theme=light]:not([data-mono]) #dpicks tbody tr.lt td.nm .nmw>span,html[data-theme=light]:not([data-mono]) #dpicks tbody tr.lt.on td{color:inherit}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 tbody tr.lt td,html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 tbody tr.lt td.nm .nmw>span,html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 tbody tr.lt.on td{color:inherit}
   html[data-theme=light]:not([data-mono]) #dpicks tbody tr.lt td.nm .nmw>span{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 tbody tr.lt td.nm .nmw>span{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-mvh .wk-btn.wk-go{color:#FFFFFF;background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-mvh .wk-btn.wk-go:hover{box-shadow:0 0 0 1px var(--accent)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-mvh .wk-btn.wk-go:disabled{background:var(--surface-2);border-color:var(--line-strong);color:var(--faint);box-shadow:none}
@@ -498,6 +513,7 @@
   }
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.gain:has(b.neg){--c:var(--danger)}
   html[data-theme=light]:not([data-mono]) #dpicks td.nm .gtag.neg{border-color:var(--danger-bar);background:var(--danger-bg)}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 td.nm .gtag.neg{border-color:var(--danger-bar);background:var(--danger-bg)}
   html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-field{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-field:focus-within{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph input.wk-amt2{background:transparent;color:var(--ink)}
@@ -505,8 +521,11 @@
   html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-field .wk-max b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-field.need{border-color:var(--amber-bar);box-shadow:0 0 0 2px var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) #dpicks td.stk{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 td.stk{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #dpicks td.nm .gtag.add{background:transparent}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 td.nm .gtag.add{background:transparent}
   html[data-theme=light]:not([data-mono]) #dpicks td.nm[data-v]:hover .nmw>span:not(.wk-lgx){color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 td.nm[data-v]:hover .nmw>span:not(.wk-lgx){color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb.wk-stb{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-unb:not(.wk-stb){color:var(--warn);border-color:var(--amber-bar);background:var(--warn-bg)}
@@ -1040,6 +1059,9 @@
   html[data-theme=light]:not([data-mono]) #prolist thead th.ck input:checked::after{border-color:var(--surface)}
   html[data-theme=light]:not([data-mono]) #prolist thead th.ck input:indeterminate{border-color:var(--accent);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) #prolist thead th.ck input:indeterminate::after{background:var(--accent)}
+  @media(min-width:1100px){
+    html[data-theme=light]:not([data-mono]) #one #p-dele #wk-mv>.wk-ans .p.rate:not(#z):not(#y)::before{background:none}
+  }
   html[data-theme=light]:not([data-mono]) #one #p-pays .ptab thead th:not(#z):not(#y){background:var(--card,var(--surface))}
   @media(min-width:1100px){
     html[data-theme=light]:not([data-mono]) .colh{border-color:var(--wbd2,var(--line-strong));background:var(--wc,var(--surface-2));color:var(--wf,var(--muted))}
