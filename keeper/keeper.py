@@ -272,7 +272,7 @@ def plan_restake(c, granter, rg, vals, m, P):  # noqa: C901
     # DELEGATE grant with no validator list may use any; an older grant that names validators keeps to them
     allow = set(rg["stake"]["allow"] or [])
     ranked = sorted(vals.values(), key=lambda v: -v["t"])
-    def ok(v): return (not allow or v["op"] in allow) and not v["tomb"] and (v.get("up") is None or v["up"] >= UP_MIN)
+    def ok(v): return not allow or v["op"] in allow          # no uptime or tombstone test: the active set is the test (operator, 2026-09-30)
     add = fill(ranked, lambda op: vals[op]["t"], int(stake), ok)
     if not add or stake <= 0: out["skip"] = "no validator to stake on" if not add else "delegate cap used up"; return out
     legs = [{"validator": op, "amount": int(a)} for op, a in add.items()]
@@ -352,13 +352,11 @@ def pairs_used(reds):
 # The smallest validator first (leaving out the last EDGE, the edge of the set): it takes as much as it can without passing the validator ranked just above
 # it (so its rank never changes, and it stays the best payer); what is left goes to the next one up, same
 # check; and so on, at most BOTTOM validators (1 to 34, as the amount needs). A source gives only what keeps
-# it at or above the validator ranked just under it. A validator not signing now (under UP_MIN of the recent
-# window) or tombstoned is passed over. Nothing is offered while any of the delegator's stake cools down,
+# it at or above the validator ranked just under it. Any validator of the active set may take stake. Nothing is offered while any of the delegator's stake cools down,
 # so the offer comes back every 21 days, when the last move's cooldown clears.
 # fixed in code, as the rest of the operator's rule: no env value can change them at launch
 BOTTOM = 34
 EDGE = 5            # the last 5 are left out: newcomers at the edge of the set (29 used)
-UP_MIN = 95.0
 
 def fill(ranked, stake, amount, ok):
     """the rule's pour: from the smallest up, each to 1 ATONE under the validator just above it (a tie
@@ -402,8 +400,9 @@ def plan(g, rows, reds, vals, m, P=None, room=None):
     if g["cap"] is not None: budget = min(budget, g["cap"])
     gone = {x["op"]: x["give"] for x in src}          # the cautious bound: every source counted as gone
     def stake(op): return vals[op]["t"] - gone.get(op, 0)
-    def ok(v): return ((g["allow"] is None or v["op"] in g["allow"]) and v["op"] not in g["deny"] and not v["tomb"]
-                       and v.get("known", True) and (v.get("up") is None or v["up"] >= UP_MIN))
+    # any validator of the active set may take stake (operator, 2026-09-30): no uptime test, and a tombstoned validator
+    # never returns to the set, so there is none to exclude; an older grant's validator list still binds
+    def ok(v): return (g["allow"] is None or v["op"] in g["allow"]) and v["op"] not in g["deny"]
     used = pairs_used(reds)
     def moves_for(amount):
         add = fill(ranked, stake, amount, ok)

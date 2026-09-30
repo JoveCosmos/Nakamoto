@@ -3166,10 +3166,10 @@ rememberGridH();
      Your move offers is the move Autopilot would make. The smallest validator first: it takes as much as it
      can without passing the validator ranked just above it; what is left goes to the next one up, same check;
      at most BOTTOM validators. A source gives only what keeps it at or above the one ranked just under it; a
-     validator not signing now (under UP_MIN) or tombstoned is passed over; at most 20 moves (move less rather
+     any validator of the active set may take stake; at most 20 moves (move less rather
      than cut); nothing while any of the wallet's stake is cooling down. Answers null or
      { now, after, gain, moves, msgs:[{from,to,amt}] }. */
-  var BOTTOM = 34, EDGE = 5, MAXMOVES = 20, UP_MIN = 95, MIN_LIFT = 0.05;   /* EDGE: the last 5 are left out, newcomers at the edge of the set */
+  var BOTTOM = 34, EDGE = 5, MAXMOVES = 20, MIN_LIFT = 0.05;   /* EDGE: the last 5 are left out, newcomers at the edge of the set */
   window.__planRank = function(pos){
     if(!pos || !pos.rows.length || !(pos.total > 0)) return null;
     /* stake in its 21-day cooldown stays where it is; the free stake is hunted, all of it at once */
@@ -3188,7 +3188,7 @@ rememberGridH();
     var budget = src.reduce(function(s, x){ return s + x.give; }, 0);
     var gone = {}; src.forEach(function(x){ gone[x.id] = x.give; });     /* the cautious bound: every source counted as gone */
     var stake = function(j){ return V[j][1] - (gone[V[j][3]] || 0); };
-    var ok = function(v){ var d = VD[v[3]] || {}; return !d.tomb && (d.up == null || +d.up >= UP_MIN); };
+    var ok = function(){ return true; };     /* any validator of the active set, as the keeper (operator, 2026-09-30) */
     var used = {}; (window.__REDS || []).forEach(function(rr){
       var k = rr.redelegation.validator_src_address.slice(-6) + ">" + rr.redelegation.validator_dst_address.slice(-6);
       used[k] = (used[k] || 0) + (rr.entries || []).length; });
