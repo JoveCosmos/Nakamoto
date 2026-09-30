@@ -66,7 +66,7 @@ DARKTEXT = {"#03120a", "#062012", "#04170b", "#1a1000", "#14103a", "#2a0d05", "#
 
 REPOINTED = {"--void","--edge","--edge2","--ink","--ink2","--ink3","--faint","--hot","--burn","--cold","--lit","--card","--card2","--inset",
              "--blue","--cyan","--green","--amber","--cv","--ce","--ce2","--ci","--ci2","--ci3","--cf","--ch","--cb","--cc","--cl","--mono","--sans",
-             "--wc","--wh","--wbd","--wbd2","--wi","--wchip","--wt","--ws","--wf","--wblue","--wcyan","--wgreen","--wamber","--wburn","--wgold","--wsans","--wmono"}
+             "--wc","--wh","--wbd","--wbd2","--wi","--wchip","--wt","--ws","--wf","--wblue","--wcyan","--wgreen","--wamber","--wburn","--wgold","--wsans","--wmono","--wsolid"}
 TEXT_PROPS = {"color", "fill", "stroke", "caret-color", "-webkit-text-fill-color", "text-decoration-color", "column-rule-color"}
 
 def hexnorm(h):
@@ -404,7 +404,8 @@ def main():
                     + SCOPE + " #sv," + SCOPE + " #sv *," + SCOPE + " #you," + SCOPE + " #you *," + SCOPE + " #paths," + SCOPE + " #paths *," + SCOPE + " .hdr-r," + SCOPE + " .hdr-r *," + SCOPE + " .brandbar," + SCOPE + " .brandbar *{"
                     "--wc:var(--surface);--wh:var(--surface-2);--wbd:var(--line);--wbd2:var(--line-strong);--wi:var(--surface-sunk);--wchip:var(--surface-2);"
                     "--wt:var(--ink);--ws:var(--muted);--wf:var(--faint);--wblue:var(--accent);--wcyan:var(--accent);--wgreen:var(--accent);"
-                    "--wamber:var(--warn);--wburn:var(--danger);--wgold:var(--warn);--wsans:var(--day-sans);--wmono:var(--day-mono)}\n")
+                    "--wamber:var(--warn);--wburn:var(--danger);--wgold:var(--warn);--wsans:var(--day-sans);--wmono:var(--day-mono);"
+                    "--wsolid:var(--surface)}\n")
     body = "\n".join(shadow)
     out = (head + fonts + "\n" + tokens + body + "\n" + night_tokens
            + "  /* ── the hand layer: the day spec's typography, shape, spacing and components ── */\n" + hand + "\n")

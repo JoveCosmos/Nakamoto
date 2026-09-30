@@ -195,7 +195,6 @@
   html[data-theme=light]:not([data-mono]) .mbtn{background:transparent}
   html[data-theme=light]:not([data-mono]) .mbtn:hover{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .mbtn[aria-pressed=true]{background:var(--amber-bar);color:#FFFFFF}
-  html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) .hdr-r,html[data-theme=light]:not([data-mono]) .brandbar,html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #clpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard,html[data-theme=light]:not([data-mono]) #grpop .txcard{--wsolid:var(--ink)}
   html[data-theme=light]:not([data-mono]) #p-dele #sd-mstrip{background:var(--surface-2);border-color:var(--line-strong);box-shadow:none}
   @media(min-width:901px){
     html[data-theme=light]:not([data-mono]) #p-dele #wbody{box-shadow:none}
@@ -247,7 +246,6 @@
   html[data-theme=light]:not([data-mono]) .wk-pl.dim{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wk-hb.hld i{background:transparent}
   html[data-theme=light]:not([data-mono]) .wk-lgx{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) .hdr-r,html[data-theme=light]:not([data-mono]) .brandbar,html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) #txpop .txcard,html[data-theme=light]:not([data-mono]) #unpop .txcard,html[data-theme=light]:not([data-mono]) #clpop .txcard,html[data-theme=light]:not([data-mono]) #stpop .txcard,html[data-theme=light]:not([data-mono]) #atpop .txcard,html[data-theme=light]:not([data-mono]) #grpop .txcard{--wsolid:var(--ink)}
   html[data-theme=light]:not([data-mono]) body{background-image:transparent}
   html[data-theme=light]:not([data-mono]) .folder{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .sec,html[data-theme=light]:not([data-mono]) .sec.tight,html[data-theme=light]:not([data-mono]) .duo .sec,html[data-theme=light]:not([data-mono]) .duo .sec:nth-child(n){background:var(--surface);box-shadow:none}
@@ -1020,7 +1018,7 @@
     html[data-theme=light]:not([data-mono]) .pth svg{fill:none;stroke:currentColor}
   }
   html[data-theme=light]:not([data-mono]){--void:var(--bg);--edge:var(--line);--edge2:var(--line-strong);--ink2:var(--muted);--ink3:var(--faint);--hot:var(--warn);--burn:var(--danger);--cold:var(--accent);--lit:var(--ink);--card:var(--surface);--card2:var(--surface-2);--inset:var(--surface-sunk);--blue:var(--accent);--cyan:var(--accent);--green:var(--accent);--amber:var(--warn);--cv:var(--bg);--ce:var(--line);--ce2:var(--line-strong);--ci:var(--ink);--ci2:var(--muted);--ci3:var(--faint);--cf:var(--faint);--ch:var(--warn);--cb:var(--danger);--cc:var(--accent);--cl:var(--ink);--mono:var(--day-mono);--sans:var(--day-sans)}
-  html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-dele *,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) .pop,html[data-theme=light]:not([data-mono]) .pop *,html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) #sv *,html[data-theme=light]:not([data-mono]) #you,html[data-theme=light]:not([data-mono]) #you *,html[data-theme=light]:not([data-mono]) #paths,html[data-theme=light]:not([data-mono]) #paths *,html[data-theme=light]:not([data-mono]) .hdr-r,html[data-theme=light]:not([data-mono]) .hdr-r *,html[data-theme=light]:not([data-mono]) .brandbar,html[data-theme=light]:not([data-mono]) .brandbar *{--wc:var(--surface);--wh:var(--surface-2);--wbd:var(--line);--wbd2:var(--line-strong);--wi:var(--surface-sunk);--wchip:var(--surface-2);--wt:var(--ink);--ws:var(--muted);--wf:var(--faint);--wblue:var(--accent);--wcyan:var(--accent);--wgreen:var(--accent);--wamber:var(--warn);--wburn:var(--danger);--wgold:var(--warn);--wsans:var(--day-sans);--wmono:var(--day-mono)}
+  html[data-theme=light]:not([data-mono]) #p-dele,html[data-theme=light]:not([data-mono]) #p-dele *,html[data-theme=light]:not([data-mono]) #p-intro,html[data-theme=light]:not([data-mono]) .pop,html[data-theme=light]:not([data-mono]) .pop *,html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) #sv *,html[data-theme=light]:not([data-mono]) #you,html[data-theme=light]:not([data-mono]) #you *,html[data-theme=light]:not([data-mono]) #paths,html[data-theme=light]:not([data-mono]) #paths *,html[data-theme=light]:not([data-mono]) .hdr-r,html[data-theme=light]:not([data-mono]) .hdr-r *,html[data-theme=light]:not([data-mono]) .brandbar,html[data-theme=light]:not([data-mono]) .brandbar *{--wc:var(--surface);--wh:var(--surface-2);--wbd:var(--line);--wbd2:var(--line-strong);--wi:var(--surface-sunk);--wchip:var(--surface-2);--wt:var(--ink);--ws:var(--muted);--wf:var(--faint);--wblue:var(--accent);--wcyan:var(--accent);--wgreen:var(--accent);--wamber:var(--warn);--wburn:var(--danger);--wgold:var(--warn);--wsans:var(--day-sans);--wmono:var(--day-mono);--wsolid:var(--surface)}
   /* ── the hand layer: the day spec's typography, shape, spacing and components ── */
   /* ════════════════════════════════════════════════════════════════════════════════════
      DAY - the hand layer, colours and typefaces ONLY. Geometry (heights, paddings, radii,
@@ -1420,4 +1418,7 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .you-tag.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
   /* the Autopilot card carried its own night typeface tokens, so day kept Helvetica there while Restake read in Plex */
   html[data-theme=light]:not([data-mono]) #atpop .txcard:not(#z),html[data-theme=light]:not([data-mono]) #rspop .txcard:not(#z){--wsans:var(--day-sans);--wmono:var(--day-mono)}
+  /* the wallet menu: a light sheet with the page's shadow, rows lit on hover */
+  html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu{box-shadow:0 18px 44px -18px rgba(20,22,26,.40)}
+  html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mi:hover:not(:disabled){border-color:var(--line-strong);background:var(--surface-2)}
 
