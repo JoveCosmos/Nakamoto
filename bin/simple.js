@@ -1653,7 +1653,8 @@
           '<div class=mv-arr aria-hidden=true><svg viewBox="0 0 44 20"><path d="M2 10h38M32 3l8 7-8 7"/></svg></div>' +
           '<div class=mv-box><em>To, ' + tL.length + ' validator' + (tL.length === 1 ? '' : 's') + '</em>' + mvRows(tL, 'g', 'validators') + '</div></div>' +
           lock + mvSet(src, dst) +
-          (auto ? '<div class=mv-act><span>Autopilot makes this move on its next run, within 12 hours. Nothing to sign.</span></div>'
+          (auto ? '<div class=mv-act><button class="sv-btn mv-go mv-on" type=button data-act=youauto><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Autopilot On</button>' +
+                  '<span>Autopilot makes this move on its next run, within 12 hours. Nothing to sign.</span></div>'
                 : '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=opt>' + (direct ? 'Grant Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE') + '</button>' +
                   (direct ? '' : '<span>One signature moves it now. Autopilot needs Keplr, which can sign it along with the move.</span>') + '</div>');
       } else if(pos.free < 1e6 && pos.locked >= 1e6){

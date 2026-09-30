@@ -5480,6 +5480,9 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-act>span{order:-1;margin-right:auto}   /* a note on the left, the button always on the right */
 .mv-act>span{font-size:12.5px;line-height:1.45;color:var(--ws);max-width:44ch}
 #mv-stage .mv-act .sd-go,#mv-stage .mv-go{width:auto;height:50px;padding:0 26px;font-size:15px;flex:0 0 auto}
+/* Autopilot is on: the same button, as a state - it opens the Autopilot card (where it can be turned off) */
+#mv-stage .mv-go.mv-on{gap:9px;border:1px solid var(--sv-teal);background:rgba(43,200,189,.12);color:var(--sv-teal)}
+#mv-stage .mv-go.mv-on svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .mv-days{display:flex;flex-direction:column;gap:8px;border:1px solid var(--wbd);border-radius:12px;padding:14px 16px}
 .mv-dh{display:flex;justify-content:space-between;font-size:13px;color:var(--ws)}
 .mv-dh span:first-child{font-weight:600;color:var(--wt)}

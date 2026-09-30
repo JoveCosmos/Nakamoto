@@ -38,8 +38,10 @@ SIGNER = os.environ.get("KEEPER_SIGNER_URL", "")
 SECRET = os.environ.get("KEEPER_SECRET", "")
 GRANTEE = os.environ.get("KEEPER_GRANTEE", "").strip()
 DRY = os.environ.get("KEEPER_DRY", "1") != "0"
-EVERY = int(os.environ.get("KEEPER_EVERY", "21600"))
-MIN_GAIN_APR = float(os.environ.get("KEEPER_MIN_GAIN_APR", "0.05"))      # the moved stake must earn 5 APR points more (operator, 2026-09-30)
+# the operator's rule, fixed here and not in the env (the env files still carried 0.005 and 6 hours from the old
+# gated keeper, which would have moved stake for half a point): a move every 12 hours, only for more than 5 APR points
+EVERY = 12 * 3600
+MIN_GAIN_APR = 0.05
 MIN_GAIN_ATONE = float(os.environ.get("KEEPER_MIN_GAIN_ATONE", "1"))      # and pay at least this per year
 MAX_MOVES_DAY = int(os.environ.get("KEEPER_MAX_MOVES_PER_DAY", "20"))   # the signer takes at most 20 moves a transaction
 MAX_DESTS = int(os.environ.get("KEEPER_MAX_DESTS", "5"))                  # split across at most this many
