@@ -6104,7 +6104,6 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 <div class=pop id=txpop><div class="card txcard">
   <header class=wk-txh><div><b>Redelegate</b><span id=txn hidden></span></div><span class=txlockn id=txlockn></span><span class=txsum id=txsum></span></header>
   <div class=txans id=txans></div>
-  <div class=txap id=txap hidden><b>And Autopilot starts:</b> every 12 hours it moves your stake again whenever that earns 5 APR points more. It can only redelegate: never send, unstake or spend.</div>
   <div class=txlist id=txlist></div>
   <div class=txlock id=txlock></div>
   <div class=txfee id=txfee></div>
