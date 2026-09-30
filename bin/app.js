@@ -2799,7 +2799,24 @@ rememberGridH();
     if(a.type === "cosmos-sdk/GenericAuthorization") return a.value.msg;
     return "";
   }
-  function revokeMsg(t){ return { type: "cosmos-sdk/MsgRevoke", value: { granter: window.__ADDR, grantee: AT.addr, msg_type_url: t } }; }
+  function revokeMsg(t, to){ return { type: "cosmos-sdk/MsgRevoke", value: { granter: window.__ADDR, grantee: to || AT.addr, msg_type_url: t } }; }
+  /* other operators' restake, cancelled in the same approval that turns ours on (operator, 2026-09-30): any other grantee
+     holding a delegate grant is a restake service; its delegate grant and its claim grant are revoked. Its other grants
+     (vote, redelegate, anything else) are left alone. Unreadable grants: nothing is cancelled, ours still goes on */
+  function otherRestake(){
+    var who = window.__ADDR;
+    return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/authz/v1beta1/grants/granter/" + who + "?pagination.limit=500", { cache: "no-store" })
+      .then(function(r){ return r.ok ? r.json() : { grants: [] }; })
+      .then(function(d){
+        var by = {};
+        (d.grants || []).forEach(function(x){ if(!x.grantee || x.grantee === AT.addr || x.granter !== who) return;
+          var k = grantType(x); if(k === DELEG || k === WDRAW) (by[x.grantee] = by[x.grantee] || {})[k] = 1; });
+        var out = [];
+        Object.keys(by).forEach(function(g){ if(!by[g][DELEG]) return;
+          out.push(revokeMsg(DELEG, g)); if(by[g][WDRAW]) out.push(revokeMsg(WDRAW, g)); });
+        return out; })
+      .catch(function(){ return []; });
+  }
   /* every grant standing between the reader and the keeper: the redelegate one is the
      switch, the delegate + withdraw pair is the restake; a revoke names what stands */
   /* answers { grant: the redelegate one or null, grants: all that stand }, for the address
@@ -3112,7 +3129,7 @@ rememberGridH();
   }
   function rsMsgs(on){
     if(!on){ var t = {}; (AT.grants || []).forEach(function(x){ var k = grantType(x); if(k === WDRAW || k === DELEG) t[k] = 1; });
-      return Object.keys(t).map(revokeMsg); }
+      return Object.keys(t).map(function(k){ return revokeMsg(k); }); }
     /* no end date, no amount cap, and (operator, 2026-09-29) no validator list: the rewards are compounded into the
        highest-paying validator by the rule (the smallest first, never past the one above), not onto the reader's
        own. The delegate grant can only ever stake - never send or withdraw */
@@ -3135,7 +3152,8 @@ rememberGridH();
       if(!AT.addr) throw new Error("Restake opens once GATA's keeper is live");
       var on = rsOn(), msgs = rsMsgs(!on);
       if(!msgs.length) throw new Error(on ? "Nothing to disable" : "Stake with a validator first");
-      return window.__TX.sendDirect(window.__WALLET, msgs, on ? "" : "GATA Restake", function(){});
+      return (on ? Promise.resolve([]) : otherRestake()).then(function(rv){
+        return window.__TX.sendDirect(window.__WALLET, msgs.concat(rv), on ? "" : "GATA Restake", function(){}); });
     })
       .then(function(){ n.ok(); done = true; return atGrant().then(function(r){ if(atKeep(r)){ draw(); if(window.__redraw) window.__redraw(); } }); })
       .catch(function(e){ n.fail(e && e.message || String(e)); })
