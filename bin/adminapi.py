@@ -152,11 +152,14 @@ def overview(net):
         if rep: e["report"] = {k: rep.get(k) for k in ("checked", "staked", "now", "after", "gain", "moves", "history", "record", "restake", "last", "admin", "dry")}
     # validator names for the plans (the page's own data)
     D = jload(os.path.join(WEB[net], "data.json"), {})
-    names = {v.get("op"): v.get("m") for v in D.get("validators", []) if v.get("op")}
+    names = {v.get("op"): v.get("m") for v in D.get("validators", []) + D.get("inactive", []) if v.get("op")}
+    # the watch knows validators by consensus address: named here from the page's own data (active by hex, the rest by cons)
+    cons = {bech32("atonevalcons", bytes.fromhex(v["chex"])): v.get("m") for v in D.get("validators", []) if v.get("chex")}
+    cons.update({v["cons"]: v.get("m") for v in D.get("inactive", []) if v.get("cons")})
     vw = jload(os.path.join(STATE_DIR, "valwatch-%s.json" % net), {})
     inc = []
     for c, i in (vw.get("inc") or {}).items():
-        inc.append({"cons": c, **{k: i.get(k) for k in ("down", "crit", "jailed", "tomb")}})
+        inc.append({"cons": c, "name": cons.get(c), **{k: i.get(k) for k in ("down", "crit", "jailed", "tomb")}})
     return {"net": net, "ledger": led, "keeper": jload(os.path.join(WEB[net], "keeper", "_status.json"), None),
             "valwatch": {"checked": (vw.get("samples") or [{}])[-1].get("t"), "active": len(vw.get("active") or []), "incidents": inc},
             "admin": {"pauses": len(adm.get("paused", {}))}, "names": names}
@@ -230,7 +233,6 @@ class H(BaseHTTPRequestHandler):
             if not (g.startswith("atone1") and len(g) == 44): return self.reply(400, {"error": "granter"})
             # no approvals since 2026-09-30: Autopilot carries out its plans itself; Hold and Resume are the operator's controls
             if act not in ("hold", "resume"): return self.reply(400, {"error": "action"})
-            if act == "hold" and not note: return self.reply(400, {"error": "a hold needs a note: why"})
             now = int(time.time())
             with LOCK:
                 adm = adm_load(net)
@@ -242,9 +244,9 @@ class H(BaseHTTPRequestHandler):
                 adm_save(net, adm)
             log("decide %s %s %s by %s" % (net, g, act, a))
             if act == "hold":
-                notify.send("warn", "Autopilot on hold: " + short(g), note, {"Delegator": g, "Operator": a}, net=net)
+                notify.send("warn", "Autopilot disabled: " + short(g), note or "Autopilot and Restake stop for this address until it is enabled.", {"Delegator": g, "Operator": a}, net=net)
             elif act == "resume":
-                notify.send("info", "Autopilot resumed: " + short(g), "", {"Delegator": g, "Operator": a}, net=net)
+                notify.send("info", "Autopilot enabled: " + short(g), "", {"Delegator": g, "Operator": a}, net=net)
             return self.reply(200, {"ok": True})
         if u.path in ("/admin-api/pause", "/admin-api/note"):
             g = str(b.get("granter", ""))

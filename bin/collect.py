@@ -417,7 +417,7 @@ for ca, kind, n, h, t, burned in srows:
 _ST = {"BOND_STATUS_BONDED": "bonded", "BOND_STATUS_UNBONDING": "unbonding", "BOND_STATUS_UNBONDED": "unbonded"}
 INACT = sorted([{"m": v["description"]["moniker"], "op": v["operator_address"], "t": int(v["tokens"]),
                  "c": float(v["commission"]["commission_rates"]["rate"]), "jailed": bool(v.get("jailed")),
-                 "st": _ST.get(v.get("status"), "unbonded"), "jail": hist.get(_cons(v), {}).get("jailed")}
+                 "st": _ST.get(v.get("status"), "unbonded"), "jail": hist.get(_cons(v), {}).get("jailed"), "cons": _cons(v)}
                 for v in all_r if (v.get("jailed") or v.get("status") != "BOND_STATUS_BONDED") and int(v["tokens"]) >= 1_000_000],
                key=lambda x: -x["t"])
 

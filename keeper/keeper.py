@@ -764,6 +764,11 @@ def once(c, only=None, live=None, force=False):
                        "staked": sum(r["x"] for r in rows), "now": p.get("now"), "after": p.get("after"), "gain": p.get("gain"),
                        "moves": [{"src": e["src"], "dst": e["dst"], "uatone": e["amount"], "gain": round(e["gain"], 3)} for e in p["moves"]], "last": None}
                 if record: rep["record"] = record
+                # the redelegation lock, for the console's Cooling down: what is held and when the last of it clears
+                ends = [time.mktime(time.strptime(e["redelegation_entry"]["completion_time"][:19], "%Y-%m-%dT%H:%M:%S")) - time.timezone
+                        for r in reds for e in r.get("entries", [])]
+                rep["locked"] = sum(r["locked"] for r in rows)
+                rep["until"] = int(max([t for t in ends if t > time.time()] or [0])) or None
                 if prev and prev.get("restake"): rep["restake"] = prev["restake"]
                 pid = plan_id(p)
                 if p["moves"]: log("granter=%s plan %s: %d moves, +%.1f ATONE a year" % (gr, pid, len(p["moves"]), p["gain"]))

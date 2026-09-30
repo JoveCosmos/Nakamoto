@@ -4,174 +4,124 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta name=robots content="noindex,nofollow">
-<title>AtomOne Admin</title>
+<title>Autopilot Admin</title>
 <link rel=icon href="assets/favicon-32.png">
 <style>
-/* The operator console, in the app's own look (2026-09-30): the same night tokens as #you / #mv-stage, the same
-   title bar with its coloured rule, tags and buttons; day follows the app's day palette. A monitor: Autopilot runs
-   by itself every 12 hours, Hold is its emergency stop. No middle dots, no long dashes. */
-:root{--bg:#06060c;--glow:#16162e;--glow2:#0a0a16;--wc:#0e0e1d;--wh:#12122a;--wi:#0a0a16;--wbd:#232342;--wbd2:#34345c;
-  --wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4;--teal:#2bc8bd;--green:#2ee06a;--amber:#ffb02e;--violet:#b9b0ff;--red:#ff5a3c;
-  --go-bg:#2ee06a;--go-ink:#05170c;--teal-soft:rgba(43,200,189,.12);--amber-soft:rgba(255,176,46,.12);--red-soft:rgba(255,90,60,.12);
+/* The operator console (2026-09-30): the layout of the design the operator was shown (a header, four count tiles, one
+   list of wallets, each row its who, what, gain, when and one action), in the app's night look only. A view: the one
+   action is Disable (Autopilot and Restake stop for that address) and Enable. No middle dots, no long dashes. */
+:root{--bg:#06060c;--wc:#0e0e1d;--wh:#12122a;--wi:#0a0a16;--wbd:#232342;--wbd2:#34345c;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4;
+  --teal:#2bc8bd;--green:#2ee06a;--amber:#ffb02e;--violet:#b9b0ff;--red:#ff5a3c;
   --wsans:"Helvetica Neue",Helvetica,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
   --wmono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;color-scheme:dark}
-@media (prefers-color-scheme:light){:root{--bg:#F4F1EA;--glow:#F4F1EA;--glow2:#F4F1EA;--wc:#FFFDF8;--wh:#F8F6F0;--wi:#F4F1EA;
-  --wbd:#E3DED3;--wbd2:#D8D2C5;--wt:#17191C;--ws:#5E5A52;--wf:#8A857B;--teal:#0E5E52;--green:#0E5E52;--amber:#9A5B0B;
-  --violet:#0E5E52;--red:#8E2F22;--go-bg:#0E5E52;--go-ink:#FFFFFF;--teal-soft:#EDF4F0;--amber-soft:#F7EEDD;--red-soft:#F6E3DF;color-scheme:light}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0}
-body{min-height:100vh;background:var(--bg);background-image:radial-gradient(130% 62% at 50% 0%,var(--glow) 0%,var(--glow2) 42%,var(--bg) 74%);
+body{min-height:100vh;background:var(--bg);background-image:radial-gradient(130% 62% at 50% 0%,#16162e 0%,#0a0a16 42%,var(--bg) 74%);
   color:var(--wt);font:14px/1.45 var(--wsans)}
-button,input,textarea{font:inherit;color:inherit}
+button{font:inherit;color:inherit}
 a{color:var(--teal);text-decoration:none}
 a:hover{text-decoration:underline}
 :focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.wrap{max-width:1400px;margin:0 auto;padding:26px 32px 40px;display:flex;flex-direction:column;gap:20px}
 
-/* ── header, as the app's ── */
-.hdr{display:flex;align-items:center;gap:14px;padding:12px 24px;border-bottom:1px solid var(--wbd)}
-.brand{display:flex;align-items:center;gap:10px}
-.brand img{width:34px;height:34px}
-.brand b{font-size:20px;font-weight:700;letter-spacing:-.01em}
-.brand em{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);
-  padding:3px 8px;border:1px solid var(--wbd2);border-radius:999px}
-.sp{flex:1}
-.net{display:inline-flex;padding:3px;gap:2px;border-radius:12px;border:1px solid var(--wbd);background:var(--wi)}
-.net button{height:30px;padding:0 14px;border:0;border-radius:9px;background:none;cursor:pointer;
-  font-family:var(--wmono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
-.net button[aria-pressed=true]{background:var(--teal-soft);color:var(--teal);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--teal) 45%,transparent)}
+/* header */
+header{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em}
+.net{display:inline-flex;padding:3px;gap:2px;border-radius:10px;border:1px solid var(--wbd);background:var(--wi)}
+.net button{height:28px;padding:0 12px;border:0;border-radius:7px;background:none;cursor:pointer;
+  font-family:var(--wmono);font-size:11px;letter-spacing:.08em;color:var(--wf)}
+.net button[aria-pressed=true]{background:var(--wh);color:var(--wt);box-shadow:inset 0 0 0 1px var(--wbd2)}
 .net button:disabled{opacity:.35;cursor:not-allowed}
-.who{font-family:var(--wmono);font-size:12px;color:var(--ws);padding:7px 12px;border:1px solid var(--wbd);border-radius:10px;background:var(--wi)}
+.sp{flex:1}
+.who{font-family:var(--wmono);font-size:12px;color:var(--ws)}
 
-/* ── buttons and tags ── */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:34px;padding:0 14px;border-radius:10px;cursor:pointer;
-  border:1px solid var(--wbd2);background:transparent;color:var(--wt);font-size:13px;font-weight:600;white-space:nowrap}
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;height:40px;min-width:96px;padding:0 16px;border-radius:10px;cursor:pointer;
+  border:1px solid var(--wbd2);background:transparent;color:var(--wt);font-size:14px;font-weight:600;white-space:nowrap}
 .btn:hover{border-color:var(--ws)}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.btn.go{background:var(--go-bg);border-color:var(--go-bg);color:var(--go-ink)}
-.btn.warn{border-color:color-mix(in srgb,var(--amber) 60%,transparent);color:var(--amber)}
-.btn.sm{height:28px;padding:0 11px;font-size:12px}
-.tag{display:inline-block;font-style:normal;font-family:var(--wmono);font-size:9.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
-  line-height:1;padding:4px 7px;border-radius:999px;border:1px solid var(--wbd2);color:var(--wf);white-space:nowrap}
-.tag.on{border-color:var(--teal);color:var(--teal);background:var(--teal-soft)}
-.tag.hold{border-color:var(--amber);color:var(--amber);background:var(--amber-soft)}
-.tag.bad{border-color:var(--red);color:var(--red);background:var(--red-soft)}
+.btn:disabled{opacity:.45;cursor:wait}
+.btn.go{background:var(--teal);border-color:var(--teal);color:#04201d}
+.btn.sm{height:30px;min-width:0;padding:0 12px;font-size:12.5px}
 
-/* ── the frame: signer | wallets | watch ── */
-.frame{display:grid;grid-template-columns:300px minmax(0,1fr) 340px;gap:16px;padding:16px 24px 32px;max-width:1720px;margin:0 auto;align-items:start}
-.card{border:1px solid var(--wbd);border-radius:14px;background:var(--wc);padding:18px 20px;min-width:0}
-.col{display:flex;flex-direction:column;gap:16px;min-width:0}
-.th{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;min-height:30px}
-.th h2{display:inline-flex;align-items:center;gap:9px;margin:0;font-size:16px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
-.th h2::before{content:"";width:3px;height:16px;border-radius:2px;background:var(--tc,var(--teal));box-shadow:0 0 10px -1px var(--tc,var(--teal))}
-.th small{font-family:var(--wmono);font-size:10.5px;letter-spacing:.04em;color:var(--wf)}
-.eb{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+/* count tiles */
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.tile{background:var(--wc);border:1px solid var(--wbd);border-radius:12px;padding:14px 16px;min-width:0}
+.tile em{display:block;font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
+.tile b{display:block;font-size:30px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:2px}
+.tile small{display:block;font-size:12px;color:var(--ws);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile.run b{color:var(--teal)}.tile.cool b{color:var(--amber)}.tile.low b{color:var(--amber)}
 
-/* signer column: rows as the wallet column's */
-.rows{display:flex;flex-direction:column}
-.sr{display:flex;align-items:baseline;gap:10px;padding:9px 0;border-top:1px solid var(--wbd)}
-.sr:first-child{border-top:0}
-.sr>span{flex:1 1 auto;color:var(--ws);font-size:13.5px;min-width:0}
-.sr>b{font-family:var(--wmono);font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
-.sr>i{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.08em;color:var(--wf);width:52px;text-align:right}
-.sr.low>b{color:var(--amber)}
-.addr{font-family:var(--wmono);font-size:13px;word-break:break-all;color:var(--wt)}
-.big{display:flex;flex-direction:column;gap:4px;margin-bottom:14px}
-.big b{font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
-.big small{font-size:12.5px;color:var(--ws)}
-.cnt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.cnt>div{border:1px solid var(--wbd);border-radius:11px;background:var(--wi);padding:10px 12px;display:flex;flex-direction:column;gap:2px}
-.cnt b{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
-.cnt em{font-style:normal;font-family:var(--wmono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
-.cnt .on b{color:var(--teal)}.cnt .hold b{color:var(--amber)}
-.foot{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
-
-/* wallets: tabs in the title bar, a table as the app's lists */
-.tabs{display:inline-flex;padding:3px;gap:2px;border-radius:11px;border:1px solid var(--wbd);background:var(--wi);margin-left:6px}
-.tabs button{height:28px;padding:0 12px;border:0;border-radius:8px;background:none;cursor:pointer;color:var(--ws);font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px}
+/* the list */
+.list{background:var(--wc);border:1px solid var(--wbd);border-radius:16px;padding:20px 24px;display:flex;flex-direction:column}
+.lh{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid var(--wbd)}
+.lh h2{margin:0;font-size:17px;font-weight:600}
+.lh small{font-size:13px;color:var(--ws)}
+.tabs{display:inline-flex;padding:3px;gap:2px;border-radius:10px;border:1px solid var(--wbd);background:var(--wi)}
+.tabs button{height:28px;padding:0 11px;border:0;border-radius:7px;background:none;cursor:pointer;color:var(--ws);font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
 .tabs button i{font-style:normal;font-family:var(--wmono);font-size:10.5px;color:var(--wf)}
 .tabs button[aria-selected=true]{background:var(--wh);color:var(--wt);box-shadow:inset 0 0 0 1px var(--wbd2)}
-.tbl{overflow-x:auto}
-table{width:100%;border-collapse:collapse}
-th{font-family:var(--wmono);font-size:9.5px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);text-align:left;
-  padding:0 10px 9px;border-bottom:1px solid var(--wbd2);white-space:nowrap}
-th.r,td.r{text-align:right}
-td{padding:11px 10px;border-bottom:1px solid var(--wbd);vertical-align:middle;font-size:13.5px}
-td.n{font-family:var(--wmono);font-variant-numeric:tabular-nums;white-space:nowrap}
-tbody tr.row{cursor:pointer}
-tbody tr.row:hover>td{background:var(--wh)}
-tr.open>td{background:var(--wh);border-bottom:0}
-.sub{display:block;font-family:var(--wmono);font-size:10.5px;color:var(--wf);margin-top:3px;white-space:nowrap}
-.dim{color:var(--wf)}
-.tx{font-family:var(--wmono)}
-.empty{padding:18px 4px;color:var(--wf);font-size:13px}
-.err{color:var(--red);font-size:12.5px;min-height:1em}
+.row{display:grid;grid-template-columns:210px minmax(0,1fr) 150px 120px 120px;align-items:center;gap:16px;padding:18px 0;border-bottom:1px solid var(--wbd)}
+.row:last-child{border-bottom:0}
+.who2{font-family:var(--wmono);font-size:13px;min-width:0}
+.who2 small{display:block;font-family:var(--wsans);font-size:12px;color:var(--wf);margin-top:2px}
+.what{display:flex;flex-direction:column;gap:2px;min-width:0}
+.what b{font-size:15px;font-weight:500}
+.what span{font-size:12.5px;color:var(--ws);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.what span.cool{color:var(--amber)}
+.gain{font-family:var(--wmono);font-size:14px;color:var(--teal)}
+.gain.dim,.when.dim{color:var(--wf)}
+.when{font-size:13px;color:var(--ws)}
+.act{display:flex;justify-content:flex-end}
+.empty{padding:22px 0;color:var(--wf);font-size:13px}
+.note{margin-top:14px;font-size:12.5px;color:var(--ws)}
 
-/* a wallet opened */
-tr.det>td{background:var(--wh);padding:4px 14px 18px}
-.dg{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px}
-.box{border:1px solid var(--wbd);border-radius:12px;background:var(--wc);padding:12px 14px;min-width:0}
-.box>.eb{display:block;margin-bottom:8px}
-.box table td{padding:7px 8px;font-size:12.5px}
-.box table th{padding:0 8px 7px}
-.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;font-size:12.5px}
-.kv span{color:var(--wf)}
-.kv b{font-family:var(--wmono);font-weight:500;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.act{display:flex;gap:8px;align-items:flex-start;margin-top:10px}
-.act textarea,.act input{flex:1 1 auto;min-width:0;min-height:34px;padding:7px 10px;border-radius:10px;border:1px solid var(--wbd2);background:var(--wi);resize:vertical;font-size:13px}
-.notes{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-.notes div{font-size:12.5px;border-left:2px solid var(--wbd2);padding-left:8px}
-
-/* the watch rail */
-.feed{display:flex;flex-direction:column;max-height:62vh;overflow-y:auto;scrollbar-width:thin}
-.feed>div{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--wbd);font-size:13px}
-.feed>div:first-child{border-top:0}
-.feed i{flex:0 0 auto;width:7px;height:7px;border-radius:50%;margin-top:6px;background:var(--teal)}
-.feed i.warn{background:var(--amber)}.feed i.crit{background:var(--red)}
-.feed small{display:block;font-family:var(--wmono);font-size:10.5px;color:var(--wf);margin-top:2px}
+/* validators */
+.vals .row{grid-template-columns:minmax(0,1fr) auto;padding:12px 0}
+.vals .what b{font-size:14px}
+.tag{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:999px;border:1px solid var(--wbd2);color:var(--wf);white-space:nowrap}
+.tag.warn{border-color:var(--amber);color:var(--amber)}.tag.crit{border-color:var(--red);color:var(--red)}
 
 /* the gate */
-.gate{display:grid;place-items:center;min-height:calc(100vh - 80px);padding:24px}
-.gate .card{width:min(420px,100%);text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center;padding:28px}
-.gate h2{margin:0;font-size:20px}
+.gate{display:grid;place-items:center;min-height:60vh}
+.gate .list{width:min(420px,100%);align-items:center;text-align:center;gap:12px;padding:28px}
 .gate p{margin:0;color:var(--ws);font-size:13px}
+.err{color:var(--red);font-size:12.5px;min-height:1em}
 
-@media (max-width:1280px){.frame{grid-template-columns:280px minmax(0,1fr)}.frame>.watch{grid-column:1 / -1;display:grid;grid-template-columns:1fr 1fr}}
-@media (max-width:900px){.hdr{flex-wrap:wrap;padding:12px 16px}.frame{grid-template-columns:minmax(0,1fr);padding:12px 16px 24px}
-  .frame>.watch{grid-template-columns:minmax(0,1fr)}.dg{grid-template-columns:minmax(0,1fr)}.hide-s{display:none}}
+@media (max-width:980px){.wrap{padding:18px 16px 32px}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .row{grid-template-columns:minmax(0,1fr) auto;gap:6px 12px}.row .gain,.row .when{grid-column:1}.row .what{grid-column:1 / -1}.row .act{grid-row:1;grid-column:2}}
 </style>
 </head>
 <body>
-<header class=hdr>
-  <div class=brand><img src="assets/atomone.svg" alt=""><b>AtomOne</b><em>Admin</em></div>
-  <div class=net role=group aria-label=Network id=net><button type=button data-net=mainnet aria-pressed=true>Mainnet</button><button type=button data-net=testnet aria-pressed=false>Testnet</button></div>
-  <span class=sp></span>
-  <span class=who id=who hidden></span>
-  <button class="btn sm" type=button id=out hidden>Sign out</button>
-</header>
-<div id=gate class=gate>
-  <div class=card>
-    <h2>Operators only</h2>
-    <p>Sign a one-time message with Keplr. Nothing is sent on chain.</p>
-    <button class="btn go" type=button id=signin>Sign in with Keplr</button>
-    <div class=err id=err></div>
+<div class=wrap>
+  <header>
+    <h1>Autopilot admin</h1>
+    <div class=net role=group aria-label=Network id=net><button type=button data-net=mainnet aria-pressed=true>MAINNET</button><button type=button data-net=testnet aria-pressed=false>TESTNET</button></div>
+    <span class=sp></span>
+    <span class=who id=who hidden></span>
+    <button class="btn sm" type=button id=out hidden>Sign out</button>
+  </header>
+  <div id=gate class=gate>
+    <div class=list>
+      <h2 style="margin:0;font-size:20px">Operators only</h2>
+      <p>Sign a one-time message with Keplr. Nothing is sent on chain.</p>
+      <button class="btn go" type=button id=signin>Sign in with Keplr</button>
+      <div class=err id=err></div>
+    </div>
+  </div>
+  <div id=app hidden style="display:flex;flex-direction:column;gap:20px">
+    <div class=tiles id=tiles></div>
+    <section class=list>
+      <div class=lh><h2>Wallets</h2><div class=tabs id=tabs role=tablist aria-label="Wallet state"></div><span class=sp></span><small id=when></small></div>
+      <div id=rows></div>
+      <div class=note>Autopilot and Restake run at 00:00 and 12:00 UTC. After a move a wallet cools down for 21 days, then comes back to Running. Disable stops both for that address until it is enabled.</div>
+    </section>
+    <section class="list vals">
+      <div class=lh><h2>Validators</h2><span class=sp></span><small id=vwsub></small></div>
+      <div id=vw></div>
+    </section>
   </div>
 </div>
-<main id=app class=frame hidden>
-  <section class="card" style="--tc:var(--teal)">
-    <div class=th><h2>Autopilot signer</h2><span class=sp></span><span id=mode></span></div>
-    <div id=signer></div>
-    <div class=foot><button class="btn sm" type=button id=test>Send test alert</button></div>
-  </section>
-  <section class="card" style="--tc:var(--violet)">
-    <div class=th><h2>Wallets</h2><div class=tabs id=tabs role=tablist aria-label="Wallet state"></div><span class=sp></span><small id=checked></small></div>
-    <div class=tbl id=grants></div>
-  </section>
-  <div class="col watch">
-    <section class="card" style="--tc:var(--red)"><div class=th><h2>Validators</h2><span class=sp></span><small id=vwsub></small></div><div class=feed id=vw></div></section>
-    <section class="card" style="--tc:var(--amber)"><div class=th><h2>Events</h2></div><div class=feed id=ev></div></section>
-  </div>
-</main>
 <script src="admin.js"></script>
 </body>
 </html>
