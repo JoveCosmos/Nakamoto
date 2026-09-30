@@ -1605,15 +1605,17 @@
     }).join("") + '</div>' +
       (rest > 0 ? '<button type=button class=mv-more data-act=mvmore data-k="' + key + '" aria-expanded=' + open + '><span>' + (open ? 'Show fewer' : 'and ' + rest + ' more ' + more) + '</span>' + CH + '</button>' : '');
   }
-  function mvSet(src, dst, lab){
-    var V = VALS(), n = V.length, top = V.length ? V[0][1] : 1, cut = Math.max(0, n - 34), edge = Math.max(cut, n - 3);   /* the rule's region: ranks 67 to 97 */
+  function mvSet(src, dst){
+    /* the set, largest first: the wallet's validators lit (where the stake is, or comes from and goes to); no window
+       tint, bracket or side label (operator, 2026-09-30) */
+    var V = VALS(), n = V.length, top = V.length ? V[0][1] : 1;
     var bars = V.map(function(v, i){
-      var cls = src[v[3]] ? ' s' : dst[v[3]] ? ' d' : i >= cut && i < edge ? ' lo' : '';
-      return '<i class="' + cls.trim() + '" style="height:' + Math.round(6 + 94 * Math.sqrt(v[1] / top)) + '%"></i>';
+      var cls = src[v[3]] ? 's' : dst[v[3]] ? 'd' : '';
+      return '<i class="' + cls + '" data-v="' + esc(v[3]) + '" title="#' + (i + 1) + ' ' + esc(v[0]) + '" style="height:' + Math.round(6 + 94 * Math.sqrt(v[1] / top)) + '%"></i>';
     }).join("");
-    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em><em class=g>' + (lab || 'Where your stake goes') + '</em></div>' +
-      '<div class=mv-bars>' + bars + '</div><div class=mv-brk><span style="flex:' + cut + '"></span><span class=g style="flex:' + (edge - cut) + '">ranks ' + (cut + 1) + ' to ' + edge + '</span><span style="flex:' + (n - edge) + '"></span></div></div>';
+    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em></div><div class=mv-bars>' + bars + '</div></div>';
   }
+
   function drawMove(){
     var el = E("mv-stage"); if(!el) return;
     var pos = window.__POS, a = window.__ADDR, S = setStats();
@@ -1629,7 +1631,10 @@
     if(big && window.__planRank && window.__VDBY && window.__VDBY[big[3]]){
       lo = rate(big[3]);
       var sp = window.__planRank({ rows: [{ id: big[3], op: window.__VDBY[big[3]].op, x: 1e10, rate: lo, locked: 0, inactive: false }], total: 1e10, locked: 0 });
+      /* no move clears 5 points (testnet today): the figure is still where the rule puts stake, the first validator
+         it fills (rank n-3), so the stage never stands empty */
       hi = sp ? sp.after : 0;
+      if(!hi && V.length > 3){ var fv = V.slice().sort(function(x, y){ return y[1] - x[1]; })[V.length - 4]; hi = rate(fv[3], 1e10); }
     }
     /* what 10,000 ATONE earns in a year: on the largest validator, by the rule (Autopilot), on the smallest - each APR
        as it would be with the 10,000 on it (operator, 2026-09-30: "show smallest as well", no plain sentence) */
@@ -1643,7 +1648,10 @@
         card('Autopilot', '&nbsp;', hi, ' g') +
         card('Smallest validator', rk(small[3]) + ' ' + esc(nm(small[3])), rate(small[3], 1e10), '') + '</div>';
     };
-    var top = function(eb, chip, cls){ return '<div class=mv-top><h3 class=mv-h>Your move</h3><em>' + eb + '</em>' + (chip ? '<span class="mv-chip ' + cls + '">' + chip + '</span>' : '') + '</div>'; };
+    /* the title row carries the state's chip and, in the top right corner, its one action (operator, 2026-09-30) */
+    var top = function(eb, chip, cls, act){ return '<div class=mv-top><h3 class=mv-h>Your move</h3><em>' + eb + '</em>' + (chip ? '<span class="mv-chip ' + cls + '">' + chip + '</span>' : '') + (act || '') + '</div>'; };
+    var btn = function(a, label){ return '<button class="sv-btn go mv-go mv-tgo" type=button data-act=' + a + '>' + label + '</button>'; };
+    var ACTIVE = '<b class="mv-on mv-ton">Autopilot is Active</b>';
     /* the set chart in every state (operator, 2026-09-30): where this wallet's stake sits, lit on the set */
     var mineIds = function(){ var o = {}; (pos && pos.rows || []).forEach(function(r){ if(r.x >= 1e5 && !r.inactive) o[r.id] = 1; }); return o; };
     var nowOn = function(){
@@ -1663,15 +1671,13 @@
     }
     var h;
     if(!a){
-      h = top('') +
-        (hi ? '<div class=mv-hl><b>About ' + pct(hi) + ' APR</b><span>with Autopilot, for 10,000 ATONE</span></div>' : '') + cmp() + mvSet({}, {}) +
-        '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=connect>Connect a wallet</button><span>Your balances and your own best move show here.</span></div>';
+      h = top('') +          /* no Connect here: the header's is the one (operator, 2026-09-30) */
+        (hi ? '<div class=mv-hl><b>About ' + pct(hi) + ' APR</b><span>with Autopilot, for 10,000 ATONE</span></div>' : '') + cmp() + mvSet({}, {});
     } else if(!pos){
       h = top('') + '<div class=mv-hl><b>Reading your stake…</b></div>';
     } else if(!pos.rows.length){
-      h = top('', 'Nothing staked', 'q') +
-        '<div class=mv-hl><b>Stake to start earning</b>' + (hi ? '<span>About ' + pct(hi) + ' APR with Autopilot</span>' : '') + '</div>' + cmp() + mvSet({}, {}) +
-        '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=stake>Stake ATONE</button></div>';
+      h = top('', 'Nothing staked', 'q', btn('stake', 'Stake ATONE')) +
+        '<div class=mv-hl><b>Stake to start earning</b>' + (hi ? '<span>About ' + pct(hi) + ' APR with Autopilot</span>' : '') + '</div>' + cmp() + mvSet({}, {});
     } else {
       var plan = planNow(pos), offer = plan && plan.after != null && plan.msgs && plan.msgs.length;
       var direct = !!(window.__WALLET && window.__WALLET.signDirect);
@@ -1682,31 +1688,28 @@
         var fL = Object.keys(fr).sort(function(x, y){ return fr[y] - fr[x]; }).map(function(id){ src[id] = 1; return { rank: rk(id), name: nm(id), amt: fmt(fr[id]), apr: pct(rate(id)) }; });
         var tL = Object.keys(to).sort(function(x, y){ return to[y] - to[x]; }).map(function(id){ dst[id] = 1; return { rank: rk(id), name: nm(id), amt: '+' + fmt(to[id]), apr: pct(rate(id, to[id])) }; });
         var lock = pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is cooling down until ' + day(pos.until) + ' and stays where it is.</div>' : '';
-        h = top('Best today', auto ? '' : 'Ready, 1 approval', 'ok') +
+        h = top('Best today', auto ? '' : 'Ready, 1 approval', 'ok', auto ? ACTIVE : btn('opt', direct ? 'Activate Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE')) +
           '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.now) + '</i> to <i class=g>' + pct(plan.after) + '</i> APR</span></div>' +
           '<div class=mv-flow><div class=mv-box><em>From, ' + fL.length + ' validator' + (fL.length === 1 ? '' : 's') + '</em>' + mvRows(fL, 'a', 'validators', 'from') + '</div>' +
           '<div class=mv-arr aria-hidden=true><svg viewBox="0 0 44 20"><path d="M2 10h38M32 3l8 7-8 7"/></svg></div>' +
           '<div class=mv-box><em>To, ' + tL.length + ' validator' + (tL.length === 1 ? '' : 's') + '</em>' + mvRows(tL, 'g', 'validators', 'to') + '</div></div>' +
-          lock + mvSet(src, dst) +
-          (auto ? '<div class=mv-act><b class=mv-on>Autopilot is Active</b></div>'
-                : '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=opt>' + (direct ? 'Activate Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE') + '</button>' +
-                  (direct ? '' : '<span>One signature moves it now. Autopilot needs Keplr, which can sign it along with the move.</span>') + '</div>');
+          lock + mvSet(src, dst);
       } else if(pos.free < 1e6 && pos.locked >= 1e6){
         var t1 = pos.until || Date.now(), t0 = t1 - 21 * 864e5, k = Math.min(21, Math.max(1, Math.ceil((Date.now() - t0) / 864e5)));
         var cells = ''; for(var i = 1; i <= 21; i++) cells += '<i' + (i <= k ? ' class=on' : '') + '></i>';
         var hist = at && at.report && at.report.history && at.report.history.length ? at.report.history[0] : null;
-        h = top(auto ? 'Moved. Autopilot is active' : 'Moved. Cooling down', 'Day ' + k + ' of 21', 'warn') +
+        h = top(auto ? 'Moved. Autopilot is active' : 'Moved. Cooling down', 'Day ' + k + ' of 21', 'warn', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
           '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>Free to move again on <b>' + day(t1) + '</b>.</span></div>' +
           '<div class=mv-days><div class=mv-dh><span>Cooling down</span><span>' + day(t0) + ' to ' + day(t1) + '</span></div><div class=mv-dc>' + cells + '</div>' +
-          '<small>The chain holds redelegated stake for 21 days. Nothing to do until then.</small></div>' + nowOn() + mvSet({}, mineIds(), 'Where your stake is') +
+          '<small>The chain holds redelegated stake for 21 days. Nothing to do until then.</small></div>' + nowOn() +
           (auto ? '<div class=mv-cyc><div class=done><em>' + (hist ? day(hist.at * 1000) : 'Done') + '</em><b>Moved</b></div><div class=warn><em>Until ' + day(t1) + '</em><b>Cooling down</b></div>' +
                   '<div><em>Every 12 hours</em><b>Checked again</b></div><div><em>5 points more</em><b>Moved for you</b></div></div>'
-                : '<div class=mv-ap><span>On ' + day(t1) + ' this stake is free again. <b>Autopilot moves it for you</b> whenever it can earn more, checking every 12 hours.</span>' +
-                  '<button class="sv-btn mv-ghost" type=button data-act=youauto>Activate Autopilot</button></div>');
+                : '<div class=mv-ap><span>On ' + day(t1) + ' this stake is free again. <b>Autopilot moves it for you</b> whenever it can earn more, checking every 12 hours.</span></div>') +
+          mvSet({}, mineIds());
       } else {
-        h = top('Your stake today', 'At its best', 'ok') +
+        h = top('Your stake today', 'At its best', 'ok', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
           '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>No move earns it 5 APR points more today.' + (auto ? ' Autopilot checks again every 12 hours.' : ' This checks again every block.') + '</span></div>' +
-          nowOn() + mvSet({}, mineIds(), 'Where your stake is');
+          nowOn() + mvSet({}, mineIds());
       }
     }
     put("mv-stage", you + h);

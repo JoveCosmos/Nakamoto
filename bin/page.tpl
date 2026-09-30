@@ -6127,6 +6127,16 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #mv-stage .mv-ap:not(#z){padding:8px 12px}
   #mv-stage .mv-ap .mv-ghost:not(#z){height:34px}
 }
+/* Your move: the action in the title row's corner, the chip just left of it; the set chart pinned to the foot, its
+   bars each opening the validator (operator, 2026-09-30) */
+#mv-stage .mv-top{min-height:38px}
+#mv-stage .mv-top .mv-chip{margin-left:auto}
+#mv-stage .mv-top>em+.mv-tgo,#mv-stage .mv-top>em+.mv-ton{margin-left:auto}
+#mv-stage .sv-btn.go.mv-go.mv-tgo:not(#z):not(#y){height:38px;min-width:0;padding:0 18px;font-size:14px;flex:0 0 auto}
+#mv-stage .mv-top .mv-ton:not(#z){font-size:14px;margin-left:10px}
+#mv-stage .mv-set:not(#z):not(#y):not(#x){margin-top:auto}
+#mv-stage .mv-bars i{cursor:pointer}
+#mv-stage .mv-bars i:hover{filter:brightness(.82)}
 /* ════ STICKY HEADS (operator, 2026-09-30): a list's column titles stay on top as it scrolls, on the pane's own
    colour, so rows never show through them - Redelegate, Delegations, Outcome's moves, Stake's list, Picks ════ */
 #one #p-dele .wk-tbl2 thead th:not(#z):not(#y),#you .wk-tbl2 thead th:not(#z):not(#y),#one #p-dele #wk-mv .wk-moves thead th:not(#z):not(#y),
