@@ -423,9 +423,6 @@ fill:none;stroke:#9ed6f7;stroke-width:1.2;stroke-dasharray:5 4;animation:march .
 .iop{font-family:var(--mono);font-size:10.5px;color:var(--ink3)}
 .icard .vbadges{padding:0 28px}
 .inote{margin:12px 28px 0;font-size:12.5px;line-height:1.5;color:var(--ink2)}
-.ibtns{display:flex;gap:10px;padding:18px 28px 24px}
-.ibtns .wk-btn{flex:1 1 0;height:38px}
-.ibtns .wk-btn[hidden]{display:none}
 
 .alist{display:flex;flex-direction:column;gap:1px;background:var(--edge);
 border-top:1px solid var(--edge);border-bottom:1px solid var(--edge);margin-top:16px}
@@ -5838,7 +5835,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   html[data-sv="dashboard/self"]:not([data-pro]) #you #wk-mine .wk-t1 #rdbtn:not(#z),html[data-pro=stake] #you #wk-mine .wk-t1 #stbtn:not(#z),
   html[data-pro=unstake] #you #wk-mine .wk-t1 #unbtn:not(#z),html[data-pro=claim] #you #wk-mine .wk-t1 #clbtn:not(#z){background:var(--wcyan);border-color:var(--wcyan);color:var(--wc)}
   /* an action docked: the Redelegate list and its outcome step aside for the action's own parts */
-  html[data-pro] #wk-plan>.wk-ph>:not(h3){display:none!important}
+  html[data-pro] #wk-plan>.wk-ph>:not(h3):not(#prohdr){display:none!important}
   html[data-pro] #wk-plan>#dpicks{display:none}
   html[data-pro] #wk-mv>:not(.wk-ph):not(#proout){display:none!important}
   html[data-pro] #wk-mv #dmvn{display:none}
@@ -5864,6 +5861,86 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #one #proout .txlock:not(#z){display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;font:400 12.5px/1.45 var(--wsans);letter-spacing:0}
   #one #proout .txlock svg:not(#z){flex:0 0 auto;width:15px;height:15px;margin-top:2px}
   #one #proout .txlock:empty,#one #proout .txfee:empty,#one #proout .txstep:empty{display:none}
+}
+/* ════ PRO ACTIONS AS REDELEGATE (operator, 2026-09-30: "copy pixel fit redelegate"): the amount field in the title
+   row at Redelegate's place and size, the lists as Redelegate's table - a titles row, 32px rows on hairlines, the
+   name in the sans, figures in the mono - so switching tabs moves nothing ════ */
+#prohdr{display:none}
+@media(min-width:1100px){
+  html[data-pro] #one #prohdr:not(#z){display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto;margin:0;padding:0;border:0;background:none;box-shadow:none;width:auto;max-width:none}
+  #one #prohdr .sttop:not(#z),#one #prohdr .unamt:not(#z){display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto;margin:0;padding:0;border:0}
+  #one #prohdr .wk-field:not(#z):not(#y){flex:0 1 180px;min-width:0;max-width:180px;height:32px;margin:0;border:1px solid var(--wbd2);border-radius:10px;background:var(--wi);box-shadow:none}
+  #one #prohdr .wk-amt2:not(#z){font:500 13px var(--wmono);color:var(--wt)}
+  #one #prohdr .wk-max:not(#z){border-radius:7px;font:500 10.5px var(--wmono)}
+  #one #prohdr .unhint:not(#z),#one #prohdr .wk-seln:not(#z){flex:0 1 auto;min-width:0;margin:0;font:400 9px var(--wmono);letter-spacing:.1em;text-transform:uppercase;color:var(--ws);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #one #prohdr .unhint:empty,#one #prohdr .wk-seln:empty{display:none}
+  /* the lists start where Redelegate's does and read as its rows */
+  #one #prolist:not(#z){gap:0}
+  #one #prolist .unpick:not(#z){display:flex;flex-direction:column;gap:0;margin:0;padding:0;border:0;max-height:none}
+  #one #prolist .unhead{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;height:26px;padding:0 6px 0 38px;
+    border-bottom:1px solid var(--wbd);background:var(--wc);font:400 9px var(--wmono);letter-spacing:.1em;text-transform:uppercase;color:var(--wf)}
+  #one #prolist .unrow:not(#z):not(#y){display:flex;align-items:center;gap:9px;height:32px;min-height:32px;margin:0;padding:0 6px;border:0;border-bottom:1px solid var(--wbd);
+    border-radius:0;background:none;box-shadow:none;cursor:pointer}
+  #one #prolist .unrow.on:not(#z):not(#y){background:rgba(43,200,189,.07)}
+  #one #prolist .unrow b:not(#z){flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:500 13.5px var(--wsans);color:var(--wt)}
+  #one #prolist .unrow i:not(#z){margin-left:auto;font:500 12px var(--wmono);font-style:normal;color:var(--wt)}
+  #one #prolist .unrow i em{display:none}
+  #one #prolist .unrow input:not(#z){flex:0 0 auto;width:15px;height:15px;margin:0 4px 0 0}
+  #one #prolist .unrow .wk-lg:not(#z){width:16px;height:16px;margin:0}
+  #one #prolist .stlist:not(#z){margin:0;border:0;padding:0}
+  #one #prolist .stlist td:not(#z){height:32px}
+}
+/* the title, the field and the list sit at one place in every tab */
+@media(min-width:1100px){
+  #one #p-dele #wk-plan>.wk-ph h3:not(#z){min-width:114px}
+  #one #p-dele #wk-plan .wk-ph .wk-field:not(#z):not(#y){flex:0 0 150px;width:150px;max-width:150px}
+  #one #prolist:not(#z):not(#y){margin-top:10px}
+  /* Redelegate's Outcome: now → after and ATONE/year on one row; the 21 days as the note above the button */
+  #one #p-dele #wk-mv .wk-ans:not(#z):not(#y){grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
+  #one #p-dele #wk-mv .wk-ans .p.rate:not(#z):not(#y){grid-column:auto}
+  #one #p-dele #wk-mv .wk-ans .p.lock{display:none!important}
+  /* every note at Outcome's foot reads as Stake's: one small mono line in a light box */
+  #one #wk-mv .rdnote:not(#z),#one #proout .txlock:not(#z):not(#y){display:flex;align-items:center;gap:8px;margin:auto 0 12px;padding:9px 12px;border-radius:8px;
+    border:1px solid rgba(255,176,46,.28);background:rgba(255,176,46,.05);width:auto;max-width:none;align-self:stretch}
+  #one #wk-mv .rdnote span:not(#z),#one #proout .txlock span:not(#z){font:400 9px/1.45 var(--wmono);letter-spacing:.04em;color:var(--ws)}
+  #one #wk-mv .rdnote span b:not(#z),#one #proout .txlock span b:not(#z){font-weight:400;color:var(--wamber)}
+  #one #wk-mv .rdnote svg:not(#z),#one #proout .txlock svg:not(#z){width:12px;height:12px;margin:0;flex:0 0 auto}
+  #one #p-dele #wk-mv #dgo:not(#z):not(#y){margin-top:0}
+  #one #p-dele #wk-mv .wk-mvempty:not(#z){flex:1 1 auto}
+}
+#rdnote{display:none}
+@media(min-width:1100px){html[data-sv="dashboard/self"]:not([data-pro]) #one #rdnote:not(#z):not(#y){display:flex}}
+/* Outcome in every tab as Redelegate's: the breakdown takes the room and scrolls, the fee line, the note and the
+   button hold fixed places at the foot */
+@media(min-width:1100px){
+  #one #proout:not(#z):not(#y){overflow:hidden;gap:10px}
+  #one #proout .pro-brk:not(#z){flex:1 1 auto;min-height:0;overflow-y:auto;order:-1}
+  #one #proout .txfee:not(#z),#one #proout .txstep:not(#z){order:1;flex:0 0 auto}
+  #one #proout .txlock:not(#z):not(#y):not(#x){order:2;flex:0 0 auto;margin:0 0 2px}
+  #one #proout .txbtns:not(#z):not(#y){order:3;flex:0 0 auto;margin:0}
+  #one #prolist .stlist tbody tr{cursor:pointer}
+  #one #prolist .stlist tbody tr.on td:not(#z){background:rgba(43,200,189,.07)}
+}
+/* the docked lists' names and boxes are Redelegate's: 12px names, square 15px boxes with the tick */
+@media(min-width:1100px){
+  #one #prolist .unrow b:not(#z):not(#y),#one #prolist .stlist td.nm:not(#z) span,#one #prolist .stlist td.nm:not(#z){font:500 12px var(--wsans)}
+  #one #prolist .unrow input:not(#z):not(#y){appearance:none;-webkit-appearance:none;position:relative;flex:0 0 auto;width:15px;height:15px;margin:0 4px 0 0;padding:0;
+    border:1px solid var(--wbd2);border-radius:4px;background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:none;cursor:pointer}
+  #one #prolist .unrow input:checked:not(#z):not(#y){background:linear-gradient(180deg,#3cf07a,#22c65c);border-color:#2ee06a}
+  #one #prolist .unrow input:checked::after{content:"";position:absolute;left:4.5px;top:1.5px;width:4px;height:8px;border:solid #062012;border-width:0 2px 2px 0;transform:rotate(45deg)}
+  #one #prolist .unrow input::before{display:none}
+}
+/* Unstake's status column: Active, Inactive or Jailed, between the name and the amount */
+.unrow .vst{display:none}
+@media(min-width:1100px){
+  #one #prolist .unhead .h-st{margin-left:auto;width:84px;text-align:left}
+  #one #prolist .unhead .h-x{width:90px;text-align:right}
+  #one #prolist .unrow .vst{display:inline-block;flex:0 0 84px;text-decoration:none;font:500 9px var(--wmono);letter-spacing:.08em;text-transform:uppercase}
+  #one #prolist .unrow .vst.a{color:var(--wcyan)}
+  #one #prolist .unrow .vst.o{color:var(--wamber)}
+  #one #prolist .unrow .vst.j{color:var(--wburn,#ff6a3d)}
+  #one #prolist .unrow i:not(#z):not(#y){flex:0 0 90px;margin-left:0;text-align:right}
 }
 /* ════ STICKY HEADS (operator, 2026-09-30): a list's column titles stay on top as it scrolls, on the pane's own
    colour, so rows never show through them - Redelegate, Delegations, Outcome's moves, Stake's list, Picks ════ */
@@ -6156,7 +6233,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
           </div>
         </section>
         <section class=wk-pane id=wk-plan>
-          <header class="wk-ph wk-t2"><h3>Redelegate</h3><div class=wk-field><input class=wk-amt2 id=amt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to move"><button class=wk-max id=amtmax type=button title="Everything that can move">max <b id=ds-mov>&mdash;</b></button></div><div class=wk-pre id=amtseg hidden><button data-p=100 type=button aria-pressed=true>All</button></div><span class=wk-seln id=dseln aria-live=polite></span>
+          <header class="wk-ph wk-t2"><h3>Redelegate</h3><div class=pro-hdr id=prohdr></div><div class=wk-field><input class=wk-amt2 id=amt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to move"><button class=wk-max id=amtmax type=button title="Everything that can move">max <b id=ds-mov>&mdash;</b></button></div><div class=wk-pre id=amtseg hidden><button data-p=100 type=button aria-pressed=true>All</button></div><span class=wk-seln id=dseln aria-live=polite></span>
             <button class=wk-ib id=wrefresh type=button title="Read the chain again now" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6M20.5 3.5v5h-5"/></svg></button>
             <span class=wk-ago id=dago title="the numbers follow every block tick; refresh re-reads your position">&mdash;</span>
             <span class=wk-lockn id=dlockn hidden></span></header>
@@ -6168,6 +6245,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
           <div class=wk-ans id=dans></div>
           <div class=wk-moves id=dstrat></div>
           <div class=wk-mvempty id=dmvempty>Select validators and enter a stake</div>
+          <div class="txlock rdnote" id=rdnote><svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Redelegated stake cannot be redelegated again for <b>21 days</b></span></div>
           <button class="wk-btn wk-go" id=dgo type=button disabled>Redelegate</button>
           <div class=pro-dock id=proout hidden><div class=pro-brk id=probrk></div></div>
         </section>
@@ -6465,7 +6543,6 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
     <div class=vstat><span class=vk>ATONE staked</span><span class=vv id=istake>&mdash;</span></div>
     <div class=vstat><span class=vk>commission</span><span class=vv id=icomm>&mdash;</span></div>
   </div>
-  <div class=ibtns><button class="wk-btn wk-go" id=igo type=button title="Move this stake to validators that pay">Redelegate</button><button class=wk-btn id=iun type=button title="Unstake from this validator (21 days)">Unstake</button></div>
 </div></div>
 
 <div class=pop id=apop><div class="card vcard acard">

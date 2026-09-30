@@ -76,9 +76,10 @@ window.__POP = POP;
    and put back, so every handler, state and fee estimate stays the card's own. The phone keeps the cards. */
 var DOCK = null;
 var DOCK_PARTS = {
-  stpop: { mode: "stake",   title: "Stake",         list: [".sttop", "#stlist"],  out: ["#stsum", "#stlock", "#stfee", "#ststep", ".txbtns"] },
-  unpop: { mode: "unstake", title: "Unstake",       list: [".unamt", "#unpick"],  out: ["#unsum", "#unlock", "#unfee", "#unstep", ".txbtns"] },
-  clpop: { mode: "claim",   title: "Claim rewards", list: ["#clpick"],            out: ["#clsum", "#clfee", "#clstep", ".txbtns"] }
+  /* hdr: into the pane's title row, where Redelegate keeps its amount field; list: the pane's body; out: Outcome */
+  stpop: { mode: "stake",   title: "Stake",         hdr: [".sttop"], list: ["#stlist"],  out: ["#stsum", "#stlock", "#stfee", "#ststep", ".txbtns"] },
+  unpop: { mode: "unstake", title: "Unstake",       hdr: [".unamt"], list: ["#unpick"],  out: ["#unsum", "#unlock", "#unfee", "#unstep", ".txbtns"] },
+  clpop: { mode: "claim",   title: "Claim rewards", hdr: [],         list: ["#clpick"],  out: ["#clsum", "#clfee", "#clstep", ".txbtns"] }
 };
 function proWide(){ return document.documentElement.getAttribute("data-sv") === "dashboard/self" && matchMedia("(min-width:1100px)").matches; }
 function undock(){
@@ -92,18 +93,23 @@ function undock(){
   if(p.__onclose) p.__onclose();
 }
 function dock(pop){
-  var P = DOCK_PARTS[pop.id], card = pop.querySelector(".card"), L = document.getElementById("prolist"), O = document.getElementById("proout");
+  var P = DOCK_PARTS[pop.id], card = pop.querySelector(".card"), L = document.getElementById("prolist"), O = document.getElementById("proout"), H = document.getElementById("prohdr");
   if(!P || !card || !L || !O){ POP.open(pop); return; }
   undock();
   var moved = [];
   function mv(sel, to){ var el = card.querySelector(sel); if(!el) return; moved.push({ el: el, parent: el.parentNode, next: el.nextSibling }); to.appendChild(el); }
+  if(H) P.hdr.forEach(function(s){ mv(s, H); });
   P.list.forEach(function(s){ mv(s, L); }); P.out.forEach(function(s){ mv(s, O); });
+
   /* the card's own classes ride along, so its parts keep the card's styling */
   L.className = O.className = "pro-dock " + card.className.replace(/\bcard\b/, "");
+  if(H) H.className = "pro-hdr " + card.className.replace(/\bcard\b/, "");
   L.hidden = O.hidden = false;
   var h = document.querySelector("#wk-plan>.wk-ph h3"); if(h) h.textContent = P.title;
   document.documentElement.setAttribute("data-pro", P.mode);
   DOCK = { pop: pop, moved: moved };
+  /* the list is drawn again now that it is docked: a docked list carries column titles as Redelegate's does */
+  if(pop.id === "unpop" && window.__unRows) window.__unRows(); if(pop.id === "clpop" && window.__clDraw) window.__clDraw();
   proTabs(); if(window.__proBrk) window.__proBrk();
 }
 window.__openCard = function(pop){ if(!pop) return; if(proWide()) dock(pop); else POP.open(pop); };
@@ -1026,18 +1032,10 @@ rememberGridH();
     E("imine").textContent = row ? f(row.x / 1e6) : "\u2014";
     E("istake").textContent = x ? f(x.t / 1e6) : "\u2014";
     E("icomm").textContent = x ? (x.c * 100).toFixed(0) + "%" : "\u2014";
-    var go = E("igo"), un = E("iun"); if(go) go.hidden = !row; if(un){ un.hidden = !row; un.dataset.v = id; }
+    /* no Redelegate or Unstake here (operator, 2026-09-30): an inactive validator's card only says what it is */
     POP.open(E("ipop"));
     return true;
   }
-  /* Redelegate: this validator's stake, planned to the best places, straight to the signing card (over Pro, where
-     the plan shows); stake still in its cooldown has nothing to sign, so it only opens Pro */
-  var igo = E("igo"); if(igo) igo.addEventListener("click", function(){
-    var id = E("iun") && E("iun").dataset.v;
-    POP.closeAll(); if(window.__shellGo) window.__shellGo("dashboard/self");
-    setTimeout(function(){ if(id && window.__optFrom && window.__optFrom(id) && window.__goSign) window.__goSign(); }, 250);
-  });
-  var iun = E("iun"); if(iun) iun.addEventListener("click", function(){ if(window.__unstakeFrom) window.__unstakeFrom(iun.dataset.v); });
   function vshow(i){
     var v = (VALS[i] && VDBY[VALS[i][3]]) || VD[i]; if(!v) return;
     var liveT = VALS[i] ? VALS[i][1] : v.t;
@@ -2185,6 +2183,8 @@ rememberGridH();
       '<span class="p gain"><i>ATONE/year</i><b' + (gain > 0.5 ? '' : gain < -0.5 ? ' class=neg' : ' class=dim') + '>' + (gain > 0.5 ? '+' + one(gain) : gain < -0.5 ? '\u2212' + one(-gain) : '\u2014') + '</b></span>' +
       /* the chain's own rule: what moves cannot move again for 21 days */
       '<span class="p lock" title="' + (MSGS.length ? 'until ' + window.__day(Date.now() + 21 * 86400000) : 'redelegated stake cannot be redelegated again for 21 days') + '"><i><svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>redelegate</i><b>21 days</b></span>';
+    /* the same rule as a note at Outcome's foot, above the button (Pro on a wide screen) */
+    var rn = E("rdnote"); if(rn){ var sp = rn.querySelector("span"); if(sp) sp.innerHTML = 'Redelegated stake cannot be redelegated again for <b>21 days</b>, until <b>' + (window.__day ? window.__day(Date.now() + 21 * 86400000) : new Date(Date.now() + 21 * 86400000).toLocaleDateString("en-GB", { day: "numeric", month: "short" })) + '</b>'; }
     /* the button lives in the stake row; here it only learns whether it can be pressed */
     var go = E("dgo"); if(go) go.disabled = !(pos && window.__WALLET && MSGS.length);
   }
@@ -2399,23 +2399,36 @@ rememberGridH();
   /* ── unstake: one validator, an amount up to what sits there, one MsgUndelegate ──
      Undelegating is allowed even while a delegation is in its redelegation cooldown;
      the ATONE then unbonds for 21 days, earning nothing, before it is liquid. */
-  var unpop = E("unpop"), UNSEL = null;
+  var unpop = E("unpop"), UNSEL = {};
+  /* Unstake takes several validators (operator, 2026-09-30): the amount splits across the selected ones in
+     proportion to what each holds, so each gives the same share of its stake */
+  function unSelRows(){ var pos = window.__POS; if(!pos) return []; return pos.rows.filter(function(r){ return UNSEL[r.id] && r.x >= 1e5; }); }
   function unRows(){
     var pos = window.__POS, el = E("unpick"); if(!el || !pos) return;
-    var rows = pos.rows.slice().sort(function(a, b){ return b.x - a.x; });
-    if(!UNSEL || (UNSEL !== "*" && !rows.some(function(r){ return r.id === UNSEL; }))) UNSEL = rows.length ? rows[0].id : null;
-    /* the first row is everything at once: the whole stake, across every validator */
-    var all = rows.length > 1 ? '<label class="unrow all' + (UNSEL === "*" ? ' on' : '') + '"><input type=radio name=unv value="*"' + (UNSEL === "*" ? ' checked' : '') + '>' +
+    /* dust a redelegation leaves behind (under 0.1 ATONE) is not a position to unstake from */
+    var rows = pos.rows.filter(function(r){ return r.x >= 1e5; }).sort(function(a, b){ return b.x - a.x; });
+    Object.keys(UNSEL).forEach(function(id){ if(!rows.some(function(r){ return r.id === id; })) delete UNSEL[id]; });
+    if(!Object.keys(UNSEL).length && rows.length) UNSEL[rows[0].id] = 1;
+    var n = 0; rows.forEach(function(r){ if(UNSEL[r.id]) n++; });
+    var head = DOCK && DOCK.pop === unpop ? '<div class=unhead><span>Validator</span><span class=h-st>Status</span><span class=h-x>ATONE</span></div>' : '';
+    /* each validator's standing, so stake sitting idle on an inactive or jailed one is plain to see */
+    var status = function(r){ var ia = (window.__INACT || {})[r.id], out = r.inactive || !!ia || !(window.__VDBY || {})[r.id];
+      return out ? (ia && ia.jailed ? '<u class="vst j">Jailed</u>' : '<u class="vst o">Inactive</u>') : '<u class="vst a">Active</u>'; };
+    /* the first row selects every validator at once */
+    var all = rows.length > 1 ? '<label class="unrow all' + (n === rows.length ? ' on' : '') + '"><input type=checkbox value="*"' + (n === rows.length ? ' checked' : '') + '>' +
               '<span class="wk-lg wk-lgx">\u2211</span><b>All validators</b><i>' + fmt(pos.total) + '<em>ATONE</em></i></label>' : '';
-    el.innerHTML = all + rows.map(function(r){
-      return '<label class="unrow' + (r.id === UNSEL ? ' on' : '') + '"><input type=radio name=unv value="' + att(r.id) + '"' + (r.id === UNSEL ? ' checked' : '') + '>' +
-             logo(r.id, r.m) + '<b>' + att(r.m) + '</b><i>' + fmt(r.x) + '<em>ATONE</em></i></label>'; }).join("");
+    el.innerHTML = head + all + rows.map(function(r){ var on = !!UNSEL[r.id];
+      return '<label class="unrow' + (on ? ' on' : '') + '"><input type=checkbox value="' + att(r.id) + '"' + (on ? ' checked' : '') + '>' +
+             logo(r.id, r.m) + '<b>' + att(r.m) + '</b>' + status(r) + '<i>' + fmt(r.x) + '<em>ATONE</em></i></label>'; }).join("");
     Array.prototype.forEach.call(el.querySelectorAll("input"), function(c){
-      c.addEventListener("change", function(){ UNSEL = c.value; Array.prototype.forEach.call(el.querySelectorAll(".unrow"), function(l){ l.classList.toggle("on", l.querySelector("input").value === UNSEL); }); unState(); }); });
+      c.addEventListener("change", function(){
+        if(c.value === "*") rows.forEach(function(r){ if(c.checked) UNSEL[r.id] = 1; else delete UNSEL[r.id]; });
+        else if(c.checked) UNSEL[c.value] = 1; else delete UNSEL[c.value];
+        unRows(); unState(); }); });
   }
-  function unRow(){ var pos = window.__POS; if(!pos) return null;
-    if(UNSEL === "*") return { id: "*", m: "all validators", x: pos.total };
-    for(var i = 0; i < pos.rows.length; i++) if(pos.rows[i].id === UNSEL) return pos.rows[i]; return null; }
+  window.__unRows = function(){ unRows(); };
+  function unRow(){ var rs = unSelRows(); if(!rs.length) return null; if(rs.length === 1) return rs[0];
+    var x = 0; rs.forEach(function(r){ x += r.x; }); return { id: "*", m: rs.length + " validators", x: x }; }
   function unAmount(){ var a = E("unamt"), n = parseFloat((a.value || "").replace(/[^0-9.]/g, "")); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
   function unState(){
     var r = unRow(), u = unAmount(), mx = E("unmaxv"), hint = E("unhint"), fld = E("unamt") && E("unamt").closest(".unfield"), go = E("unsign"), sm = E("unsum"), lk = E("unlock");
@@ -2424,7 +2437,7 @@ rememberGridH();
     if(fld) fld.classList.toggle("bad", !!over);
     if(hint){ hint.className = "unhint" + (over ? " bad" : ""); hint.textContent = over ? "" : (r ? "of " + exact(r.x) + " on " + r.m : ""); }   /* over what sits there: the box turns red, no words */
     if(go) go.disabled = !ok || !window.__WALLET;
-    if(sm) sm.innerHTML = ok ? fmt(u) + " ATONE<br>from " + (UNSEL === "*" ? unMsgs().length + " validators" : att(r.m)) : "";
+    if(sm) sm.innerHTML = ok ? fmt(u) + " ATONE<br>from " + att(r.m) : "";
     var until = new Date(Date.now() + 21 * 86400000);
 
     if(lk) lk.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
@@ -2434,20 +2447,15 @@ rememberGridH();
     proBrk();
   }
   function unMsgs(){
-    var r = unRow(), u = unAmount(), VD = window.__VDBY || {}, pos = window.__POS;
+    var r = unRow(), u = unAmount(), VD = window.__VDBY || {};
     if(!r || !(u > 0) || u > r.x) return [];
-    if(UNSEL === "*"){
-      /* everything: one message per validator, the largest positions first, until the
-         amount is covered - the whole stake when the field holds the total */
-      var need = u, out = [];
-      pos.rows.slice().sort(function(a, b){ return b.x - a.x; }).forEach(function(row){
-        if(need <= 0) return; var d = VD[row.id], op = (d && d.op) || row.op; if(!op) return;
-        var t = Math.min(row.x, need); need -= t;
-        out.push({ type: "cosmos-sdk/MsgUndelegate", value: { delegator_address: window.__ADDR, validator_address: op, amount: { denom: "uatone", amount: String(Math.floor(t)) } } }); });
-      return out;
-    }
-    var d = VD[UNSEL], op = (d && d.op) || r.op; if(!op) return [];
-    return [{ type: "cosmos-sdk/MsgUndelegate", value: { delegator_address: window.__ADDR, validator_address: op, amount: { denom: "uatone", amount: String(u) } } }];
+    var rs = unSelRows().sort(function(a, b){ return b.x - a.x; }), out = [], left = u;
+    rs.forEach(function(row, i){
+      var d = VD[row.id], op = (d && d.op) || row.op; if(!op) return;
+      var t = i === rs.length - 1 ? left : Math.floor(u * row.x / r.x); t = Math.min(t, row.x); left -= t;
+      if(t >= 1) out.push({ type: "cosmos-sdk/MsgUndelegate", value: { delegator_address: window.__ADDR, validator_address: op, amount: { denom: "uatone", amount: String(Math.floor(t)) } } });
+    });
+    return out;
   }
   window.__unMsgs = unMsgs;
   var unbtn = E("unbtn");
@@ -2459,7 +2467,7 @@ rememberGridH();
   });
   window.__unstakeFrom = function(id){
     if(!unpop || !window.__POS) return;
-    UNSEL = id; var a = E("unamt"); if(a) a.value = "";
+    UNSEL = {}; UNSEL[id] = 1; var a = E("unamt"); if(a) a.value = "";
     var go = E("unsign"); if(go){ go.disabled = true; go.textContent = "Unstake"; }
     unRows(); unState(); window.__openCard(unpop); if(a) a.focus();
   };
@@ -2502,7 +2510,8 @@ rememberGridH();
     var n = 0, tot = 0, all = 0; rows.forEach(function(r){ all += r.x; if(CLSEL[r.id]){ n++; tot += r.x; } });
     var every = rows.length > 1 ? '<label class="unrow all' + (n === rows.length ? ' on' : '') + '"><input type=checkbox value="*"' + (n === rows.length ? ' checked' : '') + '>' +
       '<span class="wk-lg wk-lgx">\u2211</span><b>All validators</b><i>' + exact(all, 6) + '<em>ATONE</em></i></label>' : '';
-    el.innerHTML = every + rows.map(function(r){ var on = !!CLSEL[r.id];
+    var head = DOCK && DOCK.pop === clpop ? '<div class=unhead><span>Validator</span><span>Rewards, ATONE</span></div>' : '';
+    el.innerHTML = head + every + rows.map(function(r){ var on = !!CLSEL[r.id];
       return '<label class="unrow' + (on ? ' on' : '') + '"><input type=checkbox value="' + att(r.id) + '"' + (on ? ' checked' : '') + '>' +
              logo(r.id, r.m) + '<b>' + att(r.m) + '</b><i>' + exact(r.x, 6) + '<em>ATONE</em></i></label>'; }).join("");
     Array.prototype.forEach.call(el.querySelectorAll("input"), function(c){
@@ -2516,6 +2525,7 @@ rememberGridH();
     feeSoon("cl", E("clfee"), n ? clMsgs : null);
     proBrk();
   }
+  window.__clDraw = clDraw;
   window.__claim = function(){
     if(!clpop || !window.__POS) return;
     var rows = clRows(); if(!rows.length) return;
@@ -2579,7 +2589,9 @@ rememberGridH();
     var top = el.scrollTop; el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
     ijWire(el, stRows);
     Array.prototype.forEach.call(el.querySelectorAll("tbody input"), function(c){
-      c.addEventListener("change", function(){ if(c.checked) STSEL[c.dataset.id] = 1; else delete STSEL[c.dataset.id]; stRows(); stState(); }); });
+      c.addEventListener("change", function(){ if(c.checked) STSEL[c.dataset.id] = 1; else delete STSEL[c.dataset.id]; stRows(); stState(); });
+      /* the whole row selects, as a tick on the box does */
+      var tr = c.closest("tr"); if(tr) tr.addEventListener("click", function(ev){ if(ev.target === c || (ev.target.closest && ev.target.closest("a"))) return; c.checked = !c.checked; c.dispatchEvent(new Event("change")); }); });
   }
   function stMsgs(){
     var P = stPlan(), VD = window.__VDBY || {}, out = [];

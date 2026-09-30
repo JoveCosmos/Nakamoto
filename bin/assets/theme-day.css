@@ -1008,6 +1008,27 @@
     html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go:not(#z):not(#y),html[data-theme=light]:not([data-mono]) #one #p-dele #wk-mv #dgo:not(#z):not(#y){box-shadow:none}
     html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go:disabled:not(#z):not(#y),html[data-theme=light]:not([data-mono]) #one #p-dele #wk-mv #dgo:disabled:not(#z):not(#y){background:transparent}
   }
+  @media(min-width:1100px){
+    html[data-theme=light]:not([data-mono])[data-pro] #one #prohdr:not(#z){background:none;box-shadow:none}
+    html[data-theme=light]:not([data-mono]) #one #prohdr .wk-field:not(#z):not(#y){box-shadow:none}
+    html[data-theme=light]:not([data-mono]) #one #prolist .unrow:not(#z):not(#y){background:none;box-shadow:none}
+    html[data-theme=light]:not([data-mono]) #one #prolist .unrow.on:not(#z):not(#y){background:var(--accent-soft)}
+  }
+  @media(min-width:1100px){
+    html[data-theme=light]:not([data-mono]) #one #wk-mv .rdnote:not(#z),html[data-theme=light]:not([data-mono]) #one #proout .txlock:not(#z):not(#y){border-color:var(--warn-bg);background:var(--warn-bg)}
+  }
+  @media(min-width:1100px){
+    html[data-theme=light]:not([data-mono]) #one #prolist .stlist tbody tr.on td:not(#z){background:var(--accent-soft)}
+  }
+  @media(min-width:1100px){
+    html[data-theme=light]:not([data-mono]) #one #prolist .unrow input:not(#z):not(#y){background:var(--surface-2);box-shadow:none}
+    html[data-theme=light]:not([data-mono]) #one #prolist .unrow input:checked:not(#z):not(#y){background:var(--accent);border-color:var(--accent)}
+    html[data-theme=light]:not([data-mono]) #one #prolist .unrow input:checked::after{border-color:var(--surface)}
+  }
+  @media(min-width:1100px){
+    html[data-theme=light]:not([data-mono]) #one #prolist .unrow .vst{text-decoration:none}
+    html[data-theme=light]:not([data-mono]) #one #prolist .unrow .vst.j{color:var(--wburn,var(--danger))}
+  }
   html[data-theme=light]:not([data-mono]) #one #p-pays .ptab thead th:not(#z):not(#y){background:var(--card,var(--surface))}
   @media(min-width:1100px){
     html[data-theme=light]:not([data-mono]) .colh{border-color:var(--wbd2,var(--line-strong));background:var(--wc,var(--surface-2));color:var(--wf,var(--muted))}
@@ -1431,4 +1452,10 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #rspop .rsfoot #rsgo:not(#z):not(.wk-danger){background:var(--accent);border-color:var(--accent);color:#fff}
   html[data-theme=light]:not([data-mono]) #atpop .atfoot #atrevoke:not(#z),html[data-theme=light]:not([data-mono]) #rspop .rsfoot #rsgo.wk-danger:not(#z){background:transparent;border-color:var(--danger);color:var(--danger)}
   html[data-theme=light]:not([data-mono]) #mv-stage .sv-btn.go.mv-go:not(#z){background:var(--accent);border-color:var(--accent);color:#fff}
+  /* Outcome's notes in day: the light tint Stake's note has */
+  html[data-theme=light]:not([data-mono]) #one #wk-mv .rdnote:not(#z),html[data-theme=light]:not([data-mono]) #one #proout .txlock:not(#z):not(#y):not(#x){background:var(--accent-soft);border-color:var(--line)}
+  /* the docked Unstake/Claim boxes read as Redelegate's in day */
+  html[data-theme=light]:not([data-mono]) #one #prolist .unrow input:not(#z):not(#y):not(#x){background:var(--surface-2);border-color:var(--line-strong)}
+  html[data-theme=light]:not([data-mono]) #one #prolist .unrow input:checked:not(#z):not(#y):not(#x){background:var(--accent);border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #one #prolist .unrow input:checked::after{border-color:var(--surface)}
 
