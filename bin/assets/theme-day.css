@@ -1005,7 +1005,10 @@
     html[data-theme=light]:not([data-mono]) #you .wk-tbl2 thead:not(#z),html[data-theme=light]:not([data-mono]) #you .wk-tbl2 thead tr:not(#z){background:none;box-shadow:none}
     html[data-theme=light]:not([data-mono]) #one .pro-dock:not(#z){background:none;box-shadow:none}
     html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go:disabled:not(#z){background:transparent}
+    html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go:not(#z):not(#y),html[data-theme=light]:not([data-mono]) #one #p-dele #wk-mv #dgo:not(#z):not(#y){box-shadow:none}
+    html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go:disabled:not(#z):not(#y),html[data-theme=light]:not([data-mono]) #one #p-dele #wk-mv #dgo:disabled:not(#z):not(#y){background:transparent}
   }
+  html[data-theme=light]:not([data-mono]) #one #p-pays .ptab thead th:not(#z):not(#y){background:var(--card,var(--surface))}
   @media(min-width:1100px){
     html[data-theme=light]:not([data-mono]) .colh{border-color:var(--wbd2,var(--line-strong));background:var(--wc,var(--surface-2));color:var(--wf,var(--muted))}
     html[data-theme=light]:not([data-mono]) .colh svg{fill:none;stroke:currentColor}

@@ -5853,13 +5853,24 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #one #proout .txbtns .wk-btn.wk-go:not(#z){flex:1 1 auto;height:46px;border-radius:12px;border:1px solid var(--wcyan);background:var(--wcyan);color:var(--wc);
     font:600 15px var(--wsans);letter-spacing:0;text-transform:none}
   #one #proout .txbtns .wk-btn.wk-go:disabled:not(#z){border-color:var(--wbd2);background:transparent;color:var(--wf)}
-  #one #proout .txbtns #uncancel{display:none}
+  #one #proout .txbtns #uncancel,#one #proout .txbtns .wk-bell{display:none!important}
+  /* every action's button is Redelegate's: full width, the same height, radius, type and fill */
+  #one #proout .txbtns .wk-btn.wk-go:not(#z):not(#y),#one #p-dele #wk-mv #dgo:not(#z):not(#y){width:100%;flex:1 1 auto;height:46px;margin:0;padding:0 20px;border-radius:12px;
+    border:1px solid var(--wcyan);background:var(--wcyan);color:var(--wc);font:600 15px var(--wsans);letter-spacing:0;text-transform:none;box-shadow:none}
+  #one #proout .txbtns .wk-btn.wk-go:disabled:not(#z):not(#y),#one #p-dele #wk-mv #dgo:disabled:not(#z):not(#y){border-color:var(--wbd2);background:transparent;color:var(--wf)}
+  #one #p-dele #wk-mv #dgo:not(#z):not(#y){flex:0 0 auto;margin-top:auto}
   /* the card's lists were sized for a card: here they take the pane's height */
   #one #prolist .unpick:not(#z),#one #prolist .stlist:not(#z){flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto}
   #one #proout .txlock:not(#z){display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;font:400 12.5px/1.45 var(--wsans);letter-spacing:0}
   #one #proout .txlock svg:not(#z){flex:0 0 auto;width:15px;height:15px;margin-top:2px}
   #one #proout .txlock:empty,#one #proout .txfee:empty,#one #proout .txstep:empty{display:none}
 }
+/* ════ STICKY HEADS (operator, 2026-09-30): a list's column titles stay on top as it scrolls, on the pane's own
+   colour, so rows never show through them - Redelegate, Delegations, Outcome's moves, Stake's list, Picks ════ */
+#one #p-dele .wk-tbl2 thead th:not(#z):not(#y),#you .wk-tbl2 thead th:not(#z):not(#y),#one #p-dele #wk-mv .wk-moves thead th:not(#z):not(#y),
+#one #prolist .stlist thead th:not(#z):not(#y),#one .pro-brk-t thead th:not(#z):not(#y){position:sticky;top:0;z-index:2;background:var(--wc)}
+#one #p-pays .ptab thead th:not(#z):not(#y){position:sticky;top:0;z-index:2;background:var(--card,#09090f)}
+#one #prolist .stlist thead th:not(#z){letter-spacing:.04em;padding-left:3px;padding-right:3px}
 /* ════ FOLDING THE SIDES (operator, 2026-09-30): the wallet column and the paths rail each fold on a click, for
    the room governance and Pro need; both are open on every load. The wallet column folds away (the header keeps the
    wallet), the rail folds to its icons. The handles sit in the gutters, halfway down. ════ */
