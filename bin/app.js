@@ -2993,7 +2993,7 @@ rememberGridH();
      validator not signing now (under UP_MIN) or tombstoned is passed over; at most 20 moves (move less rather
      than cut); nothing while any of the wallet's stake is cooling down. Answers null or
      { now, after, gain, moves, msgs:[{from,to,amt}] }. */
-  var BOTTOM = 34, MAXMOVES = 20, UP_MIN = 95;
+  var BOTTOM = 34, EDGE = 5, MAXMOVES = 20, UP_MIN = 95;   /* EDGE: the last 5 are left out, newcomers at the edge of the set */
   window.__planRank = function(pos){
     if(!pos || !pos.rows.length || !(pos.total > 0)) return null;
     if(pos.rows.some(function(r){ return r.locked > 0; })) return null;
@@ -3017,7 +3017,7 @@ rememberGridH();
       used[k] = (used[k] || 0) + (rr.entries || []).length; });
     function movesFor(amount){
       var add = [], left = amount;
-      for(var j = n - 1; j > n - 1 - BOTTOM && j >= 0; j--){
+      for(var j = n - 1 - EDGE; j > n - 1 - BOTTOM && j >= 0; j--){
         if(left < 1e6) break;
         if(!ok(V[j])) continue;
         var room = j > 0 ? stake(j - 1) - stake(j) : left, x = Math.floor(Math.min(left, room));

@@ -115,6 +115,19 @@ def model():
 
 def rate_after(m, t, c, x): return (1 - c) * (m[0] + m[1] / (t + x))
 
+def live_vals(stats):
+    """the active set as the chain has it right now - stakes, commission, who is in - with the collector's record of
+    each validator (uptime, jailings) where it has one. A validator the collector does not know yet (it entered the
+    set since the last collect) is marked unknown and is no destination until it is."""
+    out = {}
+    for v in get("/cosmos/staking/v1beta1/validators?status=BOND_STATUS_BONDED&pagination.limit=300").get("validators", []):
+        op = v["operator_address"]; st = stats.get(op) or {}
+        out[op] = {"op": op, "m": v["description"]["moniker"], "t": float(v["tokens"]),
+                   "c": float(v["commission"]["commission_rates"]["rate"]), "jail": st.get("jail") or 0,
+                   "tomb": bool(st.get("tomb")), "d90": st.get("d90"), "up": st.get("up"), "rank": None, "known": op in stats}
+    if len(out) < 50: raise ValueError("only %d bonded validators read" % len(out))
+    return out
+
 # ── strategies: the word the page wrote into the grant's memo ───────────────
 PRESETS = {
     "passive":    {"every": 7 * 86400, "min_apr": 0.015, "min_atone": 5.0, "dests": 2, "d90": 99, "restake_every": 7 * 86400},
@@ -314,20 +327,22 @@ def pairs_used(reds):
     return u
 
 # ── the plan: the operator's rule (2026-09-29) ────────────────────────────
-# The smallest validator first: it takes as much as it can without passing the validator ranked just above
+# The smallest validator first (leaving out the last EDGE, the edge of the set): it takes as much as it can without passing the validator ranked just above
 # it (so its rank never changes, and it stays the best payer); what is left goes to the next one up, same
 # check; and so on, at most BOTTOM validators (1 to 34, as the amount needs). A source gives only what keeps
 # it at or above the validator ranked just under it. A validator not signing now (under UP_MIN of the recent
 # window) or tombstoned is passed over. Nothing is offered while any of the delegator's stake cools down,
 # so the offer comes back every 21 days, when the last move's cooldown clears.
 BOTTOM = int(os.environ.get("KEEPER_BOTTOM", "34"))
+EDGE = int(os.environ.get("KEEPER_EDGE", "5"))      # the last 5 are left out: newcomers at the edge of the set (29 used)
 UP_MIN = float(os.environ.get("KEEPER_UP_MIN", "95"))
 
 def fill(ranked, stake, amount, ok):
     """the rule's pour: from the smallest up, each to the stake of the validator just above it; answers
     {op: added}. ranked is largest first; stake(op) the stake as it stands; ok(v) whether v may take any"""
     n = len(ranked); add = {}; left = amount
-    for i in range(n - 1, max(-1, n - 1 - BOTTOM), -1):
+    # from rank n-EDGE (95 of 100) up to rank n-BOTTOM+1 (67): the last EDGE are left out
+    for i in range(n - 1 - EDGE, max(-1, n - 1 - BOTTOM), -1):
         if left < 1_000_000: break
         v = ranked[i]
         if not ok(v): continue
@@ -364,7 +379,7 @@ def plan(g, rows, reds, vals, m, P=None, room=None):
     gone = {x["op"]: x["give"] for x in src}          # the cautious bound: every source counted as gone
     def stake(op): return vals[op]["t"] - gone.get(op, 0)
     def ok(v): return ((g["allow"] is None or v["op"] in g["allow"]) and v["op"] not in g["deny"] and not v["tomb"]
-                       and (v.get("up") is None or v["up"] >= UP_MIN))
+                       and v.get("known", True) and (v.get("up") is None or v["up"] >= UP_MIN))
     used = pairs_used(reds)
     def moves_for(amount):
         add = fill(ranked, stake, amount, ok)
@@ -520,7 +535,21 @@ def once(c, only=None, live=None, force=False):
     restricts it; live overrides KEEPER_DRY for this tick; force plans now."""
     dry = DRY if live is None else (not live)
     vals, m, eta = model()
+    # the set as the chain has it now (not the 15-minute collect): anything already executed is simply there
+    try: vals = live_vals(vals)
+    except Exception as e: log("live set unreadable, using the collector's: %s" % e)
+    # first come, first served (operator, 2026-09-29): grants are planned in the order they were made, and each
+    # plan that stands (waiting for an operator, approved, or carried out this tick) is counted as placed before
+    # the next grant is planned - the first grantee gets the top strategy, the next one the next best
+    work = {op: dict(v) for op, v in vals.items()}
+    def claim(moves):
+        for mv in moves or []:
+            amt = mv.get("uatone", mv.get("amount", 0))
+            if mv["src"] in work: work[mv["src"]]["t"] -= amt
+            if mv["dst"] in work: work[mv["dst"]]["t"] += amt
+    tick0 = int(time.time())
     gs = [g for g in grants() if not only or g["granter"] == only]; acted = 0
+    gs.sort(key=lambda g: granted_at(g["granter"], c))
     try: rgs = restake_grants()
     except Exception as e: rgs = {}; log("restake grants unreadable: %s" % e)
     adm = admin()
@@ -543,8 +572,8 @@ def once(c, only=None, live=None, force=False):
             if gr in adm["paused"]: due = False
             p = None
             if due:
-                rows, reds = position(gr, vals)
-                p = plan(g, rows, reds, vals, m, P, room=MAX_MOVES_DAY - moves_today(c, gr)) or {"moves": []}
+                rows, reds = position(gr, work)
+                p = plan(g, rows, reds, work, m, P, room=MAX_MOVES_DAY - moves_today(c, gr)) or {"moves": []}
                 c.execute("INSERT INTO run_g VALUES(?,?)", (int(time.time()), gr)); c.commit()
                 record = rate_record(c, gr, rows)
                 rep = {"granter": gr, "checked": int(time.time()), "dry": dry, "strategy": name,
@@ -561,6 +590,9 @@ def once(c, only=None, live=None, force=False):
             hist = c.execute("SELECT at, src, dst, uatone, gain, txhash FROM move WHERE granter=? AND dry=0 ORDER BY at DESC LIMIT 10", (gr,)).fetchall()
             rep["history"] = [{"at": h[0], "src": h[1], "dst": h[2], "uatone": h[3], "gain": h[4], "txhash": h[5]} for h in hist]
             rep["admin"] = gate(c, g, p, pid, adm, dry)
+            ad_ = rep["admin"]
+            if ad_.get("state") in ("waiting", "approved") or (ad_.get("applied") or {}).get("at", 0) >= tick0:
+                claim(rep.get("moves"))
             if rep["admin"].get("applied", {}).get("at", 0) >= int(time.time()) - TICK: acted += 1
             rep["dry"] = dry
             report(gr, rep)

@@ -1563,13 +1563,13 @@
     }).join("") + (rest > 0 ? '<div class=mv-more>and ' + rest + ' more ' + more + '</div>' : '');
   }
   function mvSet(src, dst){
-    var V = VALS(), n = V.length, top = V.length ? V[0][1] : 1, cut = Math.max(0, n - 34);   /* the rule's region: the smallest 34 */
+    var V = VALS(), n = V.length, top = V.length ? V[0][1] : 1, cut = Math.max(0, n - 34), edge = Math.max(cut, n - 5);   /* the rule's region: ranks 67 to 95 */
     var bars = V.map(function(v, i){
-      var cls = src[v[3]] ? ' s' : dst[v[3]] ? ' d' : i >= cut ? ' lo' : '';
+      var cls = src[v[3]] ? ' s' : dst[v[3]] ? ' d' : i >= cut && i < edge ? ' lo' : '';
       return '<i class="' + cls.trim() + '" style="height:' + Math.round(6 + 94 * Math.sqrt(v[1] / top)) + '%"></i>';
     }).join("");
-    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em><em class=g>The smallest ' + (n - cut) + ' pay the most</em></div>' +
-      '<div class=mv-bars>' + bars + '</div><div class=mv-brk><span style="flex:' + cut + '"></span><span class=g style="flex:' + (n - cut) + '">ranks ' + (cut + 1) + ' to ' + n + '</span></div></div>';
+    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em><em class=g>Where your stake goes</em></div>' +
+      '<div class=mv-bars>' + bars + '</div><div class=mv-brk><span style="flex:' + cut + '"></span><span class=g style="flex:' + (edge - cut) + '">ranks ' + (cut + 1) + ' to ' + edge + '</span><span style="flex:' + (n - edge) + '"></span></div></div>';
   }
   function drawMove(){
     var el = E("mv-stage"); if(!el) return;
@@ -1580,8 +1580,15 @@
     var rate = function(id, x){ var b = byId[id]; return b && window.__rateAfter ? window.__rateAfter(b.v[1], b.v[2], x || 0) : 0; };
     var at = window.__atInfo ? window.__atInfo() : null, auto = !!(at && at.grant);
     var day = window.__dayFull || function(){ return ""; };
-    var lo = Infinity, hi = 0; V.forEach(function(v){ var x = rate(v[3]); if(x > 0){ if(x < lo) lo = x; if(x > hi) hi = x; } });
-    var ex = hi ? '10,000 ATONE earns <b>' + one(1e4 * lo) + ' a year</b> on the largest validator and <b>' + one(1e4 * hi) + '</b> on the smallest.' : '';
+    /* the example is the rule's own answer, not the set's extreme (a newcomer at the edge can quote thousands of
+       percent and never receive a thing): 10,000 ATONE on the largest validator, and the same moved by the rule */
+    var lo = 0, hi = 0, big = V.slice().sort(function(x, y){ return y[1] - x[1]; })[0];
+    if(big && window.__planRank && window.__VDBY && window.__VDBY[big[3]]){
+      lo = rate(big[3]);
+      var sp = window.__planRank({ rows: [{ id: big[3], op: window.__VDBY[big[3]].op, x: 1e10, rate: lo, locked: 0, inactive: false }], total: 1e10, locked: 0 });
+      hi = sp ? sp.after : 0;
+    }
+    var ex = hi ? '10,000 ATONE earns <b>' + one(1e4 * lo) + ' a year</b> on the largest validator, and <b>' + one(1e4 * hi) + '</b> moved to where the most is paid.' : '';
     var top = function(eb, chip, cls){ return '<div class=mv-top><em>' + eb + '</em>' + (chip ? '<span class="mv-chip ' + cls + '">' + chip + '</span>' : '') + '</div>'; };
     var nowOn = function(){
       /* dust a redelegation leaves behind (under 0.1 ATONE) is not a position */
@@ -1601,7 +1608,7 @@
     var h;
     if(!a){
       h = top('Your best move') +
-        '<div class=mv-hl><b>Up to ' + (hi ? pct(hi) : '—') + ' APR</b><span>' + ex + '</span></div>' + mvSet({}, {}) +
+        '<div class=mv-hl><b>About ' + (hi ? pct(hi) : '—') + ' APR</b><span>' + ex + '</span></div>' + mvSet({}, {}) +
         '<div class=mv-act>' + CONNECT_OFF + '<span>Connect a wallet at the top: your balances, and your best move in numbers, show here.</span></div>';
     } else if(!pos){
       h = top('Your best move') + '<div class=mv-hl><b>Reading your stake…</b></div>';
