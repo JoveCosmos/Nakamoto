@@ -6114,7 +6114,6 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 #one #p-dele .wk-tbl2 thead th:not(#z):not(#y),#you .wk-tbl2 thead th:not(#z):not(#y),#one #p-dele #wk-mv .wk-moves thead th:not(#z):not(#y),
 #one #prolist .stlist thead th:not(#z):not(#y),#one .pro-brk-t thead th:not(#z):not(#y){position:sticky;top:0;z-index:2;background:var(--wc)}
 #one #p-pays .ptab thead th:not(#z):not(#y){position:sticky;top:0;z-index:2;background:var(--card,#09090f)}
-#one #prolist .stlist thead th:not(#z){letter-spacing:.04em;padding-left:3px;padding-right:3px}
 /* ════ FOLDING THE SIDES (operator, 2026-09-30): the wallet column and the paths rail each fold on a click, for
    the room governance and Pro need; both are open on every load. The wallet column folds away (the header keeps the
    wallet), the rail folds to its icons. The handles sit in the gutters, halfway down. ════ */
@@ -6157,7 +6156,21 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #sv-eco .sv-gkey{font-size:8.5px}
 }
 /* a very short screen: the set's chart gives way first, so the action never leaves the stage */
-@media(min-width:1100px) and (max-height:700px){#mv-stage .mv-set{display:none}#mv-stage .mv-box .mv-r:nth-child(n+5){display:none}#mv-stage .mv-hl>span{font-size:12.5px}}
+/* a short screen: the set chart stays (operator, 2026-09-30: "graph not anywhere") at a smaller height; the lists show
+   three rows before "and N more", the headline and gaps tighten */
+@media(min-width:1100px) and (max-height:820px){
+  #mv-stage.mv-stage:not(#z){gap:10px;padding-top:14px;padding-bottom:14px}
+  #mv-stage .mv-hl>b{font-size:30px}
+  #mv-stage .mv-hl>span{font-size:12.5px}
+  #mv-stage .mv-set:not(#z){min-height:56px}
+  #mv-stage .mv-days:not(#z){padding:10px 14px;gap:6px}
+  #mv-stage .mv-cyc>div:not(#z){padding:8px 11px}
+}
+@media(min-width:1100px) and (max-height:680px){
+  #mv-stage .mv-days small{display:none}
+  #mv-stage .mv-hl>span{display:none}
+  #mv-stage .mv-set:not(#z){min-height:48px}
+}
 /* a short screen (a laptop at 600-780px): everything a size tighter, the switches without their line */
 @media(min-width:1100px) and (max-height:780px){
   .one{padding-top:12px;padding-bottom:14px;gap:14px}

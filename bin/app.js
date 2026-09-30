@@ -2633,7 +2633,7 @@ rememberGridH();
     var h = '<table><colgroup><col style="width:30px"><col style="width:36px"><col><col style="width:64px">' + (wide ? '<col style="width:70px">' : '') + '<col style="width:72px">' + (wide ? '<col style="width:64px">' : '') + '<col style="width:50px"><col style="width:104px"></colgroup>' +
             '<thead><tr><th class=ck><input type=checkbox class=pro-all aria-label="Tick every validator"' + (allOn ? ' checked' : '') + '></th><th class=c>rank</th><th class=l>validator</th>' +
             '<th title="the validator\'s stake; green below the average size, where the bonus pays">stake</th>' + (wide ? '<th title="blocks signed over every block indexed">signed</th>' : '') + '<th>90<span class=lc>d</span> uptime</th>' + (wide ? '<th title="blocks proposed">proposed</th>' : '') + '<th>jailed</th>' +
-            '<th>APR now → there</th></tr></thead><tbody>';
+            '<th>APR</th></tr></thead><tbody>';
     cands.forEach(function(o){
       var on = !!STSEL[o.id], m = by[o.id], there = m ? m.after : o.rate0;
       var d = (window.__VDBY && window.__VDBY[o.id]) || {}, u90 = d.d90 != null ? +d.d90 : (o.up != null ? +o.up : null);
@@ -2646,7 +2646,7 @@ rememberGridH();
            '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '\u2014' : u90.toFixed(1) + '%') + '</td>' +
            (wide ? '<td>' + (pr == null ? '\u2014' : pr >= 1e6 ? (pr / 1e6).toFixed(2) + 'M' : pr >= 1e3 ? (pr / 1e3).toFixed(1) + 'k' : pr) + '</td>' : '') +
            (o.jail == null ? '<td class=dim>N/A</td>' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>') +
-           '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '\u2014') + '</s><em>→</em><b>' + pct(there) + '</b></td></tr>';
+           '<td class=r2><b>' + pct(there) + '</b></td></tr>';     /* the validator's APR with this stake on it: nothing to compare */
     });
     h += ijRows("st", (h.match(/<col[ >]/g) || []).length, STSEL);
     var top = el.scrollTop; el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;

@@ -1596,10 +1596,12 @@
   /* five rows, then "and N more" with an arrow that opens the whole list in place, scrolling (operator, 2026-09-30) */
   var MVOPEN = {};
   function mvRows(list, cls, more, key){
-    var rest = list.length - 5, open = rest > 0 && !!MVOPEN[key];
+    /* three rows on a short screen, five otherwise; the count says exactly how many more there are */
+    var lim = window.matchMedia && matchMedia("(min-width:1100px) and (max-height:820px)").matches ? 3 : 5;
+    var rest = list.length - lim, open = rest > 0 && !!MVOPEN[key];
     var CH = '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 9l6 6 6-6"/></svg>';
     return '<div class="mv-rows' + (open ? ' open' : '') + '">' + list.map(function(r, i){
-      return '<div class="mv-r' + (i >= 5 ? ' mv-x' : '') + '"><u class=' + cls + '>' + r.rank + '</u><span title="' + esc(r.name) + '">' + esc(r.name) + '</span><b>' + r.amt + '</b><i class=' + cls + '>' + r.apr + '</i></div>';
+      return '<div class="mv-r' + (i >= lim ? ' mv-x' : '') + '"><u class=' + cls + '>' + r.rank + '</u><span title="' + esc(r.name) + '">' + esc(r.name) + '</span><b>' + r.amt + '</b><i class=' + cls + '>' + r.apr + '</i></div>';
     }).join("") + '</div>' +
       (rest > 0 ? '<button type=button class=mv-more data-act=mvmore data-k="' + key + '" aria-expanded=' + open + '><span>' + (open ? 'Show fewer' : 'and ' + rest + ' more ' + more) + '</span>' + CH + '</button>' : '');
   }
