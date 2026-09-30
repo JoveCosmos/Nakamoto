@@ -185,6 +185,7 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
 
   html[data-theme=light]:not([data-mono]) .bheight,html[data-theme=light]:not([data-mono]) .bheight b{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .bheight i{background:var(--accent);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .btag{color:var(--accent)}
 
 radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear-gradient(140deg,#4130a0 0%,#271c6c 52%,#150f3b 100%)}
   html[data-theme=light]:not([data-mono]) .fpt0{color:#b8401c}html[data-theme=light]:not([data-mono]) .fpt1{color:#a86400}html[data-theme=light]:not([data-mono]) .fpt2{color:#16733a}

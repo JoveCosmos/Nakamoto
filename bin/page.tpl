@@ -5243,10 +5243,10 @@ color:#7c7aa3;text-decoration:none;white-space:nowrap;transition:color .15s,back
 .bheight{display:inline-flex;align-items:center;justify-content:flex-end;min-width:9ch;gap:5px;font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;color:#7c7aa3;line-height:1;font-variant-numeric:tabular-nums}
 .bheight i{width:4px;height:4px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green)}
 .bheight b{font-weight:400}
-html[data-net=testnet] .bheight{right:auto;left:calc(22% - 2px);justify-content:flex-start;min-width:0}
-html[data-net=testnet] .bheight::after{content:"testnet";color:#ffb02e;position:absolute;left:100%;margin-left:6px;white-space:nowrap}
-/* "testnet" hangs to the right of the height line, so the dot and the height keep their
-   mainnet place (the dot under the t of AtomOne) */
+/* the title's tag: "Autopilot", fixed on every network and in every state (operator, 2026-09-30; the network
+   shows in the wallet and the switch). The height moves left, as testnet's did, and the tag hangs after it */
+.bheight{right:auto;left:calc(22% - 2px);justify-content:flex-start;min-width:0}
+.btag{margin-left:1px;color:#2bc8bd;white-space:nowrap}
 .folder>.hdr-r{grid-area:right;justify-self:end;display:flex;align-items:center;gap:8px;min-width:0}
 .hdr-r .thbtn{margin-left:0;width:32px;height:32px;border-radius:8px}
 .hdr-r .sv-who{flex:0 0 auto}
@@ -5717,7 +5717,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 <div class=below id=below>
   <header class=folder>
     <div class=brandwrap>
-    <a class=brand href="./" data-route="intro" title="AtomOne"><img class=mark src="assets/atomone.svg" alt=""><span class=bw><span class=wordmark>AtomOne</span><span class=bheight id=dlive title="the chain's height, live"><i></i><b>{{HEIGHT}}</b></span></span></a>
+    <a class=brand href="./" data-route="intro" title="AtomOne"><img class=mark src="assets/atomone.svg" alt=""><span class=bw><span class=wordmark>AtomOne</span><span class=bheight id=dlive title="the chain's height, live"><i></i><b>{{HEIGHT}}</b><span class=btag>Autopilot</span></span></span></a>
     </div>
     <div class=hdr-r>
     <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
@@ -6182,7 +6182,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 <div class=pop id=rspop><div class="card txcard uncard rscard" role=dialog aria-modal=true aria-labelledby=rsttl>
   <header class=wk-txh><div><b id=rsttl>Restake</b><span>{{CHAIN_ID}}</span></div><button class="qm qm-r" type=button aria-label="How Restake works">?<span class=qm-tip role=tooltip><b>How it works</b><span>Claims your rewards twice a day</span><span>Stakes them where they earn the most</span><span>Rewards only ever go to your own address</span><span>Turn it off any time</span></span></button><span class=txsum id=rssum></span></header>
   <div class=rsbody>
-    <ul class=bn><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></i><span class=bn-t><b>Compounds your rewards</b><small><b id=rsadd>your rewards</b> more a year</small></span><button class=qm type=button aria-label="More about: Compounds your rewards">?<span class=qm-tip role=tooltip>Twice a day it claims your rewards and stakes them again, so your rewards earn too.</span></button></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 20V10M10 20V6M15 20v-8M20 20V4"/></svg></i><span class=bn-t><b>Into the best-paying validator</b><small>not back onto the same one</small></span><button class=qm type=button aria-label="More about: Into the best-paying validator">?<span class=qm-tip role=tooltip>Rewards go where they earn the most: filled from rank 95 up, like Autopilot, never onto the last 5 of the set.</span></button></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Claims and stakes, nothing else</b><small>no share for GATA, no fees for you</small></span><button class=qm type=button aria-label="More about: Claims and stakes, nothing else">?<span class=qm-tip role=tooltip>One grant lets GATA&#39;s keeper claim your rewards and delegate them. It cannot send, unstake or spend. GATA pays the fees. You can disable it at any time.</span></button></li></ul>
+    <ul class=bn><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></i><span class=bn-t><b>Compounds your rewards</b><small><b id=rsadd>your rewards</b> more a year</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 20V10M10 20V6M15 20v-8M20 20V4"/></svg></i><span class=bn-t><b>Into the best-paying validator</b><small>not back onto the same one</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Claims and stakes, nothing else</b><small>no share for GATA, no fees for you</small></span></li></ul>
   </div>
   <div class=rsfoot><button class="wk-btn wk-go" id=rsgo type=button>Enable</button></div>
 </div></div>
