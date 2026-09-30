@@ -44,6 +44,7 @@ EVERY = 12 * 3600
 MIN_GAIN_APR = 0.05
 MIN_GAIN_ATONE = 1.0          # and pay at least this per year
 MAX_MOVES_DAY = 20            # the signer takes at most 20 moves a transaction
+RS_EDGE = 3                   # restake: the last 3 of the set are left out of the highest-APR pick
 MIN_MOVE = 1_000_000          # no move under 1 ATONE: dust uses a pair entry and a move slot for nothing
 FRESH_S = 3600                # the collector's record older than this, or a chain head older than HEAD_S: no tick
 HEAD_S = 180
@@ -267,18 +268,15 @@ def plan_restake(c, granter, rg, vals, m, P):  # noqa: C901
     send = 0   # GATA takes no share, ever: a restake stakes every claimed reward back, it never sends
     stake = rewards - send
     if cap is not None and stake > cap: out["skip"] = "delegate cap used up"; return out
-    # where the rewards go: the operator's rule (2026-09-29), as for a move - the smallest validator first, up to
-    # the stake of the one above it, then the next one up - never the wallet's own validators by default. A
-    # DELEGATE grant with no validator list may use any; an older grant that names validators keeps to them
+    # where the rewards go (operator, 2026-09-30): all of them onto the ONE validator paying the highest APR once they
+    # land, leaving out the last 3 of the active set (today: #97 of 100). An older DELEGATE grant that names validators
+    # keeps to them
     allow = set(rg["stake"]["allow"] or [])
     ranked = sorted(vals.values(), key=lambda v: -v["t"])
-    def ok(v): return not allow or v["op"] in allow          # no uptime or tombstone test: the active set is the test (operator, 2026-09-30)
-    add = fill(ranked, lambda op: vals[op]["t"], int(stake), ok)
-    if not add or stake <= 0: out["skip"] = "no validator to stake on" if not add else "delegate cap used up"; return out
-    legs = [{"validator": op, "amount": int(a)} for op, a in add.items()]
-    left = int(stake) - sum(l["amount"] for l in legs)
-    # what the fill could not place stays in the wallet as liquid ATONE: piling it on one leg could lift that validator
-    # past the one above it (audit, 2026-09-30)
+    pool = [v for v in ranked[:max(0, len(ranked) - RS_EDGE)] if not allow or v["op"] in allow]
+    if not pool or stake <= 0: out["skip"] = "no validator to stake on"; return out
+    best = max(pool, key=lambda v: rate_after(m, v["t"], v["c"], int(stake)))
+    legs = [{"validator": best["op"], "amount": int(stake)}]
     br = rate_after(m, vals[legs[0]["validator"]]["t"], vals[legs[0]["validator"]]["c"], legs[0]["amount"])
     out.update({"claim": claim, "stake": legs, "send": int(send), "rate": br,
                 "fee_uphoton": int((120000 + 60000 * (len(claim) + 1 + len(legs))) * 0.25)})
