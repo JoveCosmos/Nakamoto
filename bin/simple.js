@@ -1655,8 +1655,7 @@
           lock + mvSet(src, dst) +
           (auto ? '<div class=mv-act><span>Autopilot makes this move on its next run, within 12 hours. Nothing to sign.</span></div>'
                 : '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=opt>' + (direct ? 'Start Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE') + '</button>' +
-                  '<span>' + (direct ? 'One approval: your stake moves now to where it earns the most, and Autopilot keeps it there, checking every 12 hours.'
-                                     : 'One signature moves it now. Autopilot needs Keplr, which can sign it along with the move.') + '</span></div>');
+                  (direct ? '' : '<span>One signature moves it now. Autopilot needs Keplr, which can sign it along with the move.</span>') + '</div>');
       } else if(pos.free < 1e6 && pos.locked >= 1e6){
         var t1 = pos.until || Date.now(), t0 = t1 - 21 * 864e5, k = Math.min(21, Math.max(1, Math.ceil((Date.now() - t0) / 864e5)));
         var cells = ''; for(var i = 1; i <= 21; i++) cells += '<i' + (i <= k ? ' class=on' : '') + '></i>';
