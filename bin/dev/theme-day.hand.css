@@ -399,3 +399,8 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   /* the wallet menu: a light sheet with the page's shadow, rows lit on hover */
   html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu{box-shadow:0 18px 44px -18px rgba(20,22,26,.40)}
   html[data-theme=light]:not([data-mono]) .hdr-r .sv-menu .mi:hover:not(:disabled){border-color:var(--line-strong);background:var(--surface-2)}
+  /* Activate reads the same in both cards: accent fill, white text (Restake's #rsgo above) */
+  html[data-theme=light]:not([data-mono]) #atpop .atfoot #atgrant:not(#z){background:var(--accent);border-color:var(--accent);color:#fff}
+  html[data-theme=light]:not([data-mono]) #atpop .atfoot #atgrant:not(#z):disabled{background:transparent;border-color:var(--line-strong);color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) #rspop .rsfoot #rsgo:not(#z):not(.wk-danger){background:var(--accent);border-color:var(--accent);color:#fff}
+  html[data-theme=light]:not([data-mono]) #atpop .atfoot #atrevoke:not(#z),html[data-theme=light]:not([data-mono]) #rspop .rsfoot #rsgo.wk-danger:not(#z){background:transparent;border-color:var(--danger);color:var(--danger)}
