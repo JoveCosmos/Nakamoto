@@ -3178,7 +3178,8 @@ rememberGridH();
     var at = {}, i; for(i = 0; i < n; i++) at[V[i][3]] = i;
     var bset = {}; for(i = Math.max(0, n - BOTTOM); i < n; i++) bset[V[i][3]] = 1;
     var now = pos.rows.reduce(function(s, r){ return s + r.x * (r.inactive ? 0 : r.rate); }, 0) / pos.total;
-    var src = pos.rows.filter(function(r){ return r.x - r.locked > 0 && !bset[r.id]; }).sort(function(a, b){ return b.x - a.x; }).map(function(r){
+    /* sources in the keeper's order: the most free stake first */
+    var src = pos.rows.filter(function(r){ return r.x - r.locked > 0 && !bset[r.id]; }).sort(function(a, b){ return (b.x - b.locked) - (a.x - a.locked); }).map(function(r){
       var free = r.x - r.locked, give = free;
       if(at[r.id] != null){ var j = at[r.id], under = j + 1 < n ? V[j + 1][1] : 0; give = Math.min(free, Math.max(0, Math.floor(V[j][1] - under - 1e6))); }
       return { id: r.id, give: give, rate: r.inactive ? 0 : r.rate };
@@ -3214,9 +3215,14 @@ rememberGridH();
     var out = movesFor(budget);
     while(out.length > MAXMOVES && budget > 1e6){ budget = Math.floor(budget * 0.85); out = movesFor(budget); }
     if(!out.length || out.length > MAXMOVES) return null;
-    var moved = {}; out.forEach(function(m){ moved[m.to] = (moved[m.to] || 0) + m.amt; });
     var rs = {}; src.forEach(function(x){ rs[x.id] = x.rate; });
-    var rd = {}; Object.keys(moved).forEach(function(k){ var v = V[at[k]]; rd[k] = window.__rateAfter(v[1], v[2], moved[k]); });
+    var dstRates = function(ms){ var mv = {}, r = {}; ms.forEach(function(m){ mv[m.to] = (mv[m.to] || 0) + m.amt; });
+      Object.keys(mv).forEach(function(k){ var v = V[at[k]]; r[k] = window.__rateAfter(v[1], v[2], mv[k]); }); return { moved: mv, rd: r }; };
+    /* as the keeper: every move on its own earns more than 5 APR points and carries at least 1 ATONE */
+    var dr0 = dstRates(out).rd;
+    out = out.filter(function(m){ return m.amt >= 1e6 && dr0[m.to] - rs[m.from] > MIN_LIFT; });
+    if(!out.length) return null;
+    var D1 = dstRates(out), moved = D1.moved, rd = D1.rd;
     var gainU = 0; out.forEach(function(m){ gainU += m.amt * (rd[m.to] - rs[m.from]); });
     var after = now + gainU / pos.total, gain = gainU / 1e6, movedU = out.reduce(function(s, m){ return s + m.amt; }, 0), lift = gainU / movedU;
     /* only a move that earns the moved stake more than 5 APR points (operator, 2026-09-30): otherwise it is at its best */

@@ -42,9 +42,11 @@ DRY = os.environ.get("KEEPER_DRY", "1") != "0"
 # gated keeper, which would have moved stake for half a point): a move every 12 hours, only for more than 5 APR points
 EVERY = 12 * 3600
 MIN_GAIN_APR = 0.05
-MIN_GAIN_ATONE = float(os.environ.get("KEEPER_MIN_GAIN_ATONE", "1"))      # and pay at least this per year
-MAX_MOVES_DAY = int(os.environ.get("KEEPER_MAX_MOVES_PER_DAY", "20"))   # the signer takes at most 20 moves a transaction
-MAX_DESTS = int(os.environ.get("KEEPER_MAX_DESTS", "5"))                  # split across at most this many
+MIN_GAIN_ATONE = 1.0          # and pay at least this per year
+MAX_MOVES_DAY = 20            # the signer takes at most 20 moves a transaction
+MIN_MOVE = 1_000_000          # no move under 1 ATONE: dust uses a pair entry and a move slot for nothing
+FRESH_S = 3600                # the collector's record older than this, or a chain head older than HEAD_S: no tick
+HEAD_S = 180
 # restake: claim a granter's rewards and stake them back onto their allow-list. Planned and
 # reported always; executed only with KEEPER_RESTAKE=1 AND KEEPER_DRY=0
 RESTAKE = os.environ.get("KEEPER_RESTAKE", "0") == "1"
@@ -106,6 +108,21 @@ def db():
     return c
 
 # ── the model, as the page has it ──────────────────────────────────────────
+def fresh():
+    """the inputs are current: the collector's record written within FRESH_S, the chain's head within HEAD_S. A stale
+    record could send stake to a validator that has since gone down; a stale node could replan over moves it has not seen"""
+    D = json.load(open(DATA)); gen = D.get("generated") or D.get("ts") or 0
+    if isinstance(gen, str):
+        import datetime
+        try: gen = datetime.datetime.fromisoformat(gen.replace("Z", "+00:00")).timestamp()
+        except Exception: gen = 0
+    if gen > 1e12: gen /= 1000
+    if not gen or time.time() - gen > FRESH_S: raise RuntimeError("collector record is stale (generated %s)" % D.get("generated"))
+    import datetime
+    h = get("/cosmos/base/tendermint/v1beta1/blocks/latest")["block"]["header"]
+    t = datetime.datetime.fromisoformat(h["time"][:26].rstrip("Z") + "+00:00").timestamp() if "." in h["time"] else datetime.datetime.fromisoformat(h["time"].replace("Z", "+00:00")).timestamp()
+    if time.time() - t > HEAD_S: raise RuntimeError("chain head is stale (block %s at %s)" % (h["height"], h["time"]))
+
 def model():
     D = json.load(open(DATA))
     S, N, R = D["set"]["bonded"], D["set"]["n"], D["set"]["reward_pool"]
@@ -143,7 +160,7 @@ PRESETS = {
 def grants():
     out, key = [], None
     while True:
-        q = "/cosmos/authz/v1beta1/grants/grantee/%s?pagination.limit=200" % GRANTEE + ("&pagination.key=%s" % key if key else "")
+        q = "/cosmos/authz/v1beta1/grants/grantee/%s?pagination.limit=200" % GRANTEE + ("&pagination.key=%s" % urllib.parse.quote(key, safe="") if key else "")
         d = get(q)
         for g in d.get("grants", []):
             a = g.get("authorization", {})
@@ -260,7 +277,8 @@ def plan_restake(c, granter, rg, vals, m, P):  # noqa: C901
     if not add or stake <= 0: out["skip"] = "no validator to stake on" if not add else "delegate cap used up"; return out
     legs = [{"validator": op, "amount": int(a)} for op, a in add.items()]
     left = int(stake) - sum(l["amount"] for l in legs)
-    if left > 0: legs[-1]["amount"] += left            # the last leg takes the rounding: every claimed reward is staked
+    # what the fill could not place stays in the wallet as liquid ATONE: piling it on one leg could lift that validator
+    # past the one above it (audit, 2026-09-30)
     br = rate_after(m, vals[legs[0]["validator"]]["t"], vals[legs[0]["validator"]]["c"], legs[0]["amount"])
     out.update({"claim": claim, "stake": legs, "send": int(send), "rate": br,
                 "fee_uphoton": int((120000 + 60000 * (len(claim) + 1 + len(legs))) * 0.25)})
@@ -337,9 +355,10 @@ def pairs_used(reds):
 # it at or above the validator ranked just under it. A validator not signing now (under UP_MIN of the recent
 # window) or tombstoned is passed over. Nothing is offered while any of the delegator's stake cools down,
 # so the offer comes back every 21 days, when the last move's cooldown clears.
-BOTTOM = int(os.environ.get("KEEPER_BOTTOM", "34"))
-EDGE = int(os.environ.get("KEEPER_EDGE", "5"))      # the last 5 are left out: newcomers at the edge of the set (29 used)
-UP_MIN = float(os.environ.get("KEEPER_UP_MIN", "95"))
+# fixed in code, as the rest of the operator's rule: no env value can change them at launch
+BOTTOM = 34
+EDGE = 5            # the last 5 are left out: newcomers at the edge of the set (29 used)
+UP_MIN = 95.0
 
 def fill(ranked, stake, amount, ok):
     """the rule's pour: from the smallest up, each to 1 ATONE under the validator just above it (a tie
@@ -404,10 +423,18 @@ def plan(g, rows, reds, vals, m, P=None, room=None):
     while len(moves) > room and budget > 1_000_000:
         budget = int(budget * 0.85); moves = moves_for(budget)
     if not moves or len(moves) > room: return None
-    moved = {}
-    for mv in moves: moved[mv["dst"]] = moved.get(mv["dst"], 0) + mv["amount"]
     rate_src = {x["op"]: x["rate"] for x in src}
-    rate_dst = {op: rate_after(m, vals[op]["t"], vals[op]["c"], a) for op, a in moved.items()}
+    def dst_rates(ms):
+        mv_ = {}
+        for x in ms: mv_[x["dst"]] = mv_.get(x["dst"], 0) + x["amount"]
+        return {op: rate_after(m, vals[op]["t"], vals[op]["c"], a) for op, a in mv_.items()}
+    # every move on its own must earn more than 5 APR points and carry at least 1 ATONE (audit 2026-09-30): a small
+    # lift does not ride along on the average, and dust does not spend a pair entry. Dropping a move only fills less,
+    # so no rank can change
+    rate_dst = dst_rates(moves)
+    moves = [x for x in moves if x["amount"] >= MIN_MOVE and rate_dst[x["dst"]] - rate_src[x["src"]] > MIN_GAIN_APR]
+    if not moves: return None
+    rate_dst = dst_rates(moves)
     for mv in moves: mv["gain"] = mv["amount"] * (rate_dst[mv["dst"]] - rate_src[mv["src"]]) / 1e6
     gain = sum(mv["gain"] for mv in moves)
     after = now + sum(mv["amount"] * (rate_dst[mv["dst"]] - rate_src[mv["src"]]) for mv in moves) / total
@@ -576,20 +603,45 @@ def schedule_retry(c, gr, kind, why, h, moves, f):
         alert("warn", "Autopilot move failed, trying again: " + short(gr), ("Sent, not yet seen on chain: the keeper looks it up by hash"
               if kind == "pending" else "A fee, network or RPC problem: the keeper tries again") + " in %d minutes." % (wait // 60), f)
 
-def settle_pending(c, gr, h, moves, now):
-    """a tx that was sent but not seen: did it land? True when it is settled (landed, either way)"""
-    try: res = tx_on_chain(h)
-    except Exception as e: log("tx lookup %s failed: %s" % (h, e)); return False
-    if res is None: return False                       # not on chain: plan again from the chain
-    code, raw = res
-    if code == 0:
-        record_moves(c, gr, moves, h, now)
-        c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, plan_id({"moves": moves}), "auto", h, 0, 1, None, 0))
-        alert("ok", "Autopilot moved: " + short(gr), "The moves landed after a slow answer.", {"Delegator": gr, "Tx": h})
-    else:
-        log("pending tx %s for %s landed with code %d: %s" % (h, gr, code, raw[:200]))
+def landed_since(gr, since, h=None):
+    """an Autopilot tx for this wallet that landed at or after `since`: {"txhash", "moves", "code"}; None when there is none;
+    "unknown" when the chain cannot be asked (then nothing is replanned - a lagging node must not cause a second move)"""
+    try:
+        if h:
+            r = tx_on_chain(h)
+            if r is not None:
+                t = get("/cosmos/tx/v1beta1/txs/" + h).get("tx_response") or {}
+                return {"txhash": h, "code": r[0], "raw": r[1], "moves": _tx_moves(t, gr)}
+        d = get("/cosmos/tx/v1beta1/txs?query=" + urllib.parse.quote("message.sender='%s'" % GRANTEE) + "&order_by=ORDER_BY_DESC&pagination.limit=30")
+    except Exception as e:
+        log("landed lookup for %s failed: %s" % (gr, e)); return "unknown"
+    import datetime
+    for t in d.get("tx_responses", []) or []:
+        try: ts = datetime.datetime.fromisoformat(t["timestamp"].replace("Z", "+00:00")).timestamp()
+        except Exception: continue
+        if ts < since - 5: break
+        mv = _tx_moves(t, gr)
+        if mv and int(t.get("code", 0)) == 0: return {"txhash": t["txhash"], "code": 0, "raw": "", "moves": mv}
+    return None
+
+def _tx_moves(t, gr):
+    out = []
+    for m in (((t.get("tx") or {}).get("body") or {}).get("messages") or []):
+        for x in m.get("msgs", []) or []:
+            if x.get("delegator_address") == gr and x.get("@type", "").endswith("MsgBeginRedelegate"):
+                out.append({"src": x["validator_src_address"], "dst": x["validator_dst_address"], "amount": int(x["amount"]["amount"]), "gain": 0})
+    return out
+
+def settle_landed(c, gr, seen):
+    """a move found on chain after a failure: recorded as the move when it succeeded; either way the retry is over"""
+    now = int(time.time())
+    if seen["code"] == 0 and seen["moves"] and not c.execute("SELECT 1 FROM move WHERE txhash=?", (seen["txhash"],)).fetchone():
+        record_moves(c, gr, seen["moves"], seen["txhash"], now)
+        c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, plan_id({"moves": seen["moves"]}), "auto", seen["txhash"], 0, 1, None, 0))
+        alert("ok", "Autopilot moved: " + short(gr), "The moves landed after a slow answer.", {"Delegator": gr, "Tx": seen["txhash"]})
+    elif seen["code"] != 0:
+        log("tx %s for %s landed with code %s: %s" % (seen["txhash"], gr, seen["code"], str(seen.get("raw"))[:200]))
     c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()
-    return code == 0
 
 def gate(c, g, p, pid, adm, dry):
     """The admin gate for one Autopilot delegator. Nothing moves unless an operator approved exactly this
@@ -654,10 +706,11 @@ def once(c, only=None, live=None, force=False):
     when an operator's approval waits to be carried out; the admin gate runs every tick. only=<granter>
     restricts it; live overrides KEEPER_DRY for this tick; force plans now."""
     dry = DRY if live is None else (not live)
+    fresh()
     vals, m, eta = model()
     # the set as the chain has it now (not the 15-minute collect): anything already executed is simply there
-    try: vals = live_vals(vals)
-    except Exception as e: log("live set unreadable, using the collector's: %s" % e)
+    # no silent fallback to the collector's stakes: a tick without the live set does nothing
+    vals = live_vals(vals)
     # first come, first served (operator, 2026-09-29): grants are planned in the order they were made, and each
     # plan that stands (waiting for an operator, approved, or carried out this tick) is counted as placed before
     # the next grant is planned - the first grantee gets the top strategy, the next one the next best
@@ -681,20 +734,24 @@ def once(c, only=None, live=None, force=False):
             path = os.path.join(REPORTS, gr + ".json")
             try: prev = json.load(open(path))
             except Exception: prev = None
-            ap = adm["approved"].get(gr)
-            waiting_ap = bool(ap) and gr not in adm["paused"] and not c.execute(
-                "SELECT 1 FROM applied WHERE granter=? AND plan_id=? AND ok=1 AND ap_at=?", (gr, ap.get("plan_id"), ap.get("at", 0))).fetchone()
             last = c.execute("SELECT max(at) FROM run_g WHERE granter=?", (gr,)).fetchone()[0] or 0
             # the grant as it stands: a re-grant (Change, a new cap or validator list) is planned at once, not
             # at the next 6-hour turn, so the console never shows a plan made for the grant it replaced
             gsig = hashlib.sha1(json.dumps([g["cap"], sorted(g["allow"] or []), g["exp"]]).encode()).hexdigest()[:12]
-            due = force or not last or time.time() - last >= P["every"] or waiting_ap or (prev or {}).get("grant_sig") != gsig
+            due = force or not last or time.time() - last >= P["every"] or (prev or {}).get("grant_sig") != gsig
             # a move that failed for a fee, network or RPC reason is tried again at its time; one that was sent but not
             # seen is looked up by hash first, and if it landed that is the move - nothing is planned over it
-            rt = c.execute("SELECT due, tries, txhash, moves FROM retry WHERE granter=?", (gr,)).fetchone()
+            rt = c.execute("SELECT due, tries, txhash, moves, since FROM retry WHERE granter=?", (gr,)).fetchone()
             if rt and rt[0] <= time.time():
-                due = True
-                if rt[2] and settle_pending(c, gr, rt[2], json.loads(rt[3] or "[]"), int(time.time())): due = False
+                # before anything is planned again, the chain is asked whether a move for this wallet landed since the first
+                # failure (a slow answer, a timeout, a tx still travelling): landed = that is the move; the chain cannot
+                # say = wait; a tx sent and not yet seen is given 30 minutes before it counts as gone (audit, 2026-09-30)
+                seen = landed_since(gr, rt[4] or 0, rt[2])
+                if seen == "unknown": due = False
+                elif seen:
+                    settle_landed(c, gr, seen); due = False
+                elif rt[2] and time.time() - (rt[4] or 0) < 1800: due = False
+                else: due = True
             if gr in adm["paused"]: due = False
             p = None
             if due:
@@ -725,8 +782,8 @@ def once(c, only=None, live=None, force=False):
             rep["admin"] = {"state": "held" if gr in adm["paused"] else "auto", "plan_id": pid}
             if last: rep["admin"]["applied"] = {"at": last[0], "plan_id": last[1], "by": last[2], "txhash": last[3], "dry": bool(last[4]), "ok": bool(last[5]), "error": last[6]}
             ad_ = rep["admin"]
-            if (ad_.get("applied") or {}).get("at", 0) >= tick0 and (ad_.get("applied") or {}).get("ok"):
-                claim(rep.get("moves"))
+            if due and p is not None and (ad_.get("applied") or {}).get("at", 0) >= tick0 and (ad_.get("applied") or {}).get("ok"):
+                claim(rep.get("moves"))          # a plan made this tick; a move found on chain is in the live set already
             if rep["admin"].get("applied", {}).get("at", 0) >= int(time.time()) - TICK: acted += 1
             rep["dry"] = dry
             report(gr, rep)
@@ -749,7 +806,10 @@ def once(c, only=None, live=None, force=False):
             seen = c.execute("SELECT at FROM rs_run WHERE granter=?", (granter,)).fetchone()
             if not force and seen and time.time() - seen[0] < RS_FIXED["restake_every"]: continue
             c.execute("INSERT INTO rs_run VALUES(?,?) ON CONFLICT(granter) DO UPDATE SET at=excluded.at", (granter, int(time.time()))); c.commit()
-            rs = restake_step(c, granter, rgs, vals, m, RS_FIXED, dry)
+            rs = restake_step(c, granter, rgs, work, m, RS_FIXED, dry)
+            # the next restake (and the next tick's plans) see these stakes where they land
+            for leg in ((rs or {}).get("stake") or []):
+                if leg.get("validator") in work: work[leg["validator"]]["t"] += int(leg.get("amount", 0))
             path = os.path.join(REPORTS, granter + ".json")
             try: rep = json.load(open(path))
             except Exception: rep = {"granter": granter, "strategy": "restake"}
@@ -819,6 +879,11 @@ def main():
     if not GRANTEE or not SIGNER or not SECRET:
         log("not configured (KEEPER_GRANTEE / KEEPER_SIGNER_URL / KEEPER_SECRET) - parking"); sys.exit(78)
     os.makedirs(os.path.dirname(STATE), exist_ok=True)
+    # one keeper per state at a time: a hand run beside the service would execute the same plan twice (audit, 2026-09-30)
+    import fcntl
+    lk = open(STATE + ".lock", "w")
+    try: fcntl.flock(lk, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError: log("another keeper holds %s - not starting" % STATE); sys.exit(75)
     c = db(); a = sys.argv[1:]
     if "--once" in a:
         only = a[a.index("--granter") + 1] if "--granter" in a else None
@@ -828,7 +893,7 @@ def main():
         try: once(c)
         except Exception as e:
             log("run failed: %s" % e); n += 1
-            if n == 10: alert("warn", "Autopilot keeper cannot run", str(e)[:300])
+            if n == 10 or (n > 10 and n % 360 == 0): alert("warn", "Autopilot keeper cannot run", str(e)[:300])   # again every 6 hours
         else: n = 0
         time.sleep(TICK)
 

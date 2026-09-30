@@ -228,7 +228,8 @@ class H(BaseHTTPRequestHandler):
         if u.path == "/admin-api/decide":
             g, act, note = str(b.get("granter", "")), str(b.get("action", "")), str(b.get("note", "")).strip()[:500]
             if not (g.startswith("atone1") and len(g) == 44): return self.reply(400, {"error": "granter"})
-            if act not in ("apply", "nomove", "hold", "resume"): return self.reply(400, {"error": "action"})
+            # no approvals since 2026-09-30: Autopilot carries out its plans itself; Hold and Resume are the operator's controls
+            if act not in ("hold", "resume"): return self.reply(400, {"error": "action"})
             if act == "hold" and not note: return self.reply(400, {"error": "a hold needs a note: why"})
             rep = jload(os.path.join(WEB[net], "keeper", g + ".json"), {}) or {}
             cur = (rep.get("admin") or {}).get("plan_id")
