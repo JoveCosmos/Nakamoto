@@ -950,8 +950,9 @@
   html[data-theme=light]:not([data-mono]) #you,html[data-theme=light]:not([data-mono]) #paths,html[data-theme=light]:not([data-mono]) #mv-stage{--sv-teal:var(--accent);--sv-green:var(--accent);--sv-amber:var(--warn);--sv-violet:var(--accent)}
   html[data-theme=light]:not([data-mono])[data-svs=over] #one #sv-over{background:none;box-shadow:none}
   html[data-theme=light]:not([data-mono]) .you-cl{background:transparent}
-  html[data-theme=light]:not([data-mono]) .you-tag.on{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .you-tag.on{border-color:var(--sv-teal,var(--accent));color:var(--sv-teal,var(--accent));background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .you-tg i{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .you-sw[data-tip]:hover::after{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .mv-h::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .mv-chip.ok{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .mv-chip.warn{background:var(--warn-bg)}
@@ -986,6 +987,9 @@
   html[data-theme=light]:not([data-mono]) .qm-tip{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #rsgo{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #rsgo.wk-danger{background:transparent;border-color:var(--danger-bar);color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) #atpop #atgrant:not(#z){color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) #atpop #atgrant:disabled:not(#z){background:transparent}
+  html[data-theme=light]:not([data-mono]) #atpop #atrevoke:not(#z),html[data-theme=light]:not([data-mono]) #rspop #rsgo.wk-danger:not(#z){background:transparent;border-color:var(--danger-bar);color:var(--danger)}
   @media(min-width:1100px) and (max-width:1599px){
     html[data-theme=light]:not([data-mono])[data-sv="dashboard/autopilot"] .pth svg{fill:none;stroke:currentColor}
   }
@@ -1414,4 +1418,6 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .pop .card:not(#z){background:#F7F4ED;border-color:#D9D3C6;box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 28px 70px -18px rgba(20,22,26,.55)}
   html[data-theme=light]:not([data-mono]) .you-tag{border-color:var(--line-strong);color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .you-tag.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  /* the Autopilot card carried its own night typeface tokens, so day kept Helvetica there while Restake read in Plex */
+  html[data-theme=light]:not([data-mono]) #atpop .txcard:not(#z),html[data-theme=light]:not([data-mono]) #rspop .txcard:not(#z){--wsans:var(--day-sans);--wmono:var(--day-mono)}
 

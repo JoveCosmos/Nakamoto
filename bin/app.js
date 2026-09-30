@@ -88,7 +88,7 @@ function undock(){
   if(L) L.hidden = true; if(O) O.hidden = true;
   var h = document.querySelector("#wk-plan>.wk-ph h3"); if(h) h.textContent = "Redelegate";
   document.documentElement.removeAttribute("data-pro");
-  var p = DOCK.pop; DOCK = null;
+  var p = DOCK.pop; DOCK = null; proTabs();
   if(p.__onclose) p.__onclose();
 }
 function dock(pop){
@@ -104,11 +104,29 @@ function dock(pop){
   var h = document.querySelector("#wk-plan>.wk-ph h3"); if(h) h.textContent = P.title;
   document.documentElement.setAttribute("data-pro", P.mode);
   DOCK = { pop: pop, moved: moved };
+  proTabs(); if(window.__proBrk) window.__proBrk();
 }
 window.__openCard = function(pop){ if(!pop) return; if(proWide()) dock(pop); else POP.open(pop); };
 window.__closeCard = function(pop){ if(DOCK && DOCK.pop === pop) undock(); else POP.close(pop); };
 window.__undock = undock;
 window.__undockIfNarrow = function(){ if(DOCK && !proWide()) undock(); };
+/* the four actions as tabs in the title bar, as every other path has its views there (operator, 2026-09-30) */
+function proTabs(){
+  var mode = document.documentElement.getAttribute("data-pro") || "redelegate", home = { stake: "stbtn", unstake: "unbtn", claim: "clbtn" };
+  [].forEach.call(document.querySelectorAll("#protabs .l2tab"), function(b){
+    var a = b.getAttribute("data-pro-act"), on = a === mode, src = home[a] && document.getElementById(home[a]);
+    b.setAttribute("aria-selected", on ? "true" : "false");
+    if(src && src.hidden) b.setAttribute("aria-disabled", "true"); else b.removeAttribute("aria-disabled");
+  });
+}
+window.__proTabs = proTabs;
+document.addEventListener("click", function(ev){
+  var b = ev.target.closest ? ev.target.closest("#protabs .l2tab") : null; if(!b || b.getAttribute("aria-disabled") === "true") return;
+  var a = b.getAttribute("data-pro-act");
+  if(a === "redelegate") undock();
+  else if(a === "claim"){ if(window.__claim) window.__claim(); }
+  else { var s = document.getElementById(a === "stake" ? "stbtn" : "unbtn"); if(s) s.click(); }
+});
 /* the node's RPC, proxied on this host (nginx: /rpc/status, /rpc/block) so the
    page never has to cross origins for a height */
 /* every chain string that reaches innerHTML or an attribute goes through this */
@@ -2400,7 +2418,7 @@ rememberGridH();
     for(var i = 0; i < pos.rows.length; i++) if(pos.rows[i].id === UNSEL) return pos.rows[i]; return null; }
   function unAmount(){ var a = E("unamt"), n = parseFloat((a.value || "").replace(/[^0-9.]/g, "")); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
   function unState(){
-    var r = unRow(), u = unAmount(), mx = E("unmaxv"), hint = E("unhint"), fld = document.querySelector("#unpop .unfield"), go = E("unsign"), sm = E("unsum"), lk = E("unlock");
+    var r = unRow(), u = unAmount(), mx = E("unmaxv"), hint = E("unhint"), fld = E("unamt") && E("unamt").closest(".unfield"), go = E("unsign"), sm = E("unsum"), lk = E("unlock");
     if(mx) mx.textContent = r ? exact(r.x, 2) : "\u2014";
     var over = r && u > r.x, ok = r && u > 0 && !over;
     if(fld) fld.classList.toggle("bad", !!over);
@@ -2413,6 +2431,7 @@ rememberGridH();
       '<span>Unstaked ATONE unbonds for <b>21 days</b>, until <b>' + window.__day(until.getTime()) + '</b>, and earns nothing meanwhile</span>';
     E("unfee").textContent = ""; var st = E("unstep"); st.textContent = ""; st.className = "txstep";
     feeSoon("un", E("unfee"), ok ? unMsgs : null);
+    proBrk();
   }
   function unMsgs(){
     var r = unRow(), u = unAmount(), VD = window.__VDBY || {}, pos = window.__POS;
@@ -2495,6 +2514,7 @@ rememberGridH();
     var go = E("clsign"); if(go) go.disabled = !n || !window.__WALLET;
     var st = E("clstep"); st.textContent = ""; st.className = "txstep";
     feeSoon("cl", E("clfee"), n ? clMsgs : null);
+    proBrk();
   }
   window.__claim = function(){
     if(!clpop || !window.__POS) return;
@@ -2569,8 +2589,35 @@ rememberGridH();
     return out;
   }
   window.__stMsgs = stMsgs;
+  /* Pro's Outcome for Stake, Unstake and Claim (operator, 2026-09-30: "should list val and full move or breakdown"):
+     every validator the action touches with what it does there - as Redelegate's outcome lists its moves */
+  function proBrk(){
+    var el = E("probrk"), mode = document.documentElement.getAttribute("data-pro"); if(!el) return;
+    var pos = window.__POS, byOp = {}; if(pos) pos.rows.forEach(function(r){ if(r.op) byOp[r.op] = r; });
+    var VD = window.__VDBY || {}, rows = [], head = [], tot = 0, foot = "";
+    var pc = function(x){ return (x * 100).toFixed(1) + "%"; };
+    if(mode === "stake"){
+      var P = stPlan(); head = ["Validator", "Stake", "APR", "ATONE/yr"];
+      P.rows.forEach(function(r){ tot += r.x; rows.push([logo(r.id, r.m) + '<span>' + att(r.m) + '</span>', fmt(r.x), r.after ? pc(r.after) : '0%', '+' + fmt(r.x * r.after)]); });
+      foot = P.rows.length ? fmt(tot) + ' ATONE on ' + P.rows.length + ' validator' + (P.rows.length === 1 ? '' : 's') + ', about <b>+' + fmt(tot * P.rate) + '</b> ATONE a year' : '';
+    } else if(mode === "unstake"){
+      var free = window.__day(Date.now() + 21 * 86400000); head = ["Validator", "Unstake", "Free on"];
+      unMsgs().forEach(function(m){ var v = m.value, r = byOp[v.validator_address] || {}, x = +v.amount.amount; tot += x;
+        rows.push([logo(r.id, r.m || "") + '<span>' + att(r.m || v.validator_address.slice(-8)) + '</span>', fmt(x), free]); });
+      foot = rows.length ? fmt(tot) + ' ATONE stops earning now and is free on ' + free : '';
+    } else if(mode === "claim"){
+      head = ["Validator", "Rewards"];
+      clRows().forEach(function(r){ if(!CLSEL[r.id]) return; tot += r.x; rows.push([logo(r.id, r.m) + '<span>' + att(r.m) + '</span>', exact(r.x, 6)]); });
+      foot = rows.length ? exact(tot, 6) + ' ATONE to your available balance' : '';
+    }
+    el.innerHTML = !mode ? '' : !rows.length ? '<div class=pro-brk-e>' + (mode === "claim" ? 'Select the rewards to claim' : 'Select validators and enter an amount') + '</div>' :
+      '<table class=pro-brk-t><thead><tr>' + head.map(function(h, i){ return '<th' + (i ? '' : ' class=l') + '>' + h + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      rows.map(function(r){ return '<tr>' + r.map(function(c, i){ return '<td' + (i ? '' : ' class=nm') + '>' + c + '</td>'; }).join('') + '</tr>'; }).join('') +
+      '</tbody></table><div class=pro-brk-f>' + foot + '</div>';
+  }
+  window.__proBrk = proBrk;
   function stState(){
-    var P = stPlan(), bal = stBal(), mx = E("stmaxv"), hint = E("sthint"), fld = document.querySelector("#stpop .unfield"), go = E("stsign"), sm = E("stsum"), lk = E("stlock");
+    var P = stPlan(), bal = stBal(), mx = E("stmaxv"), hint = E("sthint"), fld = E("stamt") && E("stamt").closest(".unfield"), go = E("stsign"), sm = E("stsum"), lk = E("stlock");
     if(mx) mx.textContent = exact(bal, 2);
     var over = P.u > bal, ok = P.u > 0 && P.n > 0 && !over && P.share > 0;
     if(fld) fld.classList.toggle("bad", !!over);
@@ -2584,6 +2631,7 @@ rememberGridH();
       '<span>Staked ATONE earns from the next block; locked; unbonding takes <b>21 days</b>.</span>';
     E("stfee").textContent = ""; var st = E("ststep"); st.textContent = ""; st.className = "txstep";
     feeSoon("st", E("stfee"), ok ? stMsgs : null);
+    proBrk();
   }
   var stbtn = E("stbtn");
   if(stbtn) stbtn.addEventListener("click", function(){
@@ -2814,7 +2862,8 @@ rememberGridH();
     if(hint){ hint.className = "unhint"; hint.textContent = !signer ? "Needs Keplr (direct signing)" : ""; }
     var go = E("atgrant"); if(go) go.disabled = !ok;
     var sm = E("atsum");
-    if(sm) sm.innerHTML = view ? "Active" : !AT.addr ? '<span class=atclosed>Inactive</span>' : ok ? "until you revoke it" : "";
+    /* the header says one thing, as Restake's does: Active or Inactive (operator, 2026-09-30) */
+    if(sm) sm.innerHTML = view ? '<i class="you-tag on">Active</i>' : '<i class=you-tag>Inactive</i>';
     var fe = E("attxfee"), st = E("atstep"); fe.textContent = ""; st.textContent = ""; st.className = "txstep";
     feeSoon("at", fe, ok ? atMsgs : null);
   }

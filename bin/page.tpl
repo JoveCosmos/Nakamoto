@@ -5427,7 +5427,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .you-swt>b{display:flex;align-items:center;gap:7px}
 .you-tag{font-style:normal;font-family:var(--wmono);font-size:9px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;line-height:1;
   padding:3px 6px;border-radius:999px;border:1px solid var(--wbd2);color:var(--wf)}
-.you-tag.on{border-color:var(--sv-teal);color:var(--sv-teal);background:rgba(43,200,189,.10)}
+.you-tag.on{border-color:var(--sv-teal,#2bc8bd);color:var(--sv-teal,#2bc8bd);background:rgba(43,200,189,.10)}
 .you-swt small{font-size:11.5px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* Hands-free: one ? for both services' rules (operator, 2026-09-30); the column clips, so the tip opens up and left */
 .you-hfh{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -5441,6 +5441,9 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .you-tg.on{background:var(--sv-teal)}
 .you-tg.on i{transform:translateX(18px)}
 .you-tg:disabled{opacity:.45;cursor:default}
+.you-sw[data-tip]{position:relative}
+.you-sw[data-tip]:hover::after{content:attr(data-tip);position:absolute;right:10px;bottom:calc(100% + 6px);z-index:4;padding:6px 10px;border-radius:8px;
+  border:1px solid var(--wbd2);background:var(--wh);box-shadow:0 10px 24px -14px rgba(0,0,0,.6);font:600 12px var(--wsans);color:var(--wt);white-space:nowrap;pointer-events:none}
 .you-tg:focus-visible,.you-cl:focus-visible,.pth:focus-visible{outline:2px solid var(--sv-violet);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){.you-tg i{transition:none}}
 .mv-top{display:flex;align-items:center;gap:10px}
@@ -5602,8 +5605,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .txap b{color:var(--wcyan);font-weight:600}
 /* the Autopilot and Restake cards: three short lines, each with a small ? that holds the detail (hover, or tap
    on a phone), and a Rules pill in the header - no paragraphs in front (operator, 2026-09-30) */
-#rspop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4;--wcyan:#2bc8bd;--wamber:#ffb02e;
-  --wsans:"Helvetica Neue",Helvetica,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--wmono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
+#rspop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4;--wcyan:#2bc8bd;--wamber:#ffb02e}
 #atpop .card.atcard{width:min(460px,94vw);height:auto;max-height:94vh}
 #atpop .atL{padding:6px 20px 4px}
 .rscard{width:min(460px,94vw)}
@@ -5640,6 +5642,24 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 #rsgo{min-width:180px;height:40px;border-color:var(--wcyan);background:var(--wcyan);color:#0b1f1c;font-weight:600}
 #rsgo.wk-danger{background:transparent;border-color:#ff6a6a;color:#ff6a6a}
 #atpop .atnote{margin:4px 0 8px}
+/* Autopilot and Restake read alike (operator, 2026-09-30): title and an Active/Inactive tag, three lines, the
+   12-hour note, one button. Autopilot's status boxes are not shown */
+#atpop #atstate{display:none!important}
+#rspop .atnote:not(#z){margin:14px 0 8px;padding:10px 12px;font-size:12px;border-radius:9px}
+/* one frame for both: width, insets, header, and a footer with the button on the right at one size */
+#atpop .card.atcard:not(#z),#rspop .card.rscard:not(#z){width:min(520px,94vw);max-width:520px;padding:0}
+#atpop .atcard>.wk-txh:not(#z),#rspop .rscard>.wk-txh:not(#z){padding:16px 20px 12px}
+#atpop .atL:not(#z),#rspop .rsbody:not(#z){padding:6px 20px 4px}
+#atpop .atnote:not(#z){margin:14px 0 8px}
+#atpop .atcard .atfoot:not(#z){display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:12px;padding:12px 20px 16px}
+#atpop .atcard .atfoot .atfs:not(#z){padding:0;margin-right:auto}
+#atpop .atcard .atfoot .txbtns:not(#z){justify-content:flex-end;margin:0}
+#rspop .rsfoot:not(#z){padding:12px 20px 16px}
+#atpop .atfoot .txbtns .wk-btn:not(#z),#rspop #rsgo:not(#z){min-width:180px;height:40px;border-radius:10px;font:600 13px var(--wsans);letter-spacing:.02em;text-transform:none}
+#atpop #atgrant:not(#z){border-color:var(--wcyan);background:var(--wcyan);color:#0b1f1c}
+#atpop #atgrant:disabled:not(#z){border-color:var(--wbd2);background:transparent;color:var(--wf)}
+#atpop #atrevoke:not(#z),#rspop #rsgo.wk-danger:not(#z){background:transparent;border-color:#ff6a6a;color:#ff6a6a}
+.txcard .wk-txh .txsum .you-tag{display:inline-block;font-size:9px;letter-spacing:.08em}
 /* Autopilot has no choices left (no cap, no validator list): the card is what it does, and Grant / Revoke */
 #atpop .atview,#atpop #atR,#atpop #atform{display:none!important}
 #atpop .atbody{grid-template-columns:minmax(0,1fr)!important;flex:0 0 auto!important;min-height:0!important}
@@ -5755,6 +5775,29 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
    the menu - Redelegate, Stake, Unstake, Claim; the main pane loads the chosen action's list and Outcome its figures
    and button (app.js dock()). The hands-free switches stay on the other paths. ════ */
 #rdbtn{display:none}
+/* the actions are tabs in the title bar now; the wallet column keeps only the list of your delegations */
+.protabs{display:none}
+@media(min-width:1100px){
+  html[data-sv="dashboard/self"] .brandbar .protabs:not(#z){display:flex;margin-left:auto;grid-column:2/-1;justify-self:end}
+  #you #wk-mine .wk-t1 .wk-unb{display:none!important}
+  #protabs .l2tab[aria-selected=true]{background:var(--ink);color:var(--void);font-weight:500}
+  #protabs .l2tab[aria-disabled=true]{color:var(--l2-off);cursor:not-allowed}
+  /* Outcome's breakdown */
+  #one #proout .pro-brk{display:flex;flex-direction:column;gap:8px;order:-1}
+  .pro-brk-t{width:100%;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}
+  .pro-brk-t th{height:24px;padding:0 6px;text-align:right;border-bottom:1px solid var(--wbd);font:400 9px var(--wmono);letter-spacing:.1em;text-transform:uppercase;color:var(--wf)}
+  .pro-brk-t th.l{text-align:left}
+  .pro-brk-t td{height:30px;padding:0 6px;text-align:right;border-bottom:1px solid var(--wbd);font:500 12px var(--wmono);color:var(--wt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pro-brk-t td.nm{text-align:left;font:500 13px var(--wsans)}
+  .pro-brk-t td.nm .wk-lg{width:16px;height:16px;margin-right:7px;vertical-align:middle}
+  .pro-brk-t td.nm span{vertical-align:middle}
+  .pro-brk-t th:first-child{width:40%}
+  .pro-brk-f{font-size:12.5px;line-height:1.45;color:var(--ws)}
+  .pro-brk-f b{color:var(--wcyan);font-weight:600}
+  .pro-brk-e{padding:24px 0;text-align:center;font-size:13px;color:var(--ws)}
+  /* the old one-line sum is the breakdown's footer now */
+  #one #proout .txsum{display:none}
+}
 @media(min-width:1100px){
   html[data-sv="dashboard/self"] #rdbtn:not(#z){display:inline-flex}
   #one #p-dele .wk-two.wk-two:not(#z){grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
@@ -5939,6 +5982,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
       <div class=bwrap data-title-for=network><div class=bt><span class=btx><i class=nk>Network </i><i class="tsfx net tsub">Uptime</i></span></div></div>
       <div class=bwrap data-title-for=governance><div class=bt><span class=btx><i class=nk>Governance </i><i class="tsfx tsub">Proposals</i></span></div></div>
       <span class=sv-brand data-title-for=dashboard><span class=sv-bw><span class="bt svtag s"><span class=btx><i class=nk>Non-custodial </i><i class="tsfx grp-s">staking</i><i class="tsfx grp-g">Governance</i></span></span><span class="bt svtag a"><span class=btx><i class=nk>Decentralize and </i><i class=tsfx>earn more</i></span></span></span><span class=welc id=svwelc hidden></span></span>
+      <div class=protabs id=protabs role=tablist aria-label="Pro"><div class=l2trk><button class=l2tab type=button role=tab data-pro-act=redelegate aria-selected=true><span>Redelegate</span></button><button class=l2tab type=button role=tab data-pro-act=stake aria-selected=false><span>Stake</span></button><button class=l2tab type=button role=tab data-pro-act=unstake aria-selected=false><span>Unstake</span></button><button class=l2tab type=button role=tab data-pro-act=claim aria-selected=false><span>Claim</span></button></div></div>
       <div class=l2host>{{SHELL_L2}}</div>
     </header>
   <div class=flipbox id=flipbox>
@@ -6103,7 +6147,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
           <div class=wk-moves id=dstrat></div>
           <div class=wk-mvempty id=dmvempty>Select validators and enter a stake</div>
           <button class="wk-btn wk-go" id=dgo type=button disabled>Redelegate</button>
-          <div class=pro-dock id=proout hidden></div>
+          <div class=pro-dock id=proout hidden><div class=pro-brk id=probrk></div></div>
         </section>
       </div>
     </div>
@@ -6383,6 +6427,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   <header class=wk-txh><div><b id=rsttl>Restake</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=rssum></span></header>
   <div class=rsbody>
     <ul class=bn><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></i><span class=bn-t><b>Compounds your rewards</b><small><b id=rsadd>your rewards</b> more a year</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 20V10M10 20V6M15 20v-8M20 20V4"/></svg></i><span class=bn-t><b>Into the best-paying validator</b><small>not back onto the same one</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Claims and stakes, nothing else</b><small>GATA funds your restake, no fees for you</small></span></li></ul>
+    <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Runs every <b>12 hours</b></span></div>
   </div>
   <div class=rsfoot><button class="wk-btn wk-go" id=rsgo type=button>Enable</button></div>
 </div></div>

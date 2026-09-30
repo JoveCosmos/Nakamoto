@@ -1523,7 +1523,9 @@
     }).join(""));
   }
   function youSwitch(act, name, on, sub, dis){
-    return '<div class=you-sw><div class=you-swt><b>' + name + '<i class="you-tag' + (on ? ' on' : '') + '">' + (on ? 'Active' : 'Inactive') + '</i></b><small>' + sub + '</small></div>' +
+    /* a switch that cannot be used says why on hover: nothing staked, or no wallet (operator, 2026-09-30) */
+    var tip = dis ? (window.__ADDR ? 'Stake ATONE' : 'Connect a wallet') : '';
+    return '<div class="you-sw' + (dis ? ' dis' : '') + '"' + (tip ? ' data-tip="' + tip + '"' : '') + '><div class=you-swt><b>' + name + '<i class="you-tag' + (on ? ' on' : '') + '">' + (on ? 'Active' : 'Inactive') + '</i></b><small>' + sub + '</small></div>' +
       '<button class="you-tg' + (on ? ' on' : '') + '" type=button role=switch aria-checked=' + (on ? 'true' : 'false') + ' aria-label="' + name + '"' +
       (dis ? ' disabled aria-disabled=true tabindex=-1' : ' data-act=' + act) + '><i></i></button></div>';
   }
@@ -1556,13 +1558,13 @@
     home();
     h += '<div class=you-hf><div class=you-hfh><em>Hands-free</em><button class=qm type=button aria-label="How Autopilot and Restake work">?<span class=qm-tip role=tooltip>' +
       '<b>Autopilot</b><span>Runs every 12 hours</span><span>Redelegates when stake inactive or for a minimum 5% APR gain</span><span>Turn it off anytime</span>' +
-      '<b>Restake</b><span>Runs every 12 hours</span><span>Minimum 1 ATONE</span><span>Turn it off anytime</span></span></button></div>' +
+      '<b>Restake</b><span>Runs every 12 hours</span><span>Claim and stake rewards minimum 1 ATONE</span><span>Turn it off anytime</span></span></button></div>' +
       youSwitch("youauto", "Autopilot", auto, asub, !a || !mine) +
       youSwitch("restakesw", "Restake", rs, rs ? "on, rewards staked every 12 hours" : "stakes your rewards every 12 hours", !a || !mine) + '</div>';
     put("you", h);
   }
   var youEl0 = E("you"), MINE_HOME = E("wk-mine") ? E("wk-mine").parentNode : null;
-  function drawOne(){ if(window.__undockIfNarrow) window.__undockIfNarrow(); if(E("you")) drawYou(); if(E("paths")) drawPaths(); }
+  function drawOne(){ if(window.__undockIfNarrow) window.__undockIfNarrow(); if(window.__proTabs) window.__proTabs(); if(E("you")) drawYou(); if(E("paths")) drawPaths(); }
   /* Restake has its own card (operator, 2026-09-30): what it does in three lines, the detail behind each ?, and
      Enable or Disable - never a signature straight from the switch */
   function rsOpen(){
@@ -1570,7 +1572,7 @@
     var at = window.__atInfo ? window.__atInfo() : null, on = !!(at && at.restake), pos = window.__POS;
     var r = pos && pos.rows.length ? pos.rate : 0, add = r > 0 ? Math.pow(1 + r / 730, 730) - 1 - r : 0;
     var ad = E("rsadd"); if(ad) ad.textContent = add > 0 ? "+" + fmt(pos.total * add) + " ATONE" : "Your rewards";
-    var sm = E("rssum"); if(sm) sm.textContent = on ? "On" : "Off";
+    var sm = E("rssum"); if(sm) sm.innerHTML = on ? '<i class="you-tag on">Active</i>' : '<i class=you-tag>Inactive</i>';
     var b = E("rsgo"); if(b){ b.textContent = on ? "Disable" : "Enable"; b.className = "wk-btn " + (on ? "wk-danger" : "wk-go"); }
     POP.open(el);
   }
@@ -1654,14 +1656,14 @@
     var h;
     if(!a){
       h = top('') +
-        '<div class=mv-hl><b>About ' + (hi ? pct(hi) : '—') + ' APR</b><span>with Autopilot, for 10,000 ATONE</span></div>' + cmp() + mvSet({}, {}) +
+        (hi ? '<div class=mv-hl><b>About ' + pct(hi) + ' APR</b><span>with Autopilot, for 10,000 ATONE</span></div>' : '') + cmp() + mvSet({}, {}) +
         '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=connect>Connect a wallet</button><span>Your balances and your own best move show here.</span></div>';
     } else if(!pos){
       h = top('') + '<div class=mv-hl><b>Reading your stake…</b></div>';
     } else if(!pos.rows.length){
       h = top('', 'Nothing staked', 'q') +
-        '<div class=mv-hl><b>Stake to start earning</b><span>About ' + (hi ? pct(hi) : '—') + ' APR with Autopilot</span></div>' + cmp() + mvSet({}, {}) +
-        '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=stake>Stake ATONE</button><span>Your ATONE stays yours: staking only delegates it.</span></div>';
+        '<div class=mv-hl><b>Stake to start earning</b>' + (hi ? '<span>About ' + pct(hi) + ' APR with Autopilot</span>' : '') + '</div>' + cmp() + mvSet({}, {}) +
+        '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=stake>Stake ATONE</button></div>';
     } else {
       var plan = planNow(pos), offer = plan && plan.after != null && plan.msgs && plan.msgs.length;
       var direct = !!(window.__WALLET && window.__WALLET.signDirect);
