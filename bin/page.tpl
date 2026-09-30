@@ -5542,7 +5542,17 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-r b{font-family:var(--wmono);font-size:13.5px;font-weight:500;text-align:right;color:var(--wt);font-variant-numeric:tabular-nums}
 .mv-r i{font-style:normal;font-family:var(--wmono);font-size:11.5px;text-align:right}
 .mv-r .a{color:var(--sv-amber)}.mv-r .g{color:var(--sv-teal)}
-.mv-more{font-size:12px;color:var(--wf);padding:6px 0 2px;border-top:1px solid var(--wbd)}
+.mv-more{display:flex;align-items:center;gap:6px;width:100%;margin:0;padding:7px 0 3px;border:0;border-top:1px solid var(--wbd);background:none;
+  font:inherit;font-size:12px;color:var(--ws);text-align:left;cursor:pointer}
+.mv-more svg{width:13px;height:13px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s ease}
+.mv-more[aria-expanded=true] svg{transform:rotate(180deg)}
+.mv-more:hover,.mv-more:focus-visible{color:var(--sv-teal);outline:none}
+.mv-rows{display:flex;flex-direction:column}
+.mv-rows>.mv-r:first-child{border-top:0}
+.mv-rows .mv-x{display:none}
+.mv-rows.open .mv-x{display:grid}
+.mv-rows.open{max-height:210px;overflow-y:auto;scrollbar-width:thin}
+@media(prefers-reduced-motion:reduce){.mv-more svg{transition:none}}
 .mv-arr{display:flex;justify-content:center}
 .mv-arr svg{width:40px;height:18px;fill:none;stroke:var(--sv-teal);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .mv-lock{font-size:12.5px;color:var(--sv-amber)}

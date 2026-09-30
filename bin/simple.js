@@ -1593,19 +1593,23 @@
 
   /* ── YOUR MOVE: the one screen's first stage. Before the click it says what moves where, in numbers;
      after it, the 21-day cooldown the chain holds redelegated stake for; then the cycle repeats. ── */
-  function mvRows(list, cls, more){
-    var shown = list.slice(0, 5), rest = list.length - shown.length;
-    return shown.map(function(r){
-      return '<div class=mv-r><u class=' + cls + '>' + r.rank + '</u><span title="' + esc(r.name) + '">' + esc(r.name) + '</span><b>' + r.amt + '</b><i class=' + cls + '>' + r.apr + '</i></div>';
-    }).join("") + (rest > 0 ? '<div class=mv-more>and ' + rest + ' more ' + more + '</div>' : '');
+  /* five rows, then "and N more" with an arrow that opens the whole list in place, scrolling (operator, 2026-09-30) */
+  var MVOPEN = {};
+  function mvRows(list, cls, more, key){
+    var rest = list.length - 5, open = rest > 0 && !!MVOPEN[key];
+    var CH = '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 9l6 6 6-6"/></svg>';
+    return '<div class="mv-rows' + (open ? ' open' : '') + '">' + list.map(function(r, i){
+      return '<div class="mv-r' + (i >= 5 ? ' mv-x' : '') + '"><u class=' + cls + '>' + r.rank + '</u><span title="' + esc(r.name) + '">' + esc(r.name) + '</span><b>' + r.amt + '</b><i class=' + cls + '>' + r.apr + '</i></div>';
+    }).join("") + '</div>' +
+      (rest > 0 ? '<button type=button class=mv-more data-act=mvmore data-k="' + key + '" aria-expanded=' + open + '><span>' + (open ? 'Show fewer' : 'and ' + rest + ' more ' + more) + '</span>' + CH + '</button>' : '');
   }
-  function mvSet(src, dst){
+  function mvSet(src, dst, lab){
     var V = VALS(), n = V.length, top = V.length ? V[0][1] : 1, cut = Math.max(0, n - 34), edge = Math.max(cut, n - 3);   /* the rule's region: ranks 67 to 97 */
     var bars = V.map(function(v, i){
       var cls = src[v[3]] ? ' s' : dst[v[3]] ? ' d' : i >= cut && i < edge ? ' lo' : '';
       return '<i class="' + cls.trim() + '" style="height:' + Math.round(6 + 94 * Math.sqrt(v[1] / top)) + '%"></i>';
     }).join("");
-    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em><em class=g>Where your stake goes</em></div>' +
+    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em><em class=g>' + (lab || 'Where your stake goes') + '</em></div>' +
       '<div class=mv-bars>' + bars + '</div><div class=mv-brk><span style="flex:' + cut + '"></span><span class=g style="flex:' + (edge - cut) + '">ranks ' + (cut + 1) + ' to ' + edge + '</span><span style="flex:' + (n - edge) + '"></span></div></div>';
   }
   function drawMove(){
@@ -1638,10 +1642,12 @@
         card('Smallest validator', rk(small[3]) + ' ' + esc(nm(small[3])), rate(small[3], 1e10), '') + '</div>';
     };
     var top = function(eb, chip, cls){ return '<div class=mv-top><h3 class=mv-h>Your move</h3><em>' + eb + '</em>' + (chip ? '<span class="mv-chip ' + cls + '">' + chip + '</span>' : '') + '</div>'; };
+    /* the set chart in every state (operator, 2026-09-30): where this wallet's stake sits, lit on the set */
+    var mineIds = function(){ var o = {}; (pos && pos.rows || []).forEach(function(r){ if(r.x >= 1e5 && !r.inactive) o[r.id] = 1; }); return o; };
     var nowOn = function(){
       /* dust a redelegation leaves behind (under 0.1 ATONE) is not a position */
       var rows = pos.rows.filter(function(r){ return r.x >= 1e5; }).sort(function(x, y){ return y.x - x.x; });
-      return '<div class=mv-box><em>Now on</em>' + mvRows(rows.map(function(r){ return { rank: r.inactive ? 'out' : rk(r.id), name: r.m, amt: fmt(r.x), apr: r.inactive ? '0%' : pct(r.rate) }; }), 'g', 'validators') + '</div>';
+      return '<div class=mv-box><em>Now on</em>' + mvRows(rows.map(function(r){ return { rank: r.inactive ? 'out' : rk(r.id), name: r.m, amt: fmt(r.x), apr: r.inactive ? '0%' : pct(r.rate) }; }), 'g', 'validators', 'now') + '</div>';
     };
     var you = '';
     if(a){
@@ -1676,9 +1682,9 @@
         var lock = pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is cooling down until ' + day(pos.until) + ' and stays where it is.</div>' : '';
         h = top('Best today', auto ? '' : 'Ready, 1 approval', 'ok') +
           '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.now) + '</i> to <i class=g>' + pct(plan.after) + '</i> APR</span></div>' +
-          '<div class=mv-flow><div class=mv-box><em>From, ' + fL.length + ' validator' + (fL.length === 1 ? '' : 's') + '</em>' + mvRows(fL, 'a', 'validators') + '</div>' +
+          '<div class=mv-flow><div class=mv-box><em>From, ' + fL.length + ' validator' + (fL.length === 1 ? '' : 's') + '</em>' + mvRows(fL, 'a', 'validators', 'from') + '</div>' +
           '<div class=mv-arr aria-hidden=true><svg viewBox="0 0 44 20"><path d="M2 10h38M32 3l8 7-8 7"/></svg></div>' +
-          '<div class=mv-box><em>To, ' + tL.length + ' validator' + (tL.length === 1 ? '' : 's') + '</em>' + mvRows(tL, 'g', 'validators') + '</div></div>' +
+          '<div class=mv-box><em>To, ' + tL.length + ' validator' + (tL.length === 1 ? '' : 's') + '</em>' + mvRows(tL, 'g', 'validators', 'to') + '</div></div>' +
           lock + mvSet(src, dst) +
           (auto ? '<div class=mv-act><b class=mv-on>Autopilot is Active</b></div>'
                 : '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=opt>' + (direct ? 'Activate Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE') + '</button>' +
@@ -1690,7 +1696,7 @@
         h = top(auto ? 'Moved. Autopilot is active' : 'Moved. Cooling down', 'Day ' + k + ' of 21', 'warn') +
           '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>Free to move again on <b>' + day(t1) + '</b>.</span></div>' +
           '<div class=mv-days><div class=mv-dh><span>Cooling down</span><span>' + day(t0) + ' to ' + day(t1) + '</span></div><div class=mv-dc>' + cells + '</div>' +
-          '<small>The chain holds redelegated stake for 21 days. Nothing to do until then.</small></div>' + nowOn() +
+          '<small>The chain holds redelegated stake for 21 days. Nothing to do until then.</small></div>' + nowOn() + mvSet({}, mineIds(), 'Where your stake is') +
           (auto ? '<div class=mv-cyc><div class=done><em>' + (hist ? day(hist.at * 1000) : 'Done') + '</em><b>Moved</b></div><div class=warn><em>Until ' + day(t1) + '</em><b>Cooling down</b></div>' +
                   '<div><em>Every 12 hours</em><b>Checked again</b></div><div><em>5 points more</em><b>Moved for you</b></div></div>'
                 : '<div class=mv-ap><span>On ' + day(t1) + ' this stake is free again. <b>Autopilot moves it for you</b> whenever it can earn more, checking every 12 hours.</span>' +
@@ -1698,7 +1704,7 @@
       } else {
         h = top('Your stake today', 'At its best', 'ok') +
           '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>No move earns it 5 APR points more today.' + (auto ? ' Autopilot checks again every 12 hours.' : ' This checks again every block.') + '</span></div>' +
-          nowOn() + mvSet({}, {});
+          nowOn() + mvSet({}, mineIds(), 'Where your stake is');
       }
     }
     put("mv-stage", you + h);
@@ -1755,6 +1761,7 @@
     }
     if(act === "youauto"){ youAuto(); return; }
     if(act === "connect"){ var cb = E("svconn"); if(cb) cb.click(); return; }
+    if(act === "mvmore"){ MVOPEN[t.dataset.k] = !MVOPEN[t.dataset.k]; drawMove(); return; }
     if(act === "restakesw"){ rsOpen(); return; }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }

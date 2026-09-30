@@ -975,6 +975,8 @@
   html[data-theme=light]:not([data-mono]) .mv-chip.warn{background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) .mv-chip.q{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .mv-r u{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .mv-more{background:none}
+  html[data-theme=light]:not([data-mono]) .mv-more svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .mv-arr svg{fill:none}
   html[data-theme=light]:not([data-mono]) .mv-cc.g{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .mv-bars i.lo{background:var(--accent)}
