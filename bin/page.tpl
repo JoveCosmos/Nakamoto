@@ -6109,6 +6109,15 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #one #p-dele #wk-mv>.wk-ans .p.rate:not(#z):not(#y):not(#x){justify-content:flex-start}
   #one #p-dele #wk-mv>.wk-ans .p.rate::before{margin-right:auto}
 }
+/* the set chart at the design's size (operator, 2026-09-30, the proposal's picture): a compact strip, ~90px of bars,
+   thin with small gaps - it no longer stretches to fill the stage */
+@media(min-width:1100px){
+  #mv-stage .mv-set:not(#z):not(#y){flex:0 0 auto;min-height:0}
+  #mv-stage .mv-bars:not(#z):not(#y){flex:0 0 auto;height:90px;min-height:0;gap:3px}
+  #mv-stage .mv-bars i:not(#z){border-radius:2px 2px 0 0}
+}
+@media(min-width:1100px) and (max-height:820px){#mv-stage .mv-bars:not(#z):not(#y){height:64px}}
+@media(min-width:1100px) and (max-height:680px){#mv-stage .mv-bars:not(#z):not(#y){height:48px}}
 /* ════ STICKY HEADS (operator, 2026-09-30): a list's column titles stay on top as it scrolls, on the pane's own
    colour, so rows never show through them - Redelegate, Delegations, Outcome's moves, Stake's list, Picks ════ */
 #one #p-dele .wk-tbl2 thead th:not(#z):not(#y),#you .wk-tbl2 thead th:not(#z):not(#y),#one #p-dele #wk-mv .wk-moves thead th:not(#z):not(#y),
