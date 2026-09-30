@@ -1555,7 +1555,7 @@
     }
     home();
     h += '<div class=you-hf><div class=you-hfh><em>Hands-free</em><button class=qm type=button aria-label="How Autopilot and Restake work">?<span class=qm-tip role=tooltip>' +
-      '<b>Autopilot</b><span>Runs every 12 hours</span><span>Redelegates stake when inactive or for a minimum 5% APR gain</span><span>Turn it off anytime</span>' +
+      '<b>Autopilot</b><span>Runs every 12 hours</span><span>Redelegates when stake inactive or for a minimum 5% APR gain</span><span>Turn it off anytime</span>' +
       '<b>Restake</b><span>Runs every 12 hours</span><span>Minimum 1 ATONE</span><span>Turn it off anytime</span></span></button></div>' +
       youSwitch("youauto", "Autopilot", auto, asub, !a || !mine) +
       youSwitch("restakesw", "Restake", rs, rs ? "on, rewards staked every 12 hours" : "stakes your rewards every 12 hours", !a || !mine) + '</div>';
