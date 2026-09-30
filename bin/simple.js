@@ -1529,22 +1529,24 @@
       '<button class="you-tg' + (on ? ' on' : '') + '" type=button role=switch aria-checked=' + (on ? 'true' : 'false') + ' aria-label="' + name + '"' +
       (dis ? ' disabled aria-disabled=true tabindex=-1' : ' data-act=' + act) + '><i></i></button></div>';
   }
-  /* ── the testnet faucet in the wallet column: 100 ATONE and 10 PHOTON, each once per address (the faucet service) ── */
+  /* ── the testnet faucet in the wallet column: 10 ATONE and 1 PHOTON, each once per address per 24 hours (the faucet service) ── */
   var FCT = {}, FCTTX = {}, FCTMSG = "", FCTBUSY = "";
-  var FCT_TX = "https://explorer.gatahub.zone/atomone-testnet/txs/";
+  var FCT_TX = "https://explorer.gatahub.zone/atomone-testnet-1/txs/";
   function faucetBox(a){
     var c = a ? FCT[a] : null;
     if(a && !c){ FCT[a] = {}; fetch("/faucet-api/claimed?address=" + encodeURIComponent(a), { cache: "no-store" })
       .then(function(r){ return r.json(); }).then(function(j){ FCT[a] = j || {}; drawYou(); }).catch(function(){}); }
-    /* one row each; once sent the button becomes its transaction, short hash, opening the explorer (operator, 2026-09-30) */
-    var b = function(t, label){
-      var tx = a && FCTTX[a] && FCTTX[a][t], got = c && c[t];
-      if(tx) return '<a class="you-fq sent" href="' + FCT_TX + esc(tx.toUpperCase()) + '" target=_blank rel=noopener title="' + esc(tx.toUpperCase()) + '">' +
-        '<span>' + label + ' sent</span><i>' + esc(tx.slice(0, 8).toUpperCase()) + '\u2026</i></a>';
+    /* one row each (operator, 2026-09-30): "10 ATONE request" / "1 PHOTON request"; once received within 24 hours the
+       row is that amount and its transaction, short hash, opening the explorer */
+    var AMT = { atone: "10 ATONE", photon: "1 PHOTON" };
+    var b = function(t){
+      var tx = (a && FCTTX[a] && FCTTX[a][t]) || (c && c[t] && c[t + "_tx"]), got = c && c[t];
+      if(got && tx) return '<a class="you-fq sent" href="' + FCT_TX + esc(String(tx).toUpperCase()) + '" target=_blank rel=noopener title="' + esc(String(tx).toUpperCase()) + '">' +
+        '<span>' + AMT[t] + '</span><i>' + esc(String(tx).slice(0, 8).toUpperCase()) + '\u2026</i></a>';
       var dis = !a || got || FCTBUSY;
       return '<span class="you-fw"' + (!a ? ' data-tip="Connect a wallet"' : '') + '><button class=you-fq type=button' + (dis ? ' disabled' : ' data-act=faucet data-t=' + t) + '>' +
-        (got ? label + ' received' : FCTBUSY === t ? 'Sending\u2026' : 'Request ' + label) + '</button></span>'; };
-    return '<div class=you-fct><em>Faucet</em><div class=you-fb>' + b("atone", "ATONE") + b("photon", "PHOTON") + '</div>' +
+        (got ? AMT[t] + ' received' : FCTBUSY === t ? 'Sending\u2026' : AMT[t] + ' request') + '</button></span>'; };
+    return '<div class=you-fct><em>Faucet <small>reset 24h</small></em><div class=you-fb>' + b("atone") + b("photon") + '</div>' +
       (FCTMSG ? '<small>' + FCTMSG + '</small>' : '') + '</div>';
   }
   function faucetGo(t){
@@ -1555,7 +1557,7 @@
       .then(function(j){ (FCT[a] = FCT[a] || {})[t] = true;
         if(j && /^[0-9A-Fa-f]{64}$/.test(j.txhash || "")) (FCTTX[a] = FCTTX[a] || {})[t] = j.txhash;
         setTimeout(function(){ if(window.__refreshPos) window.__refreshPos(); }, 6000); })
-      .catch(function(e){ var m = e && e.message || String(e); if(/already received/.test(m)) (FCT[a] = FCT[a] || {})[t] = true; else FCTMSG = esc(m); })
+      .catch(function(e){ var m = e && e.message || String(e); if(/already received/.test(m)){ (FCT[a] = FCT[a] || {})[t] = true; } FCTMSG = esc(m); })
       .then(function(){ FCTBUSY = ""; drawYou(); });
   }
   function drawYou(){

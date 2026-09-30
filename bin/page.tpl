@@ -5512,6 +5512,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .you-fct{display:flex;flex-direction:column;gap:8px}
 @media(min-width:1100px){#you .you-fct{margin-top:auto}#you .you-fct+.you-hf:not(#z){margin-top:16px}}   /* just above the hands-free switches */
 .you-fct>em{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+.you-fct>em small{margin-left:6px;font-size:9px;letter-spacing:.06em;text-transform:none;color:var(--wf);opacity:.8}
 .you-fb{display:flex;flex-direction:column;gap:8px}
 .you-fw{position:relative;display:flex}
 .you-fq{flex:1 1 auto;min-width:0;height:34px;padding:0 12px;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-sizing:border-box;border:1px solid var(--sv-teal,#2bc8bd);border-radius:9px;background:transparent;color:var(--sv-teal,#2bc8bd);

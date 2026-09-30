@@ -5,7 +5,7 @@
 // port, and the signer's code still refuses any send. Mainnet has no faucet and never will from this code.
 //
 //   GET  /faucet-api/status                    -> { address, chain_id, atone, photon, give, reserve }
-//   POST /faucet-api/request {address, token}  -> { txhash }     token: "atone" (100) | "photon" (10)
+//   POST /faucet-api/request {address, token}  -> { txhash }     token: "atone" (10) | "photon" (1), each once per 24 hours
 //
 // Rules: each address gets each token ONCE; an IP makes at most IP_DAY requests a day; a reserve of each
 // token always stays (the Autopilot signer pays its fees in PHOTON from this account). One send at a time.
@@ -24,7 +24,9 @@ const RPC = process.env.ATOMONE_RPC || "https://atomone-testnet-rpc.gatadao.com"
 const GAS = process.env.ATOMONE_GAS_PRICE || "0.03uphoton";
 const BIND = process.env.BIND || "127.0.0.1", PORT = +(process.env.PORT || 8791);
 const STATE = path.join(process.env.STATE_DIRECTORY || "/var/lib/atomone-faucet", "claims.json");
-const GIVE = { atone: { denom: "uatone", amount: 100_000_000 }, photon: { denom: "uphoton", amount: 10_000_000 } };
+const GIVE = { atone: { denom: "uatone", amount: 10_000_000 }, photon: { denom: "uphoton", amount: 1_000_000 } };   // 10 ATONE, 1 PHOTON (operator, 2026-09-30)
+const WINDOW = 24 * 3600 * 1000;                                                    // each token once per address per 24 hours
+const recent = (c) => c && typeof c === "object" && Date.now() - (c.at || 0) < WINDOW;
 const RESERVE = { uatone: 1_000_000_000, uphoton: 100_000_000 };          // 1,000 ATONE and 100 PHOTON always stay
 const IP_DAY = +(process.env.IP_DAY || 4);
 
@@ -83,7 +85,9 @@ http.createServer(async (req, res) => {
     }
     if (req.method === "GET" && req.url.startsWith("/faucet-api/claimed?address=")) {
       const a = decodeURIComponent(req.url.split("=")[1] || "");
-      return send(200, { atone: !!(S.claims[a] || {}).atone, photon: !!(S.claims[a] || {}).photon });
+      const cl = S.claims[a] || {}, out = {};
+      for (const t of ["atone", "photon"]) { const c = cl[t]; out[t] = !!recent(c); if (recent(c)) { out[t + "_tx"] = c.tx || null; out[t + "_next"] = c.at + WINDOW; } }
+      return send(200, out);
     }
     if (req.method !== "POST" || req.url !== "/faucet-api/request") return send(404, { error: "not found" });
     const { address, token } = JSON.parse(await body(req) || "{}");
@@ -92,7 +96,8 @@ http.createServer(async (req, res) => {
     if (address === from) return send(400, { error: "That is the faucet's own address." });
     const ip = String(req.headers["x-real-ip"] || req.socket.remoteAddress || ""), day = new Date().toISOString().slice(0, 10);
     return await serial(async () => {
-      if ((S.claims[address] || {})[token]) return send(409, { error: "This address already received its " + token.toUpperCase() + "." });
+      const prev = (S.claims[address] || {})[token];
+      if (recent(prev)) return send(409, { error: "This address already received " + token.toUpperCase() + " in the last 24 hours. Again after " + new Date(prev.at + WINDOW).toISOString().slice(11, 16) + " UTC." });
       const k = day + " " + ip; if ((S.ips[k] || 0) >= IP_DAY) return send(429, { error: "Too many requests from here today. Try tomorrow." });
       const g = GIVE[token], b = await balances(c, from);
       if ((b[g.denom] || 0n) - BigInt(g.amount) < BigInt(RESERVE[g.denom])) return send(503, { error: "The faucet is empty for " + token.toUpperCase() + " right now." });
