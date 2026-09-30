@@ -5605,7 +5605,8 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .txap b{color:var(--wcyan);font-weight:600}
 /* the Autopilot and Restake cards: three short lines, each with a small ? that holds the detail (hover, or tap
    on a phone), and a Rules pill in the header - no paragraphs in front (operator, 2026-09-30) */
-#rspop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4;--wcyan:#2bc8bd;--wamber:#ffb02e}
+#rspop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4;--wcyan:#2bc8bd;--wamber:#ffb02e;
+  --wsans:"Helvetica Neue",Helvetica,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--wmono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
 #atpop .card.atcard{width:min(460px,94vw);height:auto;max-height:94vh}
 #atpop .atL{padding:6px 20px 4px}
 .rscard{width:min(460px,94vw)}
@@ -5803,6 +5804,11 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #one #p-dele .wk-two.wk-two:not(#z){grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
   #one #p-dele #wk-plan.wk-pane:not(#z){grid-column:1;grid-row:1}
   #one #p-dele #wk-mv.wk-pane:not(#z){grid-column:2;grid-row:1}
+  /* Outcome keeps its button at the foot: the moves list takes the room between and scrolls, the button never moves */
+  #one #p-dele #wk-mv.wk-pane:not(#z){display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  #one #p-dele #wk-mv .wk-moves:not(#z){flex:1 1 auto;min-height:0;overflow-y:auto}
+  #one #p-dele #wk-mv .wk-mvempty:not(#z){flex:1 1 auto}
+  #one #p-dele #wk-mv #dgo:not(#z){flex:0 0 auto;margin-top:auto}
   /* the Delegations pane inside the wallet column */
   #you .you-dele{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;border-top:1px solid var(--wbd);padding-top:12px}
   #you #wk-mine.wk-pane:not(#z){flex:1 1 auto;min-height:0;display:flex;flex-direction:column;border:0;border-radius:0;background:none;box-shadow:none;padding:0;overflow:hidden}
