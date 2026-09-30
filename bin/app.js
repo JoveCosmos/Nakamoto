@@ -2292,7 +2292,7 @@ rememberGridH();
     if(lk) lk.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
       '<span>Redelegated stake cannot be redelegated again for <b>21 days</b>, until <b>' + window.__day(until.getTime()) + '</b></span>';
     fee.textContent = "fee: estimating…"; step.textContent = ""; step.className = "txstep";
-    sign.disabled = false; sign.textContent = TXAP ? "Start Autopilot" : "Redelegate";
+    sign.disabled = false; sign.textContent = TXAP ? "Grant Autopilot" : "Redelegate";
     var ap = E("txap"); if(ap) ap.hidden = !TXAP;
     if(TXAP) msgs = txAll();
     POP.open(txpop);
