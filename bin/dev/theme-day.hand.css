@@ -411,3 +411,8 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #one #prolist .unrow input:not(#z):not(#y):not(#x){background:var(--surface-2);border-color:var(--line-strong)}
   html[data-theme=light]:not([data-mono]) #one #prolist .unrow input:checked:not(#z):not(#y):not(#x){background:var(--accent);border-color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #one #prolist .unrow input:checked::after{border-color:var(--surface)}
+  html[data-theme=light]:not([data-mono]) #prolist thead th.ck input{background:var(--surface-2);border-color:var(--line-strong)}
+  html[data-theme=light]:not([data-mono]) #prolist thead th.ck input:checked{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #prolist thead th.ck input:checked::after{border-color:var(--surface)}
+  html[data-theme=light]:not([data-mono]) #one #prolist .wk-tbl2 tbody tr.on td:not(#z):not(#y):not(#x){background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #one #prolist .wk-tbl2 tbody tr.on td:first-child:not(#z):not(#y):not(#x){box-shadow:none}

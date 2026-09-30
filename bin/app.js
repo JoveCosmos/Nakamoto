@@ -2033,6 +2033,23 @@ rememberGridH();
     });
     return h;
   }
+  /* rank in the active set by stake, for the docked lists' rank column */
+  function rankMap(){ var m = {}; (window.__VALS ? window.__VALS() : []).slice().sort(function(a, b){ return b[1] - a[1]; }).forEach(function(v, i){ m[v[3]] = i + 1; }); return m; }
+  /* a docked Pro list as Redelegate's table: a titles row with its select-all box, then one row per validator;
+     cols: [[title, width px or null, class]], cells(r) -> [html...] after the box; sel: {id:1}; toggle(ids, on) */
+  function proTable(el, rows, cols, cells, sel, toggle){
+    var n = 0; rows.forEach(function(r){ if(sel[r.id]) n++; });
+    var h = '<table><colgroup><col style="width:30px">' + cols.map(function(c){ return c[1] ? '<col style="width:' + c[1] + 'px">' : '<col>'; }).join('') + '</colgroup>' +
+      '<thead><tr><th class=ck><input type=checkbox class=pro-all aria-label="Tick every validator"' + (n && n === rows.length ? ' checked' : '') + '></th>' +
+      cols.map(function(c){ return '<th' + (c[2] ? ' class=' + c[2] : '') + '>' + c[0] + '</th>'; }).join('') + '</tr></thead><tbody>';
+    rows.forEach(function(r){ var on = !!sel[r.id];
+      h += '<tr' + (on ? ' class=on' : '') + '><td class=ck><input type=checkbox data-id="' + att(r.id) + '"' + (on ? ' checked' : '') + '></td>' + cells(r).join('') + '</tr>'; });
+    el.innerHTML = h + '</tbody></table>';
+    var all = el.querySelector(".pro-all"); if(all) all.addEventListener("change", function(){ toggle(rows.map(function(r){ return r.id; }), all.checked); });
+    Array.prototype.forEach.call(el.querySelectorAll("tbody input[data-id]"), function(c){
+      c.addEventListener("change", function(){ toggle([c.dataset.id], c.checked); });
+      var tr = c.closest("tr"); if(tr) tr.addEventListener("click", function(ev){ if(ev.target === c) return; c.checked = !c.checked; c.dispatchEvent(new Event("change")); }); });
+  }
   function ijWire(el, redraw){
     Array.prototype.forEach.call(el.querySelectorAll(".ij-b"), function(b){
       b.addEventListener("click", function(){ IJ[b.dataset.ij] = !IJ[b.dataset.ij]; redraw(); }); });
@@ -2152,8 +2169,7 @@ rememberGridH();
            (o.jail == null ? '<td class=dim>N/A</td>' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>') +
            (lay ? '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '\u2014') + '</s><em>→</em><b>' + pct(there) + '</b></td>' : '<td class=r2><b>' + pct(o.rate0) + '</b></td>') + '</tr>';
     });
-    /* no inactive or jailed validators here (operator, 2026-09-30): moving stake onto one earns nothing */
-    if(SEL && typeof SEL === "object") Object.keys(SEL).forEach(function(id){ if(!(window.__VDBY || {})[id]) delete SEL[id]; });
+    h += ijRows("rd", (h.match(/<col[ >]/g) || []).length, pos ? SEL : null);
     var top = el.scrollTop;
     el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
     ijWire(el, draw);
@@ -2418,6 +2434,15 @@ rememberGridH();
     /* the first row selects every validator at once */
     var all = rows.length > 1 ? '<label class="unrow all' + (n === rows.length ? ' on' : '') + '"><input type=checkbox value="*"' + (n === rows.length ? ' checked' : '') + '>' +
               '<span class="wk-lg wk-lgx">\u2211</span><b>All validators</b><i>' + fmt(pos.total) + '<em>ATONE</em></i></label>' : '';
+    if(DOCK && DOCK.pop === unpop){
+      var rk = rankMap(); el.className = "unpick wk-tbl2";
+      proTable(el, rows, [["rank", 36, "c"], ["validator", null, "l"], ["status", 84, "l"], ["ATONE", 96, ""]],
+        function(r){ return ['<td class="c rk">' + (rk[r.id] || '\u2013') + '</td>', '<td class="l nm"><div class=nmw>' + logo(r.id, r.m) + '<span>' + att(r.m) + '</span></div></td>',
+                             '<td class=l>' + status(r) + '</td>', '<td>' + fmt(r.x) + '</td>']; },
+        UNSEL, function(ids, on){ ids.forEach(function(id){ if(on) UNSEL[id] = 1; else delete UNSEL[id]; }); unRows(); unState(); });
+      return;
+    }
+    el.className = "unpick";
     el.innerHTML = head + all + rows.map(function(r){ var on = !!UNSEL[r.id];
       return '<label class="unrow' + (on ? ' on' : '') + '"><input type=checkbox value="' + att(r.id) + '"' + (on ? ' checked' : '') + '>' +
              logo(r.id, r.m) + '<b>' + att(r.m) + '</b>' + status(r) + '<i>' + fmt(r.x) + '<em>ATONE</em></i></label>'; }).join("");
@@ -2511,7 +2536,21 @@ rememberGridH();
     var n = 0, tot = 0, all = 0; rows.forEach(function(r){ all += r.x; if(CLSEL[r.id]){ n++; tot += r.x; } });
     var every = rows.length > 1 ? '<label class="unrow all' + (n === rows.length ? ' on' : '') + '"><input type=checkbox value="*"' + (n === rows.length ? ' checked' : '') + '>' +
       '<span class="wk-lg wk-lgx">\u2211</span><b>All validators</b><i>' + exact(all, 6) + '<em>ATONE</em></i></label>' : '';
-    var head = DOCK && DOCK.pop === clpop ? '<div class=unhead><span>Validator</span><span>Rewards, ATONE</span></div>' : '';
+    if(DOCK && DOCK.pop === clpop){
+      var rk = rankMap(); el.className = "unpick wk-tbl2";
+      proTable(el, rows, [["rank", 36, "c"], ["validator", null, "l"], ["rewards", 110, ""]],
+        function(r){ return ['<td class="c rk">' + (rk[r.id] || '\u2013') + '</td>', '<td class="l nm"><div class=nmw>' + logo(r.id, r.m) + '<span>' + att(r.m) + '</span></div></td>',
+                             '<td>' + exact(r.x, 6) + '</td>']; },
+        CLSEL, function(ids, on){ ids.forEach(function(id){ if(on) CLSEL[id] = 1; else delete CLSEL[id]; }); clDraw(); });
+      var sm0 = E("clsum"), go0 = E("clsign"), n0 = 0, tot0 = 0; rows.forEach(function(r){ if(CLSEL[r.id]){ n0++; tot0 += r.x; } });
+      if(sm0) sm0.innerHTML = n0 ? exact(tot0, 6) + " ATONE<br>from " + n0 + " validator" + (n0 === 1 ? "" : "s") : "";
+      if(go0) go0.disabled = !n0 || !window.__WALLET;
+      var st0 = E("clstep"); st0.textContent = ""; st0.className = "txstep";
+      feeSoon("cl", E("clfee"), n0 ? clMsgs : null); proBrk();
+      return;
+    }
+    el.className = "unpick";
+    var head = '';
     el.innerHTML = head + every + rows.map(function(r){ var on = !!CLSEL[r.id];
       return '<label class="unrow' + (on ? ' on' : '') + '"><input type=checkbox value="' + att(r.id) + '"' + (on ? ' checked' : '') + '>' +
              logo(r.id, r.m) + '<b>' + att(r.m) + '</b><i>' + exact(r.x, 6) + '<em>ATONE</em></i></label>'; }).join("");
@@ -2577,11 +2616,11 @@ rememberGridH();
     var el = E("stlist"); if(!el) return;
     var P = stPlan(), by = {}; P.rows.forEach(function(r){ by[r.id] = r; });
     var h = '<table><colgroup><col style="width:24px"><col style="width:30px"><col><col style="width:60px"><col style="width:46px"><col style="width:64px"><col style="width:56px"></colgroup>' +
-            '<thead><tr><th></th><th>rank</th><th class=l>validator</th><th>90<span class=lc>d</span> uptime</th><th>jailed</th><th>stake</th><th>APR</th></tr></thead><tbody>';
+            '<thead><tr><th class=ck><input type=checkbox class=pro-all aria-label="Tick every validator"' + (function(){ var c = stCands(); return c.length && c.every(function(o){ return STSEL[o.id]; }) ? ' checked' : ''; })() + '></th><th class=c>rank</th><th class=l>validator</th><th>90<span class=lc>d</span> uptime</th><th>jailed</th><th>stake</th><th>APR</th></tr></thead><tbody>';
     stCands().forEach(function(o){
       var on = !!STSEL[o.id], m = by[o.id], d = (window.__VDBY && window.__VDBY[o.id]) || {}, u90 = d.d90 != null ? +d.d90 : (o.up != null ? +o.up : null);
       h += '<tr' + (on ? ' class=on' : '') + '><td class=ck><input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + '></td>' +
-           '<td>' + o.rank + '</td><td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span></div></td>' +
+           '<td class="c rk">' + o.rank + '</td><td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span></div></td>' +
            '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '\u2014' : u90.toFixed(1) + '%') + '</td>' +
            (o.jail == null ? '<td class=dim>N/A</td>' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>') +
            '<td>' + (m ? fmt(m.x) : '\u2014') + '</td><td class=r2><b>' + pct(m ? m.after : o.rate0) + '</b></td></tr>';
@@ -2589,6 +2628,9 @@ rememberGridH();
     h += ijRows("st", 7, STSEL);
     var top = el.scrollTop; el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
     ijWire(el, stRows);
+    /* the titles row's box ticks every active validator, or none - as Redelegate's does */
+    var sall = el.querySelector("thead .pro-all"); if(sall) sall.addEventListener("change", function(){
+      stCands().forEach(function(o){ if(sall.checked) STSEL[o.id] = 1; else delete STSEL[o.id]; }); stRows(); stState(); });
     Array.prototype.forEach.call(el.querySelectorAll("tbody input"), function(c){
       c.addEventListener("change", function(){ if(c.checked) STSEL[c.dataset.id] = 1; else delete STSEL[c.dataset.id]; stRows(); stState(); });
       /* the whole row selects, as a tick on the box does */

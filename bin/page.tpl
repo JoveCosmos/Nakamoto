@@ -5893,7 +5893,10 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 }
 /* the title, the field and the list sit at one place in every tab */
 @media(min-width:1100px){
-  #one #p-dele #wk-plan>.wk-ph h3:not(#z){min-width:114px}
+  #one #p-dele #wk-plan>.wk-ph h3:not(#z){min-width:0}
+  /* the amount field sits beside the title, the same in every tab; its button says MAX, the figure is the field's */
+  #one #p-dele #wk-plan>.wk-ph .wk-max b{display:none}
+  #one #p-dele #wk-plan>.wk-ph .wk-max:not(#z):not(#y){padding:0 9px}
   #one #p-dele #wk-plan .wk-ph .wk-field:not(#z):not(#y){flex:0 0 150px;width:150px;max-width:150px}
   #one #prolist:not(#z):not(#y){margin-top:10px}
   /* Redelegate's Outcome: now → after and ATONE/year on one row; the 21 days as the note above the button */
@@ -5944,6 +5947,27 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #one #prolist .unrow .vst.j{color:var(--wburn,#ff6a3d)}
   #one #prolist .unrow i:not(#z):not(#y){flex:0 0 90px;margin-left:0;text-align:right}
 }
+/* docked Unstake and Claim are Redelegate's table now (.wk-tbl2): the label rows' styling no longer applies */
+@media(min-width:1100px){
+  #one #prolist .unpick.wk-tbl2:not(#z):not(#y){display:block;flex:1 1 auto;min-height:0;overflow-y:auto}
+  #one #prolist .vst{display:inline-block;text-decoration:none;font:500 9px var(--wmono);letter-spacing:.08em;text-transform:uppercase}
+  #one #prolist .vst.a{color:var(--wcyan)}
+  #one #prolist .vst.o{color:var(--wamber)}
+  #one #prolist .vst.j{color:var(--wburn,#ff6a3d)}
+  #one #prolist .wk-tbl2 tbody tr{cursor:pointer}
+  #one #prolist .wk-tbl2 tbody tr.on td:not(#z):not(#y){background:rgba(46,224,106,.045)}
+  #one #prolist .wk-tbl2 tbody tr.on td:first-child:not(#z):not(#y){box-shadow:inset 2px 0 0 var(--wgreen)}
+  #one #prolist .wk-tbl2 td.nm:not(#z):not(#y),#one #prolist .wk-tbl2 td.nm span:not(#z):not(#y){font:500 12px var(--wsans)}
+  #one #prolist .wk-tbl2 td:not(#z):not(#y){height:32px}
+}
+/* the docked lists' select-all box is Redelegate's */
+#prolist thead th.ck input{appearance:none;-webkit-appearance:none;width:15px;height:15px;margin:0;border-radius:4px;border:1px solid var(--wbd2);background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);cursor:pointer;position:relative;vertical-align:middle;transition:border-color .12s,box-shadow .12s,background .12s}
+#prolist thead th.ck input:hover{border-color:var(--ws)}
+#prolist thead th.ck input:checked{background:linear-gradient(180deg,#3cf07a,#22c65c);border-color:#2ee06a;box-shadow:0 0 0 3px rgba(46,224,106,.14)}
+#prolist thead th.ck input:checked::after{content:"";position:absolute;left:4.5px;top:1.5px;width:4px;height:8px;border:solid #062012;border-width:0 2px 2px 0;transform:rotate(45deg)}
+#prolist thead th.ck input:indeterminate{border-color:#2ee06a;background:linear-gradient(180deg,#17172f,#0e0e1d)}
+#prolist thead th.ck input:indeterminate::after{content:"";position:absolute;left:3px;right:3px;top:6px;height:2px;background:#2ee06a;border-radius:1px}
+#prolist thead th.ck input{position:relative;cursor:pointer;vertical-align:middle}
 /* ════ STICKY HEADS (operator, 2026-09-30): a list's column titles stay on top as it scrolls, on the pane's own
    colour, so rows never show through them - Redelegate, Delegations, Outcome's moves, Stake's list, Picks ════ */
 #one #p-dele .wk-tbl2 thead th:not(#z):not(#y),#you .wk-tbl2 thead th:not(#z):not(#y),#one #p-dele #wk-mv .wk-moves thead th:not(#z):not(#y),
