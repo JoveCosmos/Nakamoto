@@ -6080,6 +6080,25 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #one #prolist .wk-tbl2 td.nm .gtag.add:not(#z){flex:0 0 auto}
 }
 .ij-t.ij-0 .ij-b{cursor:default;opacity:.7}
+/* Outcome's two figures on a full row under the title, half the width each, values never overflow (operator, 2026-09-30) */
+@media(min-width:1100px){
+  #one #p-dele #wk-mv.wk-pane:not(#z):not(#y):not(#x):not(#w){grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto}
+  #one #p-dele #wk-mv>.wk-ph:not(#z):not(#y):not(#x){grid-area:1/1/2/2}
+  #one #p-dele #wk-mv>#dans:not(#z):not(#y):not(#x),#one #p-dele #wk-mv>#proans:not(#z):not(#y):not(#x){grid-area:2/1/3/2;justify-self:stretch;align-self:stretch;
+    display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;height:auto}
+  html:not([data-pro]) #one #p-dele #wk-mv>#proans{display:none!important}
+  html[data-pro] #one #p-dele #wk-mv>#dans{display:none!important}
+  #one #p-dele #wk-mv>.wk-moves:not(#z):not(#y):not(#x),#one #p-dele #wk-mv>.wk-mvempty:not(#z):not(#y):not(#x){grid-area:3/1/4/2}
+  #one #p-dele #wk-mv>#rdnote:not(#z):not(#y):not(#x){grid-area:4/1/5/2}
+  #one #p-dele #wk-mv>#dgo:not(#z):not(#y):not(#x){grid-area:5/1/6/2}
+  #one #p-dele #wk-mv>#proout:not(#z):not(#y):not(#x){grid-area:3/1/6/2}
+  #one #p-dele #wk-mv>.wk-ans .p:not(#z):not(#y):not(#x):not(#w){display:flex;justify-content:space-between;align-items:center;gap:8px;min-width:0;width:auto;height:34px;padding:0 10px}
+  #one #p-dele #wk-mv>.wk-ans .p b:not(#z):not(#y):not(#x){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+  #one #p-dele #wk-mv>.wk-ans .p i:not(#z):not(#y):not(#x){flex:0 0 auto}
+  /* APR now → after: the arrow and the after figure ride with the value on the right */
+  #one #p-dele #wk-mv>.wk-ans .p.rate:not(#z):not(#y):not(#x){justify-content:flex-start}
+  #one #p-dele #wk-mv>.wk-ans .p.rate::before{margin-right:auto}
+}
 /* ════ STICKY HEADS (operator, 2026-09-30): a list's column titles stay on top as it scrolls, on the pane's own
    colour, so rows never show through them - Redelegate, Delegations, Outcome's moves, Stake's list, Picks ════ */
 #one #p-dele .wk-tbl2 thead th:not(#z):not(#y),#you .wk-tbl2 thead th:not(#z):not(#y),#one #p-dele #wk-mv .wk-moves thead th:not(#z):not(#y),
