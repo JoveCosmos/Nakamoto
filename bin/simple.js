@@ -1657,14 +1657,13 @@
         var fL = Object.keys(fr).sort(function(x, y){ return fr[y] - fr[x]; }).map(function(id){ src[id] = 1; return { rank: rk(id), name: nm(id), amt: fmt(fr[id]), apr: pct(rate(id)) }; });
         var tL = Object.keys(to).sort(function(x, y){ return to[y] - to[x]; }).map(function(id){ dst[id] = 1; return { rank: rk(id), name: nm(id), amt: '+' + fmt(to[id]), apr: pct(rate(id, to[id])) }; });
         var lock = pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is cooling down until ' + day(pos.until) + ' and stays where it is.</div>' : '';
-        h = top('Best today', auto ? 'Autopilot: within 12 hours' : 'Ready, 1 approval', 'ok') +
+        h = top('Best today', auto ? '' : 'Ready, 1 approval', 'ok') +
           '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.now) + '</i> to <i class=g>' + pct(plan.after) + '</i> APR</span></div>' +
           '<div class=mv-flow><div class=mv-box><em>From, ' + fL.length + ' validator' + (fL.length === 1 ? '' : 's') + '</em>' + mvRows(fL, 'a', 'validators') + '</div>' +
           '<div class=mv-arr aria-hidden=true><svg viewBox="0 0 44 20"><path d="M2 10h38M32 3l8 7-8 7"/></svg></div>' +
           '<div class=mv-box><em>To, ' + tL.length + ' validator' + (tL.length === 1 ? '' : 's') + '</em>' + mvRows(tL, 'g', 'validators') + '</div></div>' +
           lock + mvSet(src, dst) +
-          (auto ? '<div class=mv-act><b class=mv-on><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Autopilot is Active</b>' +
-                  '<span>Autopilot makes this move on its next run, within 12 hours. Nothing to sign.</span></div>'
+          (auto ? '<div class=mv-act><b class=mv-on>Autopilot is Active</b></div>'
                 : '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=opt>' + (direct ? 'Grant Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE') + '</button>' +
                   (direct ? '' : '<span>One signature moves it now. Autopilot needs Keplr, which can sign it along with the move.</span>') + '</div>');
       } else if(pos.free < 1e6 && pos.locked >= 1e6){

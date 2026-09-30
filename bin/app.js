@@ -2803,8 +2803,6 @@ rememberGridH();
       st.innerHTML = '<div class=atsb><div><em>Moves made</em><b>' + hn + '</b><small>' + (hn ? 'last ' + window.__dayFull(rp.history[0].at * 1000) : 'none yet') + '</small></div>' +
         '<div><em>Validators</em><b>' + (n ? n : 'The rule') + '</b><small>' + (n ? 'allowed (an older grant)' : 'picks them, GATA checks') + '</small></div>' +
         '<div><em>Runs until</em><b>' + (g.expiration ? exp : 'You revoke') + '</b><small>' + (g.expiration ? 'then grant again' : 'no end date') + '</small></div></div>' +
-        (last ? 'Last check <b>' + window.__dayFull(last.getTime()) + '</b>' + (rp.moves && rp.moves.length ? ', <b>' + rp.moves.length + '</b> move' + (rp.moves.length === 1 ? '' : 's') + ' planned, <b class=g>+' + one(rp.gain || 0) + '</b> ATONE a year' : ', nothing to move') : '') +
-        (rp && rp.history && rp.history.length ? '<br>Moves made: <b>' + rp.history.length + '</b>, last ' + window.__dayFull(rp.history[0].at * 1000) : '') +
         (AT_EDIT ? '<br><span class=g>Changing it:</span> the terms below replace these when you sign.' : '');
     }
     E("atform").hidden = view;

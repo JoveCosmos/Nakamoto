@@ -5490,8 +5490,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-act>span{font-size:12.5px;line-height:1.45;color:var(--ws);max-width:44ch}
 #mv-stage .mv-act .sd-go,#mv-stage .mv-go{width:auto;height:50px;padding:0 26px;font-size:15px;flex:0 0 auto}
 /* Autopilot is on: a statement, not a control (operator, 2026-09-30) - the switch in the You column turns it off */
-#mv-stage .mv-on{flex:0 0 auto;display:inline-flex;align-items:center;gap:10px;font-size:20px;font-weight:700;letter-spacing:-.01em;color:var(--sv-teal)}
-#mv-stage .mv-on svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+#mv-stage .mv-on{flex:0 0 auto;font-size:15px;font-weight:600;color:var(--sv-teal)}
 .mv-days{display:flex;flex-direction:column;gap:8px;border:1px solid var(--wbd);border-radius:12px;padding:14px 16px}
 .mv-dh{display:flex;justify-content:space-between;font-size:13px;color:var(--ws)}
 .mv-dh span:first-child{font-weight:600;color:var(--wt)}
@@ -5632,7 +5631,8 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 #atpop .atnote{margin:4px 0 8px}
 /* Autopilot has no choices left (no cap, no validator list): the card is what it does, and Grant / Revoke */
 #atpop .atview,#atpop #atR,#atpop #atform{display:none!important}
-#atpop .atbody{grid-template-columns:minmax(0,1fr)!important}
+#atpop .atbody{grid-template-columns:minmax(0,1fr)!important;flex:0 0 auto!important;min-height:0!important}
+#atpop .card.atcard:not(#z){height:auto!important;min-height:0!important}
 #atpop .atcard,#atpop .card.atcard{max-width:560px}
 .atwhat{display:flex;flex-direction:column;gap:10px;margin:4px 0 12px}
 .atwhat>div{display:flex;flex-direction:column;gap:3px;padding:11px 13px;border:1px solid var(--wbd);border-radius:10px}
@@ -6296,7 +6296,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
           <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="no cap" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
           <span class=unhint id=athint></span></div>
       </div>
-      <ul class=bn id=atwhat><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="8"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></i><span class=bn-t><b>Keeps your stake in the active set</b><small><b id=atidlen>Stake</b> sits idle on inactive validators today</small></span><button class=qm type=button aria-label="More about: Keeps your stake in the active set">?<span class=qm-tip role=tooltip>A validator that drops out of the set pays nothing. Autopilot moves your stake off it on its next run.</span></button></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 17l5-5 4 4 7-8"/><path d="M15 8h5v5"/></svg></i><span class=bn-t><b>Keeps your APR at its best</b><small>moves only for 5 APR points or more</small></span><button class=qm type=button aria-label="More about: Keeps your APR at its best">?<span class=qm-tip role=tooltip>Every 12 hours it checks your free stake and moves it to where it earns the most, when that raises its APR by more than 5 points. Stake that has just moved rests 21 days, as the chain requires.</span></button></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Redelegates, nothing else</b><small>one grant, one approval</small></span><button class=qm type=button aria-label="More about: Redelegates, nothing else">?<span class=qm-tip role=tooltip>You sign one authz grant that lets GATA&#39;s keeper redelegate your stake. It cannot send, unstake or spend your ATONE, and GATA takes no share. You can revoke it at any time.</span></button></li></ul>
+      <ul class=bn id=atwhat><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="8"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></i><span class=bn-t><b>Keeps your stake in the active set</b><small><b id=atidlen>Stake</b> sits idle on inactive validators today</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 17l5-5 4 4 7-8"/><path d="M15 8h5v5"/></svg></i><span class=bn-t><b>Keeps your APR at its best</b><small>moves only for 5 APR points or more</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Redelegates, nothing else</b><small>GATA funds your pilot, no fees for you</small></span></li></ul>
       <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Runs every <b>12 hours</b></span></div>
     </section>
     <section class=atR id=atR aria-label="Select your validators">
