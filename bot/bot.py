@@ -418,7 +418,7 @@ def handle(c, msg, V):
         if not rows:
             return send(chat, "You are not watching anyone yet.\n\n" + PAGE)
         return send(chat, "Watching:\n" + "\n".join(
-            "- <b>%s</b> — %s" % (md(name(c, op, V)),
+            "- <b>%s</b> - %s" % (md(name(c, op, V)),
                              ", ".join(ALERTS[f][1] for f in (fl or "d") if f in ALERTS))
             for op, fl in rows))
 

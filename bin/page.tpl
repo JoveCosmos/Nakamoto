@@ -63,7 +63,7 @@ cursor:pointer}
 .mbtn:hover{border-color:var(--ink3)}
 .mbtn[aria-pressed=true]{border-color:var(--hot);}
 .mbtn:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
-/* APR printed into the cell — third attempt, and the first that does not fight
+/* APR printed into the cell - third attempt, and the first that does not fight
    the map. Per-cell ink flipped colour mid-ramp and left a seam; a flat scrim
    fixed the seam but drained the colour the map exists to show. This keeps the
    fill untouched and carries contrast in the TYPE: one dark ink everywhere with
@@ -6348,13 +6348,13 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
     <div id=cwrap style="display:none"><svg id=foldchart viewBox="0 0 900 232" role=img
       aria-label="Yield against stake, every curve crossing at the mean"></svg></div>
     <div class=aprbar>
-      <div class=apre><span class=apnum id=aprlo>—</span><span class=aplab>lowest</span></div>
+      <div class=apre><span class=apnum id=aprlo>-</span><span class=aplab>lowest</span></div>
       <div class=apmid>
-        <span class=apx>Smallest <b id=g2n>—</b> Largest</span>
+        <span class=apx>Smallest <b id=g2n>-</b> Largest</span>
         <span class=apspan></span>
         <span class=apxsub>APR</span>
       </div>
-      <div class="apre right"><span class=apnum id=aprhi>—</span><span class=aplab>highest</span></div>
+      <div class="apre right"><span class=apnum id=aprhi>-</span><span class=aplab>highest</span></div>
     </div>
   </div>
 
@@ -6478,9 +6478,9 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
           </div>
         </section>
         <section class=wk-pane id=wk-plan>
-          <header class="wk-ph wk-t2"><h3>Redelegate</h3><div class=pro-hdr id=prohdr></div><div class=wk-field><input class=wk-amt2 id=amt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to move"><button class=wk-max id=amtmax type=button title="Everything that can move">max <b id=ds-mov>&mdash;</b></button></div><div class=wk-pre id=amtseg hidden><button data-p=100 type=button aria-pressed=true>All</button></div><span class=wk-seln id=dseln aria-live=polite></span>
+          <header class="wk-ph wk-t2"><h3>Redelegate</h3><div class=pro-hdr id=prohdr></div><div class=wk-field><input class=wk-amt2 id=amt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to move"><button class=wk-max id=amtmax type=button title="Everything that can move">max <b id=ds-mov>-</b></button></div><div class=wk-pre id=amtseg hidden><button data-p=100 type=button aria-pressed=true>All</button></div><span class=wk-seln id=dseln aria-live=polite></span>
             <button class=wk-ib id=wrefresh type=button title="Read the chain again now" aria-label="Refresh"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6M20.5 3.5v5h-5"/></svg></button>
-            <span class=wk-ago id=dago title="the numbers follow every block tick; refresh re-reads your position">&mdash;</span>
+            <span class=wk-ago id=dago title="the numbers follow every block tick; refresh re-reads your position">-</span>
             <span class=wk-lockn id=dlockn hidden></span></header>
           <div class=wk-tbl2 id=dpicks></div>
           <div class=pro-dock id=prolist hidden></div>
@@ -6580,27 +6580,27 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 <div class=pop id=vpop><div class="card vcard">
   <div class="vhead vwrap"><img class=vlogo id=vlogo alt=""><span class=vmono id=vmono></span>
     <div class=vcol>
-      <div class=vname><span class=vnm id=vname>&mdash;</span><span class=vrk id=vrank></span></div>
+      <div class=vname><span class=vnm id=vname>-</span><span class=vrk id=vrank></span></div>
       <div class=vsub>
         <a class=vweb id=vweb target=_blank rel="noopener noreferrer"></a>
       </div>
     </div></div>
   <div class=vbadges id=vbadges></div>
   <div class=aprband>
-    <span class=aprbig id=vapr>&mdash;</span>
+    <span class=aprbig id=vapr>-</span>
     <span class=aprstack>
       <span class=aprlab>APR</span>
-      <span class="aprx aprnet">Net<b id=vnet>&mdash;</b></span>
+      <span class="aprx aprnet">Net<b id=vnet>-</b></span>
     </span>
-    <span class=aprx><b id=vearn>&mdash;</b> avg</span>
+    <span class=aprx><b id=vearn>-</b> avg</span>
   </div>
   <div class=vgrid>
-    <div class=vstat><span class=vk>voting power</span><span class=vv id=vvp>&mdash;</span></div>
-    <div class=vstat><span class=vk>ATONE staked</span><span class=vv id=vstake>&mdash;</span></div>
-    <div class=vstat><span class=vk>commission</span><span class=vv id=vcomm>&mdash;</span></div>
-    <div class=vstat><span class=vk>blocks proposed</span><span class=vv id=vprop>&mdash;</span></div>
-    <div class=vstat><span class=vk>joined</span><span class=vv id=fjoin>&mdash;</span></div>
-    <div class=vstat><span class=vk>last jail or slash</span><span class=vv id=flast>&mdash;</span></div>
+    <div class=vstat><span class=vk>voting power</span><span class=vv id=vvp>-</span></div>
+    <div class=vstat><span class=vk>ATONE staked</span><span class=vv id=vstake>-</span></div>
+    <div class=vstat><span class=vk>commission</span><span class=vv id=vcomm>-</span></div>
+    <div class=vstat><span class=vk>blocks proposed</span><span class=vv id=vprop>-</span></div>
+    <div class=vstat><span class=vk>joined</span><span class=vv id=fjoin>-</span></div>
+    <div class=vstat><span class=vk>last jail or slash</span><span class=vv id=flast>-</span></div>
   </div>
   <div class=upsec>
     <div class=pingwrap>
@@ -6614,9 +6614,9 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
       <div class=upbars id=ubping></div>
     </div>
     <div class=upnums>
-      <div class=upcell><span class=upn id=uv10>&mdash;</span><span class=upl>10k blocks</span></div>
-      <div class=upcell><span class=upn id=uv30>&mdash;</span><span class=upl>30 days</span></div>
-      <div class=upcell><span class=upn id=uv90>&mdash;</span><span class=upl>90 days</span></div>
+      <div class=upcell><span class=upn id=uv10>-</span><span class=upl>10k blocks</span></div>
+      <div class=upcell><span class=upn id=uv30>-</span><span class=upl>30 days</span></div>
+      <div class=upcell><span class=upn id=uv90>-</span><span class=upl>90 days</span></div>
     </div>
   </div>
 </div></div>
@@ -6654,7 +6654,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
       <div class=kp-f><em>Reward pool</em><b><span data-kp=POOL>{{POOL}}</span></b><small>ATONE a year, to stakers</small></div>
       <div class=kp-f><em>Community pool</em><b><span data-kp=CTAKE>{{CTAKE}}</span></b><small>ATONE a year, <span data-kp=TAX>{{TAX}}</span>% tax</small></div>
       <div class=kp-f><em>Delegators</em><b>{{DELEG}}</b><small>staking with <span data-kp=N>{{N}}</span> validators</small></div>
-      <div class=kp-f id=kpgoal><em>Staking goal</em><b>&mdash;</b><small>&nbsp;</small></div>
+      <div class=kp-f id=kpgoal><em>Staking goal</em><b>-</b><small>&nbsp;</small></div>
     </div>
     <p class=kp-move id=kpgoalmv hidden></p>
   </div>
@@ -6703,7 +6703,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   <header class=wk-txh><div><b>Unstake</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=unsum></span></header>
   <div class=unpick id=unpick></div>
   <div class=unamt>
-    <div class="wk-field unfield"><input class=wk-amt2 id=unamt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to unstake"><button class=wk-max id=unmax type=button title="Everything on this validator">max <b id=unmaxv>&mdash;</b></button></div>
+    <div class="wk-field unfield"><input class=wk-amt2 id=unamt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to unstake"><button class=wk-max id=unmax type=button title="Everything on this validator">max <b id=unmaxv>-</b></button></div>
     <span class=unhint id=unhint></span>
   </div>
   <div class=txlock id=unlock></div>
@@ -6723,7 +6723,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 <div class=pop id=stpop><div class="card txcard uncard stcard">
   <header class=wk-txh><div><b>Stake</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=stsum></span></header>
   <div class="unamt sttop">
-    <div class="wk-field unfield"><input class=wk-amt2 id=stamt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to stake"><button class=wk-max id=stmax type=button title="Every liquid ATONE">max <b id=stmaxv>&mdash;</b></button></div>
+    <div class="wk-field unfield"><input class=wk-amt2 id=stamt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to stake"><button class=wk-max id=stmax type=button title="Every liquid ATONE">max <b id=stmaxv>-</b></button></div>
     <span class=wk-seln id=stseln aria-live=polite></span>
     <span class=unhint id=sthint></span>
   </div>
@@ -6752,7 +6752,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
             <label class=atpc><input type=radio name=atpick value=selected><b>Choose yourself</b><em id=atn2></em><small class=atd>you pick each one</small></label>
           </div></div>
         <div class=atrow><span class=atlab><i>3</i>Stake<small>optional cap on what it may move; empty for no cap</small></span>
-          <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="no cap" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
+          <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="no cap" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>-</b></button></div>
           <span class=unhint id=athint></span></div>
       </div>
       <ul class=bn id=atwhat><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="8"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></i><span class=bn-t><b>Keeps your stake in the active set</b><small><b id=atidlen>Stake</b> sits idle on inactive validators today</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 17l5-5 4 4 7-8"/><path d="M15 8h5v5"/></svg></i><span class=bn-t><b>Keeps your APR at its best</b><small>moves only for 5 APR points or more</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Redelegates, nothing else</b><small>GATA funds your pilot, no fees for you</small></span></li></ul>
@@ -6780,20 +6780,20 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 
 <div class=pop id=ipop><div class="card vcard icard">
   <div class="vhead vwrap"><span class=vmono id=imono></span>
-    <div class=vcol><div class=vname><span class=vnm id=iname>&mdash;</span></div><div class=vsub><span class=iop id=iop></span></div></div></div>
+    <div class=vcol><div class=vname><span class=vnm id=iname>-</span></div><div class=vsub><span class=iop id=iop></span></div></div></div>
   <div class=vbadges id=ibadges></div>
   <p class=inote id=inote></p>
   <div class=vgrid>
-    <div class=vstat><span class=vk>your stake</span><span class=vv id=imine>&mdash;</span></div>
+    <div class=vstat><span class=vk>your stake</span><span class=vv id=imine>-</span></div>
     <div class=vstat><span class=vk>APR now</span><span class=vv style="color:var(--burn)">0%</span></div>
-    <div class=vstat><span class=vk>ATONE staked</span><span class=vv id=istake>&mdash;</span></div>
-    <div class=vstat><span class=vk>commission</span><span class=vv id=icomm>&mdash;</span></div>
+    <div class=vstat><span class=vk>ATONE staked</span><span class=vv id=istake>-</span></div>
+    <div class=vstat><span class=vk>commission</span><span class=vv id=icomm>-</span></div>
   </div>
 </div></div>
 
 <div class=pop id=apop><div class="card vcard acard">
   <div class="vhead vwrap"><img class=vlogo id=alogo alt=""><span class=vmono id=amono></span>
-    <div class=vcol><div class=vname><span class=vnm id=aval>&mdash;</span></div></div></div>
+    <div class=vcol><div class=vname><span class=vnm id=aval>-</span></div></div></div>
   <div class=amany id=amany hidden></div>
   <div class=alist>
     <label class=aopt><input type=checkbox data-f=d checked>
@@ -6832,15 +6832,15 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 
 <div class=pop id=pop><div class="card vcard">
   <div class=vhead>
-    <div class=vhid><div class=vname><span class="ptag te">week <b id=popw>—</b></span></div></div>
+    <div class=vhid><div class=vname><span class="ptag te">week <b id=popw>-</b></span></div></div>
   </div>
   <div class=vgrid>
-    <div class="vstat hot"><span class=vk><span class=lc>&eta;</span></span><span class=vv id=pope>—</span></div>
-    <div class=vstat><span class=vk>date</span><span class=vv id=popd>—</span></div>
-    <div class=vstat><span class=vk>even reward</span><span class=vv id=popp>—</span></div>
-    <div class=vstat><span class=vk>by stake</span><span class=vv id=popb>—</span></div>
-    <div class=vstat><span class=vk>flat share each</span><span class=vv id=popf>—</span></div>
-    <div class=vstat><span class=vk>opening block</span><span class=vv id=popbk>—</span></div>
+    <div class="vstat hot"><span class=vk><span class=lc>&eta;</span></span><span class=vv id=pope>-</span></div>
+    <div class=vstat><span class=vk>date</span><span class=vv id=popd>-</span></div>
+    <div class=vstat><span class=vk>even reward</span><span class=vv id=popp>-</span></div>
+    <div class=vstat><span class=vk>by stake</span><span class=vv id=popb>-</span></div>
+    <div class=vstat><span class=vk>flat share each</span><span class=vv id=popf>-</span></div>
+    <div class=vstat><span class=vk>opening block</span><span class=vv id=popbk>-</span></div>
   </div>
   
 </div></div>

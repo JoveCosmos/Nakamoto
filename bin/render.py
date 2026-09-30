@@ -28,7 +28,7 @@ if nk["rate_after"] is not None:
     after = f"<div class=r>{nk['rate_after']:+.2f}<span class=u> pts/wk</span></div>" \
             f"<div class=l>since the bonus, {nk['n_after']} weeks</div>"
 else:
-    after = (f"<div class=r style='color:var(--ink3)'>—</div>"
+    after = (f"<div class=r style='color:var(--ink3)'>-</div>"
              f"<div class=l>since the bonus</div>"
              f"<div class=d><b>Too early to fit.</b> Only {nk['n_after']} full months since "
              f"{nk['bonus_from']}; a slope needs {nk['min_fit']}. Two points is one interval, "
@@ -36,11 +36,11 @@ else:
 
 mv = D.get("move13")
 def _m(n): return f"{n/1e6:.2f}M" if abs(n) >= 1e6 else f(n)
-mv_top  = _m(mv["from_top"])   if mv else "—"
-mv_small= _m(mv["to_small"])   if mv else "—"
-mv_new  = _m(mv["bonded_delta"]) if mv else "—"
-mv_grew = str(mv["grew"])      if mv else "—"
-mv_wk   = str(mv["weeks"])     if mv else "—"
+mv_top  = _m(mv["from_top"])   if mv else "-"
+mv_small= _m(mv["to_small"])   if mv else "-"
+mv_new  = _m(mv["bonded_delta"]) if mv else "-"
+mv_grew = str(mv["grew"])      if mv else "-"
+mv_wk   = str(mv["weeks"])     if mv else "-"
 
 t10 = nk.get("t10_change")
 if t10:
@@ -66,7 +66,7 @@ elif _ra is not None:
     speedup_k   = "pts / week"
     speedup_sub = f"since the bonus, {nk.get('n_after', 0)} weeks"
 else:
-    speedup, speedup_k, speedup_sub = "\u2014", "since the bonus", "not enough weeks yet"
+    speedup, speedup_k, speedup_sub = "-", "since the bonus", "not enough weeks yet"
 if TESTNET:
     # what only the index knows: N/A, never a dash that reads as "not yet"
     speedup, speedup_sub = "N/A", "N/A on testnet"
@@ -99,7 +99,7 @@ sched = "".join(
     f"<td>{r['week']}</td><td class=hdt>{esc(r['date'])}"
     f"{'<span class=tag-n>NOW</span>' if r['now'] else '<span class=tag-x>NEXT</span>' if r['next'] else ''}"
     f"</td><td>{_eta_cell(r)}</td><td>{_pct_cell(r)}</td>"
-    f"<td class=hc>{f'{r[chr(99)]:.2f}&times;' if r['c'] is not None else ('N/A' if TESTNET and r['past'] else '&mdash;')}</td>"
+    f"<td class=hc>{f'{r[chr(99)]:.2f}&times;' if r['c'] is not None else ('N/A' if TESTNET and r['past'] else '-')}</td>"
     f"</tr>" for r in D["schedule"])
 
 trend_rows = "".join(
@@ -134,7 +134,7 @@ def _jail(v):
     return f"<td class='{'warn' if v['jail'] else 'ok'}'>{v['jail'] if v['jail'] else 'Never'}</td>"
 def _up(v):
     return (f"{(1 - v['life_missed']/v['life_n'])*100:.2f}%"
-            if v.get("life_up") is not None and v["life_n"] else ("N/A" if TESTNET else "&mdash;"))
+            if v.get("life_up") is not None and v["life_n"] else ("N/A" if TESTNET else "-"))
 tbl_apr = "".join(
     prow(v, f"<td class={'ok' if v.get('life_up') is not None and v['life_n'] else 'dim'}>{_up(v)}</td>"
             f"{_jail(v)}") for v in by_apr)
@@ -222,10 +222,10 @@ page = (TPL
   .replace("{{CHAIN}}", esc(D["chain"])).replace("{{CHAIN_ID}}", esc(NETCFG["chain"])).replace("{{BASE}}", NETCFG["base"])   # the popups' chain line, per network
   .replace("{{ETA}}", f"{e['now']:.2f}").replace("{{ETA_PCT}}", f"{e['now']*100:.0f}")
   .replace("{{ETA_NEXT}}", f"{next((r['eta'] for r in D['schedule'] if r['next']), e['now']):.2f}")
-  .replace("{{NOW_DATE}}", next((r["date"] for r in D["schedule"] if r["now"]), "—"))
-  .replace("{{RATE_AFTER}}", f"{nk['rate_after']:+.2f}" if nk["rate_after"] is not None else ("N/A" if TESTNET else "—"))
+  .replace("{{NOW_DATE}}", next((r["date"] for r in D["schedule"] if r["now"]), "-"))
+  .replace("{{RATE_AFTER}}", f"{nk['rate_after']:+.2f}" if nk["rate_after"] is not None else ("N/A" if TESTNET else "-"))
   .replace("{{N_AFTER}}", str(nk["n_after"]))
-  .replace("{{NEXT_DATE}}", next((r["date"] for r in D["schedule"] if r["next"]), "—"))
+  .replace("{{NEXT_DATE}}", next((r["date"] for r in D["schedule"] if r["next"]), "-"))
   .replace("{{WEEK}}", str(e["week"])).replace("{{WEEKDAY}}", str(e["week_day"]))
   .replace("{{MIN}}", f"{e['min']:.2f}").replace("{{MAX}}", f"{e['max']:.2f}")
   .replace("{{STEP}}", f"{e['step']:.2f}")
@@ -250,7 +250,7 @@ page = (TPL
   .replace("{{SUPPLY}}", f(M(s["supply"]))).replace("{{TAX}}", f"{s['community_tax']*100:.0f}")
   .replace("{{BELOW}}", str(s["below_mean"]))
   .replace("{{REST_PCT}}", f"{100 - e['now']*100:.0f}")
-  .replace("{{DELEG}}", f(D["delegators"]["unique"]) if D.get("delegators") else "—")
+  .replace("{{DELEG}}", f(D["delegators"]["unique"]) if D.get("delegators") else "-")
   .replace("{{MINTED}}", f(M(s["inflation"] * s["supply"])))
   .replace("{{CTAKE}}", f(M(s["inflation"] * s["supply"] * s["community_tax"])))
   .replace("{{MINCOMM}}", f"{s['min_commission']*100:.0f}").replace("{{CPOOL}}", f(M(s["community_pool"])))
@@ -259,7 +259,7 @@ page = (TPL
   .replace("{{FALL_ON}}", "" if th["rising"] else "hot")
   .replace("{{POOL}}", f(M(s["reward_pool"])))
   .replace("{{TOP10}}", f"{nk['top10_now']:.1f}" if nk["top10_now"] is not None else "N/A").replace("{{TOP10_FIRST}}", f"{nk['top10_first']:.1f}" if nk["top10_first"] is not None else "N/A")
-  .replace("{{RATE_BEFORE}}", f"{nk['rate_before']:+.2f}" if nk["rate_before"] is not None else ("N/A" if TESTNET else "—"))
+  .replace("{{RATE_BEFORE}}", f"{nk['rate_before']:+.2f}" if nk["rate_before"] is not None else ("N/A" if TESTNET else "-"))
   .replace("{{N_BEFORE}}", str(nk["n_before"]))
   .replace("{{AFTER_BLOCK}}", after).replace("{{RATE_LINE}}", rate_line)
   .replace("{{FLOOR}}", f"{es['floor']:.2f}").replace("{{CAP}}", f"{es['cap']:.2f}")
@@ -267,7 +267,7 @@ page = (TPL
   .replace("{{CAPSUB}}", CAPSUB).replace("{{CAPSUB2}}", CAPSUB2).replace("{{STEPLINE}}", STEPLINE)
   .replace("{{REV_WHEN}}", ("&lt; " if th["rising"] else "&ge; ") + f"{th['threshold']:.2f}&times;")
   .replace("{{W2CAP}}", str(es['weeks_to_cap'])).replace("{{TODAY}}", esc(es["today"]))
-  .replace("{{START_DATE}}", esc(D["schedule"][0]["date"]) if D.get("schedule") else "\u2014")
+  .replace("{{START_DATE}}", esc(D["schedule"][0]["date"]) if D.get("schedule") else "-")
   .replace("{{Y2CAP}}", f"{es['weeks_to_cap']/52:.1f}" if es.get("weeks_to_cap") is not None else "N/A")
   .replace("{{T10LINE}}", esc(t10_line))
   .replace("{{SPEEDUP}}", speedup).replace("{{SPEEDUP_K}}", speedup_k)

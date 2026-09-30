@@ -261,11 +261,11 @@
     /* the wallet card, then five boxes - Available, Photon, Staked, APR, Rewards - each figure in its well */
     return (
       wcard() +
-      ro("Available", bal ? fmt(liq) : "\u2014", "", null, "var(--sv-violet)", "", false, bal ? "ATONE" : "") +
-      ro("Photon", bal ? '<span class=sv-pho>' + fmt(bal.uphoton) + '</span>' : "\u2014", "", null, "var(--sv-pho)", "", false, "") +
-      ro("Staked", pos ? fmt(stk) : "\u2014", "", null, "var(--sv-amber)", "", false, pos ? "ATONE" : "") +
-      ro("APR", mine ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)", "", false, "") +
-      ro("Rewards", window.__REW != null ? fmt(rew) : "\u2014", "", null, "var(--sv-green)", "", false, window.__REW != null ? "ATONE" : ""));
+      ro("Available", bal ? fmt(liq) : "-", "", null, "var(--sv-violet)", "", false, bal ? "ATONE" : "") +
+      ro("Photon", bal ? '<span class=sv-pho>' + fmt(bal.uphoton) + '</span>' : "-", "", null, "var(--sv-pho)", "", false, "") +
+      ro("Staked", pos ? fmt(stk) : "-", "", null, "var(--sv-amber)", "", false, pos ? "ATONE" : "") +
+      ro("APR", mine ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "-", "", null, "var(--sv-teal)", "", false, "") +
+      ro("Rewards", window.__REW != null ? fmt(rew) : "-", "", null, "var(--sv-green)", "", false, window.__REW != null ? "ATONE" : ""));
   }
   function drawOver(){
     var pos = window.__POS, S = setStats(), bal = window.__BAL;
@@ -289,7 +289,7 @@
     } else if(!(pos.free >= 1e6)){                  /* under 1 ATONE free (redelegation dust) is nothing to move */
       h = '<div class=sv-ph><h3>Everything is under cooldown</h3>' + tag("a", "21 days") + '</div>' +
         fig("Your APR", pct(pos.rate), "on " + pos.rows.length + " validators", heat(pos.rate).fill) +
-        fig("Free to move on", window.__dayFull ? window.__dayFull(pos.until) : "—", fmt(pos.total) + " ATONE redelegated recently", "var(--sv-amber)") +
+        fig("Free to move on", window.__dayFull ? window.__dayFull(pos.until) : "-", fmt(pos.total) + " ATONE redelegated recently", "var(--sv-amber)") +
         /* the door stands where it always does, greyed until the stake is free */
         '<button class="sv-btn go sd-go" type=button disabled title="' + esc("Free to move on " + (window.__dayFull ? window.__dayFull(pos.until) : "")) + '">Redelegate</button>';
     } else if(!plan || !(plan.gain > 0.5) || plan.after == null){
@@ -386,13 +386,13 @@
     put("sd-astrip",
       '<div class="sd-id sd-ida"><div class=sd-top><h3>Autopilot</h3></div><div class=sd-wmeta><span class=sd-wch><i class="st' + (g ? ' on' : '') + '">' + (g ? "Active" : "Inactive") + '</i>' +
         door + '</span></div></div>' +
-      (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "\u2014", "", null, "var(--sv-green)", "", false, rec ? "APR" : "")
-         : ro("Since start", "\u2014", "", null, "var(--sv-green)")) +
+      (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "-", "", null, "var(--sv-green)", "", false, rec ? "APR" : "")
+         : ro("Since start", "-", "", null, "var(--sv-green)")) +
       /* the stake it manages: the cap when the grant sets one, otherwise all the reader stakes */
-      ro("Stake", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : pos && pos.rows.length ? fmt(pos.total) : "\u2014") : "\u2014", "", null, "var(--sv-violet)", "", false, g && (a.max_tokens || (pos && pos.rows.length)) ? "ATONE" : "") +
-      ro("Runs until", g ? (until || "You revoke") : "\u2014", "", null, "var(--sv-violet)") +
-      ro("Moves made", g ? String(moves) : "\u2014", "", null, "var(--sv-teal)") +
-      ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "\u2014", "", null, "var(--sv-teal)"));
+      ro("Stake", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : pos && pos.rows.length ? fmt(pos.total) : "-") : "-", "", null, "var(--sv-violet)", "", false, g && (a.max_tokens || (pos && pos.rows.length)) ? "ATONE" : "") +
+      ro("Runs until", g ? (until || "You revoke") : "-", "", null, "var(--sv-violet)") +
+      ro("Moves made", g ? String(moves) : "-", "", null, "var(--sv-teal)") +
+      ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "-", "", null, "var(--sv-teal)"));
     /* restake, in one line: what it has done, or that it waits (only our own grants count: any other service is foreign) */
     function restakeLine(){
       var rs = rp && rp.restake;
@@ -403,9 +403,9 @@
     if(g) put("sd-ado",
       '<div class=sv-ph><h3>Autopilot is working</h3></div>' +
       '<div class="sd-figs two">' +
-        fig("Since start", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.start.rate) + '</span><em class=u>APR</em>' : "—",
+        fig("Since start", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.start.rate) + '</span><em class=u>APR</em>' : "-",
             rec ? sgnA((rec.rate - rec.start.rate) * rec.staked) + " ATONE a year" : "from its first check", "var(--sv-green)") +
-        fig("Last 3 months", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.m3.rate) + '</span><em class=u>APR</em>' : "—",
+        fig("Last 3 months", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.m3.rate) + '</span><em class=u>APR</em>' : "-",
             rec ? sgnA((rec.rate - rec.m3.rate) * rec.staked) + " ATONE a year" : "", "var(--sv-teal)") +
       '</div>' +
       '');
@@ -494,7 +494,7 @@
   function restakePanel(pos, at){
     var on = !!(at && at.restake), r = pos && pos.rows.length ? pos.rate : 0, add = r > 0 ? Math.pow(1 + r / 730, 730) - 1 - r : 0;
     var h = '<div class=sv-ph><h3>Restake</h3>' + '<span class="sv-tag ars-st' + (on ? ' on' : '') + '">' + (on ? 'Active' : 'Inactive') + '</span></div>';
-    h += '<div class=ars-fig><em>' + (on ? 'Adds a year' : 'A year') + '</em><b>' + (add > 0 ? '+' + fmt(pos.total * add) : '\u2014') + '</b>' +
+    h += '<div class=ars-fig><em>' + (on ? 'Adds a year' : 'A year') + '</em><b>' + (add > 0 ? '+' + fmt(pos.total * add) : '-') + '</b>' +
       (add > 0 ? '<small>ATONE, +' + (add * 100).toFixed(1) + '% APR</small>' : '') + rsUntil(at, on) + '</div>';
     /* the rules sit at the foot, over the switch */
     h += '<div class=ars-foot><div class=ars-two><div><em>Frequency</em><b>12 hours</b></div><div><em>Minimum</em><b>1 ATONE</b></div></div>' +
@@ -529,7 +529,7 @@
   /* the chain's governance at a glance: how many proposals, what is open or how the last ended
      (read once a visit from the chain's API; a proposal takes weeks) */
   function drawNet(){
-    var S = setStats(), f = function(v){ return v != null ? v.toFixed(2) + "%" : "—"; };
+    var S = setStats(), f = function(v){ return v != null ? v.toFixed(2) + "%" : "-"; };
     /* the set's uptime over three spans now stands on the Uptime graph's rail (drawUp): the block-by-
        block figures it replaced are the Signing tab's */
 
@@ -629,9 +629,9 @@
         '<div class=sv-rt>' +
           /* the validator set's average uptime over three spans, and how many never went to jail in each */
           (TN() ? st("30 days", NA, "on testnet") + st("90 days", NA) + st("Since genesis", NA)
-            : st("30 days", S.up != null ? S.up.toFixed(2) + "%" : "\u2014", S.clean30 + " never jailed") +
-              st("90 days", S.up90 != null ? S.up90.toFixed(2) + "%" : "\u2014", S.clean90 + " never jailed") +
-              st("Since genesis", S.life != null ? S.life.toFixed(2) + "%" : "\u2014", S.clean + " never jailed")) +
+            : st("30 days", S.up != null ? S.up.toFixed(2) + "%" : "-", S.clean30 + " never jailed") +
+              st("90 days", S.up90 != null ? S.up90.toFixed(2) + "%" : "-", S.clean90 + " never jailed") +
+              st("Since genesis", S.life != null ? S.life.toFixed(2) + "%" : "-", S.clean + " never jailed")) +
         '</div></div>' +
       '<div class=sv-upchart>' +
         '<div class=sv-upmarks>' + marks + '</div>' +
@@ -674,7 +674,7 @@
     var avg = sum / iv.length, top = mx * 1.08;
     h = '<div class=sv-ph><h3>Chain pace</h3><div class=sv-rt>' +
       st("Block time", avg.toFixed(2) + " s", "slowest " + slow.s.toFixed(1) + " s") +
-      st("Blocks a day", DAY.avg ? Math.round(86400 / DAY.avg).toLocaleString() : "—", DAY.avg ? "last 24 hours" : "measuring…") +
+      st("Blocks a day", DAY.avg ? Math.round(86400 / DAY.avg).toLocaleString() : "-", DAY.avg ? "last 24 hours" : "measuring…") +
       st("Total blocks", Number(src[src.length - 1][0] + 1).toLocaleString(), (DD().coverage || {}).from_date ? "since " + DD().coverage.from_date : "since genesis") +
     '</div></div>' +
     '<div class=sv-pace><span class=sv-pavg style="bottom:' + (avg / top * 100).toFixed(1) + '%"><b>' + avg.toFixed(1) + ' s</b></span>' +
@@ -712,8 +712,8 @@
     SG.list = list; SG.rows = rows;
     var h = '<div class=sv-ph><h3>Signing</h3><span class=sv-gkey><i class=ok></i>signed<i class=bad></i>missed</span><div class=sv-rt>' +
       st("Signed", (list.length - bad.length) + " of " + list.length, n ? "last " + n + " blocks" : "reading the blocks…") +
-      st("Missed signatures", n ? String(tot) : "—", !n ? "" : tot ? "across " + bad.length + " validator" + (bad.length === 1 ? "" : "s") : "none in the window", "#ff4d1f") +
-      st("Most missed", bad.length ? esc(bad[0].m) : n ? "none" : "—", bad.length ? bad[0].k + " of " + n + " blocks" : n ? "all signed" : "", "#ff4d1f") + '</div></div>';
+      st("Missed signatures", n ? String(tot) : "-", !n ? "" : tot ? "across " + bad.length + " validator" + (bad.length === 1 ? "" : "s") : "none in the window", "#ff4d1f") +
+      st("Most missed", bad.length ? esc(bad[0].m) : n ? "none" : "-", bad.length ? bad[0].k + " of " + n + " blocks" : n ? "all signed" : "", "#ff4d1f") + '</div></div>';
     if(!n){ put("sv-signp", h + '<div class=sv-upwait>Reading the latest blocks…</div>'); return; }
     h += '<div class=sv-grid><div class=sv-gnames>' + list.map(function(x){
         return '<div class="sv-gn' + (x.k ? ' bad' : '') + '" data-v="' + esc(x.id) + '" title="Open ' + esc(x.m) + '"><span class=sv-lgo>' + logo(x.id, x.m) + '</span><b>' + esc(x.m) + '</b>' + (x.k ? '<em>' + x.k + '</em>' : '') + '</div>'; }).join("") +
@@ -755,9 +755,9 @@
     list.sort(function(a, b){ return b.c - a.c; });
     var top = list[0], since = (D.coverage || {}).from_date, have = all ? list.length : !!p24;
     var stats = '<div class=sv-rt>' +
-      st("Blocks", have ? got.toLocaleString() : "—", all ? "since genesis" + (since ? ", " + since : "") : "last 24 hours, one every " + (got ? (86400 / got).toFixed(1) : "—") + " s") +
-      st("Proposers", have ? ever.toLocaleString() : "—", all ? "validators that ever proposed" : "validators that proposed", "var(--sv-violet)") +
-      st("Top proposer", top && top.c ? esc(top.m) : "—", top && top.c ? top.c.toLocaleString() + " blocks, " + (top.c / got * 100).toFixed(1) + "%" : "", "var(--sv-amber)") + '</div>';
+      st("Blocks", have ? got.toLocaleString() : "-", all ? "since genesis" + (since ? ", " + since : "") : "last 24 hours, one every " + (got ? (86400 / got).toFixed(1) : "-") + " s") +
+      st("Proposers", have ? ever.toLocaleString() : "-", all ? "validators that ever proposed" : "validators that proposed", "var(--sv-violet)") +
+      st("Top proposer", top && top.c ? esc(top.m) : "-", top && top.c ? top.c.toLocaleString() + " blocks, " + (top.c / got * 100).toFixed(1) + "%" : "", "var(--sv-amber)") + '</div>';
     /* the latest blocks, newest on the right */
     var lv = rows.filter(live), last = lv.slice(-(innerWidth <= 620 ? 8 : 24));
     put("sv-proplive", '<div class=sv-ph><h3>Latest blocks</h3></div>' + (last.length ? '<div class=sv-plive>' + last.map(function(r){ var p = proposer(r, ix) || { m: "?" };
@@ -776,7 +776,7 @@
         return '<div class="sv-vr click" data-v="' + esc(x.id) + '" tabindex=0 style="--c:var(--sv-teal)"><span class=sv-lgo>' + logo(x.id, x.m) + '</span><b class=sv-vn>' + esc(x.m) + '</b>' +
           '<s class=sv-va>' + x.c.toLocaleString() + '<em>blocks</em></s>' +
           '<span class=sv-vs><span class=sv-vt><i style="width:' + (x.c / mx * 100).toFixed(1) + '%"></i></span></span>' +
-          '<u>' + (got ? (x.c / got * 100).toFixed(2) + "%" : "—") + '</u></div>'; }).join("") + '</div>');
+          '<u>' + (got ? (x.c / got * 100).toFixed(2) + "%" : "-") + '</u></div>'; }).join("") + '</div>');
   }
 
   /* ── Activity: transactions per hour over the last 24 hours, or per day since genesis (a line),
@@ -795,9 +795,9 @@
     if(all){
       if(td) td.forEach(function(x){ tot += x[1]; bl += x[2]; if(!top || x[1] > top[1]) top = x; });
       var since = (D.coverage || {}).from_date;
-      stats = '<div class=sv-rt>' + st("Transactions", td ? tot.toLocaleString() : "—", since ? "since " + since : "since genesis") +
-        st("Busiest day", top ? top[1].toLocaleString() : "—", top ? dl(top[0]) : "") +
-        st("Per block", td && bl ? (tot / bl).toFixed(2) : "—", td ? "average over " + bl.toLocaleString() + " blocks" : "") + '</div>';
+      stats = '<div class=sv-rt>' + st("Transactions", td ? tot.toLocaleString() : "-", since ? "since " + since : "since genesis") +
+        st("Busiest day", top ? top[1].toLocaleString() : "-", top ? dl(top[0]) : "") +
+        st("Per block", td && bl ? (tot / bl).toFixed(2) : "-", td ? "average over " + bl.toLocaleString() + " blocks" : "") + '</div>';
       body = td && td.length > 1 ? chart("txday", td.map(function(x){ return { d: x[0], tx: x[1] }; }), [{ k: "tx", cls: "txl", area: true, name: "" }],
           function(v){ return v <= 0 ? "0" : v >= 1000 ? Math.round(v / 1000) + "k" : String(Math.round(v)); },
           function(v){ return Math.round(v).toLocaleString() + " transactions"; })
@@ -805,9 +805,9 @@
     } else if(AW === "30d"){
       var d30 = td ? td.slice(-30) : null;
       if(d30) d30.forEach(function(x){ tot += x[1]; bl += x[2]; if(!top || x[1] > top[1]) top = x; });
-      stats = '<div class=sv-rt>' + st("Transactions", d30 ? tot.toLocaleString() : "—", d30 ? "about " + Math.round(tot / Math.max(1, d30.length)).toLocaleString() + " a day" : "") +
-        st("Busiest day", top ? top[1].toLocaleString() : "—", top ? dl(top[0]) : "") +
-        st("Per block", d30 && bl ? (tot / bl).toFixed(2) : "—", d30 ? "average over " + bl.toLocaleString() + " blocks" : "") + '</div>';
+      stats = '<div class=sv-rt>' + st("Transactions", d30 ? tot.toLocaleString() : "-", d30 ? "about " + Math.round(tot / Math.max(1, d30.length)).toLocaleString() + " a day" : "") +
+        st("Busiest day", top ? top[1].toLocaleString() : "-", top ? dl(top[0]) : "") +
+        st("Per block", d30 && bl ? (tot / bl).toFixed(2) : "-", d30 ? "average over " + bl.toLocaleString() + " blocks" : "") + '</div>';
       if(d30 && d30.length){
         var m30 = Math.max(1, Math.max.apply(null, d30.map(function(x){ return x[1]; }))), t30 = "";
         d30.forEach(function(x, i){ if(i % 7 === 0) t30 += '<span style="left:' + (i / d30.length * 100).toFixed(2) + '%">' + new Date(x[0] + "T00:00:00Z").toLocaleDateString("en", { day: "numeric", month: "short", timeZone: "UTC" }) + '</span>'; });
@@ -816,9 +816,9 @@
       } else body = '<div class=sv-upwait>Reading the last 30 days…</div>';
     } else {
       if(a24) a24.forEach(function(x){ tot += x[1]; bl += x[2]; if(!top || x[1] > top[1]) top = x; });
-      stats = '<div class=sv-rt>' + st("Transactions", a24 ? tot.toLocaleString() : "—", a24 ? "about " + Math.round(tot / Math.max(1, a24.length)) + " an hour" : "") +
-        st("Busiest hour", top ? top[1].toLocaleString() : "—", top ? when(top[0]) : "") +
-        st("Per block", a24 && bl ? (tot / bl).toFixed(2) : "—", a24 ? "average over " + bl.toLocaleString() + " blocks" : "") + '</div>';
+      stats = '<div class=sv-rt>' + st("Transactions", a24 ? tot.toLocaleString() : "-", a24 ? "about " + Math.round(tot / Math.max(1, a24.length)) + " an hour" : "") +
+        st("Busiest hour", top ? top[1].toLocaleString() : "-", top ? when(top[0]) : "") +
+        st("Per block", a24 && bl ? (tot / bl).toFixed(2) : "-", a24 ? "average over " + bl.toLocaleString() + " blocks" : "") + '</div>';
       if(a24 && a24.length){
         var m = Math.max(1, Math.max.apply(null, a24.map(function(x){ return x[1]; }))), ticks = "";
         a24.forEach(function(x, i){ var d = new Date(x[0] * 1000); if(d.getHours() % 6 === 0) ticks += '<span style="left:' + (i / a24.length * 100).toFixed(2) + '%">' + (d.getHours() ? String(d.getHours()).padStart(2, "0") + ":00" : DAYN[d.getDay()] + " " + d.getDate()) + '</span>'; });
@@ -836,9 +836,9 @@
     if(TN()) sb = "";           /* testnet: only the live 100 blocks are known */
     var hb = function(k){ return '<div class=sv-ph><h3>Transactions</h3><span class=sv-gkey>per 100 blocks</span>' + sb + k + '</div>'; }, sl, lb;
     if(bw === "100"){
-      sl = '<div class=sv-rt>' + st("Transactions", rows.length ? tx.toLocaleString() : "—", rows.length ? "last " + rows.length + " blocks" : "", "var(--sv-violet)") +
-        st("Gas used", rows.length ? (gas / 1e6).toFixed(1) + "M" : "—", rows.length ? "of " + (rows.length * 100).toLocaleString() + "M capacity" : "", "var(--sv-violet)") +
-        st("Fees paid", rows.length ? (fee / 1e6).toFixed(2) + " PHOTON" : "—", rows.length ? "last " + rows.length + " blocks" : "", "var(--sv-pho)") + '</div>';
+      sl = '<div class=sv-rt>' + st("Transactions", rows.length ? tx.toLocaleString() : "-", rows.length ? "last " + rows.length + " blocks" : "", "var(--sv-violet)") +
+        st("Gas used", rows.length ? (gas / 1e6).toFixed(1) + "M" : "-", rows.length ? "of " + (rows.length * 100).toLocaleString() + "M capacity" : "", "var(--sv-violet)") +
+        st("Fees paid", rows.length ? (fee / 1e6).toFixed(2) + " PHOTON" : "-", rows.length ? "last " + rows.length + " blocks" : "", "var(--sv-pho)") + '</div>';
       if(rows.length){
         var mb = Math.max(1, Math.max.apply(null, rows.map(function(r){ return r[6]; })));
         lb = '<div class="sv-bars live">' + bscale(mb, function(v){ return String(Math.round(v)); }, true) + rows.map(function(r){ return '<i class="' + (r[6] ? "" : "z") + '" style="--h:' + (r[6] ? Math.max(6, r[6] / mb * 100) : 3).toFixed(1) + '%" data-t="block ' + Number(r[0] + 1).toLocaleString() + ": " + r[6] + " transaction" + (r[6] === 1 ? "" : "s") +
@@ -849,9 +849,9 @@
       var bk = D.b10k || [], T = 0, B = 0, NZ = 0, pk = null;
       bk.forEach(function(x){ T += x[1]; B += x[2]; NZ += x[3]; var r = x[2] ? x[1] / x[2] : 0; if(!pk || r > pk.r) pk = { h: x[0], r: r, b: x[2] }; });
       var span = function(h, b){ return Number(h).toLocaleString() + "–" + Number(h + b - 1).toLocaleString(); };
-      sl = '<div class=sv-rt>' + st("Per 100 blocks", B ? (T / B * 100).toFixed(1) : "—", B ? T.toLocaleString() + " in " + B.toLocaleString() + " blocks" : "", "var(--sv-violet)") +
-        st("Busiest 100", pk ? String(Math.round(pk.r * pk.b)) : "—", pk ? "blocks " + Number(pk.h).toLocaleString() + " on" : "", "var(--sv-violet)") +
-        st("With transactions", B ? NZ.toLocaleString() : "—", B ? "of " + B.toLocaleString() + " blocks" : "") + '</div>';
+      sl = '<div class=sv-rt>' + st("Per 100 blocks", B ? (T / B * 100).toFixed(1) : "-", B ? T.toLocaleString() + " in " + B.toLocaleString() + " blocks" : "", "var(--sv-violet)") +
+        st("Busiest 100", pk ? String(Math.round(pk.r * pk.b)) : "-", pk ? "blocks " + Number(pk.h).toLocaleString() + " on" : "", "var(--sv-violet)") +
+        st("With transactions", B ? NZ.toLocaleString() : "-", B ? "of " + B.toLocaleString() + " blocks" : "") + '</div>';
       if(bk.length){
         var m3 = Math.max(1, Math.max.apply(null, bk.map(function(x){ return x[1]; })));
         lb = '<div class="sv-bars live">' + bscale(m3, function(v){ return String(Math.round(v)); }, true) + bk.map(function(x){
@@ -861,9 +861,9 @@
     } else {
       var src = (td || []).map(function(x){ return { k: x[0], t: x[1], b: x[2] }; });
       var T = 0, B = 0, pk = null; src.forEach(function(x){ T += x.t; B += x.b; var r = x.b ? x.t / x.b : 0; if(!pk || r > pk.r) pk = { k: x.k, r: r }; });
-      sl = '<div class=sv-rt>' + st("Per 100 blocks", B ? (T / B * 100).toFixed(1) : "—", "since genesis", "var(--sv-violet)") +
-        st("Busiest day", pk ? (pk.r * 100).toFixed(0) : "—", pk ? dl(pk.k) + ", per 100 blocks" : "", "var(--sv-violet)") +
-        st("Transactions", B ? T.toLocaleString() : "—", "since genesis") + '</div>';
+      sl = '<div class=sv-rt>' + st("Per 100 blocks", B ? (T / B * 100).toFixed(1) : "-", "since genesis", "var(--sv-violet)") +
+        st("Busiest day", pk ? (pk.r * 100).toFixed(0) : "-", pk ? dl(pk.k) + ", per 100 blocks" : "", "var(--sv-violet)") +
+        st("Transactions", B ? T.toLocaleString() : "-", "since genesis") + '</div>';
       lb = src.length ? chart("tpb", src.map(function(x){ return { d: x.k, r: x.b ? x.t / x.b * 100 : 0 }; }), [{ k: "r", cls: "tpb", area: true }], function(v){ return v <= 0 ? "0" : String(Math.round(v)); },
           function(v){ return v.toFixed(1) + " per 100 blocks"; }) : '<div class=sv-upwait>Reading the history…</div>';
     }
@@ -975,7 +975,7 @@
       chart("ecoa", hist, [{ k: "atone", cls: "sup", name: "Supply" }, { k: "bonded", cls: "bon", area: true, name: "Bonded" }], M, function(v){ return big(v); }));
     put("sv-ecop", '<div class=sv-ph><h3>PHOTON</h3><span class=sv-tmax>1 billion max</span><span class=sv-gkey><i class=pho></i>supply</span>' + tp("photon", pr.photon, "var(--sv-pho)") + '<span class=sv-trole style="--c:var(--sv-pho)">Fee Token</span><div class=sv-rt>' +
       st("Capped supply", big(now.photon), sg(ch("photon")), "var(--sv-pho)") +
-      st("Mint rate", E0.conv ? E0.conv.toFixed(2) : "—", "PHOTON per ATONE burned", "var(--sv-pho)") +
+      st("Mint rate", E0.conv ? E0.conv.toFixed(2) : "-", "PHOTON per ATONE burned", "var(--sv-pho)") +
       st("Community pool", big(now.pool_ph), "PHOTON", "var(--sv-green)") + '</div></div>' +
       chart("ecop", hist, [{ k: "photon", cls: "pho", area: true, name: "Supply" }], M, function(v){ return big(v); }));
   }
@@ -1093,8 +1093,8 @@
       if(v.moniker === me.m && v.identity === me.ident && v.website === me.web && v.security_contact === me.sec && v.details === me.det) ok = false;
     } else {
       var need = GV.rules && GV.rules.minSelf, have = bondedStake(), enough = !!(need && have != null && have >= need), nd = E("grneed");
-      if(nd) nd.innerHTML = '<div><em>Needs</em><b>' + (need ? whole(need) : "—") + '</b><small>ATONE staked</small></div>' +
-        '<div class=' + (enough ? 'ok' : 'no') + '><em>You have</em><b>' + (have != null ? fmt(have) : "—") + '</b><small>ATONE on active validators</small></div>';
+      if(nd) nd.innerHTML = '<div><em>Needs</em><b>' + (need ? whole(need) : "-") + '</b><small>ATONE staked</small></div>' +
+        '<div class=' + (enough ? 'ok' : 'no') + '><em>You have</em><b>' + (have != null ? fmt(have) : "-") + '</b><small>ATONE on active validators</small></div>';
       if(!enough) ok = false;
     }
     go.disabled = !ok;
@@ -1140,8 +1140,8 @@
         st("voting power", g.vp != null ? fmt(g.vp) : NA, sh != null ? sh.toFixed(2) + "% of bonded ATONE" : "") +
         st("delegators", g.n != null ? String(g.n) : NA, "wallets that follow it") +
         st(g.active ? "active since" : "inactive since", g.since && window.__dayFull ? window.__dayFull(g.since) : NA, "") +
-        st("security contact", g.sec ? esc(g.sec) : "\u2014", "") +
-        st("identity", g.ident ? esc(g.ident) : "\u2014", g.ident ? "Keybase" : "") +
+        st("security contact", g.sec ? esc(g.sec) : "-", "") +
+        st("identity", g.ident ? esc(g.ident) : "-", g.ident ? "Keybase" : "") +
         st("address", esc(g.addr.slice(0, 12) + "\u2026" + g.addr.slice(-6)), "") +
       '</div>' +
       '<p class=gv-rules>A governor must hold at least <b>' + (R.minSelf ? whole(R.minSelf) : NA) + ' ATONE</b> of its own stake, and may change its status once every <b>' +
@@ -1156,9 +1156,9 @@
     var L = GV.list, act = L ? L.filter(function(g){ return g.active; }) : [], vp = 0, n = 0;
     (L || []).forEach(function(g){ vp += g.vp || 0; n += g.n || 0; });
     var C = ["var(--sv-teal)", "var(--sv-violet)", "var(--sv-green)"], ci = 0, c = function(k, v, sub){ return gstat(k, v, sub, C[ci++ % 3]); };
-    put("sv-govcards", c("Governors", L ? String(L.length) : "\u2014", L ? "Active " + act.length : "reading the chain\u2026") +
-      c("Voting power", L ? fmt(vp) : "\u2014", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(2) + "% of bonded ATONE follows a governor" : "ATONE") +
-      c("Delegators", L ? String(n) : "\u2014", "wallets that follow a governor"));
+    put("sv-govcards", c("Governors", L ? String(L.length) : "-", L ? "Active " + act.length : "reading the chain\u2026") +
+      c("Voting power", L ? fmt(vp) : "-", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(2) + "% of bonded ATONE follows a governor" : "ATONE") +
+      c("Delegators", L ? String(n) : "-", "wallets that follow a governor"));
     var h = '<div class=sv-ph><h3>Governors</h3><span class=sv-gkey>a delegator\'s vote goes with its governor unless it votes itself</span></div>';
     put("sv-govlist", h + (GV.err && !L ? govEmpty("Could not read the governors") : !L ? govEmpty("Reading the governors\u2026")
       : !L.length ? govEmpty("No governors on AtomOne yet") : govRows(L, myGov())));
@@ -1168,8 +1168,8 @@
   /* no governors yet: what one is, and the chain's rules for becoming one */
   function govNone(){
     var R = GV.rules || {};
-    return '<div class=gv-rules3><div><em>To become one</em><b>' + (R.minSelf ? whole(R.minSelf) : '\u2014') + '</b><small>ATONE of its own stake</small></div>' +
-      '<div><em>Status change</em><b>' + (R.period ? Math.round(R.period / 86400) + ' days' : '\u2014') + '</b><small>at most once in</small></div>' +
+    return '<div class=gv-rules3><div><em>To become one</em><b>' + (R.minSelf ? whole(R.minSelf) : '-') + '</b><small>ATONE of its own stake</small></div>' +
+      '<div><em>Status change</em><b>' + (R.period ? Math.round(R.period / 86400) + ' days' : '-') + '</b><small>at most once in</small></div>' +
       '<div><em>Its vote</em><b>Follows</b><small>for every staker who follows it</small></div></div>';
   }
   function drawMyGov(){
@@ -1180,11 +1180,11 @@
     var following = !!(window.__ADDR && mine);
     var me = window.__ADDR ? myGovRec() : null;
     put("sd-gstrip", wcard() +
-      ro(me ? "You govern" : "Your governor", me ? esc(me.m) : following ? esc(g ? g.m : mine.slice(0, 12) + "…") : window.__ADDR && mine === "" ? "None" : "—", "", null, "var(--sv-violet)") +
-      ro("Your vote weight", pos && pos.rows.length ? fmt(pos.total) : "—", "", null, "var(--sv-amber)", "", false, pos && pos.rows.length ? "ATONE" : "") +
-      ro("Voting now", P ? String(live.length) : "—", "", null, "var(--sv-teal)", "", false, P ? (live.length === 1 ? "proposal" : "proposals") : "") +
-      ro("Governors", L ? String(act.length) : "—", "", null, "var(--sv-violet)", "", false, L ? "active" : "") +
-      ro("Follows governors", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(1) + "%" : "—", "", null, "var(--sv-green)", "", false, L && GV.bonded ? "of bonded" : ""));
+      ro(me ? "You govern" : "Your governor", me ? esc(me.m) : following ? esc(g ? g.m : mine.slice(0, 12) + "…") : window.__ADDR && mine === "" ? "None" : "-", "", null, "var(--sv-violet)") +
+      ro("Your vote weight", pos && pos.rows.length ? fmt(pos.total) : "-", "", null, "var(--sv-amber)", "", false, pos && pos.rows.length ? "ATONE" : "") +
+      ro("Voting now", P ? String(live.length) : "-", "", null, "var(--sv-teal)", "", false, P ? (live.length === 1 ? "proposal" : "proposals") : "") +
+      ro("Governors", L ? String(act.length) : "-", "", null, "var(--sv-violet)", "", false, L ? "active" : "") +
+      ro("Follows governors", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(1) + "%" : "-", "", null, "var(--sv-green)", "", false, L && GV.bonded ? "of bonded" : ""));
     /* Your governor: plain words, then its card when there is one */
     var h = '<div class=sv-ph><h3>Your governor</h3></div>';
     if(!window.__ADDR) h += '<p class=gv-say>Connect a wallet to see the governor it follows.</p>';
@@ -1249,18 +1249,18 @@
      engraved well, a line under it */
   function gstat(k, v, sub, rc){ return '<div class=gv-ro style="--rc:' + (rc || 'var(--sv-teal)') + '"><em>' + k + '</em><div class=sd-well><b>' + v + '</b></div>' + (sub ? '<small>' + sub + '</small>' : '<small>&nbsp;</small>') + '</div>'; }
   function ptally(t){ var y = +(t.yes_count || 0), n = +(t.no_count || 0), a = +(t.abstain_count || 0), s = y + n + a; return { y: y, n: n, a: a, s: s }; }
-  function pday(t){ return t && window.__dayFull ? window.__dayFull(new Date(t).getTime()) : "—"; }
+  function pday(t){ return t && window.__dayFull ? window.__dayFull(new Date(t).getTime()) : "-"; }
   function drawProps(){
     loadProps();
     var L = GP.list, tp = GP.tp || {}, C = ["var(--sv-teal)", "var(--sv-amber)", "var(--sv-green)"], ci = 0, c = function(k, v, sub){ return gstat(k, v, sub, C[ci++ % 3]); };
     var n = function(st){ return L ? L.filter(function(p){ return p.st === st; }).length : 0; }, live = L ? L.filter(function(p){ return p.st === "PROPOSAL_STATUS_VOTING_PERIOD"; }) : [];
     put("sv-propcards",
-      c("Proposals", L ? String(L.length) : "—", L ? n("PROPOSAL_STATUS_PASSED") + " passed, " + n("PROPOSAL_STATUS_REJECTED") + " rejected" + (n("PROPOSAL_STATUS_FAILED") ? ", " + n("PROPOSAL_STATUS_FAILED") + " failed" : "") +
+      c("Proposals", L ? String(L.length) : "-", L ? n("PROPOSAL_STATUS_PASSED") + " passed, " + n("PROPOSAL_STATUS_REJECTED") + " rejected" + (n("PROPOSAL_STATUS_FAILED") ? ", " + n("PROPOSAL_STATUS_FAILED") + " failed" : "") +
         /* ids run to the newest; a proposal that never met its deposit is deleted by the chain, so
            the count can be lower - said, so "20" beside "#21" does not read as a mistake */
         (L.length && L[0].id > L.length ? ", " + (L[0].id - L.length) + " dropped (deposit not met)" : "") : "reading the chain…") +
-      c("Voting now", L ? (live.length ? String(live.length) : "None") : "—", L ? (live.length ? "#" + live[live.length - 1].id + " ends " + pday(live[live.length - 1].ve) : "no proposal is open") : "") +
-      c("To pass", tp.threshold ? "&gt;" + (tp.threshold * 100).toFixed(1) + "%" : "—", tp.quorum ? "of votes yes, with " + (tp.quorum * 100).toFixed(1) + "% of bonded ATONE voting" + (tp.law_threshold ? "; laws and amendments " + (tp.law_threshold * 100).toFixed(0) + "%" : "") : "of votes yes"));
+      c("Voting now", L ? (live.length ? String(live.length) : "None") : "-", L ? (live.length ? "#" + live[live.length - 1].id + " ends " + pday(live[live.length - 1].ve) : "no proposal is open") : "") +
+      c("To pass", tp.threshold ? "&gt;" + (tp.threshold * 100).toFixed(1) + "%" : "-", tp.quorum ? "of votes yes, with " + (tp.quorum * 100).toFixed(1) + "% of bonded ATONE voting" + (tp.law_threshold ? "; laws and amendments " + (tp.law_threshold * 100).toFixed(0) + "%" : "") : "of votes yes"));
     var h = '<div class=sv-ph><h3>Proposals</h3><span class=sv-gkey>newest first; tap one to read it</span></div>';
     if(GP.err && !L){ put("sv-proplist", h + govEmpty("Could not read the proposals")); return; }
     if(!L){ put("sv-proplist", h + govEmpty("Reading the proposals…")); return; }
@@ -1277,8 +1277,8 @@
       if(open){
         var sm = p.sum.length > 2400 ? p.sum.slice(0, 2400) + "…" : p.sum;
         row += '<div class=gp-d><div class=gp-f>' +
-          '<span><em>Proposer</em>' + esc(p.by ? p.by.slice(0, 12) + "…" + p.by.slice(-6) : "—") + '</span>' +
-          '<span><em>Deposit</em>' + (p.dep ? fmt(p.dep) + ' ATONE' : '—') + '</span>' +
+          '<span><em>Proposer</em>' + esc(p.by ? p.by.slice(0, 12) + "…" + p.by.slice(-6) : "-") + '</span>' +
+          '<span><em>Deposit</em>' + (p.dep ? fmt(p.dep) + ' ATONE' : '-') + '</span>' +
           '<span><em>Submitted</em>' + pday(p.submit) + '</span>' +
           '<span><em>Voting</em>' + (p.vs ? pday(p.vs) + ' to ' + pday(p.ve) : 'not started') + '</span>' +
           (t.s ? '<span><em>Votes cast</em>' + fmt(t.s) + ' ATONE</span>' : '') + '</div>' +
@@ -1292,11 +1292,11 @@
     loadProps();
     var d = GP.dao, L = GP.list, net = TN() ? "testnet" : "mainnet";
     var C = ["var(--sv-teal)", "var(--sv-amber)", "var(--sv-green)"], ci = 0, c = function(k, v, sub){ return gstat(k, v, sub, C[ci++ % 3]); };
-    var who = function(a){ return !d ? "—" : a ? esc(a.slice(0, 10) + "…" + a.slice(-6)) : "Not appointed"; };
+    var who = function(a){ return !d ? "-" : a ? esc(a.slice(0, 10) + "…" + a.slice(-6)) : "Not appointed"; };
     var ext = d ? +(d.voting_period_extensions_limit || 0) : null, dur = d ? Math.round(parseInt(d.voting_period_extension_duration || "0", 10) / 86400) : null;
     put("sv-daocards", c("Steering DAO", who(d && d.steering_dao_address), d ? (d.steering_dao_address ? "on chain" : "none on " + net + " yet") : "reading the chain…") +
       c("Oversight DAO", who(d && d.oversight_dao_address), d ? (d.oversight_dao_address ? "on chain" : "none on " + net + " yet") : "") +
-      c("Endorsed proposals", L ? String(L.filter(function(p){ return p.endorsed; }).length) : "—", L ? "of " + L.length + " proposals" : ""));
+      c("Endorsed proposals", L ? String(L.filter(function(p){ return p.endorsed; }).length) : "-", L ? "of " + L.length + " proposals" : ""));
     var row = function(name, has, text){ return '<div class=gd-r><div class=gd-h><b>' + name + '</b><span class="gp-st ' + (has ? 'p' : 'd') + '">' + (has ? 'appointed' : 'not appointed') + '</span></div><p>' + text + '</p></div>'; };
     put("sv-daop", '<div class=sv-ph><h3>What they are for</h3></div>' + (GP.err && !d ? govEmpty("Could not read the chain") : !d ? govEmpty("Reading the chain…") :
       '<div class=gd-list>' +
@@ -1566,16 +1566,16 @@
     var wname = (window.__WALLET && String(window.__WALLET.label || "").trim()) || "Your wallet";
     var row = function(k, v, u, extra){ return '<div class=you-r><span>' + k + '</span>' + (extra || '') + '<b>' + v + '</b><i>' + u + '</i></div>'; };
     var h = '<div class=you-h><h3 title="' + esc(wname) + '">' + esc(wname) + '</h3>' + wmeta() + '</div>';
-    h += '<div class=you-apr><em>Your APR</em><b' + (mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '>' + (mine ? pct(pos.rate) : '—') + '</b>' +
+    h += '<div class=you-apr><em>Your APR</em><b' + (mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '>' + (mine ? pct(pos.rate) : '-') + '</b>' +
       '<small>' + (!a ? 'connect a wallet to see yours' : !pos ? 'reading…' : mine ? 'on ' + pos.rows.length + ' validator' + (pos.rows.length === 1 ? '' : 's') : 'Nothing staked') + '</small></div>';
     /* Pro on Redelegate: what can move now, the ticked delegations' free stake when any are ticked (operator, 2026-09-30) */
     var proRd = root.getAttribute("data-sv") === "dashboard/self" && matchMedia("(min-width:1100px)").matches && !root.getAttribute("data-pro");
     h += '<div class=you-bal>' +
-      row("Staked", pos ? fmt(pos.total) : '—', "ATONE") +
-      (proRd ? row("Movable Stake", pos && window.__srcFree ? fmt(window.__srcFree()) : '—', "ATONE") : '') +
-      row("Available", bal ? fmt(bal.uatone) : '—', "ATONE") +
-      row("Rewards", window.__REW != null ? fmt(window.__REW) : '—', "ATONE") +
-      row("For fees", bal ? fmt(bal.uphoton) : '—', "PHOTON") + '</div>';
+      row("Staked", pos ? fmt(pos.total) : '-', "ATONE") +
+      (proRd ? row("Movable Stake", pos && window.__srcFree ? fmt(window.__srcFree()) : '-', "ATONE") : '') +
+      row("Available", bal ? fmt(bal.uatone) : '-', "ATONE") +
+      row("Rewards", window.__REW != null ? fmt(window.__REW) : '-', "ATONE") +
+      row("For fees", bal ? fmt(bal.uphoton) : '-', "PHOTON") + '</div>';
     var rp = at && at.report, adm = rp && rp.admin, st = adm && adm.state;
     var asub = !auto ? "keeps your stake at the best APR" : "checks every 12 hours";
     /* Pro on a wide screen (operator, 2026-09-30): the wallet column holds your delegations and the action menu
@@ -1707,10 +1707,10 @@
     if(a){
       var bal = window.__BAL, mine = pos && pos.rows.length, rs = !!(at && at.restake);
       you = '<div class=mv-you><div class=mv-yg>' +
-        '<div class=mv-yk><em>Your APR</em><b' + (mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '>' + (mine ? pct(pos.rate) : '\u2014') + '</b></div>' +
-        '<div class=mv-yk><em>Staked</em><b>' + (pos ? fmt(pos.total) : '\u2014') + '</b></div>' +
-        '<div class=mv-yk><em>Available</em><b>' + (bal ? fmt(bal.uatone) : '\u2014') + '</b></div>' +
-        '<div class=mv-yk><em>Rewards</em><b>' + (window.__REW != null ? fmt(window.__REW) : '\u2014') + '</b></div></div>' +
+        '<div class=mv-yk><em>Your APR</em><b' + (mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '>' + (mine ? pct(pos.rate) : '-') + '</b></div>' +
+        '<div class=mv-yk><em>Staked</em><b>' + (pos ? fmt(pos.total) : '-') + '</b></div>' +
+        '<div class=mv-yk><em>Available</em><b>' + (bal ? fmt(bal.uatone) : '-') + '</b></div>' +
+        '<div class=mv-yk><em>Rewards</em><b>' + (window.__REW != null ? fmt(window.__REW) : '-') + '</b></div></div>' +
         '<div class=mv-ysw>' + youSwitch("youauto", "Autopilot", auto, "", !mine) + youSwitch("restakesw", "Restake", rs, "", !mine) + '</div></div>';
     }
     var h;

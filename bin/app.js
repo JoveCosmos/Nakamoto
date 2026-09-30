@@ -422,7 +422,7 @@ function fields(e){
        were painted the ramp's black end - invisible on the frame */
     var flat = heat ? ((sp < 1e-9) ? EVEN : null) : NEUT;
     return cell(i, u, ys[i]*100,
-                v[0] + ' — ' + (byStake
+                v[0] + ' - ' + (byStake
                   ? (T[i]/D.set.bonded*100).toFixed(2) + '% of stake'
                   : (ys[i]*100).toFixed(1) + '% APR'), flat);
   }).join("") +
@@ -981,7 +981,7 @@ rememberGridH();
     E("popf").textContent=k?f(R*r.eta/N/1e6)+" ATONE / yr":"N/A";
     /* the exact block the epoch opened on, from our own index - blank for the
        weeks the chain has not reached yet */
-    E("popbk").textContent = r.height ? f(r.height) : "\u2014";
+    E("popbk").textContent = r.height ? f(r.height) : "-";
     POP.open(pop);
   }
   Array.prototype.forEach.call(document.querySelectorAll("tr.wk"), function(tr){
@@ -1034,9 +1034,9 @@ rememberGridH();
     E("ibadges").innerHTML = jailed ? '<span class="badge warn">JAILED</span>' : '<span class="badge dn">INACTIVE</span>';
     E("inote").textContent = jailed ? "Jailed and out of the active set: it earns nothing until its operator unjails it and it is back in the top 100."
                                     : "Outside the active set (the top 100 by stake): it earns nothing until it is back in.";
-    E("imine").textContent = row ? f(row.x / 1e6) : "\u2014";
-    E("istake").textContent = x ? f(x.t / 1e6) : "\u2014";
-    E("icomm").textContent = x ? (x.c * 100).toFixed(0) + "%" : "\u2014";
+    E("imine").textContent = row ? f(row.x / 1e6) : "-";
+    E("istake").textContent = x ? f(x.t / 1e6) : "-";
+    E("icomm").textContent = x ? (x.c * 100).toFixed(0) + "%" : "-";
     /* no Redelegate or Unstake here (operator, 2026-09-30): an inactive validator's card only says what it is */
     POP.open(E("ipop"));
     return true;
@@ -1103,7 +1103,7 @@ rememberGridH();
        epochs we can measure - both quieter than the headline rate */
     var vn = E("vnet"); if(vn) vn.textContent = (a*(1-v.c)*100).toFixed(1) + "%";
     var ve = E("vearn");
-    if(ve) ve.textContent = v.earn_avg ? (v.earn_avg*100).toFixed(1) + "%" : "\u2014";
+    if(ve) ve.textContent = v.earn_avg ? (v.earn_avg*100).toFixed(1) + "%" : "-";
     /* 10k blocks is the chain's OWN signing window - real uptime, the figure that
        decides jailing. The 30D/3M strips are a different measurement and say so:
        we index proposers, not commit signatures, so over longer spans the honest
@@ -1118,7 +1118,7 @@ rememberGridH();
        daily series baked into the page cannot move between rebuilds. */
     pingStart(v.chex);
     var tn = (D.net || {}).net === "testnet";
-    E("fjoin").textContent  = v.joined ? dmy(v.joined) : (tn ? "N/A" : "—");
+    E("fjoin").textContent  = v.joined ? dmy(v.joined) : (tn ? "N/A" : "-");
     E("flast").textContent  = v.last_slash || (tn ? "N/A" : "Never");
     E("vprop").textContent  = v.prop != null ? f(v.prop) : "N/A";
     /* the note repeated what the map, the graph and the APR band already say */
@@ -1208,7 +1208,7 @@ rememberGridH();
                changes reads as a frozen picture */
             else if(k === rows.length - 1) el2.className = "tip";
             if(r.h) top = r.h;
-            el2.title = (r.h || "") + (signed ? " — signed" : " — missed");
+            el2.title = (r.h || "") + (signed ? " - signed" : " - missed");
           }
           el.appendChild(el2);
         });
@@ -1904,7 +1904,7 @@ rememberGridH();
   function tickAgo(){
     if(!ago || document.documentElement.getAttribute("data-tab") !== "dele") return;
     var at = Math.max(window.__LIVEAT ? window.__LIVEAT() : 0, window.__POSAT || 0);
-    if(!at){ ago.textContent = "\u2014"; return; }
+    if(!at){ ago.textContent = "-"; return; }
     var s = Math.max(0, Math.round((Date.now() - at) / 1000));
     ago.textContent = (s < 60 ? s + "s" : Math.floor(s / 60) + "m") + " ago";
     ago.classList.toggle("fresh", s < 8);
@@ -2075,22 +2075,22 @@ rememberGridH();
   /* ── the stat strip ── */
   function stats(pos){
     var st = E("ds-staked"), mv = E("ds-mov"), ph = E("ds-photon"), bl = E("ds-bal"), rw = E("ds-rew");
-    if(!pos){ var mx0 = E("amtmax"); if(mx0) mx0.disabled = true; if(mv){ mv.textContent = "\u2014"; mv.className = ""; } var ln0 = E("dlockn"); if(ln0) ln0.hidden = true;
+    if(!pos){ var mx0 = E("amtmax"); if(mx0) mx0.disabled = true; if(mv){ mv.textContent = "-"; mv.className = ""; } var ln0 = E("dlockn"); if(ln0) ln0.hidden = true;
       /* no wallet: the figures go back to a dash - a disconnect must not leave the last
          wallet's numbers standing, which read as still connected */
-      [bl, ph, st, rw, E("ds-apr")].forEach(function(x){ if(x){ x.textContent = "\u2014"; x.className = x === ph ? "pho" : ""; } });
+      [bl, ph, st, rw, E("ds-apr")].forEach(function(x){ if(x){ x.textContent = "-"; x.className = x === ph ? "pho" : ""; } });
       return; }
     var b = window.__BAL;
     /* the tiles carry the whole figure, to the micro-ATONE */
-    if(bl) bl.textContent = b ? exact(b.uatone) : "—";
+    if(bl) bl.textContent = b ? exact(b.uatone) : "-";
     if(st) st.textContent = exact(pos.total);
-    if(rw){ rw.textContent = window.__REW != null ? exact(window.__REW) : "—"; rw.className = window.__REW > 0 ? "ok" : ""; }
+    if(rw){ rw.textContent = window.__REW != null ? exact(window.__REW) : "-"; rw.className = window.__REW > 0 ? "ok" : ""; }
     var rt = E("ds-rewt"); if(rt) rt.setAttribute("aria-disabled", clRows().length ? "false" : "true");
     var sf = srcFree(pos);
     if(mv){ mv.textContent = sf > 0 ? exact(sf, 2) : "0"; mv.title = sf > 0 ? exact(sf) + " ATONE can move" + (srcAny() ? " from the ticked delegations" : "") : "nothing can move until the cooldown ends"; mv.className = sf > 0 ? "" : "warn";
       var mxb = E("amtmax"); if(mxb) mxb.disabled = !(sf > 0); }
-    var ap = E("ds-apr"); if(ap) ap.textContent = pos.rows.length ? pct(pos.rate) : "\u2014";
-    if(ph){ ph.textContent = b ? exact(b.uphoton) : "—";
+    var ap = E("ds-apr"); if(ap) ap.textContent = pos.rows.length ? pct(pos.rate) : "-";
+    if(ph){ ph.textContent = b ? exact(b.uphoton) : "-";
       ph.className = "pho" + (b && b.uphoton < 50000 ? " warn" : ""); }
   }
 
@@ -2124,10 +2124,10 @@ rememberGridH();
       var rw = slice[k], rk = rankOf(V, rw.id);
       var canSrc = rw.x - rw.locked >= 1e5, onSrc = canSrc && !!SRCSEL[rw.id];
       h += '<tr class="' + (rw.inactive ? 'inactive' : '') + (onSrc ? ' on' : '') + '" data-v="' + att(rw.id) + '" tabindex=0 title="' + (rw.inactive ? 'Not in the active set: this stake earns nothing until it is moved or unstaked' : 'Open this validator') + '">' +
-           '<td class=ck>' + (canSrc ? '<input type=checkbox data-src="' + att(rw.id) + '"' + (onSrc ? ' checked' : '') + ' aria-label="Move from ' + att(rw.m) + '">' : '<input type=checkbox disabled aria-label="In its cooldown" title="In its 21-day cooldown: it cannot move yet">') + '</td><td class="c rk">' + (rk || '\u2014') + '</td><td class="l nm">' + logo(rw.id, rw.m) + '<span>' + att(rw.m) + '</span></td>' +
+           '<td class=ck>' + (canSrc ? '<input type=checkbox data-src="' + att(rw.id) + '"' + (onSrc ? ' checked' : '') + ' aria-label="Move from ' + att(rw.m) + '">' : '<input type=checkbox disabled aria-label="In its cooldown" title="In its 21-day cooldown: it cannot move yet">') + '</td><td class="c rk">' + (rk || '-') + '</td><td class="l nm">' + logo(rw.id, rw.m) + '<span>' + att(rw.m) + '</span></td>' +
            '<td class=amt><span title="' + (rw.locked > 0 ? 'held until ' + window.__day(rw.until) : 'free to move') + '">' + fmt(rw.x) + (rw.locked > 0 ? LOCK : '') + '</span></td>' +
            /* out of the set, the APR cell names why: Jailed (red) or Inactive */
-           '<td' + (rw.inactive ? ' class=st' : '') + '>' + (rw.inactive ? (((window.__INACT || {})[rw.id] || {}).jailed ? '<span class=dmj>Jailed</span>' : '<span class=dmi>Inactive</span>') : pct(rw.rate)) + '</td><td class=rw>' + (RB[rw.id] != null ? fmt(RB[rw.id]) : '\u2014') + '</td></tr>';
+           '<td' + (rw.inactive ? ' class=st' : '') + '>' + (rw.inactive ? (((window.__INACT || {})[rw.id] || {}).jailed ? '<span class=dmj>Jailed</span>' : '<span class=dmi>Inactive</span>') : pct(rw.rate)) + '</td><td class=rw>' + (RB[rw.id] != null ? fmt(RB[rw.id]) : '-') + '</td></tr>';
     }
     return h + '</tbody></table>';
   }
@@ -2180,18 +2180,18 @@ rememberGridH();
              '<td class="l nm" data-v="' + att(o.id) + '" tabindex=0 title="Open this validator"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span>' +
              (mv != null ? '<em class="gtag add">+' + fmt(mv) + '</em>' : '') + '</div></td>' +
              '<td class=stk>' + big(o.t) + '</td>' +
-             (lay ? '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '\u2014') + '</s><em>→</em><b>' + pct(there) + '</b></td>' : '<td class=r2><b>' + pct(o.rate0) + '</b></td>') + '</tr>';
+             (lay ? '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '-') + '</s><em>→</em><b>' + pct(there) + '</b></td>' : '<td class=r2><b>' + pct(o.rate0) + '</b></td>') + '</tr>';
         return;
       }
       h += '<tr class="' + (on ? 'on' : '') + (pos && !o.better ? ' lt' : '') + '"><td class=ck>' + (pos ? '<input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + '>' : '') + '</td>' +
            '<td class="c rk">' + o.rank + '</td><td class="l nm" data-v="' + att(o.id) + '" tabindex=0 title="Open this validator"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span>' +
            (mv != null ? '<em class="gtag add" title="what this plan adds">+' + fmt(mv) + '</em>' : '') + '</div></td>' +
            '<td class="stk" title="' + big(o.t) + ' ATONE, ' + vp.toFixed(vp < 1 ? 2 : 1) + '% of all stake; ' + (o.t < MEAN ? 'below the average size: the bonus pays here' : 'above the average size') + '">' + big(o.t) + '</td>' +
-           (wide ? '<td class="' + (lu == null ? 'dim' : lu >= 99.9 ? 'ok' : lu >= 99 ? 'warn' : 'bad') + '">' + (lu == null ? '\u2014' : lu.toFixed(2) + '%') + '</td>' : '') +
-           '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '\u2014' : u90.toFixed(1) + '%') + '</td>' +
-           (wide ? '<td>' + (pr == null ? '\u2014' : pr >= 1e6 ? (pr / 1e6).toFixed(2) + 'M' : pr >= 1e3 ? (pr / 1e3).toFixed(1) + 'k' : pr) + '</td>' : '') +
+           (wide ? '<td class="' + (lu == null ? 'dim' : lu >= 99.9 ? 'ok' : lu >= 99 ? 'warn' : 'bad') + '">' + (lu == null ? '-' : lu.toFixed(2) + '%') + '</td>' : '') +
+           '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '-' : u90.toFixed(1) + '%') + '</td>' +
+           (wide ? '<td>' + (pr == null ? '-' : pr >= 1e6 ? (pr / 1e6).toFixed(2) + 'M' : pr >= 1e3 ? (pr / 1e3).toFixed(1) + 'k' : pr) + '</td>' : '') +
            (o.jail == null ? '<td class=dim>N/A</td>' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>') +
-           (lay ? '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '\u2014') + '</s><em>→</em><b>' + pct(there) + '</b></td>' : '<td class=r2><b>' + pct(o.rate0) + '</b></td>') + '</tr>';
+           (lay ? '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '-') + '</s><em>→</em><b>' + pct(there) + '</b></td>' : '<td class=r2><b>' + pct(o.rate0) + '</b></td>') + '</tr>';
     });
     h += ijRows("rd", (h.match(/<col[ >]/g) || []).length, pos ? SEL : null);
     var top = el.scrollTop;
@@ -2225,8 +2225,8 @@ rememberGridH();
     }
     window.__ANS = { now: now, after: after, gain: gain };
     el.innerHTML =
-      '<span class="p rate"><i>now</i><b' + (pos && pos.rows.length ? '' : ' class=dim') + '>' + (pos && pos.rows.length ? pct(now) : '\u2014') + '</b><span class=arr>\u2192</span><i>after</i><b class="aft' + (after == null ? ' dim' : after < now - 0.0005 ? ' neg' : '') + '">' + (after == null ? '\u2014' : pct(after)) + '</b></span>' +
-      '<span class="p gain"><i>ATONE/year</i><b' + (gain > 0.5 ? '' : gain < -0.5 ? ' class=neg' : ' class=dim') + '>' + (gain > 0.5 ? '+' + one(gain) : gain < -0.5 ? '\u2212' + one(-gain) : '\u2014') + '</b></span>' +
+      '<span class="p rate"><i>now</i><b' + (pos && pos.rows.length ? '' : ' class=dim') + '>' + (pos && pos.rows.length ? pct(now) : '-') + '</b><span class=arr>\u2192</span><i>after</i><b class="aft' + (after == null ? ' dim' : after < now - 0.0005 ? ' neg' : '') + '">' + (after == null ? '-' : pct(after)) + '</b></span>' +
+      '<span class="p gain"><i>ATONE/year</i><b' + (gain > 0.5 ? '' : gain < -0.5 ? ' class=neg' : ' class=dim') + '>' + (gain > 0.5 ? '+' + one(gain) : gain < -0.5 ? '\u2212' + one(-gain) : '-') + '</b></span>' +
       /* the chain's own rule: what moves cannot move again for 21 days */
       (!lockTip(pos) ? '' : '<span class="p lock" title="' + lockTip(pos) + '"><i><svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>redelegate</i><b>21 days</b></span>');
     /* the same rule as a note at Outcome's foot, above the button (Pro on a wide screen) */
@@ -2259,7 +2259,7 @@ rememberGridH();
       var need = m.x;
       src.forEach(function(sv){ if(sv.id === m.id && need > 0 && sv.free > 0){ var t = Math.min(sv.free, need); sv.free -= t; need -= t;
         SCOPE.t += t; SCOPE.was += t * (srcRate[sv.id] || 0); SCOPE.aft += t * m.after;
-        h += '<tr class=stay>' + nm(m.id, m.m) + '<td class=ar></td><td class="l dim">already here</td><td class=amt>' + fmt(t) + '</td><td class="gn dim">\u2014</td></tr>'; } });
+        h += '<tr class=stay>' + nm(m.id, m.m) + '<td class=ar></td><td class="l dim">already here</td><td class=amt>' + fmt(t) + '</td><td class="gn dim">-</td></tr>'; } });
       src.forEach(function(sv){ if(need <= 0 || sv.free <= 0 || sv.id === m.id) return;
         var t = Math.min(sv.free, need), left = 7 - (used[sv.id + ">" + m.id] || 0); sv.free -= t; need -= t;
         MSGS.push({ from: sv.id, to: m.id, amt: Math.floor(t) });
@@ -2398,8 +2398,8 @@ rememberGridH();
       } else { lk.innerHTML = ""; lk.removeAttribute("title"); } }
     var an = window.__ANS || {}, ax = E("txans");
     if(ax) ax.innerHTML = '<span class=p><i>now</i><b>' + pct(an.now || 0) + '</b></span><span class=arr>\u2192</span>' +
-      '<span class="p aft' + (an.after != null && an.after < (an.now || 0) - 0.0005 ? ' neg' : '') + '"><i>after</i><b>' + (an.after != null ? pct(an.after) : '\u2014') + '</b></span>' +
-      '<span class="p gain' + (an.gain < -0.5 ? ' neg' : '') + '"><i>ATONE/year</i><b>' + (an.gain > 0.5 ? '+' + one(an.gain) : an.gain < -0.5 ? '\u2212' + one(-an.gain) : '\u2014') + '</b></span>';
+      '<span class="p aft' + (an.after != null && an.after < (an.now || 0) - 0.0005 ? ' neg' : '') + '"><i>after</i><b>' + (an.after != null ? pct(an.after) : '-') + '</b></span>' +
+      '<span class="p gain' + (an.gain < -0.5 ? ' neg' : '') + '"><i>ATONE/year</i><b>' + (an.gain > 0.5 ? '+' + one(an.gain) : an.gain < -0.5 ? '\u2212' + one(-an.gain) : '-') + '</b></span>';
     list.innerHTML = msgs.map(function(m){
       var s = m.value.validator_src_address.slice(-6), d = m.value.validator_dst_address.slice(-6);
       return '<div class=txrow><span class=f>' + logo(s, nameOf(s)) + '<b>' + att(nameOf(s)) + '</b></span><i>\u2192</i>' +
@@ -2500,7 +2500,7 @@ rememberGridH();
   function unAmount(){ var a = E("unamt"), n = parseFloat((a.value || "").replace(/[^0-9.]/g, "")); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
   function unState(){
     var r = unRow(), u = unAmount(), mx = E("unmaxv"), hint = E("unhint"), fld = E("unamt") && E("unamt").closest(".unfield"), go = E("unsign"), sm = E("unsum"), lk = E("unlock");
-    if(mx) mx.textContent = r ? exact(r.x, 2) : "\u2014";
+    if(mx) mx.textContent = r ? exact(r.x, 2) : "-";
     var over = r && u > r.x, ok = r && u > 0 && !over;
     if(fld) fld.classList.toggle("bad", !!over);
     if(hint){ hint.className = "unhint" + (over ? " bad" : ""); hint.textContent = over ? "" : (r ? "of " + exact(r.x) + " on " + r.m : ""); }   /* over what sits there: the box turns red, no words */
@@ -2677,9 +2677,9 @@ rememberGridH();
            '<td class="c rk">' + o.rank + '</td><td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span>' +
            (m && m.x > 0 ? '<em class="gtag add" title="what this stake adds">+' + fmt(m.x) + '</em>' : '') + '</div></td>' +
            '<td class="stk" title="' + big(o.t) + ' ATONE, ' + vp.toFixed(vp < 1 ? 2 : 1) + '% of all stake; ' + (o.t < MEAN ? 'below the average size: the bonus pays here' : 'above the average size') + '">' + big(o.t) + '</td>' +
-           (wide ? '<td class="' + (lu == null ? 'dim' : lu >= 99.9 ? 'ok' : lu >= 99 ? 'warn' : 'bad') + '">' + (lu == null ? '\u2014' : lu.toFixed(2) + '%') + '</td>' : '') +
-           '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '\u2014' : u90.toFixed(1) + '%') + '</td>' +
-           (wide ? '<td>' + (pr == null ? '\u2014' : pr >= 1e6 ? (pr / 1e6).toFixed(2) + 'M' : pr >= 1e3 ? (pr / 1e3).toFixed(1) + 'k' : pr) + '</td>' : '') +
+           (wide ? '<td class="' + (lu == null ? 'dim' : lu >= 99.9 ? 'ok' : lu >= 99 ? 'warn' : 'bad') + '">' + (lu == null ? '-' : lu.toFixed(2) + '%') + '</td>' : '') +
+           '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '-' : u90.toFixed(1) + '%') + '</td>' +
+           (wide ? '<td>' + (pr == null ? '-' : pr >= 1e6 ? (pr / 1e6).toFixed(2) + 'M' : pr >= 1e3 ? (pr / 1e3).toFixed(1) + 'k' : pr) + '</td>' : '') +
            (o.jail == null ? '<td class=dim>N/A</td>' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>') +
            '<td class=r2><b>' + pct(there) + '</b></td></tr>';     /* the validator's APR with this stake on it: nothing to compare */
     });
@@ -2712,19 +2712,19 @@ rememberGridH();
     if(mode === "stake"){
       var P = stPlan(); head = ["Validator", "Stake", "APR", "ATONE/yr"];
       P.rows.forEach(function(r){ tot += r.x; rows.push([logo(r.id, r.m) + '<span>' + att(r.m) + '</span>', fmt(r.x), r.after ? pc(r.after) : '0%', '+' + fmt(r.x * r.after)]); });
-      fig = ["ATONE/year", P.rows.length ? '+' + fmt(tot * P.rate) : '\u2014'];
+      fig = ["ATONE/year", P.rows.length ? '+' + fmt(tot * P.rate) : '-'];
     } else if(mode === "unstake"){
       var free = window.__day(Date.now() + 21 * 86400000); head = ["Validator", "Unstake", "Free on"];
       unMsgs().forEach(function(m){ var v = m.value, r = byOp[v.validator_address] || {}, x = +v.amount.amount; tot += x;
         rows.push([logo(r.id, r.m || "") + '<span>' + att(r.m || v.validator_address.slice(-8)) + '</span>', fmt(x), free]); });
-      fig = ["ATONE", rows.length ? fmt(tot) : '\u2014'];
+      fig = ["ATONE", rows.length ? fmt(tot) : '-'];
     } else if(mode === "claim"){
       head = ["Validator", "Rewards"];
       clRows().forEach(function(r){ if(!CLSEL[r.id]) return; tot += r.x; rows.push([logo(r.id, r.m) + '<span>' + att(r.m) + '</span>', exact(r.x, 6)]); });
-      fig = ["Rewards", rows.length ? exact(tot, 4) : '\u2014'];
+      fig = ["Rewards", rows.length ? exact(tot, 4) : '-'];
     }
     /* two boxes as Redelegate's Outcome has - how many validators, and the figure that matters here - then the list */
-    var boxes = !mode ? '' : '<div class="wk-ans pro-ans"><span class="p"><i>validators</i><b' + (rows.length ? '' : ' class=dim') + '>' + (rows.length || '\u2014') + '</b></span>' +
+    var boxes = !mode ? '' : '<div class="wk-ans pro-ans"><span class="p"><i>validators</i><b' + (rows.length ? '' : ' class=dim') + '>' + (rows.length || '-') + '</b></span>' +
       '<span class="p gain"><i>' + fig[0] + '</i><b' + (rows.length ? '' : ' class=dim') + '>' + fig[1] + '</b></span></div>';
     var pa = E("proans"); if(pa) pa.innerHTML = !mode ? '' : boxes.replace(/^<div class="wk-ans pro-ans">|<\/div>$/g, '');
     el.innerHTML = !mode ? '' : (!rows.length ? '<div class=pro-brk-e>' + (mode === "claim" ? 'Select the rewards to claim' : 'Select validators and enter an amount') + '</div>' :
@@ -2965,7 +2965,7 @@ rememberGridH();
       h += '<tr' + (o.on && !auto ? ' class=on' : '') + ' data-id="' + att(o.id) + '"><td class=ck>' + (auto ? '' : '<input type=checkbox aria-label="' + att(o.m) + '"' + (o.on ? ' checked' : '') + (view ? ' disabled' : '') + '>') + '</td>' +
            '<td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span class=nmt>' + att(o.m) + '</span>' +
              (mine[o.id] ? '<span class="attg y">yours</span>' : '') + '</div></td>' +
-           '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '—' : u90.toFixed(1) + '%') + '</td>' +
+           '<td class="' + (u90 == null ? 'dim' : u90 >= 95 ? 'ok' : u90 >= 85 ? 'warn' : 'bad') + '">' + (u90 == null ? '-' : u90.toFixed(1) + '%') + '</td>' +
            '<td class=r2><b>' + pct(window.__rateAfter(o.t, o.c, 0)) + '</b></td></tr>';
     });
     if(!rows.length) h += '<tr><td class=atnone colspan=4>' +
@@ -2988,7 +2988,7 @@ rememberGridH();
     var idl = E("atidle"), iv = window.__idleAtone ? window.__idleAtone() : "";
     if(idl) idl.hidden = true;
     var idn = E("atidlen"); if(idn) idn.textContent = iv ? iv + " ATONE" : "Stake";
-    var mx = E("atmaxv"); if(mx) mx.textContent = pos ? exact(pos.free, 2) : "—";
+    var mx = E("atmaxv"); if(mx) mx.textContent = pos ? exact(pos.free, 2) : "-";
     var signer = !!window.__WALLET && !!window.__WALLET.signDirect;
     var ok = !view && !!AT.addr && signer;
     var hint = E("athint");
@@ -3637,7 +3637,7 @@ rememberGridH();
           amt.value = "";
           window.__LOCKNOTE = "All <b>" + fmt(p.total) + "</b> is mid-redelegation and cannot " +
             "move again until <b>" + when(p.until) + "</b>. The chain rejects a second " +
-            "redelegation outright &mdash; it is not a cooldown you can pay through.";
+            "redelegation outright - it is not a cooldown you can pay through.";
         }
         if(window.__planDraw) window.__planDraw();
         if(window.__onPos){ var f = window.__onPos; window.__onPos = null; f(); }
