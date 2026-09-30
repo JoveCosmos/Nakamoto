@@ -55,7 +55,7 @@ if (cmd === "grant-any") {
   // Autopilot REDELEGATE with NO validator list (allow and deny both empty): does the chain take it as "any validator"?
   const { c, me } = await cl(testWords());
   const auth = { typeUrl: "/cosmos.staking.v1beta1.StakeAuthorization", value: StakeAuthorization.encode(StakeAuthorization.fromPartial({ authorizationType: AuthorizationType.AUTHORIZATION_TYPE_REDELEGATE })).finish() };
-  done(await c.signAndBroadcast(me, [{ typeUrl: "/cosmos.authz.v1beta1.MsgGrant", value: MsgGrant.fromPartial({ granter: me, grantee: GRANTEE, grant: { authorization: auth } }) }], "auto", "GATA Autopilot"));
+  done(await c.signAndBroadcast(me, [{ typeUrl: "/cosmos.authz.v1beta1.MsgGrant", value: MsgGrant.fromPartial({ granter: me, grantee: GRANTEE, grant: { authorization: auth } }) }], "auto", "GATA AtomOne Autopilot"));
 }
 if (cmd === "grant") {
   const { c, me } = await cl(testWords()); const allow = a[0].split(",");
@@ -65,7 +65,7 @@ if (cmd === "grant") {
   const msgs = [g(stake(AuthorizationType.AUTHORIZATION_TYPE_REDELEGATE, allow)),
     g(any("/cosmos.authz.v1beta1.GenericAuthorization", GenericAuthorization.encode({ msg: "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward" }).finish())),
     g(stake(AuthorizationType.AUTHORIZATION_TYPE_DELEGATE, a[1] ? a[1].split(",") : allow))];
-  done(await c.signAndBroadcast(me, msgs, "auto", "GATA Autopilot"));
+  done(await c.signAndBroadcast(me, msgs, "auto", "GATA AtomOne Autopilot"));
 }
 if (cmd === "revoke") {
   const { c, me } = await cl(testWords());

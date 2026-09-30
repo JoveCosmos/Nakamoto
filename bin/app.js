@@ -2430,7 +2430,7 @@ rememberGridH();
     var msgs = txAll(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
     txsign.disabled = true; txsign.classList.add("busy");
     var n = window.__notify(), ap = TXAP;
-    (ap ? window.__TX.sendDirect(window.__WALLET, msgs, "GATA Autopilot", function(){}) : window.__TX.send(window.__WALLET, msgs, "", function(){}))
+    (ap ? window.__TX.sendDirect(window.__WALLET, msgs, "GATA AtomOne Autopilot", function(){}) : window.__TX.send(window.__WALLET, msgs, "", function(){}))
     .then(function(){
       n.ok(); POP.close(txpop); TXAP = false;
       if(ap && window.__atReload) window.__atReload();
@@ -2902,7 +2902,7 @@ rememberGridH();
   function atScope(){ return atOps(atPick() === "selected" ? atSelIds() : atAutoIds()); }
   /* the memo the keeper reads: the strategy word, then the flags */
   /* the memo on the reader's grant: a plain label, nothing reads it */
-  function atMemo(){ return "GATA Autopilot"; }
+  function atMemo(){ return "GATA AtomOne Autopilot"; }
   function atMonths(){ return AT.days >= 365 ? "12 months" : AT.days >= 180 ? "6 months" : "3 months"; }
   function atCap(){ var a = E("atcap"), n = parseFloat((a.value || "").replace(/[^0-9.]/g, "")); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
   function atMsgs(){
@@ -3153,7 +3153,7 @@ rememberGridH();
       var on = rsOn(), msgs = rsMsgs(!on);
       if(!msgs.length) throw new Error(on ? "Nothing to disable" : "Stake with a validator first");
       return (on ? Promise.resolve([]) : otherRestake()).then(function(rv){
-        return window.__TX.sendDirect(window.__WALLET, msgs.concat(rv), on ? "" : "GATA Restake", function(){}); });
+        return window.__TX.sendDirect(window.__WALLET, msgs.concat(rv), on ? "" : "GATA AtomOne Restake", function(){}); });
     })
       .then(function(){ n.ok(); done = true; return atGrant().then(function(r){ if(atKeep(r)){ draw(); if(window.__redraw) window.__redraw(); } }); })
       .catch(function(e){ n.fail(e && e.message || String(e)); })
