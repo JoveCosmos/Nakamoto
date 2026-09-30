@@ -1969,6 +1969,9 @@ rememberGridH();
   function srcFree(pos){ if(!pos) return 0; if(!srcAny()) return pos.free;
     var f = 0; pos.rows.forEach(function(r){ if(SRCSEL[r.id] && r.x - r.locked >= 1e5) f += r.x - r.locked; }); return f; }
   window.__srcFree = function(){ return srcFree(window.__POS); };
+  /* the rate the stake that would move earns now: the ticked delegations' free stake, weighted; no ticks, the wallet */
+  function srcNow(pos){ if(!pos) return 0; if(!srcAny()) return pos.rate;
+    var fw = 0, fr = 0; pos.rows.forEach(function(x){ var f = x.x - x.locked; if(SRCSEL[x.id] && f >= 1e5){ fw += f; fr += f * x.rate; } }); return fw > 0 ? fr / fw : 0; }
   var QUIET = false;                               /* a redraw made to be read, not to be announced */
   /* both tables are paged, never scrolled: a fixed number of rows a page */
   var LPS = 6, PPS = 6, PG = { l: 0, p: 0 };
@@ -2135,7 +2138,7 @@ rememberGridH();
     var el = E("dpicks"); if(!el) return;
     var sel = chosen(opt);
     var sn = E("dseln"); if(sn) sn.innerHTML = sel.n ? "<b>" + sel.n + "</b>selected" : "";
-    var now = pos ? pos.rate : 0;
+    var now = srcNow(pos);                       /* ticked delegations: their rate, a jailed one 0% */
     /* without a wallet the chip is invisible but keeps its slot, so the field and the
        button do not move when one connects */
     /* the line says only one thing, and only when it is true; otherwise it keeps its
@@ -2208,29 +2211,36 @@ rememberGridH();
   function result(pos, r, B, sel){
     var el = E("dans"); if(!el) return;
     var now = pos ? pos.rate : 0, after = null, gain = 0;
+    /* ticked delegations: now and after are those of the ticked stake alone, weighted by what moves from each, so a
+       jailed source reads 0% (operator, 2026-09-30); no ticks, the whole wallet as before */
+    var scoped = srcAny() && pos;
+    if(scoped) now = srcNow(pos);
     /* the gain is the sum of the moves as the moves list priced them - each chunk from the
        rate it earns where it sits to the rate it earns where it lands (a loss is a loss);
        "after" is the position's blended rate with that gain in it */
     if(B > 0 && r.moves.length && pos && MSGS.length){
       var k; for(k in GAINBY) gain += GAINBY[k];
-      after = pos.total > 0 ? pos.rate + gain * 1e6 / pos.total : r.rate;
+      after = scoped ? (SCOPE.t > 0 ? SCOPE.aft / SCOPE.t : null) : pos.total > 0 ? pos.rate + gain * 1e6 / pos.total : r.rate;
+      if(scoped && SCOPE.t > 0) now = SCOPE.was / SCOPE.t;
     }
     window.__ANS = { now: now, after: after, gain: gain };
     el.innerHTML =
       '<span class="p rate"><i>now</i><b' + (pos && pos.rows.length ? '' : ' class=dim') + '>' + (pos && pos.rows.length ? pct(now) : '\u2014') + '</b><span class=arr>\u2192</span><i>after</i><b class="aft' + (after == null ? ' dim' : after < now - 0.0005 ? ' neg' : '') + '">' + (after == null ? '\u2014' : pct(after)) + '</b></span>' +
       '<span class="p gain"><i>ATONE/year</i><b' + (gain > 0.5 ? '' : gain < -0.5 ? ' class=neg' : ' class=dim') + '>' + (gain > 0.5 ? '+' + one(gain) : gain < -0.5 ? '\u2212' + one(-gain) : '\u2014') + '</b></span>' +
       /* the chain's own rule: what moves cannot move again for 21 days */
-      '<span class="p lock" title="' + (MSGS.length ? 'until ' + window.__day(Date.now() + 21 * 86400000) : 'redelegated stake cannot be redelegated again for 21 days') + '"><i><svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>redelegate</i><b>21 days</b></span>';
+      (!lockTip(pos) ? '' : '<span class="p lock" title="' + lockTip(pos) + '"><i><svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>redelegate</i><b>21 days</b></span>');
     /* the same rule as a note at Outcome's foot, above the button (Pro on a wide screen) */
     var rn = E("rdnote"); if(rn){ var sp = rn.querySelector("span"); if(sp) sp.innerHTML = 'Redelegated stake cannot be redelegated again for <b>21 days</b>, until <b>' + (window.__day ? window.__day(Date.now() + 21 * 86400000) : new Date(Date.now() + 21 * 86400000).toLocaleDateString("en-GB", { day: "numeric", month: "short" })) + '</b>'; }
     /* the button lives in the stake row; here it only learns whether it can be pressed */
     var go = E("dgo"); if(go) go.disabled = !(pos && window.__WALLET && MSGS.length);
   }
 
+  /* the lock says what of this wallet is locked, and until when; nothing locked, no lock at all (operator, 2026-09-30) */
+  function lockTip(pos){ return pos && pos.locked >= 1e6 ? fmt(pos.locked) + ' ATONE locked until ' + window.__dayFull(pos.until) : ''; }
   var MSGS = [];
-  var GAINBY = {}, MOVED = {};
+  var GAINBY = {}, MOVED = {}, SCOPE = { t: 0, was: 0, aft: 0 };   /* the stake this plan touches: amount, rate-weighted now and after */
   function movesPanel(pos, V, r){
-    MSGS = []; GAINBY = {}; MOVED = {};
+    MSGS = []; GAINBY = {}; MOVED = {}; SCOPE = { t: 0, was: 0, aft: 0 };
     var h = "", used = {}, srcRate = {};
     (window.__REDS || []).forEach(function(rr){
       var key = rr.redelegation.validator_src_address.slice(-6) + ">" + rr.redelegation.validator_dst_address.slice(-6);
@@ -2248,11 +2258,13 @@ rememberGridH();
     r.moves.forEach(function(m){
       var need = m.x;
       src.forEach(function(sv){ if(sv.id === m.id && need > 0 && sv.free > 0){ var t = Math.min(sv.free, need); sv.free -= t; need -= t;
+        SCOPE.t += t; SCOPE.was += t * (srcRate[sv.id] || 0); SCOPE.aft += t * m.after;
         h += '<tr class=stay>' + nm(m.id, m.m) + '<td class=ar></td><td class="l dim">already here</td><td class=amt>' + fmt(t) + '</td><td class="gn dim">\u2014</td></tr>'; } });
       src.forEach(function(sv){ if(need <= 0 || sv.free <= 0 || sv.id === m.id) return;
         var t = Math.min(sv.free, need), left = 7 - (used[sv.id + ">" + m.id] || 0); sv.free -= t; need -= t;
         MSGS.push({ from: sv.id, to: m.id, amt: Math.floor(t) });
         var was = srcRate[sv.id] || 0, gain = t * (m.after - was) / 1e6;
+        SCOPE.t += t; SCOPE.was += t * was; SCOPE.aft += t * m.after;
         GAINBY[m.id] = (GAINBY[m.id] || 0) + gain; MOVED[m.id] = (MOVED[m.id] || 0) + t;
         h += '<tr title="' + att(sv.m) + ' ' + pct(was) + ' \u2192 ' + att(m.m) + ' ' + pct(m.after) + '">' + nm(sv.id, sv.m) + '<td class=ar>\u2192</td>' + nm(m.id, m.m) +
              '<td class=amt>' + fmt(t) + '</td>' + gainCell(gain, left) + '</tr>'; });
@@ -2271,8 +2283,8 @@ rememberGridH();
     /* only what needs saying: stake that is held, stake on its way out */
     var h = "";
     /* the cooldown is said once, in the Redelegate title row, where the stake is asked for */
-    var ln = E("dlockn"); if(ln){ ln.hidden = !(pos.locked > 0);
-      if(pos.locked > 0){ ln.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><b>' + fmt(pos.locked) + '</b><span class=w>ATONE under redelegate cooldown until</span><span class=w2>locked until</span><b>' + window.__dayFull(pos.until) + '</b>'; ln.title = "redelegated stake cannot be redelegated again for 21 days" + (pos.free > 0 ? "; the rest can move now" : "; nothing can move before then"); } }
+    var ln = E("dlockn"); if(ln){ ln.hidden = !(pos.locked >= 1e6);
+      if(pos.locked >= 1e6){ ln.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><b>' + fmt(pos.locked) + '</b><span class=w>ATONE under redelegate cooldown until</span><span class=w2>locked until</span><b>' + window.__dayFull(pos.until) + '</b>'; ln.title = lockTip(pos); } }
     (window.__UNB || []).forEach(function(u){ h += pill("warn", fmt(u.amt) + " unbonding from " + att(u.m) + ", " + window.__day(u.until)); });
     el.innerHTML = h;
     var ub = E("unbtn"); if(ub) ub.hidden = !(pos && pos.rows.length);

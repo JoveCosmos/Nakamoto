@@ -1568,8 +1568,11 @@
     var h = '<div class=you-h><h3 title="' + esc(wname) + '">' + esc(wname) + '</h3>' + wmeta() + '</div>';
     h += '<div class=you-apr><em>Your APR</em><b' + (mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '>' + (mine ? pct(pos.rate) : '—') + '</b>' +
       '<small>' + (!a ? 'connect a wallet to see yours' : !pos ? 'reading…' : mine ? 'on ' + pos.rows.length + ' validator' + (pos.rows.length === 1 ? '' : 's') : 'Nothing staked') + '</small></div>';
+    /* Pro on Redelegate: what can move now, the ticked delegations' free stake when any are ticked (operator, 2026-09-30) */
+    var proRd = root.getAttribute("data-sv") === "dashboard/self" && matchMedia("(min-width:1100px)").matches && !root.getAttribute("data-pro");
     h += '<div class=you-bal>' +
       row("Staked", pos ? fmt(pos.total) : '—', "ATONE") +
+      (proRd ? row("Movable Stake", pos && window.__srcFree ? fmt(window.__srcFree()) : '—', "ATONE") : '') +
       row("Available", bal ? fmt(bal.uatone) : '—', "ATONE") +
       row("Rewards", window.__REW != null ? fmt(window.__REW) : '—', "ATONE") +
       row("For fees", bal ? fmt(bal.uphoton) : '—', "PHOTON") + '</div>';
@@ -1874,7 +1877,7 @@
     if(b && window.__shellGo) window.__shellGo(b.getAttribute("data-route"));
   });
   /* a route change moves the lit path: the shell stamps the section and view on <html> */
-  new MutationObserver(function(){ drawOne(); }).observe(root, { attributes: true, attributeFilter: ["data-sec", "data-sv"] });
+  new MutationObserver(function(){ drawOne(); }).observe(root, { attributes: true, attributeFilter: ["data-sec", "data-sv", "data-pro"] });
   var mstrip = E("sd-mstrip"); if(mstrip) mstrip.addEventListener("click", onClick);   /* Manage's copy of the strip */
   sv.addEventListener("keydown", onKey);
 
