@@ -6118,6 +6118,15 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 }
 @media(min-width:1100px) and (max-height:820px){#mv-stage .mv-bars:not(#z):not(#y){height:64px}}
 @media(min-width:1100px) and (max-height:680px){#mv-stage .mv-bars:not(#z):not(#y){height:48px}}
+/* the shortest screens: the chart keeps its bars and bracket but drops its titles; the stage's text rows tighten */
+@media(min-width:1100px) and (max-height:640px){
+  #mv-stage .mv-bars:not(#z):not(#y){height:30px}
+  #mv-stage .mv-sh:not(#z){display:none}
+  #mv-stage .mv-hl>b:not(#z){font-size:26px}
+  #mv-stage .mv-box .mv-r:not(#z){padding:3px 0}
+  #mv-stage .mv-ap:not(#z){padding:8px 12px}
+  #mv-stage .mv-ap .mv-ghost:not(#z){height:34px}
+}
 /* ════ STICKY HEADS (operator, 2026-09-30): a list's column titles stay on top as it scrolls, on the pane's own
    colour, so rows never show through them - Redelegate, Delegations, Outcome's moves, Stake's list, Picks ════ */
 #one #p-dele .wk-tbl2 thead th:not(#z):not(#y),#you .wk-tbl2 thead th:not(#z):not(#y),#one #p-dele #wk-mv .wk-moves thead th:not(#z):not(#y),
