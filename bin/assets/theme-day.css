@@ -959,6 +959,7 @@
   html[data-theme=light]:not([data-mono]) .mv-arr svg{fill:none}
   html[data-theme=light]:not([data-mono]) .mv-cc.g{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .mv-bars i.lo{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #mv-stage .sv-btn.go.mv-go:not(#z){color:var(--ink);box-shadow:none;text-shadow:none}
   html[data-theme=light]:not([data-mono]) .mv-ap{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-ghost{background:transparent}
   html[data-theme=light]:not([data-mono]) .mv-cyc>div.done{background:var(--accent-soft);border-color:transparent}
@@ -1426,4 +1427,5 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #atpop .atfoot #atgrant:not(#z):disabled{background:transparent;border-color:var(--line-strong);color:var(--muted)}
   html[data-theme=light]:not([data-mono]) #rspop .rsfoot #rsgo:not(#z):not(.wk-danger){background:var(--accent);border-color:var(--accent);color:#fff}
   html[data-theme=light]:not([data-mono]) #atpop .atfoot #atrevoke:not(#z),html[data-theme=light]:not([data-mono]) #rspop .rsfoot #rsgo.wk-danger:not(#z){background:transparent;border-color:var(--danger);color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) #mv-stage .sv-btn.go.mv-go:not(#z){background:var(--accent);border-color:var(--accent);color:#fff}
 

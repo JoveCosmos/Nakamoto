@@ -5502,7 +5502,10 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-act{margin-top:auto;display:flex;align-items:center;justify-content:flex-end;gap:18px}
 .mv-act>span{order:-1;margin-right:auto}   /* a note on the left, the button always on the right */
 .mv-act>span{font-size:12.5px;line-height:1.45;color:var(--ws);max-width:44ch}
-#mv-stage .mv-act .sd-go,#mv-stage .mv-go{width:auto;height:50px;padding:0 26px;font-size:15px;flex:0 0 auto}
+#mv-stage .mv-act .sd-go,#mv-stage .mv-go{width:auto;min-width:210px;height:50px;padding:0 26px;font-size:15px;flex:0 0 auto}
+/* night: the stage's button is the cards' Activate - teal fill, dark text, no glow (the green glow read as a bigger button) */
+#mv-stage .sv-btn.go.mv-go:not(#z){border-color:var(--sv-teal);background:var(--sv-teal);color:#0b1f1c;box-shadow:none;text-shadow:none}
+#mv-stage .sv-btn.go.mv-go:not(#z):hover{filter:brightness(1.06)}
 /* Autopilot is on: a statement, not a control (operator, 2026-09-30) - the switch in the You column turns it off */
 #mv-stage .mv-on{flex:0 0 auto;font-size:15px;font-weight:600;color:var(--sv-teal)}
 .mv-days{display:flex;flex-direction:column;gap:8px;border:1px solid var(--wbd);border-radius:12px;padding:14px 16px}
