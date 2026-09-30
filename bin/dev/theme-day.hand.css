@@ -362,6 +362,7 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-bars i.s{background:var(--warn)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-bars i.d{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-chip.ok{background:var(--accent-soft);color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #mv-stage .mv-h::before{background:var(--accent);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-chip.warn{background:var(--warn-bg);color:var(--warn-ink)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-chip.q{background:var(--surface-2);color:var(--muted)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-ap,html[data-theme=light]:not([data-mono]) #mv-stage .mv-cyc>div.done{background:var(--accent-soft)}

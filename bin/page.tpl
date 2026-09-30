@@ -5436,7 +5436,10 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 @media(prefers-reduced-motion:reduce){.you-tg i{transition:none}}
 .mv-top{display:flex;align-items:center;gap:10px}
 .mv-top>em,.mv-box>em,.mv-sh em{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
-.mv-top>em{flex:1 1 auto}
+.mv-top>em{flex:1 1 auto;padding-top:2px}
+/* the stage's title as Pro's panes carry theirs: a coloured bar and a sans name */
+.mv-h{display:inline-flex;align-items:center;gap:9px;margin:0 6px 0 0;font:700 16px/1.2 var(--wsans);letter-spacing:-.01em;color:var(--wt);white-space:nowrap}
+.mv-h::before{content:"";width:3px;height:16px;border-radius:2px;background:var(--sv-teal);box-shadow:0 0 10px -1px var(--sv-teal)}
 .mv-chip{font-family:var(--wmono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;white-space:nowrap}
 .mv-chip.ok{background:rgba(43,200,189,.14);color:var(--sv-teal)}
 .mv-chip.warn{background:rgba(255,176,46,.14);color:var(--sv-amber)}
@@ -5520,6 +5523,59 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   .mv-set{flex:1 1 0;min-height:0}
   .mv-bars{min-height:0}
 }
+/* ════ PRO ON THE ONE SCREEN (2026-09-30, operator: "redesign pro as rest of the theme"). The same cards, type
+   and controls as Your move and the paths: no frame around the panes, one card each, the balances as plain
+   figures, sans text with mono only for labels and numbers. The Pro titles (a coloured bar and a sans name)
+   stay: Your move took them. ════ */
+#one #p-dele #wbody:not(#z){border:0;background:none;box-shadow:none;padding:0;gap:14px}
+#one #p-dele .wk-two{gap:14px}
+@media(min-width:1100px){#one #p-dele .wk-two:not(#z){grid-template-columns:minmax(0,1.2fr) minmax(0,1.75fr) minmax(0,1fr)}}
+#one #p-dele .wk-pane:not(#z),#one #p-dele #sd-mstrip.sd-strip:not(#z){border:1px solid var(--wbd);border-radius:14px;background:var(--wc);box-shadow:none}
+#one #p-dele .wk-pane:not(#z){padding:14px 18px 16px}
+#one #p-dele .wk-pane>.wk-ph{margin-bottom:8px}
+/* the balances: the name, then five plain figures under small labels, as the You column shows them */
+#one #p-dele #sd-mstrip .sd-idw:not(#z){padding:16px 20px}
+#one #p-dele #sd-mstrip .sd-ro:not(#z){padding:14px 20px;gap:6px;justify-content:center;border-left:1px solid var(--wbd)}
+#one #p-dele #sd-mstrip .sd-ro em:not(#z){margin:0;font-size:10px;letter-spacing:.16em;color:var(--wf)}
+#one #p-dele #sd-mstrip .sd-ro em::before{display:none}
+#one #p-dele #sd-mstrip .sd-ro .sd-well:not(#z){flex:0 0 auto;min-height:0;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;align-items:baseline;gap:7px}
+#one #p-dele #sd-mstrip .sd-well>b{font-size:26px;font-weight:700;line-height:1.1}
+#one #p-dele #sd-mstrip .sd-well>i.u{margin:0;font-size:10px;letter-spacing:.06em}
+#one #p-dele #sd-mstrip .sd-well>.sd-m{display:none}
+/* tables: a label row over hairlines, names in the sans, figures in the mono */
+#one #p-dele .wk-tbl2 th:not(#z){height:26px;padding:0 6px;border:0;border-bottom:1px solid var(--wbd);background:none;box-shadow:none;
+  font-family:var(--wmono);font-size:9px;letter-spacing:.1em;color:var(--wf);vertical-align:middle}
+#one #p-dele .wk-tbl2 thead:not(#z),#one #p-dele .wk-tbl2 thead tr:not(#z){border:0;background:none;box-shadow:none;outline:0}
+#one #p-dele .wk-tbl2 td:not(#z){border-bottom:1px solid var(--wbd)}
+#one #p-dele .wk-tbl2 td.nm:not(#z){font-family:var(--wsans);font-size:13.5px;font-weight:500;color:var(--wt)}
+#one #p-dele .wk-tbl2 td.amt:not(#z){color:var(--wt)}
+/* Delegations: its three actions sit on their own line under the title, as small outlined buttons */
+#one #p-dele #wk-mine .wk-t1:not(#z){flex-wrap:wrap;height:auto;max-height:none;row-gap:10px;column-gap:8px}
+#one #p-dele #wk-mine .wk-t1::after{content:"";flex:0 0 100%;order:1}
+#one #p-dele #wk-mine .wk-t1 .wk-unb:not(#z){order:2;flex:1 1 0;min-width:0;margin:0;height:28px;padding:0 8px;border-radius:8px;border:1px solid var(--wcyan);background:transparent;
+  color:var(--wcyan);font:600 12px var(--wsans);letter-spacing:0;text-transform:none;box-shadow:none}
+#one #p-dele #wk-mine .wk-t1 #unbtn:not(#z){border-color:var(--wamber);color:var(--wamber)}
+#one #p-dele #wk-mine .wk-t1 .wk-unb[hidden]{display:none}
+/* Redelegate: the amount field as the app's other fields */
+#one #p-dele #wk-plan .wk-field:not(#z){height:32px;border:1px solid var(--wbd2);border-radius:10px;background:var(--wi);box-shadow:none}
+#one #p-dele #wk-plan .wk-amt2:not(#z){font:500 13px var(--wmono);color:var(--wt)}
+#one #p-dele #wk-plan .wk-max:not(#z){border-radius:7px;font:500 10.5px var(--wmono)}
+/* Outcome: the three figures as the stage's small boxes, the empty note in words, the button as Your move's */
+#one #p-dele .wk-ans .p:not(#z){border:1px solid var(--wbd);border-radius:10px;background:none;box-shadow:none}
+#one #p-dele .wk-ans .p::before{display:none}
+#one #p-dele #wk-mv .wk-ans:not(#z){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+#one #p-dele #wk-mv .wk-ans .p:not(#z){height:auto;min-height:40px;padding:6px 10px;flex-wrap:wrap}
+#one #p-dele #wk-mv .wk-ans .p.rate:not(#z){grid-column:1/-1}
+/* Delegations has the room: its amount and APR columns stop cutting their figures */
+#one #p-dele #dmy col:nth-child(3){width:92px!important}
+#one #p-dele #dmy col:nth-child(4){width:62px!important}
+#one #p-dele #wk-mv .wk-moves th:not(#z){border:0;border-bottom:1px solid var(--wbd);background:none;box-shadow:none;color:var(--wf)}
+#one #p-dele #wk-mv .wk-moves thead:not(#z),#one #p-dele #wk-mv .wk-moves thead tr:not(#z),#one #p-dele #wk-mv .wk-moves:not(#z){border:0;background:none;box-shadow:none}
+#one #p-dele .wk-mvempty:not(#z){font:400 13px/1.45 var(--wsans);letter-spacing:0;text-transform:none;color:var(--ws)}
+#one #p-dele #dgo:not(#z){height:46px;border-radius:12px;border:1px solid var(--wcyan);background:var(--wcyan);color:var(--wc);
+  font:600 15px var(--wsans);letter-spacing:0;text-transform:none;box-shadow:none}
+#one #p-dele #dgo:disabled:not(#z){border-color:var(--wbd2);background:transparent;color:var(--wf)}
+@media(max-height:700px){#one #p-dele #dgo:not(#z){height:34px;font-size:14px}}
 .txap{margin:0 0 10px;padding:10px 12px;border-radius:10px;background:rgba(43,200,189,.10);font-size:12.5px;line-height:1.45;color:var(--wt)}
 .txap b{color:var(--wcyan);font-weight:600}
 /* the Autopilot and Restake cards: three short lines, each with a small ? that holds the detail (hover, or tap
@@ -5577,9 +5633,9 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #sv-eco .sv-tp{margin-left:12px;padding-left:12px;gap:8px}
   #sv-eco .sv-trole{margin-left:8px}
 }
-/* Pro (and the old Autopilot screen) need width more than the paths need headlines: below 1440px the rail
-   folds to icons with their short names, as the phone's bar does, and Pro takes the room */
-@media(min-width:1100px) and (max-width:1439px){
+/* Pro (and the old Autopilot screen) need width more than the paths need headlines: below 1600px the rail
+   folds to icons with their short names, as the phone's bar does, and Pro's three tables take the room */
+@media(min-width:1100px) and (max-width:1599px){
   html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .one{grid-template-columns:minmax(0,1fr) 78px}
   html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth{align-items:center;justify-content:center;gap:5px;padding:8px 4px;text-align:center}
   html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth em,

@@ -1610,7 +1610,7 @@
       hi = sp ? sp.after : 0;
     }
     var ex = hi ? '10,000 ATONE earns <b>' + one(1e4 * lo) + ' a year</b> on the largest validator, and <b>' + one(1e4 * hi) + '</b> moved to where the most is paid.' : '';
-    var top = function(eb, chip, cls){ return '<div class=mv-top><em>' + eb + '</em>' + (chip ? '<span class="mv-chip ' + cls + '">' + chip + '</span>' : '') + '</div>'; };
+    var top = function(eb, chip, cls){ return '<div class=mv-top><h3 class=mv-h>Your move</h3><em>' + eb + '</em>' + (chip ? '<span class="mv-chip ' + cls + '">' + chip + '</span>' : '') + '</div>'; };
     var nowOn = function(){
       /* dust a redelegation leaves behind (under 0.1 ATONE) is not a position */
       var rows = pos.rows.filter(function(r){ return r.x >= 1e5; }).sort(function(x, y){ return y.x - x.x; });
@@ -1628,13 +1628,13 @@
     }
     var h;
     if(!a){
-      h = top('Your best move') +
+      h = top('') +
         '<div class=mv-hl><b>About ' + (hi ? pct(hi) : '—') + ' APR</b><span>' + ex + '</span></div>' + mvSet({}, {}) +
         '<div class=mv-act>' + CONNECT_OFF + '<span>Connect a wallet at the top: your balances, and your best move in numbers, show here.</span></div>';
     } else if(!pos){
-      h = top('Your best move') + '<div class=mv-hl><b>Reading your stake…</b></div>';
+      h = top('') + '<div class=mv-hl><b>Reading your stake…</b></div>';
     } else if(!pos.rows.length){
-      h = top('Your best move', 'Nothing staked yet', 'q') +
+      h = top('', 'Nothing staked yet', 'q') +
         '<div class=mv-hl><b>Stake to start earning</b><span>' + ex + '</span></div>' + mvSet({}, {}) +
         '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=stake>Stake ATONE</button><span>Your ATONE stays yours: staking only delegates it.</span></div>';
     } else {
@@ -1647,7 +1647,7 @@
         var fL = Object.keys(fr).sort(function(x, y){ return fr[y] - fr[x]; }).map(function(id){ src[id] = 1; return { rank: rk(id), name: nm(id), amt: fmt(fr[id]), apr: pct(rate(id)) }; });
         var tL = Object.keys(to).sort(function(x, y){ return to[y] - to[x]; }).map(function(id){ dst[id] = 1; return { rank: rk(id), name: nm(id), amt: '+' + fmt(to[id]), apr: pct(rate(id, to[id])) }; });
         var lock = pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is cooling down until ' + day(pos.until) + ' and stays where it is.</div>' : '';
-        h = top('Your best move today', auto ? 'Autopilot: within 12 hours' : 'Ready, 1 approval', 'ok') +
+        h = top('Best today', auto ? 'Autopilot: within 12 hours' : 'Ready, 1 approval', 'ok') +
           '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.now) + '</i> to <i class=g>' + pct(plan.after) + '</i> APR</span></div>' +
           '<div class=mv-flow><div class=mv-box><em>From, ' + fL.length + ' validator' + (fL.length === 1 ? '' : 's') + '</em>' + mvRows(fL, 'a', 'validators') + '</div>' +
           '<div class=mv-arr aria-hidden=true><svg viewBox="0 0 44 20"><path d="M2 10h38M32 3l8 7-8 7"/></svg></div>' +
