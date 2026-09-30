@@ -1662,7 +1662,7 @@
         var cells = ''; for(var i = 1; i <= 21; i++) cells += '<i' + (i <= k ? ' class=on' : '') + '></i>';
         var hist = at && at.report && at.report.history && at.report.history.length ? at.report.history[0] : null;
         h = top(auto ? 'Moved. Autopilot is on' : 'Moved. Cooling down', 'Day ' + k + ' of 21', 'warn') +
-          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>Free to move again on <b>' + day(t1) + '</b>. It earns the whole time.</span></div>' +
+          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>Free to move again on <b>' + day(t1) + '</b>.</span></div>' +
           '<div class=mv-days><div class=mv-dh><span>Cooling down</span><span>' + day(t0) + ' to ' + day(t1) + '</span></div><div class=mv-dc>' + cells + '</div>' +
           '<small>The chain holds redelegated stake for 21 days. Nothing to do until then.</small></div>' + nowOn() +
           (auto ? '<div class=mv-cyc><div class=done><em>' + (hist ? day(hist.at * 1000) : 'Done') + '</em><b>Moved</b></div><div class=warn><em>Until ' + day(t1) + '</em><b>Cooling down</b></div>' +
