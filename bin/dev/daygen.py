@@ -262,10 +262,34 @@ def _transform_decl(prop, value, important):
         if "gradient(" in low or COLOR_RE.search(v) or low in ("transparent", "none"):
             return p, flatten_layers(v, p), important
         return None
+    # a border/outline SHORTHAND is shadowed by its colour alone: the shorthand would re-assert the night rule's width
+    # and style at the shadow's higher specificity, over night rules that set them later (a checkmark's 0 2px 2px 0
+    # became a box, the range bars' underlined labels grew frames). Geometry stays night's; day only recolours.
+    if p in SHORTHANDS:
+        col = [t for t in _tokens(v) if COLOR_RE.search(t) or t.lower() in ("transparent", "currentcolor")]
+        if len(col) != 1: return None
+        t = col[0]
+        return SHORTHANDS[p], (t if t.lower() in ("transparent", "currentcolor") else map_colours(t, "border-color")), important
     if not (COLOR_RE.search(v) or low in ("transparent", "currentcolor", "none", "inherit")):
         return None
     if low in ("transparent", "currentcolor", "none", "inherit"): return p, v, important
     return p, map_colours(v, p), important
+
+SHORTHANDS = {"border": "border-color", "border-top": "border-top-color", "border-right": "border-right-color",
+              "border-bottom": "border-bottom-color", "border-left": "border-left-color", "border-block": "border-block-color",
+              "border-inline": "border-inline-color", "outline": "outline-color", "column-rule": "column-rule-color"}
+
+def _tokens(v):
+    """a value's space-separated tokens, brackets kept whole (var(--x, #fff) is one token)"""
+    out, cur, depth = [], "", 0
+    for ch in v:
+        if ch == "(": depth += 1
+        elif ch == ")": depth -= 1
+        if ch in " \t" and depth == 0:
+            if cur: out.append(cur); cur = ""
+        else: cur += ch
+    if cur: out.append(cur)
+    return out
 
 def scope_selector(sel):
     s = sel.strip()
