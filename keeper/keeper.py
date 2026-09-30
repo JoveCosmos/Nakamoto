@@ -770,14 +770,15 @@ def once(c, only=None, live=None, force=False):
             else:
                 rep = prev or {"granter": gr, "strategy": name, "moves": []}
                 pid = (rep.get("admin") or {}).get("plan_id")
-            hist = c.execute("SELECT at, src, dst, uatone, gain, txhash FROM move WHERE granter=? AND dry=0 ORDER BY at DESC LIMIT 10", (gr,)).fetchall()
-            rep["history"] = [{"at": h[0], "src": h[1], "dst": h[2], "uatone": h[3], "gain": h[4], "txhash": h[5]} for h in hist]
             # no approval (operator, 2026-09-30): a plan is carried out in the run that makes it. Hold (the console's
             # emergency stop) still stops everything for a delegator
             if due and p and p["moves"] and gr not in adm["paused"]:
                 auto_apply(c, g, p, pid, dry, rep)
             elif due and p is not None and not p["moves"]:
                 c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()     # nothing left to move: nothing to retry
+            # the history after this run's move, so a move made now is in the report now (a grant it used up gets no later run)
+            hist = c.execute("SELECT at, src, dst, uatone, gain, txhash FROM move WHERE granter=? AND dry=0 ORDER BY at DESC LIMIT 10", (gr,)).fetchall()
+            rep["history"] = [{"at": h[0], "src": h[1], "dst": h[2], "uatone": h[3], "gain": h[4], "txhash": h[5]} for h in hist]
             last = c.execute("SELECT at, plan_id, by, txhash, dry, ok, error FROM applied WHERE granter=? ORDER BY at DESC, rowid DESC LIMIT 1", (gr,)).fetchone()
             rep["admin"] = {"state": "held" if gr in adm["paused"] else "auto", "plan_id": pid}
             if last: rep["admin"]["applied"] = {"at": last[0], "plan_id": last[1], "by": last[2], "txhash": last[3], "dry": bool(last[4]), "ok": bool(last[5]), "error": last[6]}
