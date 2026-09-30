@@ -5659,12 +5659,12 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 }
 @media(min-width:1100px) and (max-width:1599px){
   html:is([data-sv="dashboard/autopilot"]) .pth{align-items:center;justify-content:center;gap:5px;padding:8px 4px;text-align:center}
-  html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth em,
-  html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth b,
-  html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth small{display:none}
-  html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth .ps{display:block;font-size:10.5px;color:var(--ws);max-width:100%;overflow:hidden;text-overflow:ellipsis}
-  html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth svg{display:block;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:var(--ws)}
-  html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth.on svg,html:is([data-sv="dashboard/self"],[data-sv="dashboard/autopilot"]) .pth.on .ps{color:var(--sv-teal)}
+  html[data-sv="dashboard/autopilot"] .pth em,
+  html[data-sv="dashboard/autopilot"] .pth b,
+  html[data-sv="dashboard/autopilot"] .pth small{display:none}
+  html[data-sv="dashboard/autopilot"] .pth .ps{display:block;font-size:10.5px;color:var(--ws);max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  html[data-sv="dashboard/autopilot"] .pth svg{display:block;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:var(--ws)}
+  html[data-sv="dashboard/autopilot"] .pth.on svg,html[data-sv="dashboard/autopilot"] .pth.on .ps{color:var(--sv-teal)}
 }
 /* Pro has Easy's structure (operator, 2026-09-30: "pro is still the same, its wallet structure and all"): the You
    column on the left holds the wallet, as on every path, and the old balance strip goes. The stage holds the pick
