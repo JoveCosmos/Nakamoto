@@ -41,6 +41,9 @@ DRY = os.environ.get("KEEPER_DRY", "1") != "0"
 # the operator's rule, fixed here and not in the env (the env files still carried 0.005 and 6 hours from the old
 # gated keeper, which would have moved stake for half a point): a move every 12 hours, only for more than 5 APR points
 EVERY = 12 * 3600
+# the 12-hour cycles are pinned to the clock (operator, 2026-09-30): Autopilot and Restake both run at 00:00 and 12:00 UTC.
+# A wallet is due once per slot; a new or changed grant is still planned at once, and retries keep their own waits
+def slot0(t=None): return int((time.time() if t is None else t) // EVERY) * EVERY
 MIN_GAIN_APR = 0.05
 MIN_GAIN_ATONE = 1.0          # and pay at least this per year
 MAX_MOVES_DAY = 20            # the signer takes at most 20 moves a transaction
@@ -246,7 +249,7 @@ def plan_restake(c, granter, rg, vals, m, P):  # noqa: C901
     wallet made (restake bots, any validator's service, GATA's validator included) is foreign and ignored -
     GATA's validator is one validator like any other here."""
     last = c.execute("SELECT max(at) FROM restake WHERE granter=?", (granter,)).fetchone()[0] or 0
-    if time.time() - last < P.get("restake_every", 86400): return {"skip": "not due"}
+    if last >= slot0(): return {"skip": "not due"}
     wa = get("/cosmos/distribution/v1beta1/delegators/%s/withdraw_address" % granter).get("withdraw_address")
     if wa != granter: return {"skip": "rewards are paid to another address"}
     # the largest rewards first, at most MAX_CLAIM validators a transaction, and no more than
@@ -735,7 +738,7 @@ def once(c, only=None, live=None, force=False):
             # the grant as it stands: a re-grant (Change, a new cap or validator list) is planned at once, not
             # at the next 6-hour turn, so the console never shows a plan made for the grant it replaced
             gsig = hashlib.sha1(json.dumps([g["cap"], sorted(g["allow"] or []), g["exp"]]).encode()).hexdigest()[:12]
-            due = force or not last or time.time() - last >= P["every"] or (prev or {}).get("grant_sig") != gsig
+            due = force or not last or last < slot0() or (prev or {}).get("grant_sig") != gsig
             # a move that failed for a fee, network or RPC reason is tried again at its time; one that was sent but not
             # seen is looked up by hash first, and if it landed that is the move - nothing is planned over it
             rt = c.execute("SELECT due, tries, txhash, moves, since FROM retry WHERE granter=?", (gr,)).fetchone()
@@ -801,7 +804,7 @@ def once(c, only=None, live=None, force=False):
         try:
             if granter in adm["paused"]: continue
             seen = c.execute("SELECT at FROM rs_run WHERE granter=?", (granter,)).fetchone()
-            if not force and seen and time.time() - seen[0] < RS_FIXED["restake_every"]: continue
+            if not force and seen and seen[0] >= slot0(): continue
             c.execute("INSERT INTO rs_run VALUES(?,?) ON CONFLICT(granter) DO UPDATE SET at=excluded.at", (granter, int(time.time()))); c.commit()
             rs = restake_step(c, granter, rgs, work, m, RS_FIXED, dry)
             # the next restake (and the next tick's plans) see these stakes where they land

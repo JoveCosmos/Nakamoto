@@ -14,6 +14,8 @@
   function dur(s){ s = Math.abs(s); var d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
     return d ? d + "d " + h + "h" : h ? h + "h " + m + "m" : m + "m"; }
   function ago(t){ if(!t) return "-"; var s = Date.now() / 1000 - t; return s < 90 ? Math.round(s) + "s ago" : dur(s) + " ago"; }
+  /* Autopilot and Restake run at 00:00 and 12:00 UTC */
+  function nextSlot(){ return (Math.floor(Date.now() / 43200000) + 1) * 43200; }
   function until(t){ if(!t) return "-"; var s = t - Date.now() / 1000; return s <= 60 ? "due now" : "in " + dur(s); }
   function atone(u, d){ return u == null ? "-" : (u / 1e6).toLocaleString("en-US", { maximumFractionDigits: d == null ? 1 : d }); }
   function pct(r){ return r == null ? "-" : (r * 100).toFixed(1) + "%"; }
@@ -79,7 +81,8 @@
       '<div class=big><span class=eb>Signs as</span><span class=addr title="' + esc(L.grantee) + '">' + esc(short(L.grantee)) + '</span></div>' +
       '<div class=rows>' +
         '<div class="sr' + (low ? ' low' : '') + '"><span>PHOTON' + (low ? ', low' : '') + '</span><b>' + (ph == null ? '-' : ph.toLocaleString("en-US", { maximumFractionDigits: 2 })) + '</b><i>fees</i></div>' +
-        '<div class=sr><span>Runs every</span><b>' + (k.every ? Math.round(k.every / 3600) : 12) + '</b><i>hours</i></div>' +
+        '<div class=sr><span>Runs at</span><b>00:00, 12:00</b><i>UTC</i></div>' +
+        '<div class=sr><span>Next run</span><b>' + until(nextSlot()) + '</b><i></i></div>' +
         '<div class=sr><span>Last check</span><b>' + ago(k.checked) + '</b><i></i></div>' +
         '<div class=sr><span>Grants on chain</span><b>' + (k.grants != null ? k.grants : '-') + '</b><i></i></div>' +
       '</div>' +
@@ -113,7 +116,7 @@
       (e.tx ? '<span>Grant tx</span><b>' + txa(e.tx) + '</b>' : '') +
       '<span>Staked</span><b>' + atone(r.staked) + ' ATONE</b>' +
       '<span>APR now</span><b>' + pct((r.record || {}).rate != null ? r.record.rate : r.now) + '</b>' +
-      (st === "ended" ? '<span>Ended</span><b>' + day(e.ended) + '</b>' : '<span>Next check</span><b>' + (st === "held" ? 'on hold' : until((r.checked || 0) + ((DATA.keeper || {}).every || 43200))) + '</b>') +
+      (st === "ended" ? '<span>Ended</span><b>' + day(e.ended) + '</b>' : '<span>Next check</span><b>' + (st === "held" ? 'on hold' : until(nextSlot())) + '</b>') +
       (old ? '<span>Old grant</span><b>' + (g.cap != null ? 'cap ' + atone(g.cap) + ' ATONE' : '') + ((g.allow || []).length ? (g.cap != null ? ', ' : '') + g.allow.length + ' validators' : '') + '</b>' : '') +
       '</div></div>';
     h += '<div class=box><span class=eb>Restake</span><div class=kv>' +
@@ -150,7 +153,7 @@
     else if(!rows.length) E("grants").innerHTML = '<div class=empty>None.</div>';
     else E("grants").innerHTML = '<table><thead><tr><th>Wallet</th><th class=r>Staked</th><th class=r>APR</th><th>Last move</th><th class=hide-s>' + (TAB === "ended" ? 'Ended' : 'Next check') + '</th><th class=hide-s>Restake</th><th class=r>State</th></tr></thead><tbody>' + rows.map(function(e){
       var r = e.report || {}, st = stOf(e), last = (r.history || [])[0], open = !!OPEN[e.granter];
-      var nxt = st === "ended" ? day(e.ended) : st === "held" ? '<span class=dim>on hold</span>' : until((r.checked || 0) + (k.every || 43200));
+      var nxt = st === "ended" ? day(e.ended) : st === "held" ? '<span class=dim>on hold</span>' : until(nextSlot());
       return '<tr class="row' + (open ? ' open' : '') + '" data-open="' + esc(e.granter) + '" tabindex=0 aria-expanded=' + open + '>' +
         '<td><span class=addr>' + esc(short(e.granter)) + '</span><span class=sub>granted ' + day(e.made || e.first_seen) + '</span></td>' +
         '<td class="n r">' + atone(r.staked) + '</td>' +
