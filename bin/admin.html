@@ -4,125 +4,174 @@
 <meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta name=robots content="noindex,nofollow">
-<title>Autopilot Admin</title>
-<link rel=icon href="favicon.ico">
+<title>AtomOne Admin</title>
+<link rel=icon href="assets/favicon-32.png">
 <style>
-:root{--bg:#09090f;--c1:#131329;--c2:#0c0c1a;--bd:#232342;--bd2:#34345c;--t:#f0eef8;--s:#c1bfdc;--f:#8f8db4;
---teal:#2bc8bd;--amber:#ffb02e;--green:#2ee06a;--violet:#b9b0ff;--red:#ff4d1f;--mono:ui-monospace,"JetBrains Mono",Menlo,monospace;
---sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif}
-@media (prefers-color-scheme:light){:root{--bg:#f4f2ec;--c1:#fffdf8;--c2:#f7f4ec;--bd:#e3ddd0;--bd2:#d2cabb;--t:#17161c;--s:#4d4a57;--f:#7a7686;
---teal:#0f5e50;--amber:#9b5a0a;--green:#16733a;--violet:#5b4fc4;--red:#b3261e}}
+/* The operator console, in the app's own look (2026-09-30): the same night tokens as #you / #mv-stage, the same
+   title bar with its coloured rule, tags and buttons; day follows the app's day palette. A monitor: Autopilot runs
+   by itself every 12 hours, Hold is its emergency stop. No middle dots, no long dashes. */
+:root{--bg:#06060c;--glow:#16162e;--glow2:#0a0a16;--wc:#0e0e1d;--wh:#12122a;--wi:#0a0a16;--wbd:#232342;--wbd2:#34345c;
+  --wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4;--teal:#2bc8bd;--green:#2ee06a;--amber:#ffb02e;--violet:#b9b0ff;--red:#ff5a3c;
+  --go-bg:#2ee06a;--go-ink:#05170c;--teal-soft:rgba(43,200,189,.12);--amber-soft:rgba(255,176,46,.12);--red-soft:rgba(255,90,60,.12);
+  --wsans:"Helvetica Neue",Helvetica,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --wmono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;color-scheme:dark}
+@media (prefers-color-scheme:light){:root{--bg:#F4F1EA;--glow:#F4F1EA;--glow2:#F4F1EA;--wc:#FFFDF8;--wh:#F8F6F0;--wi:#F4F1EA;
+  --wbd:#E3DED3;--wbd2:#D8D2C5;--wt:#17191C;--ws:#5E5A52;--wf:#8A857B;--teal:#0E5E52;--green:#0E5E52;--amber:#9A5B0B;
+  --violet:#0E5E52;--red:#8E2F22;--go-bg:#0E5E52;--go-ink:#FFFFFF;--teal-soft:#EDF4F0;--amber-soft:#F7EEDD;--red-soft:#F6E3DF;color-scheme:light}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--t);font:14px/1.45 var(--sans)}
-button{font:inherit;cursor:pointer}
-.wrap{max-width:1400px;margin:0 auto;padding:20px 24px 40px;display:flex;flex-direction:column;gap:14px}
-header{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-header h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em}
-header h1 span{color:var(--violet)}
+html,body{margin:0}
+body{min-height:100vh;background:var(--bg);background-image:radial-gradient(130% 62% at 50% 0%,var(--glow) 0%,var(--glow2) 42%,var(--bg) 74%);
+  color:var(--wt);font:14px/1.45 var(--wsans)}
+button,input,textarea{font:inherit;color:inherit}
+a{color:var(--teal);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+
+/* ── header, as the app's ── */
+.hdr{display:flex;align-items:center;gap:14px;padding:12px 24px;border-bottom:1px solid var(--wbd)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand img{width:34px;height:34px}
+.brand b{font-size:20px;font-weight:700;letter-spacing:-.01em}
+.brand em{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);
+  padding:3px 8px;border:1px solid var(--wbd2);border-radius:999px}
 .sp{flex:1}
-.sw{display:inline-flex;padding:2px;border-radius:9px;border:1px solid var(--bd2);gap:2px}
-.sw button{height:28px;padding:0 13px;border:0;border-radius:7px;background:transparent;color:var(--s);font-size:12.5px}
-.sw button:disabled{opacity:.4;cursor:not-allowed}
-.sw button[aria-pressed=true]{background:color-mix(in srgb,var(--teal) 22%,transparent);color:var(--t);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--teal) 55%,transparent)}
-.who{font-family:var(--mono);font-size:11.5px;color:var(--f)}
-.btn{height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--bd2);background:transparent;color:var(--t);font-size:12.5px}
-.btn:hover{border-color:var(--s)}
-.btn.pri{background:var(--violet);border-color:var(--violet);color:#161038;font-weight:600}
-.btn.sm{height:26px;padding:0 10px;font-size:11.5px}
-.btn:focus-visible,.sw button:focus-visible,.tab:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
-.panel{background:linear-gradient(180deg,var(--c1),var(--c2));border:1px solid var(--bd2);border-radius:12px;padding:14px 16px;position:relative}
-.panel::before{content:"";position:absolute;left:16px;right:16px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--tc,var(--violet)),transparent)}
-.ph{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-.ph h2{margin:0;font-size:15px;font-weight:700;display:inline-flex;align-items:center;gap:9px}
-.ph h2::before{content:"";width:3px;height:14px;border-radius:2px;background:var(--tc,var(--violet))}
-.strip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));padding:0;overflow:hidden}
-.ro{--rc:var(--teal);padding:13px 16px;border-left:1px solid var(--bd);position:relative;min-width:0}
-.ro:first-child{border-left:0}
-.ro::before{content:"";position:absolute;left:16px;right:16px;top:0;height:2px;background:var(--rc);box-shadow:0 0 10px var(--rc);opacity:.85}
-.ro em{display:block;font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--f)}
-.ro b{display:block;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px}
-.ro small{display:block;font-size:11px;color:var(--s);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ro b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ro b.addrv{font:600 15px/1.9 var(--mono)}
-.grid{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr);gap:14px;align-items:start}
-.tabs{display:flex;gap:4px;flex-wrap:wrap}
-.tab{height:28px;padding:0 12px;border-radius:7px;border:1px solid var(--bd);background:transparent;color:var(--s);font-size:12px}
-.tab[aria-pressed=true]{border-color:var(--violet);color:var(--t);background:color-mix(in srgb,var(--violet) 12%,transparent)}
-.tab i{font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--f);margin-left:5px}
-table{width:100%;border-collapse:collapse;font-size:12.5px}
-th{font-family:var(--mono);font-size:9px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--f);text-align:left;padding:6px 8px;border-bottom:1px solid var(--bd2)}
-td{padding:8px;border-bottom:1px solid var(--bd);vertical-align:top}
-td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
-.addr{font-family:var(--mono);font-size:11.5px}
-.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:10.5px;font-family:var(--mono);border:1px solid currentColor}
-.st-waiting,.st-planning{color:var(--amber)}.st-approved{color:var(--teal)}.st-managed{color:var(--green)}.st-held{color:var(--violet)}.st-ended{color:var(--f)}
-.over{color:var(--red)}.late{color:var(--red)}.soon{color:var(--amber)}.ok{color:var(--green)}
-tr.open>td{border-bottom:0;background:color-mix(in srgb,var(--violet) 6%,transparent)}
-tr.rvrow>td{padding:0 8px 14px;background:color-mix(in srgb,var(--violet) 6%,transparent)}
-.rv{display:flex;flex-direction:column;gap:10px;padding:12px 14px;border:1px solid var(--bd2);border-radius:10px;background:var(--c2)}
-.rvg{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
-.rvg div{padding:8px 10px;border:1px solid var(--bd);border-radius:8px}
-.rvg em{display:block;font-style:normal;font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--f)}
-.rvg b{display:block;font-size:13px;margin-top:2px;overflow-wrap:anywhere}
-.mono{font-family:var(--mono)}
-table.plan th.r,table.plan td.r{text-align:right}
-table.plan td{padding:6px 8px}
-.hist{display:flex;flex-direction:column;gap:6px;font-size:12px}
-.hist>div{padding-left:9px;border-left:2px solid var(--bd2)}
-.btn:disabled{opacity:.5;cursor:default}
-.paused{color:var(--amber);font-family:var(--mono);font-size:10px;margin-left:6px}
-.sub{font-size:11px;color:var(--f)}
-.acts{display:flex;gap:6px;flex-wrap:wrap}
-.notes{margin-top:6px;font-size:11.5px;color:var(--s)}
-.notes div{padding-left:8px;border-left:2px solid var(--violet);margin-top:3px}
-.ev{display:flex;flex-direction:column;gap:6px;max-height:520px;overflow:auto}
-.ev div{display:grid;grid-template-columns:8px minmax(0,1fr);gap:9px;font-size:12px;align-items:baseline}
-.ev i{width:8px;height:8px;border-radius:50%;background:var(--teal)}
-.ev i.warn{background:var(--amber)}.ev i.crit{background:var(--red)}.ev i.ok{background:var(--green)}
-.ev small{display:block;color:var(--f);font-family:var(--mono);font-size:10.5px}
-.empty{color:var(--f);font-size:12.5px;padding:16px 4px}
-.gate{min-height:70vh;display:grid;place-items:center}
-.gate .panel{max-width:440px;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center;padding:28px}
-.err{color:var(--red);font-size:12.5px;min-height:18px}
-@media (max-width:900px){.strip{grid-template-columns:repeat(2,minmax(0,1fr))}.ro{border-top:1px solid var(--bd)}.grid{grid-template-columns:minmax(0,1fr)}
-.wrap{padding:14px 12px}.rvg{grid-template-columns:repeat(2,minmax(0,1fr))}
-.tbl>table>thead{display:none}.tbl>table,.tbl>table>tbody,.tbl>table>tbody>tr,.tbl>table>tbody>tr>td{display:block;width:100%}
-.tbl>table>tbody>tr{padding:6px 0;border-bottom:1px solid var(--bd)}.tbl>table>tbody>tr>td{border:0;padding:3px 8px}.tbl>table>tbody>tr>td.n{white-space:normal}
-.tbl>table>tbody>tr.open{border-bottom:0}.tbl>table>tbody>tr.rvrow>td{padding:0 0 12px}}
+.net{display:inline-flex;padding:3px;gap:2px;border-radius:12px;border:1px solid var(--wbd);background:var(--wi)}
+.net button{height:30px;padding:0 14px;border:0;border-radius:9px;background:none;cursor:pointer;
+  font-family:var(--wmono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
+.net button[aria-pressed=true]{background:var(--teal-soft);color:var(--teal);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--teal) 45%,transparent)}
+.net button:disabled{opacity:.35;cursor:not-allowed}
+.who{font-family:var(--wmono);font-size:12px;color:var(--ws);padding:7px 12px;border:1px solid var(--wbd);border-radius:10px;background:var(--wi)}
+
+/* ── buttons and tags ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:34px;padding:0 14px;border-radius:10px;cursor:pointer;
+  border:1px solid var(--wbd2);background:transparent;color:var(--wt);font-size:13px;font-weight:600;white-space:nowrap}
+.btn:hover{border-color:var(--ws)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.go{background:var(--go-bg);border-color:var(--go-bg);color:var(--go-ink)}
+.btn.warn{border-color:color-mix(in srgb,var(--amber) 60%,transparent);color:var(--amber)}
+.btn.sm{height:28px;padding:0 11px;font-size:12px}
+.tag{display:inline-block;font-style:normal;font-family:var(--wmono);font-size:9.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
+  line-height:1;padding:4px 7px;border-radius:999px;border:1px solid var(--wbd2);color:var(--wf);white-space:nowrap}
+.tag.on{border-color:var(--teal);color:var(--teal);background:var(--teal-soft)}
+.tag.hold{border-color:var(--amber);color:var(--amber);background:var(--amber-soft)}
+.tag.bad{border-color:var(--red);color:var(--red);background:var(--red-soft)}
+
+/* ── the frame: signer | wallets | watch ── */
+.frame{display:grid;grid-template-columns:300px minmax(0,1fr) 340px;gap:16px;padding:16px 24px 32px;max-width:1720px;margin:0 auto;align-items:start}
+.card{border:1px solid var(--wbd);border-radius:14px;background:var(--wc);padding:18px 20px;min-width:0}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.th{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;min-height:30px}
+.th h2{display:inline-flex;align-items:center;gap:9px;margin:0;font-size:16px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+.th h2::before{content:"";width:3px;height:16px;border-radius:2px;background:var(--tc,var(--teal));box-shadow:0 0 10px -1px var(--tc,var(--teal))}
+.th small{font-family:var(--wmono);font-size:10.5px;letter-spacing:.04em;color:var(--wf)}
+.eb{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+
+/* signer column: rows as the wallet column's */
+.rows{display:flex;flex-direction:column}
+.sr{display:flex;align-items:baseline;gap:10px;padding:9px 0;border-top:1px solid var(--wbd)}
+.sr:first-child{border-top:0}
+.sr>span{flex:1 1 auto;color:var(--ws);font-size:13.5px;min-width:0}
+.sr>b{font-family:var(--wmono);font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.sr>i{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.08em;color:var(--wf);width:52px;text-align:right}
+.sr.low>b{color:var(--amber)}
+.addr{font-family:var(--wmono);font-size:13px;word-break:break-all;color:var(--wt)}
+.big{display:flex;flex-direction:column;gap:4px;margin-bottom:14px}
+.big b{font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.big small{font-size:12.5px;color:var(--ws)}
+.cnt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cnt>div{border:1px solid var(--wbd);border-radius:11px;background:var(--wi);padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.cnt b{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.cnt em{font-style:normal;font-family:var(--wmono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
+.cnt .on b{color:var(--teal)}.cnt .hold b{color:var(--amber)}
+.foot{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+
+/* wallets: tabs in the title bar, a table as the app's lists */
+.tabs{display:inline-flex;padding:3px;gap:2px;border-radius:11px;border:1px solid var(--wbd);background:var(--wi);margin-left:6px}
+.tabs button{height:28px;padding:0 12px;border:0;border-radius:8px;background:none;cursor:pointer;color:var(--ws);font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px}
+.tabs button i{font-style:normal;font-family:var(--wmono);font-size:10.5px;color:var(--wf)}
+.tabs button[aria-selected=true]{background:var(--wh);color:var(--wt);box-shadow:inset 0 0 0 1px var(--wbd2)}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-family:var(--wmono);font-size:9.5px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--wf);text-align:left;
+  padding:0 10px 9px;border-bottom:1px solid var(--wbd2);white-space:nowrap}
+th.r,td.r{text-align:right}
+td{padding:11px 10px;border-bottom:1px solid var(--wbd);vertical-align:middle;font-size:13.5px}
+td.n{font-family:var(--wmono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody tr.row{cursor:pointer}
+tbody tr.row:hover>td{background:var(--wh)}
+tr.open>td{background:var(--wh);border-bottom:0}
+.sub{display:block;font-family:var(--wmono);font-size:10.5px;color:var(--wf);margin-top:3px;white-space:nowrap}
+.dim{color:var(--wf)}
+.tx{font-family:var(--wmono)}
+.empty{padding:18px 4px;color:var(--wf);font-size:13px}
+.err{color:var(--red);font-size:12.5px;min-height:1em}
+
+/* a wallet opened */
+tr.det>td{background:var(--wh);padding:4px 14px 18px}
+.dg{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px}
+.box{border:1px solid var(--wbd);border-radius:12px;background:var(--wc);padding:12px 14px;min-width:0}
+.box>.eb{display:block;margin-bottom:8px}
+.box table td{padding:7px 8px;font-size:12.5px}
+.box table th{padding:0 8px 7px}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;font-size:12.5px}
+.kv span{color:var(--wf)}
+.kv b{font-family:var(--wmono);font-weight:500;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.act{display:flex;gap:8px;align-items:flex-start;margin-top:10px}
+.act textarea,.act input{flex:1 1 auto;min-width:0;min-height:34px;padding:7px 10px;border-radius:10px;border:1px solid var(--wbd2);background:var(--wi);resize:vertical;font-size:13px}
+.notes{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.notes div{font-size:12.5px;border-left:2px solid var(--wbd2);padding-left:8px}
+
+/* the watch rail */
+.feed{display:flex;flex-direction:column;max-height:62vh;overflow-y:auto;scrollbar-width:thin}
+.feed>div{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--wbd);font-size:13px}
+.feed>div:first-child{border-top:0}
+.feed i{flex:0 0 auto;width:7px;height:7px;border-radius:50%;margin-top:6px;background:var(--teal)}
+.feed i.warn{background:var(--amber)}.feed i.crit{background:var(--red)}
+.feed small{display:block;font-family:var(--wmono);font-size:10.5px;color:var(--wf);margin-top:2px}
+
+/* the gate */
+.gate{display:grid;place-items:center;min-height:calc(100vh - 80px);padding:24px}
+.gate .card{width:min(420px,100%);text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center;padding:28px}
+.gate h2{margin:0;font-size:20px}
+.gate p{margin:0;color:var(--ws);font-size:13px}
+
+@media (max-width:1280px){.frame{grid-template-columns:280px minmax(0,1fr)}.frame>.watch{grid-column:1 / -1;display:grid;grid-template-columns:1fr 1fr}}
+@media (max-width:900px){.hdr{flex-wrap:wrap;padding:12px 16px}.frame{grid-template-columns:minmax(0,1fr);padding:12px 16px 24px}
+  .frame>.watch{grid-template-columns:minmax(0,1fr)}.dg{grid-template-columns:minmax(0,1fr)}.hide-s{display:none}}
 </style>
 </head>
 <body>
-<div class=wrap>
-  <header>
-    <h1>Autopilot <span>Admin</span></h1>
-    <div class=sw role=group aria-label=Network id=net><button type=button data-net=mainnet aria-pressed=true>Mainnet</button><button type=button data-net=testnet aria-pressed=false>Testnet</button></div>
-    <span class=sp></span>
-    <span class=who id=who></span>
-    <button class="btn sm" type=button id=test hidden>Send test alert</button>
-    <button class="btn sm" type=button id=out hidden>Sign out</button>
-  </header>
-  <div id=gate class=gate>
-    <div class=panel>
-      <h2 style="margin:0">Operators only</h2>
-      <div class=sub>Sign a one-time message with Keplr. Nothing is sent on chain.</div>
-      <button class="btn pri" type=button id=signin>Sign in with Keplr</button>
-      <div class=err id=err></div>
-    </div>
-  </div>
-  <div id=app hidden style="display:flex;flex-direction:column;gap:14px">
-    <div class="panel strip" id=strip></div>
-    <div class=grid>
-      <div class=panel style="--tc:var(--violet)">
-        <div class=ph><h2>Grants</h2><div class=tabs id=tabs role=group aria-label="Grant state"></div><span class=sp></span><span class=sub id=checked></span></div>
-        <div class=tbl id=grants></div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:14px">
-        <div class=panel style="--tc:var(--red)"><div class=ph><h2>Validators</h2><span class=sub id=vwsub></span></div><div id=vw></div></div>
-        <div class=panel style="--tc:var(--teal)"><div class=ph><h2>Events</h2></div><div class=ev id=ev></div></div>
-      </div>
-    </div>
+<header class=hdr>
+  <div class=brand><img src="assets/atomone.svg" alt=""><b>AtomOne</b><em>Admin</em></div>
+  <div class=net role=group aria-label=Network id=net><button type=button data-net=mainnet aria-pressed=true>Mainnet</button><button type=button data-net=testnet aria-pressed=false>Testnet</button></div>
+  <span class=sp></span>
+  <span class=who id=who hidden></span>
+  <button class="btn sm" type=button id=out hidden>Sign out</button>
+</header>
+<div id=gate class=gate>
+  <div class=card>
+    <h2>Operators only</h2>
+    <p>Sign a one-time message with Keplr. Nothing is sent on chain.</p>
+    <button class="btn go" type=button id=signin>Sign in with Keplr</button>
+    <div class=err id=err></div>
   </div>
 </div>
+<main id=app class=frame hidden>
+  <section class="card" style="--tc:var(--teal)">
+    <div class=th><h2>Autopilot signer</h2><span class=sp></span><span id=mode></span></div>
+    <div id=signer></div>
+    <div class=foot><button class="btn sm" type=button id=test>Send test alert</button></div>
+  </section>
+  <section class="card" style="--tc:var(--violet)">
+    <div class=th><h2>Wallets</h2><div class=tabs id=tabs role=tablist aria-label="Wallet state"></div><span class=sp></span><small id=checked></small></div>
+    <div class=tbl id=grants></div>
+  </section>
+  <div class="col watch">
+    <section class="card" style="--tc:var(--red)"><div class=th><h2>Validators</h2><span class=sp></span><small id=vwsub></small></div><div class=feed id=vw></div></section>
+    <section class="card" style="--tc:var(--amber)"><div class=th><h2>Events</h2></div><div class=feed id=ev></div></section>
+  </div>
+</main>
 <script src="admin.js"></script>
 </body>
 </html>

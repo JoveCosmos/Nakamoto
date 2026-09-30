@@ -231,29 +231,17 @@ class H(BaseHTTPRequestHandler):
             # no approvals since 2026-09-30: Autopilot carries out its plans itself; Hold and Resume are the operator's controls
             if act not in ("hold", "resume"): return self.reply(400, {"error": "action"})
             if act == "hold" and not note: return self.reply(400, {"error": "a hold needs a note: why"})
-            rep = jload(os.path.join(WEB[net], "keeper", g + ".json"), {}) or {}
-            cur = (rep.get("admin") or {}).get("plan_id")
-            pid = b.get("plan_id") or None
-            if act == "apply":
-                if not cur or not rep.get("moves"): return self.reply(409, {"error": "there is no plan to apply: answer No"})
-                if pid != cur: return self.reply(409, {"error": "the plan changed since you opened it: review the new one"})
             now = int(time.time())
             with LOCK:
                 adm = adm_load(net)
-                if act == "apply": adm["approved"][g] = {"plan_id": cur, "by": a, "at": now}
-                if act == "nomove": adm["approved"].pop(g, None)
                 if act == "hold": adm["paused"][g] = {"by": a, "at": now}
                 if act == "resume": adm["paused"].pop(g, None)
-                adm["decisions"].setdefault(g, []).append({"action": act, "plan_id": cur if act in ("apply", "nomove") else None, "by": a, "at": now, "note": note})
+                adm["decisions"].setdefault(g, []).append({"action": act, "plan_id": None, "by": a, "at": now, "note": note})
                 adm["decisions"][g] = adm["decisions"][g][-50:]
                 if note: adm["notes"].setdefault(g, []).append({"by": a, "at": now, "text": note})
                 adm_save(net, adm)
             log("decide %s %s %s by %s" % (net, g, act, a))
-            # apply is announced by the keeper once it is carried out ("strategy applied"); the rest here
-            if act == "nomove":
-                notify.send("info", "Autopilot answered No: " + short(g), "Nothing moves; the operator settles it by hand.",
-                            {"Delegator": g, "Operator": a}, net=net)
-            elif act == "hold":
+            if act == "hold":
                 notify.send("warn", "Autopilot on hold: " + short(g), note, {"Delegator": g, "Operator": a}, net=net)
             elif act == "resume":
                 notify.send("info", "Autopilot resumed: " + short(g), "", {"Delegator": g, "Operator": a}, net=net)
