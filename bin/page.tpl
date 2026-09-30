@@ -6137,6 +6137,11 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 #mv-stage .mv-set:not(#z):not(#y):not(#x){margin-top:auto}
 #mv-stage .mv-bars i{cursor:pointer}
 #mv-stage .mv-bars i:hover{filter:brightness(.82)}
+#mv-stage .mv-top>em+.mv-tdis{margin-left:auto}
+#mv-stage .mv-tdis{position:relative;display:inline-flex;flex:0 0 auto}
+#mv-stage .mv-tdis .mv-tgo:disabled:not(#z):not(#y){opacity:.45;cursor:not-allowed;filter:grayscale(1)}
+#mv-stage .mv-tdis:hover::after{content:attr(data-tip);position:absolute;right:0;top:calc(100% + 6px);z-index:4;padding:6px 10px;border-radius:8px;
+  border:1px solid var(--wbd2);background:var(--wh);box-shadow:0 10px 24px -14px rgba(0,0,0,.6);font:600 12px var(--wsans);color:var(--wt);white-space:nowrap;pointer-events:none}
 /* ════ STICKY HEADS (operator, 2026-09-30): a list's column titles stay on top as it scrolls, on the pane's own
    colour, so rows never show through them - Redelegate, Delegations, Outcome's moves, Stake's list, Picks ════ */
 #one #p-dele .wk-tbl2 thead th:not(#z):not(#y),#you .wk-tbl2 thead th:not(#z):not(#y),#one #p-dele #wk-mv .wk-moves thead th:not(#z):not(#y),

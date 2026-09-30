@@ -1064,6 +1064,7 @@
   @media(min-width:1100px){
     html[data-theme=light]:not([data-mono]) #one #p-dele #wk-mv>.wk-ans .p.rate:not(#z):not(#y)::before{background:none}
   }
+  html[data-theme=light]:not([data-mono]) #mv-stage .mv-tdis:hover::after{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #one #p-pays .ptab thead th:not(#z):not(#y){background:var(--card,var(--surface))}
   @media(min-width:1100px){
     html[data-theme=light]:not([data-mono]) .colh{border-color:var(--wbd2,var(--line-strong));background:var(--wc,var(--surface-2));color:var(--wf,var(--muted))}

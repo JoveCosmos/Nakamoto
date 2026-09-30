@@ -1485,7 +1485,7 @@
   function pathHead(id){
     var pos = window.__POS;
     if(id === "move"){
-      if(!window.__ADDR) return ["Connect a wallet", "and see your best move"];
+      if(!window.__ADDR) return ["See your best move", ""];
       if(!pos) return ["Reading your stake…", ""];
       if(!pos.rows.length) return ["No stake yet", "stake ATONE to start earning"];
       var pl = planNow(pos);
@@ -1671,7 +1671,8 @@
     }
     var h;
     if(!a){
-      h = top('') +          /* no Connect here: the header's is the one (operator, 2026-09-30) */
+      /* disconnected: the corner holds Activate Autopilot, greyed; on hover it says why (operator, 2026-09-30) */
+      h = top('', '', '', '<span class=mv-tdis data-tip="Connect a wallet"><button class="sv-btn go mv-go mv-tgo" type=button disabled aria-disabled=true tabindex=-1>Activate Autopilot</button></span>') +
         (hi ? '<div class=mv-hl><b>About ' + pct(hi) + ' APR</b><span>with Autopilot, for 10,000 ATONE</span></div>' : '') + cmp() + mvSet({}, {});
     } else if(!pos){
       h = top('') + '<div class=mv-hl><b>Reading your stake…</b></div>';
