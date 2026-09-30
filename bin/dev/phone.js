@@ -1,13 +1,14 @@
 /* phone.js - the app on a real phone viewport (Chrome's own device emulation over the DevTools
    protocol; a headless window cannot go below 500 px). For each route: what spills past the screen's
    sides, what text a non-scrolling box cuts, and a full-page screenshot.
-     node --experimental-websocket dev/phone.js [--url URL] [--size 390x844] [--out DIR] [--wallet] [routes...]
+     node --experimental-websocket dev/phone.js [--url URL] [--size 390x844] [--out DIR] [--wallet] [--addr ATONE1...] [routes...]
    Routes default to every one in shell.json. Needs google-chrome. */
 const { spawn } = require("child_process"), fs = require("fs"), path = require("path"), os = require("os");
 const A = process.argv.slice(2), opt = k => { const i = A.indexOf(k); if(i < 0) return null; const v = A[i + 1]; A.splice(i, 2); return v; };
 const URL0 = opt("--url") || "http://127.0.0.1:8089", SIZE = (opt("--size") || "390x844").split("x").map(Number), OUT = opt("--out");
 const EVAL = opt("--eval"), WAIT = +(opt("--wait") || 0);
-const WALLET = A.includes("--wallet"); if(WALLET) A.splice(A.indexOf("--wallet"), 1);
+const ADDR = opt("--addr") || "atone14y3usgepvcxxs6jkjqwhuyjy6eyhu7rkvpg2a7";
+const WALLET = A.includes("--wallet") || ADDR !== "atone14y3usgepvcxxs6jkjqwhuyjy6eyhu7rkvpg2a7"; if(A.includes("--wallet")) A.splice(A.indexOf("--wallet"), 1);
 const VP = A.includes("--vp"); if(VP) A.splice(A.indexOf("--vp"), 1);
 const DARK = A.includes("--dark"); if(DARK) A.splice(A.indexOf("--dark"), 1);
 const shell = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "shell.json"), "utf8"));
@@ -16,7 +17,7 @@ const PORT = 9300 + Math.floor(Math.random() * 500), dir = fs.mkdtempSync(path.j
 const chrome = spawn("google-chrome", ["--headless=new", "--disable-gpu", "--no-sandbox", "--hide-scrollbars", "--remote-debugging-port=" + PORT, "--user-data-dir=" + dir,
   ...(DARK ? ["--force-dark-mode"] : []), "about:blank"], { stdio: "ignore" });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const MOCK = `window.keplr={enable:function(){return Promise.resolve()},getKey:function(){return Promise.resolve({name:"demo",bech32Address:"atone14y3usgepvcxxs6jkjqwhuyjy6eyhu7rkvpg2a7",pubKey:new Uint8Array(33)})},signDirect:function(){return Promise.reject(new Error("no"))}};
+const MOCK = `window.keplr={enable:function(){return Promise.resolve()},getKey:function(){return Promise.resolve({name:"demo",bech32Address:"${ADDR}",pubKey:new Uint8Array(33)})},signDirect:function(){return Promise.reject(new Error("no"))}};
 addEventListener("load",function(){setTimeout(function(){ if(window.__wconnect) window.__wconnect("Keplr"); },300);});`;
 const AUDIT = `(function(){
   /* the phone's own width, not innerWidth: a page wider than the phone zooms out and widens innerWidth */

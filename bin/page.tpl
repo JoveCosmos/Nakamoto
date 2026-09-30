@@ -5540,8 +5540,9 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-chip.ok{background:rgba(43,200,189,.14);color:var(--sv-teal)}
 .mv-chip.warn{background:rgba(255,176,46,.14);color:var(--sv-amber)}
 .mv-chip.q{background:rgba(185,176,255,.14);color:var(--sv-violet)}
-.mv-hl{display:flex;flex-direction:column;gap:6px}
-.mv-hl>b{font-size:40px;font-weight:700;line-height:1.05;letter-spacing:-.02em;color:var(--wt)}
+/* the headline, then one line: what it is on the left, the cooling-down note on the right (operator, 2026-09-30) */
+.mv-hl{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:20px;row-gap:6px;align-items:baseline}
+.mv-hl>b{grid-column:1/-1;font-size:40px;font-weight:700;line-height:1.05;letter-spacing:-.02em;color:var(--wt)}
 .mv-hl>b.g,.mv-hl i.g{color:var(--sv-teal)}
 .mv-hl i.a{color:var(--sv-amber)}
 .mv-hl i{font-style:normal;font-weight:600}
@@ -5567,11 +5568,13 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-rows>.mv-r:first-child{border-top:0}
 .mv-rows .mv-x{display:none}
 .mv-rows.open .mv-x{display:grid}
-.mv-rows.open{max-height:210px;overflow-y:auto;scrollbar-width:thin}
+.mv-rows.open{max-height:210px;overflow-y:auto;scrollbar-width:thin;overscroll-behavior:contain}
 @media(prefers-reduced-motion:reduce){.mv-more svg{transition:none}}
 .mv-arr{display:flex;justify-content:center}
 .mv-arr svg{width:40px;height:18px;fill:none;stroke:var(--sv-teal);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .mv-lock{font-size:12.5px;color:var(--sv-amber)}
+.mv-hl>.mv-lock{grid-column:2;white-space:nowrap;text-align:right}
+@media(max-width:700px){.mv-hl>.mv-lock{grid-column:1/-1;white-space:normal;text-align:left}}
 /* 10,000 ATONE for a year, three ways: the largest validator, Autopilot, the smallest */
 .mv-cmp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .mv-cc{display:flex;flex-direction:column;gap:3px;min-width:0;padding:13px 16px 14px;border:1px solid var(--wbd);border-radius:12px}
@@ -6395,7 +6398,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   <section class=pane id=p-eta><div class=pw>
     <div class=duo2>
       <div class=panel><div class=ptitle>Projection</div>
-<p class=sub>&eta; steps {{STEP}} every week: up while the BONDED ATONE <b class=hotc>concentration</b> is &ge; {{THRESH}}&times;, down while &lt; {{THRESH_N}}. {{STEPLINE}}.</p>
+<p class=sub>&eta; steps {{STEP}} every week: up while the BONDED ATONE <b class=hotc>concentration</b> is &ge; {{THRESH}}&times;, down while &lt; {{THRESH_N}}. {{STEPLINE}}</p>
     <svg id=etacurve viewBox="0 0 900 300" role=img
       aria-label="&eta; from the floor to today and projected forward"></svg>
     <div class=sbox>

@@ -1624,17 +1624,27 @@
 
   /* ── YOUR MOVE: the one screen's first stage. Before the click it says what moves where, in numbers;
      after it, the 21-day cooldown the chain holds redelegated stake for; then the cycle repeats. ── */
-  /* five rows, then "and N more" with an arrow that opens the whole list in place, scrolling (operator, 2026-09-30) */
+  /* four rows on every screen, then "and N more" with an arrow that opens the whole list in place, scrolling inside the
+     four rows' height, so nothing under it moves (operator, 2026-09-30) */
   var MVOPEN = {};
   function mvRows(list, cls, more, key){
-    /* three rows on a short screen, five otherwise; the count says exactly how many more there are */
-    var lim = window.matchMedia && matchMedia("(min-width:1100px) and (max-height:820px)").matches ? 3 : 5;
+    var lim = mvLim();
     var rest = list.length - lim, open = rest > 0 && !!MVOPEN[key];
     var CH = '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 9l6 6 6-6"/></svg>';
     return '<div class="mv-rows' + (open ? ' open' : '') + '">' + list.map(function(r, i){
       return '<div class="mv-r' + (i >= lim ? ' mv-x' : '') + '"><u class=' + cls + '>' + r.rank + '</u><span title="' + esc(r.name) + '">' + esc(r.name) + '</span><b>' + r.amt + '</b><i class=' + cls + '>' + r.apr + '</i></div>';
     }).join("") + '</div>' +
       (rest > 0 ? '<button type=button class=mv-more data-act=mvmore data-k="' + key + '" aria-expanded=' + open + '><span>' + (open ? 'Show fewer' : 'and ' + rest + ' more ' + more) + '</span>' + CH + '</button>' : '');
+  }
+  function mvLim(){ return 4; }
+  /* an opened list keeps the closed list's height and scrolls in it */
+  function mvFit(){
+    var el = E("mv-stage"); if(!el) return;
+    var lim = mvLim();
+    Array.prototype.forEach.call(el.querySelectorAll(".mv-rows.open"), function(r){
+      var h = 0; Array.prototype.slice.call(r.children, 0, lim).forEach(function(c){ h += c.offsetHeight; });
+      if(h) r.style.maxHeight = h + "px";
+    });
   }
   function mvSet(src, dst){
     /* the set, largest first: the wallet's validators lit (where the stake is, or comes from and goes to); no window
@@ -1719,13 +1729,13 @@
         var src = {}, dst = {};
         var fL = Object.keys(fr).sort(function(x, y){ return fr[y] - fr[x]; }).map(function(id){ src[id] = 1; return { rank: rk(id), name: nm(id), amt: fmt(fr[id]), apr: pct(rate(id)) }; });
         var tL = Object.keys(to).sort(function(x, y){ return to[y] - to[x]; }).map(function(id){ dst[id] = 1; return { rank: rk(id), name: nm(id), amt: '+' + fmt(to[id]), apr: pct(rate(id, to[id])) }; });
-        var lock = pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is cooling down until ' + day(pos.until) + ' and stays where it is.</div>' : '';
+        var lock = pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is under redelegate lock until ' + day(pos.until) + '</div>' : '';
         h = top('Best today', auto ? '' : 'Ready, 1 approval', 'ok', auto ? ACTIVE : btn('opt', direct ? 'Activate Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE')) +
-          '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.now) + '</i> to <i class=g>' + pct(plan.after) + '</i> APR</span></div>' +
+          '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.now) + '</i> to <i class=g>' + pct(plan.after) + '</i> APR</span>' + lock + '</div>' +
           '<div class=mv-flow><div class=mv-box><em>From, ' + fL.length + ' validator' + (fL.length === 1 ? '' : 's') + '</em>' + mvRows(fL, 'a', 'validators', 'from') + '</div>' +
           '<div class=mv-arr aria-hidden=true><svg viewBox="0 0 44 20"><path d="M2 10h38M32 3l8 7-8 7"/></svg></div>' +
           '<div class=mv-box><em>To, ' + tL.length + ' validator' + (tL.length === 1 ? '' : 's') + '</em>' + mvRows(tL, 'g', 'validators', 'to') + '</div></div>' +
-          lock + mvSet(src, dst);
+          mvSet(src, dst);
       } else if(pos.free < 1e6 && pos.locked >= 1e6){
         var t1 = pos.until || Date.now(), t0 = t1 - 21 * 864e5, k = Math.min(21, Math.max(1, Math.ceil((Date.now() - t0) / 864e5)));
         var cells = ''; for(var i = 1; i <= 21; i++) cells += '<i' + (i <= k ? ' class=on' : '') + '></i>';
@@ -1745,6 +1755,7 @@
       }
     }
     put("mv-stage", you + h);
+    mvFit();
   }
 
   function render(){

@@ -91,7 +91,7 @@ if _w2c is not None:
 else:
     CAPSUB = "not while it falls" if _w2f else "at the floor: not while C &lt; 3&times;"
     CAPSUB2 = "not while falling"
-STEPLINE = ("Rising now" if th["rising"] else "Falling now" if (_w2f or 0) > 0 else "Held at the floor now") + f" (c = {th['ratio']:.2f}&times;)"
+STEPLINE = "&eta; " + ("Rising now" if th["rising"] else "Falling now" if (_w2f or 0) > 0 else "Held at the floor now") + f" (c = {th['ratio']:.2f}&times;)"
 sched = "".join(
     f"<tr class='wk {'now' if r['now'] else 'next' if r['next'] else 'past' if r['past'] else 'fut'}'"
     f" tabindex=0 role=button data-w='{r['week']}' data-d='{esc(r['iso'])}' data-e='{_eta_attr(r)}'"
