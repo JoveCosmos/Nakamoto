@@ -5412,7 +5412,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .you-h{display:flex;flex-direction:column;gap:6px;min-width:0}
 .you-h h3{margin:0;font-size:17px;font-weight:600;color:var(--wt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .you-apr{display:flex;flex-direction:column;gap:3px}
-.you-apr em,.you-hf>em{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+.you-apr em,.you-hf>em,.you-hfh>em{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
 .you-apr b{font-size:44px;font-weight:700;line-height:1.05;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--wt)}
 .you-apr small{font-size:12.5px;color:var(--ws)}
 .you-bal{display:flex;flex-direction:column;border-bottom:1px solid var(--wbd)}
@@ -5425,6 +5425,13 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .you-swt{flex:1 1 auto;display:flex;flex-direction:column;gap:1px;min-width:0}
 .you-swt b{font-size:14px;font-weight:600;color:var(--wt)}
 .you-swt small{font-size:11.5px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Hands-free: one ? for both services' rules (operator, 2026-09-30); the column clips, so the tip opens up and left */
+.you-hfh{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.you-hfh .qm .qm-tip{width:250px;right:-4px;bottom:calc(100% + 8px)}
+.you-hfh .qm-tip>b{display:block;margin:0 0 5px;font:600 12.5px/1.3 var(--wsans);color:var(--wt)}
+.you-hfh .qm-tip>b~b{margin-top:10px}
+.you-hfh .qm-tip>span{display:block;position:relative;margin:4px 0 0;padding-left:13px;font:400 12.5px/1.45 var(--wsans);color:var(--ws)}
+.you-hfh .qm-tip>span::before{content:"";position:absolute;left:0;top:.55em;width:5px;height:5px;border-radius:50%;background:var(--sv-teal)}
 .you-tg{width:44px;height:26px;flex:0 0 auto;border:0;border-radius:999px;padding:3px;background:var(--wbd2);display:flex;cursor:pointer}
 .you-tg i{display:block;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .18s ease}
 .you-tg.on{background:var(--sv-teal)}
@@ -6276,7 +6283,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 </div></div>
 
 <div class=pop id=atpop><div class="card txcard uncard atcard" role=dialog aria-modal=true aria-labelledby=atttl data-v=setup>
-  <header class=wk-txh><div><b id=atttl>Autopilot</b><span>{{CHAIN_ID}}</span></div><button class="qm qm-r" type=button aria-label="How Autopilot works">?<span class=qm-tip role=tooltip><b>How it works</b><span>Moves your free stake to smaller validators that pay more</span><span>Spreads it so no validator overtakes the one above</span><span>Moves only when you gain 5% APR or more</span><span>Checks every 12 hours, hands-free</span></span></button><span class=txsum id=atsum></span></header>
+  <header class=wk-txh><div><b id=atttl>Autopilot</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=atsum></span></header>
   <!-- a phone shows one side at a time; a wide window shows both -->
   <div class=atview role=tablist aria-label="Autopilot">
     <button type=button role=tab id=atvs aria-controls=atL aria-selected=true data-v=setup>Setup</button>
@@ -6306,12 +6313,12 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   </div>
   <div class=atfoot>
     <div class=atfs><div class=txfee id=attxfee></div><div class=txstep id=atstep></div></div>
-    <div class=txbtns><button class=wk-btn id=atcancel type=button hidden>Back</button><button class="wk-btn wk-danger" id=atrevoke type=button hidden>Revoke</button><button class=wk-btn id=atedit type=button hidden>Change</button><button class="wk-btn wk-go" id=atgrant type=button disabled>Grant</button></div>
+    <div class=txbtns><button class=wk-btn id=atcancel type=button hidden>Back</button><button class="wk-btn wk-danger" id=atrevoke type=button hidden>Revoke</button><button class=wk-btn id=atedit type=button hidden>Change</button><button class="wk-btn wk-go" id=atgrant type=button disabled>Activate</button></div>
   </div>
 </div></div>
 
 <div class=pop id=rspop><div class="card txcard uncard rscard" role=dialog aria-modal=true aria-labelledby=rsttl>
-  <header class=wk-txh><div><b id=rsttl>Restake</b><span>{{CHAIN_ID}}</span></div><button class="qm qm-r" type=button aria-label="How Restake works">?<span class=qm-tip role=tooltip><b>How it works</b><span>Runs every 12 hours</span><span>Minimum 1 ATONE</span><span>Turn it off anytime</span></span></button><span class=txsum id=rssum></span></header>
+  <header class=wk-txh><div><b id=rsttl>Restake</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=rssum></span></header>
   <div class=rsbody>
     <ul class=bn><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></i><span class=bn-t><b>Compounds your rewards</b><small><b id=rsadd>your rewards</b> more a year</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 20V10M10 20V6M15 20v-8M20 20V4"/></svg></i><span class=bn-t><b>Into the best-paying validator</b><small>not back onto the same one</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Claims and stakes, nothing else</b><small>GATA funds your restake, no fees for you</small></span></li></ul>
   </div>

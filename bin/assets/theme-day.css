@@ -962,7 +962,6 @@
   html[data-theme=light]:not([data-mono]) .mv-arr svg{fill:none}
   html[data-theme=light]:not([data-mono]) .mv-cc.g{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .mv-bars i.lo{background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) #mv-stage .mv-on svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .mv-ap{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-ghost{background:transparent}
   html[data-theme=light]:not([data-mono]) .mv-cyc>div.done{background:var(--accent-soft);border-color:transparent}

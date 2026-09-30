@@ -2292,7 +2292,7 @@ rememberGridH();
     if(lk) lk.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
       '<span>Redelegated stake cannot be redelegated again for <b>21 days</b>, until <b>' + window.__day(until.getTime()) + '</b></span>';
     fee.textContent = "fee: estimating…"; step.textContent = ""; step.className = "txstep";
-    sign.disabled = false; sign.textContent = TXAP ? "Grant Autopilot" : "Redelegate";
+    sign.disabled = false; sign.textContent = TXAP ? "Activate Autopilot" : "Redelegate";
     var ap = E("txap"); if(ap) ap.hidden = !TXAP;
     if(TXAP) msgs = txAll();
     POP.open(txpop);
@@ -2807,7 +2807,7 @@ rememberGridH();
     }
     E("atform").hidden = view;
     E("atrevoke").hidden = !view; E("atedit").hidden = true;   /* nothing to change: no cap, no list */
-    var go = E("atgrant"); go.hidden = view; go.textContent = g ? "Update" : "Grant";
+    var go = E("atgrant"); go.hidden = view; go.textContent = g ? "Update" : "Activate";
     /* no Cancel or Close: a tap outside, or Escape, closes the card. Back stays - it leaves a
        change of a standing grant without closing */
     var ac = E("atcancel"); ac.textContent = "Back"; ac.hidden = !(g && AT_EDIT);
