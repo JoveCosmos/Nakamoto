@@ -5542,8 +5542,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .bn-t small b{color:var(--wt);font-weight:600}
 .qm{position:relative;flex:0 0 auto;width:22px;height:22px;padding:0;border:1px solid var(--wbd2);border-radius:50%;background:transparent;color:var(--ws);
   font:600 11px var(--wmono);line-height:20px;text-align:center;cursor:help}
-.qm-r{width:auto;height:24px;padding:0 10px;border-radius:999px;font:500 11px var(--wsans);line-height:22px;margin-left:auto;margin-right:10px}
-.qm-r::after{content:" ?";color:var(--wf)}
+.qm-r{order:2;margin:0 0 0 12px}
 .qm:hover,.qm:focus-visible{border-color:var(--wcyan);color:var(--wt);outline:none}
 .qm-tip{display:none;position:absolute;right:-6px;bottom:calc(100% + 10px);z-index:5;width:min(280px,76vw);padding:11px 13px;border:1px solid var(--wbd2);border-radius:11px;
   background:var(--wh);box-shadow:0 18px 40px -18px rgba(0,0,0,.55);font:400 12.5px/1.5 var(--wsans);letter-spacing:0;text-align:left;text-transform:none;color:var(--wt);white-space:normal;cursor:default}
@@ -5554,7 +5553,12 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .wk-txh .qm:hover .qm-tip,.wk-txh .qm.open .qm-tip,.txcard .wk-txh .qm:hover .qm-tip,.txcard .wk-txh .qm.open .qm-tip{display:block}
 /* in a card's header the tip must not take the header's small mono lettering */
 .wk-txh .qm .qm-tip,.txcard .wk-txh .qm .qm-tip{font:400 12.5px/1.5 var(--wsans);letter-spacing:0;text-transform:none;color:var(--wt)}
-.wk-txh .qm-r,.txcard .wk-txh .qm-r{font:500 11px var(--wsans);letter-spacing:0;text-transform:none;color:var(--ws)}
+.wk-txh .qm-r,.txcard .wk-txh .qm-r{font:600 11px/20px var(--wmono);letter-spacing:0;text-transform:none;color:var(--ws)}
+.wk-txh .qm-r .qm-tip{width:min(300px,80vw)}
+/* the header's own b and span rules reach into the tip: its title and lines are set here, above them */
+.txcard .wk-txh .qm-r .qm-tip>b,.uncard .wk-txh .qm-r .qm-tip>b{display:block;margin:0 0 7px;font:600 12.5px/1.3 var(--wsans);letter-spacing:0;color:var(--wt)}
+.txcard .wk-txh .qm-r .qm-tip>span{display:block;position:relative;margin:5px 0 0;padding-left:13px;font:400 12.5px/1.45 var(--wsans);letter-spacing:0;text-transform:none;color:var(--ws)}
+.txcard .wk-txh .qm-r .qm-tip>span::before{content:"";position:absolute;left:0;top:.55em;width:5px;height:5px;border-radius:50%;background:var(--wcyan)}
 #rsgo{min-width:180px;height:40px;border-color:var(--wcyan);background:var(--wcyan);color:#0b1f1c;font-weight:600}
 #rsgo.wk-danger{background:transparent;border-color:#ff6a6a;color:#ff6a6a}
 #atpop .atnote{margin:4px 0 8px}
@@ -6085,7 +6089,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 </div></div>
 
 <div class=pop id=atpop><div class="card txcard uncard atcard" role=dialog aria-modal=true aria-labelledby=atttl data-v=setup>
-  <header class=wk-txh><div><b id=atttl>Autopilot</b><span>{{CHAIN_ID}}</span></div><button class="qm qm-r" type=button aria-label="Autopilot rules">Rules<span class=qm-tip role=tooltip>It moves your free stake to the validators ranked 67 to 95: #95 first, up to the stake of #94, then #94, and on up, never lifting one past the validator above it. The last 5 of the set are left out. Only for more than 5 APR points. Every 12 hours. Earlier grants are placed first.</span></button><span class=txsum id=atsum></span></header>
+  <header class=wk-txh><div><b id=atttl>Autopilot</b><span>{{CHAIN_ID}}</span></div><button class="qm qm-r" type=button aria-label="How Autopilot works">?<span class=qm-tip role=tooltip><b>How it works</b><span>Moves your free stake to smaller validators that pay more</span><span>Spreads it so no validator overtakes the one above</span><span>Moves only when you gain 5% APR or more</span><span>Checks every 12 hours, hands-free</span></span></button><span class=txsum id=atsum></span></header>
   <!-- a phone shows one side at a time; a wide window shows both -->
   <div class=atview role=tablist aria-label="Autopilot">
     <button type=button role=tab id=atvs aria-controls=atL aria-selected=true data-v=setup>Setup</button>
@@ -6120,7 +6124,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 </div></div>
 
 <div class=pop id=rspop><div class="card txcard uncard rscard" role=dialog aria-modal=true aria-labelledby=rsttl>
-  <header class=wk-txh><div><b id=rsttl>Restake</b><span>{{CHAIN_ID}}</span></div><button class="qm qm-r" type=button aria-label="Restake rules">Rules<span class=qm-tip role=tooltip>Every 12 hours, from 1 ATONE of rewards. Rewards paid to your own address only. Staked where they earn the most, by the same rule as Autopilot. Stops when you disable it.</span></button><span class=txsum id=rssum></span></header>
+  <header class=wk-txh><div><b id=rsttl>Restake</b><span>{{CHAIN_ID}}</span></div><button class="qm qm-r" type=button aria-label="How Restake works">?<span class=qm-tip role=tooltip><b>How it works</b><span>Claims your rewards twice a day</span><span>Stakes them where they earn the most</span><span>Rewards only ever go to your own address</span><span>Turn it off any time</span></span></button><span class=txsum id=rssum></span></header>
   <div class=rsbody>
     <ul class=bn><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></i><span class=bn-t><b>Compounds your rewards</b><small><b id=rsadd>your rewards</b> more a year</small></span><button class=qm type=button aria-label="More about: Compounds your rewards">?<span class=qm-tip role=tooltip>Twice a day it claims your rewards and stakes them again, so your rewards earn too.</span></button></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 20V10M10 20V6M15 20v-8M20 20V4"/></svg></i><span class=bn-t><b>Into the best-paying validator</b><small>not back onto the same one</small></span><button class=qm type=button aria-label="More about: Into the best-paying validator">?<span class=qm-tip role=tooltip>Rewards go where they earn the most: filled from rank 95 up, like Autopilot, never onto the last 5 of the set.</span></button></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Claims and stakes, nothing else</b><small>no share for GATA, no fees for you</small></span><button class=qm type=button aria-label="More about: Claims and stakes, nothing else">?<span class=qm-tip role=tooltip>One grant lets GATA&#39;s keeper claim your rewards and delegate them. It cannot send, unstake or spend. GATA pays the fees. You can disable it at any time.</span></button></li></ul>
   </div>

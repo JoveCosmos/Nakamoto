@@ -338,7 +338,8 @@ EDGE = int(os.environ.get("KEEPER_EDGE", "5"))      # the last 5 are left out: n
 UP_MIN = float(os.environ.get("KEEPER_UP_MIN", "95"))
 
 def fill(ranked, stake, amount, ok):
-    """the rule's pour: from the smallest up, each to the stake of the validator just above it; answers
+    """the rule's pour: from the smallest up, each to 1 ATONE under the validator just above it (a tie
+    would let the chain's tie-break swap the two, so the gap keeps the order strict); answers
     {op: added}. ranked is largest first; stake(op) the stake as it stands; ok(v) whether v may take any"""
     n = len(ranked); add = {}; left = amount
     # from rank n-EDGE (95 of 100) up to rank n-BOTTOM+1 (67): the last EDGE are left out
@@ -346,7 +347,7 @@ def fill(ranked, stake, amount, ok):
         if left < 1_000_000: break
         v = ranked[i]
         if not ok(v): continue
-        room = (stake(ranked[i - 1]["op"]) - stake(v["op"])) if i > 0 else left
+        room = (stake(ranked[i - 1]["op"]) - stake(v["op"]) - 1_000_000) if i > 0 else left
         x = int(min(left, room))
         if x >= 1_000_000: add[v["op"]] = x; left -= x
     return add
@@ -369,7 +370,7 @@ def plan(g, rows, reds, vals, m, P=None, room=None):
     for r in sorted((r for r in rows if r["free"] > 0 and r["op"] not in bset), key=lambda r: -r["free"]):
         if r["op"] in pos_of:
             i = pos_of[r["op"]]; under = ranked[i + 1]["t"] if i + 1 < n else 0
-            give = min(r["free"], max(0, int(vals[r["op"]]["t"] - under)))
+            give = min(r["free"], max(0, int(vals[r["op"]]["t"] - under - 1_000_000)))   # stays 1 ATONE above
         else:
             give = r["free"]
         if give >= 1_000_000: src.append({"op": r["op"], "give": give, "rate": r["rate"]})

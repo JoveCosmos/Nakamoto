@@ -3012,7 +3012,7 @@ rememberGridH();
     var now = pos.rows.reduce(function(s, r){ return s + r.x * (r.inactive ? 0 : r.rate); }, 0) / pos.total;
     var src = pos.rows.filter(function(r){ return r.x - r.locked > 0 && !bset[r.id]; }).sort(function(a, b){ return b.x - a.x; }).map(function(r){
       var free = r.x - r.locked, give = free;
-      if(at[r.id] != null){ var j = at[r.id], under = j + 1 < n ? V[j + 1][1] : 0; give = Math.min(free, Math.max(0, Math.floor(V[j][1] - under))); }
+      if(at[r.id] != null){ var j = at[r.id], under = j + 1 < n ? V[j + 1][1] : 0; give = Math.min(free, Math.max(0, Math.floor(V[j][1] - under - 1e6))); }
       return { id: r.id, give: give, rate: r.inactive ? 0 : r.rate };
     }).filter(function(x){ return x.give >= 1e6; });
     if(!src.length) return null;
@@ -3028,7 +3028,7 @@ rememberGridH();
       for(var j = n - 1 - EDGE; j > n - 1 - BOTTOM && j >= 0; j--){
         if(left < 1e6) break;
         if(!ok(V[j])) continue;
-        var room = j > 0 ? stake(j - 1) - stake(j) : left, x = Math.floor(Math.min(left, room));
+        var room = j > 0 ? stake(j - 1) - stake(j) - 1e6 : left, x = Math.floor(Math.min(left, room));
         if(x >= 1e6){ add.push({ id: V[j][3], amt: x }); left -= x; }
       }
       var out = [], si = 0, lf = src.map(function(x){ return { id: x.id, give: x.give }; });
