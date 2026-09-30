@@ -39,7 +39,7 @@ SECRET = os.environ.get("KEEPER_SECRET", "")
 GRANTEE = os.environ.get("KEEPER_GRANTEE", "").strip()
 DRY = os.environ.get("KEEPER_DRY", "1") != "0"
 EVERY = int(os.environ.get("KEEPER_EVERY", "21600"))
-MIN_GAIN_APR = float(os.environ.get("KEEPER_MIN_GAIN_APR", "0.005"))     # blended rate must rise this much
+MIN_GAIN_APR = float(os.environ.get("KEEPER_MIN_GAIN_APR", "0.05"))      # the moved stake must earn 5 APR points more (operator, 2026-09-30)
 MIN_GAIN_ATONE = float(os.environ.get("KEEPER_MIN_GAIN_ATONE", "1"))      # and pay at least this per year
 MAX_MOVES_DAY = int(os.environ.get("KEEPER_MAX_MOVES_PER_DAY", "20"))   # the signer takes at most 20 moves a transaction
 MAX_DESTS = int(os.environ.get("KEEPER_MAX_DESTS", "5"))                  # split across at most this many
@@ -125,13 +125,13 @@ def live_vals(stats):
         out[op] = {"op": op, "m": v["description"]["moniker"], "t": float(v["tokens"]),
                    "c": float(v["commission"]["commission_rates"]["rate"]), "jail": st.get("jail") or 0,
                    "tomb": bool(st.get("tomb")), "d90": st.get("d90"), "up": st.get("up"), "rank": None, "known": op in stats}
-    if len(out) < 50: raise ValueError("only %d bonded validators read" % len(out))
+    if len(out) < 0.8 * max(1, len(stats)): raise ValueError("only %d bonded validators read (the collector has %d)" % (len(out), len(stats)))
     return out
 
 # ── strategies: the word the page wrote into the grant's memo ───────────────
 PRESETS = {
     "passive":    {"every": 7 * 86400, "min_apr": 0.015, "min_atone": 5.0, "dests": 2, "d90": 99, "restake_every": 7 * 86400},
-    "moderate":   {"every": 6 * 3600,  "min_apr": 0.005, "min_atone": 1.0, "dests": 5, "d90": 50, "restake_every": 86400},
+    "moderate":   {"every": 12 * 3600, "min_apr": 0.05,  "min_atone": 1.0, "dests": 5, "d90": 50, "restake_every": 86400},
     "aggressive": {"every": 3600,      "min_apr": 0.0025, "min_atone": 0.5, "dests": 8, "d90": 50, "restake_every": 12 * 3600},
     "picks":      {"every": 6 * 3600,  "min_apr": 0.005, "min_atone": 1.0, "dests": 5, "d90": 0, "restake_every": 86400},
 }
@@ -359,7 +359,7 @@ def plan(g, rows, reds, vals, m, P=None, room=None):
         r["free"] = r["x"] - r["locked"]
     total = sum(r["x"] for r in rows)
     if room <= 0 or not total: return None
-    if any(r["locked"] > 0 for r in rows): return None                     # the 21-day rhythm
+    # stake in its 21-day cooldown stays where it is; the free stake is hunted, all of it at once
     now = sum(r["x"] * r["rate"] for r in rows) / total
     ranked = sorted(vals.values(), key=lambda v: -v["t"]); n = len(ranked)
     if not n: return None
@@ -406,8 +406,11 @@ def plan(g, rows, reds, vals, m, P=None, room=None):
     for mv in moves: mv["gain"] = mv["amount"] * (rate_dst[mv["dst"]] - rate_src[mv["src"]]) / 1e6
     gain = sum(mv["gain"] for mv in moves)
     after = now + sum(mv["amount"] * (rate_dst[mv["dst"]] - rate_src[mv["src"]]) for mv in moves) / total
-    if gain < MIN_GAIN_ATONE or after <= now: return None
-    return {"moves": moves, "now": now, "after": after, "total": total, "gain": gain}
+    moved_u = sum(mv["amount"] for mv in moves)
+    lift = sum(mv["amount"] * (rate_dst[mv["dst"]] - rate_src[mv["src"]]) for mv in moves) / moved_u
+    # only a move that earns the moved stake more than MIN_GAIN_APR (5 APR points): otherwise it is already at its best
+    if gain < MIN_GAIN_ATONE or lift <= MIN_GAIN_APR: return None
+    return {"moves": moves, "now": now, "after": after, "total": total, "gain": gain, "lift": lift}
 
 # ── execution ──────────────────────────────────────────────────────────────
 def execute(granter, moves):
@@ -470,6 +473,35 @@ def carry_out(c, g, p, pid, ap, dry, out):
     else:
         f["Error"] = json.dumps(r.get("error"))[:300]
         alert("crit", "Autopilot move failed: " + short(gr), "The approved plan could not be carried out. The keeper tries again in an hour.", f)
+
+def auto_apply(c, g, p, pid, dry, out):
+    """carry out a plan in the run that made it (no operator step since 2026-09-30), then announce it"""
+    gr, now = g["granter"], int(time.time())
+    f = plan_fields(gr, p)
+    if dry:
+        for e in p["moves"]:
+            c.execute("INSERT INTO move VALUES(?,?,?,?,?,?,?,?)", (now, gr, e["src"], e["dst"], int(e["amount"]), e["gain"], None, 1))
+        c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, pid, "auto", None, 1, 1, None, 0)); c.commit()
+        log("DRY auto granter=%s plan=%s" % (gr, pid))
+        return
+    if moves_today(c, gr) + len(p["moves"]) > MAX_MOVES_DAY:
+        r = {"error": "daily move limit (%d) reached" % MAX_MOVES_DAY}
+    else:
+        r = execute(gr, p["moves"])
+    ok = "txhash" in r and "error" not in r
+    if ok:
+        for e in p["moves"]:
+            c.execute("INSERT INTO move VALUES(?,?,?,?,?,?,?,?)", (now, gr, e["src"], e["dst"], int(e["amount"]), e["gain"], r.get("txhash"), 0))
+    c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, pid, "auto", r.get("txhash") if ok else None, 0, 1 if ok else 0,
+              None if ok else json.dumps(r.get("error"))[:300], 0))
+    c.commit(); out["last"] = r
+    log("auto exec granter=%s plan=%s -> %s" % (gr, pid, r))
+    if ok:
+        f["Tx"] = r.get("txhash", "")
+        alert("ok", "Autopilot moved: " + short(gr), "The moves are on chain.", f)
+    else:
+        f["Error"] = json.dumps(r.get("error"))[:300]
+        alert("crit", "Autopilot move failed: " + short(gr), "The next run (in 12 hours) tries again.", f)
 
 def gate(c, g, p, pid, adm, dry):
     """The admin gate for one Autopilot delegator. Nothing moves unless an operator approved exactly this
@@ -589,9 +621,15 @@ def once(c, only=None, live=None, force=False):
                 pid = (rep.get("admin") or {}).get("plan_id")
             hist = c.execute("SELECT at, src, dst, uatone, gain, txhash FROM move WHERE granter=? AND dry=0 ORDER BY at DESC LIMIT 10", (gr,)).fetchall()
             rep["history"] = [{"at": h[0], "src": h[1], "dst": h[2], "uatone": h[3], "gain": h[4], "txhash": h[5]} for h in hist]
-            rep["admin"] = gate(c, g, p, pid, adm, dry)
+            # no approval (operator, 2026-09-30): a plan is carried out in the run that makes it. Hold (the console's
+            # emergency stop) still stops everything for a delegator
+            if due and p and p["moves"] and gr not in adm["paused"]:
+                auto_apply(c, g, p, pid, dry, rep)
+            last = c.execute("SELECT at, plan_id, by, txhash, dry, ok, error FROM applied WHERE granter=? ORDER BY at DESC, rowid DESC LIMIT 1", (gr,)).fetchone()
+            rep["admin"] = {"state": "held" if gr in adm["paused"] else "auto", "plan_id": pid}
+            if last: rep["admin"]["applied"] = {"at": last[0], "plan_id": last[1], "by": last[2], "txhash": last[3], "dry": bool(last[4]), "ok": bool(last[5]), "error": last[6]}
             ad_ = rep["admin"]
-            if ad_.get("state") in ("waiting", "approved") or (ad_.get("applied") or {}).get("at", 0) >= tick0:
+            if (ad_.get("applied") or {}).get("at", 0) >= tick0 and (ad_.get("applied") or {}).get("ok"):
                 claim(rep.get("moves"))
             if rep["admin"].get("applied", {}).get("at", 0) >= int(time.time()) - TICK: acted += 1
             rep["dry"] = dry

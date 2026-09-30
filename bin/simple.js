@@ -437,7 +437,7 @@
       put("sd-alist", '<div class=sv-ph><h3>Validators</h3></div><div class=ap-act><b>Activate Autopilot</b>' +
         '<span>' + (!pos ? 'Connect a wallet, then choose the validators Autopilot may use.' : !pos.rows.length ? 'Stake some ATONE first; Autopilot then keeps it with the better payers.'
           : 'Choose the validators it may use. It keeps your stake with the best of them, monitors them and lists them here.') + '</span>' + go +
-        '<em class=ap-48s>Autopilot activates within 48 hours of your grant.</em></div>');
+        '<em class=ap-48s>Autopilot makes its first move within 12 hours of your grant.</em></div>');
       put("sd-ars", restakePanel(pos, at));
       return;
     }
@@ -1488,10 +1488,10 @@
       if(!window.__ADDR) return ["Connect a wallet", "and see your best move"];
       if(!pos) return ["Reading your stake…", ""];
       if(!pos.rows.length) return ["No stake yet", "stake ATONE to start earning"];
-      if(pos.locked >= 1e6) return ["Cooling down", "free to move on " + (window.__dayFull ? window.__dayFull(pos.until) : "")];
       var pl = planNow(pos);
-      if(pl && pl.gain > 0.5 && pl.after != null) return ["+" + one(pl.gain) + " ATONE a year", "ready to move, 1 signature"];
-      return ["Earning " + pct(pos.rate), "nothing better to move to today"];
+      if(pl && pl.after != null) return ["+" + one(pl.gain) + " ATONE a year", "ready to move, 1 approval"];
+      if(pos.free < 1e6 && pos.locked >= 1e6) return ["Cooling down", "free to move on " + (window.__dayFull ? window.__dayFull(pos.until) : "")];
+      return ["Earning " + pct(pos.rate), "at its best today"];
     }
     if(id === "net"){
       var r = upRows(), last = r[r.length - 1];
@@ -1542,9 +1542,7 @@
           a && window.__REW >= 1e5 ? '<button class=you-cl type=button data-act=claim>Claim</button>' : '') +
       row("For fees", bal ? fmt(bal.uphoton) : '—', "PHOTON") + '</div>';
     var rp = at && at.report, adm = rp && rp.admin, st = adm && adm.state;
-    var asub = !auto ? "your best move, every 21 days"
-      : pos && pos.locked >= 1e6 && window.__dayFull ? "on, next move after " + window.__dayFull(pos.until)
-      : st === "waiting" ? "on, with GATA for a check" : "on, watching your stake";
+    var asub = !auto ? "keeps your stake at the best APR" : "on, checks every 12 hours";
     h += '<div class=you-hf><em>Hands-free</em>' +
       youSwitch("youauto", "Autopilot", auto, asub, !a || !mine) +
       youSwitch("restakesw", "Restake", rs, rs ? "on, rewards staked every 12 hours" : "stakes your rewards every 12 hours", !a || !mine) + '</div>';
@@ -1617,7 +1615,8 @@
         '<div class=mv-hl><b>Stake to start earning</b><span>' + ex + '</span></div>' + mvSet({}, {}) +
         '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=stake>Stake ATONE</button><span>Your ATONE stays yours: staking only delegates it.</span></div>';
     } else {
-      var plan = pos.locked >= 1e6 ? null : planNow(pos), offer = plan && plan.gain > 0.5 && plan.after != null && plan.msgs && plan.msgs.length;
+      var plan = planNow(pos), offer = plan && plan.after != null && plan.msgs && plan.msgs.length;
+      var direct = !!(window.__WALLET && window.__WALLET.signDirect);
       if(offer){
         var fr = {}, to = {}, moved = 0;
         plan.msgs.forEach(function(m){ fr[m.from] = (fr[m.from] || 0) + m.amt; to[m.to] = (to[m.to] || 0) + m.amt; moved += m.amt; });
@@ -1625,15 +1624,17 @@
         var fL = Object.keys(fr).sort(function(x, y){ return fr[y] - fr[x]; }).map(function(id){ src[id] = 1; return { rank: rk(id), name: nm(id), amt: fmt(fr[id]), apr: pct(rate(id)) }; });
         var tL = Object.keys(to).sort(function(x, y){ return to[y] - to[x]; }).map(function(id){ dst[id] = 1; return { rank: rk(id), name: nm(id), amt: '+' + fmt(to[id]), apr: pct(rate(id, to[id])) }; });
         var lock = pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is cooling down until ' + day(pos.until) + ' and stays where it is.</div>' : '';
-        h = top('Your best move today', auto ? 'Autopilot: with GATA for a check' : 'Ready, 1 signature', 'ok') +
+        h = top('Your best move today', auto ? 'Autopilot: within 12 hours' : 'Ready, 1 approval', 'ok') +
           '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.now) + '</i> to <i class=g>' + pct(plan.after) + '</i> APR</span></div>' +
           '<div class=mv-flow><div class=mv-box><em>From, ' + fL.length + ' validator' + (fL.length === 1 ? '' : 's') + '</em>' + mvRows(fL, 'a', 'validators') + '</div>' +
           '<div class=mv-arr aria-hidden=true><svg viewBox="0 0 44 20"><path d="M2 10h38M32 3l8 7-8 7"/></svg></div>' +
           '<div class=mv-box><em>To, ' + tL.length + ' validator' + (tL.length === 1 ? '' : 's') + '</em>' + mvRows(tL, 'g', 'validators') + '</div></div>' +
           lock + mvSet(src, dst) +
-          '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=opt>' + (auto ? 'Or redelegate now yourself' : 'Redelegate ' + fmt(moved) + ' ATONE') + '</button>' +
-          '<span>One signature. Your ATONE stays staked and in your wallet; after the move it cools down for 21 days.</span></div>';
-      } else if(pos.locked >= 1e6){
+          (auto ? '<div class=mv-act><span>Autopilot makes this move on its next run, within 12 hours. Nothing to sign.</span></div>'
+                : '<div class=mv-act><button class="sv-btn go mv-go" type=button data-act=opt>' + (direct ? 'Start Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE') + '</button>' +
+                  '<span>' + (direct ? 'One approval: your stake moves now to where it earns the most, and Autopilot keeps it there, checking every 12 hours.'
+                                     : 'One signature moves it now. Autopilot needs Keplr, which can sign it along with the move.') + '</span></div>');
+      } else if(pos.free < 1e6 && pos.locked >= 1e6){
         var t1 = pos.until || Date.now(), t0 = t1 - 21 * 864e5, k = Math.min(21, Math.max(1, Math.ceil((Date.now() - t0) / 864e5)));
         var cells = ''; for(var i = 1; i <= 21; i++) cells += '<i' + (i <= k ? ' class=on' : '') + '></i>';
         var hist = at && at.report && at.report.history && at.report.history.length ? at.report.history[0] : null;
@@ -1642,12 +1643,12 @@
           '<div class=mv-days><div class=mv-dh><span>Cooling down</span><span>' + day(t0) + ' to ' + day(t1) + '</span></div><div class=mv-dc>' + cells + '</div>' +
           '<small>The chain holds redelegated stake for 21 days. Nothing to do until then.</small></div>' + nowOn() +
           (auto ? '<div class=mv-cyc><div class=done><em>' + (hist ? day(hist.at * 1000) : 'Done') + '</em><b>Moved</b></div><div class=warn><em>Until ' + day(t1) + '</em><b>Cooling down</b></div>' +
-                  '<div><em>' + day(t1) + '</em><b>Next move offered</b></div><div><em>After GATA’s check</em><b>Made for you</b></div></div>'
-                : '<div class=mv-ap><span>On ' + day(t1) + ' your next best move shows here. <b>Autopilot makes it for you</b>, every 21 days, while you sleep.</span>' +
+                  '<div><em>Every 12 hours</em><b>Checked again</b></div><div><em>5 points more</em><b>Moved for you</b></div></div>'
+                : '<div class=mv-ap><span>On ' + day(t1) + ' this stake is free again. <b>Autopilot moves it for you</b> whenever it can earn more, checking every 12 hours.</span>' +
                   '<button class="sv-btn mv-ghost" type=button data-act=youauto>Turn on Autopilot</button></div>');
       } else {
-        h = top('Your stake today', 'Already where it pays most', 'ok') +
-          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>No better place for this stake today. This re-checks every block and shows the move as soon as there is one.</span></div>' +
+        h = top('Your stake today', 'At its best', 'ok') +
+          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>No move earns it 5 APR points more today.' + (auto ? ' Autopilot checks again every 12 hours.' : ' This checks again every block.') + '</span></div>' +
           nowOn() + mvSet({}, {});
       }
     }
@@ -1699,8 +1700,8 @@
     if(!act && t.dataset.gv){ govCard(t.dataset.gv); return; }
     if(act === "opt"){
       /* sign exactly the moves the stage shows */
-      var pl = planNow(window.__POS);
-      if(pl && window.__signMoves) window.__signMoves(pl);
+      var pl = planNow(window.__POS), ai = window.__atInfo ? window.__atInfo() : null;
+      if(pl && window.__signMoves) window.__signMoves(pl, !(ai && ai.grant));
       return;
     }
     if(act === "youauto"){ youAuto(); return; }

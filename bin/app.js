@@ -2292,7 +2292,9 @@ rememberGridH();
     if(lk) lk.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
       '<span>Redelegated stake cannot be redelegated again for <b>21 days</b>, until <b>' + window.__day(until.getTime()) + '</b></span>';
     fee.textContent = "fee: estimating…"; step.textContent = ""; step.className = "txstep";
-    sign.disabled = false; sign.textContent = "Redelegate";
+    sign.disabled = false; sign.textContent = TXAP ? "Start Autopilot" : "Redelegate";
+    var ap = E("txap"); if(ap) ap.hidden = !TXAP;
+    if(TXAP) msgs = txAll();
     POP.open(txpop);
     /* a first pass estimates the fee so the reader sees it before signing; an answer for an
        earlier opening of the card (another plan) is dropped */
@@ -2309,12 +2311,13 @@ rememberGridH();
   /* the flow: the button spins, the notify at the top right spins with it until the
      chain confirms the transaction, then answers green or red; the card closes on green */
   if(txsign) txsign.addEventListener("click", function(){
-    var msgs = txMsgs(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
+    var msgs = txAll(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
     txsign.disabled = true; txsign.classList.add("busy");
-    var n = window.__notify();
-    window.__TX.send(window.__WALLET, msgs, "", function(){})
+    var n = window.__notify(), ap = TXAP;
+    (ap ? window.__TX.sendDirect(window.__WALLET, msgs, "GATA Autopilot", function(){}) : window.__TX.send(window.__WALLET, msgs, "", function(){}))
     .then(function(){
-      n.ok(); POP.close(txpop);
+      n.ok(); POP.close(txpop); TXAP = false;
+      if(ap && window.__atReload) window.__atReload();
       if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); });
     })
     .catch(function(e){ n.fail(e && e.message || String(e)); })
@@ -2695,6 +2698,9 @@ rememberGridH();
     return msgs;
   }
   window.__atMsgs = atMsgs;
+  /* for the one screen's Start Autopilot: the grant alone (null once one stands), and a re-read after it lands */
+  window.__atGrantMsg = function(){ if(AT.grant) return null; var m = atMsgs(); return m.length ? m[0] : null; };
+  window.__atReload = function(){ atGrant().then(function(r){ if(!atKeep(r)) return; atLine(); var ab = E("atbtn"); if(ab) ab.classList.toggle("on", !!AT.grant); if(window.__redraw) window.__redraw(); }); };
   /* the DELEGATE grant stakes rewards back, so its cap is the rewards the period can earn
      (the whole stake at its APR, half again for margin), never the move cap: the chain cannot
      tell rewards from liquid ATONE, and this keeps what it could ever stake to that size */
@@ -2993,10 +2999,10 @@ rememberGridH();
      validator not signing now (under UP_MIN) or tombstoned is passed over; at most 20 moves (move less rather
      than cut); nothing while any of the wallet's stake is cooling down. Answers null or
      { now, after, gain, moves, msgs:[{from,to,amt}] }. */
-  var BOTTOM = 34, EDGE = 5, MAXMOVES = 20, UP_MIN = 95;   /* EDGE: the last 5 are left out, newcomers at the edge of the set */
+  var BOTTOM = 34, EDGE = 5, MAXMOVES = 20, UP_MIN = 95, MIN_LIFT = 0.05;   /* EDGE: the last 5 are left out, newcomers at the edge of the set */
   window.__planRank = function(pos){
     if(!pos || !pos.rows.length || !(pos.total > 0)) return null;
-    if(pos.rows.some(function(r){ return r.locked > 0; })) return null;
+    /* stake in its 21-day cooldown stays where it is; the free stake is hunted, all of it at once */
     var V = window.__VALS().slice().sort(function(a, b){ return b[1] - a[1]; }), n = V.length, VD = window.__VDBY || {};
     if(!n) return null;
     var at = {}, i; for(i = 0; i < n; i++) at[V[i][3]] = i;
@@ -3042,18 +3048,24 @@ rememberGridH();
     var rs = {}; src.forEach(function(x){ rs[x.id] = x.rate; });
     var rd = {}; Object.keys(moved).forEach(function(k){ var v = V[at[k]]; rd[k] = window.__rateAfter(v[1], v[2], moved[k]); });
     var gainU = 0; out.forEach(function(m){ gainU += m.amt * (rd[m.to] - rs[m.from]); });
-    var after = now + gainU / pos.total, gain = gainU / 1e6;
-    if(gain < 1 || !(after > now)) return null;
-    return { now: now, after: after, gain: gain, moves: out.length, msgs: out,
+    var after = now + gainU / pos.total, gain = gainU / 1e6, movedU = out.reduce(function(s, m){ return s + m.amt; }, 0), lift = gainU / movedU;
+    /* only a move that earns the moved stake more than 5 APR points (operator, 2026-09-30): otherwise it is at its best */
+    if(gain < 1 || !(lift > MIN_LIFT)) return null;
+    return { now: now, after: after, gain: gain, lift: lift, moves: out.length, msgs: out,
              picks: Object.keys(moved).map(function(k){ return { id: k, m: V[at[k]][0], x: moved[k] }; }) };
   };
   /* sign exactly these moves (the one screen's offer): the signing card lists them and prices them itself */
-  window.__signMoves = function(plan){
+  /* withAuto: the one screen's Start Autopilot - the same moves plus the Autopilot grant, in ONE approval
+     (direct signing carries the grant); the card says so and its button reads Start Autopilot */
+  var TXAP = false;
+  window.__signMoves = function(plan, withAuto){
     if(!plan || !plan.msgs || !plan.msgs.length || !window.__goSign) return;
     MSGS = plan.msgs.map(function(m){ return { from: m.from, to: m.to, amt: m.amt }; });
     window.__ANS = { now: plan.now, after: plan.after, gain: plan.gain };
+    TXAP = !!withAuto && !!window.__atGrantMsg && !!window.__atGrantMsg() && !!(window.__WALLET && window.__WALLET.signDirect);
     window.__goSign();
   };
+  function txAll(){ var m = txMsgs(); if(TXAP){ var g = window.__atGrantMsg(); if(g) m = m.concat([g]); } return m; }
   window.__optPlan = function(apply){
     var pos = window.__POS, B = pos ? pos.free : 0, k;
     window.__SRCFIRST = null;

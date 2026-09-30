@@ -4,7 +4,7 @@
 Every GRANT_SECONDS (120) it reads all authz grants to the Autopilot address (GRANTEE) and
 keeps a ledger per delegator (STATE_DIR/grants-<net>.json) that the admin console reads:
 
-    new        a grant arrived (the first 24 hours)          -> Discord: new grant (decide within 48 hours)
+    new        a grant arrived (the first 24 hours)          -> Discord: new grant (no approval: the keeper acts on its next run)
     active     standing, settled                              (a renewal or new terms -> Discord)
     expiring   standing, ends within 7 days                   -> Discord at 7 days and at 1 day
     expired    gone at or after its expiry                    -> Discord
@@ -153,9 +153,9 @@ def step(L, allg, now=None):
                      "status": "new", "grant": g, "cap0": g.get("cap"), "warned": [], "paused": (e or {}).get("paused", False),
                      "history": ((e or {}).get("history") or [])[-20:] + [{"at": now, "what": "granted"}]}
             if not first:
-                ev.append(("info", "New Autopilot grant: " + short(gr), "An operator decides within 48 hours in the admin console. The keeper's plan follows within a minute.", {
+                ev.append(("info", "New Autopilot grant: " + short(gr), "Autopilot runs every 12 hours with no approval step: the first move, if one earns 5 APR points more, is made on its next run.", {
                     "Delegator": gr, "Cap": cap(g), "Validators": str(len(g["allow"])) if g.get("allow") else "any, the rule picks",
-                    "Restake": "on" if gr in on else "off", "Decide by": when((made or now) + 48 * 3600)}))
+                    "Restake": "on" if gr in on else "off"}))
             continue
         old = e["grant"]
         if terms(old) != terms(g) or (g.get("cap") or 0) > (old.get("cap") or 0):

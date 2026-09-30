@@ -5519,6 +5519,8 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   .mv-set{flex:1 1 0;min-height:0}
   .mv-bars{min-height:0}
 }
+.txap{margin:0 0 10px;padding:10px 12px;border-radius:10px;background:rgba(43,200,189,.10);font-size:12.5px;line-height:1.45;color:var(--wt)}
+.txap b{color:var(--wcyan);font-weight:600}
 /* Autopilot has no choices left (no cap, no validator list): the card is what it does, and Grant / Revoke */
 #atpop .atview,#atpop #atR,#atpop #atform{display:none!important}
 #atpop .atbody{grid-template-columns:minmax(0,1fr)!important}
@@ -6000,6 +6002,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 <div class=pop id=txpop><div class="card txcard">
   <header class=wk-txh><div><b>Redelegate</b><span id=txn hidden></span></div><span class=txlockn id=txlockn></span><span class=txsum id=txsum></span></header>
   <div class=txans id=txans></div>
+  <div class=txap id=txap hidden><b>And Autopilot starts:</b> every 12 hours it moves your stake again whenever that earns 5 APR points more. It can only redelegate: never send, unstake or spend.</div>
   <div class=txlist id=txlist></div>
   <div class=txlock id=txlock></div>
   <div class=txfee id=txfee></div>
@@ -6064,11 +6067,11 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
           <span class=unhint id=athint></span></div>
       </div>
       <div class=atwhat id=atwhat>
-        <div><b>Your best move, made for you</b><span>Every 21 days, once your last move has cooled down, it moves your stake to the validators that pay the most.</span></div>
-        <div><b>Checked before it moves</b><span>GATA looks at every move, then the keeper makes it with one transaction. You sign once, today.</span></div>
+        <div><b>Your best move, made for you</b><span>Every 12 hours it looks at your stake, and moves it to the validators that pay the most whenever that earns 5 APR points more.</span></div>
+        <div><b>One approval, today</b><span>You approve once. Stake that has just moved rests 21 days, as the chain requires, then Autopilot looks at it again.</span></div>
         <div><b>Only redelegation</b><span>It cannot send, unstake or spend your ATONE. Your stake stays staked, in your wallet.</span></div>
       </div>
-      <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your first move is offered within <b>48 hours</b> of your grant, or when your stake's cooldown ends.</span></div>
+      <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your first move is made within <b>12 hours</b> of your grant, or once your stake's cooldown ends.</span></div>
     </section>
     <section class=atR id=atR aria-label="Select your validators">
       <div class=atrs><input class=atfind id=atfind type=search placeholder="Find by name or operator key" aria-label="Find a validator" autocomplete=off spellcheck=false><span class=wk-seln id=atcount aria-live=polite></span></div>

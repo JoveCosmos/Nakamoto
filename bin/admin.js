@@ -63,7 +63,8 @@
 
   /* where each delegator stands with the operators: the keeper writes it into its report (admin block) */
   function stOf(e){ var ad = (e.report || {}).admin; return ["new", "active", "expiring"].indexOf(e.status) < 0 ? "ended" : ad ? ad.state : "planning"; }
-  var GROUPS = { waiting: ["waiting", "planning"], live: ["managed", "approved", "waiting", "planning", "held"], held: ["held"], ended: ["ended"] };
+  /* since 2026-09-30 Autopilot runs by itself every 12 hours (no approval): the console watches it, and Hold is its emergency stop */
+  var GROUPS = { live: ["auto", "managed", "approved", "waiting", "planning"], held: ["held"], ended: ["ended"] };
   var OPEN = {};
   function left(ad){ if(!ad || !ad.deadline) return null; return ad.deadline - Date.now() / 1000; }
   function dur(s){ s = Math.abs(s); var h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return h >= 24 ? Math.floor(h / 24) + "d " + (h % 24) + "h" : h + "h " + m + "m"; }
@@ -74,7 +75,7 @@
   function planLine(r){ var mv = r.moves || [];
     return mv.length ? mv.length + ' move' + (mv.length === 1 ? '' : 's') + ', +' + (r.gain || 0).toFixed(1) + ' ATONE a year<div class=sub>APR ' + pct(r.now) + ' to ' + pct(r.after) + '</div>'
                      : 'no move<div class=sub>the stake already sits well</div>'; }
-  var SLAB = { waiting: "waiting", planning: "planning", managed: "managed", approved: "approved", held: "held", ended: "ended" };
+  var SLAB = { auto: "running", waiting: "running", planning: "planning", managed: "running", approved: "running", held: "held", ended: "ended" };
   function review(e){
     var r = e.report || {}, ad = r.admin || {}, g = e.grant || {}, mv = r.moves || [], st = stOf(e);
     var can = st !== "ended";
@@ -84,15 +85,14 @@
          '<div><em>Grant made</em><b>' + day(ad.made || e.made) + '</b></div><div><em>Plan</em><b class=mono>' + esc(ad.plan_id || "none") + '</b></div></div>';
     h += mv.length ? '<table class=plan><thead><tr><th>From</th><th>To</th><th class=r>ATONE</th><th class=r>Gain a year</th></tr></thead><tbody>' + mv.map(function(m){
         return '<tr><td>' + vn(m.src) + '</td><td>' + vn(m.dst) + '</td><td class="n r">' + (m.uatone / 1e6).toLocaleString(undefined, { maximumFractionDigits: 1 }) + '</td><td class="n r">+' + (m.gain || 0).toFixed(2) + '</td></tr>'; }).join("") +
-        '</tbody></table><div class=sub>Blended APR ' + pct(r.now) + ' now, ' + pct(r.after) + ' after. ' + (r.dry === false ? 'Yes signs these moves; No moves nothing and you settle it by hand.' : 'Dry run: Yes records them and signs nothing.') + '</div>'
-      : '<div class=empty>Nothing to move now' + (r.checked ? ' (checked ' + ago(r.checked) + ')' : '') + ': the stake is cooling down or already in place. No clears it.</div>';
+        '</tbody></table><div class=sub>Blended APR ' + pct(r.now) + ' now, ' + pct(r.after) + ' after. The keeper makes these moves in the run that plans them' + (r.dry === false ? '' : ' (dry run: recorded, not signed)') + '. Hold stops it.</div>'
+      : '<div class=empty>Nothing to move' + (r.checked ? ' (checked ' + ago(r.checked) + ')' : '') + ': the stake is cooling down, or no move earns it 5 APR points more.</div>';
     if(ad.applied) h += '<div class=sub>Last applied ' + ago(ad.applied.at) + (ad.applied.by ? ' by ' + esc(short(ad.applied.by)) : '') + (ad.applied.dry ? ', dry run' : ad.applied.ok ? ', tx ' + esc((ad.applied.txhash || "").slice(0, 12)) : ', FAILED: ' + esc(ad.applied.error || "")) + '</div>';
     var decs = (ad.decisions || []).slice().reverse();
     if(decs.length) h += '<div class=hist>' + decs.map(function(d){ return '<div><b>' + esc(d.action) + '</b> ' + esc(short(d.by)) + ' <span class=sub>' + ago(d.at) + '</span>' + (d.note ? '<div class=sub>' + esc(d.note) + '</div>' : '') + '</div>'; }).join("") + '</div>';
     if(can) h += '<div class=acts>' +
       (st === "held" ? '<button class="btn pri" type=button data-do=resume data-g="' + esc(e.granter) + '">Resume</button>'
-        : (mv.length ? '<button class="btn pri" type=button data-do=apply data-g="' + esc(e.granter) + '" data-pid="' + esc(ad.plan_id || "") + '"' + (st === "approved" ? ' disabled' : '') + '>' + (st === "approved" ? 'Yes, carrying out' : 'Yes') + '</button>' : '') +
-          '<button class=btn type=button data-do=nomove data-g="' + esc(e.granter) + '">No</button>') + '</div>';
+        : '<button class=btn type=button data-do=hold data-g="' + esc(e.granter) + '">Hold</button>') + '</div>';
     return h + '</div>';
   }
   function draw(){
@@ -104,14 +104,13 @@
     function ro(label, v, meta, col, cls){ return '<div class=ro style="--rc:' + col + '"><em>' + label + '</em><b' + (cls ? ' class=' + cls : '') + '>' + v + '</b><small>' + (meta || "&nbsp;") + '</small></div>'; }
     E("strip").innerHTML =
       ro("Autopilot address", L.grantee ? short(L.grantee) : "N/A", L.grantee ? (k.dry === false ? "live" : "dry run") : "not set yet", "var(--violet)", "addrv") +
-      ro("Waiting", wait.length, soonest != null ? (soonest <= 0 ? "one is overdue" : "next due in " + dur(soonest)) : "nothing to decide", "var(--amber)") +
-      ro("Overdue", over.length, "48 hours passed", "var(--red)") +
-      ro("Managed", by("managed").length + by("approved").length, "decided, the keeper follows", "var(--green)") +
-      ro("On hold", by("held").length, "clock and keeper stopped", "var(--f)") +
+      ro("Running", all.filter(function(e){ return GROUPS.live.indexOf(stOf(e)) >= 0; }).length, "moves by itself every 12 hours", "var(--green)") +
+      ro("On hold", by("held").length, "stopped by an operator", "var(--f)") +
       ro("Restake", Object.keys(L.restake || {}).length, "wallets restaking, no admin step", "var(--teal)") +
       ro("Signer PHOTON", k.photon != null ? (k.photon / 1e6).toLocaleString(undefined, { maximumFractionDigits: 1 }) : "N/A", "pays every fee", "var(--teal)");
     E("checked").textContent = L.checked ? "ledger checked " + ago(L.checked) : "";
-    E("tabs").innerHTML = [["waiting", "Waiting"], ["live", "Standing"], ["held", "On hold"], ["ended", "Ended"]].map(function(t){
+    if(!GROUPS[TAB]) TAB = "live";
+    E("tabs").innerHTML = [["live", "Running"], ["held", "On hold"], ["ended", "Ended"]].map(function(t){
       var cnt = all.filter(function(e){ return GROUPS[t[0]].indexOf(stOf(e)) >= 0; }).length;
       return '<button class=tab type=button data-tab=' + t[0] + ' aria-pressed=' + (TAB === t[0]) + '>' + t[1] + '<i>' + cnt + '</i></button>'; }).join("");
     var rows = all.filter(function(e){ return GROUPS[TAB].indexOf(stOf(e)) >= 0; })
