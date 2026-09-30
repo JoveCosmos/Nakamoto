@@ -392,3 +392,5 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
      a translucent ink shade with the page visible behind, and the card a touch off-white, lifted by its shadow */
   html[data-theme=light]:not([data-mono]) .pop:not(#z){background:rgba(28,30,34,.42);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
   html[data-theme=light]:not([data-mono]) .pop .card:not(#z){background:#F7F4ED;border-color:#D9D3C6;box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 28px 70px -18px rgba(20,22,26,.55)}
+  html[data-theme=light]:not([data-mono]) .you-tag{border-color:var(--line-strong);color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .you-tag.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}

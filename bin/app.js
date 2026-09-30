@@ -70,6 +70,45 @@ var POP = (function(){
   return { open: open, close: close, closeAll: closeAll, top: top };
 })();
 window.__POP = POP;
+
+/* Pro on a wide screen (operator, 2026-09-30): Stake, Unstake and Claim open no card - the card's list loads in the
+   main pane where Redelegate's is, and its figures and button in Outcome. The very same elements are moved there
+   and put back, so every handler, state and fee estimate stays the card's own. The phone keeps the cards. */
+var DOCK = null;
+var DOCK_PARTS = {
+  stpop: { mode: "stake",   title: "Stake",         list: [".sttop", "#stlist"],  out: ["#stsum", "#stlock", "#stfee", "#ststep", ".txbtns"] },
+  unpop: { mode: "unstake", title: "Unstake",       list: [".unamt", "#unpick"],  out: ["#unsum", "#unlock", "#unfee", "#unstep", ".txbtns"] },
+  clpop: { mode: "claim",   title: "Claim rewards", list: ["#clpick"],            out: ["#clsum", "#clfee", "#clstep", ".txbtns"] }
+};
+function proWide(){ return document.documentElement.getAttribute("data-sv") === "dashboard/self" && matchMedia("(min-width:1100px)").matches; }
+function undock(){
+  if(!DOCK) return;
+  for(var i = DOCK.moved.length - 1; i >= 0; i--){ var m = DOCK.moved[i]; m.parent.insertBefore(m.el, m.next); }
+  var L = document.getElementById("prolist"), O = document.getElementById("proout");
+  if(L) L.hidden = true; if(O) O.hidden = true;
+  var h = document.querySelector("#wk-plan>.wk-ph h3"); if(h) h.textContent = "Redelegate";
+  document.documentElement.removeAttribute("data-pro");
+  var p = DOCK.pop; DOCK = null;
+  if(p.__onclose) p.__onclose();
+}
+function dock(pop){
+  var P = DOCK_PARTS[pop.id], card = pop.querySelector(".card"), L = document.getElementById("prolist"), O = document.getElementById("proout");
+  if(!P || !card || !L || !O){ POP.open(pop); return; }
+  undock();
+  var moved = [];
+  function mv(sel, to){ var el = card.querySelector(sel); if(!el) return; moved.push({ el: el, parent: el.parentNode, next: el.nextSibling }); to.appendChild(el); }
+  P.list.forEach(function(s){ mv(s, L); }); P.out.forEach(function(s){ mv(s, O); });
+  /* the card's own classes ride along, so its parts keep the card's styling */
+  L.className = O.className = "pro-dock " + card.className.replace(/\bcard\b/, "");
+  L.hidden = O.hidden = false;
+  var h = document.querySelector("#wk-plan>.wk-ph h3"); if(h) h.textContent = P.title;
+  document.documentElement.setAttribute("data-pro", P.mode);
+  DOCK = { pop: pop, moved: moved };
+}
+window.__openCard = function(pop){ if(!pop) return; if(proWide()) dock(pop); else POP.open(pop); };
+window.__closeCard = function(pop){ if(DOCK && DOCK.pop === pop) undock(); else POP.close(pop); };
+window.__undock = undock;
+window.__undockIfNarrow = function(){ if(DOCK && !proWide()) undock(); };
 /* the node's RPC, proxied on this host (nginx: /rpc/status, /rpc/block) so the
    page never has to cross origins for a height */
 /* every chain string that reaches innerHTML or an attribute goes through this */
@@ -2397,18 +2436,18 @@ rememberGridH();
     if(!unpop || !window.__POS) return;
     var a = E("unamt"); if(a) a.value = "";
     var go = E("unsign"); if(go){ go.disabled = true; go.textContent = "Unstake"; }
-    unRows(); unState(); POP.open(unpop); if(a) a.focus();
+    unRows(); unState(); window.__openCard(unpop); if(a) a.focus();
   });
   window.__unstakeFrom = function(id){
     if(!unpop || !window.__POS) return;
     UNSEL = id; var a = E("unamt"); if(a) a.value = "";
     var go = E("unsign"); if(go){ go.disabled = true; go.textContent = "Unstake"; }
-    unRows(); unState(); POP.open(unpop); if(a) a.focus();
+    unRows(); unState(); window.__openCard(unpop); if(a) a.focus();
   };
   var unamtEl = E("unamt"); if(unamtEl) unamtEl.addEventListener("input", unState);
   var unmax = E("unmax"); if(unmax) unmax.addEventListener("click", function(){ var r = unRow(); if(!r) return; E("unamt").value = exact(r.x); unState(); });
   if(unpop) unpop.__onclose = function(){ feeSoon("un"); };
-  var uncancel = E("uncancel"); if(uncancel) uncancel.addEventListener("click", function(){ POP.close(unpop); });
+  var uncancel = E("uncancel"); if(uncancel) uncancel.addEventListener("click", function(){ window.__closeCard(unpop); });
   var unsign = E("unsign");
   if(unsign) unsign.addEventListener("click", function(){
     var msgs = unMsgs(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
@@ -2416,7 +2455,7 @@ rememberGridH();
     var n = window.__notify();
     window.__TX.send(window.__WALLET, msgs, "", function(){})
     .then(function(){
-      n.ok(); POP.close(unpop);
+      n.ok(); window.__closeCard(unpop);
       if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); });
     })
     .catch(function(e){ n.fail(e && e.message || String(e)); })
@@ -2463,10 +2502,11 @@ rememberGridH();
     CLSEL = {}; rows.forEach(function(r){ CLSEL[r.id] = 1; });
     var go = E("clsign"); if(go) go.textContent = "Claim";
     E("clfee").textContent = "";
-    clDraw(); POP.open(clpop);
+    clDraw(); window.__openCard(clpop);
   };
   if(clpop) clpop.__onclose = function(){ feeSoon("cl"); };
   var clbtn = E("clbtn"); if(clbtn) clbtn.addEventListener("click", function(){ window.__claim(); });
+  var rdbtn = E("rdbtn"); if(rdbtn) rdbtn.addEventListener("click", function(){ window.__undock(); });
   var rewt = E("ds-rewt");
   if(rewt){ rewt.addEventListener("click", function(){ window.__claim(); });
     rewt.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); window.__claim(); } }); }
@@ -2477,7 +2517,7 @@ rememberGridH();
     var n = window.__notify();
     window.__TX.send(window.__WALLET, msgs, "", function(){})
     .then(function(){
-      n.ok(); POP.close(clpop);
+      n.ok(); window.__closeCard(clpop);
       if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); });
     })
     .catch(function(e){ n.fail(e && e.message || String(e)); })
@@ -2550,7 +2590,7 @@ rememberGridH();
     if(!stpop || !window.__POS) return;
     STSEL = {}; var a = E("stamt"); if(a) a.value = "";
     var go = E("stsign"); if(go){ go.disabled = true; go.textContent = "Stake"; }
-    stRows(); stState(); POP.open(stpop); if(a) a.focus();
+    stRows(); stState(); window.__openCard(stpop); if(a) a.focus();
   });
   var stamtEl = E("stamt"); if(stamtEl) stamtEl.addEventListener("input", function(){ stRows(); stState(); });
   var stmax = E("stmax"); if(stmax) stmax.addEventListener("click", function(){ if(!(stBal() > 0)) return; E("stamt").value = exact(stBal()); stRows(); stState(); });
@@ -2562,7 +2602,7 @@ rememberGridH();
     var n = window.__notify();
     window.__TX.send(window.__WALLET, msgs, "", function(){})
     .then(function(){
-      n.ok(); POP.close(stpop);
+      n.ok(); window.__closeCard(stpop);
       if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); });
     })
     .catch(function(e){ n.fail(e && e.message || String(e)); })

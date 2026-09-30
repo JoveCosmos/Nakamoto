@@ -5424,6 +5424,10 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .you-sw{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--wbd);border-radius:11px;background:var(--wi)}
 .you-swt{flex:1 1 auto;display:flex;flex-direction:column;gap:1px;min-width:0}
 .you-swt b{font-size:14px;font-weight:600;color:var(--wt)}
+.you-swt>b{display:flex;align-items:center;gap:7px}
+.you-tag{font-style:normal;font-family:var(--wmono);font-size:9px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;line-height:1;
+  padding:3px 6px;border-radius:999px;border:1px solid var(--wbd2);color:var(--wf)}
+.you-tag.on{border-color:var(--sv-teal);color:var(--sv-teal);background:rgba(43,200,189,.10)}
 .you-swt small{font-size:11.5px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* Hands-free: one ? for both services' rules (operator, 2026-09-30); the column clips, so the tip opens up and left */
 .you-hfh{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -5747,6 +5751,61 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #one #p-pays .ptab th:nth-child(3){width:78px}
   #one #p-pays .ptab td.nm span{max-width:calc(100% - 26px)}
 }
+/* ════ PRO AS A WORKSPACE (operator, 2026-09-30): on a wide screen the wallet column holds your delegations and
+   the menu - Redelegate, Stake, Unstake, Claim; the main pane loads the chosen action's list and Outcome its figures
+   and button (app.js dock()). The hands-free switches stay on the other paths. ════ */
+#rdbtn{display:none}
+@media(min-width:1100px){
+  html[data-sv="dashboard/self"] #rdbtn:not(#z){display:inline-flex}
+  #one #p-dele .wk-two.wk-two:not(#z){grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+  #one #p-dele #wk-plan.wk-pane:not(#z){grid-column:1;grid-row:1}
+  #one #p-dele #wk-mv.wk-pane:not(#z){grid-column:2;grid-row:1}
+  /* the Delegations pane inside the wallet column */
+  #you .you-dele{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;border-top:1px solid var(--wbd);padding-top:12px}
+  #you #wk-mine.wk-pane:not(#z){flex:1 1 auto;min-height:0;display:flex;flex-direction:column;border:0;border-radius:0;background:none;box-shadow:none;padding:0;overflow:hidden}
+  #you #wk-acct{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+  /* the menu, 2 by 2, above your delegations; the pane's title after it */
+  #you #wk-mine .wk-t1.wk-ph:not(#z){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;height:auto;max-height:none;margin:0 0 12px;padding:0}
+  #you #wk-mine .wk-t1::after{display:none}
+  #you #wk-mine .wk-t1 .wk-unb:not(#z){order:0;display:inline-flex;align-items:center;justify-content:center;width:auto;height:32px;margin:0;padding:0 8px;
+    border-radius:9px;border:1px solid var(--wbd2);background:transparent;color:var(--wt);font:600 12.5px var(--wsans);letter-spacing:0;text-transform:none;box-shadow:none}
+  #you #wk-mine .wk-t1 .wk-unb:not(#z):hover{border-color:var(--wcyan);color:var(--wcyan)}
+  #you #wk-mine .wk-t1 .wk-unb[hidden]{display:inline-flex!important;opacity:.4;pointer-events:none}
+  #you #wk-mine .wk-t1 h3:not(#z){order:5;grid-column:1/-1;margin:10px 0 0;font:700 14px/1.2 var(--wsans);color:var(--wt)}
+  #you #wk-mine .wk-t1 .wk-pn,#you #wk-mine .wk-t1 .wk-foot{display:none}
+  #you .wk-tbl2 th:not(#z){height:24px;padding:0 5px;border:0;border-bottom:1px solid var(--wbd);background:none;box-shadow:none;font-family:var(--wmono);font-size:9px;letter-spacing:.1em;color:var(--wf)}
+  #you .wk-tbl2 thead:not(#z),#you .wk-tbl2 thead tr:not(#z){border:0;background:none;box-shadow:none;outline:0}
+  #you .wk-tbl2 td:not(#z){padding:0 5px;border-bottom:1px solid var(--wbd)}
+  #you .wk-tbl2 td.nm:not(#z){font-family:var(--wsans);font-weight:500;color:var(--wt)}
+  #you #dmy:not(#z){flex:1 1 auto;min-height:0;overflow-y:auto}
+  #you #dmy col:nth-child(5),#you #dmy th:nth-child(5),#you #dmy td:nth-child(5){display:none}
+  #you #dmy col:nth-child(1){width:30px!important}
+  #you #dmy col:nth-child(3){width:78px!important}
+  #you #dmy col:nth-child(4){width:56px!important}
+  #you #dmy td.nm:not(#z){font-size:12.5px}
+  /* the menu shows where you are */
+  html[data-sv="dashboard/self"]:not([data-pro]) #you #wk-mine .wk-t1 #rdbtn:not(#z),html[data-pro=stake] #you #wk-mine .wk-t1 #stbtn:not(#z),
+  html[data-pro=unstake] #you #wk-mine .wk-t1 #unbtn:not(#z),html[data-pro=claim] #you #wk-mine .wk-t1 #clbtn:not(#z){background:var(--wcyan);border-color:var(--wcyan);color:var(--wc)}
+  /* an action docked: the Redelegate list and its outcome step aside for the action's own parts */
+  html[data-pro] #wk-plan>.wk-ph>:not(h3){display:none!important}
+  html[data-pro] #wk-plan>#dpicks{display:none}
+  html[data-pro] #wk-mv>:not(.wk-ph):not(#proout){display:none!important}
+  html[data-pro] #wk-mv #dmvn{display:none}
+  #one .pro-dock:not(#z){width:auto;max-width:none;height:auto;max-height:none;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;animation:none;transform:none}
+  #one #prolist:not(#z){flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+  #one #proout:not(#z){flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+  #one #proout .txsum:not(#z){margin:0;text-align:left;font-size:12px}
+  #one #proout .txbtns:not(#z){margin-top:auto;padding:0;border:0;justify-content:stretch}
+  #one #proout .txbtns .wk-btn.wk-go:not(#z){flex:1 1 auto;height:46px;border-radius:12px;border:1px solid var(--wcyan);background:var(--wcyan);color:var(--wc);
+    font:600 15px var(--wsans);letter-spacing:0;text-transform:none}
+  #one #proout .txbtns .wk-btn.wk-go:disabled:not(#z){border-color:var(--wbd2);background:transparent;color:var(--wf)}
+  #one #proout .txbtns #uncancel{display:none}
+  /* the card's lists were sized for a card: here they take the pane's height */
+  #one #prolist .unpick:not(#z),#one #prolist .stlist:not(#z){flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto}
+  #one #proout .txlock:not(#z){display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;font:400 12.5px/1.45 var(--wsans);letter-spacing:0}
+  #one #proout .txlock svg:not(#z){flex:0 0 auto;width:15px;height:15px;margin-top:2px}
+  #one #proout .txlock:empty,#one #proout .txfee:empty,#one #proout .txstep:empty{display:none}
+}
 /* ════ FOLDING THE SIDES (operator, 2026-09-30): the wallet column and the paths rail each fold on a click, for
    the room governance and Pro need; both are open on every load. The wallet column folds away (the header keeps the
    wallet), the rail folds to its icons. The handles sit in the gutters, halfway down. ════ */
@@ -6022,9 +6081,10 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
           <div class=wk-ap id=wkap hidden><span class=wk-apk>Autopilot</span><span class=wk-aps id=wkaps>inactive</span><button class=wk-apb id=atbtn type=button title="Let GATA keep this stake where it earns most, inside limits you set">Set up</button></div>
           <header class="wk-ph wk-t1"><h3>Delegations</h3><span class=wk-pn id=dmyn></span>
             <div class=wk-foot id=dstat></div>
+            <button class="wk-unb wk-rdb" id=rdbtn type=button title="Move stake between validators">Redelegate</button>
             <button class="wk-unb wk-stb" id=stbtn type=button hidden title="Stake liquid ATONE">Stake</button>
             <button class=wk-unb id=unbtn type=button hidden title="Unstake from a validator">Unstake</button>
-            <button class="wk-unb wk-clb" id=clbtn type=button hidden title="Claim your staking rewards">Rewards</button></header>
+            <button class="wk-unb wk-clb" id=clbtn type=button hidden title="Claim your staking rewards">Claim</button></header>
           <div class=wk-tbl2 id=dmy></div>
           <footer class=wk-pf><nav class=wk-pg id=dmypg></nav></footer>
           </div>
@@ -6035,6 +6095,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
             <span class=wk-ago id=dago title="the numbers follow every block tick; refresh re-reads your position">&mdash;</span>
             <span class=wk-lockn id=dlockn hidden></span></header>
           <div class=wk-tbl2 id=dpicks></div>
+          <div class=pro-dock id=prolist hidden></div>
         </section>
         <section class=wk-pane id=wk-mv>
           <header class="wk-ph wk-mvh wk-t3" id=dmvh><h3>Outcome</h3><span class=wk-pn id=dmvn></span></header>
@@ -6042,6 +6103,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
           <div class=wk-moves id=dstrat></div>
           <div class=wk-mvempty id=dmvempty>Select validators and enter a stake</div>
           <button class="wk-btn wk-go" id=dgo type=button disabled>Redelegate</button>
+          <div class=pro-dock id=proout hidden></div>
         </section>
       </div>
     </div>

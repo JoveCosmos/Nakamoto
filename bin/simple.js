@@ -1523,7 +1523,7 @@
     }).join(""));
   }
   function youSwitch(act, name, on, sub, dis){
-    return '<div class=you-sw><div class=you-swt><b>' + name + '</b><small>' + sub + '</small></div>' +
+    return '<div class=you-sw><div class=you-swt><b>' + name + '<i class="you-tag' + (on ? ' on' : '') + '">' + (on ? 'Active' : 'Inactive') + '</i></b><small>' + sub + '</small></div>' +
       '<button class="you-tg' + (on ? ' on' : '') + '" type=button role=switch aria-checked=' + (on ? 'true' : 'false') + ' aria-label="' + name + '"' +
       (dis ? ' disabled aria-disabled=true tabindex=-1' : ' data-act=' + act) + '><i></i></button></div>';
   }
@@ -1542,6 +1542,18 @@
       row("For fees", bal ? fmt(bal.uphoton) : '—', "PHOTON") + '</div>';
     var rp = at && at.report, adm = rp && rp.admin, st = adm && adm.state;
     var asub = !auto ? "keeps your stake at the best APR" : "on, checks every 12 hours";
+    /* Pro on a wide screen (operator, 2026-09-30): the wallet column holds your delegations and the action menu
+       (Redelegate, Stake, Unstake, Claim) in place of the hands-free switches - the Delegations pane itself moves in */
+    var proW = root.getAttribute("data-sv") === "dashboard/self" && matchMedia("(min-width:1100px)").matches;
+    var mineEl = E("wk-mine"), home = function(){ if(mineEl && MINE_HOME && youEl0 && youEl0.contains(mineEl)) MINE_HOME.insertBefore(mineEl, E("wk-plan")); };
+    if(proW){
+      var hh = h + '<div class=you-dele id=youdele></div>', slot0 = E("youdele");
+      /* unchanged: leave the pane where it is (moving it would reset its list's scroll) */
+      if(LASTH["you"] === hh && slot0 && mineEl && slot0.contains(mineEl)) return;
+      home(); put("you", hh); var slot = E("youdele"); if(slot && mineEl) slot.appendChild(mineEl);
+      return;
+    }
+    home();
     h += '<div class=you-hf><div class=you-hfh><em>Hands-free</em><button class=qm type=button aria-label="How Autopilot and Restake work">?<span class=qm-tip role=tooltip>' +
       '<b>Autopilot</b><span>Runs every 12 hours</span><span>Redelegates stake when inactive or for a minimum 5% APR gain</span><span>Turn it off anytime</span>' +
       '<b>Restake</b><span>Runs every 12 hours</span><span>Minimum 1 ATONE</span><span>Turn it off anytime</span></span></button></div>' +
@@ -1549,7 +1561,8 @@
       youSwitch("restakesw", "Restake", rs, rs ? "on, rewards staked every 12 hours" : "stakes your rewards every 12 hours", !a || !mine) + '</div>';
     put("you", h);
   }
-  function drawOne(){ if(E("you")) drawYou(); if(E("paths")) drawPaths(); }
+  var youEl0 = E("you"), MINE_HOME = E("wk-mine") ? E("wk-mine").parentNode : null;
+  function drawOne(){ if(window.__undockIfNarrow) window.__undockIfNarrow(); if(E("you")) drawYou(); if(E("paths")) drawPaths(); }
   /* Restake has its own card (operator, 2026-09-30): what it does in three lines, the detail behind each ?, and
      Enable or Disable - never a signature straight from the switch */
   function rsOpen(){
@@ -1802,7 +1815,7 @@
     if(b && window.__shellGo) window.__shellGo(b.getAttribute("data-route"));
   });
   /* a route change moves the lit path: the shell stamps the section and view on <html> */
-  new MutationObserver(function(){ if(E("paths")) drawPaths(); }).observe(root, { attributes: true, attributeFilter: ["data-sec", "data-sv"] });
+  new MutationObserver(function(){ drawOne(); }).observe(root, { attributes: true, attributeFilter: ["data-sec", "data-sv"] });
   var mstrip = E("sd-mstrip"); if(mstrip) mstrip.addEventListener("click", onClick);   /* Manage's copy of the strip */
   sv.addEventListener("keydown", onKey);
 
