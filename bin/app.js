@@ -3169,7 +3169,7 @@ rememberGridH();
      any validator of the active set may take stake; at most 20 moves (move less rather
      than cut); nothing while any of the wallet's stake is cooling down. Answers null or
      { now, after, gain, moves, msgs:[{from,to,amt}] }. */
-  var BOTTOM = 34, EDGE = 5, MAXMOVES = 20, MIN_LIFT = 0.05;   /* EDGE: the last 5 are left out, newcomers at the edge of the set */
+  var BOTTOM = 34, EDGE = 3, MAXMOVES = 20, MIN_LIFT = 0.05;   /* EDGE: the last 3 are left out (operator, 2026-09-30) */
   window.__planRank = function(pos){
     if(!pos || !pos.rows.length || !(pos.total > 0)) return null;
     /* stake in its 21-day cooldown stays where it is; the free stake is hunted, all of it at once */

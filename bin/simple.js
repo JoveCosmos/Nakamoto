@@ -1600,7 +1600,7 @@
     }).join("") + (rest > 0 ? '<div class=mv-more>and ' + rest + ' more ' + more + '</div>' : '');
   }
   function mvSet(src, dst){
-    var V = VALS(), n = V.length, top = V.length ? V[0][1] : 1, cut = Math.max(0, n - 34), edge = Math.max(cut, n - 5);   /* the rule's region: ranks 67 to 95 */
+    var V = VALS(), n = V.length, top = V.length ? V[0][1] : 1, cut = Math.max(0, n - 34), edge = Math.max(cut, n - 3);   /* the rule's region: ranks 67 to 97 */
     var bars = V.map(function(v, i){
       var cls = src[v[3]] ? ' s' : dst[v[3]] ? ' d' : i >= cut && i < edge ? ' lo' : '';
       return '<i class="' + cls.trim() + '" style="height:' + Math.round(6 + 94 * Math.sqrt(v[1] / top)) + '%"></i>';

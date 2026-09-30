@@ -354,14 +354,14 @@ def pairs_used(reds):
 # so the offer comes back every 21 days, when the last move's cooldown clears.
 # fixed in code, as the rest of the operator's rule: no env value can change them at launch
 BOTTOM = 34
-EDGE = 5            # the last 5 are left out: newcomers at the edge of the set (29 used)
+EDGE = 3            # the last 3 are left out (operator, 2026-09-30): destinations are ranks 67 to 97 of 100 (31 used)
 
 def fill(ranked, stake, amount, ok):
     """the rule's pour: from the smallest up, each to 1 ATONE under the validator just above it (a tie
     would let the chain's tie-break swap the two, so the gap keeps the order strict); answers
     {op: added}. ranked is largest first; stake(op) the stake as it stands; ok(v) whether v may take any"""
     n = len(ranked); add = {}; left = amount
-    # from rank n-EDGE (95 of 100) up to rank n-BOTTOM+1 (67): the last EDGE are left out
+    # from rank n-EDGE (97 of 100) up to rank n-BOTTOM+1 (67): the last EDGE are left out
     for i in range(n - 1 - EDGE, max(-1, n - 1 - BOTTOM), -1):
         if left < 1_000_000: break
         v = ranked[i]
