@@ -5822,7 +5822,6 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #you #wk-mine .wk-t1 .wk-unb:not(#z){order:0;display:inline-flex;align-items:center;justify-content:center;width:auto;height:32px;margin:0;padding:0 8px;
     border-radius:9px;border:1px solid var(--wbd2);background:transparent;color:var(--wt);font:600 12.5px var(--wsans);letter-spacing:0;text-transform:none;box-shadow:none}
   #you #wk-mine .wk-t1 .wk-unb:not(#z):hover{border-color:var(--wcyan);color:var(--wcyan)}
-  #you #wk-mine .wk-t1 .wk-unb[hidden]{display:inline-flex!important;opacity:.4;pointer-events:none}
   #you #wk-mine .wk-t1 h3:not(#z){order:5;grid-column:1/-1;margin:10px 0 0;font:700 14px/1.2 var(--wsans);color:var(--wt)}
   #you #wk-mine .wk-t1 .wk-pn,#you #wk-mine .wk-t1 .wk-foot{display:none}
   #you .wk-tbl2 th:not(#z){height:24px;padding:0 5px;border:0;border-bottom:1px solid var(--wbd);background:none;box-shadow:none;font-family:var(--wmono);font-size:9px;letter-spacing:.1em;color:var(--wf)}
@@ -5847,7 +5846,10 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #one #prolist:not(#z){flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
   #one #proout:not(#z){flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
   #one #proout .txsum:not(#z){margin:0;text-align:left;font-size:12px}
-  #one #proout .txbtns:not(#z){margin-top:auto;padding:0;border:0;justify-content:stretch}
+  #one #proout .txbtns:not(#z){order:3;margin-top:auto;padding:0;border:0;justify-content:stretch}
+  /* the lock note sits at the foot, just above the button; the fee line stays under the breakdown */
+  #one #proout .txlock:not(#z){order:2;margin:auto 0 0;width:auto;max-width:none;align-self:stretch}
+  #one #proout .txlock:not(:empty) ~ .txbtns:not(#z){margin-top:0}
   #one #proout .txbtns .wk-btn.wk-go:not(#z){flex:1 1 auto;height:46px;border-radius:12px;border:1px solid var(--wcyan);background:var(--wcyan);color:var(--wc);
     font:600 15px var(--wsans);letter-spacing:0;text-transform:none}
   #one #proout .txbtns .wk-btn.wk-go:disabled:not(#z){border-color:var(--wbd2);background:transparent;color:var(--wf)}
