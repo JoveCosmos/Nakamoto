@@ -2765,7 +2765,8 @@ rememberGridH();
     atCounts();
     /* why it matters: stake left alone goes idle when its validator drops out of the set */
     var idl = E("atidle"), iv = window.__idleAtone ? window.__idleAtone() : "";
-    if(idl){ idl.hidden = view || !iv; if(iv) idl.innerHTML = "<b>Autopilot keeps your stake active</b>, through a long winter, a busy month, or when you would rather not look. Today <b class=n>" + iv + " ATONE</b> sits idle on inactive validators, earning nothing."; }
+    if(idl) idl.hidden = true;
+    var idn = E("atidlen"); if(idn) idn.textContent = iv ? iv + " ATONE" : "Stake";
     var mx = E("atmaxv"); if(mx) mx.textContent = pos ? exact(pos.free, 2) : "—";
     var signer = !!window.__WALLET && !!window.__WALLET.signDirect;
     var ok = !view && !!AT.addr && signer;
@@ -2925,16 +2926,17 @@ rememberGridH();
     var n = window.__notify();
     if(!window.__TX || !window.__WALLET || !window.__WALLET.signDirect){ n.fail("Restake needs Keplr (direct signing)"); return; }
     RS_BUSY = true; if(btn){ btn.disabled = true; btn.classList.add("busy"); }
-    atStatus().then(function(){ return atGrant(); }).then(function(r){
+    var done = false;
+    return atStatus().then(function(){ return atGrant(); }).then(function(r){
       atKeep(r);
       if(!AT.addr) throw new Error("Restake opens once GATA's keeper is live");
       var on = rsOn(), msgs = rsMsgs(!on);
       if(!msgs.length) throw new Error(on ? "Nothing to disable" : "Stake with a validator first");
       return window.__TX.sendDirect(window.__WALLET, msgs, on ? "" : "GATA Restake", function(){});
     })
-      .then(function(){ n.ok(); return atGrant().then(function(r){ if(atKeep(r)){ draw(); if(window.__redraw) window.__redraw(); } }); })
+      .then(function(){ n.ok(); done = true; return atGrant().then(function(r){ if(atKeep(r)){ draw(); if(window.__redraw) window.__redraw(); } }); })
       .catch(function(e){ n.fail(e && e.message || String(e)); })
-      .then(function(){ RS_BUSY = false; if(btn){ btn.disabled = false; btn.classList.remove("busy"); } });
+      .then(function(){ RS_BUSY = false; if(btn){ btn.disabled = false; btn.classList.remove("busy"); } return done; });
   };
   /* the wallet's Autopilot line: inactive, or active with the grant's bounds; the door reads Set up / Manage */
   function atLine(){

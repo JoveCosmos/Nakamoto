@@ -5521,6 +5521,42 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 }
 .txap{margin:0 0 10px;padding:10px 12px;border-radius:10px;background:rgba(43,200,189,.10);font-size:12.5px;line-height:1.45;color:var(--wt)}
 .txap b{color:var(--wcyan);font-weight:600}
+/* the Autopilot and Restake cards: three short lines, each with a small ? that holds the detail (hover, or tap
+   on a phone), and a Rules pill in the header - no paragraphs in front (operator, 2026-09-30) */
+#rspop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4;--wcyan:#2bc8bd;--wamber:#ffb02e;
+  --wsans:"Helvetica Neue",Helvetica,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--wmono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
+#atpop .card.atcard{width:min(460px,94vw);height:auto;max-height:94vh}
+#atpop .atL{padding:6px 20px 4px}
+.rscard{width:min(460px,94vw)}
+.rsbody{padding:6px 20px 4px}
+.rsfoot{display:flex;justify-content:flex-end;gap:10px;padding:12px 20px 16px;border-top:1px solid var(--wbd)}
+.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.bn li{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:12px;padding:13px 0;border-top:1px solid var(--wbd)}
+.bn li:first-child{border-top:0}
+.bn-ic{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;background:rgba(43,200,189,.12)}
+.bn-ic svg{width:17px;height:17px;fill:none;stroke:var(--wcyan);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.bn-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.bn-t>b{font-size:14px;font-weight:600;color:var(--wt)}
+.bn-t small{font-size:12px;color:var(--ws)}
+.bn-t small b{color:var(--wt);font-weight:600}
+.qm{position:relative;flex:0 0 auto;width:22px;height:22px;padding:0;border:1px solid var(--wbd2);border-radius:50%;background:transparent;color:var(--ws);
+  font:600 11px var(--wmono);line-height:20px;text-align:center;cursor:help}
+.qm-r{width:auto;height:24px;padding:0 10px;border-radius:999px;font:500 11px var(--wsans);line-height:22px;margin-left:auto;margin-right:10px}
+.qm-r::after{content:" ?";color:var(--wf)}
+.qm:hover,.qm:focus-visible{border-color:var(--wcyan);color:var(--wt);outline:none}
+.qm-tip{display:none;position:absolute;right:-6px;bottom:calc(100% + 10px);z-index:5;width:min(280px,76vw);padding:11px 13px;border:1px solid var(--wbd2);border-radius:11px;
+  background:var(--wh);box-shadow:0 18px 40px -18px rgba(0,0,0,.55);font:400 12.5px/1.5 var(--wsans);letter-spacing:0;text-align:left;text-transform:none;color:var(--wt);white-space:normal;cursor:default}
+.qm-r .qm-tip{bottom:auto;top:calc(100% + 10px)}
+.qm:hover .qm-tip,.qm.open .qm-tip{display:block}
+/* the card header sets display:block on every span: its tip hides and shows at that header's own specificity */
+.wk-txh .qm .qm-tip,.txcard .wk-txh .qm .qm-tip{display:none}
+.wk-txh .qm:hover .qm-tip,.wk-txh .qm.open .qm-tip,.txcard .wk-txh .qm:hover .qm-tip,.txcard .wk-txh .qm.open .qm-tip{display:block}
+/* in a card's header the tip must not take the header's small mono lettering */
+.wk-txh .qm .qm-tip,.txcard .wk-txh .qm .qm-tip{font:400 12.5px/1.5 var(--wsans);letter-spacing:0;text-transform:none;color:var(--wt)}
+.wk-txh .qm-r,.txcard .wk-txh .qm-r{font:500 11px var(--wsans);letter-spacing:0;text-transform:none;color:var(--ws)}
+#rsgo{min-width:180px;height:40px;border-color:var(--wcyan);background:var(--wcyan);color:#0b1f1c;font-weight:600}
+#rsgo.wk-danger{background:transparent;border-color:#ff6a6a;color:#ff6a6a}
+#atpop .atnote{margin:4px 0 8px}
 /* Autopilot has no choices left (no cap, no validator list): the card is what it does, and Grant / Revoke */
 #atpop .atview,#atpop #atR,#atpop #atform{display:none!important}
 #atpop .atbody{grid-template-columns:minmax(0,1fr)!important}
@@ -5555,6 +5591,8 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #sv-eco .sv-trole{margin-left:6px;padding:0 6px;font-size:8.5px;height:18px}
   #sv-eco .sv-gkey{font-size:8.5px}
 }
+/* a very short screen: the set's chart gives way first, so the action never leaves the stage */
+@media(min-width:1100px) and (max-height:700px){#mv-stage .mv-set{display:none}}
 /* a short screen (a laptop at 600-780px): everything a size tighter, the switches without their line */
 @media(min-width:1100px) and (max-height:780px){
   .one{padding-top:12px;padding-bottom:14px;gap:14px}
@@ -6046,7 +6084,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 </div></div>
 
 <div class=pop id=atpop><div class="card txcard uncard atcard" role=dialog aria-modal=true aria-labelledby=atttl data-v=setup>
-  <header class=wk-txh><div><b id=atttl>Autopilot</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=atsum></span></header>
+  <header class=wk-txh><div><b id=atttl>Autopilot</b><span>{{CHAIN_ID}}</span></div><button class="qm qm-r" type=button aria-label="Autopilot rules">Rules<span class=qm-tip role=tooltip>It moves your free stake to the validators ranked 67 to 95: #95 first, up to the stake of #94, then #94, and on up, never lifting one past the validator above it. The last 5 of the set are left out. Only for more than 5 APR points. Every 12 hours. Earlier grants are placed first.</span></button><span class=txsum id=atsum></span></header>
   <!-- a phone shows one side at a time; a wide window shows both -->
   <div class=atview role=tablist aria-label="Autopilot">
     <button type=button role=tab id=atvs aria-controls=atL aria-selected=true data-v=setup>Setup</button>
@@ -6066,11 +6104,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
           <div class="wk-field unfield atfield"><input class=wk-amt2 id=atcap type=text inputmode=decimal placeholder="no cap" autocomplete=off spellcheck=false aria-label="ATONE the keeper may move in total"><button class=wk-max id=atmax type=button title="Everything that can move">max <b id=atmaxv>&mdash;</b></button></div>
           <span class=unhint id=athint></span></div>
       </div>
-      <div class=atwhat id=atwhat>
-        <div><b>Your best move, made for you</b><span>Every 12 hours it looks at your stake, and moves it to the validators that pay the most whenever that earns 5 APR points more.</span></div>
-        <div><b>One approval, today</b><span>You approve once. Stake that has just moved rests 21 days, as the chain requires, then Autopilot looks at it again.</span></div>
-        <div><b>Only redelegation</b><span>It cannot send, unstake or spend your ATONE. Your stake stays staked, in your wallet.</span></div>
-      </div>
+      <ul class=bn id=atwhat><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="8"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></i><span class=bn-t><b>Keeps your stake in the active set</b><small><b id=atidlen>Stake</b> sits idle on inactive validators today</small></span><button class=qm type=button aria-label="More about: Keeps your stake in the active set">?<span class=qm-tip role=tooltip>A validator that drops out of the set pays nothing. Autopilot moves your stake off it on its next run.</span></button></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 17l5-5 4 4 7-8"/><path d="M15 8h5v5"/></svg></i><span class=bn-t><b>Keeps your APR at its best</b><small>moves only for 5 APR points or more</small></span><button class=qm type=button aria-label="More about: Keeps your APR at its best">?<span class=qm-tip role=tooltip>Every 12 hours it checks your free stake and moves it to where it earns the most, when that raises its APR by more than 5 points. Stake that has just moved rests 21 days, as the chain requires.</span></button></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Redelegates, nothing else</b><small>one grant, one approval</small></span><button class=qm type=button aria-label="More about: Redelegates, nothing else">?<span class=qm-tip role=tooltip>You sign one authz grant that lets GATA&#39;s keeper redelegate your stake. It cannot send, unstake or spend your ATONE, and GATA takes no share. You can revoke it at any time.</span></button></li></ul>
       <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Your first move is made within <b>12 hours</b> of your grant, or once your stake's cooldown ends.</span></div>
     </section>
     <section class=atR id=atR aria-label="Select your validators">
@@ -6082,6 +6116,14 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
     <div class=atfs><div class=txfee id=attxfee></div><div class=txstep id=atstep></div></div>
     <div class=txbtns><button class=wk-btn id=atcancel type=button hidden>Back</button><button class="wk-btn wk-danger" id=atrevoke type=button hidden>Revoke</button><button class=wk-btn id=atedit type=button hidden>Change</button><button class="wk-btn wk-go" id=atgrant type=button disabled>Grant</button></div>
   </div>
+</div></div>
+
+<div class=pop id=rspop><div class="card txcard uncard rscard" role=dialog aria-modal=true aria-labelledby=rsttl>
+  <header class=wk-txh><div><b id=rsttl>Restake</b><span>{{CHAIN_ID}}</span></div><button class="qm qm-r" type=button aria-label="Restake rules">Rules<span class=qm-tip role=tooltip>Every 12 hours, from 1 ATONE of rewards. Rewards paid to your own address only. Staked where they earn the most, by the same rule as Autopilot. Stops when you disable it.</span></button><span class=txsum id=rssum></span></header>
+  <div class=rsbody>
+    <ul class=bn><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></i><span class=bn-t><b>Compounds your rewards</b><small><b id=rsadd>your rewards</b> more a year</small></span><button class=qm type=button aria-label="More about: Compounds your rewards">?<span class=qm-tip role=tooltip>Twice a day it claims your rewards and stakes them again, so your rewards earn too.</span></button></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 20V10M10 20V6M15 20v-8M20 20V4"/></svg></i><span class=bn-t><b>Into the best-paying validator</b><small>not back onto the same one</small></span><button class=qm type=button aria-label="More about: Into the best-paying validator">?<span class=qm-tip role=tooltip>Rewards go where they earn the most: filled from rank 95 up, like Autopilot, never onto the last 5 of the set.</span></button></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Claims and stakes, nothing else</b><small>no share for GATA, no fees for you</small></span><button class=qm type=button aria-label="More about: Claims and stakes, nothing else">?<span class=qm-tip role=tooltip>One grant lets GATA&#39;s keeper claim your rewards and delegate them. It cannot send, unstake or spend. GATA pays the fees. You can disable it at any time.</span></button></li></ul>
+  </div>
+  <div class=rsfoot><button class="wk-btn wk-go" id=rsgo type=button>Enable</button></div>
 </div></div>
 
 <div class=pop id=ipop><div class="card vcard icard">

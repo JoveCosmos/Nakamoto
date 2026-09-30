@@ -1549,6 +1549,29 @@
     put("you", h);
   }
   function drawOne(){ if(E("you")) drawYou(); if(E("paths")) drawPaths(); }
+  /* Restake has its own card (operator, 2026-09-30): what it does in three lines, the detail behind each ?, and
+     Enable or Disable - never a signature straight from the switch */
+  function rsOpen(){
+    var el = E("rspop"); if(!el || typeof POP === "undefined") return;
+    var at = window.__atInfo ? window.__atInfo() : null, on = !!(at && at.restake), pos = window.__POS;
+    var r = pos && pos.rows.length ? pos.rate : 0, add = r > 0 ? Math.pow(1 + r / 730, 730) - 1 - r : 0;
+    var ad = E("rsadd"); if(ad) ad.textContent = add > 0 ? "+" + fmt(pos.total * add) + " ATONE" : "Your rewards";
+    var sm = E("rssum"); if(sm) sm.textContent = on ? "On" : "Off";
+    var b = E("rsgo"); if(b){ b.textContent = on ? "Disable" : "Enable"; b.className = "wk-btn " + (on ? "wk-danger" : "wk-go"); }
+    POP.open(el);
+  }
+  /* a ? opens its tip on a tap or click (hover does it on a desktop); a tap anywhere else closes it */
+  document.addEventListener("click", function(ev){
+    var q = ev.target.closest ? ev.target.closest(".qm") : null;
+    Array.prototype.forEach.call(document.querySelectorAll(".qm.open"), function(o){ if(o !== q) o.classList.remove("open"); });
+    if(q){ q.classList.toggle("open"); ev.stopPropagation(); }
+  });
+  var rsgo = E("rsgo");
+  if(rsgo) rsgo.addEventListener("click", function(){
+    if(!window.__rsToggle) return;
+    var p = window.__rsToggle(rsgo);
+    if(p && p.then) p.then(function(ok){ if(ok) POP.close(E("rspop")); render(); });
+  });
   /* the Autopilot switch opens its card: off, the card grants it; on, it shows how it stands and Revoke */
   function youAuto(){ var ab = E("atbtn"); if(ab) ab.click(); }
 
@@ -1705,7 +1728,7 @@
       return;
     }
     if(act === "youauto"){ youAuto(); return; }
-    if(act === "restakesw"){ if(window.__rsToggle) window.__rsToggle(t); return; }
+    if(act === "restakesw"){ rsOpen(); return; }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
     if(act === "gfollow"){ govSend(t, { type: "atomone/v1/MsgDelegateGovernor", value: { delegator_address: window.__ADDR, governor_address: t.dataset.g } }); return; }

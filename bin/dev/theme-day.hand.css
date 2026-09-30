@@ -371,3 +371,10 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #paths .pth.on{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #txpop .txap{background:var(--accent-soft);color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #txpop .txap b{color:var(--accent)}
+  /* the cards' benefit lines and their ? tips */
+  html[data-theme=light]:not([data-mono]) .bn-ic{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .bn-ic svg{stroke:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .qm-tip{background:var(--surface);box-shadow:0 18px 40px -20px rgba(23,25,28,.35)}
+  html[data-theme=light]:not([data-mono]) .qm:hover,html[data-theme=light]:not([data-mono]) .qm:focus-visible{border-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) #rsgo{background:var(--accent);border-color:var(--accent);color:#fff}
+  html[data-theme=light]:not([data-mono]) #rsgo.wk-danger{background:transparent;border-color:var(--danger);color:var(--danger)}
