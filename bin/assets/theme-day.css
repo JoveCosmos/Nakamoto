@@ -969,6 +969,11 @@
   html[data-theme=light]:not([data-mono]) .you-cl{background:transparent}
   html[data-theme=light]:not([data-mono]) .you-tag.on{border-color:var(--sv-teal,var(--accent));color:var(--sv-teal,var(--accent));background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .you-tg i{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .you-fq{text-decoration:none;border-color:var(--sv-teal,var(--accent));background:transparent;color:var(--sv-teal,var(--accent))}
+  html[data-theme=light]:not([data-mono]) .you-fq:hover:not(:disabled){background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .you-fq.sent{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .you-fct>small a{color:var(--sv-teal,var(--accent))}
+  html[data-theme=light]:not([data-mono]) .you-fw[data-tip]:hover::after{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .you-sw[data-tip]:hover::after{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .mv-h::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .mv-chip.ok{background:var(--accent-soft)}
@@ -1499,4 +1504,9 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #prolist thead th.ck input:checked::after{border-color:var(--surface)}
   html[data-theme=light]:not([data-mono]) #one #prolist .wk-tbl2 tbody tr.on td:not(#z):not(#y):not(#x){background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #one #prolist .wk-tbl2 tbody tr.on td:first-child:not(#z):not(#y):not(#x){box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .you-fq{border-color:var(--accent);color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .you-fq:hover:not(:disabled){background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .you-fq:disabled{border-color:var(--line-strong);color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .you-fct>small a{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .you-fq.sent{background:var(--accent-soft)}
 

@@ -1485,7 +1485,7 @@
   function pathHead(id){
     var pos = window.__POS;
     if(id === "move"){
-      if(!window.__ADDR) return ["See your best move", ""];
+      if(!window.__ADDR) return ["See your best move", "with Autopilot and Restake"];
       if(!pos) return ["Reading your stake…", ""];
       if(!pos.rows.length) return ["No stake yet", "stake ATONE to start earning"];
       var pl = planNow(pos);
@@ -1529,6 +1529,35 @@
       '<button class="you-tg' + (on ? ' on' : '') + '" type=button role=switch aria-checked=' + (on ? 'true' : 'false') + ' aria-label="' + name + '"' +
       (dis ? ' disabled aria-disabled=true tabindex=-1' : ' data-act=' + act) + '><i></i></button></div>';
   }
+  /* ── the testnet faucet in the wallet column: 100 ATONE and 10 PHOTON, each once per address (the faucet service) ── */
+  var FCT = {}, FCTTX = {}, FCTMSG = "", FCTBUSY = "";
+  var FCT_TX = "https://explorer.gatahub.zone/atomone-testnet/txs/";
+  function faucetBox(a){
+    var c = a ? FCT[a] : null;
+    if(a && !c){ FCT[a] = {}; fetch("/faucet-api/claimed?address=" + encodeURIComponent(a), { cache: "no-store" })
+      .then(function(r){ return r.json(); }).then(function(j){ FCT[a] = j || {}; drawYou(); }).catch(function(){}); }
+    /* one row each; once sent the button becomes its transaction, short hash, opening the explorer (operator, 2026-09-30) */
+    var b = function(t, label){
+      var tx = a && FCTTX[a] && FCTTX[a][t], got = c && c[t];
+      if(tx) return '<a class="you-fq sent" href="' + FCT_TX + esc(tx.toUpperCase()) + '" target=_blank rel=noopener title="' + esc(tx.toUpperCase()) + '">' +
+        '<span>' + label + ' sent</span><i>' + esc(tx.slice(0, 8).toUpperCase()) + '\u2026</i></a>';
+      var dis = !a || got || FCTBUSY;
+      return '<span class="you-fw"' + (!a ? ' data-tip="Connect a wallet"' : '') + '><button class=you-fq type=button' + (dis ? ' disabled' : ' data-act=faucet data-t=' + t) + '>' +
+        (got ? label + ' received' : FCTBUSY === t ? 'Sending\u2026' : 'Request ' + label) + '</button></span>'; };
+    return '<div class=you-fct><em>Faucet</em><div class=you-fb>' + b("atone", "ATONE") + b("photon", "PHOTON") + '</div>' +
+      (FCTMSG ? '<small>' + FCTMSG + '</small>' : '') + '</div>';
+  }
+  function faucetGo(t){
+    var a = window.__ADDR; if(!a || FCTBUSY) return;
+    FCTBUSY = t; FCTMSG = ""; drawYou();
+    fetch("/faucet-api/request", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ address: a, token: t }) })
+      .then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.error || ("HTTP " + r.status)); return j; }); })
+      .then(function(j){ (FCT[a] = FCT[a] || {})[t] = true;
+        if(j && /^[0-9A-Fa-f]{64}$/.test(j.txhash || "")) (FCTTX[a] = FCTTX[a] || {})[t] = j.txhash;
+        setTimeout(function(){ if(window.__refreshPos) window.__refreshPos(); }, 6000); })
+      .catch(function(e){ var m = e && e.message || String(e); if(/already received/.test(m)) (FCT[a] = FCT[a] || {})[t] = true; else FCTMSG = esc(m); })
+      .then(function(){ FCTBUSY = ""; drawYou(); });
+  }
   function drawYou(){
     var pos = window.__POS, bal = window.__BAL, a = window.__ADDR, mine = pos && pos.rows.length;
     var at = window.__atInfo ? window.__atInfo() : null, auto = !!(at && at.grant), rs = !!(at && at.restake);
@@ -1556,6 +1585,8 @@
       return;
     }
     home();
+    /* testnet only: the faucet, for the wallet the app is connected to (operator, 2026-09-30) */
+    if(root.getAttribute("data-net") === "testnet") h += faucetBox(a);
     h += '<div class=you-hf><div class=you-hfh><em>Hands-free</em><button class=qm type=button aria-label="How Autopilot and Restake work">?<span class=qm-tip role=tooltip>' +
       '<b>Autopilot</b><span>Runs every 12 hours</span><span>Redelegates when stake inactive or for a minimum 5% APR gain</span><span>Turn it off anytime</span>' +
       '<b>Restake</b><span>Runs every 12 hours</span><span>Claim and stake rewards minimum 1 ATONE</span><span>Turn it off anytime</span></span></button></div>' +
@@ -1767,6 +1798,7 @@
     }
     if(act === "youauto"){ youAuto(); return; }
     if(act === "connect"){ var cb = E("svconn"); if(cb) cb.click(); return; }
+    if(act === "faucet"){ faucetGo(t.dataset.t); return; }
     if(act === "mvmore"){ MVOPEN[t.dataset.k] = !MVOPEN[t.dataset.k]; drawMove(); return; }
     if(act === "restakesw"){ rsOpen(); return; }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }

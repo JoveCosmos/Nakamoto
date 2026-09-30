@@ -5509,6 +5509,21 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .you-tg.on{background:var(--sv-teal)}
 .you-tg.on i{transform:translateX(18px)}
 .you-tg:disabled{opacity:.45;cursor:default}
+.you-fct{display:flex;flex-direction:column;gap:8px}
+@media(min-width:1100px){#you .you-fct{margin-top:auto}#you .you-fct+.you-hf:not(#z){margin-top:16px}}   /* just above the hands-free switches */
+.you-fct>em{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+.you-fb{display:flex;flex-direction:column;gap:8px}
+.you-fw{position:relative;display:flex}
+.you-fq{flex:1 1 auto;min-width:0;height:34px;padding:0 12px;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-sizing:border-box;border:1px solid var(--sv-teal,#2bc8bd);border-radius:9px;background:transparent;color:var(--sv-teal,#2bc8bd);
+  font:600 11.5px var(--wsans);cursor:pointer;white-space:nowrap}
+.you-fq:hover:not(:disabled){background:rgba(43,200,189,.10)}
+.you-fq.sent{justify-content:space-between;background:rgba(43,200,189,.08)}
+.you-fq.sent i{font-style:normal;font-family:var(--wmono);font-size:11px;font-weight:500;letter-spacing:.02em;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.you-fq:disabled{border-color:var(--wbd2);color:var(--wf);cursor:default}
+.you-fct>small{font-size:11.5px;line-height:1.4;color:var(--ws)}
+.you-fct>small a{color:var(--sv-teal,#2bc8bd)}
+.you-fw[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:0;bottom:calc(100% + 6px);z-index:4;padding:6px 10px;border-radius:8px;
+  border:1px solid var(--wbd2);background:var(--wh);box-shadow:0 10px 24px -14px rgba(0,0,0,.6);font:600 12px var(--wsans);color:var(--wt);white-space:nowrap;pointer-events:none}
 .you-sw[data-tip]{position:relative}
 .you-sw[data-tip]:hover::after{content:attr(data-tip);position:absolute;right:10px;bottom:calc(100% + 6px);z-index:4;padding:6px 10px;border-radius:8px;
   border:1px solid var(--wbd2);background:var(--wh);box-shadow:0 10px 24px -14px rgba(0,0,0,.6);font:600 12px var(--wsans);color:var(--wt);white-space:nowrap;pointer-events:none}
@@ -6113,11 +6128,11 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
    thin with small gaps - it no longer stretches to fill the stage */
 @media(min-width:1100px){
   #mv-stage .mv-set:not(#z):not(#y){flex:0 0 auto;min-height:0}
-  #mv-stage .mv-bars:not(#z):not(#y){flex:0 0 auto;height:90px;min-height:0;gap:3px}
+  #mv-stage .mv-bars:not(#z):not(#y){flex:0 0 auto;height:140px;min-height:0;gap:3px}
   #mv-stage .mv-bars i:not(#z){border-radius:2px 2px 0 0}
 }
-@media(min-width:1100px) and (max-height:820px){#mv-stage .mv-bars:not(#z):not(#y){height:64px}}
-@media(min-width:1100px) and (max-height:680px){#mv-stage .mv-bars:not(#z):not(#y){height:48px}}
+@media(min-width:1100px) and (max-height:820px){#mv-stage .mv-bars:not(#z):not(#y){height:96px}}
+@media(min-width:1100px) and (max-height:680px){#mv-stage .mv-bars:not(#z):not(#y){height:64px}}
 /* the shortest screens: the chart keeps its bars and bracket but drops its titles; the stage's text rows tighten */
 @media(min-width:1100px) and (max-height:640px){
   #mv-stage .mv-bars:not(#z):not(#y){height:30px}

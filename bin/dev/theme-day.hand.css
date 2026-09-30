@@ -416,3 +416,8 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #prolist thead th.ck input:checked::after{border-color:var(--surface)}
   html[data-theme=light]:not([data-mono]) #one #prolist .wk-tbl2 tbody tr.on td:not(#z):not(#y):not(#x){background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #one #prolist .wk-tbl2 tbody tr.on td:first-child:not(#z):not(#y):not(#x){box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .you-fq{border-color:var(--accent);color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .you-fq:hover:not(:disabled){background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .you-fq:disabled{border-color:var(--line-strong);color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .you-fct>small a{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .you-fq.sent{background:var(--accent-soft)}
