@@ -1503,7 +1503,7 @@
     if(id === "bonus"){
       var V = VALS(), lo = Infinity, hi = 0;
       V.forEach(function(v){ var x = window.__rateAfter ? window.__rateAfter(v[1], v[2], 0) : 0; if(x > 0){ if(x < lo) lo = x; if(x > hi) hi = x; } });
-      return hi ? [pct(lo) + " to " + pct(hi) + " APR", "the smaller the validator, the more it pays"] : ["Reading the set…", ""];
+      return hi ? [pct(lo) + " to " + pct(hi), "smaller validators pay more"] : ["Reading the set…", ""];
     }
     if(id === "gov"){
       loadProps();
