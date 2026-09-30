@@ -24,7 +24,7 @@ Report per granter: /srv/atomone-app/web/keeper/<granter>.json (the page shows i
 Testnet: the same code under atomone-app-keeper-testnet with KEEPER_DATA/STATE/REPORTS/ADMIN
 and ATOMONE_API pointed at testnet.
 """
-import hashlib, json, os, sqlite3, sys, time, urllib.request, urllib.error, urllib.parse
+import hashlib, json, os, re, sqlite3, sys, time, urllib.request, urllib.error, urllib.parse
 
 # Discord, through the app's one sender (bin/notify.py; the webhook comes from the unit's alerts env)
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "bin"))
@@ -99,6 +99,8 @@ def db():
     c.execute("CREATE TABLE IF NOT EXISTS applied(at INT, granter TEXT, plan_id TEXT, by TEXT, txhash TEXT, dry INT, ok INT, error TEXT, ap_at INT)")
     c.execute("CREATE TABLE IF NOT EXISTS alert_sent(granter TEXT, k TEXT, at INT, PRIMARY KEY(granter, k))")
     c.execute("CREATE TABLE IF NOT EXISTS rs_run(granter TEXT PRIMARY KEY, at INT)")
+    # a move that failed for a fee, network or RPC reason, waiting to be tried again (see classify)
+    c.execute("CREATE TABLE IF NOT EXISTS retry(granter TEXT PRIMARY KEY, due INT, tries INT, why TEXT, txhash TEXT, moves TEXT, since INT)")
     return c
 
 # ── the model, as the page has it ──────────────────────────────────────────
@@ -422,6 +424,48 @@ def execute(granter, moves):
     except urllib.error.HTTPError as e:
         try: return {"error": json.load(e)}
         except Exception: return {"error": "HTTP %d" % e.code}
+    except (urllib.error.URLError, OSError) as e:
+        # the signer never answered: a timeout may still have broadcast, so the next try plans from the chain again
+        return {"error": "network: %s" % e}
+
+# ── a failed move: try again, or settle ────────────────────────────────────
+# operator, 2026-09-30: a failure for a fee, network or RPC reason is tried again soon; a refusal by the chain's
+# own rules (the stake is locked, a validator pair is full, the grant is gone or too small) is settled as done,
+# and the next 12-hour run plans from the chain as it then stands. A tx that was sent but not yet seen is looked
+# up by its hash before anything is tried again, so nothing is ever moved twice.
+RETRY_WAITS = (600, 1800, 3600)          # 10 minutes, 30 minutes, an hour; then it waits for the next run
+SETTLE_WORDS = ("redelegation", "transitive", "too many", "max entries", "no delegation", "delegation does not exist",
+                "not enough delegation", "insufficient delegation", "invalid shares", "shares amount", "too few tokens",
+                "truncates to zero", "validator does not exist", "no validator", "same validator", "authorization not found",
+                "authorization expired", "failed to get grant", "insufficient amount", "more than", "exceeds",
+                "daily move limit", "bad move", "bad granter")
+RETRY_WORDS = ("fee", "gas", "sequence", "mempool", "tx already in", "timeout", "timed out", "network", "connect", "refused",
+               "reset", "unreachable", "econn", "socket", "rpc", "fetch failed", "http 5", "insufficient funds", "unauthorized")
+RETRY_CODES = {5, 11, 13, 19, 20, 32}    # the sdk codespace: fee payer short, out of gas, fee too low, in cache, mempool full, sequence
+
+def classify(r):
+    """what a failed execution means: ('retry' | 'settle' | 'pending', why, txhash)"""
+    e = r.get("error"); d = e if isinstance(e, dict) else {}
+    text = json.dumps(e).lower() if not isinstance(e, str) else e.lower()
+    h = d.get("txhash") or r.get("txhash")
+    m = re.search(r"\b([0-9A-F]{64})\b", json.dumps(e)) if not h else None
+    if "not yet found" in text:
+        return "pending", "sent, not yet seen on chain", h or (m.group(1) if m else None)
+    why = (d.get("raw_log") or d.get("error") or (e if isinstance(e, str) else text))
+    why = str(why)[:200]
+    cm = re.search(r"code (\d+) \(codespace: (\w+)\)", text)
+    if cm and cm.group(2) == "sdk" and int(cm.group(1)) in RETRY_CODES: return "retry", why, h
+    if any(w in text for w in SETTLE_WORDS): return "settle", why, h
+    if any(w in text for w in RETRY_WORDS): return "retry", why, h
+    return "retry", why, h                # unknown: tried a few times, then it waits for the next run
+
+def tx_on_chain(h):
+    """the tx by hash: its result code, or None when the chain does not have it"""
+    try: t = get("/cosmos/tx/v1beta1/txs/" + h).get("tx_response") or {}
+    except urllib.error.HTTPError as e:
+        if e.code in (400, 404): return None
+        raise
+    return int(t.get("code", 0)), t.get("raw_log", "")
 
 def moves_today(c, granter):
     return c.execute("SELECT count(*) FROM move WHERE granter=? AND at>? AND dry=0", (granter, int(time.time()) - 86400)).fetchone()[0]
@@ -490,19 +534,60 @@ def auto_apply(c, g, p, pid, dry, out):
     else:
         r = execute(gr, p["moves"])
     ok = "txhash" in r and "error" not in r
-    if ok:
-        for e in p["moves"]:
-            c.execute("INSERT INTO move VALUES(?,?,?,?,?,?,?,?)", (now, gr, e["src"], e["dst"], int(e["amount"]), e["gain"], r.get("txhash"), 0))
+    kind, why, h = ("ok", "", r.get("txhash")) if ok else classify(r)
+    if ok: record_moves(c, gr, p["moves"], r.get("txhash"), now)
     c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, pid, "auto", r.get("txhash") if ok else None, 0, 1 if ok else 0,
-              None if ok else json.dumps(r.get("error"))[:300], 0))
+              None if ok else ("%s: %s" % ("settled" if kind == "settle" else "will retry", json.dumps(r.get("error"))))[:300], 0))
     c.commit(); out["last"] = r
-    log("auto exec granter=%s plan=%s -> %s" % (gr, pid, r))
+    log("auto exec granter=%s plan=%s -> %s (%s)" % (gr, pid, r, kind))
     if ok:
+        c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()
         f["Tx"] = r.get("txhash", "")
         alert("ok", "Autopilot moved: " + short(gr), "The moves are on chain.", f)
+    elif kind == "settle":
+        c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()
+        f["Chain said"] = why
+        alert("info", "Autopilot move settled: " + short(gr), "The chain's own rules stop this move (a lock, a full pair or the grant). "
+              "Nothing to fix: the next run in 12 hours plans from the chain as it then stands.", f)
     else:
-        f["Error"] = json.dumps(r.get("error"))[:300]
-        alert("crit", "Autopilot move failed: " + short(gr), "The next run (in 12 hours) tries again.", f)
+        schedule_retry(c, gr, kind, why, h, p["moves"], f)
+
+def record_moves(c, gr, moves, txhash, at):
+    for e in moves:
+        c.execute("INSERT INTO move VALUES(?,?,?,?,?,?,?,?)", (at, gr, e["src"], e["dst"], int(e["amount"]), e.get("gain", 0), txhash, 0))
+
+def schedule_retry(c, gr, kind, why, h, moves, f):
+    """a fee, network or RPC failure (or a tx not yet seen): try again after the next wait, or give up to the next run"""
+    row = c.execute("SELECT tries, since FROM retry WHERE granter=?", (gr,)).fetchone()
+    tries, since = (row[0] + 1, row[1]) if row else (1, int(time.time()))
+    f["Reason"] = why
+    if tries > len(RETRY_WAITS):
+        c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()
+        alert("crit", "Autopilot move failed %d times: %s" % (tries, short(gr)), "A fee, network or RPC problem that did not clear "
+              "in %d tries. Check the signer, its PHOTON and the RPCs; the next run in 12 hours tries again." % tries, f)
+        return
+    wait = RETRY_WAITS[0] if kind == "pending" else RETRY_WAITS[tries - 1]     # a tx not yet seen is looked up soon
+    c.execute("INSERT OR REPLACE INTO retry VALUES(?,?,?,?,?,?,?)", (gr, int(time.time()) + wait, tries, why, h if kind == "pending" else None,
+              json.dumps([{"src": e["src"], "dst": e["dst"], "amount": int(e["amount"]), "gain": e.get("gain", 0)} for e in moves]), since))
+    c.commit()
+    if tries == 1:
+        alert("warn", "Autopilot move failed, trying again: " + short(gr), ("Sent, not yet seen on chain: the keeper looks it up by hash"
+              if kind == "pending" else "A fee, network or RPC problem: the keeper tries again") + " in %d minutes." % (wait // 60), f)
+
+def settle_pending(c, gr, h, moves, now):
+    """a tx that was sent but not seen: did it land? True when it is settled (landed, either way)"""
+    try: res = tx_on_chain(h)
+    except Exception as e: log("tx lookup %s failed: %s" % (h, e)); return False
+    if res is None: return False                       # not on chain: plan again from the chain
+    code, raw = res
+    if code == 0:
+        record_moves(c, gr, moves, h, now)
+        c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, plan_id({"moves": moves}), "auto", h, 0, 1, None, 0))
+        alert("ok", "Autopilot moved: " + short(gr), "The moves landed after a slow answer.", {"Delegator": gr, "Tx": h})
+    else:
+        log("pending tx %s for %s landed with code %d: %s" % (h, gr, code, raw[:200]))
+    c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()
+    return code == 0
 
 def gate(c, g, p, pid, adm, dry):
     """The admin gate for one Autopilot delegator. Nothing moves unless an operator approved exactly this
@@ -602,6 +687,12 @@ def once(c, only=None, live=None, force=False):
             # at the next 6-hour turn, so the console never shows a plan made for the grant it replaced
             gsig = hashlib.sha1(json.dumps([g["cap"], sorted(g["allow"] or []), g["exp"]]).encode()).hexdigest()[:12]
             due = force or not last or time.time() - last >= P["every"] or waiting_ap or (prev or {}).get("grant_sig") != gsig
+            # a move that failed for a fee, network or RPC reason is tried again at its time; one that was sent but not
+            # seen is looked up by hash first, and if it landed that is the move - nothing is planned over it
+            rt = c.execute("SELECT due, tries, txhash, moves FROM retry WHERE granter=?", (gr,)).fetchone()
+            if rt and rt[0] <= time.time():
+                due = True
+                if rt[2] and settle_pending(c, gr, rt[2], json.loads(rt[3] or "[]"), int(time.time())): due = False
             if gr in adm["paused"]: due = False
             p = None
             if due:
@@ -626,6 +717,8 @@ def once(c, only=None, live=None, force=False):
             # emergency stop) still stops everything for a delegator
             if due and p and p["moves"] and gr not in adm["paused"]:
                 auto_apply(c, g, p, pid, dry, rep)
+            elif due and p is not None and not p["moves"]:
+                c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()     # nothing left to move: nothing to retry
             last = c.execute("SELECT at, plan_id, by, txhash, dry, ok, error FROM applied WHERE granter=? ORDER BY at DESC, rowid DESC LIMIT 1", (gr,)).fetchone()
             rep["admin"] = {"state": "held" if gr in adm["paused"] else "auto", "plan_id": pid}
             if last: rep["admin"]["applied"] = {"at": last[0], "plan_id": last[1], "by": last[2], "txhash": last[3], "dry": bool(last[4]), "ok": bool(last[5]), "error": last[6]}
