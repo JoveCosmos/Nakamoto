@@ -126,7 +126,7 @@ function proTabs(){
   var mode = document.documentElement.getAttribute("data-pro") || "redelegate", home = { stake: "stbtn", unstake: "unbtn", claim: "clbtn" };
   [].forEach.call(document.querySelectorAll("#protabs .l2tab"), function(b){
     var a = b.getAttribute("data-pro-act"), on = a === mode, src = home[a] && document.getElementById(home[a]);
-    b.setAttribute("aria-selected", on ? "true" : "false");
+    b.setAttribute("aria-selected", on ? "true" : "false"); b.tabIndex = on ? 0 : -1;     /* one Tab stop, the open one */
     if(src && src.hidden) b.setAttribute("aria-disabled", "true"); else b.removeAttribute("aria-disabled");
   });
 }

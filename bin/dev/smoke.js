@@ -81,8 +81,10 @@ t('picks-tables', function(){
   var r=document.querySelectorAll('#p-pays .ptab tbody tr').length;
   var l=document.querySelectorAll('#p-pays .ptab .tlg').length;
   var ph=document.querySelectorAll('#p-pays .ptab tbody tr.phr').length;
-  if(TESTNET) return (r===15 && ph===10) || 'testnet rows='+r+' placeholders='+ph;   /* five rows each, history rows as placeholders */
-  return (r===15 && l===15) || 'rows='+r+' logos='+l;   /* three lists of five */
+  /* three full lists, each validator with its mark (since 2026-09-30; they were three lists of five) */
+  var tb=document.querySelectorAll('#p-pays .ptab'), each=[].map.call(tb,function(t){ return t.querySelectorAll('tbody tr').length; });
+  if(TESTNET) return (tb.length===3 && each.every(function(k){ return k>0; })) || 'testnet tables='+tb.length+' rows='+each.join('/');
+  return (tb.length===3 && each.every(function(k){ return k>=50; }) && l===r) || 'tables='+tb.length+' rows='+each.join('/')+' logos='+l;
 });
 t('trend-charts', function(){
   go('staking/trend');
@@ -202,26 +204,21 @@ t('shell-aria', function(){
    group's tabs the row shows; Self (the three panes) is Staking's third view; Governance's
    views are announced, not built, so its option and its tabs are greyed and inert */
 t('shell-groups', function(){
-  /* the Dashboard: Stake, Autopilot, Governance; Stake has two modes, Easy and Pro, switched at the row's end */
+  /* the Dashboard (since 2026-09-30): Your move, Autopilot and Governance by route, Pro (the three panes) by the side
+     column's Pro tile; the side column carries five tiles, each opening its own path */
   var R=document.documentElement, bad=[];
   function vis(id){ var e=document.getElementById(id); return !!e && e.offsetParent!==null && e.getBoundingClientRect().height>0; }
-  function tabs(){ return [].filter.call(document.querySelectorAll('.l2[data-for=dashboard] .l2tab'),function(b){ return b.offsetParent!==null; }).map(function(b){ return b.dataset.sub; }).join(); }
-  try{ localStorage.removeItem('th_mode'); }catch(e){}
   go('dashboard/wallet');
-  if(tabs()!=='overview,autopilot,governors') bad.push('tabs '+tabs());
-  var md=document.querySelector('.l2mode[data-for=dashboard]');
-  if(!md || md.offsetParent===null) bad.push('no Easy|Pro switch on Stake');
-  if(!vis('sv-over') || vis('p-dele')) bad.push('easy is not the simple screen');
-  document.querySelector('.l2mode [data-mode=self]').click();
-  if(at()!=='dashboard/self' || !vis('p-dele') || vis('sv')) bad.push('pro is not the three panes '+at());
-  if(document.getElementById('l2-dashboard-overview').getAttribute('aria-selected')!=='true') bad.push('Stake not lit in Pro');
-  document.getElementById('l2-dashboard-governors').click();
-  if(at()!=='dashboard/governance' || !vis('sv-mygov')) bad.push('governance page '+at());
-  if(md && md.offsetParent!==null) bad.push('mode switch shown off Stake');
-  document.getElementById('l2-dashboard-overview').click();
-  if(at()!=='dashboard/self') bad.push('Stake does not reopen the last mode '+at());
-  document.querySelector('.l2mode [data-mode=overview]').click();
-  try{ localStorage.removeItem('th_mode'); }catch(e){}
+  if(!vis('sv-over') || vis('p-dele')) bad.push('wallet is not the Your move screen');
+  var tiles=[].map.call(document.querySelectorAll('button.pth[data-route]'),function(b){ return b.dataset.route; });
+  if(tiles.length && tiles.length!==10 && tiles.length!==5) bad.push('side tiles '+tiles.length);
+  var pro=document.querySelector('button.pth[data-p=pro]');
+  if(pro){ pro.click(); if(at()!=='dashboard/self' || !vis('p-dele')) bad.push('Pro tile does not open the three panes '+at()); }
+  else { go('dashboard/self'); if(!vis('p-dele')) bad.push('pro is not the three panes'); }
+  var pt=document.querySelectorAll('#protabs [role=tab]');
+  if(pt.length!==4 || [].filter.call(pt,function(b){ return b.tabIndex===0; }).length!==1) bad.push('Pro tabs: '+pt.length+' tabs, not one Tab stop');
+  go('dashboard/autopilot'); if(!vis('sv-auto')) bad.push('autopilot page '+at());
+  go('dashboard/governance'); if(at()!=='dashboard/governance' || !vis('sv-mygov')) bad.push('governance page '+at());
   go('network/uptime'); if(at()!=='network/uptime' || !vis('sv-net')) bad.push('network '+at());
   go('staking/bonus');
   return !bad.length || bad.join(', ');
