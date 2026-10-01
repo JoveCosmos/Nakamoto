@@ -6485,7 +6485,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <section class=pane id=p-intro><div class=w>
     <div class=intro>
       <h1>The chain that <em>rewards decentralization</em></h1>
-      <a class=introgo href="network" data-route="network">Network<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+      <a class=introgo href="dashboard/wallet" data-route="dashboard/wallet">Your move<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
       <a class=introby href="https://gatahub.zone/" target=_blank rel="noopener noreferrer" title="GATA HUB"><span>powered by</span><img src="assets/gata.png" alt="GATA HUB"></a>
     </div>
   </div></section>

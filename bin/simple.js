@@ -1428,13 +1428,12 @@
      one on show (html[data-svs], which the navigation shell sets) ── */
   var pending = false;
   function screen(){ return root.getAttribute("data-svs") || "over"; }
-  /* home's one link: a connected wallet goes straight to its Dashboard, a first visit to Network */
+  /* home's one link: Your move, with a wallet or without (operator, 2026-10-01) */
   function homeDoor(){
     var a = document.querySelector(".introgo"); if(!a) return;
-    var dash = !!window.__ADDR, want = dash ? "dashboard" : "network";
-    if(a.getAttribute("data-route") === want) return;
-    a.setAttribute("data-route", want); a.setAttribute("href", "#/" + want);
-    a.firstChild.nodeValue = dash ? "Dashboard" : "Network";
+    if(a.getAttribute("data-route") === "dashboard/wallet") return;
+    a.setAttribute("data-route", "dashboard/wallet"); a.setAttribute("href", "dashboard/wallet");
+    a.firstChild.nodeValue = "Your move";
   }
   /* Self's Autopilot row: the reader's own gain (the plan the Wallet's Move panel prices, cached the
      same way), counted up once; the line under it turns while Self is open. Working out the plan
