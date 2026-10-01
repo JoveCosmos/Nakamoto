@@ -1757,7 +1757,9 @@
           mvSet({}, mineIds());
       } else {
         h = top('Your stake today', 'At its best', 'ok', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
-          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>No move earns it 5 APR points more today.' + (auto ? ' Autopilot checks again every 12 hours.' : ' This checks again every block.') + '</span></div>' +
+          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>No move earns it 5 APR points more today.' + (auto ? ' Autopilot checks again every 12 hours.' : ' This checks again every block.') + '</span>' +
+          /* the same lock note as the offer's, in the same place (operator, 2026-10-01) */
+          (pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is under redelegate lock until ' + day(pos.until) + '</div>' : '') + '</div>' +
           nowOn() + mvSet({}, mineIds());
       }
     }
