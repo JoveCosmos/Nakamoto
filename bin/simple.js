@@ -13,7 +13,7 @@
   var sv = document.getElementById("sv"); if(!sv) return;
   var E = function(id){ return document.getElementById(id); };
   var root = document.documentElement;
-  var esc = window.att || function(v){ return String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); };
+  var esc = window.att || function(v){ return String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;"); };
   var PHONE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   /* ── figures, written exactly as the dashboard writes them ── */
@@ -437,7 +437,7 @@
       put("sd-alist", '<div class=sv-ph><h3>Validators</h3></div><div class=ap-act><b>Activate Autopilot</b>' +
         '<span>' + (!pos ? 'Connect a wallet, then choose the validators Autopilot may use.' : !pos.rows.length ? 'Stake some ATONE first; Autopilot then keeps it with the better payers.'
           : 'Choose the validators it may use. It keeps your stake with the best of them, monitors them and lists them here.') + '</span>' + go +
-        '<em class=ap-48s>Autopilot makes its first move within 12 hours of your grant.</em></div>');
+        '<em class=ap-firsts>Autopilot makes its first move within 12 hours of your grant.</em></div>');
       put("sd-ars", restakePanel(pos, at));
       return;
     }
@@ -512,7 +512,7 @@
       h += '<div class=se-time><div class=se-tbar><s style="width:' + (Math.min(1, (now - t0) / (t1 - t0)) * 100).toFixed(1) + '%"></s></div>' +
         '<div class=se-tl><span>' + since + '</span><b>Day ' + dn + ' of ' + tot + ', ' + left + ' day' + (left === 1 ? '' : 's') + ' left</b><span>' + until + '</span></div></div>';
     }
-    var name = function(op){ var V = VALS(), id = String(op || "").slice(-6); for(var i = 0; i < V.length; i++) if(V[i][3] === id) return esc(V[i][0]); return id; };
+    var name = function(op){ var V = VALS(), id = String(op || ""); for(var i = 0; i < V.length; i++) if(V[i][3] === id) return esc(V[i][0]); return esc(id.slice(-6)); };   /* id = full operator (2026-10-01) */
     var hist = (rp && rp.history || []).slice(-3).reverse();
     h += '<div class=se-mv><em>Last moves</em>' + (hist.length ? hist.map(function(m){
         return '<div><u>' + (window.__dayFull ? window.__dayFull(m.at * 1000) : "") + '</u><span><b>' + fmt(m.uatone) + ' ATONE</b> from ' + name(m.src) + ' to ' + name(m.dst) + '</span></div>'; }).join("")
@@ -1664,7 +1664,7 @@
     var el = E("mv-stage"); if(!el) return;
     var pos = window.__POS, a = window.__ADDR, S = setStats();
     var V = VALS(), byId = {}; V.forEach(function(v, i){ byId[v[3]] = { v: v, rank: i + 1 }; });
-    var nm = function(id){ var b = byId[id]; if(b) return b.v[0]; var x = (window.__INACT || {})[id]; return x && x.m ? x.m : id; };
+    var nm = function(id){ var b = byId[id]; if(b) return b.v[0]; var x = (window.__INACT || {})[id]; return x && x.m ? x.m : String(id).slice(-6); };
     var rk = function(id){ var b = byId[id]; return b ? '#' + b.rank : 'out'; };
     var rate = function(id, x){ var b = byId[id]; return b && window.__rateAfter ? window.__rateAfter(b.v[1], b.v[2], x || 0) : 0; };
     var at = window.__atInfo ? window.__atInfo() : null, auto = !!(at && at.grant);

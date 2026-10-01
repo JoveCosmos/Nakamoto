@@ -2159,6 +2159,10 @@ background:linear-gradient(180deg,#17172f,#0e0e1d);cursor:pointer;position:relat
 .txcard .txrow .f .wk-lg{width:16px;height:16px;margin:0}.txcard .txrow .f .wk-lgx{line-height:16px;font-size:7px}
 .txcard .txrow i{font-style:normal;color:var(--wf);text-align:center}
 .txcard .txrow .a{text-align:right;font-family:var(--wmono);font-size:11.5px;color:var(--wcyan);white-space:nowrap}
+/* the destination's operator address under its name, to compare with the wallet (2026-10-01) */
+.txcard .txrow .txw{display:flex;flex-direction:column;min-width:0;line-height:1.3}
+.txcard .txrow .txop{display:flex;min-width:0;text-decoration:none;font-family:var(--wmono);font-size:9.5px;letter-spacing:.02em;color:var(--wf);white-space:nowrap}
+.txcard .txrow .txop span{min-width:0;overflow:hidden;text-overflow:ellipsis}.txcard .txrow .txop em{flex:none;font-style:normal}
 .txlock{margin:12px 20px 0;padding:8px 10px;border:1px solid rgba(255,176,46,.28);border-radius:5px;background:rgba(255,176,46,.05);
 font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;color:var(--ws);display:flex;gap:9px;align-items:flex-start}
 .txlock svg{width:12px;height:12px;flex:0 0 auto;fill:none;stroke:var(--wamber);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;margin:2px 0 0;max-height:none}
@@ -5058,11 +5062,11 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 @media(min-width:861px) and (max-height:860px){#atpop .atpc .atd{display:none}#atpop .atnote:not(#z){margin-top:8px}#atpop .atpc:not(#z){padding-top:8px;padding-bottom:8px}}
 @media(min-width:861px) and (max-height:760px){#atpop .atidle{display:none!important}#atpop .atrow:not(#z){padding:6px 0;gap:5px}#atpop .atnote:not(#z){margin-top:6px;padding:6px 10px}}
 @media(min-width:861px) and (max-height:640px){#atpop .atL:not(#z){overflow-y:auto}}
-/* within 48 hours: the keeper proposes, an admin acts */
+/* Autopilot runs by itself at 00:00 and 12:00 UTC: the first move within 12 hours of the grant (2026-10-01) */
 #atpop .atnote:not(#z),#atpop .atnote span:not(#z){white-space:normal;overflow:visible;text-overflow:clip;line-height:1.45}
-.ap-48{padding:9px 12px;border-radius:9px;border:1px solid rgba(43,200,214,.4);background:rgba(43,200,214,.08);font-size:12px;color:var(--ws)}
-.ap-48 b{color:#8ff5ec;font-weight:700}
-#sv-auto .ap-act .ap-48s{font-style:normal;font-size:11px;color:var(--wf)}
+.ap-first{padding:9px 12px;border-radius:9px;border:1px solid rgba(43,200,214,.4);background:rgba(43,200,214,.08);font-size:12px;color:var(--ws)}
+.ap-first b{color:#8ff5ec;font-weight:700}
+#sv-auto .ap-act .ap-firsts{font-style:normal;font-size:11px;color:var(--wf)}
 .sd-ida .sd-wch i.st.rs{color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.06)}
 .sd-ida .sd-wch i.st.rs.on{color:#b6f5cb;border-color:rgba(143,240,176,.6);background:rgba(46,224,106,.16)}
 .sd-ida .sd-wch button.rsw:not(#z){cursor:pointer;font-style:normal;font-family:var(--wmono);font-size:8.5px;line-height:1;letter-spacing:.14em;text-transform:uppercase;padding:3px 7px;border-radius:999px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);height:auto}

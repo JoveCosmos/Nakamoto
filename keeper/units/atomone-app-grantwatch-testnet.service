@@ -11,6 +11,7 @@ EnvironmentFile=/etc/gata/atomone-app.env
 EnvironmentFile=-/etc/gata/atomone-app-keeper-testnet.env
 EnvironmentFile=/etc/gata/atomone-app-alerts.env
 Environment=NET=testnet
+Environment=TZ=UTC
 ExecStart=/usr/bin/python3 /srv/atomone-app/bin/grantwatch.py
 Restart=always
 RestartSec=60
@@ -25,8 +26,15 @@ ProtectKernelTunables=yes
 ProtectKernelModules=yes
 ProtectControlGroups=yes
 RestrictNamespaces=yes
-RestrictSUIDSGID=yes
 LockPersonality=yes
+CapabilityBoundingSet=
+SystemCallArchitectures=native
+ProtectKernelLogs=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
 SystemCallFilter=@system-service
 UMask=0027
 UnsetEnvironment=ATOMONE_APP_DSN KEEPER_SECRET

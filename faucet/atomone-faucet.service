@@ -1,5 +1,5 @@
 [Unit]
-Description=AtomOne TESTNET faucet (100 ATONE / 10 PHOTON once per address, from the testnet Autopilot account; 127.0.0.1:8791)
+Description=AtomOne TESTNET faucet (10 ATONE / 1 PHOTON per address per 24 hours, from the testnet Autopilot account; 127.0.0.1:8791)
 After=network-online.target
 Wants=network-online.target
 

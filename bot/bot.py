@@ -214,8 +214,8 @@ def last_jail(op, chex):
 # ── what the page can ask for ───────────────────────────────────────────────
 # Keyed by the single letters the deep link carries. Telegram caps a start
 # payload at 64 characters and allows only [A-Za-z0-9_-], which is why the
-# validator travels as an 8-character consensus-address prefix and each alert is
-# one letter rather than a word.
+# validator travels as its 40-hex consensus address (an 8-character prefix before
+# 2026-10-01, still read when unique) and each alert is one letter rather than a word.
 # INVARIANT: every alert states a FACT about a validator the reader already holds.
 # It must never name a destination, rank an alternative, or suggest a move. The
 # portal shows the same live numbers to everyone at once; a push notification that
@@ -255,7 +255,23 @@ def resolve_bits(arg, V):
     return [(by[n], flags) for n in sorted(want) if n in by]
 
 
-def resolve_many(arg, V):
+def by_chex(ident, V, amb=None):
+    """The one validator whose consensus address starts with `ident` (6 hex at least; the
+    full 40 since 2026-10-01). A prefix two validators share names neither: a ground key
+    could otherwise catch a reader's subscription (audit 2026-09-30). It is noted in `amb`
+    so the reply can say why, and treated as unknown."""
+    up = ident.strip().upper()
+    if len(up) < 6:
+        return None
+    hits = [op for op, v in V.items() if v["chex"].upper().startswith(up)]
+    if len(hits) == 1:
+        return hits[0]
+    if hits and amb is not None:
+        amb.append(up)
+    return None
+
+
+def resolve_many(arg, V, amb=None):
     """`m_<flags>_<chex6>-<chex6>-...` from the stake and redelegate cards: one
     subscription per validator named, all with the same letters. Telegram's 64-char
     cap is why the page sends 6-character prefixes and at most eight per link."""
@@ -265,17 +281,15 @@ def resolve_many(arg, V):
     flags = "".join(f for f in flags if f in ALERTS) or "d"
     out, seen = [], set()
     for ident in ids.split("-"):
-        up = ident.strip().upper()
-        if len(up) < 6:
-            continue
-        for op, v in V.items():
-            if v["chex"].upper().startswith(up) and op not in seen:
-                out.append((op, flags)); seen.add(op); break
+        op = by_chex(ident, V, amb)
+        if op and op not in seen:
+            out.append((op, flags)); seen.add(op)
     return out
 
 
-def resolve(arg, V):
-    """`v_<chex8>_<flags>` from the chooser, or the older `v_<operator>`."""
+def resolve(arg, V, amb=None):
+    """`v_<chex40>_<flags>` from the chooser (the full consensus address since 2026-10-01),
+    the older `v_<chex8>_<flags>`, or the oldest `v_<operator>`."""
     if not arg.startswith("v_"):
         return None, ""
     body = arg[2:]
@@ -283,11 +297,8 @@ def resolve(arg, V):
     flags = "".join(f for f in flags if f in ALERTS) or "d"
     if ident in V:                                   # full operator address
         return ident, flags
-    up = ident.upper()
-    for op, v in V.items():                          # consensus-address prefix
-        if v["chex"].upper().startswith(up) and len(up) >= 6:
-            return op, flags
-    return None, ""
+    op = by_chex(ident, V, amb)                      # consensus address, whole or a unique prefix
+    return (op, flags) if op else (None, "")
 
 
 # ── commands ────────────────────────────────────────────────────────────────
@@ -376,9 +387,10 @@ def handle(c, msg, V):
     cmd = cmd.split("@")[0].lower(); arg = arg.strip()
 
     if cmd == "/start":
-        many = resolve_bits(arg, V) or resolve_many(arg, V)
+        amb = []                                     # prefixes that named more than one validator
+        many = resolve_bits(arg, V) or resolve_many(arg, V, amb)
         if not many:
-            op, flags = resolve(arg, V)
+            op, flags = resolve(arg, V, amb)
             many = [(op, flags)] if op else []
         if many:
             # one row per chat and validator: subscribing again REPLACES that validator's
@@ -408,7 +420,13 @@ def handle(c, msg, V):
             count = ("Before this, you did not watch any validators." if before == 0 else
                      "You already watch 1 validator." if before == 1 else
                      "You already watch %d validators." % before)
-            return send(chat, "%s\n\n%s%s\n\n%s\n%s" % (head, what, standing(c, many, V), count, HELPERS))
+            skipped = ("\n\n%d validator%s in the link could not be told apart from another one and %s skipped: "
+                       "open the app and use that validator's own Telegram button." % (len(amb), "" if len(amb) == 1 else "s",
+                                                                                       "was" if len(amb) == 1 else "were")) if amb else ""
+            return send(chat, "%s\n\n%s%s%s\n\n%s\n%s" % (head, what, standing(c, many, V), skipped, count, HELPERS))
+        if arg and amb:
+            return send(chat, "That link does not name one validator for certain (its short code fits more than one), "
+                              "so nothing was changed. Open the app and use the validator's own Telegram button.")
         if arg:
             return send(chat, "That validator is not in the active set.")
         return send(chat, HELP)

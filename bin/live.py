@@ -13,7 +13,8 @@ small vector: each validator's stake, the bonded total, the validator count, the
 coefficient and the reward pool. The browser already computes ranks, APRs,
 concentration and the map from exactly those inputs. So the fast path does not
 need a server - it needs this vector kept fresh. Fetching it costs ~0.11s and it
-gzips to 1.4KB, against a 5.8s block time.
+gzips to 1.4KB, against a 5.8s block time (about 3.7KB since 2026-10-01, keyed by
+full operator addresses).
 
 This process holds NO database credential and talks only to our own node.
 """
@@ -51,7 +52,9 @@ def snapshot():
         key = d["pagination"].get("next_key")
         if not key:
             break
-    v = {x["operator_address"][-6:]: int(x["tokens"])
+    # keyed by the full operator address since 2026-10-01 (audit H1); the page still reads the older
+    # six-character keys while a live.json of that shape is served
+    v = {x["operator_address"]: int(x["tokens"])
          for x in vs if not x.get("jailed")}
     if len(v) < 3:
         raise RuntimeError(f"only {len(v)} bonded validators")

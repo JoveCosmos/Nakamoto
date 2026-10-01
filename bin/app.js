@@ -142,7 +142,7 @@ document.addEventListener("click", function(ev){
    page never has to cross origins for a height */
 /* every chain string that reaches innerHTML or an attribute goes through this */
 function att(v){
-  return String(v).replace(/&/g, "&amp;").replace(/"/g, "&quot;")
+  return String(v).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;")
                   .replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 /* the clipboard, with the old selection route where the API is refused; ok() on success */
@@ -716,10 +716,23 @@ bd.value = 0;   // 0 = follow the live ratio
    total, the validator count, the coefficient and the reward pool. So the fast
    path is not an API - it is those numbers, refreshed, and the same local model
    recomputing on top of them. 1.4KB gzipped against a 5.8s block. */
+/* a validator's id is its full operator address (2026-10-01, audit H1). A live.json written before that
+   keys the vector by the last six characters: it is read through the set's own ids, and a suffix two
+   validators share keeps both at the figure they have (an old vector cannot tell them apart; it only
+   ever sets the stake shown, never an address that is signed) */
+function liveVec(v){
+  for(var k in v){ if(k.indexOf("atonevaloper") === 0) return v; break; }
+  var n6 = {}, out = {}, i, s6;
+  for(i = 0; i < VALS.length; i++){ s6 = String(VALS[i][3]).slice(-6); n6[s6] = (n6[s6] || 0) + 1; }
+  for(i = 0; i < VALS.length; i++){ s6 = String(VALS[i][3]).slice(-6);
+    if(typeof v[s6] === "number") out[VALS[i][3]] = n6[s6] === 1 ? v[s6] : VALS[i][1]; }
+  return out;
+}
 function applyLive(d){
   if(!d || !d.v || !d.s || !d.n) return false;
   if(d.h && d.h <= LIVE_H) return false;          /* never go backwards */
   var moved = false, i;
+  d = { h: d.h, n: d.n, s: d.s, r: d.r, v: liveVec(d.v) };
   for(i = 0; i < VALS.length; i++){
     var t = d.v[VALS[i][3]];
     if(typeof t === "number" && t !== VALS[i][1]){ VALS[i][1] = t; moved = true; }
@@ -758,7 +771,7 @@ function applyData(d){
   var live = {}, i;
   for(i = 0; i < VALS.length; i++) live[VALS[i][3]] = VALS[i][1];
   var next = d.validators.map(function(v){
-    var id = String(v.op).slice(-6);
+    var id = String(v.op);                       /* the full operator address (2026-10-01) */
     return [v.m, live[id] != null ? live[id] : v.t, v.c, id, v.jail || 0,
             v.life_n ? Math.round((1 - v.life_missed / v.life_n) * 100000) / 1000 : null];
   });
@@ -1005,18 +1018,19 @@ rememberGridH();
 (function(){
   var VD = D.vdetail || [], vpop = E("vpop"), qpop = E("qpop");
   /* the detail rows are baked in build order; the grid is live order. Key them
-     by the validator's own id (the last six of its operator address, the same
-     key the live vector uses) so a stake crossing never opens the wrong card. */
-  var VDBY = {}; VD.forEach(function(d){ if(d.op) VDBY[String(d.op).slice(-6)] = d; });
+     by the validator's own id (its full operator address since 2026-10-01, audit H1:
+     the last six were a checksum a ground key could share; the same key the live
+     vector uses) so a stake crossing never opens the wrong card. */
+  var VDBY = {}; VD.forEach(function(d){ if(d.op) VDBY[String(d.op)] = d; });
   window.__VDBY = VDBY;
-  /* the validators outside the active set, by the same short id: an inactive one (not jailed) may be
+  /* the validators outside the active set, by the same id: an inactive one (not jailed) may be
      staked to or redelegated to from the lists' closing row, and its moves need its operator */
   window.__INACT = {};
   (D.inactive || []).forEach(function(v){ if(v[5] && !VDBY[v[3]]) window.__INACT[v[3]] = { id: v[3], m: v[0], t: v[1], c: v[2], jailed: !!v[4], op: v[5] }; });
   function inactOk(id){ var x = window.__INACT[id]; return x && !x.jailed ? x : null; }
   window.__inactOk = inactOk;
   /* a refresh brings a new detail list: the same map, refilled, so every holder of it reads the new rows */
-  window.__setVD = function(list){ VD = list || []; for(var k in VDBY) delete VDBY[k]; VD.forEach(function(d){ if(d.op) VDBY[String(d.op).slice(-6)] = d; }); };
+  window.__setVD = function(list){ VD = list || []; for(var k in VDBY) delete VDBY[k]; VD.forEach(function(d){ if(d.op) VDBY[String(d.op)] = d; }); };
   /* other sections open a card by the validator's id (the wallet's delegation rows) */
   window.__vshow = function(id){ for(var k = 0; k < VALS.length; k++) if(VALS[k][3] === id){ vshow(k); return true; } return ishow(id); };
   /* a validator outside the active set (inactive, or jailed out) has no live record to show: its own
@@ -1510,7 +1524,7 @@ rememberGridH();
       btn.classList.toggle("off", !f || !cur);
       if(!f || !cur) { btn.removeAttribute("href"); return; }
       btn.href = "https://t.me/" + (window.__BOT || "")
-               + "?start=v_" + cur.chex.slice(0, 8) + "_" + f;
+               + "?start=v_" + cur.chex + "_" + f;    /* all 40 hex (2026-10-01): a prefix could name two */
       btn.lastChild.textContent = "Continue in Telegram";
     }
     /* the stake and redelegate cards open the same chooser for every validator they touch */
@@ -1680,14 +1694,13 @@ rememberGridH();
   if(!box) return;
   var OKI = '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12.5l5 5L20 6.5"/></svg>';
   var NOI = '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 6l12 12M18 6L6 18"/></svg>';
-  function esc(v){ return String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   window.__notify = function(){
     var el = document.createElement("div"), timer = null;
     el.setAttribute("role", "status");
     function close(){ if(timer){ clearTimeout(timer); timer = null; } if(el.parentNode) el.parentNode.removeChild(el); }
     function fill(cls, icon, word, detail, ms){
       el.className = "wk-note" + (cls ? " " + cls : "");
-      el.innerHTML = icon + "<b>" + word + "</b>" + (detail ? "<i>" + esc(detail).slice(0, 220) + "</i>" : "") +
+      el.innerHTML = icon + "<b>" + word + "</b>" + (detail ? "<i>" + att(String(detail).slice(0, 220)) + "</i>" : "") +
                      '<button class=x type=button aria-label="Close">\u2715</button>';
       el.querySelector(".x").addEventListener("click", close);
       if(!el.parentNode){ box.appendChild(el); while(box.children.length > 3) box.removeChild(box.firstChild); }
@@ -1951,9 +1964,9 @@ rememberGridH();
   function empty(t){ return '<div class=wk-empty>' + t + '</div>'; }
   function pill(cls, t){ return '<span class="wk-pl ' + cls + '">' + t + '</span>'; }
   function bar(share, cls){ return '<span class="wk-hb ' + (cls || "") + '"><i style="width:' + Math.max(1, Math.round(share * 100)) + '%"></i></span>'; }
-  /* a validator's name by its short id: the active set, else one outside it (inactive, jailed), else the id itself */
+  /* a validator's name by its id: the active set, else one outside it (inactive, jailed), else the id's last six */
   function nameOf(id){ var V = window.__VALS(); for(var i = 0; i < V.length; i++) if(V[i][3] === id) return V[i][0];
-    var x = (window.__INACT || {})[id]; return x && x.m ? x.m : id; }
+    var x = (window.__INACT || {})[id]; return x && x.m ? x.m : String(id).slice(-6); }
 
   /* ── what the reader chooses: an amount, and which of five to keep ──
      The model proposes its best five destinations for the amount (the two
@@ -2243,7 +2256,7 @@ rememberGridH();
     MSGS = []; GAINBY = {}; MOVED = {}; SCOPE = { t: 0, was: 0, aft: 0 };
     var h = "", used = {}, srcRate = {};
     (window.__REDS || []).forEach(function(rr){
-      var key = rr.redelegation.validator_src_address.slice(-6) + ">" + rr.redelegation.validator_dst_address.slice(-6);
+      var key = rr.redelegation.validator_src_address + ">" + rr.redelegation.validator_dst_address;
       used[key] = (used[key] || 0) + (rr.entries || []).length; });
     /* the stake leaves the positions that earn least first, largest of equals first */
     var any = srcAny();
@@ -2401,9 +2414,12 @@ rememberGridH();
       '<span class="p aft' + (an.after != null && an.after < (an.now || 0) - 0.0005 ? ' neg' : '') + '"><i>after</i><b>' + (an.after != null ? pct(an.after) : '-') + '</b></span>' +
       '<span class="p gain' + (an.gain < -0.5 ? ' neg' : '') + '"><i>ATONE/year</i><b>' + (an.gain > 0.5 ? '+' + one(an.gain) : an.gain < -0.5 ? '\u2212' + one(-an.gain) : '-') + '</b></span>';
     list.innerHTML = msgs.map(function(m){
-      var s = m.value.validator_src_address.slice(-6), d = m.value.validator_dst_address.slice(-6);
+      var s = m.value.validator_src_address, d = m.value.validator_dst_address;
+      /* the destination's operator address as signed, to compare with the wallet's own screen (2026-10-01):
+         the key's own characters after "atonevaloper" (the prefix every operator shares) give way with an
+         ellipsis, the last six always show; the whole address is the title */
       return '<div class=txrow><span class=f>' + logo(s, nameOf(s)) + '<b>' + att(nameOf(s)) + '</b></span><i>\u2192</i>' +
-             '<span class="f to">' + logo(d, nameOf(d)) + '<b>' + att(nameOf(d)) + '</b></span><span class=a>' + fmt(+m.value.amount.amount) + ' ATONE</span></div>'; }).join("");
+             '<span class="f to">' + logo(d, nameOf(d)) + '<span class=txw><b>' + att(nameOf(d)) + '</b><s class=txop title="' + att(d) + '"><span>' + att(d.slice(12, -6)) + '</span><em>' + att(d.slice(-6)) + '</em></s></span></span><span class=a>' + fmt(+m.value.amount.amount) + ' ATONE</span></div>'; }).join("");
     var lk = E("txlock"), until = new Date(Date.now() + 21 * 86400000);
     if(lk) lk.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
       '<span>Redelegated stake cannot be redelegated again for <b>21 days</b>, until <b>' + window.__day(until.getTime()) + '</b></span>';
@@ -2909,8 +2925,9 @@ rememberGridH();
     var pos = window.__POS;
     if(!AT.addr || !pos) return [];
     /* the operator's rule (2026-09-29): no cap and no validator list - the rule picks the validators (the
-       smallest 34, never passing the one above) and GATA checks every move before the keeper signs it. Until
-       revoked: no end date. The chain reads a StakeAuthorization with neither list as "any validator". */
+       smallest 34, never passing the one above) and the keeper runs it by itself at 00:00 and 12:00 UTC (no
+       approval step since 2026-09-30). Until revoked: no end date. The chain reads a StakeAuthorization with
+       neither list as "any validator". */
     var auth = { authorization_type: "redelegate" };
     var msgs = [{ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
       grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: auth } } } }];
@@ -3243,7 +3260,7 @@ rememberGridH();
     var stake = function(j){ return V[j][1] - (gone[V[j][3]] || 0); };
     var ok = function(){ return true; };     /* any validator of the active set, as the keeper (operator, 2026-09-30) */
     var used = {}; (window.__REDS || []).forEach(function(rr){
-      var k = rr.redelegation.validator_src_address.slice(-6) + ">" + rr.redelegation.validator_dst_address.slice(-6);
+      var k = rr.redelegation.validator_src_address + ">" + rr.redelegation.validator_dst_address;
       used[k] = (used[k] || 0) + (rr.entries || []).length; });
     function movesFor(amount){
       var add = [], left = amount;
@@ -3441,7 +3458,7 @@ rememberGridH();
     /* locked balance per destination, and when it frees */
     var lock = {};
     for(i = 0; i < (reds || []).length; i++){
-      var r = reds[i], dst = r.redelegation.validator_dst_address.slice(-6);
+      var r = reds[i], dst = r.redelegation.validator_dst_address;
       for(j = 0; j < (r.entries || []).length; j++){
         var e = r.entries[j];
         var t = new Date(e.redelegation_entry.completion_time).getTime();
@@ -3455,18 +3472,18 @@ rememberGridH();
     for(i = 0; i < dels.length; i++){
       var d = dels[i];
       var amt = parseInt(d.balance.amount, 10);
-      var op = d.delegation.validator_address, id6 = op.slice(-6), v = by[id6];
+      var op = d.delegation.validator_address, v = by[op];   /* the id is the full operator (2026-10-01) */
       if(!(amt > 0)) continue;
       /* the chain refuses ANY redelegation out of a validator that still holds an
          unmatured redelegation in for this delegator (ErrTransitiveRedelegation),
          not just the amount that arrived - so the whole row is held */
-      var L = lock[id6], held = L ? amt : 0;
+      var L = lock[op], held = L ? amt : 0;
       /* a validator outside the active set (unbonded, jailed out, gone) earns nothing:
          that stake is still the reader's, shown as such, and the first to move */
       var rate = v ? window.__rateAfter(v[1], v[2], 0) : 0;   /* already in, no dilution */
       total += amt; free += (amt - held); weighted += amt * rate;
       if(L && L.until > until) until = L.until;
-      rows.push({ id: id6, op: op, m: v ? v[0] : (((window.__INACT || {})[id6] || {}).m || "Inactive validator"), x: amt, rate: rate, locked: held, until: L ? L.until : 0, inactive: !v });
+      rows.push({ id: op, op: op, m: v ? v[0] : (((window.__INACT || {})[op] || {}).m || "Inactive validator"), x: amt, rate: rate, locked: held, until: L ? L.until : 0, inactive: !v });
     }
     return { total: total, free: free, locked: total - free, until: until,
              rate: total ? weighted / total : 0, rows: rows };
@@ -3582,7 +3599,7 @@ rememberGridH();
         window.__UNB = [];
         (ub.unbonding_responses || []).forEach(function(u){
           (u.entries || []).forEach(function(e){
-            window.__UNB.push({ m: by[u.validator_address.slice(-6)] || u.validator_address.slice(-6),
+            window.__UNB.push({ m: by[u.validator_address] || u.validator_address.slice(-6),
                                 amt: parseInt(e.balance, 10), until: new Date(e.completion_time).getTime() }); }); });
         return get("/cosmos/distribution/v1beta1/delegators/" + window.__ADDR + "/rewards").catch(function(){ return {}; });
       })
@@ -3593,7 +3610,7 @@ rememberGridH();
         /* and per validator, for the ledger */
         window.__REWBY = {};
         ((rw && rw.rewards) || []).forEach(function(r){ var s = 0; (r.reward || []).forEach(function(c){ if(c.denom === "uatone") s += parseFloat(c.amount); });
-          window.__REWBY[String(r.validator_address).slice(-6)] = s; });
+          window.__REWBY[String(r.validator_address)] = s; });
         return get("/cosmos/bank/v1beta1/balances/" + window.__ADDR).catch(function(){ return {}; });
       })
       .then(function(bl){

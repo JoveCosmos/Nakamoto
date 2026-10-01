@@ -1,0 +1,50 @@
+[Unit]
+Description=AtomOne app autopilot keeper (authz redelegations via the remote signer; no key here)
+Documentation=https://atomone.gatahub.zone/
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=atomone-app
+Group=atomone-app
+EnvironmentFile=/etc/gata/atomone-app-keeper.env
+EnvironmentFile=/etc/gata/atomone-app-alerts.env
+# the signer's shared secret, readable by this process only (audit 2026-09-30); keeper.py falls back to
+# KEEPER_SECRET in the env file while the credential is not there
+LoadCredentialEncrypted=keeper_secret:/etc/gata/atomone-app-keeper.secret.cred
+Environment=TZ=UTC
+ExecStart=/usr/bin/python3 /srv/atomone-app/keeper/keeper.py
+Restart=on-failure
+RestartSec=30
+# unconfigured (no grantee / signer / secret) is a state, not a crash
+SuccessExitStatus=78
+TimeoutStopSec=20
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+ReadWritePaths=/srv/atomone-app/keeper/state /srv/atomone-app/web/keeper
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=yes
+LockPersonality=yes
+CapabilityBoundingSet=
+SystemCallArchitectures=native
+ProtectKernelLogs=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+MemoryDenyWriteExecute=yes
+SystemCallFilter=@system-service
+UMask=0027
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=multi-user.target

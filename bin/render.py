@@ -186,6 +186,15 @@ KL_S   = knob_left(s["bonded_pct"], 5, 100)
 # each validator's detail as the page's scripts read it - nothing else rides in the page (the
 # daily bars, the detail strings, the earning band... stay in data.json, which the refresh reads
 # whole); a field a script starts to read is added here
+# the validator id the page keys everything by is the FULL operator address (2026-10-01, audit H1: the
+# last six characters were a 30-bit checksum a ground key could share, and the signed operator came
+# from that map). Every operator must be a well-formed valoper and appear once, active or inactive
+_OPS = [v.get("op") for v in V] + [v.get("op") for v in D.get("inactive") or []]
+for _op in _OPS:
+    if not isinstance(_op, str) or not re.fullmatch(r"atonevaloper1[02-9ac-hj-np-z]{38}", _op):
+        sys.exit("atomone-app: FATAL operator address %r is not a valoper" % (_op,))
+if len(set(_OPS)) != len(_OPS):
+    sys.exit("atomone-app: FATAL an operator address is listed twice (active and inactive)")
 VD_KEYS = ("op", "chex", "id", "vid", "m", "t", "c", "jail", "tomb", "burned", "vp", "up", "d30", "d90",
            "life_up", "life_n", "life_missed", "prop", "joined", "last_slash", "earn_avg", "web", "av")
 payload = json.dumps({"generated": D["generated"], "thresh": th["threshold"],
@@ -193,12 +202,13 @@ payload = json.dumps({"generated": D["generated"], "thresh": th["threshold"],
                       "alert": D.get("alert"),
                       "weekly": nk["weekly"], "schedule": D["schedule"], "eta_stats": es,
                       "vdetail": [{k: v[k] for k in VD_KEYS if k in v} for v in D["validators"]],
-                      "validators": [[v["m"], v["t"], v["c"], v["op"][-6:], (v.get("jail") if TESTNET else (v.get("jail") or 0)),
+                      "validators": [[v["m"], v["t"], v["c"], v["op"], (v.get("jail") if TESTNET else (v.get("jail") or 0)),
                                       round((1 - v["life_missed"]/v["life_n"]) * 100, 3)
                                       if v.get("life_n") else None] for v in V],
                       # [moniker, tokens, commission, id, jailed 0/1, operator]: the operator so an inactive
-                      # (not jailed) validator can be staked to or redelegated to from the lists
-                      "inactive": [[v["m"], v["t"], v["c"], v["op"][-6:], 1 if v["jailed"] else 0, v["op"]] for v in D.get("inactive") or []],
+                      # (not jailed) validator can be staked to or redelegated to from the lists; id = operator
+                      # since 2026-10-01, the sixth field stays for the page's existing reads
+                      "inactive": [[v["m"], v["t"], v["c"], v["op"], 1 if v["jailed"] else 0, v["op"]] for v in D.get("inactive") or []],
                       "eta": e, "set": s,
                       # the Network tabs: 24h proposers, 7 days of hourly activity, the economics
                       # history, and where the chain's record starts
@@ -349,7 +359,7 @@ for src in glob.glob(os.path.join(AVATARS, "*.jpg")):
     fn = os.path.basename(src); have.add(fn)
     dst = os.path.join(vdir, fn)
     if not os.path.exists(dst) or os.path.getmtime(src) > os.path.getmtime(dst):
-        t = dst + ".tmp"; shutil.copyfile(src, t); os.replace(t, dst)
+        t = os.path.join(vdir, "." + fn + ".tmp"); shutil.copyfile(src, t); os.replace(t, dst)   # dot-prefixed, as above (2026-10-01)
 for old_f in os.listdir(vdir):
     if old_f not in have:
         try: os.remove(os.path.join(vdir, old_f))

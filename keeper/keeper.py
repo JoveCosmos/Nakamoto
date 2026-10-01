@@ -2,29 +2,26 @@
 """GATA autopilot keeper - runs on the app box, holds NO key.
 
 Every KEEPER_TICK (60 s) it reads, from the chain, every StakeAuthorization REDELEGATE
-grant made to the signer's address. Each granter is planned every 6 hours (at once when
-new): would moving some of their stake earn them more - the same arithmetic the page uses
-(ADR-004: rate = (1 - c) * (a + b / (t + x)) with the live eta)?
-
-THE ADMIN GATE: a plan is only a proposal. It is executed only after an operator approves
-exactly that plan (its id) in the admin console; every grant waits for an operator first,
-and every later plan that differs waits again. 48 hours to decide; Discord at 3 hours left
-and every 12 hours once overdue - never an automatic apply. Approved, it asks the remote
-signer (its own key) to execute MsgExec{MsgBeginRedelegate...}. The chain enforces the
-grant's allow-list and cap on top of everything here. Restake has no admin step.
+grant made to the signer's address. Each granter is planned once per 12-hour slot, at 00:00
+and 12:00 UTC (at once when the grant is new or changed): would moving some of their stake
+earn them more - the same arithmetic the page uses (ADR-004: rate = (1 - c) * (a + b / (t + x))
+with the live eta)? A plan is carried out in the run that makes it (no approval step since
+2026-09-30): the remote signer (its own key) executes MsgExec{MsgBeginRedelegate...}. Restake
+runs in the same slots. Disable in the admin console stops both for a wallet until Enable.
+The chain enforces the grant's allow-list and cap, and the signer its own policy (the same
+window, a daily cap), on top of everything here.
 
 What this will never do: move stake that is still in its 21-day cooldown, move to a
-jailed or tombstoned validator, move to a validator outside the grant's allow-list,
-exceed the grant's remaining cap, make more than KEEPER_MAX_MOVES_PER_DAY moves for
-one granter in a day, move without an operator's approval of that exact plan, or sign
-anything while KEEPER_DRY=1 (the default: an approved plan is recorded as applied, dry).
+validator outside the rule's window or the grant's allow-list, exceed the grant's
+remaining cap, make more than MAX_MOVES_DAY moves for one granter in a day, move a
+Disabled wallet, or sign anything while KEEPER_DRY=1 (a plan is then recorded, dry).
 
 State: /srv/atomone-app/keeper/state/keeper.db (sqlite: runs, moves); KEEPER_STATE overrides.
 Report per granter: /srv/atomone-app/web/keeper/<granter>.json (the page shows it); KEEPER_REPORTS.
 Testnet: the same code under atomone-app-keeper-testnet with KEEPER_DATA/STATE/REPORTS/ADMIN
 and ATOMONE_API pointed at testnet.
 """
-import hashlib, json, os, re, sqlite3, sys, time, urllib.request, urllib.error, urllib.parse
+import calendar, hashlib, json, os, re, sqlite3, sys, time, urllib.request, urllib.error, urllib.parse
 
 # Discord, through the app's one sender (bin/notify.py; the webhook comes from the unit's alerts env)
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "bin"))
@@ -35,7 +32,14 @@ except Exception:                                   # no sender: alerts are logg
 
 API = os.environ.get("ATOMONE_API", "https://atomone-api.gatadao.com")
 SIGNER = os.environ.get("KEEPER_SIGNER_URL", "")
-SECRET = os.environ.get("KEEPER_SECRET", "")
+def _secret():
+    """the signer's shared secret: the unit's systemd credential when it loads one, else KEEPER_SECRET from the env
+    (audit 2026-09-30: as a credential only the keeper process can read it)"""
+    d = os.environ.get("CREDENTIALS_DIRECTORY")
+    if d and os.path.exists(os.path.join(d, "keeper_secret")):
+        with open(os.path.join(d, "keeper_secret")) as f: return f.read().strip()
+    return os.environ.get("KEEPER_SECRET", "")
+SECRET = _secret()
 GRANTEE = os.environ.get("KEEPER_GRANTEE", "").strip()
 DRY = os.environ.get("KEEPER_DRY", "1") != "0"
 # the operator's rule, fixed here and not in the env (the env files still carried 0.005 and 6 hours from the old
@@ -46,8 +50,8 @@ EVERY = 12 * 3600
 def slot0(t=None): return int((time.time() if t is None else t) // EVERY) * EVERY
 MIN_GAIN_APR = 0.05
 MIN_GAIN_ATONE = 1.0          # and pay at least this per year
-MAX_MOVES_DAY = 20            # the signer takes at most 20 moves a transaction
-RS_EDGE = 3                   # restake: the last 3 of the set are left out of the highest-APR pick
+MAX_MOVES_DAY = 20            # the signer takes at most 20 moves a transaction, and 20 a wallet a day (its MAX_MOVES)
+RS_EDGE = 3                   # restake: the last 3 of the set are left out of the highest-APR pick (the signer's RS_EDGE)
 MIN_MOVE = 1_000_000          # no move under 1 ATONE: dust uses a pair entry and a move slot for nothing
 FRESH_S = 3600                # the collector's record older than this, or a chain head older than HEAD_S: no tick
 HEAD_S = 180
@@ -63,12 +67,9 @@ WDRAW_URL = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward"
 DATA = os.environ.get("KEEPER_DATA", "/srv/atomone-app/web/data.json")
 STATE = os.environ.get("KEEPER_STATE", "/srv/atomone-app/keeper/state/keeper.db")
 REPORTS = os.environ.get("KEEPER_REPORTS", "/srv/atomone-app/web/keeper")
-LOCK_S = 21 * 86400
 NET = os.environ.get("NET", "mainnet")
 SITE = os.environ.get("SITE_URL", "https://atomone.gatahub.zone")
-TICK = int(os.environ.get("KEEPER_TICK", "60"))           # the loop: approvals and new grants are picked up this fast
-SLA_S, WARN_S, OVERDUE_EVERY = 48 * 3600, 3 * 3600, 12 * 3600
-RETRY_S = 3600                                            # a failed execution is tried again after this
+TICK = int(os.environ.get("KEEPER_TICK", "60"))           # the loop: new grants and retries are picked up this fast
 TYPE_URL = "/cosmos.staking.v1beta1.MsgBeginRedelegate"
 
 def log(*a): print("keeper:", *a, flush=True)
@@ -99,11 +100,10 @@ def db():
     # the granter's blended APR at each check: the first row is where Autopilot started from
     c.execute("CREATE TABLE IF NOT EXISTS rate_log(at INT, granter TEXT, rate REAL, staked INT)")
     c.execute("CREATE TABLE IF NOT EXISTS restake(at INT, granter TEXT, rewards INT, staked INT, sent INT, target TEXT, txhash TEXT, dry INT)")
-    # the reward-split ledger: what each granter's stake has earned since we first saw
-    # them, and what we have collected of our share - the difference is the due
+    # fee_ledger and pend are approval-era tables, no longer read or written; kept so every old state opens as it was
     c.execute("CREATE TABLE IF NOT EXISTS fee_ledger(granter TEXT PRIMARY KEY, earned INT, collected INT, updated INT)")
-    # the admin gate: what waits for a decision (one row per granter), and every approved plan carried out
     c.execute("CREATE TABLE IF NOT EXISTS pend(granter TEXT PRIMARY KEY, plan_id TEXT, reason TEXT, since INT, deadline INT, warned INT, overdue_at INT, ready_sent TEXT)")
+    # every plan carried out (by "auto"), ok or not
     c.execute("CREATE TABLE IF NOT EXISTS applied(at INT, granter TEXT, plan_id TEXT, by TEXT, txhash TEXT, dry INT, ok INT, error TEXT, ap_at INT)")
     c.execute("CREATE TABLE IF NOT EXISTS alert_sent(granter TEXT, k TEXT, at INT, PRIMARY KEY(granter, k))")
     c.execute("CREATE TABLE IF NOT EXISTS rs_run(granter TEXT PRIMARY KEY, at INT)")
@@ -153,13 +153,6 @@ def live_vals(stats):
     if len(out) < 0.8 * max(1, len(stats)): raise ValueError("only %d bonded validators read (the collector has %d)" % (len(out), len(stats)))
     return out
 
-# ── strategies: the word the page wrote into the grant's memo ───────────────
-PRESETS = {
-    "passive":    {"every": 7 * 86400, "min_apr": 0.015, "min_atone": 5.0, "dests": 2, "d90": 99, "restake_every": 7 * 86400},
-    "moderate":   {"every": 12 * 3600, "min_apr": 0.05,  "min_atone": 1.0, "dests": 5, "d90": 50, "restake_every": 86400},
-    "aggressive": {"every": 3600,      "min_apr": 0.0025, "min_atone": 0.5, "dests": 8, "d90": 50, "restake_every": 12 * 3600},
-    "picks":      {"every": 6 * 3600,  "min_apr": 0.005, "min_atone": 1.0, "dests": 5, "d90": 0, "restake_every": 86400},
-}
 # ── grants ─────────────────────────────────────────────────────────────────
 def grants():
     out, key = [], None
@@ -180,22 +173,38 @@ def grants():
         if not key: break
     return out
 
+def grant_sig(g):
+    """the grant's identity for "changed": its validator list and expiry. Not the cap: the chain lowers max_tokens on
+    every move, so a capped grant would look new every tick (audit 2026-09-30)"""
+    return hashlib.sha1(json.dumps([sorted(g["allow"] or []), g["exp"]]).encode()).hexdigest()[:12]
+
+def grant_changed(g, prev):
+    """a re-grant since the last report: another list or expiry, a cap that rose (falling is the chain spending it),
+    or a cap added or removed. A report written before 2026-09-30 carries the old sig (cap, list, expiry), read too"""
+    if not prev: return True
+    pg = prev.get("grant") or {}; pcap = pg.get("cap"); ps = prev.get("grant_sig")
+    old = hashlib.sha1(json.dumps([pcap, sorted(g["allow"] or []), g["exp"]]).encode()).hexdigest()[:12]
+    if ps not in (grant_sig(g), old): return True
+    if (g["cap"] is None) != (pcap is None): return True
+    return g["cap"] is not None and g["cap"] > pcap
+
 # ── restake ────────────────────────────────────────────────────────────────
 ADMIN = os.environ.get("KEEPER_ADMIN", "/srv/atomone-app/state/admin-mainnet.json")
 def admin():
-    """what the operators decided in the admin console (adminapi writes it): pauses (Hold), approvals of a
-    plan by its id (Apply), and every decision with who and when"""
-    try: a = json.load(open(ADMIN))
-    except Exception: a = {}
-    for k in ("paused", "approved", "decisions"): a.setdefault(k, {})
+    """what the operators decided in the admin console (adminapi writes it): the Disabled wallets ("paused").
+    No file yet is a first run (nothing Disabled); a file that exists and does not parse raises, so the tick is
+    skipped and "cannot run" alerts - never read as empty, which would re-enable every Disabled wallet (audit 2026-09-30)"""
+    try: f = open(ADMIN)
+    except FileNotFoundError: return {"paused": {}}
+    with f: a = json.load(f)
+    if not isinstance(a, dict) or not isinstance(a.setdefault("paused", {}), (dict, list)):
+        raise ValueError("admin state %s is not what adminapi writes" % ADMIN)
     return a
-
-def paused(): return set(admin()["paused"])
 
 LEDGER = os.path.join(os.path.dirname(ADMIN), "grants-%s.json" % NET)
 def granted_at(granter, c):
     """when the grant was made (grantwatch's ledger reads it from the grant's transaction), else when the
-    keeper first saw it: the 48-hour clock starts here"""
+    keeper first saw it: grants are planned in this order"""
     try:
         e = (json.load(open(LEDGER)).get("grants") or {}).get(granter) or {}
         if e.get("status") in ("new", "active", "expiring") and (e.get("made") or e.get("first_seen")):
@@ -205,12 +214,10 @@ def granted_at(granter, c):
     return c.execute("SELECT min(at) FROM run_g WHERE granter=?", (granter,)).fetchone()[0] or int(time.time())
 
 def plan_id(p):
-    """a plan's identity: its moves exactly (source, destination, amount) - an approval is for these moves only"""
+    """a plan's identity: its moves exactly (source, destination, amount), as the report and the applied table name it"""
     if not p or not p.get("moves"): return None
     k = sorted((m["src"], m["dst"], int(m["amount"])) for m in p["moves"])
     return hashlib.sha1(json.dumps(k).encode()).hexdigest()[:12]
-
-EMPTY_PID = plan_id({"moves": []})   # the id of "no moves": nothing for an operator to decide
 
 def alert(level, title, text="", fields=None):
     log("alert", level, title)
@@ -218,13 +225,12 @@ def alert(level, title, text="", fields=None):
         try: notify.send(level, title, text, fields, SITE + "/admin", net=NET)
         except Exception as e: log("alert failed: %s" % e)
 
-def when(t): return time.strftime("%-d %b %H:%M UTC", time.gmtime(t))
 def short(a): return a[:12] + "\u2026" + a[-6:]
 
 def restake_grants():
     """granter -> what they let us do with rewards: claim (a GenericAuthorization for
-    MsgWithdrawDelegatorReward), stake (StakeAuthorization DELEGATE: allow-list, what is left
-    of its cap) and send (SendAuthorization: what is left of its limit, for the split)"""
+    MsgWithdrawDelegatorReward) and stake (StakeAuthorization DELEGATE: allow-list, deny-list, what is left
+    of its cap). Nothing else is read: a restake never sends"""
     out, key, now = {}, None, time.gmtime()
     while True:
         d = get("/cosmos/authz/v1beta1/grants/grantee/%s?pagination.limit=200" % GRANTEE + ("&pagination.key=%s" % urllib.parse.quote(key) if key else ""))
@@ -238,12 +244,13 @@ def restake_grants():
             elif t == "/cosmos.staking.v1beta1.StakeAuthorization" and a.get("authorization_type") == "AUTHORIZATION_TYPE_DELEGATE":
                 cap = a.get("max_tokens")
                 r["stake"] = {"allow": (a.get("allow_list") or {}).get("address") or [],
+                              "deny": (a.get("deny_list") or {}).get("address") or [],
                               "cap": int(cap["amount"]) if cap and cap.get("denom") == "uatone" else None}
         key = d.get("pagination", {}).get("next_key")
         if not key: break
     return {k: v for k, v in out.items() if v.get("claim") and v.get("stake")}
 
-def plan_restake(c, granter, rg, vals, m, P):  # noqa: C901
+def plan_restake(c, granter, rg, vals, m):  # noqa: C901
     """what a restake would do now: claim the wallet's rewards (largest first) and stake them all on the best
     validator of the DELEGATE allow-list. Only grants to our own address count: any other authz grant the
     wallet made (restake bots, any validator's service, GATA's validator included) is foreign and ignored -
@@ -273,10 +280,10 @@ def plan_restake(c, granter, rg, vals, m, P):  # noqa: C901
     if cap is not None and stake > cap: out["skip"] = "delegate cap used up"; return out
     # where the rewards go (operator, 2026-09-30): all of them onto the ONE validator paying the highest APR once they
     # land, leaving out the last 3 of the active set (today: #97 of 100). An older DELEGATE grant that names validators
-    # keeps to them
-    allow = set(rg["stake"]["allow"] or [])
+    # keeps to them, and a validator its grant denies is never picked (the chain would refuse it; audit 2026-09-30)
+    allow, deny = set(rg["stake"]["allow"] or []), set(rg["stake"].get("deny") or [])
     ranked = sorted(vals.values(), key=lambda v: -v["t"])
-    pool = [v for v in ranked[:max(0, len(ranked) - RS_EDGE)] if not allow or v["op"] in allow]
+    pool = [v for v in ranked[:max(0, len(ranked) - RS_EDGE)] if (not allow or v["op"] in allow) and v["op"] not in deny]
     if not pool or stake <= 0: out["skip"] = "no validator to stake on"; return out
     best = max(pool, key=lambda v: rate_after(m, v["t"], v["c"], int(stake)))
     legs = [{"validator": best["op"], "amount": int(stake)}]
@@ -295,12 +302,12 @@ def execute_restake(granter, p):
         try: return {"error": json.load(e)}
         except Exception: return {"error": "HTTP %d" % e.code}
 
-def restake_step(c, granter, rgs, vals, m, P, dry):
+def restake_step(c, granter, rgs, vals, m, dry):
     """plan, execute when allowed, record; returns what the report shows"""
     rg = rgs.get(granter)
     if not rg: return None
     try:
-        p = plan_restake(c, granter, rg, vals, m, P)
+        p = plan_restake(c, granter, rg, vals, m)
     except Exception as e:
         return {"error": str(e)[:200]}
     live = RESTAKE and not dry
@@ -331,7 +338,7 @@ def position(addr, vals):
     for r in reds:
         dst = r["redelegation"]["validator_dst_address"]
         for e in r.get("entries", []):
-            t = time.mktime(time.strptime(e["redelegation_entry"]["completion_time"][:19], "%Y-%m-%dT%H:%M:%S")) - time.timezone
+            t = calendar.timegm(time.strptime(e["redelegation_entry"]["completion_time"][:19], "%Y-%m-%dT%H:%M:%S"))
             if t > now: lock[dst] = lock.get(dst, 0) + int(e["balance"])
     rows = []
     for d in dels:
@@ -374,7 +381,7 @@ def fill(ranked, stake, amount, ok):
         if x >= 1_000_000: add[v["op"]] = x; left -= x
     return add
 
-def plan(g, rows, reds, vals, m, P=None, room=None):
+def plan(g, rows, reds, vals, m, room=None):
     room = MAX_MOVES_DAY if room is None else room
     for r in rows:
         v = vals.get(r["op"])
@@ -453,8 +460,9 @@ def execute(granter, moves):
     except urllib.error.HTTPError as e:
         try: return {"error": json.load(e)}
         except Exception: return {"error": "HTTP %d" % e.code}
-    except (urllib.error.URLError, OSError) as e:
-        # the signer never answered: a timeout may still have broadcast, so the next try plans from the chain again
+    except Exception as e:
+        # the signer never answered, or not in JSON: a timeout may still have broadcast, so the next try plans from the
+        # chain again (any exception, audit 2026-09-30: one escaping here would leave a sent tx with no retry row)
         return {"error": "network: %s" % e}
 
 # ── a failed move: try again, or settle ────────────────────────────────────
@@ -489,25 +497,27 @@ def classify(r):
     return "retry", why, h                # unknown: tried a few times, then it waits for the next run
 
 def tx_on_chain(h):
-    """the tx by hash: its result code, or None when the chain does not have it"""
+    """the tx by hash: its result code, raw log and codespace, or None when the chain does not have it"""
     try: t = get("/cosmos/tx/v1beta1/txs/" + h).get("tx_response") or {}
     except urllib.error.HTTPError as e:
         if e.code in (400, 404): return None
         raise
-    return int(t.get("code", 0)), t.get("raw_log", "")
+    return int(t.get("code", 0)), t.get("raw_log", ""), t.get("codespace", "")
 
 def moves_today(c, granter):
-    return c.execute("SELECT count(*) FROM move WHERE granter=? AND at>? AND dry=0", (granter, int(time.time()) - 86400)).fetchone()[0]
+    """stake-moving messages signed for this wallet in the last 24 hours: its moves and its restakes (one delegation
+    each). The signer counts the same and refuses past MAX_MOVES_DAY, so a plan is made to fit (audit 2026-09-30)"""
+    t = int(time.time()) - 86400
+    return (c.execute("SELECT count(*) FROM move WHERE granter=? AND at>? AND dry=0", (granter, t)).fetchone()[0]
+            + c.execute("SELECT count(*) FROM restake WHERE granter=? AND at>? AND dry=0 AND txhash IS NOT NULL", (granter, t)).fetchone()[0])
 
 def report(granter, obj):
+    # the public file never carries the signer's answer, an older report's included (audit 2026-09-30)
+    if "last" in obj: obj["last"] = public_last(obj["last"])
+    if isinstance(obj.get("restake"), dict) and "result" in obj["restake"]: obj["restake"]["result"] = public_last(obj["restake"]["result"])
     os.makedirs(REPORTS, exist_ok=True)
     tmp = os.path.join(REPORTS, granter + ".json.tmp")
     json.dump(obj, open(tmp, "w")); os.replace(tmp, os.path.join(REPORTS, granter + ".json"))
-
-def sent(c, gr, key):
-    """has this alert gone out already? (and mark it)"""
-    if c.execute("SELECT 1 FROM alert_sent WHERE granter=? AND k=?", (gr, key)).fetchone(): return True
-    c.execute("INSERT INTO alert_sent VALUES(?,?,?)", (gr, key, int(time.time()))); c.commit(); return False
 
 def plan_fields(gr, p):
     f = {"Delegator": gr}
@@ -518,35 +528,6 @@ def plan_fields(gr, p):
     else:
         f["Moves"] = "none: the stake already sits well"
     return f
-
-def carry_out(c, g, p, pid, ap, dry, out):
-    """execute the approved plan (or, in dry run, record it as applied and sign nothing), then announce it"""
-    gr, now = g["granter"], int(time.time())
-    f = plan_fields(gr, p); f["Approved by"] = ap.get("by") or "an operator"
-    if dry:
-        for e in p["moves"]:
-            c.execute("INSERT INTO move VALUES(?,?,?,?,?,?,?,?)", (now, gr, e["src"], e["dst"], int(e["amount"]), e["gain"], None, 1))
-        c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, pid, ap.get("by"), None, 1, 1, None, ap.get("at"))); c.commit()
-        log("DRY applied granter=%s plan=%s" % (gr, pid))
-        alert("ok", "Autopilot strategy applied: " + short(gr), "Dry run: the keeper recorded the approved moves and signed nothing.", f)
-        return
-    if moves_today(c, gr) + len(p["moves"]) > MAX_MOVES_DAY:
-        r = {"error": "daily move limit (%d) reached" % MAX_MOVES_DAY}
-    else:
-        r = execute(gr, p["moves"])
-    ok = "txhash" in r and "error" not in r
-    if ok:
-        for e in p["moves"]:
-            c.execute("INSERT INTO move VALUES(?,?,?,?,?,?,?,?)", (now, gr, e["src"], e["dst"], int(e["amount"]), e["gain"], r.get("txhash"), 0))
-    c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, pid, ap.get("by"), r.get("txhash") if ok else None, 0, 1 if ok else 0, None if ok else json.dumps(r.get("error"))[:300], ap.get("at")))
-    c.commit(); out["last"] = r
-    log("exec granter=%s plan=%s -> %s" % (gr, pid, r))
-    if ok:
-        f["Tx"] = r.get("txhash", "")
-        alert("ok", "Autopilot strategy applied: " + short(gr), "The approved moves are on chain.", f)
-    else:
-        f["Error"] = json.dumps(r.get("error"))[:300]
-        alert("crit", "Autopilot move failed: " + short(gr), "The approved plan could not be carried out. The keeper tries again in an hour.", f)
 
 def auto_apply(c, g, p, pid, dry, out):
     """carry out a plan in the run that made it (no operator step since 2026-09-30), then announce it"""
@@ -567,7 +548,7 @@ def auto_apply(c, g, p, pid, dry, out):
     if ok: record_moves(c, gr, p["moves"], r.get("txhash"), now)
     c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, pid, "auto", r.get("txhash") if ok else None, 0, 1 if ok else 0,
               None if ok else ("%s: %s" % ("settled" if kind == "settle" else "will retry", json.dumps(r.get("error"))))[:300], 0))
-    c.commit(); out["last"] = r
+    c.commit(); out["last"] = public_last(r, kind)
     log("auto exec granter=%s plan=%s -> %s (%s)" % (gr, pid, r, kind))
     if ok:
         c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()
@@ -580,6 +561,20 @@ def auto_apply(c, g, p, pid, dry, out):
               "Nothing to fix: the next run in 12 hours plans from the chain as it then stands.", f)
     else:
         schedule_retry(c, gr, kind, why, h, p["moves"], f)
+
+def public_last(r, kind=None):
+    """what the public report shows of the last execution (audit 2026-09-30): the tx on success, else only the reason's
+    class - never the signer's answer, whose errors can name RPCs and internals"""
+    if not isinstance(r, dict): return None
+    if set(r) <= {"error"} and r.get("error") in ("retry", "settled", "pending"): return {"error": r["error"]}
+    if "txhash" in r and "error" not in r: return {"txhash": r.get("txhash"), "height": r.get("height")}
+    kind = kind or classify(r)[0]
+    return {"error": "settled" if kind == "settle" else kind}
+
+def public_err(e):
+    """an applied row's error as the public report shows it: the class word only (the full text stays in keeper.db)"""
+    if not e: return None
+    return "settled" if e.startswith("settled") else "pending" if "not yet found" in e else "retry"
 
 def record_moves(c, gr, moves, txhash, at):
     for e in moves:
@@ -611,17 +606,22 @@ def landed_since(gr, since, h=None):
             r = tx_on_chain(h)
             if r is not None:
                 t = get("/cosmos/tx/v1beta1/txs/" + h).get("tx_response") or {}
-                return {"txhash": h, "code": r[0], "raw": r[1], "moves": _tx_moves(t, gr)}
-        d = get("/cosmos/tx/v1beta1/txs?query=" + urllib.parse.quote("message.sender='%s'" % GRANTEE) + "&order_by=ORDER_BY_DESC&pagination.limit=30")
+                return {"txhash": h, "code": r[0], "raw": r[1], "codespace": r[2], "moves": _tx_moves(t, gr)}
+        # the grantee's txs, newest first, 100 a page and at most 3 pages (audit 2026-09-30: 30 could miss a wallet's
+        # tx when many move in one slot). The SDK's tx search pages with page/limit; it ignores pagination.*
+        import datetime
+        q = "/cosmos/tx/v1beta1/txs?query=" + urllib.parse.quote("message.sender='%s'" % GRANTEE) + "&order_by=ORDER_BY_DESC&limit=100&page="
+        for page in (1, 2, 3):
+            txs = get(q + str(page)).get("tx_responses", []) or []
+            for t in txs:
+                try: ts = datetime.datetime.fromisoformat(t["timestamp"].replace("Z", "+00:00")).timestamp()
+                except Exception: continue
+                if ts < since - 5: return None
+                mv = _tx_moves(t, gr)
+                if mv and int(t.get("code", 0)) == 0: return {"txhash": t["txhash"], "code": 0, "raw": "", "moves": mv}
+            if len(txs) < 100: break
     except Exception as e:
         log("landed lookup for %s failed: %s" % (gr, e)); return "unknown"
-    import datetime
-    for t in d.get("tx_responses", []) or []:
-        try: ts = datetime.datetime.fromisoformat(t["timestamp"].replace("Z", "+00:00")).timestamp()
-        except Exception: continue
-        if ts < since - 5: break
-        mv = _tx_moves(t, gr)
-        if mv and int(t.get("code", 0)) == 0: return {"txhash": t["txhash"], "code": 0, "raw": "", "moves": mv}
     return None
 
 def _tx_moves(t, gr):
@@ -632,79 +632,28 @@ def _tx_moves(t, gr):
                 out.append({"src": x["validator_src_address"], "dst": x["validator_dst_address"], "amount": int(x["amount"]["amount"]), "gain": 0})
     return out
 
-def settle_landed(c, gr, seen):
-    """a move found on chain after a failure: recorded as the move when it succeeded; either way the retry is over"""
+def settle_landed(c, gr, seen, moves=None):
+    """a move found on chain after a failure: recorded as the move when it succeeded, and the retry is over. One that
+    landed with code != 0 is classified like any failure (audit 2026-09-30): a retry-class reason (out of gas, a fee)
+    keeps its RETRY_WAITS, a chain-rule reason settles to the next slot"""
     now = int(time.time())
     if seen["code"] == 0 and seen["moves"] and not c.execute("SELECT 1 FROM move WHERE txhash=?", (seen["txhash"],)).fetchone():
         record_moves(c, gr, seen["moves"], seen["txhash"], now)
         c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, plan_id({"moves": seen["moves"]}), "auto", seen["txhash"], 0, 1, None, 0))
         alert("ok", "Autopilot moved: " + short(gr), "The moves landed after a slow answer.", {"Delegator": gr, "Tx": seen["txhash"]})
     elif seen["code"] != 0:
-        log("tx %s for %s landed with code %s: %s" % (seen["txhash"], gr, seen["code"], str(seen.get("raw"))[:200]))
+        raw = str(seen.get("raw") or "")
+        log("tx %s for %s landed with code %s: %s" % (seen["txhash"], gr, seen["code"], raw[:200]))
+        kind, why, _ = classify({"error": "code %d (codespace: %s) %s" % (seen["code"], seen.get("codespace") or "sdk", raw)})
+        if kind == "retry":
+            schedule_retry(c, gr, kind, why, None, moves or seen["moves"], {"Delegator": gr, "Tx": seen["txhash"]})
+            return
     c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()
 
-def gate(c, g, p, pid, adm, dry):
-    """The admin gate for one Autopilot delegator. Nothing moves unless an operator approved exactly this
-    plan (by its id). Every grant waits for an operator first (activation), and every later plan that
-    differs from what was decided waits again. The clock is 48 hours; alerts at 3 hours left and every
-    12 hours once overdue - never an automatic apply. Returns the report's 'admin' block."""
-    gr, now = g["granter"], int(time.time())
-    made = granted_at(gr, c)
-    decs = [d for d in adm["decisions"].get(gr, []) if d.get("at", 0) >= made]
-    decided = {d.get("plan_id") for d in decs if d.get("action") in ("apply", "nomove")}
-    ap = adm["approved"].get(gr)
-    if ap and ap.get("at", 0) < made: ap = None
-    held = gr in adm["paused"]
-    out = {"plan_id": pid, "made": made, "decisions": decs[-10:]}
-    # an approval not yet carried out
-    todo = ap and not c.execute("SELECT 1 FROM applied WHERE granter=? AND plan_id=? AND ok=1 AND ap_at=?", (gr, ap["plan_id"], ap["at"])).fetchone()
-    if todo and not held:
-        if ap["plan_id"] == pid and p:
-            tried = c.execute("SELECT max(at) FROM applied WHERE granter=? AND plan_id=? AND ok=0 AND ap_at=?", (gr, pid, ap["at"])).fetchone()[0] or 0
-            if now - tried >= RETRY_S: carry_out(c, g, p, pid, ap, dry, out)
-        elif p is not None and ap["plan_id"] != pid and not sent(c, gr, "changed:" + ap["plan_id"]):
-            alert("warn", "Autopilot plan changed, approve again: " + short(gr),
-                  "The stake changed after the operator approved, so those moves no longer apply. Review the new plan.", {"Delegator": gr, "Approved by": ap.get("by", "")})
-    todo = ap and not c.execute("SELECT 1 FROM applied WHERE granter=? AND plan_id=? AND ok=1 AND ap_at=?", (gr, ap["plan_id"], ap["at"])).fetchone()
-    # what, if anything, waits for an operator
-    row = c.execute("SELECT plan_id, reason, since FROM pend WHERE granter=?", (gr,)).fetchone()
-    reason = None
-    if held: state = "held"
-    elif todo and ap["plan_id"] == pid: state = "approved"
-    elif pid == EMPTY_PID:
-        # nothing to offer (the stake is cooling down, or already in place): nothing waits for an operator and
-        # no clock runs; the first offer comes when the cooldown clears (operator, 2026-09-29)
-        state = "managed"
-    else:
-        if not decs: reason = "activation"
-        elif pid and pid not in decided: reason = "new plan"
-        state = "waiting" if reason else "managed"
-    if reason:
-        since = row[2] if row else (made if reason == "activation" else now)
-        dl = since + SLA_S
-        c.execute("INSERT INTO pend VALUES(?,?,?,?,?,0,0,'') ON CONFLICT(granter) DO UPDATE SET plan_id=excluded.plan_id, reason=excluded.reason, since=excluded.since, deadline=excluded.deadline",
-                  (gr, pid, reason, since, dl)); c.commit()
-        out.update({"reason": reason, "since": since, "deadline": dl})
-        f = plan_fields(gr, p) if p is not None else {"Delegator": gr}
-        f["Decide by"] = when(dl)
-        if p is not None and not sent(c, gr, "ready:%d:%s" % (since, pid)):
-            alert("info", ("New Autopilot plan: " if reason == "new plan" else "Autopilot plan ready: ") + short(gr),
-                  "An operator answers it in the admin console: Yes (the keeper makes it) or No (settled by hand).", f)
-        if dl - WARN_S <= now < dl and not sent(c, gr, "warn:%d" % since):
-            alert("warn", "Autopilot: 3 hours left for " + short(gr), "No operator has decided on this delegator's plan yet.", f)
-        if now >= dl and not sent(c, gr, "over:%d:%d" % (since, (now - dl) // OVERDUE_EVERY)):
-            alert("crit", "Autopilot overdue: " + short(gr), "48 hours passed with no decision. Nothing moves until an operator acts.", f)
-    else:
-        c.execute("DELETE FROM pend WHERE granter=?", (gr,)); c.commit()
-    out["state"] = state
-    last = c.execute("SELECT at, plan_id, by, txhash, dry, ok, error FROM applied WHERE granter=? AND at>=? ORDER BY at DESC, rowid DESC LIMIT 1", (gr, made)).fetchone()
-    if last: out["applied"] = {"at": last[0], "plan_id": last[1], "by": last[2], "txhash": last[3], "dry": bool(last[4]), "ok": bool(last[5]), "error": last[6]}
-    return out
-
 def once(c, only=None, live=None, force=False):
-    """One tick. Each delegator is planned at the fixed pace (every 6 hours), at once when new, and at once
-    when an operator's approval waits to be carried out; the admin gate runs every tick. only=<granter>
-    restricts it; live overrides KEEPER_DRY for this tick; force plans now."""
+    """One tick. Each delegator is planned once per 12-hour slot (00:00 and 12:00 UTC), at once when its grant is new
+    or changed, and a failed move again at its retry time; a plan is carried out in the run that makes it. A Disabled
+    wallet is skipped. only=<granter> restricts it; live overrides KEEPER_DRY for this tick; force plans now."""
     dry = DRY if live is None else (not live)
     fresh()
     vals, m, eta = model()
@@ -712,8 +661,8 @@ def once(c, only=None, live=None, force=False):
     # no silent fallback to the collector's stakes: a tick without the live set does nothing
     vals = live_vals(vals)
     # first come, first served (operator, 2026-09-29): grants are planned in the order they were made, and each
-    # plan that stands (waiting for an operator, approved, or carried out this tick) is counted as placed before
-    # the next grant is planned - the first grantee gets the top strategy, the next one the next best
+    # move carried out this tick is counted as placed before the next grant is planned - the first grantee gets the
+    # top strategy, the next one the next best
     work = {op: dict(v) for op, v in vals.items()}
     def claim(moves):
         for mv in moves or []:
@@ -729,16 +678,15 @@ def once(c, only=None, live=None, force=False):
     for g in gs:
         gr = g["granter"]
         try:
-            # no strategies: one fixed rule for every Autopilot (the former moderate); an operator decides on each plan
-            name = "moderate"; P = PRESETS[name]
+            # no strategies: one fixed rule for every Autopilot (the report still names it "moderate")
+            name = "moderate"
             path = os.path.join(REPORTS, gr + ".json")
             try: prev = json.load(open(path))
             except Exception: prev = None
             last = c.execute("SELECT max(at) FROM run_g WHERE granter=?", (gr,)).fetchone()[0] or 0
-            # the grant as it stands: a re-grant (Change, a new cap or validator list) is planned at once, not
-            # at the next 6-hour turn, so the console never shows a plan made for the grant it replaced
-            gsig = hashlib.sha1(json.dumps([g["cap"], sorted(g["allow"] or []), g["exp"]]).encode()).hexdigest()[:12]
-            due = force or not last or last < slot0() or (prev or {}).get("grant_sig") != gsig
+            # the grant as it stands: a re-grant (Change, a new validator list, expiry or a higher cap) is planned at once,
+            # not at the next slot, so the console never shows a plan made for the grant it replaced
+            due = force or not last or last < slot0() or grant_changed(g, prev)
             # a move that failed for a fee, network or RPC reason is tried again at its time; one that was sent but not
             # seen is looked up by hash first, and if it landed that is the move - nothing is planned over it
             rt = c.execute("SELECT due, tries, txhash, moves, since FROM retry WHERE granter=?", (gr,)).fetchone()
@@ -749,23 +697,23 @@ def once(c, only=None, live=None, force=False):
                 seen = landed_since(gr, rt[4] or 0, rt[2])
                 if seen == "unknown": due = False
                 elif seen:
-                    settle_landed(c, gr, seen); due = False
+                    settle_landed(c, gr, seen, json.loads(rt[3] or "[]")); due = False
                 elif rt[2] and time.time() - (rt[4] or 0) < 1800: due = False
                 else: due = True
             if gr in adm["paused"]: due = False
             p = None
             if due:
                 rows, reds = position(gr, work)
-                p = plan(g, rows, reds, work, m, P, room=MAX_MOVES_DAY - moves_today(c, gr)) or {"moves": []}
+                p = plan(g, rows, reds, work, m, room=MAX_MOVES_DAY - moves_today(c, gr)) or {"moves": []}
                 c.execute("INSERT INTO run_g VALUES(?,?)", (int(time.time()), gr)); c.commit()
                 record = rate_record(c, gr, rows)
                 rep = {"granter": gr, "checked": int(time.time()), "dry": dry, "strategy": name,
-                       "grant": {"cap": g["cap"], "allow": len(g["allow"]) if g["allow"] else None, "expires": g["exp"]}, "grant_sig": gsig,
+                       "grant": {"cap": g["cap"], "allow": len(g["allow"]) if g["allow"] else None, "expires": g["exp"]}, "grant_sig": grant_sig(g),
                        "staked": sum(r["x"] for r in rows), "now": p.get("now"), "after": p.get("after"), "gain": p.get("gain"),
                        "moves": [{"src": e["src"], "dst": e["dst"], "uatone": e["amount"], "gain": round(e["gain"], 3)} for e in p["moves"]], "last": None}
                 if record: rep["record"] = record
                 # the redelegation lock, for the console's Cooling down: what is held and when the last of it clears
-                ends = [time.mktime(time.strptime(e["redelegation_entry"]["completion_time"][:19], "%Y-%m-%dT%H:%M:%S")) - time.timezone
+                ends = [calendar.timegm(time.strptime(e["redelegation_entry"]["completion_time"][:19], "%Y-%m-%dT%H:%M:%S"))
                         for r in reds for e in r.get("entries", [])]
                 rep["locked"] = sum(r["locked"] for r in rows)
                 rep["until"] = int(max([t for t in ends if t > time.time()] or [0])) or None
@@ -775,8 +723,8 @@ def once(c, only=None, live=None, force=False):
             else:
                 rep = prev or {"granter": gr, "strategy": name, "moves": []}
                 pid = (rep.get("admin") or {}).get("plan_id")
-            # no approval (operator, 2026-09-30): a plan is carried out in the run that makes it. Hold (the console's
-            # emergency stop) still stops everything for a delegator
+            # no approval (operator, 2026-09-30): a plan is carried out in the run that makes it. Disable (the console's
+            # stop) stops everything for a delegator
             if due and p and p["moves"] and gr not in adm["paused"]:
                 auto_apply(c, g, p, pid, dry, rep)
             elif due and p is not None and not p["moves"]:
@@ -786,7 +734,8 @@ def once(c, only=None, live=None, force=False):
             rep["history"] = [{"at": h[0], "src": h[1], "dst": h[2], "uatone": h[3], "gain": h[4], "txhash": h[5]} for h in hist]
             last = c.execute("SELECT at, plan_id, by, txhash, dry, ok, error FROM applied WHERE granter=? ORDER BY at DESC, rowid DESC LIMIT 1", (gr,)).fetchone()
             rep["admin"] = {"state": "held" if gr in adm["paused"] else "auto", "plan_id": pid}
-            if last: rep["admin"]["applied"] = {"at": last[0], "plan_id": last[1], "by": last[2], "txhash": last[3], "dry": bool(last[4]), "ok": bool(last[5]), "error": last[6]}
+            if last: rep["admin"]["applied"] = {"at": last[0], "plan_id": last[1], "by": last[2], "txhash": last[3], "dry": bool(last[4]), "ok": bool(last[5]),
+                                                "error": public_err(last[6])}
             ad_ = rep["admin"]
             if due and p is not None and (ad_.get("applied") or {}).get("at", 0) >= tick0 and (ad_.get("applied") or {}).get("ok"):
                 claim(rep.get("moves"))          # a plan made this tick; a move found on chain is in the live set already
@@ -795,16 +744,9 @@ def once(c, only=None, live=None, force=False):
             report(gr, rep)
         except Exception as e:
             log("granter %s failed: %s" % (gr, e))
-    # nothing waits for a delegator who is no longer an Autopilot granter (revoked, used up)
-    live_gs = {g["granter"] for g in gs}
-    if not only:
-        for (gr,) in c.execute("SELECT granter FROM pend").fetchall():
-            if gr not in live_gs: c.execute("DELETE FROM pend WHERE granter=?", (gr,))
-        c.commit()
     # restake, its own service with fixed rules - the same for everyone, Autopilot or not: every 12 hours, from
     # 1 ATONE of rewards, staked on the best-paying validator the wallet's delegate grant allows (its own), under the
-    # usual checks (withdraw address, other services, the cap, the dry switch, an admin pause). No admin step.
-    RS_FIXED = {"restake_every": 12 * 3600, "d90": 0}
+    # usual checks (withdraw address, other services, the cap, the dry switch, Disable). No admin step.
     for granter in rgs:
         if only and granter != only: continue
         try:
@@ -812,7 +754,7 @@ def once(c, only=None, live=None, force=False):
             seen = c.execute("SELECT at FROM rs_run WHERE granter=?", (granter,)).fetchone()
             if not force and seen and seen[0] >= slot0(): continue
             c.execute("INSERT INTO rs_run VALUES(?,?) ON CONFLICT(granter) DO UPDATE SET at=excluded.at", (granter, int(time.time()))); c.commit()
-            rs = restake_step(c, granter, rgs, work, m, RS_FIXED, dry)
+            rs = restake_step(c, granter, rgs, work, m, dry)
             # the next restake (and the next tick's plans) see these stakes where they land
             for leg in ((rs or {}).get("stake") or []):
                 if leg.get("validator") in work: work[leg["validator"]]["t"] += int(leg.get("amount", 0))
@@ -877,13 +819,13 @@ def low_photon(c, photon):
         c.execute("DELETE FROM alert_sent WHERE granter='_signer' AND k='low'"); c.commit()
 
 def main():
-    """Service: a tick every KEEPER_TICK (60 s); each delegator planned every 6 hours, at once when new or
-    approved. By hand:  keeper.py --once [--granter atone1...] [--live] [--force]
+    """Service: a tick every KEEPER_TICK (60 s); each delegator planned at 00:00 and 12:00 UTC, at once when its grant
+    is new or changed. By hand:  keeper.py --once [--granter atone1...] [--live] [--force]
               --once   one tick, then exit (respects KEEPER_DRY unless --live)
-              --live   execute approved plans for real on this tick only
+              --live   carry plans out for real on this tick only
               --force  plan now even if not due"""
     if not GRANTEE or not SIGNER or not SECRET:
-        log("not configured (KEEPER_GRANTEE / KEEPER_SIGNER_URL / KEEPER_SECRET) - parking"); sys.exit(78)
+        log("not configured (KEEPER_GRANTEE / KEEPER_SIGNER_URL / the keeper_secret credential or KEEPER_SECRET) - parking"); sys.exit(78)
     os.makedirs(os.path.dirname(STATE), exist_ok=True)
     # one keeper per state at a time: a hand run beside the service would execute the same plan twice (audit, 2026-09-30)
     import fcntl

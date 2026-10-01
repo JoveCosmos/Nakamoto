@@ -16,17 +16,14 @@ session is an HMAC-signed cookie (12 hours, HttpOnly, Secure, SameSite=Strict, p
     GET  /admin-api/me                       -> {address}
     GET  /admin-api/overview?net=mainnet|testnet               -> grants ledger, keeper status,
                                                                   validator incidents, events
-    POST /admin-api/decide {net, granter, action, plan_id?, note?} -> the operator's decision on a delegator:
-         apply   carry out exactly this plan (plan_id must be the keeper's current one)
-         nomove  activate with no move: the stake already sits well
-         hold    stop the clock and the keeper for this delegator (a note says why)
-         resume  lift a hold
-    POST /admin-api/pause {net, granter, paused}               -> the keeper skips / resumes it
-    POST /admin-api/note  {net, granter, text}
-    POST /admin-api/test-alert                                 -> one Discord message
+    POST /admin-api/decide {net, granter, action, note?}      -> the operator's decision on a delegator:
+         hold    Disable: Autopilot and Restake stop for this delegator (a note says why)
+         resume  Enable: lift a hold
 
-Every sign-in and every action is announced on Discord. Pauses, approvals, decisions and notes live
-in STATE_DIR/admin-<net>.json; the keeper reads it and executes only an approved plan."""
+Every POST must be application/json and, when the browser sends an Origin, come from this host
+(audit 2026-09-30). Every sign-in and every action is announced on Discord; refused sign-ins at most
+once per wallet per hour and once per 10 minutes in all, from a background thread. Holds, decisions
+and notes live in STATE_DIR/admin-<net>.json; the keeper reads it and skips a held delegator."""
 import base64, hashlib, hmac, json, os, secrets, sys, threading, time, urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -47,7 +44,11 @@ ADMINS = ADMINS_BY["mainnet"] | ADMINS_BY["testnet"]
 def nets_of(a): return [n for n in ("mainnet", "testnet") if a in ADMINS_BY[n]]
 SESSION_S = 12 * 3600
 LOCK = threading.Lock()
-CHALLENGES = {}          # nonce -> expiry
+CHALLENGES = {}          # nonce -> (expiry, the full text issued): login must sign exactly that text (audit 2026-09-30)
+REVOKED = {}             # session token -> its expiry: logged out, refused until it would have expired anyway
+REFUSED_AT = {}          # wallet -> when its refused sign-in was last announced
+REFUSED = {"at": 0.0, "held": 0}   # the last refused-sign-in alert, and refusals not announced since
+REFUSE_WALLET_S, REFUSE_ALL_S = 3600, 600
 
 
 def log(*a): print("adminapi:", *a, flush=True)
@@ -86,13 +87,30 @@ def bech32(hrp, data):
     ex = [ord(x) >> 5 for x in hrp] + [0] + [ord(x) & 31 for x in hrp]
     pm = _polymod(ex + out + [0] * 6) ^ 1
     return hrp + "1" + "".join(CS[d] for d in out + [(pm >> 5 * (5 - i)) & 31 for i in range(6)])
+def bech32_decode(s):
+    """-> (hrp, data bytes), or None unless the checksum holds and the padding is clean (audit 2026-09-30)"""
+    if not isinstance(s, str) or s != s.lower() or len(s) > 90: return None
+    hrp, sep, rest = s.rpartition("1")
+    if not sep or not hrp or len(rest) < 6 or any(c not in CS for c in rest) or any(not 33 <= ord(c) <= 126 for c in hrp): return None
+    d = [CS.index(c) for c in rest]
+    if _polymod([ord(x) >> 5 for x in hrp] + [0] + [ord(x) & 31 for x in hrp] + d) != 1: return None
+    acc = bits = 0; out = []
+    for v in d[:-6]:
+        acc = (acc << 5) | v; bits += 5
+        if bits >= 8: bits -= 8; out.append((acc >> bits) & 255)
+    if bits >= 5 or acc & ((1 << bits) - 1): return None
+    return hrp, bytes(out)
+def is_account(a):
+    d = bech32_decode(a)
+    return bool(d) and d[0] == "atone" and len(d[1]) == 20
 
 
 def verify(address, pubkey_b64, sig_b64, text):
-    pk = base64.b64decode(pubkey_b64)
+    pk = base64.b64decode(pubkey_b64, validate=True)
+    if len(pk) != 33: return False          # a compressed secp256k1 key, nothing else (audit 2026-09-30)
     derived = bech32("atone", hashlib.new("ripemd160", hashlib.sha256(pk).digest()).digest())
     if derived != address: return False
-    sig = base64.b64decode(sig_b64)
+    sig = base64.b64decode(sig_b64, validate=True)
     if len(sig) != 64: return False
     key = ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP256K1(), pk)
     try:
@@ -104,11 +122,13 @@ def verify(address, pubkey_b64, sig_b64, text):
 
 
 def token(address):
-    body = base64.urlsafe_b64encode(json.dumps({"a": address, "e": int(time.time()) + SESSION_S}).encode()).decode()
+    # n: two sign-ins in one second still get two tokens, so a logout revokes only its own
+    body = base64.urlsafe_b64encode(json.dumps({"a": address, "e": int(time.time()) + SESSION_S, "n": secrets.token_hex(8)}).encode()).decode()
     return body + "." + hmac.new(KEY, body.encode(), hashlib.sha256).hexdigest()
 
 
-def session(cookie):
+def cookie_token(cookie):
+    """-> (token, its payload) when the session cookie carries our MAC, else None"""
     for part in (cookie or "").split(";"):
         k, _, v = part.strip().partition("=")
         if k != "aa_s": continue
@@ -116,9 +136,44 @@ def session(cookie):
         if not hmac.compare_digest(mac, hmac.new(KEY, body.encode(), hashlib.sha256).hexdigest()): return None
         try: d = json.loads(base64.urlsafe_b64decode(body.encode()))
         except Exception: return None
-        if d.get("e", 0) < time.time() or d.get("a") not in ADMINS: return None
-        return d["a"]
+        return (v, d) if isinstance(d, dict) else None
     return None
+
+
+def session(cookie):
+    t = cookie_token(cookie)
+    if not t: return None
+    v, d = t
+    if not isinstance(d.get("e"), (int, float)) or d["e"] < time.time() or d.get("a") not in ADMINS: return None
+    with LOCK:
+        if v in REVOKED: return None
+    return d["a"]
+
+
+def revoke(cookie):
+    """logout: the token stops working here and now, not only in this browser (audit 2026-09-30; in memory, a restart forgets)"""
+    t = cookie_token(cookie)
+    if not t: return
+    now = time.time()
+    with LOCK:
+        for k in [k for k, e in REVOKED.items() if e < now]: REVOKED.pop(k, None)
+        e = t[1].get("e")
+        if isinstance(e, (int, float)) and e >= now: REVOKED[t[0]] = e
+
+
+def refused(addr):
+    """a non-operator wallet signed a valid challenge: announce it at most once per wallet per hour and once
+    per 10 minutes in all, counting what was held back, from a thread so the request never waits on Discord"""
+    now = time.time()
+    with LOCK:
+        for k in [k for k, t in REFUSED_AT.items() if t < now - REFUSE_WALLET_S]: REFUSED_AT.pop(k, None)
+        if addr in REFUSED_AT or now - REFUSED["at"] < REFUSE_ALL_S:
+            REFUSED["held"] += 1; return
+        held = REFUSED["held"]
+        REFUSED_AT[addr] = now; REFUSED.update(at=now, held=0)
+    text = "A wallet that is not an operator tried to sign in."
+    if held: text += " %d more refused sign-in%s since the last alert (not announced one by one)." % (held, "" if held == 1 else "s")
+    threading.Thread(target=notify.send, args=("warn", "Admin sign-in refused", text, {"Wallet": addr}), daemon=True).start()
 
 
 def jload(p, default):
@@ -179,8 +234,10 @@ class H(BaseHTTPRequestHandler):
 
     def body(self):
         n = int(self.headers.get("content-length") or 0)
-        if n > 16384: raise ValueError("too large")
-        return json.loads(self.rfile.read(n) or b"{}")
+        if n < 0 or n > 16384: raise ValueError("length")
+        b = json.loads(self.rfile.read(n) or b"{}")
+        if not isinstance(b, dict): raise ValueError("not an object")
+        return b
 
     def who(self): return session(self.headers.get("cookie"))
 
@@ -188,11 +245,12 @@ class H(BaseHTTPRequestHandler):
         u = urllib.parse.urlparse(self.path); q = urllib.parse.parse_qs(u.query)
         if u.path == "/admin-api/challenge":
             n = secrets.token_hex(12)
+            text = "Sign in to the GATA AtomOne admin console.\nNothing is sent on chain.\nNonce: %s\nIssued: %s" % (n, time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
             with LOCK:
                 now = time.time()
-                for k in [k for k, v in CHALLENGES.items() if v < now]: CHALLENGES.pop(k, None)
-                CHALLENGES[n] = now + 300
-            return self.reply(200, {"text": "Sign in to the GATA AtomOne admin console.\nNothing is sent on chain.\nNonce: %s\nIssued: %s" % (n, time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))})
+                for k in [k for k, v in CHALLENGES.items() if v[0] < now]: CHALLENGES.pop(k, None)
+                CHALLENGES[n] = (now + 300, text)
+            return self.reply(200, {"text": text})
         a = self.who()
         if not a: return self.reply(401, {"error": "sign in"})
         if u.path == "/admin-api/me": return self.reply(200, {"address": a, "nets": nets_of(a)})
@@ -205,32 +263,43 @@ class H(BaseHTTPRequestHandler):
 
     def do_POST(self):
         u = urllib.parse.urlparse(self.path)
+        # CSRF, beside SameSite=Strict (audit 2026-09-30): JSON only (a form or a no-cors fetch cannot send it),
+        # and a browser's Origin must be this very host
+        if (self.headers.get("content-type") or "").split(";")[0].strip().lower() != "application/json":
+            return self.reply(415, {"error": "send application/json"})
+        origin, host = self.headers.get("origin"), self.headers.get("host") or ""
+        # the loopback test harness (http://127.0.0.1:8089) is the one plain-http origin allowed
+        if origin is not None and origin != "https://" + host and not (host == "127.0.0.1:8089" and origin == "http://" + host):
+            return self.reply(403, {"error": "origin"})
         try: b = self.body()
         except Exception: return self.reply(400, {"error": "bad body"})
         if u.path == "/admin-api/login":
             text, addr = str(b.get("text", "")), str(b.get("address", ""))
             n = text.split("Nonce: ")[-1].split("\n")[0] if "Nonce: " in text else ""
-            with LOCK: exp = CHALLENGES.pop(n, 0)
-            if exp < time.time(): return self.reply(401, {"error": "the challenge expired, try again"})
-            try: ok = verify(addr, b.get("pubkey", ""), b.get("signature", ""), text)
+            with LOCK: exp, issued = CHALLENGES.pop(n, (0, None))
+            # the nonce is spent either way; the signed text must be exactly the one issued (audit 2026-09-30)
+            if exp < time.time() or text != issued: return self.reply(401, {"error": "the challenge expired or does not match, try again"})
+            try: ok = verify(addr, str(b.get("pubkey", "")), str(b.get("signature", "")), text)
             except Exception: ok = False
             if not ok: return self.reply(401, {"error": "signature does not match"})
             if addr not in ADMINS:
                 log("refused sign-in from %s" % addr)
-                notify.send("warn", "Admin sign-in refused", "A wallet that is not an operator tried to sign in.", {"Wallet": addr})
+                refused(addr)
                 return self.reply(403, {"error": "this wallet is not an operator"})
             log("sign-in %s" % addr)
             notify.send("info", "Admin signed in", "", {"Operator": addr, "Networks": ", ".join(nets_of(addr))})
             return self.reply(200, {"address": addr}, cookie=token(addr))
-        if u.path == "/admin-api/logout": return self.reply(200, {}, cookie="")
+        if u.path == "/admin-api/logout":
+            revoke(self.headers.get("cookie"))
+            return self.reply(200, {}, cookie="")
         a = self.who()
         if not a: return self.reply(401, {"error": "sign in"})
-        net = b.get("net", "mainnet")
+        net = str(b.get("net", "mainnet"))
         if net not in WEB: return self.reply(400, {"error": "net"})
         if a not in ADMINS_BY[net]: return self.reply(403, {"error": "this wallet is not an operator on " + net})
         if u.path == "/admin-api/decide":
             g, act, note = str(b.get("granter", "")), str(b.get("action", "")), str(b.get("note", "")).strip()[:500]
-            if not (g.startswith("atone1") and len(g) == 44): return self.reply(400, {"error": "granter"})
+            if not is_account(g): return self.reply(400, {"error": "granter"})
             # no approvals since 2026-09-30: Autopilot carries out its plans itself; Hold and Resume are the operator's controls
             if act not in ("hold", "resume"): return self.reply(400, {"error": "action"})
             now = int(time.time())
@@ -248,27 +317,6 @@ class H(BaseHTTPRequestHandler):
             elif act == "resume":
                 notify.send("info", "Autopilot enabled: " + short(g), "", {"Delegator": g, "Operator": a}, net=net)
             return self.reply(200, {"ok": True})
-        if u.path in ("/admin-api/pause", "/admin-api/note"):
-            g = str(b.get("granter", ""))
-            if not (g.startswith("atone1") and len(g) == 44): return self.reply(400, {"error": "granter"})
-            with LOCK:
-                adm = adm_load(net)
-                if u.path.endswith("pause"):
-                    if b.get("paused"): adm.setdefault("paused", {})[g] = {"by": a, "at": int(time.time())}
-                    else: adm.setdefault("paused", {}).pop(g, None)
-                    what = "paused" if b.get("paused") else "resumed"
-                else:
-                    t = str(b.get("text", "")).strip()[:500]
-                    if not t: return self.reply(400, {"error": "empty note"})
-                    adm.setdefault("notes", {}).setdefault(g, []).append({"by": a, "at": int(time.time()), "text": t})
-                    what = "noted"
-                adm_save(net, adm)
-            notify.send("info", "Autopilot %s by an operator" % what, (b.get("text") or "")[:300] if what == "noted" else "",
-                        {"Delegator": g, "Operator": a}, net=net)
-            return self.reply(200, {"ok": True})
-        if u.path == "/admin-api/test-alert":
-            ok = notify.send("info", "Test alert from the admin console", "", {"Operator": a}, net=net)
-            return self.reply(200, {"sent": ok})
         return self.reply(404, {"error": "not found"})
 
 

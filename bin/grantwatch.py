@@ -21,7 +21,7 @@ console) live in the ledger too; the keeper skips a paused delegator.
     NET, ATOMONE_API, GRANTEE (else KEEPER_GRANTEE), DISCORD_WEBHOOK (via notify)
     grantwatch.py          run forever          grantwatch.py --once   one pass, print, send nothing
 """
-import json, os, sys, time, urllib.parse, urllib.request
+import calendar, json, os, sys, time, urllib.parse, urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import notify
@@ -47,7 +47,7 @@ def get(path, timeout=30):
 
 def ts(iso):
     if not iso: return None
-    return int(time.mktime(time.strptime(iso[:19], "%Y-%m-%dT%H:%M:%S")) - time.timezone)
+    return calendar.timegm(time.strptime(iso[:19], "%Y-%m-%dT%H:%M:%S"))     # UTC whatever the process TZ (audit 2026-09-30)
 
 
 def fmt_atone(u): return "{:,.1f}".format((u or 0) / 1e6)

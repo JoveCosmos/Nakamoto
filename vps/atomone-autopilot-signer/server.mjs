@@ -10,6 +10,11 @@
 // than the rewards pending on the validators it claims from - so it can never be used
 // to stake a delegator's own liquid ATONE, whatever the keeper asks. It cannot
 // grant. Fees are PHOTON from this account's own balance.
+// Its own policy, whatever the keeper asks (audit 2026-09-30): a move goes only to a bonded,
+// unjailed validator inside the keeper's window (ranks n-33 to n-3) and only out of what the
+// delegator holds at the source; a restake stakes only on a bonded, unjailed validator ranked
+// n-3 or higher; at most 20 stake-moving messages per delegator a day; 30 requests a minute;
+// a simulated gas ceiling and a timeout height on every transaction.
 //
 // Independent of the payout signer: a different mnemonic, secret, Linux user, unit and
 // port. Neither process can read the other's credentials.
@@ -28,10 +33,11 @@
 // Secrets arrive as systemd credentials (LoadCredentialEncrypted), never as env:
 //   $CREDENTIALS_DIRECTORY/autopilot_mnemonic, $CREDENTIALS_DIRECTORY/autopilot_secret
 import http from "node:http";
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
-import { SigningStargateClient, GasPrice, QueryClient, setupDistributionExtension } from "@cosmjs/stargate";
+import { SigningStargateClient, GasPrice, QueryClient, calculateFee, setupDistributionExtension, setupStakingExtension } from "@cosmjs/stargate";
 import { MsgBeginRedelegate, MsgDelegate } from "cosmjs-types/cosmos/staking/v1beta1/tx";
 import { MsgWithdrawDelegatorReward } from "cosmjs-types/cosmos/distribution/v1beta1/tx";
 
@@ -40,6 +46,8 @@ const GAS = process.env.ATOMONE_GAS_PRICE || "0.25uphoton";
 const RPCS = (process.env.ATOMONE_RPC || "https://atomone-rpc.gatadao.com,https://atomone-rpc.polkachu.com").split(",").map(s => s.trim()).filter(Boolean);
 const BIND = process.env.BIND || "10.9.0.2", PORT = +(process.env.PORT || 8788);
 const MAX_MOVES = +(process.env.MAX_MOVES || 20);
+const MAX_GAS = +(process.env.ATOMONE_MAX_GAS || 12_000_000);   // after the 1.4 margin; 7 redelegations used 2.4M
+const TIMEOUT_BLOCKS = 100;                                       // a tx not in a block by then can never land
 
 if (process.argv.includes("--keygen")) {
   const w = await DirectSecp256k1HdWallet.generate(24, { prefix: PREFIX });
@@ -56,6 +64,13 @@ function cred(name) {
 }
 const MNEMONIC = cred("autopilot_mnemonic"), SECRET = cred("autopilot_secret");
 if (!MNEMONIC || !SECRET) { console.error("autopilot-signer: missing credential"); process.exit(78); }
+const SECRET_B = Buffer.from(SECRET);
+// constant-time compare (audit 2026-09-30): the length check first, timingSafeEqual needs equal lengths
+function authorised(h) {
+  if (typeof h !== "string") return false;
+  const b = Buffer.from(h);
+  return b.length === SECRET_B.length && crypto.timingSafeEqual(b, SECRET_B);
+}
 
 async function connectFirst(rpcs, make) {
   let last;
@@ -71,7 +86,7 @@ async function getClient() {
       const client = await connectFirst(RPCS, rpc => SigningStargateClient.connectWithSigner(rpc, wallet, { gasPrice: GasPrice.fromString(GAS) }));
       const id = await client.getChainId();
       if (id !== CHAIN_ID) throw new Error("wrong chain " + id);
-      const query = QueryClient.withExtensions(client.forceGetCometClient(), setupDistributionExtension);
+      const query = QueryClient.withExtensions(client.forceGetCometClient(), setupDistributionExtension, setupStakingExtension);
       return { client, sender: account.address, query };
     })().catch(e => { clientPromise = null; throw e; });
   }
@@ -86,30 +101,158 @@ const isAcc = s => typeof s === "string" && /^atone1[02-9ac-hj-np-z]{38}$/.test(
 const isVal = s => typeof s === "string" && /^atonevaloper1[02-9ac-hj-np-z]{38}$/.test(s);
 const isAmt = s => /^[1-9]\d{0,17}$/.test(String(s));
 
+// ---- policy: pure functions, no I/O (audit 2026-09-30) ----
+// BOTTOM, EDGE and RS_EDGE MUST match keeper.py's BOTTOM, EDGE and RS_EDGE: the keeper plans inside this
+// window and the signer refuses anything outside it
+const BOTTOM = 34, EDGE = 3, RS_EDGE = 3;
+const DAY_MS = 86_400_000, RATE_MAX = 30, RATE_MS = 60_000;
+// the bonded set, largest first (a stable sort: ties keep the chain's order, as the keeper's does)
+function rankSet(validators) {
+  const out = validators.filter(v => v.status === 3 || v.status === "BOND_STATUS_BONDED")
+    .map(v => ({ op: v.operatorAddress, tokens: BigInt(v.tokens), jailed: !!v.jailed }));
+  return out.sort((a, b) => (a.tokens > b.tokens ? -1 : a.tokens < b.tokens ? 1 : 0));
+}
+// a move's destination: bonded, not jailed, 0-based index from n-BOTTOM to n-1-EDGE (ranks n-33 to n-3)
+function checkMoves(ranked, moves) {
+  const n = ranked.length, idx = new Map(ranked.map((v, i) => [v.op, i]));
+  const lo = Math.max(0, n - BOTTOM), hi = n - 1 - EDGE;
+  for (const m of moves) {
+    const i = idx.get(m.dst);
+    if (i === undefined) return "destination " + m.dst + " is not bonded";
+    if (ranked[i].jailed) return "destination " + m.dst + " is jailed";
+    if (i < lo || i > hi) return `destination ${m.dst} is rank ${i + 1} of ${n}, outside ranks ${lo + 1} to ${hi + 1}`;
+  }
+  return null;
+}
+// a restake's validator: bonded, not jailed, rank n-RS_EDGE or higher
+function checkStake(ranked, stake) {
+  const n = ranked.length, idx = new Map(ranked.map((v, i) => [v.op, i]));
+  for (const s of stake) {
+    const i = idx.get(s.validator);
+    if (i === undefined) return "validator " + s.validator + " is not bonded";
+    if (ranked[i].jailed) return "validator " + s.validator + " is jailed";
+    if (i > n - 1 - RS_EDGE) return `validator ${s.validator} is rank ${i + 1} of ${n}, below rank ${n - RS_EDGE}`;
+  }
+  return null;
+}
+// what each source gives in this request, in uatone
+function sumBySrc(moves) {
+  const out = new Map();
+  for (const m of moves) out.set(m.src, (out.get(m.src) || 0n) + BigInt(m.amount));
+  return out;
+}
+// the per-delegator day: one timestamp per stake-moving message signed (redelegations and delegations, both
+// endpoints; reward claims move nothing and are not counted). Room is what the last 24 hours leave of MAX_MOVES
+function capHeld(log, granter, now) {
+  const kept = (log.get(granter) || []).filter(t => t > now - DAY_MS);
+  if (kept.length) log.set(granter, kept); else log.delete(granter);
+  return kept.length;
+}
+function capRecord(log, granter, count, now) {
+  const l = log.get(granter) || [];
+  for (let i = 0; i < count; i++) l.push(now);
+  log.set(granter, l);
+}
+// every caller together: at most RATE_MAX requests in any RATE_MS
+function rateTake(stamps, now) {
+  while (stamps.length && stamps[0] <= now - RATE_MS) stamps.shift();
+  if (stamps.length >= RATE_MAX) return false;
+  stamps.push(now); return true;
+}
+// a memo: none means the fallback; a string of at most 64 characters with no control characters, else refused
+function memoOf(memo, fallback) {
+  if (memo === undefined || memo === null || memo === "") return { memo: fallback };
+  if (typeof memo !== "string" || memo.length > 64 || /[\u0000-\u001f\u007f-\u009f]/.test(memo)) return { error: "bad memo" };
+  return { memo };
+}
+// ---- end policy ----
+
+// the bonded set from this signer's own RPC, read at most once a minute (and again after every tx it signs)
+const SET_TTL_MS = 60_000;
+let setCache = { at: 0, ranked: null };
+async function bondedSet(query) {
+  if (setCache.ranked && Date.now() - setCache.at < SET_TTL_MS) return setCache.ranked;
+  const all = []; let key, pages = 0;
+  do {
+    const r = await query.staking.validators("BOND_STATUS_BONDED", key);
+    all.push(...(r.validators || [])); key = r.pagination?.nextKey;
+    if (++pages > 50) throw new Error("bonded set: too many pages");
+  } while (key && key.length);
+  const ranked = rankSet(all);
+  if (!ranked.length) throw new Error("bonded set is empty");
+  setCache = { at: Date.now(), ranked };
+  return ranked;
+}
+// the delegator's stake at one validator, in uatone (0 when there is none)
+async function delegated(query, delegator, validator) {
+  try {
+    const r = await query.staking.delegation(delegator, validator);
+    const b = r.delegationResponse?.balance;
+    return b && b.denom === "uatone" ? BigInt(b.amount) : 0n;
+  } catch (e) {
+    if (/not found/i.test(String(e.message || e))) return 0n;
+    throw e;
+  }
+}
+const capLog = new Map(), rateLog = [];
+
+// simulate, refuse over the gas ceiling, then sign with a timeout height; the day's count is kept for what landed
+// (code 0) or may still land (sent, not yet seen), never for a tx that failed
+async function signChecked(client, sender, granter, msgs, memo, moving) {
+  const gas = await client.simulate(sender, msgs, memo);
+  const limit = Math.ceil(gas * 1.4);
+  if (limit > MAX_GAS) return { refused: `gas ${limit} is more than the ceiling ${MAX_GAS}` };
+  const height = await client.getHeight();
+  try {
+    const result = await client.signAndBroadcast(sender, msgs, calculateFee(limit, GasPrice.fromString(GAS)), memo, BigInt(height + TIMEOUT_BLOCKS));
+    if (result.code === 0) { capRecord(capLog, granter, moving, Date.now()); setCache.at = 0; }
+    return { result };
+  } catch (e) {
+    if (e && e.txId) { capRecord(capLog, granter, moving, Date.now()); setCache.at = 0; }
+    throw e;
+  }
+}
+
 function readBody(req) { return new Promise((res, rej) => { let d = ""; req.on("data", c => { d += c; if (d.length > 65536) { rej(new Error("body too large")); req.destroy(); } }); req.on("end", () => res(d)); req.on("error", rej); }); }
 
 const server = http.createServer(async (req, res) => {
   res.setHeader("content-type", "application/json");
   const send = (code, obj) => { res.writeHead(code); res.end(JSON.stringify(obj)); };
-  if (req.headers["x-gata-secret"] !== SECRET) return send(401, { error: "unauthorized" });
+  if (!rateTake(rateLog, Date.now())) return send(429, { error: "rate limit: at most " + RATE_MAX + " requests a minute" });
+  if (!authorised(req.headers["x-gata-secret"])) return send(401, { error: "unauthorized" });
   try {
     if (req.method === "GET" && req.url === "/whoami") { const { sender } = await getClient(); return send(200, { address: sender, chain_id: CHAIN_ID }); }
     if (req.method === "POST" && req.url === "/authz-restake") return await restake(JSON.parse(await readBody(req)), send);
     if (req.method !== "POST" || req.url !== "/authz-exec") return send(404, { error: "not found" });
     const body = JSON.parse(await readBody(req));
-    const { granter, moves, memo } = body;
+    const { granter, moves } = body;
     if (!isAcc(granter)) return send(400, { error: "bad granter" });
     if (!Array.isArray(moves) || !moves.length || moves.length > MAX_MOVES) return send(400, { error: "bad moves" });
     for (const m of moves) {
-      if (!isVal(m.src) || !isVal(m.dst) || m.src === m.dst || !isAmt(m.amount)) return send(400, { error: "bad move" });
+      if (!m || !isVal(m.src) || !isVal(m.dst) || m.src === m.dst || !isAmt(m.amount)) return send(400, { error: "bad move" });
     }
-    const { client, sender } = await getClient();
-    const inner = moves.map(m => ({
-      typeUrl: "/cosmos.staking.v1beta1.MsgBeginRedelegate",
-      value: MsgBeginRedelegate.encode({ delegatorAddress: granter, validatorSrcAddress: m.src, validatorDstAddress: m.dst, amount: { denom: "uatone", amount: String(m.amount) } }).finish(),
-    }));
-    const exec = { typeUrl: "/cosmos.authz.v1beta1.MsgExec", value: { grantee: sender, msgs: inner } };
-    const result = await serial(() => client.signAndBroadcast(sender, [exec], "auto", typeof memo === "string" && memo.length <= 64 ? memo : "GATA AtomOne Autopilot"));
+    const memo = memoOf(body.memo, "GATA AtomOne Autopilot");
+    if (memo.error) return send(400, { error: memo.error });
+    const { client, sender, query } = await getClient();
+    // the policy, the day's count and the signature in one turn of the queue: two requests cannot both pass the cap
+    const out = await serial(async () => {
+      if (capHeld(capLog, granter, Date.now()) + moves.length > MAX_MOVES) return { code: 400, err: "daily move limit (" + MAX_MOVES + ") reached" };
+      const bad = checkMoves(await bondedSet(query), moves);
+      if (bad) return { code: 400, err: bad };
+      for (const [src, amt] of sumBySrc(moves)) {
+        const has = await delegated(query, granter, src);
+        if (has < amt) return { code: 400, err: `not enough delegation at ${src}: ${has} uatone, ${amt} asked` };
+      }
+      const inner = moves.map(m => ({
+        typeUrl: "/cosmos.staking.v1beta1.MsgBeginRedelegate",
+        value: MsgBeginRedelegate.encode({ delegatorAddress: granter, validatorSrcAddress: m.src, validatorDstAddress: m.dst, amount: { denom: "uatone", amount: String(m.amount) } }).finish(),
+      }));
+      const exec = { typeUrl: "/cosmos.authz.v1beta1.MsgExec", value: { grantee: sender, msgs: inner } };
+      const r = await signChecked(client, sender, granter, [exec], memo.memo, moves.length);
+      return r.refused ? { code: 400, err: r.refused } : r;
+    });
+    if (out.err) { console.log(`autopilot-signer: exec granter=${granter} refused: ${out.err}`); return send(out.code, { error: out.err }); }
+    const result = out.result;
     const total = moves.reduce((a, m) => a + Number(m.amount), 0);
     console.log(`autopilot-signer: exec granter=${granter} moves=${moves.length} uatone=${total} code=${result.code} hash=${result.transactionHash} height=${result.height}`);
     if (result.code !== 0) return send(502, { error: "rejected", code: result.code, raw_log: result.rawLog, txhash: result.transactionHash });
@@ -127,29 +270,42 @@ async function pending(query, delegator, validator) {
   return t;
 }
 async function restake(body, send) {
-  const { granter, claim, stake, memo } = body;
+  const { granter, claim, stake } = body;
   // a restake never sends: every claimed reward is staked back, GATA takes no share
   if (body.send != null) return send(400, { error: "a restake never sends" });
   const out = 0n;
   if (!isAcc(granter)) return send(400, { error: "bad granter" });
   if (!Array.isArray(claim) || !claim.length || claim.length > MAX_MOVES || !claim.every(isVal) || new Set(claim).size !== claim.length) return send(400, { error: "bad claim" });
-  if (!Array.isArray(stake) || stake.length > MAX_MOVES || !stake.every(s => isVal(s.validator) && isAmt(s.amount))) return send(400, { error: "bad stake" });
+  if (!Array.isArray(stake) || stake.length > MAX_MOVES || !stake.every(s => s && isVal(s.validator) && isAmt(s.amount))) return send(400, { error: "bad stake" });
+  const memo = memoOf(body.memo, "GATA AtomOne Restake");
+  if (memo.error) return send(400, { error: memo.error });
   const { client, sender, query } = await getClient();
-  // rewards must come back to the delegator: otherwise the claim lands elsewhere and a
-  // stake of 'the same amount' would be the delegator's own liquid ATONE
-  const wa = await query.distribution.delegatorWithdrawAddress(granter);
-  if (wa.withdrawAddress !== granter) return send(409, { error: "rewards are paid to another address" });
-  let rewards = 0n;
-  for (const v of claim) rewards += await pending(query, granter, v);
-  const staked = stake.reduce((a, s) => a + BigInt(s.amount), 0n);
-  if (staked + out > rewards) return send(409, { error: "more than the rewards pending", rewards: rewards.toString() });
-  if (staked + out === 0n) return send(400, { error: "nothing to do" });
-  const inner = claim.map(v => ({ typeUrl: "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
-    value: MsgWithdrawDelegatorReward.encode({ delegatorAddress: granter, validatorAddress: v }).finish() }))
-    .concat(stake.map(s => ({ typeUrl: "/cosmos.staking.v1beta1.MsgDelegate",
-      value: MsgDelegate.encode({ delegatorAddress: granter, validatorAddress: s.validator, amount: { denom: "uatone", amount: String(s.amount) } }).finish() })))
-  const exec = { typeUrl: "/cosmos.authz.v1beta1.MsgExec", value: { grantee: sender, msgs: inner } };
-  const result = await serial(() => client.signAndBroadcast(sender, [exec], "auto", typeof memo === "string" && memo.length <= 64 ? memo : "GATA AtomOne Restake"));
+  const res = await serial(async () => {
+    if (capHeld(capLog, granter, Date.now()) + stake.length > MAX_MOVES) return { code: 400, err: "daily move limit (" + MAX_MOVES + ") reached" };
+    const bad = checkStake(await bondedSet(query), stake);
+    if (bad) return { code: 400, err: bad };
+    // rewards must come back to the delegator: otherwise the claim lands elsewhere and a
+    // stake of 'the same amount' would be the delegator's own liquid ATONE
+    const wa = await query.distribution.delegatorWithdrawAddress(granter);
+    if (wa.withdrawAddress !== granter) return { code: 409, err: "rewards are paid to another address" };
+    let rewards = 0n;
+    for (const v of claim) rewards += await pending(query, granter, v);
+    const staked = stake.reduce((a, s) => a + BigInt(s.amount), 0n);
+    if (staked + out > rewards) return { code: 409, err: "more than the rewards pending", rewards };
+    if (staked + out === 0n) return { code: 400, err: "nothing to do" };
+    const inner = claim.map(v => ({ typeUrl: "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
+      value: MsgWithdrawDelegatorReward.encode({ delegatorAddress: granter, validatorAddress: v }).finish() }))
+      .concat(stake.map(s => ({ typeUrl: "/cosmos.staking.v1beta1.MsgDelegate",
+        value: MsgDelegate.encode({ delegatorAddress: granter, validatorAddress: s.validator, amount: { denom: "uatone", amount: String(s.amount) } }).finish() })))
+    const exec = { typeUrl: "/cosmos.authz.v1beta1.MsgExec", value: { grantee: sender, msgs: inner } };
+    const r = await signChecked(client, sender, granter, [exec], memo.memo, stake.length);
+    return r.refused ? { code: 400, err: r.refused } : { ...r, rewards, staked };
+  });
+  if (res.err) {
+    console.log(`autopilot-signer: restake granter=${granter} refused: ${res.err}`);
+    return send(res.code, res.rewards !== undefined ? { error: res.err, rewards: res.rewards.toString() } : { error: res.err });
+  }
+  const { result, rewards, staked } = res;
   console.log(`autopilot-signer: restake granter=${granter} claim=${claim.length} rewards=${rewards} staked=${staked} sent=${out} code=${result.code} hash=${result.transactionHash} height=${result.height}`);
   if (result.code !== 0) return send(502, { error: "rejected", code: result.code, raw_log: result.rawLog, txhash: result.transactionHash });
   return send(200, { txhash: result.transactionHash, height: result.height, rewards: rewards.toString(), gas_used: result.gasUsed?.toString?.() });

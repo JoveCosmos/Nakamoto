@@ -10,6 +10,10 @@ User=atomone-app
 Group=atomone-app
 EnvironmentFile=/etc/gata/atomone-app-keeper-testnet.env
 EnvironmentFile=/etc/gata/atomone-app-alerts.env
+# the signer's shared secret, readable by this process only (audit 2026-09-30); keeper.py falls back to
+# KEEPER_SECRET in the env file while the credential is not there
+LoadCredentialEncrypted=keeper_secret:/etc/gata/atomone-app-keeper-testnet.secret.cred
+Environment=TZ=UTC
 ExecStart=/usr/bin/python3 /srv/atomone-app/keeper/keeper.py
 Restart=on-failure
 RestartSec=30
@@ -28,6 +32,14 @@ ReadWritePaths=/srv/atomone-app/keeper/state-testnet /srv/atomone-app/web/testne
 RestrictAddressFamilies=AF_INET AF_INET6
 RestrictNamespaces=yes
 LockPersonality=yes
+CapabilityBoundingSet=
+SystemCallArchitectures=native
+ProtectKernelLogs=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
 MemoryDenyWriteExecute=yes
 SystemCallFilter=@system-service
 UMask=0027

@@ -20,6 +20,9 @@ MAXB  = 120_000          # skip anything implausibly large for a 40px tile
 
 
 TILE = 64            # 2x a ~32px box, so it stays crisp on retina
+# a 120 kB file can still decode to ~80M pixels (a few hundred MB in the build): refuse anything
+# over 4096x4096 before it is decoded (2026-10-01, audit LOW)
+MAXPX = 4096
 
 def shrink(path):
     """Downscale in place. Keybase serves ~35 KB originals; 96 of those is 3.4 MB
@@ -27,7 +30,13 @@ def shrink(path):
     simply dropped, because a missing avatar is cosmetic and must never break a build."""
     try:
         from PIL import Image
-        im = Image.open(path)
+        Image.MAX_IMAGE_PIXELS = MAXPX * MAXPX          # PIL's own bomb guard, 16,777,216
+        im = Image.open(path)                           # reads the header only
+        w, h = im.size
+        if w > MAXPX or h > MAXPX or w * h > MAXPX * MAXPX:
+            raise ValueError("image too large: %dx%d" % (w, h))
+        if im.format == "JPEG":
+            im.draft("RGB", (2 * TILE, 2 * TILE))       # JPEG decodes straight at a reduced scale
         im = im.convert("RGB")
         im.thumbnail((TILE, TILE), Image.LANCZOS)
         im.save(path, "JPEG", quality=78, optimize=True)
@@ -91,7 +100,7 @@ def download(idx):
                 blob = f.read(MAXB + 1)
             if len(blob) > MAXB or not blob:
                 continue
-            tmp = dst + ".tmp"
+            tmp = os.path.join(CACHE, "." + key + ".jpg.tmp")   # dot-prefixed, as render.py (2026-10-01)
             open(tmp, "wb").write(blob)
             shrink(tmp)                    # 35 KB originals -> ~3 KB tiles
             os.replace(tmp, dst)
