@@ -50,7 +50,8 @@ EVERY = 12 * 3600
 def slot0(t=None): return int((time.time() if t is None else t) // EVERY) * EVERY
 MIN_GAIN_APR = 0.05
 MIN_GAIN_ATONE = 1.0          # and pay at least this per year
-MAX_MOVES_DAY = 20            # the signer takes at most 20 moves a transaction, and 20 a wallet a day (its MAX_MOVES)
+MAX_MOVES_DAY = 60            # per wallet in any 24 hours (operator, 2026-10-01: a large wallet finishes in one run); the signer's MAX_MOVES_DAY
+MAX_MOVES_TX = 20             # per transaction: the signer takes at most 20 (its MAX_MOVES), so a bigger plan goes out in parts
 RS_EDGE = 3                   # restake: the last 3 of the set are left out of the highest-APR pick (the signer's RS_EDGE)
 MIN_MOVE = 1_000_000          # no move under 1 ATONE: dust uses a pair entry and a move slot for nothing
 FRESH_S = 3600                # the collector's record older than this, or a chain head older than HEAD_S: no tick
@@ -539,22 +540,35 @@ def auto_apply(c, g, p, pid, dry, out):
         c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, pid, "auto", None, 1, 1, None, 0)); c.commit()
         log("DRY auto granter=%s plan=%s" % (gr, pid))
         return
-    if moves_today(c, gr) + len(p["moves"]) > MAX_MOVES_DAY:
+    # in parts of at most MAX_MOVES_TX, one transaction each, in order; a part that fails stops the rest, and what
+    # landed before it stays recorded (the retry plans again from the chain)
+    moves, sent, r = p["moves"], [], {}
+    if moves_today(c, gr) + len(moves) > MAX_MOVES_DAY:
         r = {"error": "daily move limit (%d) reached" % MAX_MOVES_DAY}
     else:
-        r = execute(gr, p["moves"])
-    ok = "txhash" in r and "error" not in r
+        for k in range(0, len(moves), MAX_MOVES_TX):
+            part = moves[k:k + MAX_MOVES_TX]
+            r = execute(gr, part)
+            if not ("txhash" in r and "error" not in r): moves = moves[k:]; break
+            record_moves(c, gr, part, r.get("txhash"), now); c.commit()
+            sent.append(r.get("txhash"))
+        else:
+            moves = []
+    ok = not moves
     kind, why, h = ("ok", "", r.get("txhash")) if ok else classify(r)
-    if ok: record_moves(c, gr, p["moves"], r.get("txhash"), now)
-    c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, pid, "auto", r.get("txhash") if ok else None, 0, 1 if ok else 0,
+    c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, pid, "auto", ",".join(sent) or None, 0, 1 if ok else 0,
               None if ok else ("%s: %s" % ("settled" if kind == "settle" else "will retry", json.dumps(r.get("error"))))[:300], 0))
     c.commit(); out["last"] = public_last(r, kind)
-    log("auto exec granter=%s plan=%s -> %s (%s)" % (gr, pid, r, kind))
+    log("auto exec granter=%s plan=%s parts=%d sent=%s -> %s (%s)" % (gr, pid, -(-len(p["moves"]) // MAX_MOVES_TX), sent, r, kind))
+    if sent:
+        f["Tx"] = ", ".join(sent)
+        if not ok: f["Moved"] = "%d of %d moves" % (len(p["moves"]) - len(moves), len(p["moves"]))
     if ok:
         c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()
-        f["Tx"] = r.get("txhash", "")
         alert("ok", "Autopilot moved: " + short(gr), "The moves are on chain.", f)
-    elif kind == "settle":
+        return
+    p = dict(p, moves=moves)                       # what is left is what the retry or the next run is about
+    if kind == "settle":
         c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()
         f["Chain said"] = why
         alert("info", "Autopilot move settled: " + short(gr), "The chain's own rules stop this move (a lock, a full pair or the grant). "

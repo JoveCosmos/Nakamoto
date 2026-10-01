@@ -45,7 +45,8 @@ const PREFIX = "atone", CHAIN_ID = process.env.CHAIN_ID || "atomone-1";   // tes
 const GAS = process.env.ATOMONE_GAS_PRICE || "0.25uphoton";
 const RPCS = (process.env.ATOMONE_RPC || "https://atomone-rpc.gatadao.com,https://atomone-rpc.polkachu.com").split(",").map(s => s.trim()).filter(Boolean);
 const BIND = process.env.BIND || "10.9.0.2", PORT = +(process.env.PORT || 8788);
-const MAX_MOVES = +(process.env.MAX_MOVES || 20);
+const MAX_MOVES = +(process.env.MAX_MOVES || 20);              // messages in one request (one transaction): gas and size
+const MAX_MOVES_DAY = +(process.env.MAX_MOVES_DAY || 60);      // per delegator in any 24 hours; MUST match keeper.py (operator, 2026-10-01)
 const MAX_GAS = +(process.env.ATOMONE_MAX_GAS || 12_000_000);   // after the 1.4 margin; 7 redelegations used 2.4M
 const TIMEOUT_BLOCKS = 100;                                       // a tx not in a block by then can never land
 
@@ -142,7 +143,7 @@ function sumBySrc(moves) {
   return out;
 }
 // the per-delegator day: one timestamp per stake-moving message signed (redelegations and delegations, both
-// endpoints; reward claims move nothing and are not counted). Room is what the last 24 hours leave of MAX_MOVES
+// endpoints; reward claims move nothing and are not counted). Room is what the last 24 hours leave of MAX_MOVES_DAY
 function capHeld(log, granter, now) {
   const kept = (log.get(granter) || []).filter(t => t > now - DAY_MS);
   if (kept.length) log.set(granter, kept); else log.delete(granter);
@@ -236,7 +237,7 @@ const server = http.createServer(async (req, res) => {
     const { client, sender, query } = await getClient();
     // the policy, the day's count and the signature in one turn of the queue: two requests cannot both pass the cap
     const out = await serial(async () => {
-      if (capHeld(capLog, granter, Date.now()) + moves.length > MAX_MOVES) return { code: 400, err: "daily move limit (" + MAX_MOVES + ") reached" };
+      if (capHeld(capLog, granter, Date.now()) + moves.length > MAX_MOVES_DAY) return { code: 400, err: "daily move limit (" + MAX_MOVES_DAY + ") reached" };
       const bad = checkMoves(await bondedSet(query), moves);
       if (bad) return { code: 400, err: bad };
       for (const [src, amt] of sumBySrc(moves)) {
@@ -281,7 +282,7 @@ async function restake(body, send) {
   if (memo.error) return send(400, { error: memo.error });
   const { client, sender, query } = await getClient();
   const res = await serial(async () => {
-    if (capHeld(capLog, granter, Date.now()) + stake.length > MAX_MOVES) return { code: 400, err: "daily move limit (" + MAX_MOVES + ") reached" };
+    if (capHeld(capLog, granter, Date.now()) + stake.length > MAX_MOVES_DAY) return { code: 400, err: "daily move limit (" + MAX_MOVES_DAY + ") reached" };
     const bad = checkStake(await bondedSet(query), stake);
     if (bad) return { code: 400, err: bad };
     // rewards must come back to the delegator: otherwise the claim lands elsewhere and a
