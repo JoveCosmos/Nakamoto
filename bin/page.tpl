@@ -5505,7 +5505,16 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .you-swt small{font-size:11.5px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* Hands-free: one ? for both services' rules (operator, 2026-09-30); the column clips, so the tip opens up and left */
 .you-hfh{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.you-tgal{display:inline-flex;align-items:center;gap:5px;font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--sv-teal);text-decoration:none;padding:4px 0}
+.you-tgal{display:inline-flex;align-items:center;gap:5px;font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--sv-teal);text-decoration:none;padding:4px 0;background:none;border:0;cursor:pointer;position:relative}
+.you-tgal.off{color:var(--wf);opacity:.6;cursor:not-allowed}
+.you-tgal.off:hover{text-decoration:none}
+.you-tgal[data-tip]:hover::after{content:attr(data-tip);position:absolute;right:0;bottom:calc(100% + 6px);z-index:4;padding:6px 10px;border-radius:8px;letter-spacing:0;text-transform:none;
+  border:1px solid var(--wbd2);background:var(--wh);box-shadow:0 10px 24px -14px rgba(0,0,0,.6);font:600 12px var(--wsans);color:var(--wt);white-space:nowrap;pointer-events:none}
+/* the wallet's Telegram card: the validator alert card's look; a service that is off is a greyed row */
+.wtcard .wtic{display:flex;align-items:center;justify-content:center;color:#5bb3e8}
+.wtcard .wtic svg{width:22px;height:22px}
+.wtcard .aopt.off{opacity:.42;cursor:not-allowed}
+#wtpop .vnote{padding:12px 24px 18px;line-height:1.7}
 .you-tgal svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
 .you-tgal:hover,.you-tgal:focus-visible{text-decoration:underline;text-underline-offset:3px}
 .you-hfh .qm .qm-tip{width:250px;right:-4px;bottom:calc(100% + 8px)}
@@ -5597,6 +5606,8 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 @media(max-width:700px){.mv-cmp{grid-template-columns:minmax(0,1fr);gap:8px}.mv-cc b{font-size:20px}}
 .mv-set{display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-height:96px}
 .mv-sh{display:flex;justify-content:space-between;gap:10px}
+.mv-sh:has(.mv-tip){justify-content:flex-start;flex-wrap:wrap;column-gap:36px;row-gap:4px}
+.mv-sh em.mv-tip{color:var(--sv-teal);letter-spacing:.12em}
 .mv-sh em.g{color:var(--sv-teal)}
 .mv-bars{flex:1 1 auto;min-height:48px;display:flex;align-items:flex-end;gap:2px}
 .mv-bars i{flex:1 1 0;min-width:0;border-radius:2px 2px 0 0;background:var(--wbd2)}
@@ -6799,6 +6810,17 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
     <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Runs every <b>12 hours</b>, minimum 1 ATONE, you can revoke anytime.</span></div>
   </div>
   <div class=rsfoot><div class=atfs><div class=txfee id=rsfee></div></div><button class="wk-btn wk-go" id=rsgo type=button>Activate</button></div>
+</div></div>
+
+<div class=pop id=wtpop><div class="card vcard acard wtcard" role=dialog aria-modal=true aria-labelledby=wtttl>
+  <div class="vhead vwrap"><span class="vmono wtic"><svg viewBox="0 0 24 24" aria-hidden=true><path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.8.8 l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.35-.1-.55-.6-.2L6.2 13.1 1.4 11.6c-1-.3-1-1 .2-1.5l19-7.3c.85-.3 1.6.2 1.3 1.5z"/></svg></span>
+    <div class=vcol><div class=vname><span class=vnm id=wtttl>Telegram alerts</span></div><div class=vsub><span class=iop id=wtaddr></span></div></div></div>
+  <div class=alist>
+    <label class=aopt id=wtap><input type=checkbox data-w=a><span>Autopilot<i>each move: how much, from where, ATONE a year</i></span></label>
+    <label class=aopt id=wtrs><input type=checkbox data-w=r><span>Restake<i>each restake: the rewards staked</i></span></label>
+  </div>
+  <a class=tgbtn id=wttg target=_blank rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden=true><path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.8.8 l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.35-.1-.55-.6-.2L6.2 13.1 1.4 11.6c-1-.3-1-1 .2-1.5l19-7.3c.85-.3 1.6.2 1.3 1.5z"/></svg>Continue in Telegram</a>
+  <div class=vnote>Subscribe again to change your choices.<br>/list shows your wallet and every validator you watch.<br>/stop &lt;address&gt; stops this wallet, /stop stops everything.</div>
 </div></div>
 
 <div class=pop id=ipop><div class="card vcard icard">

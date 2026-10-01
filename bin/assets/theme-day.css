@@ -969,7 +969,10 @@
   html[data-theme=light]:not([data-mono])[data-svs=over] #one #sv-over{background:none;box-shadow:none}
   html[data-theme=light]:not([data-mono]) .you-cl{background:transparent}
   html[data-theme=light]:not([data-mono]) .you-tag.on{border-color:var(--sv-teal,var(--accent));color:var(--sv-teal,var(--accent));background:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .you-tgal{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .you-tgal{text-decoration:none;background:none}
+  html[data-theme=light]:not([data-mono]) .you-tgal.off:hover{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .you-tgal[data-tip]:hover::after{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .wtcard .wtic{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .you-tgal svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .you-tg i{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .you-fq{text-decoration:none;border-color:var(--sv-teal,var(--accent));background:transparent;color:var(--sv-teal,var(--accent))}

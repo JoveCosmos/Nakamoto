@@ -1600,9 +1600,12 @@
     if(root.getAttribute("data-net") === "testnet") h += faucetBox(a);
     /* the wallet's own Telegram alerts (2026-10-01), mainnet, once Autopilot or Restake is on: a move or a restake
        told as it lands, by the app's bot */
-    var tgw = a && (auto || rs) && window.__BOT && root.getAttribute("data-net") !== "testnet" && /^atone1[02-9ac-hj-np-z]{38}$/.test(a)
-      ? '<a class=you-tgal href="https://t.me/' + window.__BOT + '?start=w_' + a.slice(6) + '" target=_blank rel="noopener noreferrer" title="Hear in Telegram each time Autopilot moves your stake or Restake stakes your rewards">' +
-        '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M21 4L3 11l6 2 2 6 3-4 5 4z"/><path d="M9 13l12-9"/></svg>Alerts</a>' : '';
+    /* always there (operator, 2026-10-01): greyed with its reason until Autopilot or Restake is on; it opens the
+       wallet's Telegram card */
+    var tnet = root.getAttribute("data-net") === "testnet", ton = !!(a && (auto || rs) && window.__BOT && !tnet);
+    var tgw = '<button class="you-tgal' + (ton ? '' : ' off') + '" type=button data-act=wtalerts' + (ton ? '' : ' aria-disabled=true data-tip="' +
+        (tnet ? 'Telegram alerts follow mainnet wallets' : 'Activate Autopilot or Restake') + '"') + '>' +
+        '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M21 4L3 11l6 2 2 6 3-4 5 4z"/><path d="M9 13l12-9"/></svg>Alerts</button>';
     h += '<div class=you-hf><div class=you-hfh><em>Hands-free</em>' + tgw + '</div>' +
       youSwitch("youauto", "Autopilot", auto, asub, !a || !mine) +
       youSwitch("restakesw", "Restake", rs, rs ? "rewards staked every 12 hours" : "stakes your rewards every 12 hours", !a || !mine) + '</div>';
@@ -1612,6 +1615,25 @@
   function drawOne(){ if(window.__undockIfNarrow) window.__undockIfNarrow(); if(window.__proTabs) window.__proTabs(); if(E("you")) drawYou(); if(E("paths")) drawPaths(); }
   /* Restake has its own card (operator, 2026-09-30): what it does in three lines, the detail behind each ?, and
      Enable or Disable - never a signature straight from the switch */
+  /* the wallet's Telegram card: Autopilot and Restake rows (a service that is off is greyed), the bot's link for this
+     wallet, its commands */
+  function wtOpen(){
+    var el = E("wtpop"), a = window.__ADDR; if(!el || typeof POP === "undefined" || !a || !window.__BOT) return;
+    var at = window.__atInfo ? window.__atInfo() : null, on = { wtap: !!(at && at.grant), wtrs: !!(at && at.restake) };
+    /* a service that is on is ticked, one that is off is greyed and cannot be */
+    Object.keys(on).forEach(function(id){ var r = E(id); if(!r) return; r.classList.toggle("off", !on[id]);
+      var c = r.querySelector("input"); if(c){ c.checked = on[id]; c.disabled = !on[id]; } r.title = on[id] ? "" : "Inactive: activate it first"; });
+    var ad = E("wtaddr"); if(ad) ad.textContent = a.slice(0, 10) + "\u2026" + a.slice(-6);
+    wtLink(); POP.open(el);
+  }
+  /* the link carries what is ticked (w_<address>_<a and/or r>); nothing ticked, nothing to subscribe to */
+  function wtLink(){
+    var a = window.__ADDR, b = E("wttg"); if(!a || !b) return;
+    var f = [].filter.call(document.querySelectorAll("#wtpop input[data-w]"), function(c){ return c.checked && !c.disabled; }).map(function(c){ return c.dataset.w; }).join("");
+    b.classList.toggle("off", !f);
+    if(f) b.href = "https://t.me/" + window.__BOT + "?start=w_" + a.slice(6) + "_" + f; else b.removeAttribute("href");
+  }
+  var wtp = E("wtpop"); if(wtp) wtp.addEventListener("change", function(ev){ if(ev.target && ev.target.dataset && ev.target.dataset.w) wtLink(); });
   function rsOpen(){
     var el = E("rspop"); if(!el || typeof POP === "undefined") return;
     var at = window.__atInfo ? window.__atInfo() : null, on = !!(at && at.restake), pos = window.__POS;
@@ -1669,7 +1691,7 @@
       var cls = src[v[3]] ? 's' : dst[v[3]] ? 'd' : '';
       return '<i class="' + cls + '" data-v="' + esc(v[3]) + '" title="#' + (i + 1) + ' ' + esc(v[0]) + '" style="height:' + Math.round(6 + 94 * Math.sqrt(v[1] / top)) + '%"></i>';
     }).join("");
-    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em></div><div class=mv-bars>' + bars + '</div></div>';
+    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em><em class=mv-tip>Tap any bar to setup validator telegram alerts</em></div><div class=mv-bars>' + bars + '</div></div>';
   }
 
   function drawMove(){
@@ -1841,6 +1863,7 @@
     if(act === "faucet"){ faucetGo(t.dataset.t); return; }
     if(act === "mvmore"){ MVOPEN[t.dataset.k] = !MVOPEN[t.dataset.k]; drawMove(); return; }
     if(act === "restakesw"){ rsOpen(); return; }
+    if(act === "wtalerts"){ if(t.getAttribute("aria-disabled") !== "true") wtOpen(); return; }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
     if(act === "gfollow"){ govSend(t, { type: "atomone/v1/MsgDelegateGovernor", value: { delegator_address: window.__ADDR, governor_address: t.dataset.g } }); return; }
