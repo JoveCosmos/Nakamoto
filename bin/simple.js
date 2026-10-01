@@ -1489,7 +1489,9 @@
       if(!pos) return ["Reading your stake…", ""];
       if(!pos.rows.length) return ["No stake yet", "stake ATONE to start earning"];
       var pl = planNow(pos);
-      if(pl && pl.after != null) return ["+" + one(pl.gain) + " ATONE a year", "ready to move, 1 approval"];
+      /* with Autopilot on, the move waits for its next run, no approval (operator, 2026-10-01) */
+      var apOn = !!(window.__atInfo && window.__atInfo() && window.__atInfo().grant);
+      if(pl && pl.after != null) return ["+" + one(pl.gain) + " ATONE a year", apOn ? "Autopilot is active" : "ready to move, 1 approval"];
       if(pos.free < 1e6 && pos.locked >= 1e6) return ["Cooling down", "free to move on " + (window.__dayFull ? window.__dayFull(pos.until) : "")];
       return ["Earning " + pct(pos.rate), "at its best today"];
     }
