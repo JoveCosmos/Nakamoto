@@ -1691,7 +1691,7 @@
       var cls = src[v[3]] ? 's' : dst[v[3]] ? 'd' : '';
       return '<i class="' + cls + '" data-v="' + esc(v[3]) + '" title="#' + (i + 1) + ' ' + esc(v[0]) + '" style="height:' + Math.round(6 + 94 * Math.sqrt(v[1] / top)) + '%"></i>';
     }).join("");
-    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em><em class=mv-tip>Tap any bar to setup validator telegram alerts</em></div><div class=mv-bars>' + bars + '</div></div>';
+    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em><em class=mv-tip>Tap any bar to setup telegram alerts</em></div><div class=mv-bars>' + bars + '</div></div>';
   }
 
   function drawMove(){
