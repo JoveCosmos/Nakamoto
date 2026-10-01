@@ -1603,8 +1603,8 @@
     /* always there (operator, 2026-10-01): greyed with its reason until Autopilot or Restake is on; it opens the
        wallet's Telegram card */
     var tnet = root.getAttribute("data-net") === "testnet", ton = !!(a && (auto || rs) && window.__BOT && !tnet);
-    var tgw = '<button class="you-tgal' + (ton ? '' : ' off') + '" type=button data-act=wtalerts' + (ton ? '' : ' aria-disabled=true data-tip="' +
-        (tnet ? 'Telegram alerts follow mainnet wallets' : 'Activate Autopilot or Restake') + '"') + '>' +
+    /* no alerts on testnet (operator, 2026-10-01): the bot follows mainnet only */
+    var tgw = tnet ? '' : '<button class="you-tgal' + (ton ? '' : ' off') + '" type=button data-act=wtalerts' + (ton ? '' : ' aria-disabled=true data-tip="Activate Autopilot or Restake"') + '>' +
         '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M21 4L3 11l6 2 2 6 3-4 5 4z"/><path d="M9 13l12-9"/></svg>Alerts</button>';
     h += '<div class=you-hf><div class=you-hfh><em>Hands-free</em>' + tgw + '</div>' +
       youSwitch("youauto", "Autopilot", auto, asub, !a || !mine) +
@@ -1691,7 +1691,7 @@
       var cls = src[v[3]] ? 's' : dst[v[3]] ? 'd' : '';
       return '<i class="' + cls + '" data-v="' + esc(v[3]) + '" title="#' + (i + 1) + ' ' + esc(v[0]) + '" style="height:' + Math.round(6 + 94 * Math.sqrt(v[1] / top)) + '%"></i>';
     }).join("");
-    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em><em class=mv-tip>Tap any bar to setup telegram alerts</em></div><div class=mv-bars>' + bars + '</div></div>';
+    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em>' + (document.documentElement.getAttribute("data-net") === "testnet" ? '' : '<em class=mv-tip>Tap any bar to setup telegram alerts</em>') + '</div><div class=mv-bars>' + bars + '</div></div>';
   }
 
   function drawMove(){
