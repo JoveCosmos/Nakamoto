@@ -11,7 +11,7 @@
 // to stake a delegator's own liquid ATONE, whatever the keeper asks. It cannot
 // grant. Fees are PHOTON from this account's own balance.
 // Its own policy, whatever the keeper asks (audit 2026-09-30): a move goes only to a bonded,
-// unjailed validator inside the keeper's window (ranks n-33 to n-3) and only out of what the
+// unjailed validator inside the keeper's window (ranks 21 to n-3) and only out of what the
 // delegator holds at the source; a restake stakes only on a bonded, unjailed validator ranked
 // n-3 or higher; at most MAX_MOVES_DAY stake-moving messages per delegator a day, every broadcast
 // counted whatever its code; 30 authenticated requests a minute; every grant the request needs
@@ -108,9 +108,9 @@ const isVal = s => typeof s === "string" && /^atonevaloper1[02-9ac-hj-np-z]{38}$
 const isAmt = s => /^[1-9]\d{0,17}$/.test(String(s));
 
 // ---- policy: pure functions, no I/O (audit 2026-09-30) ----
-// BOTTOM, EDGE and RS_EDGE MUST match keeper.py's BOTTOM, EDGE and RS_EDGE: the keeper plans inside this
+// TOP, EDGE and RS_EDGE MUST match keeper.py's TOP, EDGE and RS_EDGE: the keeper plans inside this
 // window and the signer refuses anything outside it
-const BOTTOM = 34, EDGE = 3, RS_EDGE = 3;
+const TOP = 20, EDGE = 3, RS_EDGE = 3;     // the shelf rise (operator, 2026-10-01): ranks 21 to n-3
 const DAY_MS = 86_400_000, RATE_MAX = 30, RATE_MS = 60_000;
 // the bonded set, largest first (a stable sort: ties keep the chain's order, as the keeper's does)
 function rankSet(validators) {
@@ -118,10 +118,10 @@ function rankSet(validators) {
     .map(v => ({ op: v.operatorAddress, tokens: BigInt(v.tokens), jailed: !!v.jailed }));
   return out.sort((a, b) => (a.tokens > b.tokens ? -1 : a.tokens < b.tokens ? 1 : 0));
 }
-// a move's destination: bonded, not jailed, 0-based index from n-BOTTOM to n-1-EDGE (ranks n-33 to n-3)
+// a move's destination: bonded, not jailed, 0-based index from TOP to n-1-EDGE (ranks 21 to n-3)
 function checkMoves(ranked, moves) {
   const n = ranked.length, idx = new Map(ranked.map((v, i) => [v.op, i]));
-  const lo = Math.max(0, n - BOTTOM), hi = n - 1 - EDGE;
+  const lo = TOP, hi = n - 1 - EDGE;
   for (const m of moves) {
     const i = idx.get(m.dst);
     if (i === undefined) return "destination " + m.dst + " is not bonded";

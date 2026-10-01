@@ -3232,18 +3232,38 @@ rememberGridH();
     QUIET = true; draw(); QUIET = false;
     return MSGS.length > 0;
   };
-  /* THE RULE (operator, 2026-09-29), the page's copy of keeper.py plan() - the same arithmetic, so the move
-     Your move offers is the move Autopilot would make. The smallest validator first: it takes as much as it
-     can without passing the validator ranked just above it; what is left goes to the next one up, same check;
-     at most BOTTOM validators. A source gives only what keeps it at or above the one ranked just under it; a
-     any validator of the active set may take stake; at most 20 moves (move less rather
-     than cut); nothing while any of the wallet's stake is cooling down. Answers null or
-     { now, after, gain, moves, msgs:[{from,to,amt}] }. */
-  var BOTTOM = 34, EDGE = 3, MAXMOVES = 20, MIN_LIFT = 0.05;   /* EDGE: the last 3 are left out (operator, 2026-09-30) */
+  /* THE RULE (operator, 2026-09-29), with the shelf rise (2026-10-01): the page's copy of keeper.py plan() and fill() -
+     the same arithmetic, so the move Your move offers is the move Autopilot would make. Water poured from the lowest
+     step: the smallest validator (the last EDGE left out) rises first, to 1 ATONE under the one ranked above it; then
+     the two rise together, and the shelf takes the next validator up as it reaches it. Nobody passes the one above;
+     the largest TOP never take stake. A source gives only what keeps it at or above the one ranked just under it;
+     stake on the smallest BOTTOM never moves out; at most MAXMOVES moves (move less rather than cut); nothing while
+     any of the wallet's stake is cooling down. Answers null or { now, after, gain, moves, msgs:[{from,to,amt}] }. */
+  var TOP = 20, BOTTOM = 34, EDGE = 3, GAP = 1e6, MAXMOVES = 60, MIN_LIFT = 0.05;   /* keeper.py TOP, BOTTOM, EDGE, MAX_MOVES_DAY */
+  /* keeper.py fill(): {op: added}; s[j] the stake as it stands, ok(j) whether rank j+1 may take any. One that may not is
+     a fixed step: the shelf below it rises to 1 ATONE under it, then the pour carries on above it */
+  function shelfFill(V, s, amount, ok){
+    var n = V.length, add = {}, left = Math.floor(amount), i = n - 1 - EDGE, j;
+    while(i >= TOP && left >= GAP){
+      if(!ok(i)){ i--; continue; }
+      var b0 = i;
+      while(i - 1 >= TOP && ok(i - 1)) i--;
+      var k0 = i; i--;
+      var cost = function(k, L){ var c = 0; for(var q = k; q <= b0; q++) c += Math.max(0, L - (q - k) * GAP - s[q]); return c; };
+      var k = b0, lmax;
+      for(;;){ lmax = s[k - 1] - GAP; if(cost(k, lmax) >= left || k === k0) break; k--; }
+      var hi = lmax, lo = Math.min(s[k], hi);
+      if(cost(k, hi) <= left) lo = hi;
+      else while(lo < hi){ var mid = Math.floor((lo + hi + 1) / 2); if(cost(k, mid) <= left) lo = mid; else hi = mid - 1; }
+      for(j = k; j <= b0; j++){ var x = lo - (j - k) * GAP - s[j]; if(x > 0){ add[V[j][3]] = x; left -= x; } }
+    }
+    Object.keys(add).forEach(function(op){ if(add[op] < 1e6) delete add[op]; });
+    return add;
+  }
   window.__planRank = function(pos){
     if(!pos || !pos.rows.length || !(pos.total > 0)) return null;
     /* stake in its 21-day cooldown stays where it is; the free stake is hunted, all of it at once */
-    var V = window.__VALS().slice().sort(function(a, b){ return b[1] - a[1]; }), n = V.length, VD = window.__VDBY || {};
+    var V = window.__VALS().slice().sort(function(a, b){ return b[1] - a[1]; }), n = V.length;
     if(!n) return null;
     var at = {}, i; for(i = 0; i < n; i++) at[V[i][3]] = i;
     var bset = {}; for(i = Math.max(0, n - BOTTOM); i < n; i++) bset[V[i][3]] = 1;
@@ -3255,42 +3275,51 @@ rememberGridH();
       return { id: r.id, give: give, rate: r.inactive ? 0 : r.rate };
     }).filter(function(x){ return x.give >= 1e6; });
     if(!src.length) return null;
-    var budget = src.reduce(function(s, x){ return s + x.give; }, 0);
-    var gone = {}; src.forEach(function(x){ gone[x.id] = x.give; });     /* the cautious bound: every source counted as gone */
-    var stake = function(j){ return V[j][1] - (gone[V[j][3]] || 0); };
-    var ok = function(){ return true; };     /* any validator of the active set, as the keeper (operator, 2026-09-30) */
+    var rs = {}; src.forEach(function(x){ rs[x.id] = x.rate; });
     var used = {}; (window.__REDS || []).forEach(function(rr){
       var k = rr.redelegation.validator_src_address + ">" + rr.redelegation.validator_dst_address;
       used[k] = (used[k] || 0) + (rr.entries || []).length; });
-    function movesFor(amount){
-      var add = [], left = amount;
-      for(var j = n - 1 - EDGE; j > n - 1 - BOTTOM && j >= 0; j--){
-        if(left < 1e6) break;
-        if(!ok(V[j])) continue;
-        var room = j > 0 ? stake(j - 1) - stake(j) - 1e6 : left, x = Math.floor(Math.min(left, room));
-        if(x >= 1e6){ add.push({ id: V[j][3], amt: x }); left -= x; }
-      }
-      var out = [], si = 0, lf = src.map(function(x){ return { id: x.id, give: x.give }; });
-      add.forEach(function(d){
-        var need = d.amt;
-        while(need > 0 && si < lf.length){
-          var s = lf[si], x = Math.min(need, s.give);
-          if(x >= 1 && (used[s.id + ">" + d.id] || 0) < 7) out.push({ from: s.id, to: d.id, amt: Math.floor(x) });
-          s.give -= x; need -= x;
-          if(s.give <= 0) si++;
-        }
-      });
-      return out;
-    }
-    var out = movesFor(budget);
-    while(out.length > MAXMOVES && budget > 1e6){ budget = Math.floor(budget * 0.85); out = movesFor(budget); }
-    if(!out.length || out.length > MAXMOVES) return null;
-    var rs = {}; src.forEach(function(x){ rs[x.id] = x.rate; });
     var dstRates = function(ms){ var mv = {}, r = {}; ms.forEach(function(m){ mv[m.to] = (mv[m.to] || 0) + m.amt; });
       Object.keys(mv).forEach(function(k){ var v = V[at[k]]; r[k] = window.__rateAfter(v[1], v[2], mv[k]); }); return { moved: mv, rd: r }; };
-    /* as the keeper: every move on its own earns more than 5 APR points and carries at least 1 ATONE */
-    var dr0 = dstRates(out).rd;
-    out = out.filter(function(m){ return m.amt >= 1e6 && dr0[m.to] - rs[m.from] > MIN_LIFT; });
+    function movesFor(srcs, amount, s, ok){
+      var add = shelfFill(V, s, amount, ok), out = [], short = {}, si = 0, lf = srcs.map(function(x){ return { id: x.id, give: x.give }; });
+      Object.keys(add).sort(function(a, b){ return at[b] - at[a]; }).forEach(function(d){
+        var need = add[d];
+        while(need > 0 && si < lf.length){
+          var sx = lf[si], x = Math.min(need, sx.give);
+          if((used[sx.id + ">" + d] || 0) < 7) out.push({ from: sx.id, to: d, amt: Math.floor(x) });
+          else short[d] = 1;
+          sx.give -= x; need -= x;
+          if(sx.give <= 0) si++;
+        }
+      });
+      return { out: out, short: Object.keys(short) };
+    }
+    /* settled in rounds, as the keeper: a destination a full pair would leave short, or one too poor for even the
+       best-placed source, becomes a fixed step; a source the shelf cannot lift by more than 5 points stays put */
+    var fixed = {}, out = [], done = false;
+    for(var round = 0; round < 2 * n + src.length + 2 && src.length; round++){
+      var budget = src.reduce(function(s, x){ return s + x.give; }, 0), gone = {};
+      src.forEach(function(x){ gone[x.id] = x.give; });     /* the cautious bound: every source counted as gone */
+      var s = V.map(function(v){ return v[1] - (gone[v[3]] || 0); });
+      var ok = function(j){ return !fixed[V[j][3]] && !gone[V[j][3]]; };     /* any validator of the active set (operator, 2026-09-30) */
+      var r = movesFor(src, budget, s, ok);
+      while(r.out.length > MAXMOVES && budget > 1e6){ budget = Math.floor(budget * 0.85); r = movesFor(src, budget, s, ok); }
+      out = r.out;
+      if(!out.length || out.length > MAXMOVES) return null;
+      if(r.short.length){ r.short.forEach(function(d){ fixed[d] = 1; }); continue; }
+      var rd = dstRates(out).rd, best = Math.min.apply(null, out.map(function(m){ return rs[m.from]; }));
+      var weak = Object.keys(rd).filter(function(d){ return rd[d] - best <= MIN_LIFT; });
+      if(weak.length){ weak.forEach(function(d){ fixed[d] = 1; }); continue; }
+      var floor = Math.min.apply(null, Object.keys(rd).map(function(d){ return rd[d]; }));
+      var high = src.filter(function(x){ return rs[x.id] >= floor - MIN_LIFT; });
+      if(high.length){ var top = high.reduce(function(a, b){ return rs[b.id] > rs[a.id] ? b : a; });
+        src = src.filter(function(x){ return x !== top; }); continue; }
+      done = true; break;
+    }
+    if(!done) return null;
+    /* a source's last piece under 1 ATONE is no move: the shelf it leaves short by less than the 1 ATONE gap keeps its order */
+    out = out.filter(function(m){ return m.amt >= 1e6; });
     if(!out.length) return null;
     var D1 = dstRates(out), moved = D1.moved, rd = D1.rd;
     var gainU = 0; out.forEach(function(m){ gainU += m.amt * (rd[m.to] - rs[m.from]); });

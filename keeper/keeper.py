@@ -527,30 +527,61 @@ def pairs_used(reds):
         u[k] = u.get(k, 0) + len(r.get("entries", []))
     return u
 
-# ── the plan: the operator's rule (2026-09-29) ────────────────────────────
-# The smallest validator first (leaving out the last EDGE, the edge of the set): it takes as much as it can without passing the validator ranked just above
-# it (so its rank never changes, and it stays the best payer); what is left goes to the next one up, same
-# check; and so on, at most BOTTOM validators (1 to 34, as the amount needs). A source gives only what keeps
-# it at or above the validator ranked just under it. Any validator of the active set may take stake. Nothing is offered while any of the delegator's stake cools down,
-# so the offer comes back every 21 days, when the last move's cooldown clears.
+# ── the plan: the operator's rule (2026-09-29), with the shelf rise (2026-10-01) ─────────────
+# Water poured from the lowest step: the smallest validator (leaving out the last EDGE, the edge of the set) rises
+# first, to 1 ATONE under the validator ranked just above it; then the two rise together, each 1 ATONE under the
+# one above, and so on: a shelf that rises one step at a time and takes the next validator up as it reaches it
+# (operator, 2026-10-01: "apply shelf rise"). Nobody passes the validator above, so no rank changes; the largest
+# TOP never take stake. Any validator of the active set may take stake. A source gives only what keeps it at or
+# above the validator ranked just under it; stake on the smallest BOTTOM never moves out. Nothing is offered while
+# any of the delegator's stake cools down, so the offer comes back every 21 days, when the last move's cooldown clears.
 # fixed in code, as the rest of the operator's rule: no env value can change them at launch
-BOTTOM = 34
-EDGE = 3            # the last 3 are left out (operator, 2026-09-30): destinations are ranks 67 to 97 of 100 (31 used)
+TOP = 20            # the largest 20 never take stake: destinations are ranks 21 to 97 of 100 (the signer's TOP)
+BOTTOM = 34         # stake on the smallest 34 is never moved out
+EDGE = 3            # the last 3 are left out (operator, 2026-09-30)
+GAP = 1_000_000     # 1 ATONE between neighbours: a tie would let the chain's tie-break swap the two
 
 def fill(ranked, stake, amount, ok):
-    """the rule's pour: from the smallest up, each to 1 ATONE under the validator just above it (a tie
-    would let the chain's tie-break swap the two, so the gap keeps the order strict); answers
-    {op: added}. ranked is largest first; stake(op) the stake as it stands; ok(v) whether v may take any"""
-    n = len(ranked); add = {}; left = amount
-    # from rank n-EDGE (97 of 100) up to rank n-BOTTOM+1 (67): the last EDGE are left out
-    for i in range(n - 1 - EDGE, max(-1, n - 1 - BOTTOM), -1):
-        if left < 1_000_000: break
-        v = ranked[i]
-        if not ok(v): continue
-        room = (stake(ranked[i - 1]["op"]) - stake(v["op"]) - 1_000_000) if i > 0 else left
-        x = int(min(left, room))
-        if x >= 1_000_000: add[v["op"]] = x; left -= x
-    return add
+    """the shelf rise: answers {op: added}. ranked is largest first; stake(op) the stake as it stands; ok(v) whether v
+    may take any. A validator that may not (a source, a refused pair, a grant's list) is a fixed step: the shelf below
+    it rises to 1 ATONE under it, then the pour carries on above it"""
+    n = len(ranked); add = {}; left = int(amount)
+    s = [int(stake(v["op"])) for v in ranked]
+    i = n - 1 - EDGE
+    while i >= TOP and left >= GAP:
+        if not ok(ranked[i]): i -= 1; continue
+        b0 = i                                         # the segment: b0 up to the first fixed step (or TOP)
+        while i - 1 >= TOP and ok(ranked[i - 1]): i -= 1
+        k0 = i; i -= 1                                 # ranked[k0 - 1] is a fixed step, or rank TOP
+        def cost(k, L): return sum(max(0, L - (j - k) * GAP - s[j]) for j in range(k, b0 + 1))
+        k = b0
+        while True:
+            lmax = s[k - 1] - GAP                      # the shelf's top stays 1 ATONE under the one above it
+            if cost(k, lmax) >= left or k == k0: break
+            k -= 1                                     # it reached ranked[k - 1]: that one joins the shelf
+        hi = lmax; lo = min(s[k], hi)                  # the highest level the amount pays for, never past lmax
+        if cost(k, hi) <= left: lo = hi
+        else:
+            while lo < hi:
+                mid = (lo + hi + 1) // 2
+                if cost(k, mid) <= left: lo = mid
+                else: hi = mid - 1
+        for j in range(k, b0 + 1):
+            x = lo - (j - k) * GAP - s[j]
+            if x > 0: add[ranked[j]["op"]] = x; left -= x
+    # dust is not a move; leaving it out keeps the order, as the gap (1 ATONE) is wider than any dust
+    return {op: x for op, x in add.items() if x >= MIN_MOVE}
+
+def ranks_kept(ranked, moves):
+    """the plan's own proof: with every move applied, each validator still stands where it stood (above the one under
+    it, and never level with it unless they were level before)"""
+    d = {}
+    for x in moves:
+        d[x["src"]] = d.get(x["src"], 0) - x["amount"]; d[x["dst"]] = d.get(x["dst"], 0) + x["amount"]
+    new = [v["t"] + d.get(v["op"], 0) for v in ranked]
+    for j in range(1, len(ranked)):
+        if new[j - 1] < new[j] or (ranked[j - 1]["t"] > ranked[j]["t"] and new[j - 1] <= new[j]): return False
+    return True
 
 def plan(g, rows, reds, vals, m, room=None):
     room = MAX_MOVES_DAY if room is None else room
@@ -575,43 +606,63 @@ def plan(g, rows, reds, vals, m, room=None):
             give = r["free"]
         if give >= 1_000_000: src.append({"op": r["op"], "give": give, "rate": r["rate"]})
     if not src: return None
-    budget = sum(x["give"] for x in src)
-    if g["cap"] is not None: budget = min(budget, g["cap"])
-    gone = {x["op"]: x["give"] for x in src}          # the cautious bound: every source counted as gone
-    def stake(op): return vals[op]["t"] - gone.get(op, 0)
+    rate_src = {x["op"]: x["rate"] for x in src}
     # any validator of the active set may take stake (operator, 2026-09-30): no uptime test, and a tombstoned validator
     # never returns to the set, so there is none to exclude; an older grant's validator list still binds
-    def ok(v): return (g["allow"] is None or v["op"] in g["allow"]) and v["op"] not in g["deny"]
+    def listed(v): return (g["allow"] is None or v["op"] in g["allow"]) and v["op"] not in g["deny"]
     used = pairs_used(reds)
-    def moves_for(amount):
-        add = fill(ranked, stake, amount, ok)
-        # sources fill destinations in turn, smallest validator first: at most S + D - 1 moves, none on a pair
-        # that already holds 7 unmatured entries
-        out, si, left = [], 0, [dict(x) for x in src]
-        for op in sorted(add, key=lambda o: -pos_of[o]):
-            need = add[op]
-            while need > 0 and si < len(left):
-                s_ = left[si]; x = min(need, s_["give"])
-                if x >= 1 and used.get((s_["op"], op), 0) < 7: out.append({"src": s_["op"], "dst": op, "amount": int(x)})
-                s_["give"] -= x; need -= x
-                if s_["give"] <= 0: si += 1
-        return out
-    # more moves than the day allows: move less, never cut a plan (a cut could leave a gap in the fill)
-    moves = moves_for(budget)
-    while len(moves) > room and budget > 1_000_000:
-        budget = int(budget * 0.85); moves = moves_for(budget)
-    if not moves or len(moves) > room: return None
-    rate_src = {x["op"]: x["rate"] for x in src}
     def dst_rates(ms):
         mv_ = {}
         for x in ms: mv_[x["dst"]] = mv_.get(x["dst"], 0) + x["amount"]
         return {op: rate_after(m, vals[op]["t"], vals[op]["c"], a) for op, a in mv_.items()}
-    # every move on its own must earn more than 5 APR points and carry at least 1 ATONE (audit 2026-09-30): a small
-    # lift does not ride along on the average, and dust does not spend a pair entry. Dropping a move only fills less,
-    # so no rank can change
-    rate_dst = dst_rates(moves)
-    moves = [x for x in moves if x["amount"] >= MIN_MOVE and rate_dst[x["dst"]] - rate_src[x["src"]] > MIN_GAIN_APR]
+    def moves_for(srcs, amount, ok):
+        add = fill(ranked, stake, amount, ok)
+        # sources fill destinations in turn, smallest validator first: at most S + D - 1 moves
+        out, short, si, left = [], set(), 0, [dict(x) for x in srcs]
+        for op in sorted(add, key=lambda o: -pos_of[o]):
+            need = add[op]
+            while need > 0 and si < len(left):
+                s_ = left[si]; x = min(need, s_["give"])
+                if used.get((s_["op"], op), 0) < 7: out.append({"src": s_["op"], "dst": op, "amount": int(x)})
+                else: short.add(op)                   # a pair that already holds 7 unmatured entries
+                s_["give"] -= x; need -= x
+                if s_["give"] <= 0: si += 1
+        return out, short
+    # the shelf is settled in rounds: a destination a full pair would leave short, or one that pays too little after
+    # its share for even the best-placed source, becomes a fixed step; a source the shelf cannot lift by more than
+    # MIN_GAIN_APR stays where it is. Each round only adds a step or drops a source, so it ends, and every move left
+    # on its own earns more than 5 APR points (audit 2026-09-30) on a shelf with no hole in it
+    fixed = set(); moves = []
+    for _ in range(2 * n + len(src) + 2):
+        if not src: return None
+        budget = sum(x["give"] for x in src)
+        if g["cap"] is not None: budget = min(budget, g["cap"])
+        gone = {x["op"]: x["give"] for x in src}      # the cautious bound: every source counted as gone
+        def stake(op, gone=gone): return vals[op]["t"] - gone.get(op, 0)
+        # a source is never a destination of its own plan: it is a fixed step while it gives
+        def ok(v, gone=gone): return listed(v) and v["op"] not in fixed and v["op"] not in gone
+        # more moves than the day allows: move less, never cut a plan (a cut would leave a hole in the shelf)
+        moves, short = moves_for(src, budget, ok)
+        while len(moves) > room and budget > MIN_MOVE:
+            budget = int(budget * 0.85); moves, short = moves_for(src, budget, ok)
+        if not moves or len(moves) > room: return None
+        if short: fixed |= short; continue
+        rate_dst = dst_rates(moves)
+        best = min(rate_src[x["src"]] for x in moves)
+        weak = {op for op, r in rate_dst.items() if r - best <= MIN_GAIN_APR}
+        if weak: fixed |= weak; continue
+        floor = min(rate_dst.values())
+        high = [x for x in src if rate_src[x["op"]] >= floor - MIN_GAIN_APR]
+        if high:
+            top = max(high, key=lambda x: rate_src[x["op"]])
+            src = [x for x in src if x is not top]; continue
+        break
+    else: return None
+    # a source's last piece under 1 ATONE is no move: the shelf it leaves short by less than the 1 ATONE gap keeps its order
+    moves = [x for x in moves if x["amount"] >= MIN_MOVE]
     if not moves: return None
+    if not ranks_kept(ranked, moves):
+        log("plan refused: it would change a rank (%s)" % g.get("granter", "?")); return None
     rate_dst = dst_rates(moves)
     for mv in moves: mv["gain"] = mv["amount"] * (rate_dst[mv["dst"]] - rate_src[mv["src"]]) / 1e6
     gain = sum(mv["gain"] for mv in moves)
