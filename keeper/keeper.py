@@ -64,7 +64,7 @@ HEAD_S = 180
 # (any code) hold it until the window passes; a failure that says the grant or the stake is gone holds it HOLD_S,
 # and a re-grant does not lift that
 EXP_MIN_S = 86400
-FEE_DAY = 3_000_000           # uphoton: 3 PHOTON per wallet per 24 hours
+FEE_DAY = 8_000_000           # uphoton: 8 PHOTON per wallet per 24 hours (operator, 2026-10-01: was 3, under one full 60-move run ~7)
 HOLD_S = 86400
 HOLD_WORDS = ("authorization not found", "authorization expired", "failed to get grant", "not enough delegation",
               "insufficient delegation", "no delegation", "delegation does not exist", "validator does not exist",
@@ -74,6 +74,7 @@ MAX_LIST = 64                 # (red team 2026-10-01) a grant whose allow or den
 # reported always; executed only with KEEPER_RESTAKE=1 AND KEEPER_DRY=0
 RESTAKE = os.environ.get("KEEPER_RESTAKE", "0") == "1"
 MIN_RESTAKE = float(os.environ.get("KEEPER_MIN_RESTAKE_ATONE", "1"))       # skip while rewards are below this
+RS_LEGS = 10                  # a restake stakes on at most 10 validators (the shelf it pours into)
 MAX_CLAIM = int(os.environ.get("KEEPER_MAX_CLAIM", "18"))                  # validators claimed in one transaction (the signer takes 20 messages)
 RESTAKE_URL = os.environ.get("KEEPER_RESTAKE_URL", "") or (SIGNER.rsplit("/", 1)[0] + "/authz-restake" if SIGNER else "")
 WDRAW_URL = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward"
@@ -436,16 +437,32 @@ def plan_restake(c, granter, rg, vals, m):  # noqa: C901
     send = 0   # GATA takes no share, ever: a restake stakes every claimed reward back, it never sends
     stake = rewards - send
     if cap is not None and stake > cap: out["skip"] = "delegate cap used up"; return out
-    # where the rewards go (operator, 2026-09-30): all of them onto the ONE validator paying the highest APR once they
-    # land, leaving out the last 3 of the active set (today: #97 of 100). An older DELEGATE grant that names validators
-    # keeps to them, and a validator its grant denies is never picked (the chain would refuse it; audit 2026-09-30)
+    # where the rewards go (operator, 2026-10-01): poured onto the shelf, as Autopilot's moves are - from the smallest
+    # validator up (the last EDGE left out, never the largest TOP), each 1 ATONE under the one above, so a restake never
+    # passes a validator and many restakes in one run spread instead of piling onto one (until 2026-10-01: all onto
+    # the single highest-APR validator). An older DELEGATE grant that names validators keeps to them, and a validator
+    # its grant denies is never picked (the chain would refuse it; audit 2026-09-30). At most RS_LEGS validators:
+    # past that, fewer rewards are claimed now and the rest at the next run
     allow, deny = set(rg["stake"]["allow"] or []), set(rg["stake"].get("deny") or [])
     ranked = sorted(vals.values(), key=lambda v: -v["t"])
-    pool = [v for v in ranked[:max(0, len(ranked) - RS_EDGE)] if (not allow or v["op"] in allow) and v["op"] not in deny]
-    if not pool or stake <= 0: out["skip"] = "no validator to stake on"; return out
-    best = max(pool, key=lambda v: rate_after(m, v["t"], v["c"], int(stake)))
-    legs = [{"validator": best["op"], "amount": int(stake)}]
-    br = rate_after(m, vals[legs[0]["validator"]]["t"], vals[legs[0]["validator"]]["c"], legs[0]["amount"])
+    def ok(v): return (not allow or v["op"] in allow) and v["op"] not in deny
+    while True:
+        stake = rewards - send
+        add = fill(ranked, lambda op: vals[op]["t"], stake, ok, min_leg=1) if stake > 0 else {}
+        # what the shelf cannot take (a grant's list leaves too little room) would pass a validator: claim less
+        fits = len(add) <= RS_LEGS and stake - sum(add.values()) < GAP // 2
+        if fits or len(claim) <= 1: break
+        claim.pop(); rewards = sum(a for a, v in pend if v in claim)
+    if not add or not fits: out["skip"] = "no validator to stake on"; return out
+    if rewards < MIN_RESTAKE * 1e6: out["rewards"] = rewards; out["skip"] = "below %g ATONE" % MIN_RESTAKE; return out
+    out["rewards"] = rewards
+    # every claimed uatone is staked: what the level search leaves (a few uatone) goes to the smallest leg, far
+    # inside its 1 ATONE gap
+    pos = {v["op"]: i for i, v in enumerate(ranked)}
+    order = sorted(add, key=lambda o: pos[o])                     # the shelf's top first
+    add[order[-1]] += int(stake - sum(add.values()))
+    legs = [{"validator": op, "amount": int(add[op])} for op in order]
+    br = sum(rate_after(m, vals[l["validator"]]["t"], vals[l["validator"]]["c"], l["amount"]) * l["amount"] for l in legs) / stake
     out.update({"claim": claim, "stake": legs, "send": int(send), "rate": br,
                 "fee_uphoton": int((120000 + 60000 * (len(claim) + 1 + len(legs))) * 0.25)})
     return out
@@ -542,7 +559,7 @@ BOTTOM = 34         # stake on the smallest 34 is never moved out
 EDGE = 3            # the last 3 are left out (operator, 2026-09-30)
 GAP = 1_000_000     # 1 ATONE between neighbours: a tie would let the chain's tie-break swap the two
 
-def fill(ranked, stake, amount, ok):
+def fill(ranked, stake, amount, ok, min_leg=MIN_MOVE):
     """the shelf rise: answers {op: added}. ranked is largest first; stake(op) the stake as it stands; ok(v) whether v
     may take any. A validator that may not (a source, a refused pair, a grant's list) is a fixed step: the shelf below
     it rises to 1 ATONE under it, then the pour carries on above it"""
@@ -570,8 +587,9 @@ def fill(ranked, stake, amount, ok):
         for j in range(k, b0 + 1):
             x = lo - (j - k) * GAP - s[j]
             if x > 0: add[ranked[j]["op"]] = x; left -= x
-    # dust is not a move; leaving it out keeps the order, as the gap (1 ATONE) is wider than any dust
-    return {op: x for op, x in add.items() if x >= MIN_MOVE}
+    # dust is not a move; leaving it out keeps the order, as the gap (1 ATONE) is wider than any dust. A restake has no
+    # dust (a delegation spends no pair entry): it passes min_leg=1
+    return {op: x for op, x in add.items() if x >= min_leg}
 
 def ranks_kept(ranked, moves):
     """the plan's own proof, with every move applied: every validator but the plan's sources still stands where it

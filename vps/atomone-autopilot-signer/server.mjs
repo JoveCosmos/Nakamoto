@@ -158,6 +158,31 @@ function capRecord(log, granter, count, now) {
   const l = log.get(granter) || [];
   for (let i = 0; i < count; i++) l.push(now);
   log.set(granter, l);
+  daySave(log, now);
+}
+// the per-delegator day survives a restart (2026-10-01; it lived in memory only, so a restart reset every wallet's
+// 60): kept in systemd's StateDirectory as day.json, written atomically after every signed request and read back at
+// start. With no StateDirectory it stays in memory, and says so once
+const DAY_FILE = process.env.STATE_DIRECTORY ? path.join(process.env.STATE_DIRECTORY.split(":")[0], "day.json") : null;
+function daySave(log, now) {
+  if (!DAY_FILE) return;
+  const out = {};
+  for (const [g, l] of log) { const kept = l.filter(t => t > now - DAY_MS); if (kept.length) out[g] = kept; }
+  try { fs.writeFileSync(DAY_FILE + ".tmp", JSON.stringify(out), { mode: 0o600 }); fs.renameSync(DAY_FILE + ".tmp", DAY_FILE); }
+  catch (e) { console.error("autopilot-signer: could not keep the day log: " + e.message); }
+}
+function dayLoad(log, now) {
+  if (!DAY_FILE) { console.log("autopilot-signer: no StateDirectory - the per-delegator day is kept in memory only"); return; }
+  let d = {};
+  try { d = JSON.parse(fs.readFileSync(DAY_FILE, "utf8")); }
+  catch (e) { if (e.code !== "ENOENT") console.error("autopilot-signer: day log unreadable, starting empty: " + e.message); return; }
+  let n = 0;
+  for (const [g, l] of Object.entries(d)) {
+    if (!isAcc(g) || !Array.isArray(l)) continue;
+    const kept = l.filter(t => Number.isFinite(t) && t > now - DAY_MS && t <= now + 60_000);
+    if (kept.length) { log.set(g, kept); n += kept.length; }
+  }
+  console.log(`autopilot-signer: day log read, ${n} messages in the last 24 hours across ${log.size} delegators`);
 }
 // every caller together: at most RATE_MAX requests in any RATE_MS
 function rateTake(stamps, now) {
@@ -212,6 +237,7 @@ async function delegated(query, delegator, validator) {
   }
 }
 const capLog = new Map(), rateLog = [];
+dayLoad(capLog, Date.now());
 // the grants granter -> this signer for each message type: its expiry in ms, null with none, undefined when there is
 // no grant (the chain answers "not found" for a missing or expired one); any other error is thrown (a 500, no tx)
 async function grantsFor(query, granter, grantee, types) {

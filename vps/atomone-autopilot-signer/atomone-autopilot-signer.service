@@ -12,6 +12,9 @@ EnvironmentFile=-/etc/atomone-autopilot/signer.env
 LoadCredentialEncrypted=autopilot_mnemonic:/etc/atomone-autopilot/mnemonic.cred
 LoadCredentialEncrypted=autopilot_secret:/etc/atomone-autopilot/secret.cred
 ExecStart=/usr/bin/node /opt/atomone-autopilot-signer/server.mjs
+# the per-delegator day (day.json) survives a restart: /var/lib/atomone-autopilot-signer, owned by the service user
+StateDirectory=atomone-autopilot-signer
+StateDirectoryMode=0700
 Restart=on-failure
 RestartSec=10
 SuccessExitStatus=78
