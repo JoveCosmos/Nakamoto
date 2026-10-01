@@ -1588,7 +1588,11 @@
       var hh = h + '<div class=you-dele id=youdele></div>', slot0 = E("youdele");
       /* unchanged: leave the pane where it is (moving it would reset its list's scroll) */
       if(LASTH["you"] === hh && slot0 && mineEl && slot0.contains(mineEl)) return;
+      /* moving the pane makes the browser forget its lists' scroll (a tick reset the delegations to the top,
+         operator 2026-10-01): every scrolled box inside it is put back where it was */
+      var keepSc = mineEl ? [].filter.call(mineEl.querySelectorAll("*"), function(x){ return x.scrollTop > 0; }).map(function(x){ return [x, x.scrollTop]; }) : [];
       home(); put("you", hh); var slot = E("youdele"); if(slot && mineEl) slot.appendChild(mineEl);
+      keepSc.forEach(function(k){ k[0].scrollTop = k[1]; });
       return;
     }
     home();

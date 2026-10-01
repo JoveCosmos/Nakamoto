@@ -2336,7 +2336,11 @@ rememberGridH();
     }
     stats(pos);
     var a = E("dmy"), c = E("dstrat");
-    if(a) a.innerHTML = myRows(pos, V);
+    /* a redraw (a tick, a new block) keeps the list where the reader left it: every scrolling box from the table up
+       is put back where it was (operator, 2026-10-01: a tick reset the delegations to the top) */
+    if(a){ var keepSc = []; for(var se = a; se && se !== document.body; se = se.parentElement) if(se.scrollTop) keepSc.push([se, se.scrollTop]);
+           a.innerHTML = myRows(pos, V);
+           keepSc.forEach(function(k){ k[0].scrollTop = k[1]; }); }
     var mv = movesPanel(pos, V, r);                /* first: the list shows each tick's gain */
     picks(opt, r, B, pos);
     if(c){ c.innerHTML = mv || MVHEAD + '</table>'; c.classList.toggle("none", !mv); }

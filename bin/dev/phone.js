@@ -65,7 +65,7 @@ const AUDIT = `(function(){
     const res = await send("Runtime.evaluate", { expression: AUDIT.replace("DEVW", String(SIZE[0])), returnByValue: true });
     if(!res.result || !res.result.result || res.result.result.value == null){ console.log(`${SIZE.join("x")} ${r} : audit failed ` + JSON.stringify(res.result && res.result.exceptionDetails || res.error || "").slice(0, 200)); continue; }
     const v = JSON.parse(res.result.result.value);
-    if(EVAL){ const x = await send("Runtime.evaluate", { expression: EVAL, returnByValue: true }); console.log("    EVAL " + JSON.stringify(x.result && x.result.result && x.result.result.value)); }
+    if(EVAL){ const x = await send("Runtime.evaluate", { expression: EVAL, returnByValue: true, awaitPromise: true });   /* an --eval may return a Promise: it is waited for */ console.log("    EVAL " + JSON.stringify(x.result && x.result.result && x.result.result.value)); }
     console.log(`${SIZE.join("x")} ${r} : side=${v.nside} cut=${v.ncut} docW=${v.docW}/${v.W}` + (v.nside ? "\n    SIDE " + v.side.join("\n    SIDE ") : "") + (v.ncut ? "\n    CUT " + v.cut.join("\n    CUT ") : ""));
     /* the page as a phone shows it, top to bottom - capped at 4000 css px (the constitution is a book) */
     /* the page as a phone shows it: one screen at a time, scrolled (a capture beyond the viewport
