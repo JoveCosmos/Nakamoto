@@ -498,7 +498,7 @@
       (add > 0 ? '<small>ATONE, +' + (add * 100).toFixed(1) + '% APR</small>' : '') + rsUntil(at, on) + '</div>';
     /* the rules sit at the foot, over the switch */
     h += '<div class=ars-foot><div class=ars-two><div><em>Frequency</em><b>12 hours</b></div><div><em>Minimum</em><b>1 ATONE</b></div></div>' +
-      '<div class=ars-how>Auto-compounds rewards into the <b>highest-paying</b> validator</div></div>';
+      '<div class=ars-how>Auto-compounds rewards into the <b>highest-paying</b> validators</div></div>';
     h += !pos ? CONNECT_OFF
       : !pos.rows.length ? '<button class="sv-btn go sd-go" type=button data-act=stake>Stake ATONE</button>'
       : '<button class="sv-btn go sd-go' + (on ? ' ars-off' : '') + '" type=button data-act=restakesw>' + (on ? 'Revoke' : 'Activate') + '</button>';

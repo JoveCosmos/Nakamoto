@@ -335,6 +335,15 @@ def tx_backfill(c):
         if d: c.execute("INSERT OR REPLACE INTO tx_log VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", (h, a, svc, g, n, u, d["height"], d["code"], d["gas_wanted"], d["gas_used"], d["fee"], None))
     c.commit(); log("tx_log backfilled: %d transactions" % len(rows))
 
+def impact(c):
+    """what Autopilot and Restake have done in all (2026-10-01), from the landed rows: every Autopilot move goes to a
+    smaller validator by the rule, so this is stake taken down the set"""
+    m = c.execute("SELECT coalesce(sum(uatone), 0), count(DISTINCT granter), count(DISTINCT dst), coalesce(sum(gain), 0), count(DISTINCT txhash)"
+                  " FROM move WHERE dry=0 AND txhash IS NOT NULL").fetchone()
+    r = c.execute("SELECT coalesce(sum(staked), 0), count(*), count(DISTINCT granter) FROM restake WHERE dry=0 AND txhash IS NOT NULL").fetchone()
+    return {"moved_uatone": int(m[0]), "wallets": m[1], "validators": m[2], "gain_atone_year": round(m[3], 1), "txs": m[4],
+            "restaked_uatone": int(r[0]), "restakes": r[1], "restake_wallets": r[2]}
+
 def run_summaries(c, n_ap, n_rs, dry):
     """Discord: one message per scheduled run of each service, and one for any other tick that did something"""
     slot, tag = slot0(), " (dry run)" if dry else ""
@@ -356,6 +365,9 @@ def run_summaries(c, n_ap, n_rs, dry):
                  "Gain": "+{:,.1f} ATONE a year".format(RUN["ap_gain"]), "Gas": "{:,}".format(gas),
                  "Fees": "{:,.4f} PHOTON".format(fee / 1e6), "Failed": RUN["ap_failed"]}
             if RUN["ap_held"]: f["Held"] = RUN["ap_held"]
+            im = impact(c)
+            f["Autopilot so far"] = "{:,.1f} ATONE moved by {} wallets to {} smaller validators, +{:,.1f} ATONE a year".format(
+                im["moved_uatone"] / 1e6, im["wallets"], im["validators"], im["gain_atone_year"])
             if RUN["ap_txs"]: f["Tx"] = "\n".join(RUN["ap_txs"])
             if RUN["ap_wallets"]: f["Wallets"] = "\n".join(sorted(RUN["ap_wallets"]))
             discord("crit" if RUN["ap_failed"] else "ok" if RUN["ap_moves"] else "info", "Autopilot run" + tag,
@@ -373,6 +385,8 @@ def run_summaries(c, n_ap, n_rs, dry):
                  "ATONE restaked": "{:,.4f}".format(RUN["rs_staked"] / 1e6), "Gas": "{:,}".format(gas),
                  "Fees": "{:,.4f} PHOTON".format(fee / 1e6), "Failed": RUN["rs_failed"]}
             if RUN["rs_held"]: f["Held"] = RUN["rs_held"]
+            im = impact(c)
+            f["Restake so far"] = "{:,.4f} ATONE restaked in {} restakes for {} wallets".format(im["restaked_uatone"] / 1e6, im["restakes"], im["restake_wallets"])
             if RUN["rs_txs"]: f["Tx"] = "\n".join(RUN["rs_txs"])
             discord("crit" if RUN["rs_failed"] else "ok" if RUN["rs_done"] else "info", "Restake run" + tag,
                     "%d wallets restaked, %d transactions." % (RUN["rs_done"], len(RUN["rs_txs"])), f)
@@ -1150,7 +1164,8 @@ def once(c, only=None, live=None, force=False):
     try:
         s = get("/cosmos/bank/v1beta1/balances/%s" % GRANTEE)
         photon = next((int(b["amount"]) for b in s.get("balances", []) if b["denom"] == "uphoton"), 0)
-        report("_status", {"grantee": GRANTEE, "checked": int(time.time()), "grants": len(gs), "dry": DRY, "photon": photon, "every": EVERY})
+        report("_status", {"grantee": GRANTEE, "checked": int(time.time()), "grants": len(gs), "dry": DRY, "photon": photon, "every": EVERY,
+                           "impact": impact(c)})
         atone = next((int(b["amount"]) for b in s.get("balances", []) if b["denom"] == "uatone"), 0)
         RUN["photon"] = photon
         low_funds(c, photon, atone)
