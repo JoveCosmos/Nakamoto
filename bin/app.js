@@ -1984,6 +1984,9 @@ rememberGridH();
   function srcFree(pos){ if(!pos) return 0; if(!srcAny()) return pos.free;
     var f = 0; pos.rows.forEach(function(r){ if(SRCSEL[r.id] && r.x - r.locked >= 1e5) f += r.x - r.locked; }); return f; }
   window.__srcFree = function(){ return srcFree(window.__POS); };
+  /* the amount and the ticks agree (operator, 2026-10-01): an amount with nothing ticked draws on every delegation that
+     can move, so they are ticked to say so (MAX, a share, a typed amount) */
+  function srcTickAll(pos){ if(!pos || srcAny()) return; pos.rows.forEach(function(r){ if(r.x - r.locked >= 1e5) SRCSEL[r.id] = 1; }); }
   /* the rate the stake that would move earns now: the ticked delegations' free stake, weighted; no ticks, the wallet */
   function srcNow(pos){ if(!pos) return 0; if(!srcAny()) return pos.rate;
     var fw = 0, fr = 0; pos.rows.forEach(function(x){ var f = x.x - x.locked; if(SRCSEL[x.id] && f >= 1e5){ fw += f; fr += f * x.rate; } }); return fw > 0 ? fr / fw : 0; }
@@ -2357,7 +2360,7 @@ rememberGridH();
 
   /* att() is the file-level escaper (defined beside POP) */
 
-  amt.addEventListener("input", function(){ window.__SRCFIRST = null; draw(); });
+  amt.addEventListener("input", function(){ window.__SRCFIRST = null; if(value() > 0) srcTickAll(window.__POS); draw(); });
   /* a delegation row opens its validator's card - the same card the map opens */
   var go0 = E("dgo"); if(go0) go0.addEventListener("click", function(){ if(window.__goSign) window.__goSign(); });
   var dmy = E("dmy");
@@ -2371,19 +2374,24 @@ rememberGridH();
   if(dmy){ dmy.addEventListener("click", rowCard); dmy.addEventListener("keydown", rowCard);
     dmy.addEventListener("change", function(ev){
       var c = ev.target, pos = window.__POS; if(!c || c.type !== "checkbox" || !pos) return;
+      var wasMax = srcAny() && value() * 1e6 >= srcFree(pos) - 1;
       if(c.classList.contains("src-all")) pos.rows.forEach(function(r){ if(r.x - r.locked >= 1e5){ if(c.checked) SRCSEL[r.id] = 1; else delete SRCSEL[r.id]; } });
       else if(c.dataset.src){ if(c.checked) SRCSEL[c.dataset.src] = 1; else delete SRCSEL[c.dataset.src]; }
-      /* the amount follows: never more than the ticked stake can give */
-      var f = srcFree(pos), a0 = value() * 1e6; if(a0 > f) amt.value = f > 0 ? exact(f) : "";
+      /* the amount follows: never more than the ticked stake can give, all of it when it was all, and nothing when
+         nothing is ticked */
+      var f = srcFree(pos), a0 = value() * 1e6;
+      if(!srcAny()) amt.value = "";
+      else if(a0 > f || wasMax) amt.value = f > 0 ? exact(f) : "";
       draw(); }); }
   /* the Redelegate list too: its name cells open the card, its boxes keep the tick */
   var dpk = E("dpicks"); if(dpk){ dpk.addEventListener("click", rowCard); dpk.addEventListener("keydown", rowCard); }
   /* max is what can actually move; with nothing free (all in cooldown) or no wallet it does nothing */
-  var mx = E("amtmax"); if(mx) mx.addEventListener("click", function(){ var pos = window.__POS, f = srcFree(pos); if(!pos || !(f > 0)) return; amt.value = exact(f); draw(); });
+  var mx = E("amtmax"); if(mx) mx.addEventListener("click", function(){ var pos = window.__POS, f = srcFree(pos); if(!pos || !(f > 0)) return; srcTickAll(pos); amt.value = exact(srcFree(pos)); draw(); });
   /* amount presets: a share of what can move */
   Array.prototype.forEach.call(document.querySelectorAll("#amtseg button"), function(b){
     b.addEventListener("click", function(){
       var pos = window.__POS, f = srcFree(pos), base = pos && f > 0 ? f : 10000e6;
+      if(pos && f > 0) srcTickAll(pos);
       amt.value = Math.floor(base * (+b.dataset.p) / 100 / 1e6).toLocaleString();
       Array.prototype.forEach.call(document.querySelectorAll("#amtseg button"), function(o){ o.setAttribute("aria-pressed", o === b ? "true" : "false"); });
       draw();
@@ -3247,6 +3255,7 @@ rememberGridH();
     if(!r.moves.length){ window.__SRCFIRST = null; return false; }
     for(k in SEL) delete SEL[k];
     r.moves.forEach(function(m){ SEL[m.id] = 1; });
+    for(k in SRCSEL) delete SRCSEL[k]; SRCSEL[id] = 1;          /* the ticks say where the amount comes from */
     amt.value = exact(B);
     QUIET = true; draw(); QUIET = false;
     return MSGS.length > 0;
@@ -3389,8 +3398,12 @@ rememberGridH();
     if(!r.moves.length) return null;
     for(k in SEL) delete SEL[k];
     r.moves.forEach(function(m){ SEL[m.id] = 1; });
+    /* applied, the amount is all the free stake: every delegation that can move is ticked */
+    var srcKeep = {}; for(k in SRCSEL) srcKeep[k] = 1;
+    for(k in SRCSEL) delete SRCSEL[k]; srcTickAll(pos);
     amt.value = exact(B);
     QUIET = true; draw(); QUIET = false;
+    if(!apply){ for(k in SRCSEL) delete SRCSEL[k]; for(k in srcKeep) SRCSEL[k] = 1; }
     var an = window.__ANS || {};
     var out = { now: an.now || 0, after: an.after, gain: an.gain || 0, moves: MSGS.length,
                 picks: r.moves.map(function(m){ return { id: m.id, m: m.m, x: m.x }; }),
