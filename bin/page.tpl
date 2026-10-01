@@ -6161,6 +6161,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 #mv-stage .mv-top>em+.mv-tgo,#mv-stage .mv-top>em+.mv-ton{margin-left:auto}
 #mv-stage .sv-btn.go.mv-go.mv-tgo:not(#z):not(#y){height:38px;min-width:0;padding:0 18px;font-size:14px;flex:0 0 auto}
 #mv-stage .mv-top .mv-ton:not(#z){font-size:14px;margin-left:10px}
+#mv-stage .mv-cd{font-family:var(--wmono);font-variant-numeric:tabular-nums;letter-spacing:.02em}
 #mv-stage .mv-set:not(#z):not(#y):not(#x){margin-top:auto}
 #mv-stage .mv-bars i{cursor:pointer}
 #mv-stage .mv-bars i:hover{filter:brightness(.82)}

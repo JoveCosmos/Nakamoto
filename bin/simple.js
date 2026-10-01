@@ -1697,7 +1697,9 @@
     /* the title row carries the state's chip and, in the top right corner, its one action (operator, 2026-09-30) */
     var top = function(eb, chip, cls, act){ return '<div class=mv-top><h3 class=mv-h>Your move</h3><em>' + eb + '</em>' + (chip ? '<span class="mv-chip ' + cls + '">' + chip + '</span>' : '') + (act || '') + '</div>'; };
     var btn = function(a, label){ return '<button class="sv-btn go mv-go mv-tgo" type=button data-act=' + a + '>' + label + '</button>'; };
-    var ACTIVE = '<b class="mv-on mv-ton">Autopilot is Active</b>';
+    /* Autopilot on: the corner counts down to its next run, 00:00 or 12:00 UTC (operator, 2026-10-01); the digits are
+       filled by apTick() so the stage's HTML stays the same between draws */
+    var ACTIVE = '<b class="mv-on mv-ton">Autopilot <span class=mv-cd>--:--:--</span></b>';
     /* the set chart in every state (operator, 2026-09-30): where this wallet's stake sits, lit on the set */
     var mineIds = function(){ var o = {}; (pos && pos.rows || []).forEach(function(r){ if(r.x >= 1e5 && !r.inactive) o[r.id] = 1; }); return o; };
     var nowOn = function(){
@@ -1761,7 +1763,16 @@
     }
     put("mv-stage", you + h);
     mvFit();
+    apTick();
   }
+  /* the time left to Autopilot's next run, h:mm:ss, in every countdown on the page */
+  function apTick(){
+    var els = document.querySelectorAll(".mv-cd"); if(!els.length) return;
+    var left = Math.max(0, Math.ceil(((Math.floor(Date.now() / 432e5) + 1) * 432e5 - Date.now()) / 1000));
+    var t = Math.floor(left / 3600) + ":" + ("0" + Math.floor(left % 3600 / 60)).slice(-2) + ":" + ("0" + left % 60).slice(-2);
+    Array.prototype.forEach.call(els, function(e){ if(e.textContent !== t) e.textContent = t; });
+  }
+  setInterval(apTick, 1000);
 
   function render(){
     if(window.__rerate) window.__rerate();
