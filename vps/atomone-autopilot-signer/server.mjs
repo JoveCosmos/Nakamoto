@@ -45,9 +45,9 @@ const PREFIX = "atone", CHAIN_ID = process.env.CHAIN_ID || "atomone-1";   // tes
 const GAS = process.env.ATOMONE_GAS_PRICE || "0.25uphoton";
 const RPCS = (process.env.ATOMONE_RPC || "https://atomone-rpc.gatadao.com,https://atomone-rpc.polkachu.com").split(",").map(s => s.trim()).filter(Boolean);
 const BIND = process.env.BIND || "10.9.0.2", PORT = +(process.env.PORT || 8788);
-const MAX_MOVES = +(process.env.MAX_MOVES || 20);              // messages in one request (one transaction): gas and size
+const MAX_MOVES = +(process.env.MAX_MOVES || 60);              // messages in one request (one transaction); 60 moves ~ 20M gas of the block's 100M
 const MAX_MOVES_DAY = +(process.env.MAX_MOVES_DAY || 60);      // per delegator in any 24 hours; MUST match keeper.py (operator, 2026-10-01)
-const MAX_GAS = +(process.env.ATOMONE_MAX_GAS || 12_000_000);   // after the 1.4 margin; 7 redelegations used 2.4M
+const MAX_GAS = +(process.env.ATOMONE_MAX_GAS || 30_000_000);   // after the 1.4 margin; 7 redelegations used 2.4M
 const TIMEOUT_BLOCKS = 100;                                       // a tx not in a block by then can never land
 
 if (process.argv.includes("--keygen")) {
