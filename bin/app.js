@@ -3236,8 +3236,8 @@ rememberGridH();
      the same arithmetic, so the move Your move offers is the move Autopilot would make. Water poured from the lowest
      step: the smallest validator (the last EDGE left out) rises first, to 1 ATONE under the one ranked above it; then
      the two rise together, and the shelf takes the next validator up as it reaches it. Nobody passes the one above;
-     the largest TOP never take stake. A source gives only what keeps it at or above the one ranked just under it;
-     stake on the smallest BOTTOM never moves out; at most MAXMOVES moves (move less rather than cut); nothing while
+     the largest TOP never take stake. A source may give all the free stake and fall in rank, never below the top of
+     the shelf (operator, 2026-10-01); stake on the smallest BOTTOM never moves out; at most MAXMOVES moves (move less rather than cut); nothing while
      any of the wallet's stake is cooling down. Answers null or { now, after, gain, moves, msgs:[{from,to,amt}] }. */
   var TOP = 20, BOTTOM = 34, EDGE = 3, GAP = 1e6, MAXMOVES = 60, MIN_LIFT = 0.05;   /* keeper.py TOP, BOTTOM, EDGE, MAX_MOVES_DAY */
   /* keeper.py fill(): {op: added}; s[j] the stake as it stands, ok(j) whether rank j+1 may take any. One that may not is
@@ -3269,10 +3269,9 @@ rememberGridH();
     var bset = {}; for(i = Math.max(0, n - BOTTOM); i < n; i++) bset[V[i][3]] = 1;
     var now = pos.rows.reduce(function(s, r){ return s + r.x * (r.inactive ? 0 : r.rate); }, 0) / pos.total;
     /* sources in the keeper's order: the most free stake first */
+    /* all the free stake may go: the floor (never below the shelf) is set in the rounds, once the shelf is known */
     var src = pos.rows.filter(function(r){ return r.x - r.locked > 0 && !bset[r.id]; }).sort(function(a, b){ return (b.x - b.locked) - (a.x - a.locked); }).map(function(r){
-      var free = r.x - r.locked, give = free;
-      if(at[r.id] != null){ var j = at[r.id], under = j + 1 < n ? V[j + 1][1] : 0; give = Math.min(free, Math.max(0, Math.floor(V[j][1] - under - 1e6))); }
-      return { id: r.id, give: give, rate: r.inactive ? 0 : r.rate };
+      return { id: r.id, give: Math.floor(r.x - r.locked), rate: r.inactive ? 0 : r.rate };
     }).filter(function(x){ return x.give >= 1e6; });
     if(!src.length) return null;
     var rs = {}; src.forEach(function(x){ rs[x.id] = x.rate; });
@@ -3281,9 +3280,10 @@ rememberGridH();
       used[k] = (used[k] || 0) + (rr.entries || []).length; });
     var dstRates = function(ms){ var mv = {}, r = {}; ms.forEach(function(m){ mv[m.to] = (mv[m.to] || 0) + m.amt; });
       Object.keys(mv).forEach(function(k){ var v = V[at[k]]; r[k] = window.__rateAfter(v[1], v[2], mv[k]); }); return { moved: mv, rd: r }; };
-    function movesFor(srcs, amount, s, ok){
-      var add = shelfFill(V, s, amount, ok), out = [], short = {}, si = 0, lf = srcs.map(function(x){ return { id: x.id, give: x.give }; });
-      Object.keys(add).sort(function(a, b){ return at[b] - at[a]; }).forEach(function(d){
+    function movesFor(srcs, amount, Vn, s, ok){
+      var add = shelfFill(Vn, s, amount, ok), out = [], short = {}, si = 0, lf = srcs.map(function(x){ return { id: x.id, give: x.give }; });
+      var an = {}; Vn.forEach(function(v, q){ an[v[3]] = q; });
+      Object.keys(add).sort(function(a, b){ return an[b] - an[a]; }).forEach(function(d){
         var need = add[d];
         while(need > 0 && si < lf.length){
           var sx = lf[si], x = Math.min(need, sx.give);
@@ -3298,16 +3298,27 @@ rememberGridH();
     /* settled in rounds, as the keeper: a destination a full pair would leave short, or one too poor for even the
        best-placed source, becomes a fixed step; a source the shelf cannot lift by more than 5 points stays put */
     var fixed = {}, out = [], done = false;
-    for(var round = 0; round < 2 * n + src.length + 2 && src.length; round++){
+    for(var round = 0, rmax = 4 * n + 4 * src.length + 10; round < rmax && src.length; round++){
       var budget = src.reduce(function(s, x){ return s + x.give; }, 0), gone = {};
       src.forEach(function(x){ gone[x.id] = x.give; });     /* the cautious bound: every source counted as gone */
-      var s = V.map(function(v){ return v[1] - (gone[v[3]] || 0); });
-      var ok = function(j){ return !fixed[V[j][3]] && !gone[V[j][3]]; };     /* any validator of the active set (operator, 2026-09-30) */
-      var r = movesFor(src, budget, s, ok);
-      while(r.out.length > MAXMOVES && budget > 1e6){ budget = Math.floor(budget * 0.85); r = movesFor(src, budget, s, ok); }
+      /* the set as it stands once the sources have given: a source that falls in rank is placed where it falls
+         (a stable sort, as the keeper's) */
+      var Vn = V.map(function(v, q){ return [v, q]; }).sort(function(a, b){
+        var d = (b[0][1] - (gone[b[0][3]] || 0)) - (a[0][1] - (gone[a[0][3]] || 0)); return d || a[1] - b[1]; }).map(function(x){ return x[0]; });
+      var s = Vn.map(function(v){ return v[1] - (gone[v[3]] || 0); });
+      var ok = function(j){ return !fixed[Vn[j][3]] && !gone[Vn[j][3]]; };     /* any validator of the active set (operator, 2026-09-30) */
+      var r = movesFor(src, budget, Vn, s, ok);
+      while(r.out.length > MAXMOVES && budget > 1e6){ budget = Math.floor(budget * 0.85); r = movesFor(src, budget, Vn, s, ok); }
       out = r.out;
       if(!out.length || out.length > MAXMOVES) return null;
       if(r.short.length){ r.short.forEach(function(d){ fixed[d] = 1; }); continue; }
+      /* the floor: no source in the set ends below the shelf's top + 1 ATONE */
+      var recv = {}, sent = {}, shelf = 0;
+      out.forEach(function(m){ recv[m.to] = (recv[m.to] || 0) + m.amt; sent[m.from] = (sent[m.from] || 0) + m.amt; });
+      Object.keys(recv).forEach(function(d){ shelf = Math.max(shelf, V[at[d]][1] + recv[d]); });
+      var low = src.filter(function(x){ return at[x.id] != null && V[at[x.id]][1] - (sent[x.id] || 0) < shelf + GAP; });
+      if(low.length){ low.forEach(function(x){ x.give = Math.max(0, Math.floor(V[at[x.id]][1] - shelf - GAP)); });
+        src = src.filter(function(x){ return x.give >= 1e6; }); continue; }
       var rd = dstRates(out).rd, best = Math.min.apply(null, out.map(function(m){ return rs[m.from]; }));
       var weak = Object.keys(rd).filter(function(d){ return rd[d] - best <= MIN_LIFT; });
       if(weak.length){ weak.forEach(function(d){ fixed[d] = 1; }); continue; }
