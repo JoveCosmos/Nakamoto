@@ -17,7 +17,10 @@ ProtectSystem=strict
 ProtectHome=true
 PrivateDevices=true
 RestrictAddressFamilies=AF_INET AF_INET6
-ReadWritePaths=/srv/atomone-app/state
+# red team 2026-10-01: writes only its own state (admin-secret, admin-<net>.json); the shared state dir is read only
+Environment=ADMIN_STATE_DIR=/srv/atomone-app/state/admin
+ReadWritePaths=/srv/atomone-app/state/admin
+MemoryMax=256M
 ProtectKernelTunables=yes
 ProtectKernelModules=yes
 ProtectControlGroups=yes

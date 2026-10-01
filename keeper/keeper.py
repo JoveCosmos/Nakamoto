@@ -19,7 +19,7 @@ Disabled wallet, or sign anything while KEEPER_DRY=1 (a plan is then recorded, d
 State: /srv/atomone-app/keeper/state/keeper.db (sqlite: runs, moves); KEEPER_STATE overrides.
 Report per granter: /srv/atomone-app/web/keeper/<granter>.json (the page shows it); KEEPER_REPORTS.
 Testnet: the same code under atomone-app-keeper-testnet with KEEPER_DATA/STATE/REPORTS/ADMIN
-and ATOMONE_API pointed at testnet.
+and ATOMONE_API pointed at testnet. Mainnet reads the box's own node (127.0.0.1:3999) unless ATOMONE_API says otherwise.
 """
 import calendar, hashlib, json, os, re, sqlite3, sys, time, urllib.request, urllib.error, urllib.parse
 
@@ -30,7 +30,10 @@ try:
 except Exception:                                   # no sender: alerts are logged, never fatal
     notify = None
 
-API = os.environ.get("ATOMONE_API", "https://atomone-api.gatadao.com")
+NET = os.environ.get("NET", "mainnet")
+# (red team 2026-10-01) mainnet reads the box's own node: the public API shares one nginx rate-limit bucket with the
+# world, and a flood there must not starve the keeper. An ATOMONE_API in the env still wins (testnet sets its own)
+API = (os.environ.get("ATOMONE_API") or ("http://127.0.0.1:3999" if NET == "mainnet" else "https://atomone-api.gatadao.com")).rstrip("/")
 SIGNER = os.environ.get("KEEPER_SIGNER_URL", "")
 def _secret():
     """the signer's shared secret: the unit's systemd credential when it loads one, else KEEPER_SECRET from the env
@@ -56,6 +59,17 @@ RS_EDGE = 3                   # restake: the last 3 of the set are left out of t
 MIN_MOVE = 1_000_000          # no move under 1 ATONE: dust uses a pair entry and a move slot for nothing
 FRESH_S = 3600                # the collector's record older than this, or a chain head older than HEAD_S: no tick
 HEAD_S = 180
+# (red team 2026-10-01) fee griefing: a grant that ends between our read and the block fails at delivery and the
+# signer pays. A grant ending within EXP_MIN_S is not acted on; fees paid for one wallet over FEE_DAY in any 24 hours
+# (any code) hold it until the window passes; a failure that says the grant or the stake is gone holds it HOLD_S,
+# and a re-grant does not lift that
+EXP_MIN_S = 86400
+FEE_DAY = 3_000_000           # uphoton: 3 PHOTON per wallet per 24 hours
+HOLD_S = 86400
+HOLD_WORDS = ("authorization not found", "authorization expired", "failed to get grant", "not enough delegation",
+              "insufficient delegation", "no delegation", "delegation does not exist", "validator does not exist",
+              "transitive", "already in progress")
+MAX_LIST = 64                 # (red team 2026-10-01) a grant whose allow or deny list is longer is ignored: the page never builds more than ~31
 # restake: claim a granter's rewards and stake them back onto their allow-list. Planned and
 # reported always; executed only with KEEPER_RESTAKE=1 AND KEEPER_DRY=0
 RESTAKE = os.environ.get("KEEPER_RESTAKE", "0") == "1"
@@ -68,7 +82,6 @@ WDRAW_URL = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward"
 DATA = os.environ.get("KEEPER_DATA", "/srv/atomone-app/web/data.json")
 STATE = os.environ.get("KEEPER_STATE", "/srv/atomone-app/keeper/state/keeper.db")
 REPORTS = os.environ.get("KEEPER_REPORTS", "/srv/atomone-app/web/keeper")
-NET = os.environ.get("NET", "mainnet")
 SITE = os.environ.get("SITE_URL", "https://atomone.gatahub.zone")
 TICK = int(os.environ.get("KEEPER_TICK", "60"))           # the loop: new grants and retries are picked up this fast
 TYPE_URL = "/cosmos.staking.v1beta1.MsgBeginRedelegate"
@@ -117,9 +130,14 @@ def db():
               " checked INT, acted INT, skipped INT, failed INT, msgs INT, txs INT, uatone INT, gain REAL, gas_used INT, fee_uphoton INT, photon_after INT)")
     c.execute("CREATE TABLE IF NOT EXISTS tx_log(txhash TEXT PRIMARY KEY, at INT, service TEXT, granter TEXT, msgs INT, uatone INT, height INT,"
               " code INT, gas_wanted INT, gas_used INT, fee_uphoton INT, run_id INT)")
+    # (red team 2026-10-01) every broadcast that did not land as a success (a code != 0, a 502 with a txhash, a tx sent
+    # and not yet seen): it counts in the wallet's day like a move. A wallet held after a failure that says its grant
+    # or stake is gone: a re-grant does not clear it
+    c.execute("CREATE TABLE IF NOT EXISTS failed_tx(txhash TEXT PRIMARY KEY, at INT, granter TEXT, service TEXT, msgs INT)")
+    c.execute("CREATE TABLE IF NOT EXISTS hold(granter TEXT PRIMARY KEY, until INT, why TEXT, at INT, err TEXT)")
     try: c.execute("ALTER TABLE restake ADD COLUMN error TEXT")
     except sqlite3.OperationalError: pass
-    for ix in ("run_g(granter, at)", "applied(granter, at)", "move(granter, at)", "move(txhash)", "restake(granter, at)", "rate_log(granter, at)"):
+    for ix in ("run_g(granter, at)", "applied(granter, at)", "move(granter, at)", "move(txhash)", "restake(granter, at)", "rate_log(granter, at)", "tx_log(granter, at)", "failed_tx(granter, at)"):
         c.execute("CREATE INDEX IF NOT EXISTS ix_%s ON %s" % (ix.split("(")[0] + "_" + ix.split("(")[1].split(",")[1 if "," in ix else 0].strip(" )"), ix))
     c.execute("PRAGMA busy_timeout=5000")
     return c
@@ -167,6 +185,19 @@ def live_vals(stats):
     return out
 
 # ── grants ─────────────────────────────────────────────────────────────────
+def exp_ts(exp):
+    """a grant's expiration as epoch seconds (UTC), None when it has none"""
+    return calendar.timegm(time.strptime(exp[:19], "%Y-%m-%dT%H:%M:%S")) if exp else None
+
+BIG = set()
+def too_long(g, a):
+    """(red team 2026-10-01) an allow or deny list over MAX_LIST: the grant is ignored, logged once per granter"""
+    n = max(len((a.get("allow_list") or {}).get("address") or []), len((a.get("deny_list") or {}).get("address") or []))
+    if n <= MAX_LIST: return False
+    k = (g.get("granter"), a.get("@type"), a.get("authorization_type") or a.get("msg"))
+    if k not in BIG: BIG.add(k); log("ignored a grant from %s: a validator list of %d (over %d)" % (g.get("granter"), n, MAX_LIST))
+    return True
+
 def grants():
     out, key = [], None
     while True:
@@ -178,10 +209,11 @@ def grants():
             if a.get("authorization_type") != "AUTHORIZATION_TYPE_REDELEGATE": continue
             exp = g.get("expiration")
             if exp and time.strptime(exp[:19], "%Y-%m-%dT%H:%M:%S") < time.gmtime(): continue
+            if too_long(g, a): continue
             allow = (a.get("allow_list") or {}).get("address") or None
             deny = set((a.get("deny_list") or {}).get("address") or [])
             cap = a.get("max_tokens"); cap = int(cap["amount"]) if cap and cap.get("denom") == "uatone" else None
-            out.append({"granter": g["granter"], "allow": allow, "deny": deny, "cap": cap, "exp": exp})
+            out.append({"granter": g["granter"], "allow": allow, "deny": deny, "cap": cap, "exp": exp, "exp_ts": exp_ts(exp)})
         key = d.get("pagination", {}).get("next_key")
         if not key: break
     return out
@@ -214,12 +246,21 @@ def admin():
         raise ValueError("admin state %s is not what adminapi writes" % ADMIN)
     return a
 
-LEDGER = os.path.join(os.path.dirname(ADMIN), "grants-%s.json" % NET)
-def granted_at(granter, c):
+# the grant ledger (grantwatch's), in the shared state dir; since 2026-10-01 the admin file lives in its own dir, so the
+# ledger is no longer found beside it
+LEDGER = os.environ.get("KEEPER_LEDGER") or "/srv/atomone-app/state/grants-%s.json" % NET
+def ledger():
+    """grantwatch's ledger, {} when it cannot be read; read once per tick (red team 2026-10-01: it was re-read per grant)"""
+    try:
+        with open(LEDGER) as f: return json.load(f).get("grants") or {}
+    except Exception:
+        return {}
+
+def granted_at(granter, c, led=None):
     """when the grant was made (grantwatch's ledger reads it from the grant's transaction), else when the
     keeper first saw it: grants are planned in this order"""
     try:
-        e = (json.load(open(LEDGER)).get("grants") or {}).get(granter) or {}
+        e = (ledger() if led is None else led).get(granter) or {}
         if e.get("status") in ("new", "active", "expiring") and (e.get("made") or e.get("first_seen")):
             return int(e.get("made") or e["first_seen"])
     except Exception:
@@ -252,7 +293,8 @@ RUN = {}
 def run_reset():
     RUN.clear()
     RUN.update({"ap_checked": 0, "ap_wallets": set(), "ap_moves": 0, "ap_txs": [], "ap_uatone": 0, "ap_gain": 0.0, "ap_failed": 0,
-                "rs_checked": 0, "rs_done": 0, "rs_txs": [], "rs_rewards": 0, "rs_staked": 0, "rs_failed": 0, "rs_small": 0, "txinfo": {}})
+                "rs_checked": 0, "rs_done": 0, "rs_txs": [], "rs_rewards": 0, "rs_staked": 0, "rs_failed": 0, "rs_small": 0, "txinfo": {},
+                "ap_bad": [], "rs_bad": [], "ap_held": 0, "rs_held": 0})
 
 def tx_chain(h):
     """what the chain says one of our transactions cost: height, code, gas wanted and used, fee in uphoton (None if unread)"""
@@ -303,7 +345,7 @@ def run_summaries(c, n_ap, n_rs, dry):
         if kind == "autopilot":
             did = RUN["ap_moves"] or RUN["ap_failed"]
             if not (scheduled or did): continue
-            gas, fee = tx_cost(RUN["ap_txs"], c, "autopilot")
+            gas, fee = tx_cost(RUN["ap_txs"] + RUN["ap_bad"], c, "autopilot")     # a failed broadcast pays too (red team 2026-10-01)
             c.execute("INSERT INTO run_sum(at, slot, service, kind, dry, wallets, checked, acted, skipped, failed, msgs, txs, uatone, gain, gas_used, fee_uphoton, photon_after)"
                       " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (int(time.time()), slot, kind, "slot" if scheduled else "grant", int(dry), n_ap, RUN["ap_checked"],
                       len(RUN["ap_wallets"]), 0, RUN["ap_failed"], RUN["ap_moves"], len(RUN["ap_txs"]), int(RUN["ap_uatone"]), RUN["ap_gain"], gas, fee, RUN.get("photon")))
@@ -312,6 +354,7 @@ def run_summaries(c, n_ap, n_rs, dry):
                  "Transactions": len(RUN["ap_txs"]), "ATONE moved": "{:,.1f}".format(RUN["ap_uatone"] / 1e6),
                  "Gain": "+{:,.1f} ATONE a year".format(RUN["ap_gain"]), "Gas": "{:,}".format(gas),
                  "Fees": "{:,.4f} PHOTON".format(fee / 1e6), "Failed": RUN["ap_failed"]}
+            if RUN["ap_held"]: f["Held"] = RUN["ap_held"]
             if RUN["ap_txs"]: f["Tx"] = "\n".join(RUN["ap_txs"])
             if RUN["ap_wallets"]: f["Wallets"] = "\n".join(sorted(RUN["ap_wallets"]))
             discord("crit" if RUN["ap_failed"] else "ok" if RUN["ap_moves"] else "info", "Autopilot run" + tag,
@@ -319,7 +362,7 @@ def run_summaries(c, n_ap, n_rs, dry):
         else:
             did = RUN["rs_done"] or RUN["rs_failed"]
             if not (scheduled or did): continue
-            gas, fee = tx_cost(RUN["rs_txs"], c, "restake")
+            gas, fee = tx_cost(RUN["rs_txs"] + RUN["rs_bad"], c, "restake")
             c.execute("INSERT INTO run_sum(at, slot, service, kind, dry, wallets, checked, acted, skipped, failed, msgs, txs, uatone, gain, gas_used, fee_uphoton, photon_after)"
                       " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (int(time.time()), slot, kind, "slot" if scheduled else "enabled", int(dry), n_rs, RUN["rs_checked"],
                       RUN["rs_done"], RUN["rs_small"], RUN["rs_failed"], RUN["rs_done"], len(RUN["rs_txs"]), int(RUN["rs_staked"]), 0.0, gas, fee, RUN.get("photon")))
@@ -328,6 +371,7 @@ def run_summaries(c, n_ap, n_rs, dry):
                  "Transactions": len(RUN["rs_txs"]), "Rewards claimed": "{:,.4f} ATONE".format(RUN["rs_rewards"] / 1e6),
                  "ATONE restaked": "{:,.4f}".format(RUN["rs_staked"] / 1e6), "Gas": "{:,}".format(gas),
                  "Fees": "{:,.4f} PHOTON".format(fee / 1e6), "Failed": RUN["rs_failed"]}
+            if RUN["rs_held"]: f["Held"] = RUN["rs_held"]
             if RUN["rs_txs"]: f["Tx"] = "\n".join(RUN["rs_txs"])
             discord("crit" if RUN["rs_failed"] else "ok" if RUN["rs_done"] else "info", "Restake run" + tag,
                     "%d wallets restaked, %d transactions." % (RUN["rs_done"], len(RUN["rs_txs"])), f)
@@ -348,13 +392,18 @@ def restake_grants():
             if exp and time.strptime(exp[:19], "%Y-%m-%dT%H:%M:%S") < now: continue
             a, r = g.get("authorization", {}), out.setdefault(g["granter"], {})
             t = a.get("@type")
+            if too_long(g, a): continue
+            # the earliest end of the two grants Restake needs (red team 2026-10-01: within 24 hours it is not acted on)
+            e = exp_ts(exp)
             if t == "/cosmos.authz.v1beta1.GenericAuthorization" and a.get("msg") == WDRAW_URL:
                 r["claim"] = True
+                if e is not None: r["exp_ts"] = min(e, r.get("exp_ts") or e)
             elif t == "/cosmos.staking.v1beta1.StakeAuthorization" and a.get("authorization_type") == "AUTHORIZATION_TYPE_DELEGATE":
                 cap = a.get("max_tokens")
                 r["stake"] = {"allow": (a.get("allow_list") or {}).get("address") or [],
                               "deny": (a.get("deny_list") or {}).get("address") or [],
                               "cap": int(cap["amount"]) if cap and cap.get("denom") == "uatone" else None}
+                if e is not None: r["exp_ts"] = min(e, r.get("exp_ts") or e)
         key = d.get("pagination", {}).get("next_key")
         if not key: break
     return {k: v for k, v in out.items() if v.get("claim") and v.get("stake")}
@@ -410,6 +459,8 @@ def execute_restake(granter, p):
     except urllib.error.HTTPError as e:
         try: return {"error": json.load(e)}
         except Exception: return {"error": "HTTP %d" % e.code}
+    except Exception as e:
+        return {"error": "network: %s" % e}      # recorded as a failure, never an escape past the restake row (red team 2026-10-01)
 
 def restake_step(c, granter, rgs, vals, m, dry):
     """plan, execute when allowed, record; returns what the report shows"""
@@ -428,7 +479,12 @@ def restake_step(c, granter, rgs, vals, m, dry):
             if ok:
                 RUN["rs_done"] += 1; RUN["rs_txs"].append(r.get("txhash")); RUN["rs_rewards"] += int(p["rewards"]); RUN["rs_staked"] += int(amt)
                 RUN["txinfo"][r.get("txhash")] = {"at": int(time.time()), "granter": granter, "msgs": len(p["claim"]) + len(p["stake"]), "uatone": int(amt)}
-            else: RUN["rs_failed"] += 1
+            else:
+                RUN["rs_failed"] += 1
+                # (red team 2026-10-01) a broadcast that failed still counts in the day and its fee in the budget; a grant
+                # or stake that is gone holds the wallet 24 hours
+                record_failed(c, granter, "restake", classify(r)[2], len(p["stake"]))
+                hold_if(c, granter, r.get("error"))
             c.execute("INSERT INTO restake(at, granter, rewards, staked, sent, target, txhash, dry, error) VALUES(?,?,?,?,?,?,?,?,?)",
                       (int(time.time()), granter, p["rewards"], amt, p["send"], p["stake"][0]["validator"], r.get("txhash") if ok else None, 0,
                        None if ok else json.dumps(r.get("error"))[:500]))
@@ -624,7 +680,79 @@ def moves_today(c, granter):
     each). The signer counts the same and refuses past MAX_MOVES_DAY, so a plan is made to fit (audit 2026-09-30)"""
     t = int(time.time()) - 86400
     return (c.execute("SELECT count(*) FROM move WHERE granter=? AND at>? AND dry=0", (granter, t)).fetchone()[0]
-            + c.execute("SELECT count(*) FROM restake WHERE granter=? AND at>? AND dry=0 AND txhash IS NOT NULL", (granter, t)).fetchone()[0])
+            + c.execute("SELECT count(*) FROM restake WHERE granter=? AND at>? AND dry=0 AND txhash IS NOT NULL", (granter, t)).fetchone()[0]
+            # (red team 2026-10-01) and every broadcast that did not land as a success: the signer pays for those too
+            + c.execute("SELECT coalesce(sum(msgs), 0) FROM failed_tx WHERE granter=? AND at>?", (granter, t)).fetchone()[0])
+
+def record_failed(c, gr, service, h, msgs):
+    """(red team 2026-10-01) a broadcast that did not land as a success: in the wallet's day (moves_today) and, through
+    tx_log at the run's end, in its fee budget. Without a txhash nothing was broadcast and nothing is counted"""
+    if not h: return
+    c.execute("INSERT OR IGNORE INTO failed_tx VALUES(?,?,?,?,?)", (h, int(time.time()), gr, service, int(msgs or 1))); c.commit()
+    k = "ap_bad" if service == "autopilot" else "rs_bad"
+    if h not in RUN.get(k, []) and h not in RUN.get(k[:3] + "txs", []):
+        RUN.setdefault(k, []).append(h)
+        RUN.setdefault("txinfo", {}).setdefault(h, {"at": int(time.time()), "granter": gr, "msgs": int(msgs or 1), "uatone": 0})
+
+def hold_if(c, gr, err):
+    """(red team 2026-10-01) a failure that says the grant or the stake is gone (authorization not found or expired, no
+    or not enough delegation, no validator, a redelegation in progress): the wallet waits HOLD_S, whatever it grants
+    meanwhile. Answers the hold's reason, or None"""
+    text = (err if isinstance(err, str) else json.dumps(err)).lower()
+    w = next((w for w in HOLD_WORDS if w in text), None)
+    if not w: return None
+    why = "the grant is gone" if ("authorization" in w or "grant" in w) else "the stake changed"
+    now = int(time.time())
+    c.execute("INSERT OR REPLACE INTO hold VALUES(?,?,?,?,?)", (gr, now + HOLD_S, why, now, text[:300])); c.commit()
+    log("hold granter=%s for %d h: %s (%s)" % (gr, HOLD_S // 3600, why, w))
+    return why
+
+def fee_hold(c, gr):
+    """(red team 2026-10-01) fees paid for this wallet in the last 24 hours (tx_log, any code) over FEE_DAY: held until
+    enough of them age out of the window. Alerts ops once per hold. Answers (why, until) or None"""
+    now = int(time.time())
+    rows = c.execute("SELECT at, fee_uphoton FROM tx_log WHERE granter=? AND at>? AND fee_uphoton IS NOT NULL ORDER BY at",
+                     (gr, now - 86400)).fetchall()
+    tot = sum(f for _, f in rows)
+    if tot <= FEE_DAY: return None
+    left, until = tot, now
+    for at, f in rows:
+        left -= f; until = at + 86400
+        if left <= FEE_DAY: break
+    row = c.execute("SELECT at FROM alert_sent WHERE granter=? AND k='fee_hold'", (gr,)).fetchone()
+    if not row or row[0] <= now:
+        alert("warn", "Autopilot wallet held: fees over %g PHOTON a day: %s" % (FEE_DAY / 1e6, short(gr)),
+              "Its transactions cost more than the daily budget in the last 24 hours. Nothing is signed for it until "
+              + time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime(until)) + ".",
+              {"Delegator": gr, "Fees, 24 hours": "{:,.4f} PHOTON".format(tot / 1e6), "Transactions": len(rows)})
+        c.execute("INSERT OR REPLACE INTO alert_sent VALUES(?, 'fee_hold', ?)", (gr, until)); c.commit()
+    return "fees over the daily budget", until
+
+def wallet_hold(c, gr, exp=None, need=None):
+    """(red team 2026-10-01) why nothing is signed for this wallet now, and until when: (why, until) or None. A hold after
+    a failure, the fee budget, a grant ending within EXP_MIN_S (exp: its end, epoch s), and with need, no room left in
+    the day for that many more (Autopilot's plan fits the room itself)"""
+    now = int(time.time())
+    row = c.execute("SELECT until, why FROM hold WHERE granter=? AND until>?", (gr, now)).fetchone()
+    if row: return "held 24 hours: " + row[1], row[0]
+    f = fee_hold(c, gr)
+    if f: return f
+    if exp is not None and exp - now < EXP_MIN_S: return "the grant ends within 24 hours", exp
+    if need and moves_today(c, gr) + need > MAX_MOVES_DAY:
+        t = now - 86400
+        first = c.execute("SELECT min(at) FROM (SELECT at FROM move WHERE granter=? AND at>? AND dry=0 UNION ALL SELECT at FROM restake WHERE granter=?"
+                          " AND at>? AND dry=0 AND txhash IS NOT NULL UNION ALL SELECT at FROM failed_tx WHERE granter=? AND at>?)", (gr, t, gr, t, gr, t)).fetchone()[0]
+        return "daily move limit", (first or now) + 86400
+    return None
+
+HELD = {}
+def held_log(gr, svc, h):
+    """a hold is logged when it starts or its reason changes, not every tick"""
+    k, v = (gr, svc), (h[0] if h else None)
+    if HELD.get(k) != v:
+        if v: log("%s held granter=%s: %s, until %s" % (svc, gr, v, time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime(h[1]))))
+        elif k in HELD: log("%s hold lifted granter=%s" % (svc, gr))
+        HELD[k] = v
 
 def report(granter, obj):
     # the public file never carries the signer's answer, an older report's included (audit 2026-09-30)
@@ -673,6 +801,12 @@ def auto_apply(c, g, p, pid, dry, out):
             moves = []
     ok = not moves
     kind, why, h = ("ok", "", r.get("txhash")) if ok else classify(r)
+    held = None
+    if not ok:
+        # (red team 2026-10-01) every broadcast counts: a failed one (a code != 0, a 502 with its txhash, one sent and not
+        # yet seen) is in the wallet's day and its fee in the wallet's budget; a grant or stake gone holds it 24 hours
+        record_failed(c, gr, "autopilot", h, min(len(moves), MAX_MOVES_TX))
+        held = hold_if(c, gr, r.get("error"))
     c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, pid, "auto", ",".join(sent) or None, 0, 1 if ok else 0,
               None if ok else ("%s: %s" % ("settled" if kind == "settle" else "will retry", json.dumps(r.get("error"))))[:300], 0))
     c.commit(); out["last"] = public_last(r, kind)
@@ -688,6 +822,7 @@ def auto_apply(c, g, p, pid, dry, out):
     if kind == "settle":
         c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()
         f["Chain said"] = why
+        if held: f["Held"] = "24 hours: " + held
         alert("info", "Autopilot move settled: " + short(gr), "The chain's own rules stop this move (a lock, a full pair or the grant). "
               "Nothing to fix: the next run in 12 hours plans from the chain as it then stands.", f)
     else:
@@ -768,6 +903,8 @@ def settle_landed(c, gr, seen, moves=None):
     landed with code != 0 is classified like any failure (audit 2026-09-30): a retry-class reason (out of gas, a fee)
     keeps its RETRY_WAITS, a chain-rule reason settles to the next slot"""
     now = int(time.time())
+    if seen["code"] == 0:
+        c.execute("DELETE FROM failed_tx WHERE txhash=?", (seen["txhash"],))     # it landed: its moves count it (red team 2026-10-01)
     if seen["code"] == 0 and seen["moves"] and not c.execute("SELECT 1 FROM move WHERE txhash=?", (seen["txhash"],)).fetchone():
         record_moves(c, gr, seen["moves"], seen["txhash"], now)
         c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, plan_id({"moves": seen["moves"]}), "auto", seen["txhash"], 0, 1, None, 0))
@@ -777,6 +914,8 @@ def settle_landed(c, gr, seen, moves=None):
         raw = str(seen.get("raw") or "")
         log("tx %s for %s landed with code %s: %s" % (seen["txhash"], gr, seen["code"], raw[:200]))
         kind, why, _ = classify({"error": "code %d (codespace: %s) %s" % (seen["code"], seen.get("codespace") or "sdk", raw)})
+        record_failed(c, gr, "autopilot", seen["txhash"], len(moves or seen["moves"]) or 1)     # it paid (red team 2026-10-01)
+        hold_if(c, gr, raw)
         if kind == "retry":
             schedule_retry(c, gr, kind, why, None, moves or seen["moves"], {"Delegator": gr, "Tx": seen["txhash"]})
             return
@@ -803,7 +942,8 @@ def once(c, only=None, live=None, force=False):
             if mv["dst"] in work: work[mv["dst"]]["t"] += amt
     tick0 = int(time.time()); run_reset()
     gs = [g for g in grants() if not only or g["granter"] == only]; acted = 0
-    gs.sort(key=lambda g: granted_at(g["granter"], c))
+    led = ledger()                                    # once per tick (red team 2026-10-01)
+    gs.sort(key=lambda g: granted_at(g["granter"], c, led))
     try: rgs = restake_grants()
     except Exception as e: rgs = {}; log("restake grants unreadable: %s" % e)
     adm = admin()
@@ -832,6 +972,12 @@ def once(c, only=None, live=None, force=False):
                     settle_landed(c, gr, seen, json.loads(rt[3] or "[]")); due = False
                 elif rt[2] and time.time() - (rt[4] or 0) < 1800: due = False
                 else: due = True
+            # (red team 2026-10-01) held: a failure that said the grant or stake is gone (a re-grant does not lift it), the
+            # fee budget, a grant ending within 24 hours, a full day. The report says why
+            hold = wallet_hold(c, gr, g.get("exp_ts"))
+            held_log(gr, "autopilot", hold)
+            if hold:
+                due = False; RUN["ap_held"] += 1
             if gr in adm["paused"]: due = False
             p = None
             if due:
@@ -874,6 +1020,8 @@ def once(c, only=None, live=None, force=False):
                 claim(rep.get("moves"))          # a plan made this tick; a move found on chain is in the live set already
             if rep["admin"].get("applied", {}).get("at", 0) >= int(time.time()) - TICK: acted += 1
             rep["dry"] = dry
+            if hold: rep["hold"] = {"why": hold[0], "until": int(hold[1])}
+            else: rep.pop("hold", None)
             report(gr, rep)
         except Exception as e:
             log("granter %s failed: %s" % (gr, e))
@@ -884,6 +1032,20 @@ def once(c, only=None, live=None, force=False):
         if only and granter != only: continue
         try:
             if granter in adm["paused"]: continue
+            # (red team 2026-10-01) the same holds as Autopilot, with the end of Restake's own two grants; not marked as
+            # run, so it goes ahead in this slot once the hold lifts
+            hold = wallet_hold(c, granter, rgs[granter].get("exp_ts"), need=1)
+            held_log(granter, "restake", hold)
+            if hold:
+                RUN["rs_held"] += 1
+                path = os.path.join(REPORTS, granter + ".json")
+                try: rep = json.load(open(path))
+                except Exception: rep = {"granter": granter, "strategy": "restake"}
+                done = c.execute("SELECT count(*), coalesce(sum(staked), 0), max(at) FROM restake WHERE granter=? AND dry=0 AND txhash IS NOT NULL", (granter,)).fetchone()
+                rep["restake"] = {"skip": hold[0], "until": int(hold[1]), "live": RESTAKE and not dry, "count": done[0], "total": done[1], "last_at": done[2]}
+                rep["checked"] = int(time.time()); rep["dry"] = dry
+                report(granter, rep)
+                continue
             seen = c.execute("SELECT at FROM rs_run WHERE granter=?", (granter,)).fetchone()
             if not force and seen and seen[0] >= slot0(): continue
             c.execute("INSERT INTO rs_run VALUES(?,?) ON CONFLICT(granter) DO UPDATE SET at=excluded.at", (granter, int(time.time()))); c.commit()
@@ -978,6 +1140,7 @@ def main():
     try: fcntl.flock(lk, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except OSError: log("another keeper holds %s - not starting" % STATE); sys.exit(75)
     c = db(); a = sys.argv[1:]
+    log("net %s, api %s, state %s, reports %s" % (NET, API, STATE, REPORTS))       # the effective paths (red team 2026-10-01)
     try: tx_backfill(c)
     except Exception as e: log("tx_log backfill failed: %s" % e)
     if "--once" in a:

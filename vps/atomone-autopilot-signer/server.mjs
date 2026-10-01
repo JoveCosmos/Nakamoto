@@ -13,7 +13,10 @@
 // Its own policy, whatever the keeper asks (audit 2026-09-30): a move goes only to a bonded,
 // unjailed validator inside the keeper's window (ranks n-33 to n-3) and only out of what the
 // delegator holds at the source; a restake stakes only on a bonded, unjailed validator ranked
-// n-3 or higher; at most 20 stake-moving messages per delegator a day; 30 requests a minute;
+// n-3 or higher; at most MAX_MOVES_DAY stake-moving messages per delegator a day, every broadcast
+// counted whatever its code; 30 authenticated requests a minute; every grant the request needs
+// read from the chain first and refused when missing or ending within GRANT_MIN_MS (red team
+// 2026-10-01: a grant expiring in flight fails at delivery and this account pays the fee);
 // a simulated gas ceiling and a timeout height on every transaction.
 //
 // Independent of the payout signer: a different mnemonic, secret, Linux user, unit and
@@ -37,7 +40,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
-import { SigningStargateClient, GasPrice, QueryClient, calculateFee, setupDistributionExtension, setupStakingExtension } from "@cosmjs/stargate";
+import { SigningStargateClient, GasPrice, QueryClient, calculateFee, setupAuthzExtension, setupDistributionExtension, setupStakingExtension } from "@cosmjs/stargate";
 import { MsgBeginRedelegate, MsgDelegate } from "cosmjs-types/cosmos/staking/v1beta1/tx";
 import { MsgWithdrawDelegatorReward } from "cosmjs-types/cosmos/distribution/v1beta1/tx";
 
@@ -49,6 +52,8 @@ const MAX_MOVES = +(process.env.MAX_MOVES || 60);              // messages in on
 const MAX_MOVES_DAY = +(process.env.MAX_MOVES_DAY || 60);      // per delegator in any 24 hours; MUST match keeper.py (operator, 2026-10-01)
 const MAX_GAS = +(process.env.ATOMONE_MAX_GAS || 30_000_000);   // after the 1.4 margin; 7 redelegations used 2.4M
 const TIMEOUT_BLOCKS = 100;                                       // a tx not in a block by then can never land
+const REDEL_URL = "/cosmos.staking.v1beta1.MsgBeginRedelegate", DELEG_URL = "/cosmos.staking.v1beta1.MsgDelegate",
+  WDRAW_URL = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward";
 
 if (process.argv.includes("--keygen")) {
   const w = await DirectSecp256k1HdWallet.generate(24, { prefix: PREFIX });
@@ -87,7 +92,7 @@ async function getClient() {
       const client = await connectFirst(RPCS, rpc => SigningStargateClient.connectWithSigner(rpc, wallet, { gasPrice: GasPrice.fromString(GAS) }));
       const id = await client.getChainId();
       if (id !== CHAIN_ID) throw new Error("wrong chain " + id);
-      const query = QueryClient.withExtensions(client.forceGetCometClient(), setupDistributionExtension, setupStakingExtension);
+      const query = QueryClient.withExtensions(client.forceGetCometClient(), setupAuthzExtension, setupDistributionExtension, setupStakingExtension);
       return { client, sender: account.address, query };
     })().catch(e => { clientPromise = null; throw e; });
   }
@@ -160,6 +165,17 @@ function rateTake(stamps, now) {
   if (stamps.length >= RATE_MAX) return false;
   stamps.push(now); return true;
 }
+// (red team 2026-10-01) the grants a request needs, as read from the chain: found is { typeUrl: expiry ms | null (no
+// end) | undefined (no grant) }. Missing, or ending within GRANT_MIN_MS of now -> the refusal, else null
+const GRANT_MIN_MS = 3_600_000;
+function grantProblem(found, need, now) {
+  for (const t of need) {
+    // the chain's own words, so the keeper settles and holds the wallet instead of retrying
+    if (found[t] === undefined) return "authorization not found: no grant for " + t.split(".").pop();
+    if (found[t] !== null && found[t] - now < GRANT_MIN_MS) return "authorization expired: the grant for " + t.split(".").pop() + " ends within an hour";
+  }
+  return null;
+}
 // a memo: none means the fallback; a string of at most 64 characters with no control characters, else refused
 function memoOf(memo, fallback) {
   if (memo === undefined || memo === null || memo === "") return { memo: fallback };
@@ -196,9 +212,27 @@ async function delegated(query, delegator, validator) {
   }
 }
 const capLog = new Map(), rateLog = [];
+// the grants granter -> this signer for each message type: its expiry in ms, null with none, undefined when there is
+// no grant (the chain answers "not found" for a missing or expired one); any other error is thrown (a 500, no tx)
+async function grantsFor(query, granter, grantee, types) {
+  const found = {};
+  for (const t of types) {
+    try {
+      const r = await query.authz.grants(granter, grantee, t);
+      const g = (r.grants || [])[0];
+      if (!g) { found[t] = undefined; continue; }
+      const e = g.expiration;
+      found[t] = e ? Number(e.seconds) * 1000 + Math.floor(Number(e.nanos || 0) / 1e6) : null;
+    } catch (e) {
+      if (/not found/i.test(String(e.message || e))) { found[t] = undefined; continue; }
+      throw e;
+    }
+  }
+  return found;
+}
 
-// simulate, refuse over the gas ceiling, then sign with a timeout height; the day's count is kept for what landed
-// (code 0) or may still land (sent, not yet seen), never for a tx that failed
+// simulate, refuse over the gas ceiling, then sign with a timeout height; the day's count is kept for every broadcast,
+// whatever its code (red team 2026-10-01: a tx that lands and fails is paid for too), and one sent and not yet seen
 async function signChecked(client, sender, granter, msgs, memo, moving) {
   const gas = await client.simulate(sender, msgs, memo);
   const limit = Math.ceil(gas * 1.4);
@@ -206,7 +240,8 @@ async function signChecked(client, sender, granter, msgs, memo, moving) {
   const height = await client.getHeight();
   try {
     const result = await client.signAndBroadcast(sender, msgs, calculateFee(limit, GasPrice.fromString(GAS)), memo, BigInt(height + TIMEOUT_BLOCKS));
-    if (result.code === 0) { capRecord(capLog, granter, moving, Date.now()); setCache.at = 0; }
+    capRecord(capLog, granter, moving, Date.now());
+    if (result.code === 0) setCache.at = 0;
     return { result };
   } catch (e) {
     if (e && e.txId) { capRecord(capLog, granter, moving, Date.now()); setCache.at = 0; }
@@ -219,8 +254,9 @@ function readBody(req) { return new Promise((res, rej) => { let d = ""; req.on("
 const server = http.createServer(async (req, res) => {
   res.setHeader("content-type", "application/json");
   const send = (code, obj) => { res.writeHead(code); res.end(JSON.stringify(obj)); };
-  if (!rateTake(rateLog, Date.now())) return send(429, { error: "rate limit: at most " + RATE_MAX + " requests a minute" });
+  // (red team 2026-10-01) the secret first: an unauthenticated caller gets 401 and never spends the bucket the keeper needs
   if (!authorised(req.headers["x-gata-secret"])) return send(401, { error: "unauthorized" });
+  if (!rateTake(rateLog, Date.now())) return send(429, { error: "rate limit: at most " + RATE_MAX + " requests a minute" });
   try {
     if (req.method === "GET" && req.url === "/whoami") { const { sender } = await getClient(); return send(200, { address: sender, chain_id: CHAIN_ID }); }
     if (req.method === "POST" && req.url === "/authz-restake") return await restake(JSON.parse(await readBody(req)), send);
@@ -238,6 +274,8 @@ const server = http.createServer(async (req, res) => {
     // the policy, the day's count and the signature in one turn of the queue: two requests cannot both pass the cap
     const out = await serial(async () => {
       if (capHeld(capLog, granter, Date.now()) + moves.length > MAX_MOVES_DAY) return { code: 400, err: "daily move limit (" + MAX_MOVES_DAY + ") reached" };
+      const gp = grantProblem(await grantsFor(query, granter, sender, [REDEL_URL]), [REDEL_URL], Date.now());
+      if (gp) return { code: 409, err: gp };
       const bad = checkMoves(await bondedSet(query), moves);
       if (bad) return { code: 400, err: bad };
       for (const [src, amt] of sumBySrc(moves)) {
@@ -283,6 +321,9 @@ async function restake(body, send) {
   const { client, sender, query } = await getClient();
   const res = await serial(async () => {
     if (capHeld(capLog, granter, Date.now()) + stake.length > MAX_MOVES_DAY) return { code: 400, err: "daily move limit (" + MAX_MOVES_DAY + ") reached" };
+    const need = stake.length ? [WDRAW_URL, DELEG_URL] : [WDRAW_URL];
+    const gp = grantProblem(await grantsFor(query, granter, sender, need), need, Date.now());
+    if (gp) return { code: 409, err: gp };
     const bad = checkStake(await bondedSet(query), stake);
     if (bad) return { code: 400, err: bad };
     // rewards must come back to the delegator: otherwise the claim lands elsewhere and a

@@ -11,8 +11,12 @@ Its own policy on top (audit 2026-09-30), read from its own RPC, whatever the ke
 a move's destination must be bonded, not jailed and inside the keeper's window (ranks n-33 to
 n-3 of the bonded set, `BOTTOM = 34`, `EDGE = 3` in both `server.mjs` and `keeper.py`), and the
 delegator must hold at least the amount at each source; a restake stakes only on a bonded,
-unjailed validator ranked n-3 or higher; at most 20 redelegations and delegations per delegator
-in any 24 hours (in memory: a restart clears it); 30 requests a minute in all (429); a memo
+unjailed validator ranked n-3 or higher; at most `MAX_MOVES_DAY` redelegations and delegations per
+delegator in any 24 hours, every broadcast counted whatever its code (in memory: a restart clears it);
+every grant the request needs (REDELEGATE for a move; the reward claim and DELEGATE for a restake) read
+from the chain first, refused (409) when missing or ending within an hour; the secret checked first, then
+30 authenticated requests a minute (429): an unauthenticated call is 401 and spends nothing (red team
+2026-10-01); a memo
 over 64 characters or with control characters is refused; every tx is simulated first and
 refused when gas x 1.4 passes `ATOMONE_MAX_GAS`, and carries a timeout height 100 blocks ahead.
 

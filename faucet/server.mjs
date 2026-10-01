@@ -95,6 +95,15 @@ const fail = (status, msg) => Object.assign(new Error(msg), { status });
 const { c, from } = await client();
 log("testnet faucet sending from", from, "on", BIND + ":" + PORT);
 
+// /status answers from one balance query per 10 s at most, shared by every caller in that time (red team 2026-10-01)
+const STATUS_MS = 10_000;
+let statusQ = null, statusAt = 0;
+function statusBalances() {
+  const now = Date.now();
+  if (!statusQ || now - statusAt >= STATUS_MS) { statusAt = now; statusQ = balances(c, from); statusQ.catch(() => {}); }
+  return statusQ;
+}
+
 function body(req) {
   return new Promise((res, rej) => {
     if (+(req.headers["content-length"] || 0) > 4096) return rej(fail(413, "too large"));
@@ -113,12 +122,14 @@ http.createServer(async (req, res) => {
   const send = (code, o, more) => { if (res.headersSent) return; res.writeHead(code, { "content-type": "application/json", "cache-control": "no-store", ...more }); res.end(JSON.stringify(o)); };
   try {
     if (req.method === "GET" && req.url === "/faucet-api/status") {
-      const b = await balances(c, from);
+      const b = await statusBalances();
       return send(200, { address: from, chain_id: CHAIN_ID, atone: String(b.uatone || 0n), photon: String(b.uphoton || 0n),
                          give: { atone: GIVE.atone.amount, photon: GIVE.photon.amount } });
     }
     if (req.method === "GET" && req.url.startsWith("/faucet-api/claimed?address=")) {
-      const a = decodeURIComponent(req.url.split("=")[1] || "");
+      let a;
+      try { a = decodeURIComponent(req.url.split("=")[1] || ""); }
+      catch { return send(400, { error: "Bad address." }); }     // malformed percent-encoding: 400, not 500 (red team 2026-10-01)
       const cl = S.claims[a] || {}, out = {};
       for (const t of ["atone", "photon"]) { const c = cl[t]; out[t] = !!recent(c); if (recent(c)) { out[t + "_tx"] = c.tx || null; out[t + "_next"] = c.at + WINDOW; } }
       return send(200, out);

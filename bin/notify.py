@@ -4,7 +4,8 @@
       grant with the live counts, user and ATONE milestones, every Autopilot and Restake run, the treasury low on
       PHOTON, the testnet faucet low. The network leads every title. Webhook: DISCORD_WEBHOOK.
   ops(level, title, text, fields, net)      everything operational (a service down, the signer not answering, retries,
-      the validator watch, admin sign-ins, Disable / Enable): Telegram, the box's ops bot (OPS_TG_TOKEN, OPS_TG_CHAT).
+      the validator watch, admin sign-ins, Disable / Enable): Telegram, the box's ops bot (@ChainsPingBot): its token is the sealed credential
+      ops_tg_token (/etc/gata/atomone-app-ops-tg.cred), the group is OPS_TG_CHAT.
       With no Telegram configured it is written to the journal only.
 
 Both live in /etc/gata/atomone-app-alerts.env and are never logged or written out. level: info, ok, warn, crit. A
@@ -13,7 +14,12 @@ failure to deliver is logged and swallowed: an alert that cannot be delivered mu
 import json, os, sys, time, urllib.request, urllib.error, urllib.parse
 
 HOOK = os.environ.get("DISCORD_WEBHOOK", "").strip()
-TG_TOKEN = os.environ.get("OPS_TG_TOKEN", "").strip()
+def _cred(name):
+    """a systemd credential (LoadCredentialEncrypted), readable only by the unit that loads it"""
+    d = os.environ.get("CREDENTIALS_DIRECTORY")
+    try: return open(os.path.join(d, name)).read().strip() if d else ""
+    except OSError: return ""
+TG_TOKEN = os.environ.get("OPS_TG_TOKEN", "").strip() or _cred("ops_tg_token")
 TG_CHAT = os.environ.get("OPS_TG_CHAT", "").strip()
 COLOR = {"info": 0x2bc8bd, "ok": 0x2ee06a, "warn": 0xffb02e, "crit": 0xff4d1f}
 ICON = {"info": "ℹ️", "ok": "✅", "warn": "⚠️", "crit": "🚨"}

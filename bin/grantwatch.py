@@ -21,7 +21,7 @@ console) live in the ledger too; the keeper skips a paused delegator.
     NET, ATOMONE_API, GRANTEE (else KEEPER_GRANTEE), DISCORD_WEBHOOK (via notify)
     grantwatch.py          run forever          grantwatch.py --once   one pass, print, send nothing
 """
-import calendar, json, os, sqlite3, sys, time, urllib.parse, urllib.request
+import calendar, hashlib, json, os, queue, sqlite3, sys, threading, time, urllib.parse, urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import notify
@@ -35,6 +35,8 @@ SITE = os.environ.get("SITE_URL", "https://atomone.gatahub.zone")
 REDEL = "AUTHORIZATION_TYPE_REDELEGATE"
 WDRAW = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward"
 NEW_S, SOON_S, LAST_S = 86400, 7 * 86400, 86400
+MAX_LIST = 64           # (red team 2026-10-01) a grant whose allow or deny list is longer is ignored: the page never builds more than ~31
+BURST = 3               # more grant announcements than this in one poll go to Discord as one message
 
 
 def log(*a): print("grantwatch:", *a, flush=True)
@@ -56,6 +58,27 @@ def fmt_atone(u): return "{:,.1f}".format((u or 0) / 1e6)
 def day(t): return time.strftime("%-d %b %Y", time.gmtime(t)) if t else "no expiry"
 
 
+def allow_sha(lst): return hashlib.sha1(json.dumps(sorted(lst or [])).encode()).hexdigest()[:16]
+
+
+# (red team 2026-10-01) the ledger keeps the allow-list's count and sha1, not the list: a ledger entry written before
+# carries "allow" and is read the same way
+def allow_n(g): return g["allow_n"] if "allow_n" in g else len(g.get("allow") or [])
+
+
+def allow_sig(g): return g.get("allow_sha") or allow_sha(g.get("allow"))
+
+
+_BIG = set()
+def too_long(g, a):
+    """(red team 2026-10-01) an allow or deny list over MAX_LIST: that grant is ignored, logged once"""
+    n = max(len((a.get("allow_list") or {}).get("address") or []), len((a.get("deny_list") or {}).get("address") or []))
+    if n <= MAX_LIST: return False
+    k = (g.get("granter"), a.get("@type"), a.get("authorization_type") or a.get("msg"))
+    if k not in _BIG: _BIG.add(k); log("ignored a grant from %s: a validator list of %d (over %d)" % (g.get("granter"), n, MAX_LIST))
+    return True
+
+
 def standing():
     """delegator -> the terms of what they granted us now"""
     out, key = {}, ""
@@ -65,10 +88,12 @@ def standing():
             a, r = g.get("authorization", {}), out.setdefault(g["granter"], {})
             t = a.get("@type", "")
             exp = ts(g.get("expiration"))
+            if too_long(g, a): continue
             if t.endswith("StakeAuthorization") and a.get("authorization_type") == REDEL:
                 cap = a.get("max_tokens")
+                lst = (a.get("allow_list") or {}).get("address") or []
                 r.update({"cap": int(cap["amount"]) if cap and cap.get("denom") == "uatone" else None,
-                          "allow": (a.get("allow_list") or {}).get("address") or [], "exp": exp})
+                          "allow_n": len(lst), "allow_sha": allow_sha(lst), "exp": exp})
             elif t.endswith("StakeAuthorization") and a.get("authorization_type") == "AUTHORIZATION_TYPE_DELEGATE":
                 r["restake"] = True
             elif t.endswith("GenericAuthorization") and a.get("msg") == WDRAW:
@@ -142,7 +167,7 @@ def gdb():
     return c
 
 
-def terms(g): return (sorted(g.get("allow") or []), g.get("exp"), bool(g.get("restake")))
+def terms(g): return (allow_sig(g), g.get("exp"), bool(g.get("restake")))
 
 
 def step(L, allg, now=None):
@@ -169,7 +194,7 @@ def step(L, allg, now=None):
                      "history": ((e or {}).get("history") or [])[-20:] + [{"at": now, "what": "granted"}]}
             if not first:
                 ev.append(("info", "New Autopilot grant: " + short(gr), "Autopilot runs every 12 hours with no approval step: the first move, if one earns 5 APR points more, is made on its next run.", {
-                    "Delegator": gr, "Cap": cap(g), "Validators": str(len(g["allow"])) if g.get("allow") else "any, the rule picks",
+                    "Delegator": gr, "Cap": cap(g), "Validators": str(allow_n(g)) if allow_n(g) else "any, the rule picks",
                     "Restake": "on" if gr in on else "off"}))
             continue
         old = e["grant"]
@@ -177,7 +202,7 @@ def step(L, allg, now=None):
             e["history"].append({"at": now, "what": "changed"})
             e["cap0"], e["warned"] = g.get("cap"), []
             ev.append(("info", "Autopilot grant changed: " + short(gr), "The delegator changed the validators or the cap. The keeper plans again.", {
-                "Delegator": gr, "Cap": cap(g), "Validators": str(len(g["allow"])) if g.get("allow") else "any, the rule picks", "Restake": "on" if gr in on else "off"}))
+                "Delegator": gr, "Cap": cap(g), "Validators": str(allow_n(g)) if allow_n(g) else "any, the rule picks", "Restake": "on" if gr in on else "off"}))
         e["grant"] = g
         left = (g.get("exp") or 0) - now if g.get("exp") else None
         e["status"] = "expiring" if left is not None and left <= SOON_S else ("new" if now - e["first_seen"] < NEW_S else "active")
@@ -198,7 +223,7 @@ def step(L, allg, now=None):
         e["status"], e["ended"] = st, now
         e["history"].append({"at": now, "what": st})
         ev.append(("warn" if st == "revoked" else "info", "Autopilot grant %s: %s" % (st, short(gr)), text + " Nothing waits for an operator any more.",
-                   {"Delegator": gr, "Was": cap({"cap": e.get("cap0")}) + ", " + str(len(g.get("allow") or [])) + " validators", "Since": day(e.get("made"))}))
+                   {"Delegator": gr, "Was": cap({"cap": e.get("cap0")}) + ", " + str(allow_n(g)) + " validators", "Since": day(e.get("made"))}))
     if first: L["started"] = now
     for level, title, text, fields in ev:
         L["events"].append({"at": now, "level": level, "title": title, "delegator": fields.get("Delegator")})
@@ -234,24 +259,58 @@ def count_fields(T):
     return {"Autopilot users": T["autopilot"][0], "Autopilot ATONE": "{:,.1f}".format(T["autopilot"][1] / 1e6),
             "Restake users": T["restake"][0], "Restake ATONE": "{:,.1f}".format(T["restake"][1] / 1e6)}
 
+# (red team 2026-10-01) Discord is sent from one daemon thread, in order: a slow or failing webhook never holds the poll
+_Q, _W = queue.Queue(maxsize=200), []
+def _worker():
+    while True:
+        job = _Q.get()
+        try: job()
+        except Exception as e: log("discord job failed: %s" % e)
+
+
+def later(job):
+    if not _W:
+        t = threading.Thread(target=_worker, name="discord", daemon=True); t.start(); _W.append(t)
+    try: _Q.put_nowait(job)
+    except queue.Full: log("discord queue full, a message dropped")
+
+
+def disc(level, title, text, fields):
+    later(lambda: notify.discord(NET, level, title, text, fields, SITE + "/admin"))
+
+
 def announce(L, ev):
-    """the two grant events of this step, with the counts as they stand after it"""
+    """the two grant events of this step, with the counts as they stand after it. More than BURST in one poll: one
+    message with the counts per service and every address (red team 2026-10-01: a grant flood is one message, not N)"""
     want = [e for e in ev if e[1].startswith("New Autopilot grant") or e[1].startswith("Restake enabled")]
     if not want: return
     T = totals(L)
+    if len(want) > BURST:
+        ap = [e[3].get("Delegator") for e in want if e[1].startswith("New Autopilot")]
+        rs = [e[3].get("Delegator") for e in want if e[1].startswith("Restake enabled")]
+        f = {"New Autopilot grants": len(ap), "Restake turned on": len(rs)}
+        f.update(count_fields(T))
+        lines = ["Autopilot " + a for a in ap] + ["Restake " + a for a in rs]
+        text, n = "", 0
+        for ln in lines:
+            if len(text) + len(ln) + 40 > 3800: break
+            text += ln + "\n"; n += 1
+        if n < len(lines): text += "and %d more (the admin console lists them all)" % (len(lines) - n)
+        disc("ok", "%d new grants in one check" % len(want), text, f)
+        return
     for level, title, text, fields in want:
         gr = fields.get("Delegator"); ap = title.startswith("New Autopilot")
         f = {"Address": gr, "Staked": "{:,.1f} ATONE".format(staked(gr) / 1e6)}
         f.update(count_fields(T))
-        notify.discord(NET, "ok", "New Autopilot grant" if ap else "Restake turned on",
-                       ("Autopilot moves this wallet at the next run (00:00 or 12:00 UTC), at once if it is new."
-                        if ap else "Rewards are claimed and staked again at every run, from 1 ATONE."), f, SITE + "/admin")
+        disc("ok", "New Autopilot grant" if ap else "Restake turned on",
+             ("Autopilot moves this wallet at the next run (00:00 or 12:00 UTC), at once if it is new."
+              if ap else "Rewards are claimed and staked again at every run, from 1 ATONE."), f)
 
 def milestones(L, c):
     """20 / 50 / 100 users and 200k / 500k / 1M ATONE, per service, each announced once (a row in `milestone`). The very
     first pass (no counts recorded yet) marks what already stands without announcing it; the counts go to svc_count"""
     T, now = totals(L), int(time.time())
-    quiet = not c.execute("SELECT 1 FROM svc_count LIMIT 1").fetchone()
+    quiet, jobs = not c.execute("SELECT 1 FROM svc_count LIMIT 1").fetchone(), []
     for svc in ("autopilot", "restake"):
         c.execute("INSERT OR REPLACE INTO svc_count VALUES(?,?,?,?)", (now, svc, T[svc][0], T[svc][1]))
     for svc, name in (("autopilot", "Autopilot"), ("restake", "Restake")):
@@ -263,9 +322,18 @@ def milestones(L, c):
                  "{:,.1f} ATONE staked by %d %s wallets.".format(uatone / 1e6) % (users, name))):
             for n in marks:
                 if value < n or c.execute("SELECT 1 FROM milestone WHERE metric=? AND threshold=?", (metric, n)).fetchone(): continue
-                sent = None if quiet else (notify.discord(NET, "ok", title(n), text, count_fields(T), SITE + "/admin") or None)
-                c.execute("INSERT INTO milestone VALUES(?,?,?,?,?)", (metric, n, value, now, now if (sent or quiet) else None))
+                c.execute("INSERT INTO milestone VALUES(?,?,?,?,?)", (metric, n, value, now, now if quiet else None))
+                if not quiet: jobs.append((metric, n, title(n), text, count_fields(T)))
     c.commit()
+    # sent from the Discord thread, which marks announced_at on its own connection once it went (red team 2026-10-01)
+    for metric, n, title_, text_, f in jobs:
+        later(lambda m=metric, k=n, t=title_, x=text_, f=f: _ms_sent(m, k) if notify.discord(NET, "ok", t, x, f, SITE + "/admin") else None)
+
+
+def _ms_sent(metric, n):
+    c2 = sqlite3.connect(DBP, timeout=5)
+    try: c2.execute("UPDATE milestone SET announced_at=? WHERE metric=? AND threshold=?", (int(time.time()), metric, n)); c2.commit()
+    finally: c2.close()
 
 
 def main():
