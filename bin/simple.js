@@ -1736,7 +1736,7 @@
         var tL = Object.keys(to).sort(function(x, y){ return to[y] - to[x]; }).map(function(id){ dst[id] = 1; return { rank: rk(id), name: nm(id), amt: '+' + fmt(to[id]), apr: pct(rate(id, to[id])) }; });
         var lock = pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is under redelegate lock until ' + day(pos.until) + '</div>' : '';
         h = top('Best today', auto ? '' : 'Ready, 1 approval', 'ok', auto ? ACTIVE : btn('opt', direct ? 'Activate Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE')) +
-          '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.now) + '</i> to <i class=g>' + pct(plan.after) + '</i> APR</span>' + lock + '</div>' +
+          '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.mnow != null ? plan.mnow : plan.now) + '</i> to <i class=g>' + pct(plan.mafter != null ? plan.mafter : plan.after) + '</i> APR</span>' + lock + '</div>' +   /* the moved stake's own APR (operator, 2026-10-01) */
           '<div class=mv-flow><div class=mv-box><em>From, ' + fL.length + ' validator' + (fL.length === 1 ? '' : 's') + '</em>' + mvRows(fL, 'a', 'validators', 'from') + '</div>' +
           '<div class=mv-arr aria-hidden=true><svg viewBox="0 0 44 20"><path d="M2 10h38M32 3l8 7-8 7"/></svg></div>' +
           '<div class=mv-box><em>To, ' + tL.length + ' validator' + (tL.length === 1 ? '' : 's') + '</em>' + mvRows(tL, 'g', 'validators', 'to') + '</div></div>' +

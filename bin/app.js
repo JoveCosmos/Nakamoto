@@ -3297,7 +3297,10 @@ rememberGridH();
     var after = now + gainU / pos.total, gain = gainU / 1e6, movedU = out.reduce(function(s, m){ return s + m.amt; }, 0), lift = gainU / movedU;
     /* only a move that earns the moved stake more than 5 APR points (operator, 2026-09-30): otherwise it is at its best */
     if(gain < 1 || !(lift > MIN_LIFT)) return null;
-    return { now: now, after: after, gain: gain, lift: lift, moves: out.length, msgs: out,
+    /* the moved stake alone (operator, 2026-10-01): what it earns where it sits and where it lands - the numbers
+       "The same N ATONE, from a to b" and the sign card speak of, and that clear the 5-point rule */
+    var mnow = out.reduce(function(s, m){ return s + m.amt * rs[m.from]; }, 0) / movedU;
+    return { now: now, after: after, gain: gain, lift: lift, mnow: mnow, mafter: mnow + lift, moved: movedU, moves: out.length, msgs: out,
              picks: Object.keys(moved).map(function(k){ return { id: k, m: V[at[k]][0], x: moved[k] }; }) };
   };
   /* sign exactly these moves (the one screen's offer): the signing card lists them and prices them itself */
@@ -3307,7 +3310,7 @@ rememberGridH();
   window.__signMoves = function(plan, withAuto){
     if(!plan || !plan.msgs || !plan.msgs.length || !window.__goSign) return;
     MSGS = plan.msgs.map(function(m){ return { from: m.from, to: m.to, amt: m.amt }; });
-    window.__ANS = { now: plan.now, after: plan.after, gain: plan.gain };
+    window.__ANS = { now: plan.mnow != null ? plan.mnow : plan.now, after: plan.mafter != null ? plan.mafter : plan.after, gain: plan.gain };   /* the moved stake */
     TXAP = !!withAuto && !!window.__atGrantMsg && !!window.__atGrantMsg() && !!(window.__WALLET && window.__WALLET.signDirect);
     window.__goSign();
   };
