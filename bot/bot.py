@@ -47,6 +47,10 @@ STATE  = os.path.dirname(IDFILE)
 # 10,000 heights itself, so Telegram and Discord go critical on the same number
 VALWATCH = os.environ.get("VALWATCH_JSON", os.path.join(STATE, "valwatch-mainnet.json"))
 BACKUP = os.path.join(STATE, "subs.backup.db")
+# a wallet's own alerts (2026-10-01): what the keeper did for it, read from the report it writes per wallet (the page
+# reads the same file); the explorer the messages link to
+REPORTS = os.environ.get("KEEPER_REPORTS", "/srv/atomone-app/web/keeper")
+EXPLORER = os.environ.get("EXPLORER_TX", "https://explorer.gatahub.zone/atomone-1/txs/")
 API    = "https://api.telegram.org/bot" + TOKEN + "/"
 
 if not TOKEN:
@@ -105,6 +109,10 @@ def store():
     c.execute("CREATE TABLE IF NOT EXISTS meta(k TEXT PRIMARY KEY, v TEXT)")
     # the consensus address of each watched validator, kept for when it leaves the page's data
     c.execute("CREATE TABLE IF NOT EXISTS vchex(op TEXT PRIMARY KEY, chex TEXT)")
+    # a wallet's own alerts (2026-10-01): who watches which wallet, and what was last announced for it (the newest
+    # Autopilot move's time, Restake's running total), so each move and restake is told once
+    c.execute("CREATE TABLE IF NOT EXISTS wsub(chat INTEGER, addr TEXT, made INTEGER, PRIMARY KEY(chat, addr))")
+    c.execute("CREATE TABLE IF NOT EXISTS wstate(addr TEXT PRIMARY KEY, mv_at INTEGER, rs_total INTEGER)")
     c.commit()
     return c
 
@@ -177,6 +185,31 @@ def valcons(chex):
     ex = [ord(x) >> 5 for x in hrp] + [0] + [ord(x) & 31 for x in hrp]
     pm = _polymod(ex + data + [0] * 6) ^ 1
     return hrp + "1" + "".join(CS[d] for d in data + [(pm >> 5 * (5 - i)) & 31 for i in range(6)])
+
+
+def wallet(arg):
+    """`w_<the 38 characters after atone1>` from the app's wallet link: the full address, its checksum verified, or None"""
+    m = re.fullmatch(r"w_([02-9ac-hj-np-z]{38})", arg or "")
+    if not m: return None
+    hrp, data = "atone", [CS.index(ch) for ch in m.group(1)]
+    if _polymod([ord(x) >> 5 for x in hrp] + [0] + [ord(x) & 31 for x in hrp] + data) != 1: return None
+    return "atone1" + m.group(1)
+
+
+def short(a): return a[:10] + "..." + a[-4:]
+
+
+def report(addr):
+    try:
+        with open(os.path.join(REPORTS, addr + ".json")) as f: return json.load(f)
+    except Exception:
+        return None
+
+
+def wallet_marks(r):
+    """what has been announced is everything in the report now: the newest move's time, Restake's total"""
+    hist = (r or {}).get("history") or []
+    return max([int(h.get("at") or 0) for h in hist] or [0]), int(((r or {}).get("restake") or {}).get("total") or 0)
 
 
 def slashing():
@@ -311,6 +344,8 @@ HELP = ("Alerts for AtomOne validators: when one stops signing, misses half its 
         "Open the AtomOne app and tap the Telegram button in a validator's signing "
         "row, or the bell on the stake and redelegate cards, then choose what to hear "
         "about.\n\n"
+        "Your own wallet: the Telegram link under Autopilot and Restake in the app's wallet column tells you "
+        "each time Autopilot moves your stake or Restake stakes your rewards.\n\n"
         + HELPERS + "\n\n" + PAGE)
 
 
@@ -353,7 +388,7 @@ def send(chat, text):
 def drop_gone(c):
     while GONE:
         chat = GONE.pop()
-        c.execute("DELETE FROM sub WHERE chat=?", (chat,)); c.commit()
+        c.execute("DELETE FROM sub WHERE chat=?", (chat,)); c.execute("DELETE FROM wsub WHERE chat=?", (chat,)); c.commit()
         log("removed the subscriptions of chat %s" % chat)
 
 
@@ -385,6 +420,21 @@ def handle(c, msg, V):
         return send(chat, HELP)
     cmd, _, arg = text.partition(" ")
     cmd = cmd.split("@")[0].lower(); arg = arg.strip()
+
+    if cmd == "/start" and arg.startswith("w_"):
+        addr = wallet(arg)
+        if not addr:
+            return send(chat, "That link does not carry a valid AtomOne address, so nothing was changed. Open the app and use the Telegram link in your wallet column.")
+        had = c.execute("SELECT 1 FROM wsub WHERE chat=? AND addr=?", (chat, addr)).fetchone()
+        c.execute("INSERT OR IGNORE INTO wsub(chat, addr, made) VALUES(?,?,?)", (chat, addr, int(time.time())))
+        # from now on: what already happened is not told again
+        if not c.execute("SELECT 1 FROM wstate WHERE addr=?", (addr,)).fetchone():
+            mv, rs = wallet_marks(report(addr))
+            c.execute("INSERT INTO wstate(addr, mv_at, rs_total) VALUES(?,?,?)", (addr, mv, rs))
+        c.commit()
+        return send(chat, ("Already watching" if had else "Watching") + " your wallet <code>%s</code>.\n\n"
+                          "You will hear each time Autopilot moves your stake and each time Restake stakes your rewards.\n\n"
+                          "/stop %s stops it." % (short(addr), addr))
 
     if cmd == "/start":
         amb = []                                     # prefixes that named more than one validator
@@ -433,14 +483,19 @@ def handle(c, msg, V):
 
     if cmd == "/list":
         rows = c.execute("SELECT op, flags FROM sub WHERE chat=?", (chat,)).fetchall()
-        if not rows:
+        ws = [r[0] for r in c.execute("SELECT addr FROM wsub WHERE chat=?", (chat,)).fetchall()]
+        if not rows and not ws:
             return send(chat, "You are not watching anyone yet.\n\n" + PAGE)
-        return send(chat, "Watching:\n" + "\n".join(
+        return send(chat, "".join("Your wallet <code>%s</code>: Autopilot and Restake\n" % short(a) for a in ws) +
+                          ("\n" if ws and rows else "") + ("Watching:\n" if rows else "") + "\n".join(
             "- <b>%s</b> - %s" % (md(name(c, op, V)),
                              ", ".join(ALERTS[f][1] for f in (fl or "d") if f in ALERTS))
             for op, fl in rows))
 
     if cmd == "/stop":
+        if arg.startswith("atone1"):
+            n = c.execute("DELETE FROM wsub WHERE chat=? AND addr=?", (chat, arg)).rowcount; c.commit()
+            return send(chat, ("Stopped watching <code>%s</code>." % short(arg)) if n else "You are not watching that wallet. /list shows what you watch.")
         if arg:
             # match among what this chat watches, by today's moniker or the stored one,
             # so a validator that has left the set can still be dropped by name
@@ -450,10 +505,50 @@ def handle(c, msg, V):
                 return send(chat, "You are not watching a validator by that name. /list shows who you watch.")
             c.execute("DELETE FROM sub WHERE chat=? AND op=?", (chat, hit[0])); c.commit()
             return send(chat, "Stopped watching <b>%s</b>." % md(name(c, hit[0], V)))
-        c.execute("DELETE FROM sub WHERE chat=?", (chat,)); c.commit()
+        c.execute("DELETE FROM sub WHERE chat=?", (chat,)); c.execute("DELETE FROM wsub WHERE chat=?", (chat,)); c.commit()
         return send(chat, "Unsubscribed from everything.")
 
     return send(chat, HELP)
+
+
+# ── a wallet's own alerts ───────────────────────────────────────────────────
+def atone(u): return "{:,.1f}".format(int(u) / 1e6)
+
+
+def wallets(c, V):
+    """Each watched wallet: Autopilot moves newer than the last announced, one message per transaction; Restake when
+    its total rose. The report is the keeper's own record of what landed on chain."""
+    for (addr,) in c.execute("SELECT DISTINCT addr FROM wsub").fetchall():
+        r = report(addr)
+        if not r: continue
+        st = c.execute("SELECT mv_at, rs_total FROM wstate WHERE addr=?", (addr,)).fetchone() or (None, None)
+        if st[0] is None:                                # a wallet first seen: nothing old is told
+            mv, rs = wallet_marks(r)
+            c.execute("INSERT OR REPLACE INTO wstate(addr, mv_at, rs_total) VALUES(?,?,?)", (addr, mv, rs)); c.commit(); continue
+        msgs, mv_at, rs_total = [], st[0] or 0, st[1] or 0
+        new = [h for h in (r.get("history") or []) if int(h.get("at") or 0) > mv_at and h.get("txhash")]
+        for tx in sorted({h["txhash"] for h in new}, key=lambda t: min(int(h["at"]) for h in new if h["txhash"] == t)):
+            hs = [h for h in new if h["txhash"] == tx]
+            amt = sum(int(h.get("uatone") or 0) for h in hs); gain = sum(float(h.get("gain") or 0) for h in hs)
+            src = sorted({h["src"] for h in hs}, key=lambda o: name(c, o, V)); dst = {h["dst"] for h in hs}
+            msgs.append("<b>Autopilot moved %s ATONE</b>\nfrom %s to %d smaller validator%s\n+%s ATONE a year\n%s<a href=\"%s%s\">%s</a>" % (
+                atone(amt), ", ".join("<b>%s</b>" % md(name(c, o, V)) for o in src[:3]) + (" and %d more" % (len(src) - 3) if len(src) > 3 else ""),
+                len(dst), "" if len(dst) == 1 else "s", "{:,.1f}".format(gain),
+                "Wallet <code>%s</code>, " % short(addr), EXPLORER, tx, tx[:8]))
+            mv_at = max(mv_at, max(int(h["at"]) for h in hs))
+        rs = r.get("restake") or {}
+        tot = int(rs.get("total") or 0)
+        if tot > rs_total:
+            legs = rs.get("stake") or []
+            h = ((rs.get("result") or {}).get("txhash")) or ""
+            msgs.append("<b>Restake staked %s ATONE of rewards</b>\n%sWallet <code>%s</code>%s" % (
+                atone(tot - rs_total), ("across %d validators\n" % len(legs)) if len(legs) > 1 else "",
+                short(addr), (', <a href="%s%s">%s</a>' % (EXPLORER, h, h[:8])) if h else ""))
+            rs_total = tot
+        if not msgs: continue
+        for (chat,) in c.execute("SELECT chat FROM wsub WHERE addr=?", (addr,)).fetchall():
+            for t in msgs: send(chat, t)
+        c.execute("UPDATE wstate SET mv_at=?, rs_total=? WHERE addr=?", (mv_at, rs_total, addr)); c.commit()
 
 
 # ── the watch ───────────────────────────────────────────────────────────────
@@ -630,6 +725,10 @@ def main():
                 check(c, V)
             except Exception as e:
                 log("check: %s" % e)
+            try:
+                wallets(c, V)
+            except Exception as e:
+                log("wallets: %s" % e)
             heartbeat(me["username"])
         if time.time() - last_backup >= 3600:
             last_backup = time.time(); backup(c)

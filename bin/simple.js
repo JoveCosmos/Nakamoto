@@ -1594,7 +1594,12 @@
     home();
     /* testnet only: the faucet, for the wallet the app is connected to (operator, 2026-09-30) */
     if(root.getAttribute("data-net") === "testnet") h += faucetBox(a);
-    h += '<div class=you-hf><div class=you-hfh><em>Hands-free</em></div>' +
+    /* the wallet's own Telegram alerts (2026-10-01), mainnet, once Autopilot or Restake is on: a move or a restake
+       told as it lands, by the app's bot */
+    var tgw = a && (auto || rs) && window.__BOT && root.getAttribute("data-net") !== "testnet" && /^atone1[02-9ac-hj-np-z]{38}$/.test(a)
+      ? '<a class=you-tgal href="https://t.me/' + window.__BOT + '?start=w_' + a.slice(6) + '" target=_blank rel="noopener noreferrer" title="Hear in Telegram each time Autopilot moves your stake or Restake stakes your rewards">' +
+        '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M21 4L3 11l6 2 2 6 3-4 5 4z"/><path d="M9 13l12-9"/></svg>Alerts</a>' : '';
+    h += '<div class=you-hf><div class=you-hfh><em>Hands-free</em>' + tgw + '</div>' +
       youSwitch("youauto", "Autopilot", auto, asub, !a || !mine) +
       youSwitch("restakesw", "Restake", rs, rs ? "rewards staked every 12 hours" : "stakes your rewards every 12 hours", !a || !mine) + '</div>';
     put("you", h);

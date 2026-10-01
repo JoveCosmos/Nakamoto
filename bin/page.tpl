@@ -5505,6 +5505,9 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .you-swt small{font-size:11.5px;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* Hands-free: one ? for both services' rules (operator, 2026-09-30); the column clips, so the tip opens up and left */
 .you-hfh{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.you-tgal{display:inline-flex;align-items:center;gap:5px;font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--sv-teal);text-decoration:none;padding:4px 0}
+.you-tgal svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
+.you-tgal:hover,.you-tgal:focus-visible{text-decoration:underline;text-underline-offset:3px}
 .you-hfh .qm .qm-tip{width:250px;right:-4px;bottom:calc(100% + 8px)}
 .you-hfh .qm-tip>b{display:block;margin:0 0 5px;font:600 12.5px/1.3 var(--wsans);color:var(--wt)}
 .you-hfh .qm-tip>b~b{margin-top:10px}
