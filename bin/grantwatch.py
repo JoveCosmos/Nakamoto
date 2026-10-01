@@ -193,6 +193,64 @@ def step(L, allg, now=None):
     return ev
 
 
+# ── Discord (operator, 2026-10-01): a new Autopilot or Restake grant with the live counts, and the milestones ──────
+# Every other ledger event (changed, revoked, used up, expiring, Restake off) stays in the ledger and the admin
+# console only. Counts: wallets holding the grant now; ATONE: what those wallets have staked.
+USERS_AT = (20, 50, 100)
+ATONE_AT = (200_000, 500_000, 1_000_000)
+_stk = {}
+def staked(granter):
+    """the wallet's total delegated ATONE (uatone), read at most every 10 minutes"""
+    hit = _stk.get(granter)
+    if hit and time.time() - hit[0] < 600: return hit[1]
+    try:
+        d = get("/cosmos/staking/v1beta1/delegations/%s?pagination.limit=500" % granter)
+        u = sum(int(x["balance"]["amount"]) for x in d.get("delegation_responses", []))
+        _stk[granter] = (time.time(), u); return u
+    except Exception:
+        return hit[1] if hit else 0
+
+def totals(L):
+    ap = [g for g, e in L["grants"].items() if e.get("status") in ("new", "active", "expiring")]
+    rs = list((L.get("restake") or {}).keys())
+    return {"autopilot": (len(ap), sum(staked(g) for g in ap)), "restake": (len(rs), sum(staked(g) for g in rs))}
+
+def count_fields(T):
+    return {"Autopilot users": T["autopilot"][0], "Autopilot ATONE": "{:,.1f}".format(T["autopilot"][1] / 1e6),
+            "Restake users": T["restake"][0], "Restake ATONE": "{:,.1f}".format(T["restake"][1] / 1e6)}
+
+def announce(L, ev):
+    """the two grant events of this step, with the counts as they stand after it"""
+    want = [e for e in ev if e[1].startswith("New Autopilot grant") or e[1].startswith("Restake enabled")]
+    if not want: return
+    T = totals(L)
+    for level, title, text, fields in want:
+        gr = fields.get("Delegator"); ap = title.startswith("New Autopilot")
+        f = {"Address": gr, "Staked": "{:,.1f} ATONE".format(staked(gr) / 1e6)}
+        f.update(count_fields(T))
+        notify.discord(NET, "ok", "New Autopilot grant" if ap else "Restake turned on",
+                       ("Autopilot moves this wallet at the next run (00:00 or 12:00 UTC), at once if it is new."
+                        if ap else "Rewards are claimed and staked again at every run, from 1 ATONE."), f, SITE + "/admin")
+
+def milestones(L, quiet=False):
+    """20 / 50 / 100 users and 200k / 500k / 1M ATONE, per service, each once; quiet marks what already stands"""
+    M, T = L.setdefault("milestones", {}), totals(L)
+    for svc, name in (("autopilot", "Autopilot"), ("restake", "Restake")):
+        users, uatone = T[svc]
+        for n in USERS_AT:
+            k = "%s_users_%d" % (svc, n)
+            if users >= n and k not in M:
+                M[k] = int(time.time())
+                if not quiet: notify.discord(NET, "ok", "%s reached %d users" % (name, n),
+                                             "%d wallets hold the %s grant, {:,.1f} ATONE staked.".format(uatone / 1e6) % (users, name), count_fields(T), SITE + "/admin")
+        for a in ATONE_AT:
+            k = "%s_atone_%d" % (svc, a)
+            if uatone >= a * 1_000_000 and k not in M:
+                M[k] = int(time.time())
+                if not quiet: notify.discord(NET, "ok", "%s reached {:,} ATONE".format(a) % name,
+                                             "{:,.1f} ATONE staked by %d %s wallets.".format(uatone / 1e6) % (users, name), count_fields(T), SITE + "/admin")
+
+
 def main():
     once = "--once" in sys.argv
     if not GRANTEE:
@@ -204,19 +262,22 @@ def main():
             time.sleep(600)
             if (os.environ.get("GRANTEE") or os.environ.get("KEEPER_GRANTEE")): break
         return
-    L, fails = load(), 0
+    L, fails, mtick = load(), 0, 0
     while True:
         try:
             ev = step(L, standing())
             for level, title, text, fields in ev:
                 log(level, title, fields.get("Delegator"))
-                if not once: notify.send(level, title, text, fields, SITE + "/admin", net=NET)
             if once:
                 print(json.dumps(L["counts"]), [e[1] for e in ev]); return
+            announce(L, ev)
+            # milestones every 10 minutes and after any event; the first time, what already stands is marked silently
+            if ev or time.time() - mtick >= 600 or "milestones" not in L:
+                milestones(L, quiet="milestones" not in L); mtick = time.time()
             save(L); fails = 0
         except Exception as e:
             fails += 1; log("read failed: %s" % e)
-            if fails == 10: notify.send("warn", "Grant watch cannot read the chain", str(e)[:300], net=NET)
+            if fails == 10: notify.ops("warn", "Grant watch cannot read the chain", str(e)[:300], net=NET)
         time.sleep(EVERY)
 
 

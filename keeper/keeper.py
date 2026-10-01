@@ -221,12 +221,75 @@ def plan_id(p):
     return hashlib.sha1(json.dumps(k).encode()).hexdigest()[:12]
 
 def alert(level, title, text="", fields=None):
+    """operational: the ops Telegram (notify.ops); business events go through discord()"""
     log("alert", level, title)
     if notify:
         try: notify.send(level, title, text, fields, SITE + "/admin", net=NET)
         except Exception as e: log("alert failed: %s" % e)
 
 def short(a): return a[:12] + "\u2026" + a[-6:]
+
+# ── Discord (operator, 2026-10-01): business events only, the network first in every title ──────────────────────────
+def discord(level, title, text="", fields=None):
+    try: return notify.discord(NET, level, title, text, fields, SITE + "/admin")
+    except Exception as e: log("discord failed: %s" % e)
+
+# what one tick did, for the run summaries: Autopilot and Restake each announce their scheduled run (00:00, 12:00 UTC)
+# once, and any other tick that moved or restaked (a new grant is acted on at once)
+RUN = {}
+def run_reset():
+    RUN.clear()
+    RUN.update({"ap_checked": 0, "ap_wallets": set(), "ap_moves": 0, "ap_txs": [], "ap_uatone": 0, "ap_gain": 0.0, "ap_failed": 0,
+                "rs_checked": 0, "rs_done": 0, "rs_txs": [], "rs_rewards": 0, "rs_staked": 0, "rs_failed": 0, "rs_small": 0})
+
+def tx_cost(hashes):
+    """gas used and the fee paid (uphoton) for our transactions, read back from the chain"""
+    gas = fee = 0
+    for h in hashes:
+        for attempt in range(3):
+            try:
+                t = get("/cosmos/tx/v1beta1/txs/%s" % h)
+                gas += int(t["tx_response"].get("gas_used") or 0)
+                fee += sum(int(a["amount"]) for a in t["tx"]["auth_info"]["fee"]["amount"] if a["denom"] == "uphoton")
+                break
+            except Exception:
+                time.sleep(2)
+    return gas, fee
+
+def run_summaries(c, n_ap, n_rs, dry):
+    """Discord: one message per scheduled run of each service, and one for any other tick that did something"""
+    slot, tag = slot0(), " (dry run)" if dry else ""
+    when = time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime(slot))
+    for kind in ("autopilot", "restake"):
+        row = c.execute("SELECT at FROM alert_sent WHERE granter='_run' AND k=?", (kind,)).fetchone()
+        scheduled = not row or row[0] < slot
+        if kind == "autopilot":
+            did = RUN["ap_moves"] or RUN["ap_failed"]
+            if not (scheduled or did): continue
+            gas, fee = tx_cost(RUN["ap_txs"])
+            f = {"Run": when if scheduled else "outside the schedule (a new grant)", "Autopilot wallets": n_ap,
+                 "Wallets checked": RUN["ap_checked"], "Wallets moved": len(RUN["ap_wallets"]), "Moves": RUN["ap_moves"],
+                 "Transactions": len(RUN["ap_txs"]), "ATONE moved": "{:,.1f}".format(RUN["ap_uatone"] / 1e6),
+                 "Gain": "+{:,.1f} ATONE a year".format(RUN["ap_gain"]), "Gas": "{:,}".format(gas),
+                 "Fees": "{:,.4f} PHOTON".format(fee / 1e6), "Failed": RUN["ap_failed"]}
+            if RUN["ap_txs"]: f["Tx"] = "\n".join(RUN["ap_txs"])
+            if RUN["ap_wallets"]: f["Wallets"] = "\n".join(sorted(RUN["ap_wallets"]))
+            discord("crit" if RUN["ap_failed"] else "ok" if RUN["ap_moves"] else "info", "Autopilot run" + tag,
+                    "%d wallets moved, %d moves in %d transactions." % (len(RUN["ap_wallets"]), RUN["ap_moves"], len(RUN["ap_txs"])), f)
+        else:
+            did = RUN["rs_done"] or RUN["rs_failed"]
+            if not (scheduled or did): continue
+            gas, fee = tx_cost(RUN["rs_txs"])
+            f = {"Run": when if scheduled else "outside the schedule (Restake turned on)", "Restake wallets": n_rs,
+                 "Wallets checked": RUN["rs_checked"], "Wallets restaked": RUN["rs_done"], "Under 1 ATONE (skipped)": RUN["rs_small"],
+                 "Transactions": len(RUN["rs_txs"]), "Rewards claimed": "{:,.4f} ATONE".format(RUN["rs_rewards"] / 1e6),
+                 "ATONE restaked": "{:,.4f}".format(RUN["rs_staked"] / 1e6), "Gas": "{:,}".format(gas),
+                 "Fees": "{:,.4f} PHOTON".format(fee / 1e6), "Failed": RUN["rs_failed"]}
+            if RUN["rs_txs"]: f["Tx"] = "\n".join(RUN["rs_txs"])
+            discord("crit" if RUN["rs_failed"] else "ok" if RUN["rs_done"] else "info", "Restake run" + tag,
+                    "%d wallets restaked, %d transactions." % (RUN["rs_done"], len(RUN["rs_txs"])), f)
+        if scheduled:
+            c.execute("INSERT OR REPLACE INTO alert_sent VALUES('_run', ?, ?)", (kind, slot)); c.commit()
 
 def restake_grants():
     """granter -> what they let us do with rewards: claim (a GenericAuthorization for
@@ -317,6 +380,8 @@ def restake_step(c, granter, rgs, vals, m, dry):
         if live:
             r = execute_restake(granter, p); p["result"] = r
             ok = "txhash" in r and "error" not in r
+            if ok: RUN["rs_done"] += 1; RUN["rs_txs"].append(r.get("txhash")); RUN["rs_rewards"] += int(p["rewards"]); RUN["rs_staked"] += int(amt)
+            else: RUN["rs_failed"] += 1
             c.execute("INSERT INTO restake VALUES(?,?,?,?,?,?,?,?)", (int(time.time()), granter, p["rewards"], amt, p["send"], p["stake"][0]["validator"], r.get("txhash") if ok else None, 0))
             c.commit()
             # a failed restake alerts (it is tried again at the next 12-hour turn); while the signer is known to be
@@ -551,6 +616,8 @@ def auto_apply(c, g, p, pid, dry, out):
             r = execute(gr, part)
             if not ("txhash" in r and "error" not in r): moves = moves[k:]; break
             record_moves(c, gr, part, r.get("txhash"), now); c.commit()
+            RUN["ap_wallets"].add(gr); RUN["ap_moves"] += len(part); RUN["ap_txs"].append(r.get("txhash"))
+            RUN["ap_uatone"] += sum(int(e["amount"]) for e in part); RUN["ap_gain"] += sum(float(e.get("gain", 0)) for e in part)
             sent.append(r.get("txhash"))
         else:
             moves = []
@@ -564,9 +631,9 @@ def auto_apply(c, g, p, pid, dry, out):
         f["Tx"] = ", ".join(sent)
         if not ok: f["Moved"] = "%d of %d moves" % (len(p["moves"]) - len(moves), len(p["moves"]))
     if ok:
-        c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()
-        alert("ok", "Autopilot moved: " + short(gr), "The moves are on chain.", f)
+        c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()      # announced in the run summary (Discord)
         return
+    RUN["ap_failed"] += 1
     p = dict(p, moves=moves)                       # what is left is what the retry or the next run is about
     if kind == "settle":
         c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()
@@ -654,7 +721,8 @@ def settle_landed(c, gr, seen, moves=None):
     if seen["code"] == 0 and seen["moves"] and not c.execute("SELECT 1 FROM move WHERE txhash=?", (seen["txhash"],)).fetchone():
         record_moves(c, gr, seen["moves"], seen["txhash"], now)
         c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, plan_id({"moves": seen["moves"]}), "auto", seen["txhash"], 0, 1, None, 0))
-        alert("ok", "Autopilot moved: " + short(gr), "The moves landed after a slow answer.", {"Delegator": gr, "Tx": seen["txhash"]})
+        RUN["ap_wallets"].add(gr); RUN["ap_moves"] += len(seen["moves"]); RUN["ap_txs"].append(seen["txhash"])    # in the run summary
+        RUN["ap_uatone"] += sum(int(e["amount"]) for e in seen["moves"])
     elif seen["code"] != 0:
         raw = str(seen.get("raw") or "")
         log("tx %s for %s landed with code %s: %s" % (seen["txhash"], gr, seen["code"], raw[:200]))
@@ -683,7 +751,7 @@ def once(c, only=None, live=None, force=False):
             amt = mv.get("uatone", mv.get("amount", 0))
             if mv["src"] in work: work[mv["src"]]["t"] -= amt
             if mv["dst"] in work: work[mv["dst"]]["t"] += amt
-    tick0 = int(time.time())
+    tick0 = int(time.time()); run_reset()
     gs = [g for g in grants() if not only or g["granter"] == only]; acted = 0
     gs.sort(key=lambda g: granted_at(g["granter"], c))
     try: rgs = restake_grants()
@@ -720,6 +788,7 @@ def once(c, only=None, live=None, force=False):
                 rows, reds = position(gr, work)
                 p = plan(g, rows, reds, work, m, room=MAX_MOVES_DAY - moves_today(c, gr)) or {"moves": []}
                 c.execute("INSERT INTO run_g VALUES(?,?)", (int(time.time()), gr)); c.commit()
+                RUN["ap_checked"] += 1
                 record = rate_record(c, gr, rows)
                 rep = {"granter": gr, "checked": int(time.time()), "dry": dry, "strategy": name,
                        "grant": {"cap": g["cap"], "allow": len(g["allow"]) if g["allow"] else None, "expires": g["exp"]}, "grant_sig": grant_sig(g),
@@ -769,6 +838,8 @@ def once(c, only=None, live=None, force=False):
             if not force and seen and seen[0] >= slot0(): continue
             c.execute("INSERT INTO rs_run VALUES(?,?) ON CONFLICT(granter) DO UPDATE SET at=excluded.at", (granter, int(time.time()))); c.commit()
             rs = restake_step(c, granter, rgs, work, m, dry)
+            RUN["rs_checked"] += 1
+            if (rs or {}).get("skip") == "below 1 ATONE": RUN["rs_small"] += 1
             # the next restake (and the next tick's plans) see these stakes where they land
             for leg in ((rs or {}).get("stake") or []):
                 if leg.get("validator") in work: work[leg["validator"]]["t"] += int(leg.get("amount", 0))
@@ -785,13 +856,17 @@ def once(c, only=None, live=None, force=False):
         s = get("/cosmos/bank/v1beta1/balances/%s" % GRANTEE)
         photon = next((int(b["amount"]) for b in s.get("balances", []) if b["denom"] == "uphoton"), 0)
         report("_status", {"grantee": GRANTEE, "checked": int(time.time()), "grants": len(gs), "dry": DRY, "photon": photon, "every": EVERY})
-        low_photon(c, photon)
+        atone = next((int(b["amount"]) for b in s.get("balances", []) if b["denom"] == "uatone"), 0)
+        low_funds(c, photon, atone)
     except Exception as e:
         log("status failed: %s" % e)
     try:
         signer_health(c)
     except Exception as e:
         log("status failed: %s" % e)
+    if not only:
+        try: run_summaries(c, len(gs), len(rgs), dry)
+        except Exception as e: log("run summary failed: %s" % e)
 
 SIGNER_FAILS = [0]                               # consecutive ticks the signer did not answer
 def signer_health(c):
@@ -816,21 +891,26 @@ def signer_health(c):
             alert("ok", "Autopilot signer back", "", {"Signer": url})
             c.execute("DELETE FROM alert_sent WHERE granter='_signer' AND k='down'"); c.commit()
 
-LOW_PHOTON = int(float(os.environ.get("KEEPER_LOW_PHOTON", "15")) * 1e6)   # the signer pays every fee in PHOTON
-def low_photon(c, photon):
-    """Discord when the signer's PHOTON falls below LOW_PHOTON: once on the way down, again every 24 hours while
-    it stays low, and once when it is funded back above. One marker row ('_signer', 'low') exists while it is low."""
-    now = int(time.time())
-    row = c.execute("SELECT at FROM alert_sent WHERE granter='_signer' AND k='low'").fetchone()
-    f = {"Signer": GRANTEE, "Balance": "{:,.2f} PHOTON".format(photon / 1e6), "Alert below": "{:,.0f} PHOTON".format(LOW_PHOTON / 1e6)}
-    if photon < LOW_PHOTON:
-        if not row or now - row[0] >= 86400:
-            alert("warn", "Autopilot signer low on PHOTON: {:,.2f} left".format(photon / 1e6),
-                  "The signer pays every move and restake fee in PHOTON. Send PHOTON to its address.", f)
-            c.execute("INSERT OR REPLACE INTO alert_sent VALUES('_signer', 'low', ?)", (now,)); c.commit()
-    elif row:
-        alert("ok", "Autopilot signer PHOTON funded: {:,.2f}".format(photon / 1e6), "", f)
-        c.execute("DELETE FROM alert_sent WHERE granter='_signer' AND k='low'"); c.commit()
+# the money that keeps the service running (operator, 2026-10-01), to Discord: on mainnet the signer's PHOTON (the
+# treasury that pays every fee) under 15; on testnet the same account is the faucet: under 100 ATONE or 10 PHOTON
+LOW = {"mainnet": {"uphoton": 15_000_000}, "testnet": {"uatone": 100_000_000, "uphoton": 10_000_000}}
+def low_funds(c, photon, atone):
+    """once on the way down, again every 24 hours while low, once when funded back above; a marker row per denom"""
+    now, have = int(time.time()), {"uphoton": photon, "uatone": atone}
+    who = "Treasury (Autopilot signer)" if NET == "mainnet" else "Testnet faucet"
+    for denom, floor in LOW["testnet" if NET == "testnet" else "mainnet"].items():
+        sym, k = denom[1:].upper(), "low_" + denom
+        row = c.execute("SELECT at FROM alert_sent WHERE granter='_signer' AND k=?", (k,)).fetchone()
+        f = {"Address": GRANTEE, "Balance": "{:,.2f} {}".format(have[denom] / 1e6, sym), "Alert below": "{:,.0f} {}".format(floor / 1e6, sym)}
+        if have[denom] < floor:
+            if not row or now - row[0] >= 86400:
+                discord("warn", "%s low on %s: %s left" % (who, sym, "{:,.2f}".format(have[denom] / 1e6)),
+                        ("Send %s to the address below." % sym) + (" It pays every Autopilot and Restake fee." if NET == "mainnet" else ""), f)
+                c.execute("INSERT OR REPLACE INTO alert_sent VALUES('_signer', ?, ?)", (k, now)); c.commit()
+        elif row:
+            discord("ok", "%s funded: %s %s" % (who, "{:,.2f}".format(have[denom] / 1e6), sym), "", f)
+            c.execute("DELETE FROM alert_sent WHERE granter='_signer' AND k=?", (k,)); c.commit()
+
 
 def main():
     """Service: a tick every KEEPER_TICK (60 s); each delegator planned at 00:00 and 12:00 UTC, at once when its grant
