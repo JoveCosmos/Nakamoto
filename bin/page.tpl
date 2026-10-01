@@ -6188,6 +6188,12 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 #dmy thead th.ck input:indeterminate::after{content:"";position:absolute;left:3px;right:3px;top:6px;height:2px;background:#2ee06a;border-radius:1px}
 #dmy thead th.ck input{position:relative;cursor:pointer;vertical-align:middle}
 #dmy tbody tr.on td{background:rgba(46,224,106,.045)}
+/* Stake, Unstake and Claim (html[data-pro]): the ticks only choose what Redelegate moves from, so their column is
+   gone there and a ticked row is not marked (operator, 2026-10-01) */
+html[data-pro] #dmy col:nth-child(1):not(#z){width:0!important}
+html[data-pro] #dmy :is(th,td).ck:not(#z){padding:0!important;font-size:0}
+html[data-pro] #dmy .ck input{display:none}
+html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
 #dmy td.ck input:disabled{opacity:.35;cursor:not-allowed}
 #dmy td.ck,#dmy th.ck{text-overflow:clip;overflow:visible;padding:0 2px 0 4px}
 /* ════ STICKY HEADS (operator, 2026-09-30): a list's column titles stay on top as it scrolls, on the pane's own

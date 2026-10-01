@@ -123,6 +123,8 @@ window.__undock = undock;
 window.__undockIfNarrow = function(){ if(DOCK && !proWide()) undock(); };
 /* the four actions as tabs in the title bar, as every other path has its views there (operator, 2026-09-30) */
 function proTabs(){
+  var dn = window.__DMYN, pn = document.getElementById("dmyn");
+  if(dn && pn && dn.all) pn.textContent = dn.sel && !document.documentElement.hasAttribute("data-pro") ? dn.sel + " selected" : dn.all + " validator" + (dn.all === 1 ? "" : "s");
   var mode = document.documentElement.getAttribute("data-pro") || "redelegate", home = { stake: "stbtn", unstake: "unbtn", claim: "clbtn" };
   [].forEach.call(document.querySelectorAll("#protabs .l2tab"), function(b){
     var a = b.getAttribute("data-pro-act"), on = a === mode, src = home[a] && document.getElementById(home[a]);
@@ -2124,7 +2126,9 @@ rememberGridH();
     if(!pos.rows.length){ if(pn) pn.textContent = ""; pager(E("dmypg"), 0, 0, LPS, "l"); return empty("No stake on AtomOne"); }
     var rows = pos.rows.slice().sort(function(a, b){ return b.x - a.x; }), h = "", k;
     var nsel = 0; rows.forEach(function(r){ if(SRCSEL[r.id] && r.x - r.locked >= 1e5) nsel++; });
-    if(pn) pn.textContent = nsel ? nsel + " selected" : rows.length + " validator" + (rows.length === 1 ? "" : "s");
+    /* "N selected" is Redelegate's: in Stake, Unstake and Claim the ticks are not there (proTabs() redoes this on a switch) */
+    window.__DMYN = { sel: nsel, all: rows.length };
+    if(pn) pn.textContent = nsel && !document.documentElement.hasAttribute("data-pro") ? nsel + " selected" : rows.length + " validator" + (rows.length === 1 ? "" : "s");
     var movable = rows.filter(function(r){ return r.x - r.locked >= 1e5; });
     var slice = rows; pager(E("dmypg"), 0, 0, LPS, "l");
     var LOCK = '<i class=lk><svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></i>';
