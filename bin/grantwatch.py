@@ -21,7 +21,7 @@ console) live in the ledger too; the keeper skips a paused delegator.
     NET, ATOMONE_API, GRANTEE (else KEEPER_GRANTEE), DISCORD_WEBHOOK (via notify)
     grantwatch.py          run forever          grantwatch.py --once   one pass, print, send nothing
 """
-import calendar, json, os, sys, time, urllib.parse, urllib.request
+import calendar, json, os, sqlite3, sys, time, urllib.parse, urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import notify
@@ -118,13 +118,28 @@ def revoked(granter, since):
 
 
 def load():
-    try: return json.load(open(STATE))
-    except Exception: return {"grantee": GRANTEE, "grants": {}, "events": [], "started": None}
+    """a missing ledger starts fresh; one that exists and does not parse stops the watcher (the state audit, 2026-10-01):
+    starting over would lose every grant's history and fire nothing"""
+    if not os.path.exists(STATE): return {"grantee": GRANTEE, "grants": {}, "events": [], "started": None}
+    return json.load(open(STATE))
 
 
 def save(s):
-    tmp = STATE + ".tmp"
-    json.dump(s, open(tmp, "w")); os.replace(tmp, STATE)
+    tmp = os.path.join(os.path.dirname(STATE), "." + os.path.basename(STATE) + ".tmp")
+    with open(tmp, "w") as f:
+        json.dump(s, f); f.flush(); os.fsync(f.fileno())
+    os.replace(tmp, STATE)
+
+
+# the counts over time, the milestones and every grant event, in SQLite beside the ledger (restic covers state/)
+DBP = os.path.join(os.path.dirname(STATE), "grants-%s.db" % NET)
+def gdb():
+    c = sqlite3.connect(DBP); c.execute("PRAGMA journal_mode=WAL"); c.execute("PRAGMA busy_timeout=5000")
+    c.execute("CREATE TABLE IF NOT EXISTS milestone(metric TEXT, threshold INT, value INT, reached_at INT, announced_at INT, PRIMARY KEY(metric, threshold))")
+    c.execute("CREATE TABLE IF NOT EXISTS svc_count(at INT, service TEXT, users INT, uatone INT, PRIMARY KEY(at, service))")
+    c.execute("CREATE TABLE IF NOT EXISTS grant_event(id INTEGER PRIMARY KEY, at INT, granter TEXT, service TEXT, what TEXT, title TEXT)")
+    c.execute("CREATE INDEX IF NOT EXISTS ix_grant_event ON grant_event(granter, at)")
+    return c
 
 
 def terms(g): return (sorted(g.get("allow") or []), g.get("exp"), bool(g.get("restake")))
@@ -232,23 +247,25 @@ def announce(L, ev):
                        ("Autopilot moves this wallet at the next run (00:00 or 12:00 UTC), at once if it is new."
                         if ap else "Rewards are claimed and staked again at every run, from 1 ATONE."), f, SITE + "/admin")
 
-def milestones(L, quiet=False):
-    """20 / 50 / 100 users and 200k / 500k / 1M ATONE, per service, each once; quiet marks what already stands"""
-    M, T = L.setdefault("milestones", {}), totals(L)
+def milestones(L, c):
+    """20 / 50 / 100 users and 200k / 500k / 1M ATONE, per service, each announced once (a row in `milestone`). The very
+    first pass (no counts recorded yet) marks what already stands without announcing it; the counts go to svc_count"""
+    T, now = totals(L), int(time.time())
+    quiet = not c.execute("SELECT 1 FROM svc_count LIMIT 1").fetchone()
+    for svc in ("autopilot", "restake"):
+        c.execute("INSERT OR REPLACE INTO svc_count VALUES(?,?,?,?)", (now, svc, T[svc][0], T[svc][1]))
     for svc, name in (("autopilot", "Autopilot"), ("restake", "Restake")):
         users, uatone = T[svc]
-        for n in USERS_AT:
-            k = "%s_users_%d" % (svc, n)
-            if users >= n and k not in M:
-                M[k] = int(time.time())
-                if not quiet: notify.discord(NET, "ok", "%s reached %d users" % (name, n),
-                                             "%d wallets hold the %s grant, {:,.1f} ATONE staked.".format(uatone / 1e6) % (users, name), count_fields(T), SITE + "/admin")
-        for a in ATONE_AT:
-            k = "%s_atone_%d" % (svc, a)
-            if uatone >= a * 1_000_000 and k not in M:
-                M[k] = int(time.time())
-                if not quiet: notify.discord(NET, "ok", "%s reached {:,} ATONE".format(a) % name,
-                                             "{:,.1f} ATONE staked by %d %s wallets.".format(uatone / 1e6) % (users, name), count_fields(T), SITE + "/admin")
+        for metric, value, marks, title, text in (
+                (svc + "_users", users, USERS_AT, lambda n: "%s reached %d users" % (name, n),
+                 "%d wallets hold the %s grant, {:,.1f} ATONE staked.".format(uatone / 1e6) % (users, name)),
+                (svc + "_atone", uatone // 1_000_000, ATONE_AT, lambda a: "%s reached {:,} ATONE".format(a) % name,
+                 "{:,.1f} ATONE staked by %d %s wallets.".format(uatone / 1e6) % (users, name))):
+            for n in marks:
+                if value < n or c.execute("SELECT 1 FROM milestone WHERE metric=? AND threshold=?", (metric, n)).fetchone(): continue
+                sent = None if quiet else (notify.discord(NET, "ok", title(n), text, count_fields(T), SITE + "/admin") or None)
+                c.execute("INSERT INTO milestone VALUES(?,?,?,?,?)", (metric, n, value, now, now if (sent or quiet) else None))
+    c.commit()
 
 
 def main():
@@ -263,6 +280,7 @@ def main():
             if (os.environ.get("GRANTEE") or os.environ.get("KEEPER_GRANTEE")): break
         return
     L, fails, mtick = load(), 0, 0
+    c = gdb()
     while True:
         try:
             ev = step(L, standing())
@@ -270,11 +288,15 @@ def main():
                 log(level, title, fields.get("Delegator"))
             if once:
                 print(json.dumps(L["counts"]), [e[1] for e in ev]); return
-            announce(L, ev)
-            # milestones every 10 minutes and after any event; the first time, what already stands is marked silently
-            if ev or time.time() - mtick >= 600 or "milestones" not in L:
-                milestones(L, quiet="milestones" not in L); mtick = time.time()
+            for level, title, text, fields in ev:          # every event, kept for good
+                c.execute("INSERT INTO grant_event(at, granter, service, what, title) VALUES(?,?,?,?,?)", (int(time.time()), fields.get("Delegator"),
+                          "restake" if title.startswith("Restake") else "autopilot", title.split(":")[0], title))
+            c.commit()
             save(L); fails = 0
+            announce(L, ev)
+            # milestones every 10 minutes and after any event (the first pass marks what already stands, silently)
+            if ev or time.time() - mtick >= 600:
+                milestones(L, c); mtick = time.time()
         except Exception as e:
             fails += 1; log("read failed: %s" % e)
             if fails == 10: notify.ops("warn", "Grant watch cannot read the chain", str(e)[:300], net=NET)

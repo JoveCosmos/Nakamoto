@@ -110,6 +110,18 @@ def db():
     c.execute("CREATE TABLE IF NOT EXISTS rs_run(granter TEXT PRIMARY KEY, at INT)")
     # a move that failed for a fee, network or RPC reason, waiting to be tried again (see classify)
     c.execute("CREATE TABLE IF NOT EXISTS retry(granter TEXT PRIMARY KEY, due INT, tries INT, why TEXT, txhash TEXT, moves TEXT, since INT)")
+    # (2026-10-01, the state audit) one row per run of each service that was announced, and one per transaction we
+    # broadcast with what the chain says it cost: fees come from the chain, never from gas_used (the signer pays
+    # gas_wanted, ~1.35x more)
+    c.execute("CREATE TABLE IF NOT EXISTS run_sum(id INTEGER PRIMARY KEY, at INT, slot INT, service TEXT, kind TEXT, dry INT, wallets INT,"
+              " checked INT, acted INT, skipped INT, failed INT, msgs INT, txs INT, uatone INT, gain REAL, gas_used INT, fee_uphoton INT, photon_after INT)")
+    c.execute("CREATE TABLE IF NOT EXISTS tx_log(txhash TEXT PRIMARY KEY, at INT, service TEXT, granter TEXT, msgs INT, uatone INT, height INT,"
+              " code INT, gas_wanted INT, gas_used INT, fee_uphoton INT, run_id INT)")
+    try: c.execute("ALTER TABLE restake ADD COLUMN error TEXT")
+    except sqlite3.OperationalError: pass
+    for ix in ("run_g(granter, at)", "applied(granter, at)", "move(granter, at)", "move(txhash)", "restake(granter, at)", "rate_log(granter, at)"):
+        c.execute("CREATE INDEX IF NOT EXISTS ix_%s ON %s" % (ix.split("(")[0] + "_" + ix.split("(")[1].split(",")[1 if "," in ix else 0].strip(" )"), ix))
+    c.execute("PRAGMA busy_timeout=5000")
     return c
 
 # ── the model, as the page has it ──────────────────────────────────────────
@@ -240,25 +252,50 @@ RUN = {}
 def run_reset():
     RUN.clear()
     RUN.update({"ap_checked": 0, "ap_wallets": set(), "ap_moves": 0, "ap_txs": [], "ap_uatone": 0, "ap_gain": 0.0, "ap_failed": 0,
-                "rs_checked": 0, "rs_done": 0, "rs_txs": [], "rs_rewards": 0, "rs_staked": 0, "rs_failed": 0, "rs_small": 0})
+                "rs_checked": 0, "rs_done": 0, "rs_txs": [], "rs_rewards": 0, "rs_staked": 0, "rs_failed": 0, "rs_small": 0, "txinfo": {}})
 
-def tx_cost(hashes):
-    """gas used and the fee paid (uphoton) for our transactions, read back from the chain"""
+def tx_chain(h):
+    """what the chain says one of our transactions cost: height, code, gas wanted and used, fee in uphoton (None if unread)"""
+    for attempt in range(3):
+        try:
+            t = get("/cosmos/tx/v1beta1/txs/%s" % h); r = t["tx_response"]
+            return {"height": int(r.get("height") or 0), "code": int(r.get("code") or 0), "gas_wanted": int(r.get("gas_wanted") or 0),
+                    "gas_used": int(r.get("gas_used") or 0),
+                    "fee": sum(int(a["amount"]) for a in t["tx"]["auth_info"]["fee"]["amount"] if a["denom"] == "uphoton")}
+        except Exception:
+            time.sleep(2)
+    return None
+
+def tx_cost(hashes, c=None, service=None):
+    """gas used and fees paid for our transactions, from the chain; each one is logged in tx_log when c is given"""
     gas = fee = 0
     for h in hashes:
-        for attempt in range(3):
-            try:
-                t = get("/cosmos/tx/v1beta1/txs/%s" % h)
-                gas += int(t["tx_response"].get("gas_used") or 0)
-                fee += sum(int(a["amount"]) for a in t["tx"]["auth_info"]["fee"]["amount"] if a["denom"] == "uphoton")
-                break
-            except Exception:
-                time.sleep(2)
+        d = tx_chain(h)
+        if not d: continue
+        gas += d["gas_used"]; fee += d["fee"]
+        if c is not None:
+            info = RUN.get("txinfo", {}).get(h, {})
+            c.execute("INSERT OR REPLACE INTO tx_log VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", (h, info.get("at", int(time.time())), service, info.get("granter"),
+                      info.get("msgs"), info.get("uatone"), d["height"], d["code"], d["gas_wanted"], d["gas_used"], d["fee"], None))
+    if c is not None: c.commit()
     return gas, fee
+
+def tx_backfill(c):
+    """once: every transaction already recorded in move / restake, read back from the chain into tx_log"""
+    if c.execute("SELECT count(*) FROM tx_log").fetchone()[0]: return
+    rows = [(h, "autopilot", g, n, u, a) for h, g, n, u, a in c.execute(
+                "SELECT txhash, granter, count(*), sum(uatone), min(at) FROM move WHERE dry=0 AND txhash IS NOT NULL GROUP BY txhash")]
+    rows += [(h, "restake", g, None, u, a) for h, g, u, a in c.execute(
+                "SELECT txhash, granter, staked, at FROM restake WHERE dry=0 AND txhash IS NOT NULL")]
+    for h, svc, g, n, u, a in rows:
+        d = tx_chain(h)
+        if d: c.execute("INSERT OR REPLACE INTO tx_log VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", (h, a, svc, g, n, u, d["height"], d["code"], d["gas_wanted"], d["gas_used"], d["fee"], None))
+    c.commit(); log("tx_log backfilled: %d transactions" % len(rows))
 
 def run_summaries(c, n_ap, n_rs, dry):
     """Discord: one message per scheduled run of each service, and one for any other tick that did something"""
     slot, tag = slot0(), " (dry run)" if dry else ""
+    RUN["slot_run"] = any((c.execute("SELECT at FROM alert_sent WHERE granter='_run' AND k=?", (k,)).fetchone() or [0])[0] < slot for k in ("autopilot", "restake"))
     when = time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime(slot))
     for kind in ("autopilot", "restake"):
         row = c.execute("SELECT at FROM alert_sent WHERE granter='_run' AND k=?", (kind,)).fetchone()
@@ -266,7 +303,10 @@ def run_summaries(c, n_ap, n_rs, dry):
         if kind == "autopilot":
             did = RUN["ap_moves"] or RUN["ap_failed"]
             if not (scheduled or did): continue
-            gas, fee = tx_cost(RUN["ap_txs"])
+            gas, fee = tx_cost(RUN["ap_txs"], c, "autopilot")
+            c.execute("INSERT INTO run_sum(at, slot, service, kind, dry, wallets, checked, acted, skipped, failed, msgs, txs, uatone, gain, gas_used, fee_uphoton, photon_after)"
+                      " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (int(time.time()), slot, kind, "slot" if scheduled else "grant", int(dry), n_ap, RUN["ap_checked"],
+                      len(RUN["ap_wallets"]), 0, RUN["ap_failed"], RUN["ap_moves"], len(RUN["ap_txs"]), int(RUN["ap_uatone"]), RUN["ap_gain"], gas, fee, RUN.get("photon")))
             f = {"Run": when if scheduled else "outside the schedule (a new grant)", "Autopilot wallets": n_ap,
                  "Wallets checked": RUN["ap_checked"], "Wallets moved": len(RUN["ap_wallets"]), "Moves": RUN["ap_moves"],
                  "Transactions": len(RUN["ap_txs"]), "ATONE moved": "{:,.1f}".format(RUN["ap_uatone"] / 1e6),
@@ -279,7 +319,10 @@ def run_summaries(c, n_ap, n_rs, dry):
         else:
             did = RUN["rs_done"] or RUN["rs_failed"]
             if not (scheduled or did): continue
-            gas, fee = tx_cost(RUN["rs_txs"])
+            gas, fee = tx_cost(RUN["rs_txs"], c, "restake")
+            c.execute("INSERT INTO run_sum(at, slot, service, kind, dry, wallets, checked, acted, skipped, failed, msgs, txs, uatone, gain, gas_used, fee_uphoton, photon_after)"
+                      " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (int(time.time()), slot, kind, "slot" if scheduled else "enabled", int(dry), n_rs, RUN["rs_checked"],
+                      RUN["rs_done"], RUN["rs_small"], RUN["rs_failed"], RUN["rs_done"], len(RUN["rs_txs"]), int(RUN["rs_staked"]), 0.0, gas, fee, RUN.get("photon")))
             f = {"Run": when if scheduled else "outside the schedule (Restake turned on)", "Restake wallets": n_rs,
                  "Wallets checked": RUN["rs_checked"], "Wallets restaked": RUN["rs_done"], "Under 1 ATONE (skipped)": RUN["rs_small"],
                  "Transactions": len(RUN["rs_txs"]), "Rewards claimed": "{:,.4f} ATONE".format(RUN["rs_rewards"] / 1e6),
@@ -290,6 +333,8 @@ def run_summaries(c, n_ap, n_rs, dry):
                     "%d wallets restaked, %d transactions." % (RUN["rs_done"], len(RUN["rs_txs"])), f)
         if scheduled:
             c.execute("INSERT OR REPLACE INTO alert_sent VALUES('_run', ?, ?)", (kind, slot)); c.commit()
+    if RUN.get("slot_run"):
+        c.execute("DELETE FROM run WHERE at < ?", (int(time.time()) - 30 * 86400,)); c.commit()      # the per-tick log keeps 30 days
 
 def restake_grants():
     """granter -> what they let us do with rewards: claim (a GenericAuthorization for
@@ -380,9 +425,13 @@ def restake_step(c, granter, rgs, vals, m, dry):
         if live:
             r = execute_restake(granter, p); p["result"] = r
             ok = "txhash" in r and "error" not in r
-            if ok: RUN["rs_done"] += 1; RUN["rs_txs"].append(r.get("txhash")); RUN["rs_rewards"] += int(p["rewards"]); RUN["rs_staked"] += int(amt)
+            if ok:
+                RUN["rs_done"] += 1; RUN["rs_txs"].append(r.get("txhash")); RUN["rs_rewards"] += int(p["rewards"]); RUN["rs_staked"] += int(amt)
+                RUN["txinfo"][r.get("txhash")] = {"at": int(time.time()), "granter": granter, "msgs": len(p["claim"]) + len(p["stake"]), "uatone": int(amt)}
             else: RUN["rs_failed"] += 1
-            c.execute("INSERT INTO restake VALUES(?,?,?,?,?,?,?,?)", (int(time.time()), granter, p["rewards"], amt, p["send"], p["stake"][0]["validator"], r.get("txhash") if ok else None, 0))
+            c.execute("INSERT INTO restake(at, granter, rewards, staked, sent, target, txhash, dry, error) VALUES(?,?,?,?,?,?,?,?,?)",
+                      (int(time.time()), granter, p["rewards"], amt, p["send"], p["stake"][0]["validator"], r.get("txhash") if ok else None, 0,
+                       None if ok else json.dumps(r.get("error"))[:500]))
             c.commit()
             # a failed restake alerts (it is tried again at the next 12-hour turn); while the signer is known to be
             # down its own alert covers every delegator, so no flood
@@ -617,6 +666,7 @@ def auto_apply(c, g, p, pid, dry, out):
             if not ("txhash" in r and "error" not in r): moves = moves[k:]; break
             record_moves(c, gr, part, r.get("txhash"), now); c.commit()
             RUN["ap_wallets"].add(gr); RUN["ap_moves"] += len(part); RUN["ap_txs"].append(r.get("txhash"))
+            RUN["txinfo"][r.get("txhash")] = {"at": now, "granter": gr, "msgs": len(part), "uatone": sum(int(e["amount"]) for e in part)}
             RUN["ap_uatone"] += sum(int(e["amount"]) for e in part); RUN["ap_gain"] += sum(float(e.get("gain", 0)) for e in part)
             sent.append(r.get("txhash"))
         else:
@@ -857,6 +907,7 @@ def once(c, only=None, live=None, force=False):
         photon = next((int(b["amount"]) for b in s.get("balances", []) if b["denom"] == "uphoton"), 0)
         report("_status", {"grantee": GRANTEE, "checked": int(time.time()), "grants": len(gs), "dry": DRY, "photon": photon, "every": EVERY})
         atone = next((int(b["amount"]) for b in s.get("balances", []) if b["denom"] == "uatone"), 0)
+        RUN["photon"] = photon
         low_funds(c, photon, atone)
     except Exception as e:
         log("status failed: %s" % e)
@@ -927,6 +978,8 @@ def main():
     try: fcntl.flock(lk, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except OSError: log("another keeper holds %s - not starting" % STATE); sys.exit(75)
     c = db(); a = sys.argv[1:]
+    try: tx_backfill(c)
+    except Exception as e: log("tx_log backfill failed: %s" % e)
     if "--once" in a:
         only = a[a.index("--granter") + 1] if "--granter" in a else None
         once(c, only=only, live=True if "--live" in a else None, force="--force" in a); return
