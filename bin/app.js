@@ -3240,14 +3240,17 @@ rememberGridH();
      the same arithmetic, so the move Your move offers is the move Autopilot would make. Water poured from the lowest
      step: the smallest validator (the last EDGE left out) rises first, to 1 ATONE under the one ranked above it; then
      the two rise together, and the shelf takes the next validator up as it reaches it. Nobody passes the one above;
-     the largest TOP never take stake. A source may give all the free stake and fall in rank, never below the top of
-     the shelf (operator, 2026-10-01); stake on the smallest BOTTOM never moves out; at most MAXMOVES moves (move less rather than cut); nothing while
+     the largest fifth never take stake. A source may give all the free stake and fall in rank, never below the top of
+     the shelf (operator, 2026-10-01); stake on the smallest 34% never moves out; at most MAXMOVES moves (move less rather than cut); nothing while
      any of the wallet's stake is cooling down. Answers null or { now, after, gain, moves, msgs:[{from,to,amt}] }. */
-  var TOP = 20, BOTTOM = 34, EDGE = 3, GAP = 1e6, MAXMOVES = 60, MIN_LIFT = 0.05;   /* keeper.py TOP, BOTTOM, EDGE, MAX_MOVES_DAY */
+  var EDGE = 3, GAP = 1e6, MAXMOVES = 60, MIN_LIFT = 0.05;   /* keeper.py EDGE, MAX_MOVES_DAY */
+  /* keeper.py top(n) and bottom(n): the largest fifth never take stake, the smallest 34% never give (20 and 34 of 100) */
+  function topN(n){ return Math.floor(n / 5); }
+  function bottomN(n){ return Math.floor((n * 34 + 50) / 100); }
   /* keeper.py fill(): {op: added}; s[j] the stake as it stands, ok(j) whether rank j+1 may take any. One that may not is
      a fixed step: the shelf below it rises to 1 ATONE under it, then the pour carries on above it */
   function shelfFill(V, s, amount, ok){
-    var n = V.length, add = {}, left = Math.floor(amount), i = n - 1 - EDGE, j;
+    var n = V.length, add = {}, left = Math.floor(amount), i = n - 1 - EDGE, j, TOP = topN(n);
     while(i >= TOP && left >= GAP){
       if(!ok(i)){ i--; continue; }
       var b0 = i;
@@ -3270,7 +3273,7 @@ rememberGridH();
     var V = window.__VALS().slice().sort(function(a, b){ return b[1] - a[1]; }), n = V.length;
     if(!n) return null;
     var at = {}, i; for(i = 0; i < n; i++) at[V[i][3]] = i;
-    var bset = {}; for(i = Math.max(0, n - BOTTOM); i < n; i++) bset[V[i][3]] = 1;
+    var bset = {}; for(i = Math.max(0, n - bottomN(n)); i < n; i++) bset[V[i][3]] = 1;
     var now = pos.rows.reduce(function(s, r){ return s + r.x * (r.inactive ? 0 : r.rate); }, 0) / pos.total;
     /* sources in the keeper's order: the most free stake first */
     /* all the free stake may go: the floor (never below the shelf) is set in the rounds, once the shelf is known */

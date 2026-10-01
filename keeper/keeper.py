@@ -452,7 +452,7 @@ def plan_restake(c, granter, rg, vals, m):  # noqa: C901
     stake = rewards - send
     if cap is not None and stake > cap: out["skip"] = "delegate cap used up"; return out
     # where the rewards go (operator, 2026-10-01): poured onto the shelf, as Autopilot's moves are - from the smallest
-    # validator up (the last EDGE left out, never the largest TOP), each 1 ATONE under the one above, so a restake never
+    # validator up (the last EDGE left out, never the largest fifth), each 1 ATONE under the one above, so a restake never
     # passes a validator and many restakes in one run spread instead of piling onto one (until 2026-10-01: all onto
     # the single highest-APR validator). An older DELEGATE grant that names validators keeps to them, and a validator
     # its grant denies is never picked (the chain would refuse it; audit 2026-09-30). At most RS_LEGS validators:
@@ -563,13 +563,16 @@ def pairs_used(reds):
 # first, to 1 ATONE under the validator ranked just above it; then the two rise together, each 1 ATONE under the
 # one above, and so on: a shelf that rises one step at a time and takes the next validator up as it reaches it
 # (operator, 2026-10-01: "apply shelf rise"). Nobody passes the validator above, so no rank changes; the largest
-# TOP never take stake. Any validator of the active set may take stake. A source may give all of the wallet's free
+# top(n) never take stake. Any validator of the active set may take stake. A source may give all of the wallet's free
 # stake and fall in rank, but never below the top of the shelf it pours into (operator, 2026-10-01: "never below
-# shelf, otherwise source rank doesn't matter"); stake on the smallest BOTTOM never moves out. Nothing is offered while
+# shelf, otherwise source rank doesn't matter"); stake on the smallest bottom(n) never moves out. Nothing is offered while
 # any of the delegator's stake cools down, so the offer comes back every 21 days, when the last move's cooldown clears.
 # fixed in code, as the rest of the operator's rule: no env value can change them at launch
-TOP = 20            # the largest 20 never take stake: destinations are ranks 21 to 97 of 100 (the signer's TOP)
-BOTTOM = 34         # stake on the smallest 34 is never moved out
+# both scale with the set (2026-10-01: sized for 100, they left nothing to do on testnet's 44): the largest fifth never
+# take stake (mainnet: 20, destinations ranks 21 to 97 of 100; the signer's top()), and stake on the smallest 34% never
+# moves out (mainnet: 34). Integer arithmetic, so the page and the signer round the same way
+def top(n): return n // 5
+def bottom(n): return (n * 34 + 50) // 100
 EDGE = 3            # the last 3 are left out (operator, 2026-09-30)
 GAP = 1_000_000     # 1 ATONE between neighbours: a tie would let the chain's tie-break swap the two
 
@@ -577,7 +580,7 @@ def fill(ranked, stake, amount, ok, min_leg=MIN_MOVE):
     """the shelf rise: answers {op: added}. ranked is largest first; stake(op) the stake as it stands; ok(v) whether v
     may take any. A validator that may not (a source, a refused pair, a grant's list) is a fixed step: the shelf below
     it rises to 1 ATONE under it, then the pour carries on above it"""
-    n = len(ranked); add = {}; left = int(amount)
+    n = len(ranked); add = {}; left = int(amount); TOP = top(n)
     s = [int(stake(v["op"])) for v in ranked]
     i = n - 1 - EDGE
     while i >= TOP and left >= GAP:
@@ -633,7 +636,7 @@ def plan(g, rows, reds, vals, m, room=None):
     now = sum(r["x"] * r["rate"] for r in rows) / total
     ranked = sorted(vals.values(), key=lambda v: -v["t"]); n = len(ranked)
     if not n: return None
-    bset = {v["op"] for v in ranked[max(0, n - BOTTOM):]}
+    bset = {v["op"] for v in ranked[max(0, n - bottom(n)):]}
     src = []
     # all the free stake may go: the floor (never below the shelf) is set in the rounds below, once the shelf is known
     for r in sorted((r for r in rows if r["free"] > 0 and r["op"] not in bset), key=lambda r: -r["free"]):

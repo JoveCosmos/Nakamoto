@@ -108,9 +108,12 @@ const isVal = s => typeof s === "string" && /^atonevaloper1[02-9ac-hj-np-z]{38}$
 const isAmt = s => /^[1-9]\d{0,17}$/.test(String(s));
 
 // ---- policy: pure functions, no I/O (audit 2026-09-30) ----
-// TOP, EDGE and RS_EDGE MUST match keeper.py's TOP, EDGE and RS_EDGE: the keeper plans inside this
+// top(), EDGE and RS_EDGE MUST match keeper.py's top(), EDGE and RS_EDGE: the keeper plans inside this
 // window and the signer refuses anything outside it
-const TOP = 20, EDGE = 3, RS_EDGE = 3;     // the shelf rise (operator, 2026-10-01): ranks 21 to n-3
+const EDGE = 3, RS_EDGE = 3;
+// the shelf rise (operator, 2026-10-01): the largest fifth never take stake - ranks 21 to n-3 of 100 (it was a fixed 20,
+// which on testnet's 44 left nothing to do)
+const top = n => Math.floor(n / 5);
 const DAY_MS = 86_400_000, RATE_MAX = 30, RATE_MS = 60_000;
 // the bonded set, largest first (a stable sort: ties keep the chain's order, as the keeper's does)
 function rankSet(validators) {
@@ -118,10 +121,10 @@ function rankSet(validators) {
     .map(v => ({ op: v.operatorAddress, tokens: BigInt(v.tokens), jailed: !!v.jailed }));
   return out.sort((a, b) => (a.tokens > b.tokens ? -1 : a.tokens < b.tokens ? 1 : 0));
 }
-// a move's destination: bonded, not jailed, 0-based index from TOP to n-1-EDGE (ranks 21 to n-3)
+// a move's destination: bonded, not jailed, 0-based index from top(n) to n-1-EDGE (ranks 21 to n-3 of 100)
 function checkMoves(ranked, moves) {
   const n = ranked.length, idx = new Map(ranked.map((v, i) => [v.op, i]));
-  const lo = TOP, hi = n - 1 - EDGE;
+  const lo = top(n), hi = n - 1 - EDGE;
   for (const m of moves) {
     const i = idx.get(m.dst);
     if (i === undefined) return "destination " + m.dst + " is not bonded";
