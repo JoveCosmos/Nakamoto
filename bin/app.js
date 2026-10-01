@@ -3163,6 +3163,17 @@ rememberGridH();
              { type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr, grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: { authorization_type: "delegate" } } } } }];
     return m;
   }
+  /* the Restake card's network fee (operator, 2026-10-01: as the Autopilot card has it): exactly what its button would
+     sign - the two grants and any other restake service's revoke, or the revokes - simulated by the node */
+  var rspop = E("rspop");
+  window.__rsFee = function(){
+    var el = E("rsfee"); if(!el) return;
+    if(!AT.addr || !window.__ADDR){ feeSoon("rs"); el.textContent = ""; return; }
+    var on = rsOn(), msgs = rsMsgs(!on); if(!msgs.length){ feeSoon("rs"); el.textContent = ""; return; }
+    (on ? Promise.resolve([]) : otherRestake()).catch(function(){ return []; })
+      .then(function(rv){ feeSoon("rs", el, function(){ return msgs.concat(rv); }); });
+  };
+  if(rspop) rspop.__onclose = function(){ feeSoon("rs"); };
   /* the Restake button acts at once: it reads what stands, builds the grant (or the revoke) and hands it to the wallet
      for approval - no card in between */
   var RS_BUSY = false;

@@ -5765,6 +5765,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 #atpop .atcard .atfoot .atfs:not(#z){padding:0;margin-right:auto}
 #atpop .atcard .atfoot .txbtns:not(#z){justify-content:flex-end;margin:0}
 #rspop .rsfoot:not(#z){padding:12px 20px 16px}
+#rspop .rsfoot{align-items:center}#rspop .rsfoot .txfee:not(#z){padding:0;white-space:normal;line-height:1.5}   /* the fee on the card's own left edge */
 #atpop .atfoot .txbtns .wk-btn:not(#z),#rspop #rsgo:not(#z){min-width:180px;height:40px;border-radius:10px;font:600 13px var(--wsans);letter-spacing:.02em;text-transform:none}
 #atpop #atgrant:not(#z){border-color:var(--wcyan);background:var(--wcyan);color:#0b1f1c}
 #atpop #atgrant:disabled:not(#z){border-color:var(--wbd2);background:transparent;color:var(--wf)}
@@ -6794,10 +6795,10 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
 <div class=pop id=rspop><div class="card txcard uncard rscard" role=dialog aria-modal=true aria-labelledby=rsttl>
   <header class=wk-txh><div><b id=rsttl>Restake</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=rssum></span></header>
   <div class=rsbody>
-    <ul class=bn><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></i><span class=bn-t><b>Compounds your rewards</b><small><b id=rsadd>your rewards</b> more a year</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 20V10M10 20V6M15 20v-8M20 20V4"/></svg></i><span class=bn-t><b>Into the best-paying validator</b><small>not back onto the same one</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Claims and stakes, nothing else</b><small>GATA funds your restake, no fees for you</small></span></li></ul>
+    <ul class=bn><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></i><span class=bn-t><b>Compounds your rewards</b><small><b id=rsadd>your rewards</b> more a year</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 20V10M10 20V6M15 20v-8M20 20V4"/></svg></i><span class=bn-t><b>Into the best-paying validators</b><small>not back onto the same one</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Claims and stakes, nothing else</b><small>GATA funds your restake, no fees for you</small></span></li></ul>
     <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Runs every <b>12 hours</b>, minimum 1 ATONE, you can revoke anytime.</span></div>
   </div>
-  <div class=rsfoot><button class="wk-btn wk-go" id=rsgo type=button>Activate</button></div>
+  <div class=rsfoot><div class=atfs><div class=txfee id=rsfee></div></div><button class="wk-btn wk-go" id=rsgo type=button>Activate</button></div>
 </div></div>
 
 <div class=pop id=ipop><div class="card vcard icard">
