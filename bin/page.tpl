@@ -2576,6 +2576,11 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .uncard .unfield .wk-max:disabled{opacity:.45;cursor:default}
 .uncard .unhint{font-family:var(--wmono);font-size:8.5px;letter-spacing:.06em;color:var(--wf);white-space:nowrap}
 .uncard .unhint.bad{color:var(--wburn)}
+/* phones: the amount box takes the row and its caption ("of 2,426.167977 on PRO Delegators") wraps under it, cut
+   at the card's edge, instead of running off the side (operator, 2026-10-02) */
+@media(max-width:620px){.uncard .unamt:not(#z){flex-wrap:wrap;row-gap:6px}.uncard .unamt>.unfield:not(#z){flex:1 1 100%;width:auto;max-width:none}
+  .uncard .unamt>.unhint:not(#z),.uncard .unamt>.wk-seln:not(#z){flex:1 1 100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .uncard .unamt>.unhint:empty:not(#z),.uncard .unamt>.wk-seln:empty:not(#z){display:none}}
 .uncard .txlock{padding-top:12px}
 .uncard .wk-btn.wk-go{background:linear-gradient(180deg,#ffc453,#e69a17);border:1px solid #ffb02e;color:#1d1200;box-shadow:0 10px 24px -12px rgba(255,176,46,.7),inset 0 1px 0 rgba(255,255,255,.3)}
 .uncard .wk-btn.wk-go:hover{filter:brightness(1.06)}
