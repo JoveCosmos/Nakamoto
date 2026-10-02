@@ -32,7 +32,32 @@
   /* write a box only when its markup changed: a block tick that changes nothing touches no
      DOM, and the row or chip the keyboard is on keeps its focus */
   var LASTH = {};
-  function put(id, h){ if(RAIL[id]) h = rail(h); var el = E(id); if(!el || LASTH[id] === h) return el; LASTH[id] = h; el.innerHTML = h; return el; }
+  function put(id, h){ if(RAIL[id]) h = rail(h); var el = E(id); if(!el || LASTH[id] === h) return el; LASTH[id] = h; el.innerHTML = h; fitFigs(el); return el; }
+  /* governance figures on phones (operator, 2026-10-02: "your governor boxes values overflow if big"): a figure wider
+     than its box steps its size down until it fits (12px at the least, then the ellipsis); wider screens keep the
+     stylesheet's size. Run on every draw, on resize and when the view changes (a hidden box measures nothing) */
+  var FIGS = ".gv-ro .sd-well>b,#sd-gstrip .sd-well>b,.gv-rules3>div>b";
+  function fitFigs(el){
+    if(!el || !el.querySelectorAll) return;
+    var ph = window.matchMedia && matchMedia("(max-width:620px)").matches;
+    Array.prototype.forEach.call(el.querySelectorAll(FIGS), function(x){
+      x.style.fontSize = "";
+      /* the figure (with its unit, when it sits in a well) against its cell's inner edges, and any of it the
+         figure's own ellipsis hides */
+      var cell = x.closest(".sd-ro,.gv-ro,.gv-rules3>div"), w = x.parentNode.classList.contains("sd-well") ? x.parentNode : x;
+      if(!ph || !cell || !cell.clientWidth) return;
+      var cs = getComputedStyle(cell), fs = parseFloat(getComputedStyle(x).fontSize);
+      /* the text's own width from a range: scrollWidth rounds to whole pixels and hides the sub-pixel overflow
+         that already draws the ellipsis */
+      var rg = document.createRange();
+      function over(){ var c = cell.getBoundingClientRect(), r = w.getBoundingClientRect(); rg.selectNodeContents(x);
+        return rg.getBoundingClientRect().width > x.getBoundingClientRect().width + 0.25 || r.right > c.right - parseFloat(cs.paddingRight) + 0.5 || r.left < c.left + parseFloat(cs.paddingLeft) - 0.5; }
+      while(over() && fs > 12){ fs -= 0.5; x.style.fontSize = fs + "px"; }
+    });
+  }
+  function fitAll(){ fitFigs(E("sv")); }
+  window.addEventListener("resize", fitAll);
+  if(window.MutationObserver) new MutationObserver(function(){ requestAnimationFrame(fitAll); }).observe(root, { attributes: true, attributeFilter: ["data-sv"] });
   /* Network panels carry their readouts on a rail down the right rim, the panel's full height,
      not in the heading: the heading is one line beside the graph's column. The draw functions still
      write the readouts in the heading's .sv-rt; this lifts them out beside the body. */
@@ -1092,9 +1117,9 @@
   /* ── becoming a governor. A governor is the wallet's own key under the "atonegov" prefix; the chain wants
      10,000 ATONE staked on ACTIVE validators (its min_governor_self_delegation) and caps each field in bytes.
      Registering makes the wallet follow itself. Signed in the wallet, broadcast through our node. ── */
-  /* registering and editing a governor: switched off 2026-09-28; on in dev 2026-10-02, held back from the 2026-10-02
-     release (operator) - off until they say; the code stays */
-  var GOV_REG = false;
+  /* registering and editing a governor: switched off 2026-09-28; held back from production 2026-10-02 but shown on dev
+     (operator: "Register governor should be visible in dev"); render stamps data-stage=dev on the dev tree only */
+  var GOV_REG = root.getAttribute("data-stage") === "dev";
   var B32 = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
   function b32poly(v){ var G = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3], c = 1;
     v.forEach(function(x){ var b = c >>> 25; c = ((c & 0x1ffffff) << 5) ^ x; for(var i = 0; i < 5; i++) if((b >>> i) & 1) c ^= G[i]; }); return c; }

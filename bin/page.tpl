@@ -1,4 +1,4 @@
-<!doctype html><html lang=en><head><meta charset=utf-8>
+<!doctype html><html lang=en{{STAGE}}><head><meta charset=utf-8>
 <base href="{{BASE}}">
 <meta name=viewport content="width=device-width,initial-scale=1">
 <title>AtomOne Nakamoto Bonus</title>
@@ -5911,6 +5911,16 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   /* the governor rules' three tiles: their figures fit a phone's third (28 days stayed on two lines) */
   #one .gv-rules3>div>b:not(#z){font-size:20px;white-space:nowrap;letter-spacing:-.02em}
   #one .gv-rules3>div>em:not(#z){letter-spacing:.1em}
+  /* big figures (operator, 2026-10-02): simple.js steps them down to 12px; past that a figure stays in its cell and
+     ends in an ellipsis (a long governor name), never over the next one */
+  #one .gv-rules3>div>b:not(#z){max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  #one #sd-gstrip .sd-ro .sd-well:not(#z),#one .gv-strip .gv-ro .sd-well:not(#z){max-width:100%;min-width:0}
+  #one #sd-gstrip .sd-well>b:not(#z),#one .gv-strip .gv-ro .sd-well>b:not(#z){flex:0 1 auto;min-width:0}
+  #one #sd-gstrip .sd-well>.u:not(#z),#one .gv-strip .gv-ro .sd-well>.u:not(#z){flex:0 0 auto}
+  /* Governors' head with the Register door: the count chip steps aside (the strip above carries the count; at 360px
+     it was cut mid-word), the door stays inside the panel */
+  #one #sv-mygovlist>.sv-ph:has(.gr-open)>:not(h3):not(.gr-open):not(#z){display:none}
+  #one #sv-mygovlist>.sv-ph>.gr-open:not(#z){flex:0 0 auto;margin-left:auto}
   .l2trk.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent,#000 28px,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,transparent,#000 28px,#000 calc(100% - 28px),transparent)}
 }
 /* ════ PICKS (operator, 2026-09-30): the three tables list every validator and fill the stage's height, each

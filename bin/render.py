@@ -227,7 +227,11 @@ for _k, _v in SHELL.items():
     if TPL.count("{{%s}}" % _k) != 1:
         sys.exit("atomone-app: FATAL page.tpl must carry {{%s}} exactly once" % _k)
     TPL = TPL.replace("{{%s}}" % _k, _v)
+# the dev tree stamps <html data-stage=dev>: features held back from a release show on dev only (operator, 2026-10-02:
+# "Register governor should be visible in dev"); production's render writes nothing here
+STAGE = " data-stage=dev" if os.path.realpath(OUT).startswith("/srv/atomone-app-dev/") else ""
 page = (TPL
+  .replace("{{STAGE}}", STAGE)
   .replace("{{GENERATED}}", D["generated"]).replace("{{HEIGHT}}", f(D["height"]))
   .replace("{{CHAIN}}", esc(D["chain"])).replace("{{CHAIN_ID}}", esc(NETCFG["chain"])).replace("{{BASE}}", NETCFG["base"])   # the popups' chain line, per network
   .replace("{{ETA}}", f"{e['now']:.2f}").replace("{{ETA_PCT}}", f"{e['now']*100:.0f}")
