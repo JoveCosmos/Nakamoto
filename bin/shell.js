@@ -65,6 +65,18 @@
 
   var cur = { s: null, v: null };
 
+  function edgeFade(t){
+    t.classList.toggle("fl", t.scrollLeft > 2);
+    t.classList.toggle("fr", t.scrollLeft + t.clientWidth < t.scrollWidth - 2);
+    if(!t.__fade){ t.__fade = 1; t.addEventListener("scroll", function(){ edgeFade(t); }, { passive: true });
+      window.addEventListener("resize", function(){ edgeFade(t); });
+      /* the strip gets its width only once its section is on screen: re-check then, and bring the open tab in */
+      if(window.ResizeObserver) new ResizeObserver(function(){
+        var on1 = t.querySelector('.l2tab[aria-selected="true"]');
+        if(on1 && t.scrollWidth > t.clientWidth + 1 && (on1.offsetLeft < t.scrollLeft || on1.offsetLeft + on1.offsetWidth > t.scrollLeft + t.clientWidth))
+          t.scrollLeft = Math.max(0, on1.offsetLeft - (t.clientWidth - on1.offsetWidth) / 2);
+        edgeFade(t); }).observe(t); }
+  }
   /* ── the strips: selection, the one Tab stop each (roving tabindex), what each controls ── */
   function sync(){
     var s = cur.s, v = cur.v;
@@ -81,6 +93,13 @@
         b.setAttribute("aria-selected", on ? "true" : "false"); b.tabIndex = on ? 0 : -1;
       });
       if(!hit && tabs.length) tabs[0].tabIndex = 0;
+      /* a strip wider than the phone (Governance's five): the open tab is brought into view, never left half off the
+         edge, and the edges fade where there is more (operator, 2026-10-02) */
+      var trk = list.querySelector(".l2trk"), on1 = list.querySelector('.l2tab[aria-selected="true"]');
+      /* after layout: a strip shown by this very change has no width yet */
+      if(trk) requestAnimationFrame(function(){
+        if(on1 && trk.scrollWidth > trk.clientWidth + 1) trk.scrollLeft = Math.max(0, on1.offsetLeft - (trk.clientWidth - on1.offsetWidth) / 2);
+        edgeFade(trk); });
     });
     /* what each tab controls follows the version (Overview is the three-pane screen in
        Advanced); a tab the version turns off stays in the row, greyed, and says why */

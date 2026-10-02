@@ -5879,6 +5879,29 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 #one #sd-gstrip>.sd-id:not(#z){display:none}
 #one #sd-gstrip>.sd-ro:nth-child(2){border-left:0}
 #one #sd-gstrip .sd-ro em:not(#z){white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* ════ GOVERNANCE ON A PHONE (operator, 2026-10-02: "designed late, never adjusted for the phone") ════ */
+@media(max-width:620px){
+  /* Your governor's strip: five columns forced at every width left ~65px each, labels cut to "YO..." and the figures
+     printed over each other; two columns, the fifth across the bottom */
+  #one #sd-gstrip.sd-strip:not(#z){grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #one #sd-gstrip>.sd-ro:not(#z){border-left:0;border-top:1px solid var(--wbd);padding:11px 14px 12px}
+  #one #sd-gstrip>.sd-ro:nth-child(2):not(#z),#one #sd-gstrip>.sd-ro:nth-child(3):not(#z){border-top:0}
+  #one #sd-gstrip>.sd-ro:nth-child(3):not(#z),#one #sd-gstrip>.sd-ro:nth-child(5):not(#z){border-left:1px solid var(--wbd)}
+  #one #sd-gstrip>.sd-ro:nth-child(6):not(#z){grid-column:1/-1}
+  #one #sd-gstrip .sd-well>b:not(#z){font-size:20px}
+  /* a panel head's small caption goes under its title instead of off the edge */
+  #one .sv-ph:has(.sv-gkey):not(#z){flex-wrap:wrap;row-gap:2px;height:auto!important;max-height:none!important}
+  #one .sv-ph .sv-gkey:not(#z){flex:1 1 100%;white-space:normal;margin-left:0}
+  /* proposal titles: two lines before the ellipsis */
+  .gp-t b:not(#z){white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.3}
+  /* a view strip wider than the phone: its edges fade where there is more to scroll (shell.js sets .fl / .fr) */
+  .l2trk.fr:not(.fl){-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+  .l2trk.fl:not(.fr){-webkit-mask-image:linear-gradient(90deg,transparent,#000 28px);mask-image:linear-gradient(90deg,transparent,#000 28px)}
+  /* the governor rules' three tiles: their figures fit a phone's third (28 days stayed on two lines) */
+  #one .gv-rules3>div>b:not(#z){font-size:20px;white-space:nowrap;letter-spacing:-.02em}
+  #one .gv-rules3>div>em:not(#z){letter-spacing:.1em}
+  .l2trk.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent,#000 28px,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,transparent,#000 28px,#000 calc(100% - 28px),transparent)}
+}
 /* ════ PICKS (operator, 2026-09-30): the three tables list every validator and fill the stage's height, each
    scrolling in its own card under a header that stays; nothing below them is left empty ════ */
 @media(min-width:1100px){
