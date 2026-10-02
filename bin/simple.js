@@ -267,12 +267,13 @@
     var pos = window.__POS, bal = window.__BAL, mine = pos && pos.rows.length, mv = movable(pos);
     var yk = function(k, v, st){ return '<div class=mv-yk><em>' + k + '</em><b' + (st || '') + '>' + v + '</b></div>'; };
     return '<div class="mv-yg mv-bal">' +
-      yk("Your APR", mine ? pct(pos.rate) : '-', mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') +
+      /* the order (operator, 2026-10-02): what is in the wallet, what is staked, then what it earns */
+      yk("ATONE available", bal ? fmt(bal.uatone) : '-') +
+      yk("PHOTON available", bal ? fmt(bal.uphoton) : '-') +
       yk("ATONE staked", pos ? fmt(pos.total) : '-') +
       yk("Movable stake", mv != null ? fmt(mv) : '-') +
-      yk("ATONE available", bal ? fmt(bal.uatone) : '-') +
       yk("ATONE rewards", window.__REW != null ? fmt(window.__REW) : '-') +
-      yk("PHOTON available", bal ? fmt(bal.uphoton) : '-') + '</div>';
+      yk("Your APR", mine ? pct(pos.rate) : '-', mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '</div>';
   }
   /* a figure never overflows its box: the type steps down until it fits (phones and tablets) */
   function fitBoxes(el){
