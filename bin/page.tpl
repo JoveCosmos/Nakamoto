@@ -1882,7 +1882,11 @@ background:transparent;border:0;box-shadow:none;padding:0;color:var(--ink2)}
    own scroll (same weight, later), so ~100 rows spilled out of 200px over the next card. Each list scrolls inside its
    card again, five rows high, its column heads pinned (2026-10-02) */
 @media(max-width:620px){.duotab .ptw:not(#z){overflow-y:auto;overflow-x:hidden;max-height:232px;overscroll-behavior:contain}
-  .duotab .ptab thead th{position:sticky;top:0;z-index:1;background:var(--card,#09090f)}}
+  .duotab .ptab thead th{position:sticky;top:0;z-index:1;background:var(--card,#09090f)}
+  /* a long moniker ("ECO Stake ... REStake.app") ran over the figures beside it: names stop at the cell, with an
+     ellipsis (the validator's card, a tap away, has the full name) (operator, 2026-10-02) */
+  #p-pays .ptab td.nm:not(#z){max-width:0;width:44%;white-space:nowrap;overflow:hidden}
+  #p-pays .ptab td.nm>span:last-child{display:inline-block;max-width:calc(100% - 28px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}}
 .ptab{border-collapse:collapse;border-spacing:0}
 .ptab th,.ptab thead th{position:static;background:transparent;border:0;border-bottom:1px solid var(--edge);padding:0 9px 6px;font-family:var(--mono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);font-weight:400}
 .ptab td,.ptab td:first-child,.ptab td:last-child,.ptab td:nth-child(2){border:0;border-bottom:1px solid var(--edge);border-radius:0;background:transparent;padding:9px 9px;font-family:var(--mono);font-size:10.5px;color:var(--ink2);font-variant-numeric:tabular-nums}
