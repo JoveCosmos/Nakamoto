@@ -1092,8 +1092,9 @@
   /* ── becoming a governor. A governor is the wallet's own key under the "atonegov" prefix; the chain wants
      10,000 ATONE staked on ACTIVE validators (its min_governor_self_delegation) and caps each field in bytes.
      Registering makes the wallet follow itself. Signed in the wallet, broadcast through our node. ── */
-  /* registering and editing a governor: switched off 2026-09-28, back on 2026-10-02 (operator) */
-  var GOV_REG = true;
+  /* registering and editing a governor: switched off 2026-09-28; on in dev 2026-10-02, held back from the 2026-10-02
+     release (operator) - off until they say; the code stays */
+  var GOV_REG = false;
   var B32 = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
   function b32poly(v){ var G = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3], c = 1;
     v.forEach(function(x){ var b = c >>> 25; c = ((c & 0x1ffffff) << 5) ^ x; for(var i = 0; i < 5; i++) if((b >>> i) & 1) c ^= G[i]; }); return c; }
