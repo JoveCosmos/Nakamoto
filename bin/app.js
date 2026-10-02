@@ -972,6 +972,12 @@ rememberGridH();
   s+='<path d="'+dp+'" fill="none" stroke="#ffb02e" stroke-width="3"/>';
   s+='<line x1="'+X(nowI)+'" y1="'+PT+'" x2="'+X(nowI)+'" y2="'+(H-PB)+'" stroke="#ff4d1f" stroke-width="1.5"/>';
   s+='<text x="'+(X(nowI)+10)+'" y="'+(PT+17)+'" font-size="12.5" fill="#ff4d1f">TODAY</text>';
+  /* where eta is heading, on the graph under TODAY (operator, 2026-10-02: it was a sentence above the chart) - the
+     same three states render.py's STEPLINE had; it flips to the line's left when the right side has no room */
+  var Ru = D.rule || {}, st = ES.rising ? "rising" : (ES.weeks_to_floor || 0) > 0 ? "falling" : "held at the floor";
+  var lab = "\u03b7 " + st + " now" + (Ru.ratio != null ? " (c = " + Ru.ratio.toFixed(2) + "\u00d7)" : ""), lw = lab.length * 6.6;
+  var lx = X(nowI) + 10 + lw > W - PR ? X(nowI) - 10 : X(nowI) + 10;
+  s+='<text x="'+lx+'" y="'+(PT+34)+'" font-size="12" fill="#ff4d1f"'+(lx < X(nowI) ? ' text-anchor="end"' : '')+'>'+lab+'</text>';
   SC.forEach(function(r,i){
     if(r.eta==null){ if(i%2===0) s+='<text x="'+X(i).toFixed(1)+'" y="'+(H-PB+23)+'" text-anchor="middle" font-size="10.5" fill="#6f6d94">'+r.date.split(" ")[0]+'</text>'; return; }
     s+='<circle class="etapt" data-i="'+i+'" cx="'+X(i).toFixed(1)+'" cy="'+Y(r.eta).toFixed(1)+

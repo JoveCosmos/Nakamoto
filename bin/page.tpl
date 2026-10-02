@@ -6435,7 +6435,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <section class=pane id=p-eta><div class=pw>
     <div class=duo2>
       <div class=panel><div class=ptitle>Projection</div>
-<p class=sub>&eta; steps {{STEP}} every week: up while the BONDED ATONE <b class=hotc>concentration</b> is &ge; {{THRESH}}&times;, down while &lt; {{THRESH_N}}. {{STEPLINE}}</p>
+<p class=sub>&eta; steps {{STEP}} every week: up while the BONDED ATONE <b class=hotc>concentration</b> is &ge; {{THRESH}}&times;, down while &lt; {{THRESH}}.</p>
     <svg id=etacurve viewBox="0 0 900 300" role=img
       aria-label="&eta; from the floor to today and projected forward"></svg>
     <div class=sbox>
