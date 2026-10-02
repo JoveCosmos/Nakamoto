@@ -1878,6 +1878,11 @@ background:transparent;border:0;box-shadow:none;padding:0;color:var(--ink2)}
 .tcap.hot{color:var(--hot)}.tcap.earn{color:#b9b0ff}.tcap.cool{color:#8fe8e0}
 .tcap i{font-size:7.5px;letter-spacing:.12em}
 .ptw,.duotab .ptw{border:0;border-radius:0;margin:0;overflow:visible;background:transparent}
+/* phones: the three Picks lists carry every validator since 2026-09-30, and the line above cancelled the phone rule's
+   own scroll (same weight, later), so ~100 rows spilled out of 200px over the next card. Each list scrolls inside its
+   card again, five rows high, its column heads pinned (2026-10-02) */
+@media(max-width:620px){.duotab .ptw:not(#z){overflow-y:auto;overflow-x:hidden;max-height:232px;overscroll-behavior:contain}
+  .duotab .ptab thead th{position:sticky;top:0;z-index:1;background:var(--card,#09090f)}}
 .ptab{border-collapse:collapse;border-spacing:0}
 .ptab th,.ptab thead th{position:static;background:transparent;border:0;border-bottom:1px solid var(--edge);padding:0 9px 6px;font-family:var(--mono);font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);font-weight:400}
 .ptab td,.ptab td:first-child,.ptab td:last-child,.ptab td:nth-child(2){border:0;border-bottom:1px solid var(--edge);border-radius:0;background:transparent;padding:9px 9px;font-family:var(--mono);font-size:10.5px;color:var(--ink2);font-variant-numeric:tabular-nums}

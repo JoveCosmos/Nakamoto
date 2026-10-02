@@ -280,6 +280,9 @@
   html[data-theme=light]:not([data-mono]) .tcap.earn{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .tcap.cool{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .ptw,html[data-theme=light]:not([data-mono]) .duotab .ptw{background:transparent}
+  @media(max-width:620px){
+    html[data-theme=light]:not([data-mono]) .duotab .ptab thead th{background:var(--card,var(--surface))}
+  }
   html[data-theme=light]:not([data-mono]) .ptab th,html[data-theme=light]:not([data-mono]) .ptab thead th{background:transparent}
   html[data-theme=light]:not([data-mono]) .ptab td,html[data-theme=light]:not([data-mono]) .ptab td:first-child,html[data-theme=light]:not([data-mono]) .ptab td:last-child,html[data-theme=light]:not([data-mono]) .ptab td:nth-child(2){background:transparent}
   html[data-theme=light]:not([data-mono]) .ptab tr.vrow:hover td{background:var(--surface-2)}
