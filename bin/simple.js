@@ -255,7 +255,38 @@
     var wname = (window.__WALLET && String(window.__WALLET.label || "").trim()) || "Your wallet";
     return '<div class="sd-id sd-idw"><div class=sd-idl><div class=sd-top><h3 title="' + esc(wname) + '"><span class=sv-wn>' + esc(wname) + '</span></h3></div>' + wmeta() + '</div></div>';
   }
+  /* phones and tablets (under 1100px): one set of balance boxes for Your move and Pro, same order and labels, the
+     unit in the label and none beside the figure (operator, 2026-10-02). Movable stake is what can be redelegated
+     now (Pro on Redelegate: the ticked delegations' free stake, as its amount field) */
+  function movable(pos){
+    if(!pos) return null;
+    var proRd = root.getAttribute("data-sv") === "dashboard/self" && !root.getAttribute("data-pro");
+    return proRd && window.__srcFree ? window.__srcFree() : pos.free;
+  }
+  function balBoxes(){
+    var pos = window.__POS, bal = window.__BAL, mine = pos && pos.rows.length, mv = movable(pos);
+    var yk = function(k, v, st){ return '<div class=mv-yk><em>' + k + '</em><b' + (st || '') + '>' + v + '</b></div>'; };
+    return '<div class="mv-yg mv-bal">' +
+      yk("Your APR", mine ? pct(pos.rate) : '-', mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') +
+      yk("ATONE staked", pos ? fmt(pos.total) : '-') +
+      yk("Movable stake", mv != null ? fmt(mv) : '-') +
+      yk("ATONE available", bal ? fmt(bal.uatone) : '-') +
+      yk("ATONE rewards", window.__REW != null ? fmt(window.__REW) : '-') +
+      yk("PHOTON available", bal ? fmt(bal.uphoton) : '-') + '</div>';
+  }
+  /* a figure never overflows its box: the type steps down until it fits (phones and tablets) */
+  function fitBoxes(el){
+    if(!el) return;
+    Array.prototype.forEach.call(el.querySelectorAll(".mv-bal .mv-yk>b"), function(x){
+      x.style.fontSize = "";
+      if(!x.clientWidth) return;
+      var fs = parseFloat(getComputedStyle(x).fontSize);
+      while(x.scrollWidth > x.clientWidth + 1 && fs > 10){ fs -= 0.5; x.style.fontSize = fs + "px"; }
+    });
+  }
+  window.addEventListener("resize", function(){ fitBoxes(E("mv-stage")); fitBoxes(E("sd-mstrip")); });
   function wstrip(){
+    if(window.matchMedia && matchMedia("(max-width:1099px)").matches) return balBoxes();
     var pos = window.__POS, bal = window.__BAL;
     var mine = pos && pos.rows.length, rew = window.__REW || 0, liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0;
     /* the wallet card, then five boxes - Available, Photon, Staked, APR, Rewards - each figure in its well */
@@ -1573,10 +1604,10 @@
     var proRd = root.getAttribute("data-sv") === "dashboard/self" && matchMedia("(min-width:1100px)").matches && !root.getAttribute("data-pro");
     h += '<div class=you-bal>' +
       row("Staked", pos ? fmt(pos.total) : '-', "ATONE") +
-      (proRd ? row("Movable Stake", pos && window.__srcFree ? fmt(window.__srcFree()) : '-', "ATONE") : '') +
+      row("Movable Stake", pos ? fmt(movable(pos)) : '-', "ATONE") +
       row("Available", bal ? fmt(bal.uatone) : '-', "ATONE") +
       row("Rewards", window.__REW != null ? fmt(window.__REW) : '-', "ATONE") +
-      row("For fees", bal ? fmt(bal.uphoton) : '-', "PHOTON") + '</div>';
+      row("PHOTON", bal ? fmt(bal.uphoton) : '-', "") + '</div>';
     var rp = at && at.report, adm = rp && rp.admin, st = adm && adm.state;
     var asub = !auto ? "keeps your stake at the best APR" : "checks every 12 hours";
     /* Pro on a wide screen (operator, 2026-09-30): the wallet column holds your delegations and the action menu
@@ -1688,7 +1719,7 @@
   window.addEventListener("resize", function(){ var el = E("mv-stage"); if(el) hlFit(el); });
   function mvFit(){
     var el = E("mv-stage"); if(!el) return;
-    hlFit(el);
+    hlFit(el); fitBoxes(el);
     var lim = mvLim();
     Array.prototype.forEach.call(el.querySelectorAll(".mv-rows.open"), function(r){
       var h = 0; Array.prototype.slice.call(r.children, 0, lim).forEach(function(c){ h += c.offsetHeight; });
@@ -1754,11 +1785,7 @@
     var you = '';
     if(a){
       var bal = window.__BAL, mine = pos && pos.rows.length, rs = !!(at && at.restake);
-      you = '<div class=mv-you><div class=mv-yg>' +
-        '<div class=mv-yk><em>Your APR</em><b' + (mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '>' + (mine ? pct(pos.rate) : '-') + '</b></div>' +
-        '<div class=mv-yk><em>Staked</em><b>' + (pos ? fmt(pos.total) : '-') + '</b></div>' +
-        '<div class=mv-yk><em>Available</em><b>' + (bal ? fmt(bal.uatone) : '-') + '</b></div>' +
-        '<div class=mv-yk><em>Rewards</em><b>' + (window.__REW != null ? fmt(window.__REW) : '-') + '</b></div></div>' +
+      you = '<div class=mv-you>' + balBoxes() +
         '<div class=mv-ysw>' + youSwitch("youauto", "Autopilot", auto, "", !mine) + youSwitch("restakesw", "Restake", rs, "", !mine) + '</div></div>';
     }
     var h;
@@ -1826,7 +1853,7 @@
     selfBand();
     drawHead();
     drawOne();
-    if(root.getAttribute("data-sv") === "dashboard/self") put("sd-mstrip", wstrip());
+    if(root.getAttribute("data-sv") === "dashboard/self"){ put("sd-mstrip", wstrip()); fitBoxes(E("sd-mstrip")); }
     if(root.getAttribute("data-tab") !== "dele" || root.getAttribute("data-ui") !== "simple") return;
     var s = screen();
     if(s === "over") drawOver();

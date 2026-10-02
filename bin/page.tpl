@@ -6346,6 +6346,10 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   .mv-yk{display:flex;flex-direction:column;gap:2px;padding:9px 11px;border:1px solid var(--wbd);border-radius:10px;min-width:0}
   .mv-yk em{font-style:normal;font-family:var(--wmono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
   .mv-yk b{font-family:var(--wmono);font-size:17px;font-weight:600;color:var(--wt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* figures fit their box (simple.js fitBoxes steps the size down), never cut: no ellipsis on the balances */
+  .mv-bal .mv-yk b{text-overflow:clip}
+  /* Pro's strip holds the same six boxes as Your move (operator, 2026-10-02: same order, labels and boxes) */
+  #p-dele #sd-mstrip.sd-strip:not(#z):not(#y){display:block!important;padding:12px!important;overflow:visible}
   .mv-ysw{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .mv-ysw .you-sw{padding:8px 10px}
   .mv-ysw .you-swt small{display:none}
