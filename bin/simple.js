@@ -1565,10 +1565,12 @@
   /* ── the testnet faucet in the wallet column: 10 ATONE and 1 PHOTON, each once per address per 24 hours (the faucet service) ── */
   var FCT = {}, FCTTX = {}, FCTMSG = "", FCTBUSY = "";
   var FCT_TX = "https://explorer.gatahub.zone/atomone-testnet-1/txs/";
+  /* the faucet shows in the wallet column (wide) and in Your move's wallet section (phones and tablets): both redraw */
+  function fctDraw(){ drawYou(); if(E("mv-stage")) drawMove(); }
   function faucetBox(a){
     var c = a ? FCT[a] : null;
     if(a && !c){ FCT[a] = {}; fetch("/faucet-api/claimed?address=" + encodeURIComponent(a), { cache: "no-store" })
-      .then(function(r){ return r.json(); }).then(function(j){ FCT[a] = j || {}; drawYou(); }).catch(function(){}); }
+      .then(function(r){ return r.json(); }).then(function(j){ FCT[a] = j || {}; fctDraw(); }).catch(function(){}); }
     /* one row each (operator, 2026-09-30): "10 ATONE request" / "1 PHOTON request"; once received within 24 hours the
        row is that amount and its transaction, short hash, opening the explorer */
     var AMT = { atone: "10 ATONE", photon: "1 PHOTON" };
@@ -1584,14 +1586,14 @@
   }
   function faucetGo(t){
     var a = window.__ADDR; if(!a || FCTBUSY) return;
-    FCTBUSY = t; FCTMSG = ""; drawYou();
+    FCTBUSY = t; FCTMSG = ""; fctDraw();
     fetch("/faucet-api/request", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ address: a, token: t }) })
       .then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.error || ("HTTP " + r.status)); return j; }); })
       .then(function(j){ (FCT[a] = FCT[a] || {})[t] = true;
         if(j && /^[0-9A-Fa-f]{64}$/.test(j.txhash || "")) (FCTTX[a] = FCTTX[a] || {})[t] = j.txhash;
         setTimeout(function(){ if(window.__refreshPos) window.__refreshPos(); }, 6000); })
       .catch(function(e){ var m = e && e.message || String(e); if(/already received/.test(m)){ (FCT[a] = FCT[a] || {})[t] = true; } FCTMSG = esc(m); })
-      .then(function(){ FCTBUSY = ""; drawYou(); });
+      .then(function(){ FCTBUSY = ""; fctDraw(); });
   }
   function drawYou(){
     var pos = window.__POS, bal = window.__BAL, a = window.__ADDR, mine = pos && pos.rows.length;
@@ -1786,7 +1788,8 @@
     var you = '';
     if(a){
       var bal = window.__BAL, mine = pos && pos.rows.length, rs = !!(at && at.restake);
-      you = '<div class=mv-you>' + balBoxes() +
+      /* testnet: the faucet, as the wide wallet column has it (operator, 2026-10-02: "no faucet on phone?") */
+      you = '<div class=mv-you>' + balBoxes() + (root.getAttribute("data-net") === "testnet" ? faucetBox(a) : '') +
         '<div class=mv-ysw>' + youSwitch("youauto", "Autopilot", auto, "", !mine) + youSwitch("restakesw", "Restake", rs, "", !mine) + '</div></div>';
     }
     var h;
