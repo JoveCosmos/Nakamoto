@@ -3402,7 +3402,11 @@ color:var(--wt);font-family:var(--wmono);font-size:10.5px;cursor:pointer}
    first (the wallet pill still says who is connected), then the tagline; the tabs keep it all */
 /* the lockup owns the title line's first column, beside the centred views: the greeting
    only where there is room to read it, then each tagline while it still fits whole */
-@media(min-width:621px) and (max-width:1599px){.brandbar .welc{display:none}}
+/* the greeting shows at every width (operator, 2026-10-02); only Pro, whose four tabs share the title row, keeps it
+   hidden below 1600px rather than cut. Elsewhere on the dashboard the title and greeting take the whole row (the
+   three-column grid was for tabs that have since left it), centred on the title's line */
+@media(min-width:621px) and (max-width:1599px){html[data-sv="dashboard/self"] .brandbar .welc{display:none}}
+@media(min-width:621px){html:not([data-sv="dashboard/self"]) .brandbar>.sv-brand:not(#z){grid-column:1/-1}}
 @media(min-width:621px) and (max-width:1079px){.brandbar .svtag.a{display:none}}
 @media(min-width:621px) and (max-width:1079px){.brandbar .svtag.s{display:none}}
 .sv-who{position:relative}
