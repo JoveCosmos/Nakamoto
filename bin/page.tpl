@@ -6221,6 +6221,13 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #mv-stage .mv-top:not(#z){flex-wrap:wrap;row-gap:10px}
   #mv-stage .mv-top>.mv-tgo:not(#z),#mv-stage .mv-top>.mv-ton:not(#z),#mv-stage .mv-top>.mv-tdis:not(#z){flex:1 1 100%;margin-left:0}
   #mv-stage .mv-top .sv-btn.go.mv-go.mv-tgo:not(#z):not(#y):not(#x){width:100%}
+  /* the status chip stays in the title row, smaller, next to its caption; the caption gives way first (2026-10-02) */
+  #mv-stage .mv-top>em:not(#z){flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9px;letter-spacing:.12em}
+  #mv-stage .mv-top .mv-chip:not(#z){flex:0 0 auto;margin-left:6px;font-size:8.5px;letter-spacing:.06em;padding:4px 8px;white-space:nowrap}
+  /* the headline figure and the line under it: one row each, whatever the amount; simple.js steps the size down to
+     fit (hlFit), starting smaller than the desktop's 40px (operator: "too big") */
+  #mv-stage .mv-hl>b:not(#z){font-size:30px;white-space:nowrap;overflow:hidden}
+  #mv-stage .mv-hl>span:not(.mv-lock):not(#z){font-size:13.5px;white-space:nowrap;overflow:hidden}
 }
 #mv-stage .mv-tdis{position:relative;display:inline-flex;flex:0 0 auto}
 #mv-stage .mv-tdis .mv-tgo:disabled:not(#z):not(#y){opacity:.45;cursor:not-allowed;filter:grayscale(1)}

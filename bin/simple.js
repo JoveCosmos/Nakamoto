@@ -1674,8 +1674,21 @@
   }
   function mvLim(){ return 4; }
   /* an opened list keeps the closed list's height and scrolls in it */
+  /* a phone: the headline figure and its line each stay on one row, the type stepping down only as far as the
+     amount needs (operator, 2026-10-02: "+19,051.6 ATONE a year" broke onto two rows) */
+  function hlFit(el){
+    var phone = window.matchMedia && matchMedia("(max-width:700px)").matches;
+    Array.prototype.forEach.call(el.querySelectorAll(".mv-hl>b, .mv-hl>span:not(.mv-lock)"), function(x){
+      x.style.fontSize = "";
+      if(!phone || !x.clientWidth) return;
+      var fs = parseFloat(getComputedStyle(x).fontSize), min = x.tagName === "B" ? 16 : 10;
+      while(x.scrollWidth > x.clientWidth + 1 && fs > min){ fs -= 0.5; x.style.fontSize = fs + "px"; }
+    });
+  }
+  window.addEventListener("resize", function(){ var el = E("mv-stage"); if(el) hlFit(el); });
   function mvFit(){
     var el = E("mv-stage"); if(!el) return;
+    hlFit(el);
     var lim = mvLim();
     Array.prototype.forEach.call(el.querySelectorAll(".mv-rows.open"), function(r){
       var h = 0; Array.prototype.slice.call(r.children, 0, lim).forEach(function(c){ h += c.offsetHeight; });
