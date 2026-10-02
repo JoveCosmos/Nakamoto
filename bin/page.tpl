@@ -5321,6 +5321,9 @@ color:#7c7aa3;text-decoration:none;white-space:nowrap;transition:color .15s,back
 .hdr-r .thbtn{margin-left:0;width:32px;height:32px;border-radius:8px}
 .hdr-r .sv-who{flex:0 0 auto}
 .hdr-r .sv-btn.sml{height:32px}
+/* phones under 390px (360, 375): the right group was a fixed 314px and ran into the AtomOne mark; the pill and the
+   Connect button narrow to 150px and the gaps to 6px, so the mark keeps its room (2026-10-02) */
+@media(max-width:389px){.folder>.hdr-r{gap:6px}.hdr-r #svconn:not(#z),.hdr-r .wpill:not(#z){width:150px}.hdr-r .wpill .wpcopy svg.cp{display:none}.hdr-r .wpill .wpa{letter-spacing:-.01em}}   /* the address keeps its ends: the copy icon goes (the address itself still copies) */
 .l1{display:flex;align-items:center;gap:4px;min-width:0}
 .l1tab{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 13px;border:0;border-radius:6px;
 background:transparent;color:var(--ink2);font:inherit;font-family:var(--sans);font-size:13px;font-weight:400;line-height:1;white-space:nowrap;cursor:pointer;
