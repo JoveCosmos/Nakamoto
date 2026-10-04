@@ -1636,8 +1636,9 @@
       row("Movable Stake", pos ? fmt(movable(pos)) : '-', "ATONE") +
       row("Available", bal ? fmt(bal.uatone) : '-', "ATONE") +
       row("Rewards", window.__REW != null ? fmt(window.__REW) : '-', "ATONE") +
-      /* Mint where the unit would be (operator, 2026-10-04): ATONE burned for PHOTON, the Mint PHOTON card */
-      row("PHOTON", bal ? fmt(bal.uphoton) : '-', a && bal ? '<button type=button class=you-mint data-act=mint title="Mint PHOTON from ATONE">Mint</button>' : "") + '</div>';
+      /* Mint where the unit would be (operator, 2026-10-04): ATONE burned for PHOTON, the Mint PHOTON card. Dev only
+         until the operator releases it (held back from the 2026-10-04 publish), as Register governor is */
+      row("PHOTON", bal ? fmt(bal.uphoton) : '-', a && bal && root.getAttribute("data-stage") === "dev" ? '<button type=button class=you-mint data-act=mint title="Mint PHOTON from ATONE">Mint</button>' : "") + '</div>';
     var rp = at && at.report, adm = rp && rp.admin, st = adm && adm.state;
     var asub = !auto ? "keeps your stake at the best APR" : "checks every 12 hours";
     /* Pro on a wide screen (operator, 2026-09-30): the wallet column holds your delegations and the action menu
