@@ -5612,6 +5612,11 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-lock{font-size:12.5px;color:var(--sv-amber)}
 .mv-hl>.mv-lock{grid-column:2;white-space:nowrap;text-align:right}
 @media(max-width:700px){.mv-hl>.mv-lock{grid-column:1/-1;white-space:normal;text-align:left}}
+/* "Stake more" while the stake cools down (operator, 2026-10-04): Activate Autopilot's button, beside the line; on
+   phones on its own line under it, as wide as its label */
+.mv-hl>.mv-stk{grid-column:2;justify-self:end;align-self:center}
+#mv-stage .mv-hl>.sv-btn.go.mv-go.mv-stk:not(#z):not(#y){height:38px;min-width:0;padding:0 18px;font-size:14px;margin:0}
+@media(max-width:700px){#mv-stage .mv-hl>.sv-btn.go.mv-go.mv-stk:not(#z):not(#y):not(#x){grid-column:1/-1;justify-self:start;width:auto;margin-top:4px}}
 /* 10,000 ATONE for a year, three ways: the largest validator, Autopilot, the smallest */
 .mv-cmp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .mv-cc{display:flex;flex-direction:column;gap:3px;min-width:0;padding:13px 16px 14px;border:1px solid var(--wbd);border-radius:12px}
@@ -6224,8 +6229,10 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 /* Your move: the action in the title row's corner, the chip just left of it; the set chart pinned to the foot, its
    bars each opening the validator (operator, 2026-09-30) */
 #mv-stage .mv-top{min-height:38px}
-#mv-stage .mv-top .mv-chip{margin-left:auto}
-#mv-stage .mv-top>em+.mv-tgo,#mv-stage .mv-top>em+.mv-ton{margin-left:auto}
+/* the chip sits beside its caption on the left ("Day 12 of 21", operator 2026-10-04), the action alone in the corner */
+#mv-stage .mv-top>em:not(#z){flex:0 1 auto;min-width:0}
+#mv-stage .mv-top .mv-chip{margin-left:0}
+#mv-stage .mv-top>.mv-tgo,#mv-stage .mv-top>.mv-ton:not(#z):not(#y),#mv-stage .mv-top>.mv-tdis{margin-left:auto}
 #mv-stage .sv-btn.go.mv-go.mv-tgo:not(#z):not(#y){height:38px;min-width:0;padding:0 18px;font-size:14px;flex:0 0 auto}
 #mv-stage .mv-top .mv-ton:not(#z){font-size:14px;margin-left:10px}
 #mv-stage .mv-cd{font-family:var(--wmono);font-variant-numeric:tabular-nums;letter-spacing:.02em}
@@ -6239,7 +6246,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #mv-stage .mv-top>.mv-tgo:not(#z),#mv-stage .mv-top>.mv-ton:not(#z),#mv-stage .mv-top>.mv-tdis:not(#z){flex:1 1 100%;margin-left:0}
   #mv-stage .mv-top .sv-btn.go.mv-go.mv-tgo:not(#z):not(#y):not(#x){width:100%}
   /* the status chip stays in the title row, smaller, next to its caption; the caption gives way first (2026-10-02) */
-  #mv-stage .mv-top>em:not(#z){flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9px;letter-spacing:.12em}
+  #mv-stage .mv-top>em:not(#z){flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9px;letter-spacing:.12em}
   #mv-stage .mv-top .mv-chip:not(#z){flex:0 0 auto;margin-left:6px;font-size:8.5px;letter-spacing:.06em;padding:4px 8px;white-space:nowrap}
   /* the headline figure and the line under it: one row each, whatever the amount; simple.js steps the size down to
      fit (hlFit), starting smaller than the desktop's 40px (operator: "too big") */
