@@ -995,6 +995,8 @@
   html[data-theme=light]:not([data-mono]) .mv-more{background:none}
   html[data-theme=light]:not([data-mono]) .mv-more svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .mv-arr svg{fill:none}
+  html[data-theme=light]:not([data-mono]) #mv-stage .mv-hl .mv-stk{background:none}
+  html[data-theme=light]:not([data-mono]) #mv-stage .mv-hl .mv-stk svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .mv-cc.g{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .mv-bars i.lo{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) #mv-stage .sv-btn.go.mv-go:not(#z){color:var(--ink);box-shadow:none;text-shadow:none}

@@ -5626,12 +5626,14 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-lock{font-size:12.5px;color:var(--sv-amber)}
 .mv-hl>.mv-lock{grid-column:2;white-space:nowrap;text-align:right}
 @media(max-width:700px){.mv-hl>.mv-lock{grid-column:1/-1;white-space:normal;text-align:left}}
-/* "Stake more" while the stake cools down (operator, 2026-10-04): inside the "Free to move again" line, on the
-   opposite side, a button in the line's own type size and no taller than the line; when the line has no room (a
-   phone) the button wraps under it */
-#mv-stage .mv-hl>span.mv-fl:not(#z){grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;column-gap:12px;row-gap:6px;white-space:normal;overflow:visible}
-#mv-stage .mv-fl>span{min-width:0}
-#mv-stage .mv-fl>.sv-btn.go.mv-go.mv-stk:not(#z):not(#y):not(#x){flex:0 0 auto;width:auto;max-width:none;height:1.45em;min-height:0;min-width:0;padding:0 .7em;font-size:1em;line-height:1.45em;border-radius:6px;margin:0}
+/* "Stake more" while the stake cools down (operator, 2026-10-04): a text link with an arrow, right after the "Free to
+   move again" sentence, in the line's own size */
+#mv-stage .mv-hl .mv-stk{display:inline-flex;align-items:center;gap:.3em;margin:0 0 0 .35em;padding:0;border:0;background:none;cursor:pointer;
+  font:inherit;font-weight:600;color:var(--sv-teal);vertical-align:baseline;white-space:nowrap}
+#mv-stage .mv-hl .mv-stk svg{width:1em;height:1em;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+#mv-stage .mv-hl .mv-stk:hover svg{transform:translateX(3px)}
+#mv-stage .mv-hl .mv-stk:focus-visible{outline:2px solid var(--sv-teal);outline-offset:3px;border-radius:3px}
+@media(prefers-reduced-motion:reduce){#mv-stage .mv-hl .mv-stk svg{transition:none}}
 /* 10,000 ATONE for a year, three ways: the largest validator, Autopilot, the smallest */
 .mv-cmp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .mv-cc{display:flex;flex-direction:column;gap:3px;min-width:0;padding:13px 16px 14px;border:1px solid var(--wbd);border-radius:12px}
