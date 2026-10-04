@@ -2677,6 +2677,66 @@ rememberGridH();
     .then(function(){ clsign.disabled = false; clsign.classList.remove("busy"); });
   });
 
+  /* ── mint PHOTON (operator, 2026-10-04): ATONE burned for PHOTON at the chain's rate, one MsgMintPhoton to the
+     reader's own address. The fee is paid in ATONE - a mint is the chain's one fee exception - so a wallet that
+     holds no PHOTON yet can still mint some. Max keeps a little ATONE back for that fee ── */
+  var mtpop = E("mtpop"), MT = { rate: 0, q: 0, t: 0 }, MT_KEEP = 50000;   /* 0.05 ATONE: the fee is under 0.01 today */
+  function mtAmount(){ var a = E("mtamt"), n = parseFloat(((a && a.value) || "").replace(/[^0-9.]/g, "")); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
+  function mtHave(){ var b = window.__BAL; return b && b.uatone > 0 ? b.uatone : 0; }
+  function mtMax(){ return Math.max(0, mtHave() - MT_KEEP); }
+  function mtMsgs(){ var u = mtAmount(); return u > 0 && window.__ADDR ? [{ type: "atomone/photon/v1/MsgMintPhoton", value: { to_address: window.__ADDR, amount: { denom: "uatone", amount: String(u) } } }] : []; }
+  /* the fee in ATONE, estimated once the amount settles; an answer for an older amount is dropped */
+  function mtFeeSoon(el, on){
+    var n = ++MT.q, w = window.__WALLET; clearTimeout(MT.t);
+    if(!on || !w || !window.__TX || !el || !(MT.rate > 0)){ if(el) el.textContent = ""; return; }
+    el.textContent = "fee: estimating\u2026";
+    MT.t = setTimeout(function(){
+      var msgs = mtMsgs(); if(!msgs.length || n !== MT.q) return;
+      window.__TX.account(w.address).then(function(acc){ return window.__TX.simulate(msgs, "", w.pubKey, acc.sequence); }).catch(function(){ return 0; })
+        .then(function(g){ if(n !== MT.q) return; var f = window.__TX.feeFor(g, 1, window.__TX.mintFeeOpt(MT.rate));
+          el.textContent = "fee \u2248 " + (parseInt(f.amount[0].amount, 10) / 1e6).toFixed(6) + " ATONE, gas " + f.gas.toLocaleString(); });
+    }, 350);
+  }
+  function mtState(){
+    var u = mtAmount(), have = mtHave(), over = u > have, ok = u > 0 && !over && MT.rate > 0, out = E("mtout");
+    var mx = E("mtmaxv"); if(mx) mx.textContent = exact(mtMax(), 2);
+    var fld = E("mtamt") && E("mtamt").closest(".unfield"); if(fld) fld.classList.toggle("bad", !!over);
+    var hint = E("mthint"); if(hint){ hint.className = "unhint" + (over ? " bad" : ""); hint.textContent = ""; }
+    if(out) out.innerHTML = !(MT.rate > 0) ? (MT.rate < 0 ? '<span>The chain\'s rate could not be read. Try again in a moment.</span>' : '<span>Reading today\'s rate\u2026</span>')
+      : '<em>You receive</em><b>' + (u > 0 ? '\u2248 ' + fmt(Math.floor(u * MT.rate)) : '0') + '<small>PHOTON</small></b>' +
+        '<span>1 ATONE = ' + MT.rate.toFixed(4) + ' PHOTON, the chain\'s rate now</span>';
+    var sm = E("mtsum"); if(sm) sm.innerHTML = ok ? fmt(u) + " ATONE<br>to \u2248 " + fmt(Math.floor(u * MT.rate)) + " PHOTON" : "";
+    var lk = E("mtlock"); if(lk) lk.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.5"/></svg>' +
+      '<span>Minting <b>burns</b> the ATONE for good; PHOTON cannot be turned back into ATONE. The chain sets the rate, and it falls as more PHOTON is minted.</span>';
+    var go = E("mtsign"); if(go) go.disabled = !ok || !window.__WALLET;
+    var st = E("mtstep"); if(st){ st.textContent = ""; st.className = "txstep"; }
+    mtFeeSoon(E("mtfee"), ok);
+  }
+  window.__mint = function(){
+    if(!mtpop || !window.__ADDR) return;
+    var a = E("mtamt"); if(a) a.value = "";
+    var go = E("mtsign"); if(go){ go.disabled = true; go.textContent = "Mint"; }
+    MT.rate = 0; mtState(); POP.open(mtpop); if(a) a.focus();
+    if(window.__TX) window.__TX.mintRate().then(function(r){ MT.rate = r; mtState(); }).catch(function(){ MT.rate = -1; mtState(); });
+  };
+  if(mtpop) mtpop.__onclose = function(){ mtFeeSoon(null, false); };
+  var mtamtEl = E("mtamt"); if(mtamtEl) mtamtEl.addEventListener("input", mtState);
+  var mtmax = E("mtmax"); if(mtmax) mtmax.addEventListener("click", function(){ if(!(mtMax() > 0)) return; E("mtamt").value = exact(mtMax()); mtState(); });
+  var mtcancel = E("mtcancel"); if(mtcancel) mtcancel.addEventListener("click", function(){ POP.close(mtpop); });
+  var mtsign = E("mtsign");
+  if(mtsign) mtsign.addEventListener("click", function(){
+    var msgs = mtMsgs(), u = mtAmount(); if(!msgs.length || !window.__TX || !window.__WALLET || !(MT.rate > 0)) return;
+    mtsign.disabled = true; mtsign.classList.add("busy");
+    var n = window.__notify(), opt = window.__TX.mintFeeOpt(MT.rate); opt.burn = u;
+    window.__TX.send(window.__WALLET, msgs, "", function(){}, opt)
+    .then(function(){
+      n.ok(); POP.close(mtpop);
+      if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); });
+    })
+    .catch(function(e){ n.fail(e && e.message || String(e)); })
+    .then(function(){ mtsign.disabled = false; mtsign.classList.remove("busy"); });
+  });
+
   /* ── stake: liquid ATONE onto validators the reader ticks, split equally, one
      MsgDelegate each - the same list as Redelegate, priced at the share that lands ── */
   var stpop = E("stpop"), STSEL = {};

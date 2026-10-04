@@ -427,6 +427,9 @@
   html[data-theme=light]:not([data-mono]) .uncard .wk-txh b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .stcard .txlock{border-color:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) #p-dele .stcard .txlock svg,html[data-theme=light]:not([data-mono]) .stcard .txlock svg{fill:none}
+  html[data-theme=light]:not([data-mono]) .you-r i .you-mint{border-color:var(--sv-teal,var(--accent));background:transparent;color:var(--sv-teal,var(--accent))}
+  html[data-theme=light]:not([data-mono]) .you-r i .you-mint:hover{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .you-r i .you-mint:focus-visible{outline-color:var(--sv-teal,var(--accent))}
   html[data-theme=light]:not([data-mono]) .pop .card.stcard::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .stcard .stlist thead th{color:var(--muted);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .stcard .stlist td{border-bottom-color:var(--line-soft)}

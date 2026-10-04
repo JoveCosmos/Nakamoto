@@ -1636,7 +1636,8 @@
       row("Movable Stake", pos ? fmt(movable(pos)) : '-', "ATONE") +
       row("Available", bal ? fmt(bal.uatone) : '-', "ATONE") +
       row("Rewards", window.__REW != null ? fmt(window.__REW) : '-', "ATONE") +
-      row("PHOTON", bal ? fmt(bal.uphoton) : '-', "") + '</div>';
+      /* Mint where the unit would be (operator, 2026-10-04): ATONE burned for PHOTON, the Mint PHOTON card */
+      row("PHOTON", bal ? fmt(bal.uphoton) : '-', a && bal ? '<button type=button class=you-mint data-act=mint title="Mint PHOTON from ATONE">Mint</button>' : "") + '</div>';
     var rp = at && at.report, adm = rp && rp.admin, st = adm && adm.state;
     var asub = !auto ? "keeps your stake at the best APR" : "checks every 12 hours";
     /* Pro on a wide screen (operator, 2026-09-30): the wallet column holds your delegations and the action menu
@@ -1937,6 +1938,7 @@
     if(act === "restakesw"){ rsOpen(); return; }
     if(act === "wtalerts"){ if(t.getAttribute("aria-disabled") !== "true") wtOpen(); return; }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
+    if(act === "mint"){ if(window.__mint) window.__mint(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
     if(act === "gfollow"){ govSend(t, { type: "atomone/v1/MsgDelegateGovernor", value: { delegator_address: window.__ADDR, governor_address: t.dataset.g } }); return; }
     if(act === "greg"){ if(GOV_REG) govForm(); return; }

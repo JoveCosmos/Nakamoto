@@ -1513,7 +1513,7 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
    top edge), Inter at 600-800, solid gradient buttons, tinted tag pills, inset
    tracks. Every class here is prefixed wk- or scoped under #p-dele, so nothing
    the calculator names can reach in - and nothing here reaches out. */
-#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard{
+#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard{
   --wsolid:rgba(14,24,38,.97);
   
   --wblue:#3B9EFF;--wcyan:#62D9FF;--wgreen:#36D399;--wamber:#FFB155;--wburn:#FF7A45;--wgold:#F5C66B;
@@ -1769,7 +1769,7 @@ html[data-tab=dele] .calclab,html[data-tab=empty] .calclab,html[data-tab=connect
 :root{--void:#06060c;--edge:#232342;--edge2:#34345c;--ink:#e6e4f0;--ink2:#a5a3c4;--ink3:#6f6d94;--faint:#3a3a54;
 --hot:#ffb02e;--burn:#ff4d1f;--cold:#6f66c8;--lit:#fff8dc;--card:#0b0b16;--card2:#111124;--inset:#0a0a14;
 --blue:#6f66c8;--cyan:#2bc8bd;--green:#2ee06a;--amber:#ffb02e}
-#sv,.hdr-r,.brandbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
+#sv,.hdr-r,.brandbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
 --wt:#e6e4f0;--ws:#a5a3c4;--wf:#6f6d94;--wblue:#6f66c8;--wcyan:#2bc8bd;--wgreen:#2ee06a;--wamber:#ffb02e;--wburn:#ff4d1f;--wgold:#ffb02e;
 --wsans:"Helvetica Neue",Helvetica,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--wmono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
 body{background:var(--void);background-image:radial-gradient(130% 62% at 50% 0%,#16162e 0%,#0a0a16 42%,var(--void) 74%)}
@@ -2223,7 +2223,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 
 /* the wallet, lifted out of the dark: lighter grounds, brighter hairlines and
    type, so the figures read without leaning in */
-#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
+#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
 
 .wk-pane{background:linear-gradient(180deg,#10101f,#0d0d1b)}
 .wk-tbl2 td{border-bottom-color:#22223c}
@@ -2656,6 +2656,20 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 #wk-mine .wk-t1 .wk-foot:not(:empty)+.wk-stb{margin-left:8px}
 #wk-mine .wk-t1 .wk-stb[hidden]{display:none}
 .pop .card.stcard{width:min(520px,94vw);max-width:520px;max-height:92vh;max-height:92svh}
+/* Mint PHOTON (operator, 2026-10-04): the amount, what it becomes at today's rate, the burn note, the fee */
+.pop .card.mtcard{width:min(440px,94vw);max-width:440px}
+.mtcard .mtout{margin:12px 20px 0;padding:12px 14px;border:1px solid var(--wbd);border-radius:8px;display:grid;grid-template-columns:minmax(0,1fr) auto;row-gap:4px;align-items:baseline}
+.mtcard .mtout:empty{display:none}
+.mtcard .mtout em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
+.mtcard .mtout b{grid-column:1/-1;font-size:24px;font-weight:700;letter-spacing:-.01em;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mtcard .mtout b small{font-family:var(--wmono);font-size:10px;font-weight:400;letter-spacing:.08em;color:var(--wf);margin-left:6px}
+.mtcard .mtout span{grid-column:1/-1;font-family:var(--wmono);font-size:10px;letter-spacing:.04em;color:var(--ws)}
+.mtcard .unamt>.unfield{flex:1 1 auto}
+/* the wallet column's PHOTON row: Mint where the unit would be */
+.you-r i .you-mint{display:inline-flex;align-items:center;justify-content:center;height:22px;padding:0 9px;border:1px solid var(--sv-teal,#2bc8bd);border-radius:6px;background:transparent;
+  color:var(--sv-teal,#2bc8bd);font:500 10px var(--wmono);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.you-r i .you-mint:hover{background:rgba(43,200,189,.10)}
+.you-r i .you-mint:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offset:2px}
 .pop .card.stcard::before{background:linear-gradient(90deg,transparent,var(--wgreen),transparent)}
 .stcard .txsum{color:var(--wgreen)}
 
@@ -6822,6 +6836,19 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <div class=txfee id=clfee></div>
   <div class=txstep id=clstep></div>
   <div class=txbtns><button class="wk-btn wk-go" id=clsign type=button disabled>Claim</button></div>
+</div></div>
+
+<div class=pop id=mtpop><div class="card txcard uncard mtcard" role=dialog aria-modal=true aria-labelledby=mtttl>
+  <header class=wk-txh><div><b id=mtttl>Mint PHOTON</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=mtsum></span></header>
+  <div class=unamt>
+    <div class="wk-field unfield"><input class=wk-amt2 id=mtamt type=text inputmode=decimal placeholder="ATONE to burn" autocomplete=off spellcheck=false aria-label="ATONE to burn"><button class=wk-max id=mtmax type=button title="Every available ATONE, less the fee">max <b id=mtmaxv>-</b></button></div>
+    <span class=unhint id=mthint></span>
+  </div>
+  <div class=mtout id=mtout aria-live=polite></div>
+  <div class=txlock id=mtlock></div>
+  <div class=txfee id=mtfee></div>
+  <div class=txstep id=mtstep></div>
+  <div class=txbtns><button class=wk-btn id=mtcancel type=button>Cancel</button><button class="wk-btn wk-go" id=mtsign type=button disabled>Mint</button></div>
 </div></div>
 
 <div class=pop id=stpop><div class="card txcard uncard stcard">

@@ -4,7 +4,7 @@
    redelegation needs are encoded here by hand - varints and length-delimited
    fields, nothing else - and the signature travels in SIGN_MODE_LEGACY_AMINO_JSON
    (127). Gas comes from the node's own simulate; fees are PHOTON, the only
-   token AtomOne accepts for anything but minting PHOTON. */
+   token AtomOne accepts for anything but minting PHOTON (a mint pays in ATONE). */
 (function(root){
 "use strict";
 /* the network this page is for (render.py puts it in the payload, which precedes this script) */
@@ -59,6 +59,10 @@ function msgBytes(m){
       strField(1, m.value.address), bytesField(2, cat(strField(1, d.moniker), strField(2, d.identity), strField(3, d.website),
       strField(4, d.security_contact), strField(5, d.details)))));
   }
+  /* minting PHOTON: MsgMintPhoton{to_address(1), amount Coin(2)} - burns the signer's ATONE and mints PHOTON to the
+     same address (the chain makes the signer the to_address); amino name as the chain registers it */
+  if(m.type === "atomone/photon/v1/MsgMintPhoton")
+    return any("/atomone.photon.v1.MsgMintPhoton", cat(strField(1, m.value.to_address), bytesField(2, coin(m.value.amount))));
   /* ── authz: a grant of restricted staking authority, its revocation, and execution ── */
   if(m.type === "cosmos-sdk/MsgGrant")
     return any("/cosmos.authz.v1beta1.MsgGrant", cat(
@@ -137,9 +141,25 @@ function simulate(msgs, memo, pubKey, sequence){
   return call("POST", "/cosmos/tx/v1beta1/simulate", { tx_bytes: b64(raw) })
     .then(function(d){ return parseInt((d.gas_info || {}).gas_used || "0", 10); });
 }
-function feeFor(gasUsed, n){
-  var gas = Math.ceil(Math.max(gasUsed * GAS_ADJ, 120000 * n));
-  return { gas: gas, amount: [{ denom: FEE_DENOM, amount: String(Math.ceil(gas * GAS_PRICE)) }] };
+/* opt {denom, price}: a fee in another token at its own gas price. Only a mint may use one: a transaction made of
+   MsgMintPhoton alone is the chain's fee exception and may pay in ATONE, at PHOTON's price divided by the conversion
+   rate (the fee market's own resolver), so a wallet holding no PHOTON can still mint some */
+function feeFor(gasUsed, n, opt){
+  var gas = Math.ceil(Math.max(gasUsed * GAS_ADJ, 120000 * n)), d = (opt && opt.denom) || FEE_DENOM, pr = (opt && opt.price) || GAS_PRICE;
+  return { gas: gas, amount: [{ denom: d, amount: String(Math.ceil(gas * pr)) }] };
+}
+/* PHOTON minted per ATONE burned, as the chain computes it now */
+function mintRate(){
+  return call("GET", "/atomone/photon/v1/conversion_rate").then(function(d){ var r = parseFloat(d.conversion_rate); if(!(r > 0)) throw new Error("no conversion rate"); return r; });
+}
+/* the fee in ATONE for a mint: PHOTON's gas price over the rate, a little above the floor */
+function mintFeeOpt(rate){ return { denom: "uatone", price: GAS_PRICE / rate * 1.1 }; }
+function feeShort(fee, b){
+  var c = fee.amount[0], need = parseInt(c.amount, 10), has = b[c.denom] || 0;
+  if(has >= need) return null;
+  var tok = c.denom === "uatone" ? "ATONE" : "PHOTON";
+  return new Error("This needs " + (need / 1e6).toFixed(c.denom === "uatone" ? 6 : 3) + " " + tok + " for the fee and the wallet holds " + (has / 1e6).toFixed(3) + "." +
+                   (tok === "PHOTON" ? " Mint PHOTON from ATONE first." : ""));
 }
 
 /* A simulation that the node REFUSES is the chain saying the transaction would fail in the
@@ -159,17 +179,19 @@ function signDoc(acc, fee, msgs, memo){
 }
 
 /* wallet: {name, address, pubKey(Uint8Array), signAmino(signDoc)->{signed, signature}} */
-function sendRedelegations(wallet, msgs, memo, onStep){
+function sendRedelegations(wallet, msgs, memo, onStep, opt){
   var step = onStep || function(){};
   var acc, fee;
   return account(wallet.address).then(function(a){ acc = a; step("simulating");
     return simulate(msgs, memo, wallet.pubKey, acc.sequence).catch(gasFallback);
   }).then(function(gasUsed){
-    fee = feeFor(gasUsed, msgs.length);
+    fee = feeFor(gasUsed, msgs.length, opt);
     return balances(wallet.address).then(function(b){
-      if(b.uphoton < parseInt(fee.amount[0].amount, 10))
-        throw new Error("This needs " + (parseInt(fee.amount[0].amount, 10) / 1e6).toFixed(3) +
-                        " PHOTON for the fee and the wallet holds " + (b.uphoton / 1e6).toFixed(3) + ". Mint PHOTON from ATONE first.");
+      /* a mint's fee comes out of the same ATONE it burns: both must fit */
+      var short = feeShort(fee, b), burn = opt && opt.burn ? opt.burn : 0;
+      if(!short && burn && fee.amount[0].denom === "uatone" && b.uatone < burn + parseInt(fee.amount[0].amount, 10))
+        short = new Error("The wallet holds " + (b.uatone / 1e6).toFixed(6) + " ATONE: not enough for this amount and the " + (parseInt(fee.amount[0].amount, 10) / 1e6).toFixed(6) + " ATONE fee.");
+      if(short) throw short;
       step("signing", fee);
       return wallet.signAmino(signDoc(acc, fee, msgs, memo));
     });
@@ -191,18 +213,16 @@ function sendRedelegations(wallet, msgs, memo, onStep){
    chain_id(3), account_number(4)} - the wallet signs the bytes the chain will decode, so
    messages with nested Any types (grants) need no amino rendering. Keplr offers signDirect;
    a wallet without it falls back to amino. */
-function sendDirect(wallet, msgs, memo, onStep){
+function sendDirect(wallet, msgs, memo, onStep, opt){
   var step = onStep || function(){};
-  if(!wallet.signDirect) return sendRedelegations(wallet, msgs, memo, onStep);
+  if(!wallet.signDirect) return sendRedelegations(wallet, msgs, memo, onStep, opt);
   var acc, fee, bodyB;
   return account(wallet.address).then(function(a){ acc = a; step("simulating");
     return simulate(msgs, memo, wallet.pubKey, acc.sequence).catch(gasFallback);
   }).then(function(gasUsed){
-    fee = feeFor(gasUsed, msgs.length);
+    fee = feeFor(gasUsed, msgs.length, opt);
     return balances(wallet.address).then(function(b){
-      if(b.uphoton < parseInt(fee.amount[0].amount, 10))
-        throw new Error("This needs " + (parseInt(fee.amount[0].amount, 10) / 1e6).toFixed(3) +
-                        " PHOTON for the fee and the wallet holds " + (b.uphoton / 1e6).toFixed(3) + ". Mint PHOTON from ATONE first.");
+      var short = feeShort(fee, b); if(short) throw short;
       step("signing", fee);
       bodyB = body(msgs, memo);
       var authB = authInfo(wallet.pubKey, parseInt(acc.sequence, 10), fee, 1);
@@ -240,7 +260,7 @@ function waitFor(hash, tries){
   });
 }
 var TX = { body: body, authInfo: authInfo, txRaw: txRaw, b64: b64, unb64: unb64, account: account, balances: balances,
-           simulate: simulate, feeFor: feeFor, signDoc: signDoc, send: sendRedelegations, sendDirect: sendDirect, waitFor: waitFor, CHAIN: CHAIN,
+           simulate: simulate, feeFor: feeFor, mintRate: mintRate, mintFeeOpt: mintFeeOpt, signDoc: signDoc, send: sendRedelegations, sendDirect: sendDirect, waitFor: waitFor, CHAIN: CHAIN,
            msgBytes: msgBytes };
 if(typeof module !== "undefined" && module.exports) module.exports = TX; else root.__TX = TX;
 })(typeof window !== "undefined" ? window : globalThis);
