@@ -5626,11 +5626,12 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-lock{font-size:12.5px;color:var(--sv-amber)}
 .mv-hl>.mv-lock{grid-column:2;white-space:nowrap;text-align:right}
 @media(max-width:700px){.mv-hl>.mv-lock{grid-column:1/-1;white-space:normal;text-align:left}}
-/* "Stake more" while the stake cools down (operator, 2026-10-04): Activate Autopilot's button, beside the line; on
-   phones on its own line under it, as wide as its label */
-.mv-hl>.mv-stk{grid-column:2;justify-self:end;align-self:center}
-#mv-stage .mv-hl>.sv-btn.go.mv-go.mv-stk:not(#z):not(#y){height:38px;min-width:0;padding:0 18px;font-size:14px;margin:0}
-@media(max-width:700px){#mv-stage .mv-hl>.sv-btn.go.mv-go.mv-stk:not(#z):not(#y):not(#x){grid-column:1/-1;justify-self:start;width:auto;margin-top:4px}}
+/* "Stake more" while the stake cools down (operator, 2026-10-04): a small button in Activate Autopilot's colour. On
+   wide screens it sits on the headline's row, which is taller than it, so the line under the headline keeps its
+   spacing (beside that line it pushed the cooldown box down); on phones under the line, as wide as its label */
+@media(min-width:701px){.mv-hl:has(>.mv-stk)>b{grid-column:1}.mv-hl>.mv-stk{grid-column:2;grid-row:1;justify-self:end;align-self:center}}
+#mv-stage .mv-hl>.sv-btn.go.mv-go.mv-stk:not(#z):not(#y){height:28px;min-width:0;padding:0 12px;font-size:12.5px;border-radius:7px;margin:0}
+@media(max-width:700px){#mv-stage .mv-hl>.sv-btn.go.mv-go.mv-stk:not(#z):not(#y):not(#x){grid-column:1/-1;grid-row:auto;justify-self:start;width:auto;margin-top:2px}}
 /* 10,000 ATONE for a year, three ways: the largest validator, Autopilot, the smallest */
 .mv-cmp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .mv-cc{display:flex;flex-direction:column;gap:3px;min-width:0;padding:13px 16px 14px;border:1px solid var(--wbd);border-radius:12px}
