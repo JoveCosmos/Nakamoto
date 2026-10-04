@@ -5626,12 +5626,12 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-lock{font-size:12.5px;color:var(--sv-amber)}
 .mv-hl>.mv-lock{grid-column:2;white-space:nowrap;text-align:right}
 @media(max-width:700px){.mv-hl>.mv-lock{grid-column:1/-1;white-space:normal;text-align:left}}
-/* "Stake more" while the stake cools down (operator, 2026-10-04): a small button in Activate Autopilot's colour. On
-   wide screens it sits on the headline's row, which is taller than it, so the line under the headline keeps its
-   spacing (beside that line it pushed the cooldown box down); on phones under the line, as wide as its label */
-@media(min-width:701px){.mv-hl:has(>.mv-stk)>b{grid-column:1}.mv-hl>.mv-stk{grid-column:2;grid-row:1;justify-self:end;align-self:center}}
-#mv-stage .mv-hl>.sv-btn.go.mv-go.mv-stk:not(#z):not(#y){height:28px;min-width:0;padding:0 12px;font-size:12.5px;border-radius:7px;margin:0}
-@media(max-width:700px){#mv-stage .mv-hl>.sv-btn.go.mv-go.mv-stk:not(#z):not(#y):not(#x){grid-column:1/-1;grid-row:auto;justify-self:start;width:auto;margin-top:2px}}
+/* "Stake more" while the stake cools down (operator, 2026-10-04): inside the "Free to move again" line, on the
+   opposite side, a button in the line's own type size and no taller than the line; when the line has no room (a
+   phone) the button wraps under it */
+#mv-stage .mv-hl>span.mv-fl:not(#z){grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;column-gap:12px;row-gap:6px;white-space:normal;overflow:visible}
+#mv-stage .mv-fl>span{min-width:0}
+#mv-stage .mv-fl>.sv-btn.go.mv-go.mv-stk:not(#z):not(#y):not(#x){flex:0 0 auto;width:auto;max-width:none;height:1.45em;min-height:0;min-width:0;padding:0 .7em;font-size:1em;line-height:1.45em;border-radius:6px;margin:0}
 /* 10,000 ATONE for a year, three ways: the largest validator, Autopilot, the smallest */
 .mv-cmp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .mv-cc{display:flex;flex-direction:column;gap:3px;min-width:0;padding:13px 16px 14px;border:1px solid var(--wbd);border-radius:12px}

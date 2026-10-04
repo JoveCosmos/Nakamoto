@@ -1850,10 +1850,11 @@
         var cells = ''; for(var i = 1; i <= 21; i++) cells += '<i' + (i <= k ? ' class=on' : '') + '></i>';
         var hist = at && at.report && at.report.history && at.report.history.length ? at.report.history[0] : null;
         h = top(auto ? 'Moved. Autopilot is active' : 'Moved. Cooling down', 'Day ' + k + ' of 21', 'warn', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
-          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>Free to move again on <b>' + day(t1) + '</b>.</span>' +
           /* the one move open while the stake cools down: staking what sits in the wallet (operator, 2026-10-04), shown
-             whenever any ATONE is available */
-          (window.__BAL && window.__BAL.uatone > 0 ? '<button type=button class="sv-btn go mv-go mv-stk" data-act=stake>Stake more</button>' : '') + '</div>' +
+             whenever any ATONE is available, inside the line so it takes the line's own size */
+          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b>' + (window.__BAL && window.__BAL.uatone > 0
+            ? '<span class=mv-fl><span>Free to move again on <b>' + day(t1) + '</b>.</span><button type=button class="sv-btn go mv-go mv-stk" data-act=stake>Stake more</button></span>'
+            : '<span>Free to move again on <b>' + day(t1) + '</b>.</span>') + '</div>' +
           '<div class=mv-days><div class=mv-dh><span>Cooling down</span><span>' + day(t0) + ' to ' + day(t1) + '</span></div><div class=mv-dc>' + cells + '</div>' +
           '<small>The chain holds redelegated stake for 21 days.</small></div>' + nowOn() +
           (auto ? '<div class=mv-cyc><div class=done><em>' + (hist ? day(hist.at * 1000) : 'Done') + '</em><b>Moved</b></div><div class=warn><em>Until ' + day(t1) + '</em><b>Cooling down</b></div>' +
