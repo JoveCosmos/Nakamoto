@@ -15,7 +15,18 @@ const shell = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "shell.json"
 const ROUTES = A.length ? A : shell.sections.flatMap(s => (s.sub || []).filter(v => !v.off).map(v => s.route + "/" + v.route));
 const PORT = 9300 + Math.floor(Math.random() * 500), dir = fs.mkdtempSync(path.join(os.tmpdir(), "phone-"));
 const chrome = spawn("google-chrome", ["--headless=new", "--disable-gpu", "--no-sandbox", "--hide-scrollbars", "--remote-debugging-port=" + PORT, "--user-data-dir=" + dir,
-  ...(DARK ? ["--force-dark-mode"] : []), "about:blank"], { stdio: "ignore" });
+  ...(DARK ? ["--force-dark-mode"] : []), "about:blank"], { stdio: "ignore", detached: true });
+/* the browser and its profile go on EVERY exit - normal end, an error, ctrl-c, a crash. Chrome runs in its own process
+   group and the whole group is killed: killing only the launcher left headless browsers running for days and 223
+   profiles (2 GB) in /tmp (found 2026-10-05) */
+let gone = false;
+function teardown(){ if(gone) return; gone = true;
+  try{ process.kill(-chrome.pid, "SIGKILL"); }catch(e){ try{ chrome.kill("SIGKILL"); }catch(e2){} }
+  try{ fs.rmSync(dir, { recursive: true, force: true }); }catch(e){} }
+process.on("exit", teardown);
+for(const sig of ["SIGINT", "SIGTERM", "SIGHUP"]) process.on(sig, () => { teardown(); process.exit(130); });
+process.on("uncaughtException", e => { console.error(e); teardown(); process.exit(1); });
+process.on("unhandledRejection", e => { console.error(e); teardown(); process.exit(1); });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const MOCK = `window.keplr={enable:function(){return Promise.resolve()},getKey:function(){return Promise.resolve({name:"demo",bech32Address:"${ADDR}",pubKey:new Uint8Array(33)})},signDirect:function(){return Promise.reject(new Error("no"))}};
 addEventListener("load",function(){setTimeout(function(){ if(window.__wconnect) window.__wconnect("Keplr"); },300);});`;
@@ -44,7 +55,7 @@ const AUDIT = `(function(){
 })()`;
 (async () => {
   let tgt = null; for(let k = 0; k < 50 && !tgt; k++){ await sleep(150); try{ const l = await (await fetch(`http://127.0.0.1:${PORT}/json/list`)).json(); tgt = l.find(t => t.type === "page"); }catch(e){} }
-  if(!tgt){ console.error("chrome did not start"); chrome.kill(); process.exit(1); }
+  if(!tgt){ console.error("chrome did not start"); process.exit(1); }
   const ws = new WebSocket(tgt.webSocketDebuggerUrl); let id = 0; const pend = {};
   ws.onmessage = m => { const d = JSON.parse(m.data); if(d.id && pend[d.id]){ pend[d.id](d); delete pend[d.id]; } };
   await new Promise(r => ws.onopen = r);
@@ -77,5 +88,5 @@ const AUDIT = `(function(){
         if(s.result && s.result.data) fs.writeFileSync(path.join(OUT, r.replace("/", "_") + "_" + k + ".png"), Buffer.from(s.result.data, "base64")); }
       await send("Runtime.evaluate", { expression: "window.scrollTo(0,0)" }); }
   }catch(e){ console.log(`${SIZE.join("x")} ${r} : error ${e && e.message}`); } }
-  ws.close(); chrome.on("exit", () => { try{ fs.rmSync(dir, { recursive: true, force: true }); }catch(e){} }); chrome.kill();
+  ws.close(); teardown(); process.exit(0);
 })();
