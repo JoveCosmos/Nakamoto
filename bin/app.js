@@ -2896,10 +2896,18 @@ rememberGridH();
   /* what a grant this card builds is for, to set against the kinds that stand */
   function authType(a){
     if(!a) return "";
-    if(a.type === "cosmos-sdk/StakeAuthorization") return a.value.authorization_type === "delegate" ? DELEG : REDEL;
+    if(a.type === "cosmos-sdk/StakeAuthorization") return (a.value.authorization_type === 1 || a.value.authorization_type === "delegate") ? DELEG : REDEL;
     if(a.type === "cosmos-sdk/GenericAuthorization") return a.value.msg;
     return "";
   }
+  /* a StakeAuthorization exactly as the chain renders it for SIGN_MODE_LEGACY_AMINO_JSON (cosmossdk.io/x/tx aminojson):
+     the type as its enum NUMBER (1 delegate, 3 redelegate) and the empty validator oneof written once as "Validators": null.
+     A Ledger can only sign amino JSON, and the chain checks the signature against its own rendering, so the words the
+     app used before ("redelegate") failed signature verification. Proven on atomone-testnet-1 2026-10-08: the old form
+     rejected, this form accepted for the Autopilot grant, the Restake grants and a revoke. Direct signing is unaffected:
+     tx.js encodes the number as before. */
+  function stakeAuth(kind){ return { Validators: null, authorization_type: kind }; }
+  window.__canGrant = function(){ var w = window.__WALLET; return !!w && (!!w.signDirect || !!w.ledger); };
   function revokeMsg(t, to){ return { type: "cosmos-sdk/MsgRevoke", value: { granter: window.__ADDR, grantee: to || AT.addr, msg_type_url: t } }; }
   /* other operators' restake, cancelled in the same approval that turns ours on (operator, 2026-09-30): any other grantee
      holding a delegate grant is a restake service; its delegate grant and its claim grant are revoked. Its other grants
@@ -3013,7 +3021,7 @@ rememberGridH();
        smallest 34, never passing the one above) and the keeper runs it by itself at 00:00 and 12:00 UTC (no
        approval step since 2026-09-30). Until revoked: no end date. The chain reads a StakeAuthorization with
        neither list as "any validator". */
-    var auth = { authorization_type: "redelegate" };
+    var auth = stakeAuth(3);
     var msgs = [{ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr,
       grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: auth } } } }];
     /* only the redelegate permission: no send, no fee, no share for GATA - ever. A grant that stands is simply
@@ -3091,10 +3099,10 @@ rememberGridH();
     if(idl) idl.hidden = true;
     var idn = E("atidlen"); if(idn) idn.textContent = iv ? iv + " ATONE" : "Stake";
     var mx = E("atmaxv"); if(mx) mx.textContent = pos ? exact(pos.free, 2) : "-";
-    var signer = !!window.__WALLET && !!window.__WALLET.signDirect;
+    var signer = window.__canGrant();
     var ok = !view && !!AT.addr && signer;
     var hint = E("athint");
-    if(hint){ hint.className = "unhint"; hint.textContent = !signer ? "Needs Keplr (direct signing)" : ""; }
+    if(hint){ hint.className = "unhint"; hint.textContent = !signer ? "Needs Keplr" : ""; }
     var go = E("atgrant"); if(go) go.disabled = !ok;
     var sm = E("atsum");
     /* the header says one thing, as Restake's does: Active or Inactive (operator, 2026-09-30) */
@@ -3237,7 +3245,7 @@ rememberGridH();
        own. The delegate grant can only ever stake - never send or withdraw */
     if(!AT.addr) return [];
     var m = [{ type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr, grant: { authorization: { type: "cosmos-sdk/GenericAuthorization", value: { msg: WDRAW } } } } },
-             { type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr, grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: { authorization_type: "delegate" } } } } }];
+             { type: "cosmos-sdk/MsgGrant", value: { granter: window.__ADDR, grantee: AT.addr, grant: { authorization: { type: "cosmos-sdk/StakeAuthorization", value: stakeAuth(1) } } } }];
     return m;
   }
   /* the Restake card's network fee (operator, 2026-10-01: as the Autopilot card has it): exactly what its button would
@@ -3257,7 +3265,7 @@ rememberGridH();
   window.__rsToggle = function(btn){
     if(RS_BUSY || !window.__ADDR) return;
     var n = window.__notify();
-    if(!window.__TX || !window.__WALLET || !window.__WALLET.signDirect){ n.fail("Restake needs Keplr (direct signing)"); return; }
+    if(!window.__TX || !window.__canGrant()){ n.fail("Restake needs Keplr"); return; }
     RS_BUSY = true; if(btn){ btn.disabled = true; btn.classList.add("busy"); }
     var done = false;
     return atStatus().then(function(){ return atGrant(); }).then(function(r){
@@ -3451,7 +3459,7 @@ rememberGridH();
     if(!plan || !plan.msgs || !plan.msgs.length || !window.__goSign) return;
     MSGS = plan.msgs.map(function(m){ return { from: m.from, to: m.to, amt: m.amt }; });
     window.__ANS = { now: plan.mnow != null ? plan.mnow : plan.now, after: plan.mafter != null ? plan.mafter : plan.after, gain: plan.gain };   /* the moved stake */
-    TXAP = !!withAuto && !!window.__atGrantMsg && !!window.__atGrantMsg() && !!(window.__WALLET && window.__WALLET.signDirect);
+    TXAP = !!withAuto && !!window.__atGrantMsg && !!window.__atGrantMsg() && window.__canGrant();
     window.__goSign();
   };
   function txAll(){ var m = txMsgs(); if(TXAP){ var g = window.__atGrantMsg(); if(g) m = m.concat([g]); } return m; }
@@ -3720,9 +3728,13 @@ rememberGridH();
            called it in Keplr/Adena); name: the provider, kept for the mark */
         /* Adena's API carries no account name (getKey: algo, pubKey, address; GetAccount: no
            name either), so an Adena account reads "My wallet" beside its address */
+        /* a Ledger behind Keplr (getKey().isNanoLedger) signs only amino JSON: no signDirect, so tx.js sends every
+           transaction, grants included, in SIGN_MODE_LEGACY_AMINO_JSON (see stakeAuth) */
+        var ledger = !!k.isNanoLedger;
         window.__WALLET = { name: w.name, label: (k.name || "").trim() || (w.name === "Adena" ? "My wallet" : w.name), address: k.bech32Address, pubKey: k.pubKey,
+                            ledger: ledger,
                             signAmino: function(doc){ return w.signAmino(k.bech32Address, doc); },
-                            signDirect: w.signDirect ? function(doc){ return w.signDirect(k.bech32Address, doc); } : null };
+                            signDirect: w.signDirect && !ledger ? function(doc){ return w.signDirect(k.bech32Address, doc); } : null };
         return get("/cosmos/staking/v1beta1/delegations/" + k.bech32Address);
       })
       .then(function(d){

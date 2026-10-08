@@ -270,7 +270,7 @@
   function wmeta(){
     var W = window.__WALLET, a = window.__ADDR, net = TN() ? "Testnet" : "Mainnet";
     if(!W || !a) return '';
-    return '<div class=sd-wmeta><span class=sd-wch><i class=app>' + esc(W.name || "Wallet") + '</i><i class="net' + (TN() ? ' tn' : '') + '">' + net + '</i></span></div>';
+    return '<div class=sd-wmeta><span class=sd-wch><i class=app>' + esc(W.name || "Wallet") + '</i>' + (W.ledger ? '<i class=app>Ledger</i>' : '') + '<i class="net' + (TN() ? ' tn' : '') + '">' + net + '</i></span></div>';
   }
   /* the wallet strip, one builder for Overview and Manage: the wallet box, then Total, Staked,
      Available, Rewards and APR, each figure in its engraved well */
@@ -1832,7 +1832,7 @@
         '<div class=mv-hl><b>Stake to start earning</b>' + (hi ? '<span>About ' + pct(hi) + ' APR with Autopilot</span>' : '') + '</div>' + cmp() + mvSet({}, {});
     } else {
       var plan = planNow(pos), offer = plan && plan.after != null && plan.msgs && plan.msgs.length;
-      var direct = !!(window.__WALLET && window.__WALLET.signDirect);
+      var direct = !!(window.__canGrant && window.__canGrant());
       if(offer){
         var fr = {}, to = {}, moved = 0;
         plan.msgs.forEach(function(m){ fr[m.from] = (fr[m.from] || 0) + m.amt; to[m.to] = (to[m.to] || 0) + m.amt; moved += m.amt; });
