@@ -5768,6 +5768,8 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 #one #p-dele #wk-mv .wk-ans:not(#z){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
 #one #p-dele #wk-mv .wk-ans .p:not(#z){height:auto;min-height:40px;padding:6px 10px;flex-wrap:wrap}
 #one #p-dele #wk-mv .wk-ans .p.rate:not(#z){grid-column:1/-1}
+/* phones and tablets too: now -> after and ATONE/year share one row, leaving the height to the moves list (operator, 2026-10-08) */
+@media(max-width:1099px){#one #p-dele #wk-mv .wk-ans:not(#z):not(#y){grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}#one #p-dele #wk-mv .wk-ans .p.rate:not(#z):not(#y){grid-column:auto}}
 /* Delegations has the room: its amount and APR columns stop cutting their figures */
 #one #p-dele #dmy col:nth-child(4){width:92px!important}
 #one #p-dele #dmy col:nth-child(5){width:62px!important}
