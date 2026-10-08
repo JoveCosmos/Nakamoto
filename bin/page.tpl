@@ -3221,6 +3221,13 @@ background:linear-gradient(180deg,#17172f,#0e0e1d);box-shadow:inset 0 1px 0 rgba
 #prolist .wk-tbl2 td.nm .gtag.add{margin-left:auto;flex:0 0 auto;overflow:visible;padding:0;border:0;background:transparent;color:var(--wgreen);font-size:10.5px;letter-spacing:.02em}
 #dpicks td.nm .nmw:has(.gtag.add)>span:not(.wk-lgx){flex:0 1 auto;margin-right:10px}
 #prolist .wk-tbl2 td.nm .nmw:has(.gtag.add)>span:not(.wk-lgx){flex:0 1 auto;margin-right:10px}
+/* phones: the amount a row receives is a small aside so the validator's name keeps the room (operator, 2026-10-08) */
+/* a compact list (a phone, or a narrow desktop pane) sets it as small as a phone does; a name beside a tag may shrink
+   to its ellipsis, and nothing in the name cell ever crosses into the stake column (operator, 2026-10-08) */
+#dpicks table.cmp td.nm .gtag.add,#prolist .wk-tbl2 table.cmp td.nm .gtag.add,#prolist table.cmp td.nm .gtag.add{font-size:7.5px;letter-spacing:0;opacity:.9}
+#dpicks td.nm .nmw:has(.gtag.add)>span:not(.wk-lgx),#prolist .wk-tbl2 td.nm .nmw:has(.gtag.add)>span:not(.wk-lgx){min-width:0}
+#dpicks td.nm .nmw:has(.gtag.add),#prolist .wk-tbl2 td.nm .nmw:has(.gtag.add){overflow:hidden}
+@media(max-width:620px){#dpicks td.nm .gtag.add,#prolist .wk-tbl2 td.nm .gtag.add{font-size:7.5px;letter-spacing:0;opacity:.9}#dpicks td.nm .nmw:has(.gtag.add)>span:not(.wk-lgx),#prolist .wk-tbl2 td.nm .nmw:has(.gtag.add)>span:not(.wk-lgx){margin-right:4px}}
 /* a validator's name in the Redelegate list is a door to its card, like a delegation row */
 #dpicks td.nm[data-v]{cursor:pointer}
 #prolist .wk-tbl2 td.nm[data-v]{cursor:pointer}

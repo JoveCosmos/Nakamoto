@@ -2182,14 +2182,22 @@ rememberGridH();
        stake, the full APR pair); a wide frame adds the two lifetime columns */
     var ph = window.innerWidth <= 700;
     var wide = !ph && (window.innerWidth > 1560 || window.innerWidth <= 900);
+    /* the columns follow the list's OWN width, not the window's (operator, 2026-10-08): at 1280 px the full set left the
+       name 34 px, so names and the "+amount" tag ran into the stake column. A frame without 170 px for the name drops the
+       two lifetime columns, then takes the phone's compact set (tick, name, stake, now -> there) */
+    var lw = el.clientWidth || 0;
+    if(wide && lw && lw < 30 + 36 + 64 + 70 + 72 + 64 + 50 + 104 + 170) wide = false;
+    if(!ph && lw && lw < 30 + 36 + 64 + 72 + 50 + 104 + 170) ph = true;
+    /* a very narrow list (the 1100 px frame: 277 px) gives the stake column to the name as well */
+    var tiny = ph && lw && lw < 320;
     /* the wallet's columns (tick, stake, now -> there) are laid out from the first paint for a
        reader who will be reconnected, with dashes until the position lands - so the list does
        not shift when it does */
     var lay = !!pos || expectWallet();
     var h = ph
-      ? '<table><colgroup><col style="width:' + (lay ? 30 : 24) + 'px"><col><col style="width:50px"><col style="width:' + (lay ? 96 : 56) + 'px"></colgroup>' +
+      ? '<table class=cmp><colgroup><col style="width:' + (lay ? 30 : 24) + 'px"><col>' + (tiny ? '' : '<col style="width:50px">') + '<col style="width:' + (lay ? 96 : 56) + 'px"></colgroup>' +
         '<thead><tr><th class=ck>' + (pos ? '<input type=checkbox id=ckall aria-label="Tick every validator"' + (sel.n && sel.n === opt.length ? ' checked' : '') + '>' : '') + '</th><th class=l>validator</th>' +
-        '<th title="the validator\'s stake">stake</th><th>' + (lay ? 'APR' : 'APR') + '</th></tr></thead><tbody>'
+        (tiny ? '' : '<th title="the validator\'s stake">stake</th>') + '<th>' + (lay ? 'APR' : 'APR') + '</th></tr></thead><tbody>'
       : '<table><colgroup><col style="width:' + (lay ? 30 : 22) + 'px"><col style="width:36px"><col><col style="width:64px">' + (wide ? '<col style="width:70px">' : '') + '<col style="width:72px">' + (wide ? '<col style="width:64px">' : '') + '<col style="width:50px"><col style="width:' + (lay ? 104 : 60) + 'px"></colgroup>' +
             '<thead><tr><th class=ck>' + (pos ? '<input type=checkbox id=ckall aria-label="Tick every validator"' + (sel.n && sel.n === opt.length ? ' checked' : '') + '>' : '') + '</th><th class=c>rank</th><th class=l>validator</th>' +
             '<th title="the validator\'s stake; green below the average size, where the bonus pays">stake</th>' + (wide ? '<th title="blocks signed over every block indexed">signed</th>' : '') + '<th>90<span class=lc>d</span> uptime</th>' + (wide ? '<th title="blocks proposed">proposed</th>' : '') + '<th>jailed</th>' +
@@ -2205,7 +2213,7 @@ rememberGridH();
         h += '<tr class="' + (on ? 'on' : '') + (pos && !o.better ? ' lt' : '') + '"><td class=ck>' + (pos ? '<input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + '>' : '') + '</td>' +
              '<td class="l nm" data-v="' + att(o.id) + '" tabindex=0 title="Open this validator"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span>' +
              (mv != null ? '<em class="gtag add">+' + fmt(mv) + '</em>' : '') + '</div></td>' +
-             '<td class=stk>' + big(o.t) + '</td>' +
+             (tiny ? '' : '<td class=stk>' + big(o.t) + '</td>') +
              (lay ? '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '-') + '</s><em>→</em><b>' + pct(there) + '</b></td>' : '<td class=r2><b>' + pct(o.rate0) + '</b></td>') + '</tr>';
         return;
       }
@@ -2781,8 +2789,12 @@ rememberGridH();
     /* phones (operator, 2026-10-02: "in phone stake pop has no val names logos"): the fixed columns alone were wider
        than the card, so the name column had no width left; a phone keeps the name, the stake and the APR */
     var ph = window.innerWidth <= 620, wide = !ph && (window.innerWidth > 1560 || window.innerWidth <= 900);
+    /* the columns follow the list's own width, as Redelegate's: room for the name and its "+amount" first */
+    var lw = el.clientWidth || 0;
+    if(wide && lw && lw < 30 + 36 + 64 + 70 + 72 + 64 + 50 + 104 + 170) wide = false;
+    if(!ph && lw && lw < 30 + 36 + 64 + 72 + 50 + 104 + 170) ph = true;
     var cands = stCands(), allOn = cands.length && cands.every(function(o){ return STSEL[o.id]; });
-    var h = '<table><colgroup>' + (ph ? '<col style="width:26px"><col style="width:30px"><col><col style="width:52px"><col style="width:58px">'
+    var h = '<table' + (ph ? ' class=cmp' : '') + '><colgroup>' + (ph ? '<col style="width:26px"><col style="width:30px"><col><col style="width:52px"><col style="width:58px">'
             : '<col style="width:30px"><col style="width:36px"><col><col style="width:64px">' + (wide ? '<col style="width:70px">' : '') + '<col style="width:72px">' + (wide ? '<col style="width:64px">' : '') + '<col style="width:50px"><col style="width:104px">') + '</colgroup>' +
             '<thead><tr><th class=ck><input type=checkbox class=pro-all aria-label="Tick every validator"' + (allOn ? ' checked' : '') + '></th><th class=c>rank</th><th class=l>validator</th>' +
             '<th title="the validator\'s stake; green below the average size, where the bonus pays">stake</th>' + (wide ? '<th title="blocks signed over every block indexed">signed</th>' : '') + (ph ? '' : '<th>90<span class=lc>d</span> uptime</th>') + (wide ? '<th title="blocks proposed">proposed</th>' : '') + (ph ? '' : '<th>jailed</th>') +
