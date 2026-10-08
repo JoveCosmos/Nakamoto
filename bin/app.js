@@ -1523,7 +1523,7 @@ rememberGridH();
         btn.lastChild.textContent = links.length > 1 ? "Continue in Telegram, " + Math.min(PER, many.length) + " of " + many.length : "Continue in Telegram";
         if(more){ more.hidden = links.length < 2;
           more.innerHTML = links.slice(1).map(function(u, k){ var a = (k + 1) * PER + 1, b = Math.min(many.length, (k + 2) * PER);
-            return '<a href="' + att(u) + '" target=_blank rel="noopener noreferrer"' + (f ? '' : ' class=off') + '>Continue in Telegram, ' + a + '\u2013' + b + ' of ' + many.length + '</a>'; }).join("") +
+            return '<a href="' + att(u) + '" target=_blank rel="noopener noreferrer"' + (f ? '' : ' class=off') + '>Continue in Telegram, ' + a + '-' + b + ' of ' + many.length + '</a>'; }).join("") +
             '<small>Telegram takes eight validators per link</small>'; }
         return;
       }
@@ -2002,7 +2002,7 @@ rememberGridH();
   function pager(el, page, n, per, key){
     if(!el) return;
     var pages = Math.max(1, Math.ceil(n / per)); if(page >= pages) page = pages - 1; PG[key] = page;
-    el.innerHTML = n > per ? '<button type=button data-d=-1' + (page === 0 ? ' disabled' : '') + '>\u2039</button><span>' + (page * per + 1) + '\u2013' + Math.min(n, (page + 1) * per) + ' of ' + n + '</span><button type=button data-d=1' + (page >= pages - 1 ? ' disabled' : '') + '>\u203a</button>' : '';
+    el.innerHTML = n > per ? '<button type=button data-d=-1' + (page === 0 ? ' disabled' : '') + '>\u2039</button><span>' + (page * per + 1) + '-' + Math.min(n, (page + 1) * per) + ' of ' + n + '</span><button type=button data-d=1' + (page >= pages - 1 ? ' disabled' : '') + '>\u203a</button>' : '';
     Array.prototype.forEach.call(el.querySelectorAll("button"), function(b){ b.addEventListener("click", function(){ PG[key] = Math.max(0, Math.min(pages - 1, PG[key] + (+b.dataset.d))); draw(); }); });
     return page;
   }
@@ -2517,7 +2517,7 @@ rememberGridH();
     if(DOCK && DOCK.pop === unpop){
       var rk = rankMap(); el.className = "unpick wk-tbl2";
       proTable(el, rows, [["rank", 36, "c"], ["validator", null, "l"], ["status", 84, "l"], ["ATONE", 96, ""]],
-        function(r){ return ['<td class="c rk">' + (rk[r.id] || '\u2013') + '</td>', '<td class="l nm"><div class=nmw>' + logo(r.id, r.m) + '<span>' + att(r.m) + '</span></div></td>',
+        function(r){ return ['<td class="c rk">' + (rk[r.id] || '-') + '</td>', '<td class="l nm"><div class=nmw>' + logo(r.id, r.m) + '<span>' + att(r.m) + '</span></div></td>',
                              '<td class=l>' + status(r) + '</td>', '<td>' + fmt(r.x) + '</td>']; },
         UNSEL, function(ids, on){ ids.forEach(function(id){ if(on) UNSEL[id] = 1; else delete UNSEL[id]; }); unRows(); unState(); });
       return;
@@ -2621,7 +2621,7 @@ rememberGridH();
     if(DOCK && DOCK.pop === clpop){
       var rk = rankMap(); el.className = "unpick wk-tbl2";
       proTable(el, rows, [["rank", 36, "c"], ["validator", null, "l"], ["rewards", 110, ""]],
-        function(r){ return ['<td class="c rk">' + (rk[r.id] || '\u2013') + '</td>', '<td class="l nm"><div class=nmw>' + logo(r.id, r.m) + '<span>' + att(r.m) + '</span></div></td>',
+        function(r){ return ['<td class="c rk">' + (rk[r.id] || '-') + '</td>', '<td class="l nm"><div class=nmw>' + logo(r.id, r.m) + '<span>' + att(r.m) + '</span></div></td>',
                              '<td>' + exact(r.x, 6) + '</td>']; },
         CLSEL, function(ids, on){ ids.forEach(function(id){ if(on) CLSEL[id] = 1; else delete CLSEL[id]; }); clDraw(); });
       var sm0 = E("clsum"), go0 = E("clsign"), n0 = 0, tot0 = 0; rows.forEach(function(r){ if(CLSEL[r.id]){ n0++; tot0 += r.x; } });

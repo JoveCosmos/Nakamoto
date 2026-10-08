@@ -101,7 +101,9 @@ def store():
                            ("vstate", "rank_ref", "INTEGER"),
                            ("vstate", "jail_h", "INTEGER"),
                            # added 2026-09-27: in the half-window critical zone (NULL = not yet seen)
-                           ("vstate", "half", "INTEGER")):
+                           ("vstate", "half", "INTEGER"),
+                           # added 2026-10-08: jailed and not yet back in the set (1), so a user hears it return
+                           ("vstate", "out", "INTEGER")):
         try:
             c.execute(f"ALTER TABLE {tbl} ADD COLUMN {col} {decl}")
         except sqlite3.OperationalError:
@@ -232,6 +234,21 @@ def slashing():
         return None
 
 
+CHAIN_REST = os.environ.get("CHAIN_REST", "http://127.0.0.1:3999")
+_MINSIG = [0, 0.05]
+def jail_at(window):
+    """missed blocks at which the chain jails: window x (1 - min_signed_per_window), the chain's own parameter,
+    re-read hourly; 0.05 (AtomOne's value) until the first read succeeds"""
+    if time.time() - _MINSIG[0] > 3600:
+        try:
+            with urllib.request.urlopen(CHAIN_REST + "/cosmos/slashing/v1beta1/params", timeout=10) as r:
+                _MINSIG[1] = float(json.loads(r.read())["params"]["min_signed_per_window"])
+            _MINSIG[0] = time.time()
+        except Exception:
+            pass
+    return int(round(window * (1 - _MINSIG[1])))
+
+
 def last_jail(op, chex):
     """height of the newest jailing of this validator in the index, 0 if none.
 
@@ -343,15 +360,15 @@ def resolve(arg, V, amb=None):
 
 # ── commands ────────────────────────────────────────────────────────────────
 # the two helper lines every confirmation and the help end with
-HELPERS = ("/list shows every validator you watch and its alerts.\n"
-           "/stop stops all validators, /stop &lt;name&gt; stops one validator.")
+HELPERS = ("/list shows your wallet and every validator you watch.\n"
+           "/stop &lt;name&gt; stops one validator, /stop &lt;address&gt; stops a wallet, /stop alone stops everything.")
 
 HELP = ("Alerts for AtomOne validators: when one stops signing, misses half its slashing "
         "window, is jailed, changes rank or its APR moves.\n\n"
-        "Open the AtomOne app and tap the Telegram button in a validator's signing "
+        "Open the AtomOne app and tap the alert button in a validator's signing "
         "row, or the bell on the stake and redelegate cards, then choose what to hear "
         "about.\n\n"
-        "Your own wallet: the Telegram link under Autopilot and Restake in the app's wallet column tells you "
+        "Your own wallet: the Alerts button under Hands-free in the app's wallet column tells you "
         "each time Autopilot moves your stake or Restake stakes your rewards.\n\n"
         + HELPERS + "\n\n" + PAGE)
 
@@ -441,10 +458,11 @@ def handle(c, msg, V):
             mv, rs = wallet_marks(report(addr))
             c.execute("INSERT INTO wstate(addr, mv_at, rs_total) VALUES(?,?,?)", (addr, mv, rs))
         c.commit()
-        head = ("Already watching" if had and (had[0] or "ar") == fl else "Updated" if had else "Watching")
-        return send(chat, "%s your wallet <code>%s</code>. Its alerts are:\n\n%s\n\n"
+        head = ("Already watching your wallet <code>%s</code>, with the same alerts:" if had and (had[0] or "ar") == fl else
+                "Updated your wallet <code>%s</code>. Its alerts are now:" if had else "Watching your wallet <code>%s</code>. Its alerts are:")
+        return send(chat, head + "\n\n%s\n\n"
                           "/list shows your wallet and every validator you watch.\n/stop %s stops this wallet, /stop stops everything." % (
-                          head, short(addr), "\n".join("- %s: %s" % WALERTS[f] for f in fl), addr))
+                          short(addr), "\n".join("- %s: %s" % WALERTS[f] for f in fl), addr))
 
     if cmd == "/start":
         amb = []                                     # prefixes that named more than one validator
@@ -481,21 +499,21 @@ def handle(c, msg, V):
                      "You already watch 1 validator." if before == 1 else
                      "You already watch %d validators." % before)
             skipped = ("\n\n%d validator%s in the link could not be told apart from another one and %s skipped: "
-                       "open the app and use that validator's own Telegram button." % (len(amb), "" if len(amb) == 1 else "s",
+                       "open the app and use that validator's own alert button." % (len(amb), "" if len(amb) == 1 else "s",
                                                                                        "was" if len(amb) == 1 else "were")) if amb else ""
             return send(chat, "%s\n\n%s%s%s\n\n%s\n%s" % (head, what, standing(c, many, V), skipped, count, HELPERS))
         if arg and amb:
             return send(chat, "That link does not name one validator for certain (its short code fits more than one), "
-                              "so nothing was changed. Open the app and use the validator's own Telegram button.")
+                              "so nothing was changed. Open the app and use the validator's own alert button.")
         if arg:
-            return send(chat, "That validator is not in the active set.")
+            return send(chat, "That link names no validator in the active set, so nothing was changed. Open the app and use the validator's own alert button.")
         return send(chat, HELP)
 
     if cmd == "/list":
         rows = c.execute("SELECT op, flags FROM sub WHERE chat=?", (chat,)).fetchall()
         ws = c.execute("SELECT addr, flags FROM wsub WHERE chat=?", (chat,)).fetchall()
         if not rows and not ws:
-            return send(chat, "You are not watching anyone yet.\n\n" + PAGE)
+            return send(chat, "You are not watching a wallet or a validator yet.\n\n" + PAGE)
         return send(chat, "".join("Your wallet <code>%s</code>: %s\n" % (short(a), " and ".join(WALERTS[f][0] for f in (fl or "ar") if f in WALERTS)) for a, fl in ws) +
                           ("\n" if ws and rows else "") + ("Watching:\n" if rows else "") + "\n".join(
             "- <b>%s</b> - %s" % (md(name(c, op, V)),
@@ -516,7 +534,7 @@ def handle(c, msg, V):
             c.execute("DELETE FROM sub WHERE chat=? AND op=?", (chat, hit[0])); c.commit()
             return send(chat, "Stopped watching <b>%s</b>." % md(name(c, hit[0], V)))
         c.execute("DELETE FROM sub WHERE chat=?", (chat,)); c.execute("DELETE FROM wsub WHERE chat=?", (chat,)); c.commit()
-        return send(chat, "Unsubscribed from everything.")
+        return send(chat, "Stopped watching everything.")
 
     return send(chat, HELP)
 
@@ -541,9 +559,9 @@ def wallets(c, V):
             hs = [h for h in new if h["txhash"] == tx]
             amt = sum(int(h.get("uatone") or 0) for h in hs); gain = sum(float(h.get("gain") or 0) for h in hs)
             src = sorted({h["src"] for h in hs}, key=lambda o: name(c, o, V)); dst = {h["dst"] for h in hs}
-            msgs.append(("a", "<b>Autopilot moved %s ATONE</b>\nfrom %s to %d smaller validator%s\n+%s ATONE a year\n%s<a href=\"%s%s\">%s</a>" % (
+            msgs.append(("a", "<b>Autopilot moved %s ATONE</b>\nfrom %s to %d smaller validator%s\n%s ATONE a year\n%s<a href=\"%s%s\">%s</a>" % (
                 atone(amt), ", ".join("<b>%s</b>" % md(name(c, o, V)) for o in src[:3]) + (" and %d more" % (len(src) - 3) if len(src) > 3 else ""),
-                len(dst), "" if len(dst) == 1 else "s", "{:,.1f}".format(gain),
+                len(dst), "" if len(dst) == 1 else "s", "{:+,.1f}".format(gain),
                 "Wallet <code>%s</code>, " % short(addr), EXPLORER, tx, tx[:8])))
             mv_at = max(mv_at, max(int(h["at"]) for h in hs))
         rs = r.get("restake") or {}
@@ -588,8 +606,8 @@ def check(c, V):
 
     for op, watchers in subs.items():
         v = V.get(op)
-        row = c.execute("SELECT down, rank, apr, jail, m, rank_ref, jail_h, half FROM vstate WHERE op=?", (op,)).fetchone()
-        was_down, was_rank, was_apr, was_jail, was_m, rank_ref, jail_h, half = row if row else (0, None, None, None, None, None, None, None)
+        row = c.execute("SELECT down, rank, apr, jail, m, rank_ref, jail_h, half, out FROM vstate WHERE op=?", (op,)).fetchone()
+        was_down, was_rank, was_apr, was_jail, was_m, rank_ref, jail_h, half, out = row if row else (0, None, None, None, None, None, None, None, 0)
         m = v["m"] if v else (was_m or op)
         chex = v["chex"] if v else None
         events = []                                      # (letter, message)
@@ -603,7 +621,12 @@ def check(c, V):
             if jail_h is not None and jh > jail_h:
                 events.append(("j", "<b>%s</b> was jailed at height %s.\nIt is out of the active set until it unjails."
                                % (md(m), format(jh, ","))))
+                out = 1
             jail_h = jh
+        # back: the page lists it again and it is not jailed
+        if out and v and not v.get("jail"):
+            events.append(("j", "<b>%s</b> is back in the active set." % md(m)))
+            out = 0
 
         # signing - only while it is in the set, and only on a fresh index
         down = bool(was_down)
@@ -626,8 +649,8 @@ def check(c, V):
             n = miss.get(valcons(v["chex"]))
             if n is not None:
                 if n >= crit and not half:
-                    events.append(("h", "<b>%s</b> has missed %s blocks.\nThat is half of the %s-block slashing window. Jailing comes at %s missed."
-                                   % (md(m), format(n, ","), format(W, ","), format(int(W * 0.95), ","))))
+                    events.append(("h", "<b>%s</b> has missed %s of the last %s blocks, over half its slashing window.\nIt is jailed at %s missed."
+                                   % (md(m), format(n, ","), format(W, ","), format(jail_at(W), ","))))
                     half = 1
                 elif n < crit * 0.8 and half:
                     events.append(("h", "<b>%s</b> is out of the critical zone.\nMissed %s of %s." % (md(m), format(n, ","), format(W, ","))))
@@ -654,19 +677,18 @@ def check(c, V):
             else:
                 move = apr / apr_ref - 1
                 if abs(move) >= APR_STEP["t"]:
-                    events.append(("t", "<b>%s</b> APR %s %.1f%%.\nNow %.1f%%, was %.1f%%."
-                                   % (md(m), "rose" if move > 0 else "fell",
-                                      abs(move) * 100, apr * 100, apr_ref * 100)))
+                    events.append(("t", "<b>%s</b> APR %s from %.1f%% to %.1f%%."
+                                   % (md(m), "rose" if move > 0 else "fell", apr_ref * 100, apr * 100)))
                     apr_ref = apr
 
         if v:
             c.execute("INSERT INTO vchex(op, chex) VALUES(?,?) ON CONFLICT(op) DO UPDATE SET chex=excluded.chex", (op, v["chex"]))
-        c.execute("""INSERT INTO vstate(op, down, since, rank, apr, jail, m, rank_ref, jail_h, half)
-                     VALUES(?,?,?,?,?,?,?,?,?,?)
+        c.execute("""INSERT INTO vstate(op, down, since, rank, apr, jail, m, rank_ref, jail_h, half, out)
+                     VALUES(?,?,?,?,?,?,?,?,?,?,?)
                      ON CONFLICT(op) DO UPDATE SET down=excluded.down, since=excluded.since,
                        rank=excluded.rank, apr=excluded.apr, jail=excluded.jail, m=excluded.m,
-                       rank_ref=excluded.rank_ref, jail_h=excluded.jail_h, half=excluded.half""",
-                  (op, int(down), known, rank, apr_ref, v.get("jail", 0) if v else was_jail, m, rank_ref, jail_h, half))
+                       rank_ref=excluded.rank_ref, jail_h=excluded.jail_h, half=excluded.half, out=excluded.out""",
+                  (op, int(down), known, rank, apr_ref, v.get("jail", 0) if v else was_jail, m, rank_ref, jail_h, half, out or 0))
         c.commit()
 
         for letter, msg in events:
