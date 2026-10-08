@@ -2089,9 +2089,11 @@ border:1px solid var(--wbd2);background:linear-gradient(90deg,rgba(255,255,255,.
 font-family:var(--wsans);font-size:13px;color:var(--ws);text-align:left}
 .ij-b span{color:var(--wt);font-weight:700}
 .ij-b i{font-style:normal;font-family:var(--wmono);font-size:10.5px;font-weight:600;padding:1px 8px;border:1px solid var(--wbd2);border-radius:999px;color:var(--wt)}
-.ij-b em{font-style:normal;font-size:11.5px;color:var(--ws);margin-left:auto}.ij-b em b{color:#2ee06a;font-weight:600}
+.ij-b em{font-style:normal;font-size:11.5px;color:var(--ws);margin-left:auto;white-space:normal;min-width:0;text-align:right;line-height:1.3}.ij-b em b{color:#2ee06a;font-weight:600}
 .ij-b u{width:8px;height:8px;border-right:2px solid var(--ws);border-bottom:2px solid var(--ws);transform:rotate(45deg);margin:-4px 4px 0 6px}
 .ij-t.open .ij-b u{transform:rotate(-135deg);margin-top:3px}
+/* phones: the note takes its own line under the label, the chevron stays on the first line's right (2026-10-08) */
+@media (max-width:620px){.ij-b{flex-wrap:wrap;row-gap:4px}.ij-b u{order:2;margin-left:auto}.ij-b em{order:3;flex-basis:100%;margin-left:0;text-align:left}}
 .ij-b:hover{border-color:var(--ws);background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.03))}.ij-b:hover u{border-color:var(--wt)}
 .ij-b:focus-visible{outline:2px solid var(--av);outline-offset:2px}
 .wk-tbl2 tr.ij-r td{text-align:left;padding:0 8px}
