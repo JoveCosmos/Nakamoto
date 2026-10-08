@@ -5,7 +5,7 @@
 
    It owns no state and no arithmetic. Every figure is read from what the
    advanced dashboard has already computed (window.__POS, __VALS, __VDBY,
-   __ANS, __optPlan, __atInfo), and every action goes through the advanced
+   __ANS, __planRank, __atInfo), and every action goes through the advanced
    view's own doors (__wconnect, __goSign, the stake and autopilot cards), so
    the two views can never disagree about a number or sign something different.
    Classes are sv-, scoped to #sv. */
@@ -23,6 +23,9 @@
   function pct(x){ return (x * 100).toFixed(1) + "%"; }
   /* validators the wallet is on once a plan's moves land: every delegation with more than dust left, plus each
      destination it was not on before (operator, 2026-10-08: figures read the whole wallet) */
+  /* validators the wallet is on now, as the "Now on" list counts them: a dust remainder (under 0.1 ATONE, what a near-full
+     move leaves behind) is not a position (operator, 2026-10-08) */
+  function onNow(pos){ var n = 0; (pos.rows || []).forEach(function(r){ if(r.x >= 1e5) n++; }); return n || (pos.rows || []).length; }
   function onAfter(pos, plan){
     var left = {}, n = 0;
     (pos.rows || []).forEach(function(r){ left[r.id] = (left[r.id] || 0) + (+r.x || 0); });
@@ -351,7 +354,7 @@
       h = '<div class=sv-none><h3>No stake on AtomOne</h3><button class="sv-btn go" type=button data-act=stake>Stake ATONE</button></div>';
     } else if(!(pos.free >= 1e6)){                  /* under 1 ATONE free (redelegation dust) is nothing to move */
       h = '<div class=sv-ph><h3>Everything is under cooldown</h3>' + tag("a", "21 days") + '</div>' +
-        fig("Your APR", pct(pos.rate), "on " + pos.rows.length + " validators", heat(pos.rate).fill) +
+        fig("Your APR", pct(pos.rate), "on " + onNow(pos) + " validator" + (onNow(pos) === 1 ? "" : "s"), heat(pos.rate).fill) +
         fig("Free to move on", window.__dayFull ? window.__dayFull(pos.until) : "-", fmt(pos.total) + " ATONE redelegated recently", "var(--sv-amber)") +
         /* the door stands where it always does, greyed until the stake is free */
         '<button class="sv-btn go sd-go" type=button disabled title="' + esc("Free to move on " + (window.__dayFull ? window.__dayFull(pos.until) : "")) + '">Redelegate</button>';
@@ -372,7 +375,7 @@
         /* stake redelegated in the last 21 days cannot move again yet: with any of it, the gain shares the bottom
            row with a Locked box (how much, until when), and the gain says what it is made from - the free stake */
         (function(lk){ return '<div class="sd-figs sd-mv' + (lk ? ' four' : '') + '">' +
-          fig("Now", '<span style="color:' + hn.ink + '">' + pct(plan.now) + '</span>', "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s"), hn.fill) +
+          fig("Now", '<span style="color:' + hn.ink + '">' + pct(plan.now) + '</span>', "on " + onNow(pos) + " validator" + (onNow(pos) === 1 ? "" : "s"), hn.fill) +
           fig("After", '<span style="color:' + ha.ink + '">' + pct(plan.after) + '</span>', "on " + onAfter(pos, plan) + " validator" + (onAfter(pos, plan) === 1 ? "" : "s"), ha.fill) +
           fig("Gain", '<span class=sd-gain>+' + one(plan.gain) + '</span>', lk ? "a year, moving " + fmt(plan.moved || pos.free) : "ATONE a year", "var(--sv-green)") +
           (lk ? fig("Locked", fmt(pos.locked), "until " + (window.__dayFull ? window.__dayFull(pos.until) : "the cooldown ends"), "var(--sv-amber)") : "") +
@@ -406,7 +409,7 @@
   /* today's moves, when there are any: what the rules' Activate hands to the Outcome card */
   window.__planMoves = function(){ var p = planNow(window.__POS); return p && p.after != null && p.msgs && p.msgs.length ? p : null; };
   function planNow(pos){
-    if(!pos || !(pos.free > 0) || !window.__optPlan) return null;
+    if(!pos || !(pos.free > 0) || !window.__planRank) return null;
     /* the answer changes only when a stake moves (anyone's) or the reader's position is re-read -
        not on every block */
     var key = pos.total + "/" + pos.free + "/" + (window.__LIVEV ? window.__LIVEV() : 0) + "/" + (window.__POSAT || 0);
@@ -1501,7 +1504,7 @@
     var row = function(k, v, u, extra){ return '<div class=you-r><span>' + k + '</span>' + (extra || '') + '<b>' + v + '</b><i>' + u + '</i></div>'; };
     var h = '<div class=you-h><h3 title="' + esc(wname) + '">' + esc(wname) + '</h3>' + wmeta() + '</div>';
     h += '<div class=you-apr>' + rsx(pos, mine) + '<em>Your APR</em><b' + (mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '>' + (mine ? pct(pos.rate) : '-') + '</b>' +
-      '<small>' + (!a ? 'connect a wallet to see yours' : !pos ? 'reading…' : mine ? 'on ' + pos.rows.length + ' validator' + (pos.rows.length === 1 ? '' : 's') : 'Nothing staked') + '</small></div>';
+      '<small>' + (!a ? 'connect a wallet to see yours' : !pos ? 'reading…' : mine ? 'on ' + onNow(pos) + ' validator' + (onNow(pos) === 1 ? '' : 's') : 'Nothing staked') + '</small></div>';
     /* Pro on Redelegate: what can move now, the ticked delegations' free stake when any are ticked (operator, 2026-09-30) */
     var proRd = root.getAttribute("data-sv") === "dashboard/self" && matchMedia("(min-width:1100px)").matches && !root.getAttribute("data-pro");
     h += '<div class=you-bal>' +

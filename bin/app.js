@@ -2837,7 +2837,7 @@ rememberGridH();
   function proBrk(){
     var el = E("probrk"), mode = document.documentElement.getAttribute("data-pro"); if(!el) return;
     var pos = window.__POS, byOp = {}; if(pos) pos.rows.forEach(function(r){ if(r.op) byOp[r.op] = r; });
-    var rows = [], head = [], tot = 0, fig = ["", ""];
+    var rows = [], head = [], tot = 0, fig = ["", ""], fig0 = null;
     var pc = function(x){ return (x * 100).toFixed(1) + "%"; };
     if(mode === "stake"){
       var P = stPlan(); head = ["Validator", "Stake", "APR", "ATONE/yr"];
@@ -2845,17 +2845,28 @@ rememberGridH();
       fig = ["ATONE/year", P.rows.length ? (tot * P.rate + P.rest >= 0 ? '+' : '\u2212') + fmt(Math.abs(tot * P.rate + P.rest)) : '-'];
     } else if(mode === "unstake"){
       var free = window.__day(Date.now() + 21 * 86400000); head = ["Validator", "Unstake", "Free on"];
+      var unBy = {};
       unMsgs().forEach(function(m){ var v = m.value, r = byOp[v.validator_address] || {}, x = +v.amount.amount; tot += x;
+        if(r.id) unBy[r.id] = (unBy[r.id] || 0) + x;
         rows.push([logo(r.id, r.m || "") + '<span>' + att(r.m || v.validator_address.slice(-8)) + '</span>', fmt(x), free]); });
-      fig = ["ATONE", rows.length ? fmt(tot) : '-'];
+      /* what the wallet earns less a year (operator, 2026-10-08): the unstaked ATONE stops earning; stake left on those
+         validators earns their new, higher rate, and a smaller bonded total lifts every rate a little */
+      var yr = 0;
+      if(rows.length && pos){ var vby = {}; window.__VALS().forEach(function(q){ vby[q[3]] = q; });
+        pos.rows.forEach(function(row){ var q = vby[row.id], x = unBy[row.id] || 0, r0 = row.inactive ? 0 : row.rate;
+          yr -= x * r0;
+          if(q && !row.inactive) yr += (row.x - x) * (window.__rateAfterNew(q[1], q[2], -x, -tot) - r0); }); }
+      fig0 = ["ATONE", rows.length ? fmt(tot) : '-'];
+      fig = ["ATONE/year", rows.length ? (yr < 0 ? '\u2212' : '+') + fmt(Math.abs(yr)) : '-', yr < -5e5];
     } else if(mode === "claim"){
       head = ["Validator", "Rewards"];
       clRows().forEach(function(r){ if(!CLSEL[r.id]) return; tot += r.x; rows.push([logo(r.id, r.m) + '<span>' + att(r.m) + '</span>', exact(r.x, 6)]); });
       fig = ["Rewards", rows.length ? exact(tot, 4) : '-'];
     }
     /* two boxes as Redelegate's Outcome has - how many validators, and the figure that matters here - then the list */
-    var boxes = !mode ? '' : '<div class="wk-ans pro-ans"><span class="p"><i>validators</i><b' + (rows.length ? '' : ' class=dim') + '>' + (rows.length || '-') + '</b></span>' +
-      '<span class="p gain"><i>' + fig[0] + '</i><b' + (rows.length ? '' : ' class=dim') + '>' + fig[1] + '</b></span></div>';
+    /* Unstake's first box is the amount and its second what the wallet earns less a year, in red (fig[2]) */
+    var boxes = !mode ? '' : '<div class="wk-ans pro-ans"><span class="p"><i>' + (fig0 ? fig0[0] : 'validators') + '</i><b' + (rows.length ? '' : ' class=dim') + '>' + (fig0 ? fig0[1] : (rows.length || '-')) + '</b></span>' +
+      '<span class="p gain"><i>' + fig[0] + '</i><b' + (rows.length ? (fig[2] ? ' class=neg' : '') : ' class=dim') + '>' + fig[1] + '</b></span></div>';
     var pa = E("proans"); if(pa) pa.innerHTML = !mode ? '' : boxes.replace(/^<div class="wk-ans pro-ans">|<\/div>$/g, '');
     el.innerHTML = !mode ? '' : (!rows.length ? '<div class=pro-brk-e>' + (mode === "claim" ? 'Select the rewards to claim' : 'Select validators and enter an amount') + '</div>' :
       '<div class=pro-brk-s><table class=pro-brk-t><thead><tr>' + head.map(function(h, i){ return '<th' + (i ? '' : ' class=l') + '>' + h + '</th>'; }).join('') + '</tr></thead><tbody>' +
@@ -3506,33 +3517,6 @@ rememberGridH();
     window.__goSign();
   };
   function txAll(){ var m = txMsgs(); if(TXAP){ var g = window.__atGrantMsg(); if(g) m = m.concat([g]); } return m; }
-  window.__optPlan = function(apply){
-    var pos = window.__POS, B = pos ? pos.free : 0, k;
-    window.__SRCFIRST = null;
-    if(!pos || !(B > 0)) return null;
-    var keep = null, kamt = amt.value;
-    if(!apply){ keep = {}; for(k in SEL) keep[k] = 1; }
-    /* up to ten validators, so a large stake can spread instead of piling onto four; the stake is
-       then split equally across the picks, as a hand-ticked plan is */
-    var r = window.__planWith(B, { cleanRecord: CLEAN, maxVals: 10 });
-    if(!r.moves.length) return null;
-    for(k in SEL) delete SEL[k];
-    r.moves.forEach(function(m){ SEL[m.id] = 1; });
-    /* applied, the amount is all the free stake: every delegation that can move is ticked */
-    var srcKeep = {}; for(k in SRCSEL) srcKeep[k] = 1;
-    for(k in SRCSEL) delete SRCSEL[k]; srcTickAll(pos);
-    amt.value = exact(B);
-    QUIET = true; draw(); QUIET = false;
-    if(!apply){ for(k in SRCSEL) delete SRCSEL[k]; for(k in srcKeep) SRCSEL[k] = 1; }
-    var an = window.__ANS || {};
-    var out = { now: an.now || 0, after: an.after, gain: an.gain || 0, moves: MSGS.length,
-                picks: r.moves.map(function(m){ return { id: m.id, m: m.m, x: m.x }; }),
-                /* every move, as the signing card will list it - the one screen shows it before the click */
-                msgs: MSGS.map(function(m){ return { from: m.from, to: m.to, amt: m.amt }; }) };
-    if(!apply){ for(k in SEL) delete SEL[k]; for(k in keep) SEL[k] = 1; amt.value = kamt;
-                QUIET = true; draw(); QUIET = false; }
-    return out;
-  };
   /* what stands between this reader and the keeper, for the simple view to state */
   window.__atInfo = function(){ return { addr: AT.addr, dry: AT.dry, grant: AT.grant, grants: AT.grants || [],
     days: AT.days, report: AT.report, since: AT.since || null,
