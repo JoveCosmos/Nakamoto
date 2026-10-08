@@ -2297,6 +2297,16 @@ rememberGridH();
              '<td class=amt>' + fmt(t) + '</td>' + gainCell(gain, left) + '</tr>'; });
     });
     if(!h) return "";                                /* ticks, but nothing that can move */
+    /* the rest of the wallet (operator, 2026-10-08), as the planner and keeper.py: stake already on a destination earns its
+       new, lower rate; stake left on a source its new, higher rate. Outcome's ATONE/year sums GAINBY, so it is the wallet's
+       true change; each row keeps its own move's figure */
+    var vby = {}; window.__VALS().forEach(function(v){ vby[v[3]] = v; });
+    var aftBy = {}; r.moves.forEach(function(m){ aftBy[m.id] = m.after; });
+    var sentU = {}, recvU = {}, restU = 0; MSGS.forEach(function(x){ sentU[x.from] = (sentU[x.from] || 0) + x.amt; recvU[x.to] = (recvU[x.to] || 0) + x.amt; });
+    if(pos) pos.rows.forEach(function(row){ var v = vby[row.id]; if(!v || row.inactive) return;
+      if(recvU[row.id] && aftBy[row.id] != null) restU += row.x * (aftBy[row.id] - row.rate);
+      else if(sentU[row.id]) restU += (row.x - sentU[row.id]) * (window.__rateAfter(v[1], v[2], -sentU[row.id]) - row.rate); });
+    if(restU) GAINBY._rest = restU / 1e6;
     return MVHEAD + '<tbody>' + h + '</tbody></table>';
   }
   /* the moves table's head, shown on its own while there are no moves yet */
@@ -2755,7 +2765,12 @@ rememberGridH();
     if(u > 0 && n) ids.forEach(function(id){ var x = window.__inactOk(id); if(x) rows.push({ id: id, m: x.m, x: share, after: 0 }); });
     ids.forEach(function(id){ if(!window.__inactOk(id) && !(window.__VDBY || {})[id]) n--; });   /* a tick that no longer resolves is not counted */
     if(n < ids.length){ share = n ? Math.floor(u / n) : 0; rows.forEach(function(r){ r.x = share; }); earned = 0; rows.forEach(function(r){ earned += share * r.after; }); }
-    return { u: u, n: n, share: share, rate: u > 0 && n ? earned / (share * n) : 0, rows: rows };
+    /* the rest of the wallet (operator, 2026-10-08): the stake it already has earns the rate after this stake lands - lower
+       on a validator that receives some, a little lower everywhere as the bonded total grows */
+    var rest = 0, pos = window.__POS, sh = {}; rows.forEach(function(r){ sh[r.id] = r.x; });
+    if(u > 0 && n && pos) pos.rows.forEach(function(row){ var v = (window.__VALS() || []).filter(function(q){ return q[3] === row.id; })[0];
+      if(!v || row.inactive) return; rest += row.x * (window.__rateAfterNew(v[1], v[2], sh[row.id] || 0, u) - row.rate); });
+    return { u: u, n: n, share: share, rate: u > 0 && n ? earned / (share * n) : 0, rows: rows, rest: rest };
   }
   function stRows(){
     var el = E("stlist"); if(!el) return;
@@ -2815,7 +2830,7 @@ rememberGridH();
     if(mode === "stake"){
       var P = stPlan(); head = ["Validator", "Stake", "APR", "ATONE/yr"];
       P.rows.forEach(function(r){ tot += r.x; rows.push([logo(r.id, r.m) + '<span>' + att(r.m) + '</span>', fmt(r.x), r.after ? pc(r.after) : '0%', '+' + fmt(r.x * r.after)]); });
-      fig = ["ATONE/year", P.rows.length ? '+' + fmt(tot * P.rate) : '-'];
+      fig = ["ATONE/year", P.rows.length ? (tot * P.rate + P.rest >= 0 ? '+' : '\u2212') + fmt(Math.abs(tot * P.rate + P.rest)) : '-'];
     } else if(mode === "unstake"){
       var free = window.__day(Date.now() + 21 * 86400000); head = ["Validator", "Unstake", "Free on"];
       unMsgs().forEach(function(m){ var v = m.value, r = byOp[v.validator_address] || {}, x = +v.amount.amount; tot += x;
@@ -3450,13 +3465,20 @@ rememberGridH();
     if(!out.length) return null;
     var D1 = dstRates(out), moved = D1.moved, rd = D1.rd;
     var gainU = 0; out.forEach(function(m){ gainU += m.amt * (rd[m.to] - rs[m.from]); });
+    /* the rest of the wallet (operator, 2026-10-08), as keeper.py plan(): stake already on a destination earns its new,
+       lower rate; stake that stays on a source earns its new, higher rate */
+    var sentU = {}; out.forEach(function(m){ sentU[m.from] = (sentU[m.from] || 0) + m.amt; });
+    pos.rows.forEach(function(r){ var v = V[at[r.id]]; if(!v || r.inactive) return;
+      if(moved[r.id]) gainU += r.x * (rd[r.id] - r.rate);
+      else if(sentU[r.id]) gainU += (r.x - sentU[r.id]) * (window.__rateAfter(v[1], v[2], -sentU[r.id]) - r.rate); });
     var after = now + gainU / pos.total, gain = gainU / 1e6, movedU = out.reduce(function(s, m){ return s + m.amt; }, 0), lift = gainU / movedU;
-    /* only a move that earns the moved stake more than 5 APR points (operator, 2026-09-30): otherwise it is at its best */
+    /* only a move whose true gain is worth more than 5 APR points on the stake that moves (operator, 2026-09-30 / 10-08) */
     if(gain < 1 || !(lift > MIN_LIFT)) return null;
     /* the moved stake alone (operator, 2026-10-01): what it earns where it sits and where it lands - the numbers
-       "The same N ATONE, from a to b" and the sign card speak of, and that clear the 5-point rule */
+       "The same N ATONE, from a to b" and the sign card speak of */
     var mnow = out.reduce(function(s, m){ return s + m.amt * rs[m.from]; }, 0) / movedU;
-    return { now: now, after: after, gain: gain, lift: lift, mnow: mnow, mafter: mnow + lift, moved: movedU, moves: out.length, msgs: out,
+    var mafter = out.reduce(function(s, m){ return s + m.amt * rd[m.to]; }, 0) / movedU;
+    return { now: now, after: after, gain: gain, lift: lift, mnow: mnow, mafter: mafter, moved: movedU, moves: out.length, msgs: out,
              picks: Object.keys(moved).map(function(k){ return { id: k, m: V[at[k]][0], x: moved[k] }; }) };
   };
   /* sign exactly these moves (the one screen's offer): the signing card lists them and prices them itself */

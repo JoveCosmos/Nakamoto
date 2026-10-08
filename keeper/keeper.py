@@ -714,11 +714,26 @@ def plan(g, rows, reds, vals, m, room=None):
         log("plan refused: it would change a rank (%s)" % g.get("granter", "?")); return None
     rate_dst = dst_rates(moves)
     for mv in moves: mv["gain"] = mv["amount"] * (rate_dst[mv["dst"]] - rate_src[mv["src"]]) / 1e6
+    # the rest of the wallet (operator, 2026-10-08): stake it already has on a destination earns that destination's new,
+    # lower rate, and stake that stays on a source earns that source's new, higher rate. Each validator's effect is
+    # shared over the moves into or out of it, so the moves' gains (and the public totals that sum them) are the
+    # wallet's true change. The app's planner (bin/app.js __planRank) does the same arithmetic.
+    sent, recv = {}, {}
+    for mv in moves:
+        sent[mv["src"]] = sent.get(mv["src"], 0) + mv["amount"]; recv[mv["dst"]] = recv.get(mv["dst"], 0) + mv["amount"]
+    for r in rows:
+        op, v = r["op"], vals.get(r["op"])
+        if not v or (op not in sent and op not in recv): continue
+        if op in recv: stays, new, by, key = r["x"], rate_dst[op], recv[op], "dst"
+        else: stays, new, by, key = r["x"] - sent[op], rate_after(m, v["t"], v["c"], -sent[op]), sent[op], "src"
+        rest = stays * (new - r["rate"]) / 1e6
+        for mv in moves:
+            if mv[key] == op: mv["gain"] += rest * mv["amount"] / by
     gain = sum(mv["gain"] for mv in moves)
-    after = now + sum(mv["amount"] * (rate_dst[mv["dst"]] - rate_src[mv["src"]]) for mv in moves) / total
+    after = now + gain * 1e6 / total
     moved_u = sum(mv["amount"] for mv in moves)
-    lift = sum(mv["amount"] * (rate_dst[mv["dst"]] - rate_src[mv["src"]]) for mv in moves) / moved_u
-    # only a move that earns the moved stake more than MIN_GAIN_APR (5 APR points): otherwise it is already at its best
+    lift = gain * 1e6 / moved_u
+    # only a move whose true gain is worth more than MIN_GAIN_APR (5 APR points) on the stake that moves: otherwise the wallet is at its best
     if gain < MIN_GAIN_ATONE or lift <= MIN_GAIN_APR: return None
     return {"moves": moves, "now": now, "after": after, "total": total, "gain": gain, "lift": lift}
 
