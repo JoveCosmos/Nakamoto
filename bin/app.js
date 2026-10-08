@@ -2427,7 +2427,8 @@ rememberGridH();
     var lk = E("txlockn"), pz = window.__POS;
     if(lk){ if(pz && pz.locked >= 1e6 && window.__dayFull){
         lk.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><b>' + fmt(pz.locked) + '</b>locked until<b>' + window.__dayFull(pz.until) + '</b>';
-        lk.title = fmt(pz.locked) + " ATONE was redelegated in the last 21 days and cannot move again until then; this redelegates the free " + fmt(pz.free);
+        var mvU = 0; msgs.forEach(function(m){ mvU += +m.value.amount.amount; });
+        lk.title = fmt(pz.locked) + " ATONE was redelegated in the last 21 days and cannot move again until then; this redelegates " + fmt(mvU) + " of the free " + fmt(pz.free);
       } else { lk.innerHTML = ""; lk.removeAttribute("title"); } }
     var an = window.__ANS || {}, ax = E("txans");
     if(ax) ax.innerHTML = '<span class=p><i>now</i><b>' + pct(an.now || 0) + '</b></span><span class=arr>\u2192</span>' +
@@ -3462,7 +3463,8 @@ rememberGridH();
   window.__signMoves = function(plan, withAuto){
     if(!plan || !plan.msgs || !plan.msgs.length || !window.__goSign) return;
     MSGS = plan.msgs.map(function(m){ return { from: m.from, to: m.to, amt: m.amt }; });
-    window.__ANS = { now: plan.mnow != null ? plan.mnow : plan.now, after: plan.mafter != null ? plan.mafter : plan.after, gain: plan.gain };   /* the moved stake */
+    /* the whole wallet, as Pro's Outcome reads it (operator, 2026-10-08): the card says the same whichever button opened it */
+    window.__ANS = { now: plan.now, after: plan.after, gain: plan.gain };
     TXAP = !!withAuto && !!window.__atGrantMsg && !!window.__atGrantMsg() && window.__canGrant();
     window.__goSign();
   };

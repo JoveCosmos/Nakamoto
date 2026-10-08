@@ -21,6 +21,15 @@
   function fmt(u){ return one(u / 1e6); }
   function whole(u){ return Math.floor(u / 1e6).toLocaleString(); }
   function pct(x){ return (x * 100).toFixed(1) + "%"; }
+  /* validators the wallet is on once a plan's moves land: every delegation with more than dust left, plus each
+     destination it was not on before (operator, 2026-10-08: figures read the whole wallet) */
+  function onAfter(pos, plan){
+    var left = {}, n = 0;
+    (pos.rows || []).forEach(function(r){ left[r.id] = (left[r.id] || 0) + (+r.x || 0); });
+    (plan.msgs || []).forEach(function(m){ left[m.from] = (left[m.from] || 0) - (+m.amt || 0); left[m.to] = (left[m.to] || 0) + (+m.amt || 0); });
+    Object.keys(left).forEach(function(k){ if(left[k] >= 1e5) n++; });
+    return n || (plan.picks || []).length;
+  }
   /* beside Your APR while Restake is on: what compounding adds, the Restake card's own figure (rewards staked back
      twice a day at today's rate, against the plain year), small, as Net sits beside a validator's APR (operator, 2026-10-08) */
   function rsx(pos, mine){
@@ -193,7 +202,7 @@
     /* restake runs every 12 hours (a fixed rule): the rewards claimed and staked again earn too - the year
        compounded twice a day at today's rate, against the plain year */
     var cy = stake * (Math.pow(1 + rate / 730, 730) - 1);
-    var at = !ex && window.__atInfo ? window.__atInfo() : null, on = !!(at && at.grant && at.restake);
+    var at = !ex && window.__atInfo ? window.__atInfo() : null, on = !!(at && at.restake);
     /* restaking already: every figure carries the restake's effect */
     var Y = on ? cy : y, P = function(days){ return Y * days / 365; };
     var amt = function(u){ return '<span class=se-amt>+' + one(u / 1e6) + '</span>'; };
@@ -364,8 +373,8 @@
            row with a Locked box (how much, until when), and the gain says what it is made from - the free stake */
         (function(lk){ return '<div class="sd-figs sd-mv' + (lk ? ' four' : '') + '">' +
           fig("Now", '<span style="color:' + hn.ink + '">' + pct(plan.now) + '</span>', "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s"), hn.fill) +
-          fig("After", '<span style="color:' + ha.ink + '">' + pct(plan.after) + '</span>', "on " + plan.picks.length + " validator" + (plan.picks.length === 1 ? "" : "s"), ha.fill) +
-          fig("Gain", '<span class=sd-gain>+' + one(plan.gain) + '</span>', lk ? "a year, on " + fmt(pos.free) + " free" : "ATONE a year", "var(--sv-green)") +
+          fig("After", '<span style="color:' + ha.ink + '">' + pct(plan.after) + '</span>', "on " + onAfter(pos, plan) + " validator" + (onAfter(pos, plan) === 1 ? "" : "s"), ha.fill) +
+          fig("Gain", '<span class=sd-gain>+' + one(plan.gain) + '</span>', lk ? "a year, moving " + fmt(plan.moved || pos.free) : "ATONE a year", "var(--sv-green)") +
           (lk ? fig("Locked", fmt(pos.locked), "until " + (window.__dayFull ? window.__dayFull(pos.until) : "the cooldown ends"), "var(--sv-amber)") : "") +
         '</div>'; })(pos.locked >= 1e6) +
         '<button class="sv-btn go sd-go" type=button data-act=opt>Redelegate</button>';
