@@ -143,7 +143,7 @@
      background-clip, which turned them into solid amber blocks: the clip is restored here. And
      the GATA mark (a white glyph) gets the dark tile it wears elsewhere, or it vanishes on ivory. */
   html[data-theme=light]:not([data-mono]) .intro h1 em{-webkit-background-clip:text;background-clip:text;color:transparent}
-  html[data-theme=light]:not([data-mono]) #p-intro .introby img{background:#1b1a22;padding:2px}
+  html[data-theme=light]:not([data-mono]) :is(#p-intro .introby,#calc>.pby) img{background:#1b1a22;padding:2px}
 
   /* Self's Autopilot row: its own tokens, in the day palette */
   html[data-theme=light]:not([data-mono]) .sa-band{--sa-v:#5b4fc4;--sa-t:#0f5e50;--sa-g:#16733a;--sa-on:#ffffff}

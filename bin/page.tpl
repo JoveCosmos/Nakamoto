@@ -2023,7 +2023,11 @@ background:transparent;border:0;box-shadow:none;padding:0;color:var(--ink2)}
 
 /* home: the muscle, then the name */
 .introby{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:inline-flex;align-items:center;gap:8px;margin:0;text-decoration:none;color:var(--ink3);transition:color .2s}
-#p-intro .introby img{width:18px;height:18px;border-radius:5px;display:block;opacity:.85;transform:translateY(-1px);margin-left:-2px}
+#calc>.pby{display:none;z-index:1}
+html:is(:not([data-tab]),[data-tab=home]) #calc>.pby{display:inline-flex}
+/* under 1100px the paths become the fixed bottom bar and the Bonus page fills to it: no free space, so no badge */
+@media(max-width:1099px){#calc>.pby{display:none!important}}
+:is(#p-intro .introby,#calc>.pby) img{width:18px;height:18px;border-radius:5px;display:block;opacity:.85;transform:translateY(-1px);margin-left:-2px}
 .introby span{font-family:var(--mono);font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;white-space:nowrap}
 .introby:hover{color:var(--ink)}
 /* home's one door: plain words and an arrow under the headline, into the first tab */
@@ -6443,6 +6447,8 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <aside class=you id=you aria-label="Your wallet"></aside>
   <div class=panes id=well>
   <div class=w id=calc>
+    <!-- the home page's "powered by", in the same place on the Nakamoto Bonus page (operator, 2026-10-08) -->
+    <a class="introby pby" href="https://gatahub.zone/" target=_blank rel="noopener noreferrer" title="GATA HUB"><span>powered by</span><img src="assets/gata.png" alt="GATA HUB"></a>
       <span class=calclab>Nakamoto</span>
     <header class=brandbar>
       <div class=bwrap data-title-for=staking><div class=bt><span class=btx><i class=nk>Nakamoto </i><i class=tsfx id=tsfx>Bonus</i></span></div></div>
