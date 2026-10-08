@@ -3222,7 +3222,13 @@ rememberGridH();
     .catch(function(e){ n.fail(e && e.message || String(e)); })
     .then(function(){ btn.disabled = false; btn.classList.remove("busy"); });
   }
-  var atgrant = E("atgrant"); if(atgrant) atgrant.addEventListener("click", function(){ atSend(atMsgs(), atgrant, atMemo()); });
+  /* Activate: with a move to make today, the Outcome card shows it and one approval signs the moves and the grant;
+     with none, the grant alone is signed here. A standing grant being changed is never a move (operator, 2026-10-08) */
+  var atgrant = E("atgrant"); if(atgrant) atgrant.addEventListener("click", function(){
+    var pl = !AT.grant && !AT_EDIT && window.__planMoves ? window.__planMoves() : null;
+    if(pl && window.__signMoves){ POP.close(atpop); window.__signMoves(pl, true); return; }
+    atSend(atMsgs(), atgrant, atMemo());
+  });
   /* revoke names every grant that stands (a revoke of one that does not fails the whole tx) */
   var atrevoke = E("atrevoke"); if(atrevoke) atrevoke.addEventListener("click", function(){
     /* Autopilot's own permission only: restake keeps its own switch */

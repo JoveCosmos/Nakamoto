@@ -386,6 +386,8 @@
 
   /* the plan is recomputed only when a stake moves or the position is re-read */
   var PC = { key: null, val: null };
+  /* today's moves, when there are any: what the rules' Activate hands to the Outcome card */
+  window.__planMoves = function(){ var p = planNow(window.__POS); return p && p.after != null && p.msgs && p.msgs.length ? p : null; };
   function planNow(pos){
     if(!pos || !(pos.free > 0) || !window.__optPlan) return null;
     /* the answer changes only when a stake moves (anyone's) or the reader's position is re-read -
@@ -1780,9 +1782,12 @@
     var act = t.dataset.act;
     if(!act && t.dataset.gv){ govCard(t.dataset.gv); return; }
     if(act === "opt"){
-      /* sign exactly the moves the stage shows */
+      /* one way in to Autopilot (operator, 2026-10-08): Activate Autopilot opens its rules first, as the Hands-free
+         switch does; the rules' Activate then takes today's moves, if there are any, to the Outcome card. A wallet that
+         cannot grant reads Redelegate here and signs exactly the moves the stage shows */
       var pl = planNow(window.__POS), ai = window.__atInfo ? window.__atInfo() : null;
-      if(pl && window.__signMoves) window.__signMoves(pl, !(ai && ai.grant));
+      if(!(ai && ai.grant) && window.__canGrant && window.__canGrant()){ youAuto(); return; }
+      if(pl && window.__signMoves) window.__signMoves(pl, false);
       return;
     }
     if(act === "youauto"){ youAuto(); return; }
