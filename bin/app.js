@@ -2236,16 +2236,19 @@ rememberGridH();
   /* ── the answer: one strip - now → after, the gain, the count, the button ── */
   function result(pos, r, B, sel){
     var el = E("dans"); if(!el) return;
-    /* now and after are ALWAYS the whole wallet (operator, 2026-10-08, replacing the 2026-09-30 ticked-stake reading):
-       with 15,000 staked, 5,000 already on X at 33% and 10,000 moving to X from 62.2%, the answer is 52.5% -> 33%, not
-       62.2% (the moved part) -> 33%. ATONE/year stays the change the moves cause */
     var now = pos ? pos.rate : 0, after = null, gain = 0;
+    /* ticked delegations: now and after are those of the ticked stake alone, weighted by what moves from each, so a
+       jailed source reads 0% (operator, 2026-09-30, confirmed 2026-10-08 after a whole-wallet trial: the selected stake is
+       what is measured, as Autopilot measures only what it moves); no ticks, the whole wallet */
+    var scoped = srcAny() && pos;
+    if(scoped) now = srcNow(pos);
     /* the gain is the sum of the moves as the moves list priced them - each chunk from the
        rate it earns where it sits to the rate it earns where it lands (a loss is a loss);
        "after" is the position's blended rate with that gain in it */
     if(B > 0 && r.moves.length && pos && MSGS.length){
       var k; for(k in GAINBY) gain += GAINBY[k];
-      after = pos.total > 0 ? pos.rate + gain * 1e6 / pos.total : r.rate;
+      after = scoped ? (SCOPE.t > 0 ? SCOPE.aft / SCOPE.t : null) : pos.total > 0 ? pos.rate + gain * 1e6 / pos.total : r.rate;
+      if(scoped && SCOPE.t > 0) now = SCOPE.was / SCOPE.t;
     }
     window.__ANS = { now: now, after: after, gain: gain };
     el.innerHTML =
@@ -3463,8 +3466,8 @@ rememberGridH();
   window.__signMoves = function(plan, withAuto){
     if(!plan || !plan.msgs || !plan.msgs.length || !window.__goSign) return;
     MSGS = plan.msgs.map(function(m){ return { from: m.from, to: m.to, amt: m.amt }; });
-    /* the whole wallet, as Pro's Outcome reads it (operator, 2026-10-08): the card says the same whichever button opened it */
-    window.__ANS = { now: plan.now, after: plan.after, gain: plan.gain };
+    /* the moved stake, as Autopilot measures it (operator, 2026-10-08) */
+    window.__ANS = { now: plan.mnow != null ? plan.mnow : plan.now, after: plan.mafter != null ? plan.mafter : plan.after, gain: plan.gain };
     TXAP = !!withAuto && !!window.__atGrantMsg && !!window.__atGrantMsg() && window.__canGrant();
     window.__goSign();
   };
