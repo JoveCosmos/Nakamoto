@@ -6633,15 +6633,6 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
           <div class="sv-panel sd-col" id=sd-move></div>
         </div>
       </section>
-      <section class="sv-screen sd-scr" id=sv-auto data-sc=auto aria-label=Autopilot>
-        <div class="sv-panel sd-strip" id=sd-astrip></div>
-        <div class="sd-grid sd-agrid">
-          <div class="sv-panel sd-col" id=sd-ado></div>
-          <div class="sv-panel sd-col" id=sd-asky></div>
-          <div class="sv-panel sd-col" id=sd-alist></div>
-          <div class="sv-panel sd-col" id=sd-ars></div>
-        </div>
-      </section>
       <section class=sv-screen id=sv-net data-sc=net aria-label=Network>
         <div class="sv-panel sv-up" id=sv-up></div>
         <div class=sv-row2 id=sv-netrow>

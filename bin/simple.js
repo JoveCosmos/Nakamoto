@@ -210,16 +210,6 @@
 
   /* the validators, as a list: logo, name and amount, APR in its heat, share of the stake - every
      one of them, largest first; the list scrolls inside its panel */
-  function vlist(rows, total){
-    rows = rows.slice().sort(function(a, b){ return b.x - a.x; });
-    return '<div class=sd-list>' + rows.map(function(r){ var c = heat(r.inactive ? 0 : r.rate);
-      return '<div class="sd-vr click" data-v="' + esc(r.id) + '" tabindex=0 title="Open this validator" style="--c:' + c.fill + '">' +
-        '<span class=sv-lgo>' + logo(r.id, r.m) + '</span><span class=sd-vn><b>' + esc(r.m) + '</b>' +
-        /* the line under the name in colour: the stake in the Staked amber, its share in teal, a cooldown in violet */
-        '<s><em class=a>' + fmt(r.x) + '</em> ATONE, <em class=p>' + (r.x / (total || 1) * 100).toFixed(0) + '%</em>' + (r.locked > 0 ? ', <em class=l>cooldown</em>' : '') + '</s></span>' +
-        /* out of the set: "Jailed" when it is, in red; otherwise "Inactive" */
-        (r.inactive && ((window.__INACT || {})[r.id] || {}).jailed ? '<u class=jl>Jailed</u>' : '<u style="color:' + c.ink + '">' + (r.inactive ? "Inactive" : pct(r.rate)) + '</u>') + '</div>'; }).join("") + '</div>';
-  }
   /* Where the stake sits: the share on the largest, middle and smallest third of the active set (by
      stake, live), and any outside it. The bonus is split equally between validators, so the smallest
      third pays most - and stake there is what decentralizes the chain. With no wallet: all bonded ATONE */
@@ -263,7 +253,6 @@
       '<div class=fp-br>' + br + '</div>';
   }
 
-  function vskel(n){ var h = ""; for(var i = 0; i < n; i++) h += '<div class="sd-vr skel"><span class=sv-lgo></span><span class=sd-vn><b></b><s></s></span><u></u></div>'; return '<div class=sd-list>' + h + '</div>'; }
 
   /* the wallet card under its name: the wallet app and the network, as two chips (the address is in the
      top bar, with its copy button) */
@@ -423,120 +412,13 @@
 
   /* ── AUTOPILOT: the Wallet's frame - the strip, then what it does, the skyline of what it
      would manage (the allow-list capped in violet once a grant stands), and the validators ── */
-  /* ATONE sitting on validators outside the active set today, earning nothing - live from the chain read */
   function idleAtone(){ var L = (window.__D && window.__D.inactive) || [], t = 0; L.forEach(function(v){ t += +v[1] || 0; });
     return t > 1e12 ? (t / 1e12).toFixed(1) + "M" : t > 1e9 ? Math.round(t / 1e9) + "k" : ""; }
   window.__idleAtone = idleAtone;
-  function drawAuto(){
-    var pos = window.__POS, S = setStats(), at = window.__atInfo ? window.__atInfo() : null, g = at && at.grant;
-    var a = g && g.authorization || {};
-    var until = g && g.expiration && window.__dayFull ? window.__dayFull(new Date(g.expiration).getTime()) : null;
-    var rp = at && at.report, moves = rp && rp.history ? rp.history.length : 0, rec = g && rp && rp.record && rp.record.start ? rp.record : null;
-    var since = g && at.since ? window.__dayFull(at.since) : null;
-    var sgn = function(d){ return (d >= 0 ? "+" : "−") + Math.abs(d * 100).toFixed(1) + "%"; }, sgnA = function(u){ return (u >= 0 ? "+" : "−") + one(Math.abs(u) / 1e6); };
-    /* no wallet: no door here - the bar's Connect is the one (as the Stake view's wallet card) */
-    var door = !pos ? ''
-      : !pos.rows.length ? '<button type=button data-act=stake>Stake ATONE</button>'
-      : '<button type=button data-act=autopilot>' + (g ? "Revoke" : "Activate") + '</button>';
-    /* the strip as the Stake view's: the lead card (name and state on one line, the door under them), then five
-       boxes - the figure in its well, the unit beside it, no captions and no gauges */
-    put("sd-astrip",
-      '<div class="sd-id sd-ida"><div class=sd-top><h3>Autopilot</h3></div><div class=sd-wmeta><span class=sd-wch><i class="st' + (g ? ' on' : '') + '">' + (g ? "Active" : "Inactive") + '</i>' +
-        door + '</span></div></div>' +
-      (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "-", "", null, "var(--sv-green)", "", false, rec ? "APR" : "")
-         : ro("Since start", "-", "", null, "var(--sv-green)")) +
-      /* the stake it manages: the cap when the grant sets one, otherwise all the reader stakes */
-      ro("Stake", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : pos && pos.rows.length ? fmt(pos.total) : "-") : "-", "", null, "var(--sv-violet)", "", false, g && (a.max_tokens || (pos && pos.rows.length)) ? "ATONE" : "") +
-      ro("Runs until", g ? (until || "You revoke") : "-", "", null, "var(--sv-violet)") +
-      ro("Moves made", g ? String(moves) : "-", "", null, "var(--sv-teal)") +
-      ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "-", "", null, "var(--sv-teal)"));
-    /* restake, in one line: what it has done, or that it waits (only our own grants count: any other service is foreign) */
-    function restakeLine(){
-      var rs = rp && rp.restake;
-      if(!(at && at.restake)) return "";
-      if(rs && rs.count) return "Restaked <b>" + fmt(rs.total) + " ATONE</b> of rewards in " + rs.count + " run" + (rs.count === 1 ? "" : "s") + (rs.last_at ? ", last " + window.__dayFull(rs.last_at * 1000) : "") + ".";
-      return "Restake is active: rewards are staked back as they build up.";
-    }
-    if(g) put("sd-ado",
-      '<div class=sv-ph><h3>Autopilot is working</h3></div>' +
-      '<div class="sd-figs two">' +
-        fig("Since start", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.start.rate) + '</span><em class=u>APR</em>' : "-",
-            rec ? sgnA((rec.rate - rec.start.rate) * rec.staked) + " ATONE a year" : "from its first check", "var(--sv-green)") +
-        fig("Last 3 months", rec ? '<span class=sd-gain>' + sgn(rec.rate - rec.m3.rate) + '</span><em class=u>APR</em>' : "-",
-            rec ? sgnA((rec.rate - rec.m3.rate) * rec.staked) + " ATONE a year" : "", "var(--sv-teal)") +
-      '</div>' +
-      '');
-    else {
-      /* not active: what it does and what it never does, each as Move your stake shows its figures - four big
-         boxes, the same with or without a wallet - and, in place of the list, the way to switch it on */
-      /* not active: what it does and never does, one compact panel - two rows of small boxes, centred */
-      var ib = idleAtone();
-      var cb = function(k, v, sub, c, cls){ if(String(v).replace(/<[^>]*>/g, "").length > 11) v = '<span class=lvs>' + v + '</span>';
-        return '<div class="ap-cb' + (cls ? ' ' + cls : '') + '" style="--rc:' + c + '"><em>' + k + '</em><b>' + v + '</b><small>' + sub + '</small></div>'; };
-      put("sd-ado", '<div class=sv-ph><h3>Your Autopilot Grant</h3></div>' +
-        '<div class=ap-dd><i class="ap-ln ok" aria-hidden=true></i><div class=ap-row>' +
-          cb("Redelegates", "Your Stake cap", "among your validators", "#2ee06a") +
-          cb("Strategize", "Better APR", "among your validators", "#b9b0ff") +
-          cb("Keeps stake active", "24/7", ib ? ib + " ATONE idle on inactive validators" : "through a long winter or a busy month", "#2bc8d6") +
-          cb("You grant", "It runs", "you revoke, it stops", "#2ee06a") +
-        '</div><i class="ap-ln no" aria-hidden=true></i><div class=ap-row>' +
-          cb("Send", "Never", "nor spend your ATONE", "#ff6a6a", "no") +
-          cb("Unstake", "Never", "your stake stays staked", "#ff6a6a", "no") +
-          cb("Custody", "Never", "stays in your wallet", "#ff6a6a", "no") +
-          cb("GATA's share", "0%", "GATA funds your transactions", "#2ee06a", "ok") +
-        '</div></div>');
-      put("sd-asky", "");
-      /* the validators only once it is active: until then, the way to switch it on */
-      /* no wallet: an inert Connect a wallet, the header's is the working one */
-      var go = !pos ? connectOff("ap-go")
-        : !pos.rows.length ? '<button class="sv-btn go sd-go ap-go" type=button data-act=stake>Stake ATONE</button>'
-        : '<button class="sv-btn go sd-go ap-go" type=button data-act=autopilot>Activate Autopilot</button>';
-      put("sd-alist", '<div class=sv-ph><h3>Validators</h3></div><div class=ap-act><b>Activate Autopilot</b>' +
-        '<span>' + (!pos ? 'Connect a wallet, then choose the validators Autopilot may use.' : !pos.rows.length ? 'Stake some ATONE first; Autopilot then keeps it with the better payers.'
-          : 'Choose the validators it may use. It keeps your stake with the best of them, monitors them and lists them here.') + '</span>' + go +
-        '<em class=ap-firsts>Autopilot makes its first move within 12 hours of your grant.</em></div>');
-      put("sd-ars", restakePanel(pos, at));
-      return;
-    }
-    put("sd-ars", restakePanel(pos, at));
-    var rows = pos ? pos.rows : [];
-    put("sd-asky", g ? grantView(g, at, rp, since, until) : wouldDo(pos));
-    put("sd-alist", rows.length ? '<div class=sv-ph><h3>Validators</h3>' + tag("q", String(rows.length)) + '</div>' + vlist(rows, pos.total)
-      : '<div class=sv-ph><h3>Validators</h3></div>' + (pos ? '<div class=sv-upwait>None yet</div>' : vskel(6)));
-  }
 
   /* Before a grant: what Autopilot would change, in two numbers - where the stake earns now and
      the best it can reach today (the same plan the Wallet's Redelegate uses) - and what that is
      worth a year. */
-  function wouldDo(pos){
-    var h = '<div class=sv-ph><h3>What Autopilot would do</h3></div>';
-    if(!pos){
-      /* no wallet: the spread Autopilot works in, as two plain facts - what the largest validator
-         pays, and the middle of the set (half pay more). Not the single best payer: that is a
-         tiny validator whose rate a real stake would dilute at once, so it would read as a promise */
-      var V = VALS(), big = null, S0 = setStats();
-      V.forEach(function(v){ if(!big || v[1] > big.t) big = { t: v[1], r: rate0(v[1], v[2]), m: v[0] }; });
-      if(!big) return h + '<div class=se-say>Connect a wallet to see what Autopilot would do for your stake.</div>';
-      return h + '<div class=se-vs><div><em>The largest validator</em><b style="color:' + heat(big.r).ink + '">' + pct(big.r) + '</b><small>' + esc(big.m) + '</small></div><i aria-hidden=true>\u2192</i>' +
-          '<div><em>Half the set pays over</em><b style="color:' + heat(S0.mid).ink + '">' + pct(S0.mid) + '</b><small>of ' + V.length + ' validators</small></div></div>' +
-        '<div class=se-say>The same ATONE earns more in some places than others. Autopilot keeps your stake with the better payers, among the validators you allow.' +
-        ' Connect a wallet to see it for yours.</div>';
-    }
-    if(!pos.rows.length) return h + '<div class=se-say>Nothing staked yet, so nothing for it to manage.</div>';
-    if(!(pos.free >= 1e6)) return h + '<div class=se-say>Your stake is in its 21-day cooldown until <b>' + (window.__dayFull ? window.__dayFull(pos.until) : "later") + '</b>. Autopilot can move it after that.</div>';
-    var plan = planNow(pos), hn = heat(pos.rate);
-    if(!plan || !(plan.gain > 0.5) || plan.after == null)
-      return h + '<div class=se-vs><div><em>Now</em><b style="color:' + hn.ink + '">' + pct(pos.rate) + '</b></div></div>' +
-        '<div class=se-say>Your stake already earns the best it can today. Autopilot keeps it there: when rates change, it moves your stake for you.</div>';
-    /* the same cards as Move your stake on the Overview: Now and Best today side by side, the gain under both */
-    var ha = heat(plan.after);
-    return h + '<div class="sd-figs sd-mv">' +
-        fig("Now", '<span style="color:' + hn.ink + '">' + pct(plan.now) + '</span>', "on " + pos.rows.length + " validator" + (pos.rows.length === 1 ? "" : "s"), hn.fill) +
-        fig("Best today", '<span style="color:' + ha.ink + '">' + pct(plan.after) + '</span>', "where Autopilot would move it", ha.fill) +
-        fig("More a year", '<span class=sd-gain>+' + one(plan.gain) + '</span><i class=u>ATONE</i>', "at today\'s rates", "var(--sv-green)") +
-      '</div>' +
-      '<div class=se-say>Autopilot moves your stake there, and again whenever rates change. You approve once.</div>';
-  }
   /* With a grant: how far along it is, and what it has done - its last three moves in words */
   /* Restake: its own service with fixed rules (every 12 hours, from 1 ATONE, on the reader's best-paying validator,
      no admin step), its own switch - the same in every Autopilot state */
@@ -547,34 +429,6 @@
     var ex = dg && dg.expiration ? new Date(dg.expiration).getTime() : null; if(!ex) return '<span class=ars-until>Runs until <b>you disable it</b></span>';
     var left = Math.max(0, Math.ceil((ex - Date.now()) / 86400000));
     return '<span class=ars-until>Runs until <b>' + (window.__dayFull ? window.__dayFull(ex) : new Date(ex).toISOString().slice(0, 10)) + '</b>, ' + left + ' day' + (left === 1 ? '' : 's') + ' left</span>';
-  }
-  function restakePanel(pos, at){
-    var on = !!(at && at.restake), r = pos && pos.rows.length ? pos.rate : 0, add = r > 0 ? Math.pow(1 + r / 730, 730) - 1 - r : 0;
-    var h = '<div class=sv-ph><h3>Restake</h3>' + '<span class="sv-tag ars-st' + (on ? ' on' : '') + '">' + (on ? 'Active' : 'Inactive') + '</span></div>';
-    h += '<div class=ars-fig><em>' + (on ? 'Adds a year' : 'A year') + '</em><b>' + (add > 0 ? '+' + fmt(pos.total * add) : '-') + '</b>' +
-      (add > 0 ? '<small>ATONE, +' + (add * 100).toFixed(1) + '% APR</small>' : '') + rsUntil(at, on) + '</div>';
-    /* the rules sit at the foot, over the switch */
-    h += '<div class=ars-foot><div class=ars-two><div><em>Frequency</em><b>12 hours</b></div><div><em>Minimum</em><b>1 ATONE</b></div></div>' +
-      '<div class=ars-how>Auto-compounds rewards into the <b>highest-paying</b> validators</div></div>';
-    h += !pos ? CONNECT_OFF
-      : !pos.rows.length ? '<button class="sv-btn go sd-go" type=button data-act=stake>Stake ATONE</button>'
-      : '<button class="sv-btn go sd-go' + (on ? ' ars-off' : '') + '" type=button data-act=restakesw>' + (on ? 'Revoke' : 'Activate') + '</button>';
-    return h;
-  }
-  function grantView(g, at, rp, since, until){
-    var t0 = at && at.since, t1 = g.expiration ? new Date(g.expiration).getTime() : null, now = Date.now(), day = 86400000;
-    var h = '<div class=sv-ph><h3>Your grant</h3></div>';
-    if(t0 && t1 && t1 > t0){
-      var tot = Math.max(1, Math.round((t1 - t0) / day)), dn = Math.min(tot, Math.max(1, Math.ceil((now - t0) / day))), left = Math.max(0, Math.ceil((t1 - now) / day));
-      h += '<div class=se-time><div class=se-tbar><s style="width:' + (Math.min(1, (now - t0) / (t1 - t0)) * 100).toFixed(1) + '%"></s></div>' +
-        '<div class=se-tl><span>' + since + '</span><b>Day ' + dn + ' of ' + tot + ', ' + left + ' day' + (left === 1 ? '' : 's') + ' left</b><span>' + until + '</span></div></div>';
-    }
-    var name = function(op){ var V = VALS(), id = String(op || ""); for(var i = 0; i < V.length; i++) if(V[i][3] === id) return esc(V[i][0]); return esc(id.slice(-6)); };   /* id = full operator (2026-10-01) */
-    var hist = (rp && rp.history || []).slice(-3).reverse();
-    h += '<div class=se-mv><em>Last moves</em>' + (hist.length ? hist.map(function(m){
-        return '<div><u>' + (window.__dayFull ? window.__dayFull(m.at * 1000) : "") + '</u><span><b>' + fmt(m.uatone) + ' ATONE</b> from ' + name(m.src) + ' to ' + name(m.dst) + '</span></div>'; }).join("")
-      : '<div class=none>No move yet.</div>') + '</div>';
-    return h;
   }
 
   function strategyWord(g){
@@ -1892,7 +1746,6 @@
     if(root.getAttribute("data-tab") !== "dele" || root.getAttribute("data-ui") !== "simple") return;
     var s = screen();
     if(s === "over") drawOver();
-    else if(s === "auto") drawAuto();
     else if(s === "sign") drawSign();
     else if(s === "prop") drawProp();
     else if(s === "act") drawAct();

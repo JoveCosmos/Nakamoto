@@ -64,7 +64,6 @@
       "sub": [
         {"id": "overview",  "label": "Stake",      "route": "wallet",     "tab": "dele", "ui": "simple", "screen": "over", "panel": "sv-over"},
         {"id": "self",      "label": "Pro",        "route": "self",       "under": "overview", "tab": "dele", "panel": "p-dele"},
-        {"id": "autopilot", "label": "Autopilot",  "route": "autopilot",  "tab": "dele", "ui": "simple", "screen": "auto", "panel": "sv-auto"},
         {"id": "governors", "label": "Govern", "route": "governance", "tab": "dele", "ui": "simple", "screen": "mygov", "panel": "sv-mygov"}
       ]
     }

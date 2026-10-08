@@ -4,7 +4,7 @@ function h32(s){ var h=0x811c9dc5>>>0; for(var i=0;i<s.length;i++){ h^=s.charCod
 function freeze(){ try{ document.getAnimations().forEach(function(a){ try{ a.finish(); }catch(e){ try{ a.pause(); a.currentTime=0; }catch(e2){} } }); }catch(e){} }
 var PROPS=null;
 function styleStr(cs){ var s=[]; for(var i=0;i<cs.length;i++){ var p=cs[i]; s.push(p+':'+cs.getPropertyValue(p)); } return s.sort().join(';'); }
-var ATTRS={"data-tab": ["connect", "dele", "empty", "eta", "home", "intro", "pays"], "hidden": [], "aria-pressed": ["true"], "type": ["range"], "href": [], "data-ui": ["simple"], "viewBox": [], "disabled": [], "data-v": ["setup", "vals"], "data-wallet": [], "data-theme": ["light"], "data-ver": ["pro", "simple"], "data-sc": ["auto", "net", "over"], "aria-selected": ["true"], "data-title-for": ["dashboard", "governance", "staking"], "role": ["tabpanel"], "data-mono": [], "data-sec": ["dashboard", "governance", "staking"], "data-for": ["dashboard", "governance", "staking"], "data-section": ["dashboard", "governance", "staking"], "data-sv": ["dashboard/autopilot", "dashboard/governors", "dashboard/network", "dashboard/overview", "dashboard/votes", "governance/constitution", "governance/core-daos", "governance/governors", "governance/proposals", "staking/bonus", "staking/picks", "staking/trend"], "data-key": ["dashboard/autopilot", "dashboard/governors", "dashboard/network", "dashboard/overview", "dashboard/votes", "governance/constitution", "governance/core-daos", "governance/governors", "governance/proposals", "staking/bonus", "staking/picks", "staking/trend"], "data-svs": ["auto", "net", "over"], "data-var": ["b"]};
+var ATTRS={"data-tab": ["connect", "dele", "empty", "eta", "home", "intro", "pays"], "hidden": [], "aria-pressed": ["true"], "type": ["range"], "href": [], "data-ui": ["simple"], "viewBox": [], "disabled": [], "data-v": ["setup", "vals"], "data-wallet": [], "data-theme": ["light"], "data-ver": ["pro", "simple"], "data-sc": ["auto", "net", "over"], "aria-selected": ["true"], "data-title-for": ["dashboard", "governance", "staking"], "role": ["tabpanel"], "data-mono": [], "data-sec": ["dashboard", "governance", "staking"], "data-for": ["dashboard", "governance", "staking"], "data-section": ["dashboard", "governance", "staking"], "data-sv": ["dashboard/governors", "dashboard/network", "dashboard/overview", "dashboard/votes", "governance/constitution", "governance/core-daos", "governance/governors", "governance/proposals", "staking/bonus", "staking/picks", "staking/trend"], "data-key": ["dashboard/governors", "dashboard/network", "dashboard/overview", "dashboard/votes", "governance/constitution", "governance/core-daos", "governance/governors", "governance/proposals", "staking/bonus", "staking/picks", "staking/trend"], "data-svs": ["auto", "net", "over"], "data-var": ["b"]};
 function sig(el){
   var p=el.parentElement, i=0, s=el, n=0; while((s=s.previousElementSibling)) i++; s=el; while((s=s.nextElementSibling)) n++;
   var a=''; for(var k in ATTRS){ var v=el.getAttribute(k); if(v===null) continue; a+=k+(ATTRS[k].indexOf(v)>=0?'='+v:'')+';'; }
@@ -43,7 +43,7 @@ step(200,function(){ fp('d-walletmenu'); document.body.click(); });
 ['apr','stake','rank','logo','graph','color'].forEach(function(m){ step(250,function(){ var b=document.querySelector('.mbtn[data-m='+m+']'); if(b) b.click(); }); step(250,function(){ fp('d-mode-'+m); }); });
 step(200,function(){ var s=document.getElementById('eta'); s.value=80; s.dispatchEvent(new Event('input',{bubbles:true})); });
 step(250,function(){ fp('d-whatif'); window.__resetLive(); });
-['staking/trend','staking/picks','governance/proposals','governance/constitution','dashboard/overview','dashboard/autopilot','dashboard/network','dashboard/votes'].forEach(function(r){
+['staking/trend','staking/picks','governance/proposals','governance/constitution','dashboard/overview','dashboard/network','dashboard/votes'].forEach(function(r){
   step(450,function(){ go(r); }); step(450,function(){ fp('d-'+r); }); });
 step(300,function(){ window.__shellVer('pro'); go('dashboard/overview'); });
 step(500,function(){ fp('d-advanced'); window.__shellVer('simple'); go('staking/bonus'); });
@@ -55,8 +55,7 @@ step(400,function(){ fp('d-pop-week'); closeAll(); });
 // connect
 step(300,function(){ window.__wconnect('Keplr'); });
 step(2200,function(){ go('dashboard/overview'); });
-step(600,function(){ fp('c-dashboard/overview'); go('dashboard/autopilot'); });
-step(600,function(){ fp('c-dashboard/autopilot'); go('dashboard/network'); });
+step(600,function(){ fp('c-dashboard/overview'); go('dashboard/network'); });
 step(600,function(){ fp('c-dashboard/network'); window.__shellVer('pro'); go('dashboard/overview'); });
 step(800,function(){ fp('c-advanced'); });
 step(300,function(){ var b=document.getElementById('atbtn'); if(b) b.click(); });
