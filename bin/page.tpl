@@ -5526,6 +5526,11 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .you-apr em,.you-hf>em,.you-hfh>em{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
 .you-apr b{font-size:44px;font-weight:700;line-height:1.05;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--wt)}
 .you-apr small{font-size:12.5px;color:var(--ws)}
+/* Restake's addition beside Your APR: small italic green on the figure's baseline, as Net beside a validator's APR */
+.you-aprv{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px;row-gap:0;min-width:0}
+.you-rsx{font-family:var(--wmono);font-size:12px;font-style:italic;letter-spacing:.03em;color:var(--sv-green);white-space:nowrap;font-weight:500}
+.you-rsx i{font-size:10px;opacity:.8}
+.mv-yk .you-rsx{font-size:10px;margin-left:6px;vertical-align:baseline}
 .you-bal{display:flex;flex-direction:column;border-bottom:1px solid var(--wbd)}
 .you-r{display:flex;align-items:center;gap:8px;min-height:40px;border-top:1px solid var(--wbd)}
 .you-r span{flex:1 1 auto;font-size:13.5px;color:var(--ws)}
