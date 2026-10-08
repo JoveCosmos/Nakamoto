@@ -5592,6 +5592,8 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-chip{font-family:var(--wmono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;white-space:nowrap}
 .mv-chip.ok{background:rgba(43,200,189,.14);color:var(--sv-teal)}
 .mv-chip.warn{background:rgba(255,176,46,.14);color:var(--sv-amber)}
+/* beside Activate Autopilot: how many wallets already run it, in the chip's type; never wraps (2026-10-08) */
+.mv-proof{flex:0 0 auto;margin-left:auto;font-family:var(--wmono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--sv-teal);white-space:nowrap}
 .mv-chip.q{background:rgba(185,176,255,.14);color:var(--sv-violet)}
 /* the headline, then one line: what it is on the left, the cooling-down note on the right (operator, 2026-09-30) */
 .mv-hl{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:20px;row-gap:6px;align-items:baseline}
@@ -6259,6 +6261,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 #mv-stage .mv-bars i{cursor:pointer}
 #mv-stage .mv-bars i:hover{filter:brightness(.82)}
 #mv-stage .mv-top>em+.mv-tdis{margin-left:auto}
+#mv-stage .mv-top>.mv-proof+.mv-tgo,#mv-stage .mv-top>.mv-proof+.mv-tdis{margin-left:0}
 /* a phone: the action takes its own full row under the title, never off the edge (2026-09-30) */
 @media(max-width:700px){
   #mv-stage .mv-top:not(#z){flex-wrap:wrap;row-gap:10px}

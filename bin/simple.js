@@ -17,6 +17,8 @@
   var PHONE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   /* ── figures, written exactly as the dashboard writes them ── */
+  /* 125,867 -> "125.9k", 1,234,567 -> "1.23M": totals that must fit a box */
+  function kfmt(a){ return a >= 1e6 ? (a / 1e6).toFixed(2) + "M" : a >= 1e3 ? (a / 1e3).toFixed(1) + "k" : String(Math.round(a)); }
   function one(a){ return (Math.floor(a * 10) / 10).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
   function fmt(u){ return one(u / 1e6); }
   function whole(u){ return Math.floor(u / 1e6).toLocaleString(); }
@@ -428,7 +430,7 @@
     return t > 1e12 ? (t / 1e12).toFixed(1) + "M" : t > 1e9 ? Math.round(t / 1e9) + "k" : ""; }
   window.__idleAtone = idleAtone;
   function drawAuto(){
-    var pos = window.__POS, S = setStats(), at = window.__atInfo ? window.__atInfo() : null, g = at && at.grant;
+    var pos = window.__POS, S = setStats(), at = window.__atInfo ? window.__atInfo() : null, g = at && at.grant, net = at && at.net;
     var a = g && g.authorization || {};
     var until = g && g.expiration && window.__dayFull ? window.__dayFull(new Date(g.expiration).getTime()) : null;
     var rp = at && at.report, moves = rp && rp.history ? rp.history.length : 0, rec = g && rp && rp.record && rp.record.start ? rp.record : null;
@@ -443,12 +445,19 @@
     put("sd-astrip",
       '<div class="sd-id sd-ida"><div class=sd-top><h3>Autopilot</h3></div><div class=sd-wmeta><span class=sd-wch><i class="st' + (g ? ' on' : '') + '">' + (g ? "Active" : "Inactive") + '</i>' +
         door + '</span></div></div>' +
-      (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "-", "", null, "var(--sv-green)", "", false, rec ? "APR" : "")
-         : ro("Since start", "-", "", null, "var(--sv-green)")) +
+      (g ? ro("Since start", rec ? sgn(rec.rate - rec.start.rate) : "-", "", null, "var(--sv-green)", "", false, rec ? "APR" : "") +
       /* the stake it manages: the cap when the grant sets one, otherwise all the reader stakes */
-      ro("Stake", g ? (a.max_tokens ? fmt(+a.max_tokens.amount) : pos && pos.rows.length ? fmt(pos.total) : "-") : "-", "", null, "var(--sv-violet)", "", false, g && (a.max_tokens || (pos && pos.rows.length)) ? "ATONE" : "") +
-      ro("Runs until", g ? (until || "You revoke") : "-", "", null, "var(--sv-violet)") +
-      ro("Moves made", g ? String(moves) : "-", "", null, "var(--sv-teal)") +
+      ro("Stake", a.max_tokens ? fmt(+a.max_tokens.amount) : pos && pos.rows.length ? fmt(pos.total) : "-", "", null, "var(--sv-violet)", "", false, a.max_tokens || (pos && pos.rows.length) ? "ATONE" : "") +
+      ro("Runs until", until || "You revoke", "", null, "var(--sv-violet)") +
+      ro("Moves made", String(moves), "", null, "var(--sv-teal)")
+      /* not active: the boxes would only hold dashes, so they carry what Autopilot has done for everyone so far
+         (the keeper's public totals, keeper/_status.json; operator 2026-10-08: "autopilot stats should be visible") */
+      : net ? ro("On Autopilot", String(net.grants), "", null, "var(--sv-green)", "", false, "wallets") +
+        ro("Moved", kfmt(net.impact.moved_uatone / 1e6), "", null, "var(--sv-violet)", "", false, "ATONE") +
+        ro("Extra a year", "+" + kfmt(net.impact.gain_atone_year), "", null, "var(--sv-green)", "", false, "ATONE") +
+        ro("Validators", String(net.impact.validators), "", null, "var(--sv-teal)", "", false, "gained") :
+        ro("Since start", "-", "", null, "var(--sv-green)") + ro("Stake", "-", "", null, "var(--sv-violet)") +
+        ro("Runs until", "-", "", null, "var(--sv-violet)") + ro("Moves made", "-", "", null, "var(--sv-teal)")) +
       ro("Your APR", pos && pos.rows.length ? '<span style="color:' + heat(pos.rate).ink + '">' + pct(pos.rate) + '</span>' : "-", "", null, "var(--sv-teal)"));
     /* restake, in one line: what it has done, or that it waits (only our own grants count: any other service is foreign) */
     function restakeLine(){
@@ -1802,7 +1811,10 @@
     };
     /* the title row carries the state's chip and, in the top right corner, its one action (operator, 2026-09-30) */
     var top = function(eb, chip, cls, act){ return '<div class=mv-top><h3 class=mv-h>Your move</h3><em>' + eb + '</em>' + (chip ? '<span class="mv-chip ' + cls + '">' + chip + '</span>' : '') + (act || '') + '</div>'; };
-    var btn = function(a, label){ return '<button class="sv-btn go mv-go mv-tgo" type=button data-act=' + a + '>' + label + '</button>'; };
+    var btn = function(a, label){ return proof(label) + '<button class="sv-btn go mv-go mv-tgo" type=button data-act=' + a + '>' + label + '</button>'; };
+    /* beside Activate Autopilot: how many wallets already run it (the keeper's public count) */
+    function proof(label){ var n = window.__atInfo && window.__atInfo().net;
+      return /Activate Autopilot/.test(label) && n && n.grants ? '<span class=mv-proof>' + n.grants + ' on Autopilot</span>' : ''; }
     /* Autopilot on: the corner counts down to its next run, 00:00 or 12:00 UTC (operator, 2026-10-01); the digits are
        filled by apTick() so the stage's HTML stays the same between draws */
     var ACTIVE = '<b class="mv-on mv-ton">Autopilot <span class=mv-cd>--:--:--</span></b>';
@@ -1823,7 +1835,7 @@
     var h;
     if(!a){
       /* disconnected: the corner holds Activate Autopilot, greyed; on hover it says why (operator, 2026-09-30) */
-      h = top('', '', '', '<span class=mv-tdis data-tip="Connect a wallet"><button class="sv-btn go mv-go mv-tgo" type=button disabled aria-disabled=true tabindex=-1>Activate Autopilot</button></span>') +
+      h = top('', '', '', proof('Activate Autopilot') + '<span class=mv-tdis data-tip="Connect a wallet"><button class="sv-btn go mv-go mv-tgo" type=button disabled aria-disabled=true tabindex=-1>Activate Autopilot</button></span>') +
         (hi ? '<div class=mv-hl><b>About ' + pct(hi) + ' APR</b><span>with Autopilot, for 10,000 ATONE</span></div>' : '') + cmp() + mvSet({}, {});
     } else if(!pos){
       h = top('') + '<div class=mv-hl><b>Reading your stake…</b></div>';
