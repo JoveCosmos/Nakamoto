@@ -2887,9 +2887,7 @@ rememberGridH();
   var ATSEL = {}, AT_EDIT = false, AT_FIND = "", AT_OPEN = 0;
   function atStatus(){
     return fetch("keeper/_status.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
-      AT.addr = j && j.grantee ? j.grantee : null; AT.dry = !j || j.dry !== false;
-      /* the keeper's public totals: every wallet on Autopilot together (shown to everyone, wallet or not) */
-      if(j && j.impact) AT.net = { grants: j.grants || 0, impact: j.impact };
+      AT.addr = j && j.grantee ? j.grantee : null; AT.dry = !j || j.dry !== false; 
       return j; }).catch(function(){ AT.addr = null; return null; });
   }
   var REDEL = "/cosmos.staking.v1beta1.MsgBeginRedelegate", DELEG = "/cosmos.staking.v1beta1.MsgDelegate", WDRAW = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward";
@@ -3495,10 +3493,7 @@ rememberGridH();
   /* what stands between this reader and the keeper, for the simple view to state */
   window.__atInfo = function(){ return { addr: AT.addr, dry: AT.dry, grant: AT.grant, grants: AT.grants || [],
     days: AT.days, report: AT.report, since: AT.since || null,
-    restake: (AT.grants || []).some(function(x){ return grantType(x) === DELEG; }), net: AT.net || null }; };
-  /* the totals are for every visitor, so they load with the page (not only on connect) and refresh with the keeper */
-  function atNet(){ atStatus().then(function(){ window.dispatchEvent(new Event("thermo:draw")); }); }
-  atNet(); setInterval(atNet, 600000);
+    restake: (AT.grants || []).some(function(x){ return grantType(x) === DELEG; }) }; };
   window.__planDraw = draw;
   draw();
 
