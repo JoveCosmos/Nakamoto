@@ -973,6 +973,7 @@
   html[data-theme=light]:not([data-mono]) .shell-act:disabled{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #you,html[data-theme=light]:not([data-mono]) #paths,html[data-theme=light]:not([data-mono]) #mv-stage{--sv-teal:var(--accent);--sv-green:var(--accent);--sv-amber:var(--warn);--sv-violet:var(--accent)}
   html[data-theme=light]:not([data-mono])[data-svs=over] #one #sv-over{background:none;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .you-rsx i{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .you-cl{background:transparent}
   html[data-theme=light]:not([data-mono]) .you-tag.on{border-color:var(--sv-teal,var(--accent));color:var(--sv-teal,var(--accent));background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .you-tgal{text-decoration:none;background:none}

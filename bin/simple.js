@@ -23,10 +23,11 @@
   function pct(x){ return (x * 100).toFixed(1) + "%"; }
   /* beside Your APR while Restake is on: what compounding adds, the Restake card's own figure (rewards staked back
      twice a day at today's rate, against the plain year), small, as Net sits beside a validator's APR (operator, 2026-10-08) */
-  function rsx(pos, mine, word){
+  function rsx(pos, mine){
     var at = window.__atInfo ? window.__atInfo() : null, r = mine && pos ? pos.rate : 0;
     if(!(at && at.restake) || !(r > 0)) return '';
-    return '<span class=you-rsx>+' + pct(Math.pow(1 + r / 730, 730) - 1 - r) + (word ? ' <i>restake</i>' : '') + '</span>';
+    /* two lines in the block's upper corner (operator, 2026-10-08): the addition, then a live dot and the word */
+    return '<span class=you-rsx><span>+' + pct(Math.pow(1 + r / 730, 730) - 1 - r) + ' APR</span><span><i aria-hidden=true></i>restake</span></span>';
   }
   function pp(x){ return (x >= 0 ? "+" : "−") + Math.abs(x * 100).toFixed(1) + "%"; }
   function hueOf(n){ var h = 0, s = String(n || "?"); for(var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return h; }
@@ -286,7 +287,7 @@
   }
   function balBoxes(){
     var pos = window.__POS, bal = window.__BAL, mine = pos && pos.rows.length, mv = movable(pos);
-    var yk = function(k, v, st){ return '<div class=mv-yk><em>' + k + '</em><b' + (st || '') + '>' + v + '</b></div>'; };
+    var yk = function(k, v, st, x){ return '<div class=mv-yk>' + (x || '') + '<em>' + k + '</em><b' + (st || '') + '>' + v + '</b></div>'; };
     return '<div class="mv-yg mv-bal">' +
       /* the order (operator, 2026-10-02): what is in the wallet, what is staked, then what it earns */
       yk("ATONE available", bal ? fmt(bal.uatone) : '-') +
@@ -294,7 +295,7 @@
       yk("ATONE staked", pos ? fmt(pos.total) : '-') +
       yk("Movable stake", mv != null ? fmt(mv) : '-') +
       yk("ATONE rewards", window.__REW != null ? fmt(window.__REW) : '-') +
-      yk("Your APR", mine ? pct(pos.rate) + rsx(pos, mine, false) : '-', mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '</div>';
+      yk("Your APR", mine ? pct(pos.rate) : '-', mine ? ' style="color:' + heat(pos.rate).ink + '"' : '', rsx(pos, mine)) + '</div>';
   }
   /* a figure never overflows its box: the type steps down until it fits (phones and tablets) */
   function fitBoxes(el){
@@ -1490,7 +1491,7 @@
     var wname = (window.__WALLET && String(window.__WALLET.label || "").trim()) || "Your wallet";
     var row = function(k, v, u, extra){ return '<div class=you-r><span>' + k + '</span>' + (extra || '') + '<b>' + v + '</b><i>' + u + '</i></div>'; };
     var h = '<div class=you-h><h3 title="' + esc(wname) + '">' + esc(wname) + '</h3>' + wmeta() + '</div>';
-    h += '<div class=you-apr><em>Your APR</em><div class=you-aprv><b' + (mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '>' + (mine ? pct(pos.rate) : '-') + '</b>' + rsx(pos, mine, true) + '</div>' +
+    h += '<div class=you-apr>' + rsx(pos, mine) + '<em>Your APR</em><b' + (mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '>' + (mine ? pct(pos.rate) : '-') + '</b>' +
       '<small>' + (!a ? 'connect a wallet to see yours' : !pos ? 'reading…' : mine ? 'on ' + pos.rows.length + ' validator' + (pos.rows.length === 1 ? '' : 's') : 'Nothing staked') + '</small></div>';
     /* Pro on Redelegate: what can move now, the ticked delegations' free stake when any are ticked (operator, 2026-09-30) */
     var proRd = root.getAttribute("data-sv") === "dashboard/self" && matchMedia("(min-width:1100px)").matches && !root.getAttribute("data-pro");
