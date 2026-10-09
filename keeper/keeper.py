@@ -423,6 +423,12 @@ def restake_grants():
         if not key: break
     return {k: v for k, v in out.items() if v.get("claim") and v.get("stake")}
 
+def gas_price():
+    """the uphoton a gas the signer pays: the chain's live x/dynamicfee price times its 2x headroom (2026-10-09; was a
+    fixed 0.25, 25 times the floor), 0.25 when the price cannot be read"""
+    try: return float(get("/cosmos/dynamicfee/v1/gas_price/uphoton")["price"]["amount"]) * 2
+    except Exception: return 0.25
+
 def plan_restake(c, granter, rg, vals, m):  # noqa: C901
     """what a restake would do now: claim the wallet's rewards (largest first) and stake them all on the best
     validator of the DELEGATE allow-list. Only grants to our own address count: any other authz grant the
@@ -491,7 +497,7 @@ def plan_restake(c, granter, rg, vals, m):  # noqa: C901
     legs = [{"validator": op, "amount": int(add[op])} for op in order]
     br = sum(rate_after(m, vals[l["validator"]]["t"], vals[l["validator"]]["c"], l["amount"]) * l["amount"] for l in legs) / stake
     out.update({"claim": claim, "stake": legs, "send": int(send), "rate": br,
-                "fee_uphoton": int((120000 + 60000 * (len(claim) + 1 + len(legs))) * 0.25)})
+                "fee_uphoton": int((120000 + 60000 * (len(claim) + 1 + len(legs))) * gas_price())})
     return out
 
 def execute_restake(granter, p):

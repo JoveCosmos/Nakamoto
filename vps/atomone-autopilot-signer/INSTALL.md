@@ -91,7 +91,7 @@ logs every refusal as `exec granter=... refused: <why>` / `restake granter=... r
 the `.prev` copy once a 00:00 or 12:00 UTC run has gone through.
 
 Environment (`signer.env`, all optional except on the testnet box): `BIND`, `PORT`, `ATOMONE_RPC`,
-`CHAIN_ID` (default `atomone-1`), `ATOMONE_GAS_PRICE` (default `0.25uphoton`), `MAX_MOVES` (default 60, messages in one request: one transaction, about 20M gas of the block's 100M), `MAX_MOVES_DAY` (default 60, per delegator in any 24 hours; keep it at the keeper's 60), `ATOMONE_MAX_GAS` (default 30000000: 60 moves at ~334k gas each, times the 1.4 margin).
+`CHAIN_ID` (default `atomone-1`), `ATOMONE_GAS_PRICE` (default `0.25uphoton`, paid only when the chain's live x/dynamicfee price cannot be read; otherwise the live price times `ATOMONE_GAS_HEADROOM`, default 2), `MAX_MOVES` (default 60, messages in one request: one transaction, about 20M gas of the block's 100M), `MAX_MOVES_DAY` (default 60, per delegator in any 24 hours; keep it at the keeper's 60), `ATOMONE_MAX_GAS` (default 30000000: 60 moves at ~334k gas each, times the 1.4 margin).
 Rotate the secret: re-run step 3's first line, restart, update the app box.
 Retire it: `systemctl disable --now atomone-autopilot-signer`; every grant to its address goes inert.
 

@@ -45,7 +45,11 @@ import { MsgBeginRedelegate, MsgDelegate } from "cosmjs-types/cosmos/staking/v1b
 import { MsgWithdrawDelegatorReward } from "cosmjs-types/cosmos/distribution/v1beta1/tx";
 
 const PREFIX = "atone", CHAIN_ID = process.env.CHAIN_ID || "atomone-1";   // testnet: atomone-testnet-1
-const GAS = process.env.ATOMONE_GAS_PRICE || "0.25uphoton";
+const GAS = process.env.ATOMONE_GAS_PRICE || "0.25uphoton";   // only when the chain's own price cannot be read
+// (2026-10-09) the chain prices gas itself (x/dynamicfee, 0.01 uphoton at its floor) and every node takes that price, so a
+// fixed 0.25 paid 25 times what was needed. Each transaction now pays the live price times GAS_HEAD, room for the price
+// to rise while it waits for a block
+const GAS_HEAD = +(process.env.ATOMONE_GAS_HEADROOM || 2);
 const RPCS = (process.env.ATOMONE_RPC || "https://atomone-rpc.gatadao.com,https://atomone-rpc.polkachu.com").split(",").map(s => s.trim()).filter(Boolean);
 const BIND = process.env.BIND || "10.9.0.2", PORT = +(process.env.PORT || 8788);
 const MAX_MOVES = +(process.env.MAX_MOVES || 60);              // messages in one request (one transaction); 60 moves ~ 20M gas of the block's 100M
@@ -262,13 +266,38 @@ async function grantsFor(query, granter, grantee, types) {
 
 // simulate, refuse over the gas ceiling, then sign with a timeout height; the day's count is kept for every broadcast,
 // whatever its code (red team 2026-10-01: a tx that lands and fails is paid for too), and one sent and not yet seen
+function pbField(buf, num) {   // the first length-delimited field `num` of a protobuf message (all a DecCoin needs)
+  let i = 0;
+  const varint = () => { let v = 0, s = 0, b; do { b = buf[i++]; v += (b & 0x7f) * 2 ** s; s += 7; } while (b & 0x80); return v; };
+  while (i < buf.length) {
+    const k = varint(), f = Math.floor(k / 8), w = k & 7;
+    if (w === 2) { const n = varint(); if (f === num) return buf.subarray(i, i + n); i += n; }
+    else if (w === 0) varint(); else throw new Error("unexpected wire type " + w);
+  }
+  return null;
+}
+async function gasPrice(client) {
+  try {
+    const d = new TextEncoder().encode("uphoton");
+    const r = await client.forceGetCometClient().abciQuery({ path: "/cosmos.dynamicfee.v1.Query/GasPrice", data: Uint8Array.from([0x0a, d.length, ...d]) });
+    if (r.code) throw new Error("query code " + r.code);
+    const coin = pbField(r.value, 1), amt = coin && pbField(coin, 2);
+    const p = amt ? Number(new TextDecoder().decode(amt)) / 1e18 : 0;   // a LegacyDec travels as an integer of 18 decimals
+    if (!(p > 0)) throw new Error("no price");
+    return GasPrice.fromString((p * GAS_HEAD).toFixed(9) + "uphoton");
+  } catch (e) {
+    console.log("autopilot-signer: chain gas price unreadable (" + (e.message || e) + "), paying " + GAS);
+    return GasPrice.fromString(GAS);
+  }
+}
+
 async function signChecked(client, sender, granter, msgs, memo, moving) {
   const gas = await client.simulate(sender, msgs, memo);
   const limit = Math.ceil(gas * 1.4);
   if (limit > MAX_GAS) return { refused: `gas ${limit} is more than the ceiling ${MAX_GAS}` };
   const height = await client.getHeight();
   try {
-    const result = await client.signAndBroadcast(sender, msgs, calculateFee(limit, GasPrice.fromString(GAS)), memo, BigInt(height + TIMEOUT_BLOCKS));
+    const result = await client.signAndBroadcast(sender, msgs, calculateFee(limit, await gasPrice(client)), memo, BigInt(height + TIMEOUT_BLOCKS));
     capRecord(capLog, granter, moving, Date.now());
     if (result.code === 0) setCache.at = 0;
     return { result };

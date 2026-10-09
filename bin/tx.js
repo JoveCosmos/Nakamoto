@@ -10,7 +10,11 @@
 /* the network this page is for (render.py puts it in the payload, which precedes this script) */
 var NET = (function(){ try{ return JSON.parse(document.getElementById("payload").textContent).net || {}; }catch(e){ return {}; } })();
 var API = NET.api || "https://atomone-api.gatadao.com", CHAIN = NET.chain || "atomone-1", FEE_DENOM = "uphoton";
-var GAS_PRICE = 0.25;            /* uphoton per gas: minimum is 0.225, a little above it */
+var GAS_PRICE = 0.25;            /* uphoton per gas, paid only when the chain's own price cannot be read */
+/* (2026-10-09) the chain prices gas itself (x/dynamicfee, 0.01 uphoton at its floor, and every node takes that price):
+   a fixed 0.25 paid 25 times what was needed. A fee is the live price times GAS_HEAD, room for a rise while the
+   wallet signs; the price is read at most every 30 seconds */
+var GAS_HEAD = 2, LIVE = { at: 0, p: null };
 var GAS_ADJ = 1.35;
 
 /* ── protobuf, the little that is needed ── */
@@ -144,8 +148,17 @@ function simulate(msgs, memo, pubKey, sequence){
 /* opt {denom, price}: a fee in another token at its own gas price. Only a mint may use one: a transaction made of
    MsgMintPhoton alone is the chain's fee exception and may pay in ATONE, at PHOTON's price divided by the conversion
    rate (the fee market's own resolver), so a wallet holding no PHOTON can still mint some */
+function gasPrices(){
+  if(LIVE.p && Date.now() - LIVE.at < 30000) return Promise.resolve(LIVE.p);
+  return call("GET", "/cosmos/dynamicfee/v1/gas_prices").then(function(d){
+    var p = {}; (d.prices || []).forEach(function(c){ var x = parseFloat(c.amount); if(x > 0) p[c.denom] = x; });
+    if(!p[FEE_DENOM]) throw new Error("no gas price");
+    LIVE = { at: Date.now(), p: p }; return p;
+  }).catch(function(){ return LIVE.p; });           /* unreadable: the last price read, or GAS_PRICE */
+}
+function livePrice(denom){ var x = LIVE.p && LIVE.p[denom]; return x ? x * GAS_HEAD : 0; }
 function feeFor(gasUsed, n, opt){
-  var gas = Math.ceil(Math.max(gasUsed * GAS_ADJ, 120000 * n)), d = (opt && opt.denom) || FEE_DENOM, pr = (opt && opt.price) || GAS_PRICE;
+  var gas = Math.ceil(Math.max(gasUsed * GAS_ADJ, 120000 * n)), d = (opt && opt.denom) || FEE_DENOM, pr = (opt && opt.price) || livePrice(d) || GAS_PRICE;
   return { gas: gas, amount: [{ denom: d, amount: String(Math.ceil(gas * pr)) }] };
 }
 /* PHOTON minted per ATONE burned, as the chain computes it now */
@@ -153,7 +166,7 @@ function mintRate(){
   return call("GET", "/atomone/photon/v1/conversion_rate").then(function(d){ var r = parseFloat(d.conversion_rate); if(!(r > 0)) throw new Error("no conversion rate"); return r; });
 }
 /* the fee in ATONE for a mint: PHOTON's gas price over the rate, a little above the floor */
-function mintFeeOpt(rate){ return { denom: "uatone", price: GAS_PRICE / rate * 1.1 }; }
+function mintFeeOpt(rate){ return { denom: "uatone", price: livePrice("uatone") || GAS_PRICE / rate * 1.1 }; }   /* the chain's own ATONE price when read */
 function feeShort(fee, b){
   var c = fee.amount[0], need = parseInt(c.amount, 10), has = b[c.denom] || 0;
   if(has >= need) return null;
@@ -182,7 +195,7 @@ function signDoc(acc, fee, msgs, memo){
 function sendRedelegations(wallet, msgs, memo, onStep, opt){
   var step = onStep || function(){};
   var acc, fee;
-  return account(wallet.address).then(function(a){ acc = a; step("simulating");
+  return gasPrices().then(function(){ return account(wallet.address); }).then(function(a){ acc = a; step("simulating");
     return simulate(msgs, memo, wallet.pubKey, acc.sequence).catch(gasFallback);
   }).then(function(gasUsed){
     fee = feeFor(gasUsed, msgs.length, opt);
@@ -217,7 +230,7 @@ function sendDirect(wallet, msgs, memo, onStep, opt){
   var step = onStep || function(){};
   if(!wallet.signDirect) return sendRedelegations(wallet, msgs, memo, onStep, opt);
   var acc, fee, bodyB;
-  return account(wallet.address).then(function(a){ acc = a; step("simulating");
+  return gasPrices().then(function(){ return account(wallet.address); }).then(function(a){ acc = a; step("simulating");
     return simulate(msgs, memo, wallet.pubKey, acc.sequence).catch(gasFallback);
   }).then(function(gasUsed){
     fee = feeFor(gasUsed, msgs.length, opt);
@@ -260,7 +273,7 @@ function waitFor(hash, tries){
   });
 }
 var TX = { body: body, authInfo: authInfo, txRaw: txRaw, b64: b64, unb64: unb64, account: account, balances: balances,
-           simulate: simulate, feeFor: feeFor, mintRate: mintRate, mintFeeOpt: mintFeeOpt, signDoc: signDoc, send: sendRedelegations, sendDirect: sendDirect, waitFor: waitFor, CHAIN: CHAIN,
+           simulate: simulate, gasPrices: gasPrices, feeFor: feeFor, mintRate: mintRate, mintFeeOpt: mintFeeOpt, signDoc: signDoc, send: sendRedelegations, sendDirect: sendDirect, waitFor: waitFor, CHAIN: CHAIN,
            msgBytes: msgBytes };
-if(typeof module !== "undefined" && module.exports) module.exports = TX; else root.__TX = TX;
+if(typeof module !== "undefined" && module.exports) module.exports = TX; else { root.__TX = TX; gasPrices(); }   /* read once at load, for the fee previews */
 })(typeof window !== "undefined" ? window : globalThis);

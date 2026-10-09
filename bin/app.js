@@ -3576,13 +3576,15 @@ rememberGridH();
     if(window.keplr) out.push({ name: "Keplr", raw: window.keplr,
       enable: function(){ return enable(window.keplr); },
       getKey: function(){ return window.keplr.getKey(CHAIN); },
-      signAmino: function(addr, doc){ return window.keplr.signAmino(CHAIN, addr, doc); },
+      /* preferNoSetFee: Keplr keeps the fee the page computed from the chain's live gas price; without it Keplr put its own
+         (0.36 uphoton a gas on AtomOne, 36 times the chain's floor) in its place (2026-10-09) */
+      signAmino: function(addr, doc){ return window.keplr.signAmino(CHAIN, addr, doc, { preferNoSetFee: true }); },
       /* SIGN_MODE_DIRECT: the account number travels as a Long-shaped object. Keplr's injected script turns it into
          text with toString() before signing - a plain {low, high} object became "[object Object]" and every direct
          signature (Autopilot grant, Restake, following a governor) failed on chain. toString gives the number. */
       signDirect: function(addr, doc){ var n = parseInt(doc.accountNumber, 10);
         return window.keplr.signDirect(CHAIN, addr, { bodyBytes: doc.bodyBytes, authInfoBytes: doc.authInfoBytes, chainId: doc.chainId,
-          accountNumber: { low: n % 4294967296, high: Math.floor(n / 4294967296), unsigned: true, toString: function(){ return String(n); } } }); } });
+          accountNumber: { low: n % 4294967296, high: Math.floor(n / 4294967296), unsigned: true, toString: function(){ return String(n); } } }, { preferNoSetFee: true }); } });
     if(window.adena && window.adena.cosmos) out.push({ name: "Adena", raw: window.adena.cosmos,
       enable: function(){ return window.adena.cosmos.enable(CHAIN).then(unwrapA); },
       getKey: function(){ return window.adena.cosmos.getKey(CHAIN).then(unwrapA); },
@@ -3608,7 +3610,7 @@ rememberGridH();
     currencies: [{ coinDenom: "ATONE", coinMinimalDenom: "uatone", coinDecimals: 6 },
                  { coinDenom: "PHOTON", coinMinimalDenom: "uphoton", coinDecimals: 6 }],
     feeCurrencies: [{ coinDenom: "PHOTON", coinMinimalDenom: "uphoton", coinDecimals: 6,
-                      gasPriceStep: { low: 0.225, average: 0.25, high: 0.3 } }],
+                      gasPriceStep: { low: 0.01, average: 0.02, high: 0.05 } }],   /* x/dynamicfee floor 0.01 (2026-10-09) */
     stakeCurrency: { coinDenom: "ATONE", coinMinimalDenom: "uatone", coinDecimals: 6 },
     features: []
   };
