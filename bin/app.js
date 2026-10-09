@@ -7,6 +7,21 @@
    The embedded payload is still the whole page: if live.json never loads, nothing
    breaks and the page renders exactly as it did before. The live feed only
    overwrites the five numbers the model is a function of. */
+
+/* an amount typed or filled into a field, in ATONE (2026-10-09). The page fills fields in one format ("12,345.678",
+   see exact()); a reader may type their own. Both marks: the last one is the decimal mark ("1.234,5" or "1,234.5");
+   a comma alone is a decimal comma unless exactly three digits follow it ("12,5" is 12.5, "1,000" is 1000); dots
+   alone, more than one, group thousands ("1.234.567"). Until then the browser's own grouping (a dot in German,
+   Indonesian, Spanish...) made MAX read back as a thousandth of the balance */
+window.__amountIn = function(v){
+  var s = String(v || "").replace(/[\s\u00a0\u202f'\u2019_]/g, ""), c = s.lastIndexOf(","), d = s.lastIndexOf(".");
+  if(c > -1 && d > -1) s = c > d ? s.replace(/\./g, "").replace(",", ".") : s.replace(/,/g, "");
+  else if(c > -1){ var p = s.split(","); s = p.length === 2 && p[1].length !== 3 ? p[0] + "." + p[1] : s.replace(/,/g, ""); }
+  else if(s.split(".").length > 2) s = s.replace(/\./g, "");
+  var n = parseFloat(s.replace(/[^0-9.]/g, ""));
+  return isFinite(n) && n > 0 ? n : 0;
+};
+
 /* ── popup stack: one owner for open and close. The card on top when another
    opens is its parent - hidden while the child shows, put back when the child
    closes - so Escape and a tap outside always step back ONE level, never
@@ -1949,15 +1964,14 @@ rememberGridH();
   });
 
   function value(){
-    var n = parseFloat((amt.value || "").replace(/[^0-9.]/g, ""));
-    return isFinite(n) && n > 0 ? n : 0;
+    return window.__amountIn(amt.value);
   }
   /* the whole amount, to the micro-ATONE, nothing rounded away: what "max" means */
   function exact(u, places){
     var w = Math.floor(u / 1e6), f = Math.round(u - w * 1e6), d = f ? ("000000" + f).slice(-6) : "";
     if(places != null) d = d.slice(0, places);           /* shown short, never rounded up */
     d = d.replace(/0+$/, "");
-    return w.toLocaleString() + (d ? "." + d : "");
+    return w.toLocaleString("en-US") + (d ? "." + d : "");      /* one format, whatever the browser's language (see __amountIn) */
   }
   /* one decimal, floored: an amount on the page never reads as more than it is.
      Display only - what is signed is the exact micro-ATONE (see MSGS: Math.floor on uatone). */
@@ -2417,7 +2431,7 @@ rememberGridH();
     b.addEventListener("click", function(){
       var pos = window.__POS, f = srcFree(pos), base = pos && f > 0 ? f : 10000e6;
       if(pos && f > 0) srcTickAll(pos);
-      amt.value = Math.floor(base * (+b.dataset.p) / 100 / 1e6).toLocaleString();
+      amt.value = Math.floor(base * (+b.dataset.p) / 100 / 1e6).toLocaleString("en-US");
       Array.prototype.forEach.call(document.querySelectorAll("#amtseg button"), function(o){ o.setAttribute("aria-pressed", o === b ? "true" : "false"); });
       draw();
     });
@@ -2555,7 +2569,7 @@ rememberGridH();
   window.__unRows = function(){ unRows(); unState(); };
   function unRow(){ var rs = unSelRows(); if(!rs.length) return null; if(rs.length === 1) return rs[0];
     var x = 0; rs.forEach(function(r){ x += r.x; }); return { id: "*", m: rs.length + " validators", x: x }; }
-  function unAmount(){ var a = E("unamt"), n = parseFloat((a.value || "").replace(/[^0-9.]/g, "")); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
+  function unAmount(){ var a = E("unamt"), n = window.__amountIn(a.value); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
   function unState(){
     var r = unRow(), u = unAmount(), mx = E("unmaxv"), hint = E("unhint"), fld = E("unamt") && E("unamt").closest(".unfield"), go = E("unsign"), sm = E("unsum"), lk = E("unlock");
     if(mx) mx.textContent = r ? exact(r.x, 2) : "-";
@@ -2701,7 +2715,7 @@ rememberGridH();
      reader's own address. The fee is paid in ATONE - a mint is the chain's one fee exception - so a wallet that
      holds no PHOTON yet can still mint some. Max keeps a little ATONE back for that fee ── */
   var mtpop = E("mtpop"), MT = { rate: 0, q: 0, t: 0 }, MT_KEEP = 50000;   /* 0.05 ATONE: the fee is under 0.01 today */
-  function mtAmount(){ var a = E("mtamt"), n = parseFloat(((a && a.value) || "").replace(/[^0-9.]/g, "")); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
+  function mtAmount(){ var a = E("mtamt"), n = window.__amountIn(a && a.value); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
   function mtHave(){ var b = window.__BAL; return b && b.uatone > 0 ? b.uatone : 0; }
   function mtMax(){ return Math.max(0, mtHave() - MT_KEEP); }
   function mtMsgs(){ var u = mtAmount(); return u > 0 && window.__ADDR ? [{ type: "atomone/photon/v1/MsgMintPhoton", value: { to_address: window.__ADDR, amount: { denom: "uatone", amount: String(u) } } }] : []; }
@@ -2764,7 +2778,7 @@ rememberGridH();
     return window.__candidates({ except: {}, cleanRecord: CLEAN }).map(function(v){ v.rate0 = window.__rateAfter(v.t, v.c, 0); return v; })
       .sort(function(a, b){ return a.rank - b.rank; });
   }
-  function stAmount(){ var a = E("stamt"), n = parseFloat((a.value || "").replace(/[^0-9.]/g, "")); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
+  function stAmount(){ var a = E("stamt"), n = window.__amountIn(a.value); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
   function stBal(){ var b = window.__BAL; return b && b.uatone > 0 ? b.uatone : 0; }
   function stPlan(){
     var u = stAmount(), ids = Object.keys(STSEL), n = ids.length, share = n ? Math.floor(u / n) : 0, earned = 0, rows = [];
@@ -3055,7 +3069,7 @@ rememberGridH();
   /* the memo on the reader's grant: a plain label, nothing reads it */
   function atMemo(){ return "GATA AtomOne Autopilot"; }
   function atMonths(){ return AT.days >= 365 ? "12 months" : AT.days >= 180 ? "6 months" : "3 months"; }
-  function atCap(){ var a = E("atcap"), n = parseFloat((a.value || "").replace(/[^0-9.]/g, "")); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
+  function atCap(){ var a = E("atcap"), n = window.__amountIn(a.value); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
   function atMsgs(){
     var pos = window.__POS;
     if(!AT.addr || !pos) return [];
