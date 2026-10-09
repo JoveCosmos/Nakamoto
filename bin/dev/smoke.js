@@ -128,9 +128,9 @@ t('simple-view', function(){
   var advBox=pane.getBoundingClientRect();
   go('dashboard/wallet');
   var svBox=sv.getBoundingClientRect(), paneGone=getComputedStyle(pane).display==='none';
-  /* the three screens, one shown at a time, each its own level-2 view */
+  /* the screens, one shown at a time, each its own level-2 view (the Autopilot screen retired 2026-10-08) */
   var seen=[];
-  [['dashboard/wallet','sv-over'],['dashboard/autopilot','sv-auto'],['network/uptime','sv-net']].forEach(function(k){
+  [['dashboard/wallet','sv-over'],['network/uptime','sv-net']].forEach(function(k){
     go(k[0]);
     var id=k[1];
     seen.push([].filter.call(document.querySelectorAll('.sv-screen'),function(x){ return getComputedStyle(x).display!=='none'; }).map(function(x){ return x.id; }).join()===id);
@@ -217,7 +217,6 @@ t('shell-groups', function(){
   else { go('dashboard/self'); if(!vis('p-dele')) bad.push('pro is not the three panes'); }
   var pt=document.querySelectorAll('#protabs [role=tab]');
   if(pt.length!==4 || [].filter.call(pt,function(b){ return b.tabIndex===0; }).length!==1) bad.push('Pro tabs: '+pt.length+' tabs, not one Tab stop');
-  go('dashboard/autopilot'); if(!vis('sv-auto')) bad.push('autopilot page '+at());
   go('dashboard/governance'); if(at()!=='dashboard/governance' || !vis('sv-mygov')) bad.push('governance page '+at());
   go('network/uptime'); if(at()!=='network/uptime' || !vis('sv-net')) bad.push('network '+at());
   go('staking/bonus');
