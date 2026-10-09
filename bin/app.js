@@ -2947,7 +2947,9 @@ rememberGridH();
      rejected, this form accepted for the Autopilot grant, the Restake grants and a revoke. Direct signing is unaffected:
      tx.js encodes the number as before. */
   function stakeAuth(kind){ return { Validators: null, authorization_type: kind }; }
-  window.__canGrant = function(){ var w = window.__WALLET; return !!w && (!!w.signDirect || !!w.ledger); };
+  /* any connected wallet can grant: Keplr signs direct, a Ledger behind Keplr and Adena sign amino JSON with this same
+     form (Adena was left out when Ledger came in, 2026-10-08; covered 2026-10-09) */
+  window.__canGrant = function(){ var w = window.__WALLET; return !!w && (!!w.signDirect || !!w.signAmino); };
   function revokeMsg(t, to){ return { type: "cosmos-sdk/MsgRevoke", value: { granter: window.__ADDR, grantee: to || AT.addr, msg_type_url: t } }; }
   /* other operators' restake, cancelled in the same approval that turns ours on (operator, 2026-09-30): any other grantee
      holding a delegate grant is a restake service; its delegate grant and its claim grant are revoked. Its other grants
@@ -3142,7 +3144,7 @@ rememberGridH();
     var signer = window.__canGrant();
     var ok = !view && !!AT.addr && signer;
     var hint = E("athint");
-    if(hint){ hint.className = "unhint"; hint.textContent = !signer ? "Needs Keplr" : ""; }
+    if(hint){ hint.className = "unhint"; hint.textContent = !signer ? "Connect a wallet" : ""; }
     var go = E("atgrant"); if(go) go.disabled = !ok;
     var sm = E("atsum");
     /* the header says one thing, as Restake's does: Active or Inactive (operator, 2026-09-30) */
@@ -3311,7 +3313,7 @@ rememberGridH();
   window.__rsToggle = function(btn){
     if(RS_BUSY || !window.__ADDR) return;
     var n = window.__notify();
-    if(!window.__TX || !window.__canGrant()){ n.fail("Restake needs Keplr"); return; }
+    if(!window.__TX || !window.__canGrant()){ n.fail("Connect a wallet to turn on Restake"); return; }
     RS_BUSY = true; if(btn){ btn.disabled = true; btn.classList.add("busy"); }
     var done = false;
     return atStatus().then(function(){ return atGrant(); }).then(function(r){
