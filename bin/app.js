@@ -3385,17 +3385,18 @@ rememberGridH();
   };
   /* THE RULE (operator, 2026-09-29), with the shelf rise (2026-10-01): the page's copy of keeper.py plan() and fill() -
      the same arithmetic, so the move Your move offers is the move Autopilot would make. Water poured from the lowest
-     step: the smallest validator (the last EDGE left out) rises first, to 1 ATONE under the one ranked above it; then
+     step: the smallest validator (the last EDGE left out) rises first, to STEP (300 ATONE) under the one ranked above it; then
      the two rise together, and the shelf takes the next validator up as it reaches it. Nobody passes the one above;
      the largest fifth never take stake. A source may give all the free stake and fall in rank, never below the top of
      the shelf (operator, 2026-10-01); stake on the smallest 34% never moves out; at most MAXMOVES moves (move less rather than cut); nothing while
      any of the wallet's stake is cooling down. Answers null or { now, after, gain, moves, msgs:[{from,to,amt}] }. */
-  var EDGE = 3, GAP = 1e6, MAXMOVES = 60, MIN_LIFT = 0.05;   /* keeper.py EDGE, MAX_MOVES_DAY */
+  var EDGE = 3, GAP = 1e6, STEP = 300e6, MAXMOVES = 60, MIN_LIFT = 0.05;   /* keeper.py EDGE, GAP, STEP, MAX_MOVES_DAY */
   /* keeper.py top(n) and bottom(n): the largest fifth never take stake, the smallest 34% never give (20 and 34 of 100) */
   function topN(n){ return Math.floor(n / 5); }
   function bottomN(n){ return Math.floor((n * 34 + 50) / 100); }
   /* keeper.py fill(): {op: added}; s[j] the stake as it stands, ok(j) whether rank j+1 may take any. One that may not is
-     a fixed step: the shelf below it rises to 1 ATONE under it, then the pour carries on above it */
+     a fixed step: the shelf below it rises to STEP (300 ATONE, the room Restake stakes into) under it, then the pour
+     carries on above it */
   function shelfFill(V, s, amount, ok){
     var n = V.length, add = {}, left = Math.floor(amount), i = n - 1 - EDGE, j, TOP = topN(n);
     while(i >= TOP && left >= GAP){
@@ -3403,13 +3404,13 @@ rememberGridH();
       var b0 = i;
       while(i - 1 >= TOP && ok(i - 1)) i--;
       var k0 = i; i--;
-      var cost = function(k, L){ var c = 0; for(var q = k; q <= b0; q++) c += Math.max(0, L - (q - k) * GAP - s[q]); return c; };
+      var cost = function(k, L){ var c = 0; for(var q = k; q <= b0; q++) c += Math.max(0, L - (q - k) * STEP - s[q]); return c; };
       var k = b0, lmax;
-      for(;;){ lmax = s[k - 1] - GAP; if(cost(k, lmax) >= left || k === k0) break; k--; }
+      for(;;){ lmax = s[k - 1] - STEP; if(cost(k, lmax) >= left || k === k0) break; k--; }
       var hi = lmax, lo = Math.min(s[k], hi);
       if(cost(k, hi) <= left) lo = hi;
       else while(lo < hi){ var mid = Math.floor((lo + hi + 1) / 2); if(cost(k, mid) <= left) lo = mid; else hi = mid - 1; }
-      for(j = k; j <= b0; j++){ var x = lo - (j - k) * GAP - s[j]; if(x > 0){ add[V[j][3]] = x; left -= x; } }
+      for(j = k; j <= b0; j++){ var x = lo - (j - k) * STEP - s[j]; if(x > 0){ add[V[j][3]] = x; left -= x; } }
     }
     Object.keys(add).forEach(function(op){ if(add[op] < 1e6) delete add[op]; });
     return add;

@@ -473,7 +473,7 @@ def plan_restake(c, granter, rg, vals, m):  # noqa: C901
         return add
     while True:
         stake = rewards - send
-        add = fill(ranked, lambda op: vals[op]["t"], stake, ok, min_leg=1) if stake > 0 else {}
+        add = fill(ranked, lambda op: vals[op]["t"], stake, ok, min_leg=1, step=GAP) if stake > 0 else {}
         # what the shelf cannot take (a grant's list leaves too little room) would pass a validator: claim less
         fits = len(add) <= RS_LEGS and stake - sum(add.values()) < GAP // 2
         if not fits and stake > 0:
@@ -573,7 +573,7 @@ def pairs_used(reds):
 
 # ── the plan: the operator's rule (2026-09-29), with the shelf rise (2026-10-01) ─────────────
 # Water poured from the lowest step: the smallest validator (leaving out the last EDGE, the edge of the set) rises
-# first, to 1 ATONE under the validator ranked just above it; then the two rise together, each 1 ATONE under the
+# first, to STEP (300 ATONE since 2026-10-09) under the validator ranked just above it; then the two rise together, each STEP under the
 # one above, and so on: a shelf that rises one step at a time and takes the next validator up as it reaches it
 # (operator, 2026-10-01: "apply shelf rise"). Nobody passes the validator above, so no rank changes; the largest
 # top(n) never take stake. Any validator of the active set may take stake. A source may give all of the wallet's free
@@ -588,11 +588,13 @@ def top(n): return n // 5
 def bottom(n): return (n * 34 + 50) // 100
 EDGE = 3            # the last 3 are left out (operator, 2026-09-30)
 GAP = 1_000_000     # 1 ATONE between neighbours: a tie would let the chain's tie-break swap the two
+STEP = 300_000_000  # Autopilot fills each validator to 300 ATONE under the one above (operator, 2026-10-09; was 1 ATONE):
+                    # the room left is where Restake stakes, as a 1-ATONE staircase had none (no restake ran 10-09 12:00)
 
-def fill(ranked, stake, amount, ok, min_leg=MIN_MOVE):
+def fill(ranked, stake, amount, ok, min_leg=MIN_MOVE, step=STEP):
     """the shelf rise: answers {op: added}. ranked is largest first; stake(op) the stake as it stands; ok(v) whether v
     may take any. A validator that may not (a source, a refused pair, a grant's list) is a fixed step: the shelf below
-    it rises to 1 ATONE under it, then the pour carries on above it"""
+    it rises to `step` under it, then the pour carries on above it. Autopilot pours with STEP, Restake with GAP"""
     n = len(ranked); add = {}; left = int(amount); TOP = top(n)
     s = [int(stake(v["op"])) for v in ranked]
     i = n - 1 - EDGE
@@ -601,10 +603,10 @@ def fill(ranked, stake, amount, ok, min_leg=MIN_MOVE):
         b0 = i                                         # the segment: b0 up to the first fixed step (or TOP)
         while i - 1 >= TOP and ok(ranked[i - 1]): i -= 1
         k0 = i; i -= 1                                 # ranked[k0 - 1] is a fixed step, or rank TOP
-        def cost(k, L): return sum(max(0, L - (j - k) * GAP - s[j]) for j in range(k, b0 + 1))
+        def cost(k, L): return sum(max(0, L - (j - k) * step - s[j]) for j in range(k, b0 + 1))
         k = b0
         while True:
-            lmax = s[k - 1] - GAP                      # the shelf's top stays 1 ATONE under the one above it
+            lmax = s[k - 1] - step                     # the shelf's top stays `step` under the one above it
             if cost(k, lmax) >= left or k == k0: break
             k -= 1                                     # it reached ranked[k - 1]: that one joins the shelf
         hi = lmax; lo = min(s[k], hi)                  # the highest level the amount pays for, never past lmax
@@ -615,7 +617,7 @@ def fill(ranked, stake, amount, ok, min_leg=MIN_MOVE):
                 if cost(k, mid) <= left: lo = mid
                 else: hi = mid - 1
         for j in range(k, b0 + 1):
-            x = lo - (j - k) * GAP - s[j]
+            x = lo - (j - k) * step - s[j]
             if x > 0: add[ranked[j]["op"]] = x; left -= x
     # dust is not a move; leaving it out keeps the order, as the gap (1 ATONE) is wider than any dust. A restake has no
     # dust (a delegation spends no pair entry): it passes min_leg=1
