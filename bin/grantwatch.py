@@ -255,10 +255,6 @@ def totals(L):
     rs = list((L.get("restake") or {}).keys())
     return {"autopilot": (len(ap), sum(staked(g) for g in ap)), "restake": (len(rs), sum(staked(g) for g in rs))}
 
-def count_fields(T):
-    return {"Autopilot users": T["autopilot"][0], "Autopilot ATONE": "{:,.1f}".format(T["autopilot"][1] / 1e6),
-            "Restake users": T["restake"][0], "Restake ATONE": "{:,.1f}".format(T["restake"][1] / 1e6)}
-
 # (red team 2026-10-01) Discord is sent from one daemon thread, in order: a slow or failing webhook never holds the poll
 _Q, _W = queue.Queue(maxsize=200), []
 def _worker():
@@ -280,31 +276,29 @@ def disc(level, title, text, fields):
 
 
 def announce(L, ev):
-    """the two grant events of this step, with the counts as they stand after it. More than BURST in one poll: one
-    message with the counts per service and every address (red team 2026-10-01: a grant flood is one message, not N)"""
+    """the two grant events of this step as sentences, Autopilot and Restake never in one message (operator, 2026-10-09:
+    an admin watch, no explanations), with the service's total as it stands after it. More than BURST of one service
+    in one poll: one message for that service listing every address (red team 2026-10-01: a flood is one message)"""
     want = [e for e in ev if e[1].startswith("New Autopilot grant") or e[1].startswith("Restake enabled")]
     if not want: return
     T = totals(L)
-    if len(want) > BURST:
-        ap = [e[3].get("Delegator") for e in want if e[1].startswith("New Autopilot")]
-        rs = [e[3].get("Delegator") for e in want if e[1].startswith("Restake enabled")]
-        f = {"New Autopilot grants": len(ap), "Restake turned on": len(rs)}
-        f.update(count_fields(T))
-        lines = ["Autopilot " + a for a in ap] + ["Restake " + a for a in rs]
-        text, n = "", 0
-        for ln in lines:
-            if len(text) + len(ln) + 40 > 3800: break
-            text += ln + "\n"; n += 1
-        if n < len(lines): text += "and %d more (the admin console lists them all)" % (len(lines) - n)
-        disc("ok", "%d new grants in one check" % len(want), text, f)
-        return
-    for level, title, text, fields in want:
-        gr = fields.get("Delegator"); ap = title.startswith("New Autopilot")
-        f = {"Address": gr, "Staked": "{:,.1f} ATONE".format(staked(gr) / 1e6)}
-        f.update(count_fields(T))
-        disc("ok", "New Autopilot grant" if ap else "Restake turned on",
-             ("Autopilot moves this wallet at the next run (00:00 or 12:00 UTC), at once if it is new."
-              if ap else "Rewards are claimed and staked again at every run, from 1 ATONE."), f)
+    for svc, name, prefix, did in (("autopilot", "Autopilot", "New Autopilot grant", "granted Autopilot"),
+                                   ("restake", "Restake", "Restake enabled", "turned on Restake")):
+        grs = [e[3].get("Delegator") for e in want if e[1].startswith(prefix)]
+        if not grs: continue
+        tot = "%s now has %d wallets and {:,.1f} ATONE staked.".format(T[svc][1] / 1e6) % (name, T[svc][0])
+        if len(grs) <= BURST:
+            for gr in grs:
+                disc("ok", "New Autopilot grant" if svc == "autopilot" else "Restake turned on",
+                     "`%s` %s with {:,.2f} ATONE staked.\n%s".format(staked(gr) / 1e6) % (gr, did, tot), None)
+            continue
+        text, n = "%d wallets %s in one check:\n" % (len(grs), did), 0
+        for gr in grs:
+            ln = "`%s` {:,.2f} ATONE\n".format(staked(gr) / 1e6) % gr
+            if len(text) + len(ln) + 120 > 3800: break
+            text += ln; n += 1
+        if n < len(grs): text += "and %d more (the admin console lists them all)\n" % (len(grs) - n)
+        disc("ok", "%d new %s" % (len(grs), "Autopilot grants" if svc == "autopilot" else "Restake wallets"), text + tot, None)
 
 def milestones(L, c):
     """20 / 50 / 100 users and 200k / 500k / 1M ATONE, per service, each announced once (a row in `milestone`). The very
@@ -323,7 +317,7 @@ def milestones(L, c):
             for n in marks:
                 if value < n or c.execute("SELECT 1 FROM milestone WHERE metric=? AND threshold=?", (metric, n)).fetchone(): continue
                 c.execute("INSERT INTO milestone VALUES(?,?,?,?,?)", (metric, n, value, now, now if quiet else None))
-                if not quiet: jobs.append((metric, n, title(n), text, count_fields(T)))
+                if not quiet: jobs.append((metric, n, title(n), text, None))
     c.commit()
     # sent from the Discord thread, which marks announced_at on its own connection once it went (red team 2026-10-01)
     for metric, n, title_, text_, f in jobs:

@@ -295,7 +295,7 @@ def run_reset():
     RUN.clear()
     RUN.update({"ap_checked": 0, "ap_wallets": set(), "ap_moves": 0, "ap_txs": [], "ap_uatone": 0, "ap_gain": 0.0, "ap_failed": 0,
                 "rs_checked": 0, "rs_done": 0, "rs_txs": [], "rs_rewards": 0, "rs_staked": 0, "rs_failed": 0, "rs_small": 0, "txinfo": {},
-                "ap_bad": [], "rs_bad": [], "ap_held": 0, "rs_held": 0})
+                "ap_bad": [], "rs_bad": [], "ap_held": 0, "rs_held": 0, "ap_fail": [], "rs_list": [], "rs_fail": []})
 
 def tx_chain(h):
     """what the chain says one of our transactions cost: height, code, gas wanted and used, fee in uphoton (None if unread)"""
@@ -344,11 +344,48 @@ def impact(c):
     return {"moved_uatone": int(m[0]), "wallets": m[1], "validators": m[2], "gain_atone_year": round(m[3], 1), "txs": m[4],
             "restaked_uatone": int(r[0]), "restakes": r[1], "restake_wallets": r[2]}
 
+EXPLORER = os.environ.get("EXPLORER_TX", "https://explorer.gatahub.zone/atomone-1/txs/" if NET == "mainnet" else "")
+
+def _md(x):
+    """a chain string (a moniker is anyone's text) in a Discord message: its markdown characters escaped"""
+    return re.sub(r"([\\`*_~|>\[\]()#<@])", r"\\\1", str(x))[:40]
+
+def _names():
+    """validator -> (moniker, rank), from the collector's record"""
+    try: return {v["op"]: (v["m"], v.get("rank")) for v in json.load(open(DATA))["validators"]}
+    except Exception: return {}
+
+def _vals(N, ops, k=3):
+    """validators in rank order as "Name (#r)", the first k and how many more"""
+    ops = sorted(set(ops), key=lambda o: (N.get(o, ("", 999))[1] or 999))
+    out = ["%s (#%s)" % (_md(N[o][0]), N[o][1]) if o in N and N[o][1] else ("inactive validator " + o[:20] + "\u2026") for o in ops]
+    return ", ".join(out) if len(out) <= k else "%s and %d more" % (", ".join(out[:k]), len(out) - k)
+
+def _tx(h):
+    return ("[%s](%s%s)" % (h[:8], EXPLORER, h)) if h and EXPLORER else (h or "")[:8]
+
+def _why(t):
+    """a failed broadcast's reason in plain words"""
+    l = str(t).lower()
+    if "spendable balance" in l or "insufficient fee" in l or "insufficient funds" in l: return "the fee account is short of PHOTON"
+    if "429" in l or "rate limit" in l: return "the node was busy (rate limited)"
+    if "authorization not found" in l or "authorization expired" in l: return "the grant is gone"
+    if "not yet seen" in l: return "sent, not yet seen on chain"
+    return str(t)[:100]
+
+def _lines(text, lines, tail):
+    """the message within Discord's limit: what does not fit is counted, never cut mid-line"""
+    out, n = (text if lines else text.rstrip("\n") + "\n"), 0
+    for ln in lines:
+        if len(out) + len(ln) + len(tail) + 80 > 3800: break
+        out += ln + "\n"; n += 1
+    if n < len(lines): out += "and %d more (the admin console lists them all)\n" % (len(lines) - n)
+    return out + tail
+
 def run_summaries(c, n_ap, n_rs, dry):
     """Discord: one message per scheduled run of each service, and one for any other tick that did something"""
     slot, tag = slot0(), " (dry run)" if dry else ""
     RUN["slot_run"] = any((c.execute("SELECT at FROM alert_sent WHERE granter='_run' AND k=?", (k,)).fetchone() or [0])[0] < slot for k in ("autopilot", "restake"))
-    when = time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime(slot))
     for kind in ("autopilot", "restake"):
         row = c.execute("SELECT at FROM alert_sent WHERE granter='_run' AND k=?", (kind,)).fetchone()
         scheduled = not row or row[0] < slot
@@ -359,19 +396,32 @@ def run_summaries(c, n_ap, n_rs, dry):
             c.execute("INSERT INTO run_sum(at, slot, service, kind, dry, wallets, checked, acted, skipped, failed, msgs, txs, uatone, gain, gas_used, fee_uphoton, photon_after)"
                       " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (int(time.time()), slot, kind, "slot" if scheduled else "grant", int(dry), n_ap, RUN["ap_checked"],
                       len(RUN["ap_wallets"]), 0, RUN["ap_failed"], RUN["ap_moves"], len(RUN["ap_txs"]), int(RUN["ap_uatone"]), RUN["ap_gain"], gas, fee, RUN.get("photon")))
-            f = {"Run": when if scheduled else "outside the schedule (a new grant)", "Autopilot wallets": n_ap,
-                 "Wallets checked": RUN["ap_checked"], "Wallets moved": len(RUN["ap_wallets"]), "Moves": RUN["ap_moves"],
-                 "Transactions": len(RUN["ap_txs"]), "ATONE moved": "{:,.1f}".format(RUN["ap_uatone"] / 1e6),
-                 "Gain": "+{:,.1f} ATONE a year".format(RUN["ap_gain"]), "Gas": "{:,}".format(gas),
-                 "Fees": "{:,.4f} PHOTON".format(fee / 1e6), "Failed": RUN["ap_failed"]}
-            if RUN["ap_held"]: f["Held"] = RUN["ap_held"]
-            im = impact(c)
-            f["Autopilot so far"] = "{:,.1f} ATONE moved by {} wallets to {} smaller validators, +{:,.1f} ATONE a year".format(
-                im["moved_uatone"] / 1e6, im["wallets"], im["validators"], im["gain_atone_year"])
-            if RUN["ap_txs"]: f["Tx"] = "\n".join(RUN["ap_txs"])
-            if RUN["ap_wallets"]: f["Wallets"] = "\n".join(sorted(RUN["ap_wallets"]))
-            discord("crit" if RUN["ap_failed"] else "ok" if RUN["ap_moves"] else "info", "Autopilot run" + tag,
-                    "%d wallets moved, %d moves in %d transactions." % (len(RUN["ap_wallets"]), RUN["ap_moves"], len(RUN["ap_txs"])), f)
+            # (operator, 2026-10-09) an admin watch in sentences: what moved, from which validator to which, how many moves
+            N, im, held = _names(), impact(c), (" %d held." % RUN["ap_held"]) if RUN["ap_held"] else ""
+            if RUN["ap_moves"]:
+                text = ("Moved {:,.1f} ATONE for %d wallet%s in %d moves (%d transaction%s), +{:,.1f} ATONE a year. Fees {:,.4f} PHOTON.%s\n\n"
+                        .format(RUN["ap_uatone"] / 1e6, RUN["ap_gain"], fee / 1e6)
+                        % (len(RUN["ap_wallets"]), "" if len(RUN["ap_wallets"]) == 1 else "s", RUN["ap_moves"],
+                           len(RUN["ap_txs"]), "" if len(RUN["ap_txs"]) == 1 else "s", held))
+            else:
+                text = "Checked %d wallet%s, nothing to move.%s\n\n" % (RUN["ap_checked"], "" if RUN["ap_checked"] == 1 else "s", held)
+            lines, txs = [], [t for t in RUN["ap_txs"] if t]
+            if txs:
+                rows = c.execute("SELECT granter, src, dst, uatone, gain, txhash FROM move WHERE dry=0 AND txhash IN (%s)" % ",".join("?" * len(txs)), txs).fetchall()
+                by = {}
+                for g, src, dst, u, gain, h in rows:
+                    w = by.setdefault(g, {"src": [], "dst": [], "u": 0, "gain": 0.0, "n": 0, "tx": []})
+                    w["src"].append(src); w["dst"].append(dst); w["u"] += u; w["gain"] += gain or 0; w["n"] += 1
+                    if h not in w["tx"]: w["tx"].append(h)
+                for g, w in sorted(by.items(), key=lambda kv: -kv[1]["u"]):
+                    lines.append("`%s` {:,.1f} ATONE from %s to %s, %d move%s, +{:,.1f} ATONE a year, %s".format(w["u"] / 1e6, w["gain"])
+                                 % (short(g), _vals(N, w["src"]), _vals(N, w["dst"]), w["n"], "" if w["n"] == 1 else "s", " ".join(_tx(h) for h in w["tx"])))
+            lines = ["Failed: `%s`, %s." % (short(g), _why(w)) for g, w in RUN["ap_fail"]] + lines      # failures first
+            tail = "\nSo far Autopilot has moved {:,.1f} ATONE for %d wallets onto %d smaller validators, +{:,.1f} ATONE a year.".format(
+                im["moved_uatone"] / 1e6, im["gain_atone_year"]) % (im["wallets"], im["validators"])
+            discord("crit" if RUN["ap_failed"] else "ok" if RUN["ap_moves"] else "info",
+                    ("Autopilot run " + time.strftime("%H:%M UTC", time.gmtime(slot)) if scheduled else "Autopilot, new grant") + tag,
+                    _lines(text, lines, tail))
         else:
             did = RUN["rs_done"] or RUN["rs_failed"]
             if not (scheduled or did): continue
@@ -379,17 +429,24 @@ def run_summaries(c, n_ap, n_rs, dry):
             c.execute("INSERT INTO run_sum(at, slot, service, kind, dry, wallets, checked, acted, skipped, failed, msgs, txs, uatone, gain, gas_used, fee_uphoton, photon_after)"
                       " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (int(time.time()), slot, kind, "slot" if scheduled else "enabled", int(dry), n_rs, RUN["rs_checked"],
                       RUN["rs_done"], RUN["rs_small"], RUN["rs_failed"], RUN["rs_done"], len(RUN["rs_txs"]), int(RUN["rs_staked"]), 0.0, gas, fee, RUN.get("photon")))
-            f = {"Run": when if scheduled else "outside the schedule (Restake turned on)", "Restake wallets": n_rs,
-                 "Wallets checked": RUN["rs_checked"], "Wallets restaked": RUN["rs_done"], "Under 1 ATONE (skipped)": RUN["rs_small"],
-                 "Transactions": len(RUN["rs_txs"]), "Rewards claimed": "{:,.4f} ATONE".format(RUN["rs_rewards"] / 1e6),
-                 "ATONE restaked": "{:,.4f}".format(RUN["rs_staked"] / 1e6), "Gas": "{:,}".format(gas),
-                 "Fees": "{:,.4f} PHOTON".format(fee / 1e6), "Failed": RUN["rs_failed"]}
-            if RUN["rs_held"]: f["Held"] = RUN["rs_held"]
-            im = impact(c)
-            f["Restake so far"] = "{:,.4f} ATONE restaked in {} restakes for {} wallets".format(im["restaked_uatone"] / 1e6, im["restakes"], im["restake_wallets"])
-            if RUN["rs_txs"]: f["Tx"] = "\n".join(RUN["rs_txs"])
-            discord("crit" if RUN["rs_failed"] else "ok" if RUN["rs_done"] else "info", "Restake run" + tag,
-                    "%d wallets restaked, %d transactions." % (RUN["rs_done"], len(RUN["rs_txs"])), f)
+            N, im = _names(), impact(c)
+            small = (" %d had under 1 ATONE of rewards." % RUN["rs_small"]) if RUN["rs_small"] else ""
+            held = (" %d held." % RUN["rs_held"]) if RUN["rs_held"] else ""
+            if RUN["rs_done"]:
+                text = ("Restaked {:,.2f} ATONE of rewards for %d wallet%s (%d transaction%s).%s%s Fees {:,.4f} PHOTON.\n\n"
+                        .format(RUN["rs_staked"] / 1e6, fee / 1e6)
+                        % (RUN["rs_done"], "" if RUN["rs_done"] == 1 else "s", len(RUN["rs_txs"]), "" if len(RUN["rs_txs"]) == 1 else "s", small, held))
+            else:
+                text = "Checked %d wallet%s, nothing restaked.%s%s\n\n" % (RUN["rs_checked"], "" if RUN["rs_checked"] == 1 else "s", small, held)
+            # failures first; no link per restake (a run has dozens, the admin console has every transaction)
+            lines = ["Failed: `%s`, %s." % (short(g), _why(w)) for g, w in RUN["rs_fail"]]
+            lines += ["`%s` {:,.2f} ATONE onto %s".format(u / 1e6) % (short(g), _vals(N, legs))
+                      for g, u, legs, h in sorted(RUN["rs_list"], key=lambda x: -x[1])]
+            tail = "\nSo far Restake has staked {:,.2f} ATONE of rewards in %d restakes for %d wallets.".format(
+                im["restaked_uatone"] / 1e6) % (im["restakes"], im["restake_wallets"])
+            discord("crit" if RUN["rs_failed"] else "ok" if RUN["rs_done"] else "info",
+                    ("Restake run " + time.strftime("%H:%M UTC", time.gmtime(slot)) if scheduled else "Restake, turned on") + tag,
+                    _lines(text, lines, tail))
         if scheduled:
             c.execute("INSERT OR REPLACE INTO alert_sent VALUES('_run', ?, ?)", (kind, slot)); c.commit()
     if RUN.get("slot_run"):
@@ -528,9 +585,10 @@ def restake_step(c, granter, rgs, vals, m, dry):
             ok = "txhash" in r and "error" not in r
             if ok:
                 RUN["rs_done"] += 1; RUN["rs_txs"].append(r.get("txhash")); RUN["rs_rewards"] += int(p["rewards"]); RUN["rs_staked"] += int(amt)
+                RUN["rs_list"].append((granter, int(amt), [s["validator"] for s in p["stake"]], r.get("txhash")))
                 RUN["txinfo"][r.get("txhash")] = {"at": int(time.time()), "granter": granter, "msgs": len(p["claim"]) + len(p["stake"]), "uatone": int(amt)}
             else:
-                RUN["rs_failed"] += 1
+                RUN["rs_failed"] += 1; RUN["rs_fail"].append((granter, classify(r)[1]))
                 # (red team 2026-10-01) a broadcast that failed still counts in the day and its fee in the budget; a grant
                 # or stake that is gone holds the wallet 24 hours
                 record_failed(c, granter, "restake", classify(r)[2], len(p["stake"]))
@@ -953,7 +1011,7 @@ def auto_apply(c, g, p, pid, dry, out):
     if ok:
         c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()      # announced in the run summary (Discord)
         return
-    RUN["ap_failed"] += 1
+    RUN["ap_failed"] += 1; RUN["ap_fail"].append((gr, why or kind))
     p = dict(p, moves=moves)                       # what is left is what the retry or the next run is about
     if kind == "settle":
         c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()
