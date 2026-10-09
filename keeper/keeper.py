@@ -438,10 +438,9 @@ def run_summaries(c, n_ap, n_rs, dry):
                         % (RUN["rs_done"], "" if RUN["rs_done"] == 1 else "s", len(RUN["rs_txs"]), "" if len(RUN["rs_txs"]) == 1 else "s", small, held))
             else:
                 text = "Checked %d wallet%s, nothing restaked.%s%s\n\n" % (RUN["rs_checked"], "" if RUN["rs_checked"] == 1 else "s", small, held)
-            # failures first; no link per restake (a run has dozens, the admin console has every transaction)
+            # no list of wallets (operator, 2026-10-09: the admin console has them): where the rewards went, and failures
+            if RUN["rs_list"]: text += "Onto %s.\n\n" % _vals(N, [v for x in RUN["rs_list"] for v in x[2]], 5)
             lines = ["Failed: `%s`, %s." % (short(g), _why(w)) for g, w in RUN["rs_fail"]]
-            lines += ["`%s` {:,.2f} ATONE onto %s".format(u / 1e6) % (short(g), _vals(N, legs))
-                      for g, u, legs, h in sorted(RUN["rs_list"], key=lambda x: -x[1])]
             tail = "\nSo far Restake has staked {:,.2f} ATONE of rewards in %d restakes for %d wallets.".format(
                 im["restaked_uatone"] / 1e6) % (im["restakes"], im["restake_wallets"])
             discord("crit" if RUN["rs_failed"] else "ok" if RUN["rs_done"] else "info",
