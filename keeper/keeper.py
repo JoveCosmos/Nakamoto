@@ -460,11 +460,24 @@ def plan_restake(c, granter, rg, vals, m):  # noqa: C901
     allow, deny = set(rg["stake"]["allow"] or []), set(rg["stake"].get("deny") or [])
     ranked = sorted(vals.values(), key=lambda v: -v["t"])
     def ok(v): return (not allow or v["op"] in allow) and v["op"] not in deny
+    def room(amount):
+        """(2026-10-09) Autopilot's pours leave the shelf a staircase 1 ATONE a step (20 validators wide that day): rising
+        from its bottom lifts every step, more legs than RS_LEGS, and every restake was skipped. Then the rewards go where
+        there is room without lifting anyone: the lowest-ranked first, each up to 1 ATONE under the one above it (the
+        staircase's top step had 837 ATONE of room). No validator passes another, so no rank changes"""
+        s = [int(v["t"]) for v in ranked]; add, left = {}, int(amount)
+        for i in range(len(ranked) - 1 - EDGE, top(len(ranked)) - 1, -1):
+            if left <= 0 or len(add) >= RS_LEGS: break
+            x = min(left, s[i - 1] - GAP - s[i]) if ok(ranked[i]) else 0
+            if x >= 1: add[ranked[i]["op"]] = x; left -= x
+        return add
     while True:
         stake = rewards - send
         add = fill(ranked, lambda op: vals[op]["t"], stake, ok, min_leg=1) if stake > 0 else {}
         # what the shelf cannot take (a grant's list leaves too little room) would pass a validator: claim less
         fits = len(add) <= RS_LEGS and stake - sum(add.values()) < GAP // 2
+        if not fits and stake > 0:
+            add = room(stake); fits = bool(add) and stake - sum(add.values()) < 1
         if fits or len(claim) <= 1: break
         claim.pop(); rewards = sum(a for a, v in pend if v in claim)
     if not add or not fits: out["skip"] = "no validator to stake on"; return out
