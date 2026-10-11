@@ -3353,13 +3353,13 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
    height with Trend and Picks scrolling inside it - a box that ended above the foot of the screen and
    left a dead band under it. Now the PHONE scrolls, as on the dashboard; the bar stays at the top */
 @media(max-width:620px){
-  html:is([data-tab=home],[data-tab=eta],[data-tab=pays]) .below{height:auto;min-height:100svh;overflow:visible}
+  html:is([data-tab=home],[data-tab=eta],[data-tab=effect],[data-tab=pays]) .below{height:auto;min-height:100svh;overflow:visible}
   html:is([data-tab=home],[data-tab=eta],[data-tab=effect],[data-tab=pays]) .panes{overflow:visible;height:auto}
   html:is([data-tab=home],[data-tab=eta],[data-tab=effect],[data-tab=pays]) .w#calc{overflow:visible;height:auto}
   html[data-tab=home] .w#calc>#p-home,html[data-tab=eta] .w#calc>#p-eta,html[data-tab=effect] .w#calc>#p-effect,html[data-tab=pays] .w#calc>#p-pays,
   html[data-tab=home] #p-home,html[data-tab=eta] #p-eta,html[data-tab=effect] #p-effect,html[data-tab=pays] #p-pays{height:auto;max-height:none;margin-top:0;flex:1 1 auto;overflow:visible;overscroll-behavior:auto}
   html:is([data-tab=eta],[data-tab=effect],[data-tab=pays]) :is(#p-eta,#p-effect,#p-pays)>.pw{height:auto;min-height:0}
-  html:is([data-tab=home],[data-tab=eta],[data-tab=pays]) .folder{position:sticky;top:0;z-index:20;background:var(--void)}
+  html:is([data-tab=home],[data-tab=eta],[data-tab=effect],[data-tab=pays]) .folder{position:sticky;top:0;z-index:20;background:var(--void)}
 }
 /* ── the phone's Redelegate list: four real columns (its markup is its own), laid out
    fixed so nothing is cut; the APR pair shows whole; the plan's addition keeps room ── */
