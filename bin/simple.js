@@ -895,10 +895,18 @@
         (d == null ? '' : '<i class=' + (d >= 0 ? "up" : "dn") + '>' + (d >= 0 ? "+" : "\u2212") + Math.abs(d).toFixed(1) + '% 24h</i>') +
         (cap ? '<small>market cap <u>$' + (cap >= 1e9 ? (cap / 1e9).toFixed(2) + "B" : (cap / 1e6).toFixed(1) + "M") + '</u></small>' : '') + '</span>'; };
     if(!hist.length){ put("sv-ecoa", '<div class=sv-ph><h3>ATONE supply and stake</h3></div><div class=sv-upwait>Reading the chain…</div>'); put("sv-ecop", '<div class=sv-ph><h3>PHOTON supply</h3></div><div class=sv-upwait>Reading the chain…</div>'); return; }
-    /* each supply's bottom line is its change over 30 days, against the reading nearest that day */
-    var now = hist[hist.length - 1], cut = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10), was = null;
-    for(var i = hist.length - 1; i >= 0; i--) if(hist[i].d <= cut){ was = hist[i]; break; }
-    var ch = function(k){ return was && was[k] ? ((now[k] / was[k] - 1) * 100) : null; };
+    /* each supply's bottom line is its change over the last 30 days, exactly: the value on the day 30 days before the
+       latest reading, interpolated by date between the two readings around it (the history is daily since 2026-09-26
+       with a few missed days, weekly before; operator, 2026-10-11: "real recent 30 days", not the nearest reading) */
+    var now = hist[hist.length - 1], cutMs = new Date(now.d).getTime() - 30 * 86400000, cut = new Date(cutMs).toISOString().slice(0, 10), lo = null, hi = null;
+    for(var i = hist.length - 1; i >= 0; i--){ if(hist[i].d <= cut){ lo = hist[i]; hi = hist[i + 1] || null; break; } }
+    var at = function(k){
+      if(!lo || !lo[k]) return null;
+      if(lo.d === cut || !hi || !hi[k]) return lo[k];
+      var t0 = new Date(lo.d).getTime(), t1 = new Date(hi.d).getTime(), f = t1 > t0 ? (cutMs - t0) / (t1 - t0) : 0;
+      return lo[k] + (hi[k] - lo[k]) * Math.max(0, Math.min(1, f));
+    };
+    var ch = function(k){ var v = at(k); return v ? ((now[k] / v - 1) * 100) : null; };
     var sg = function(v){ return v == null ? "" : (v >= 0 ? "+" : "\u2212") + Math.abs(v).toFixed(1) + "% in 30 days"; };
     var M = function(v){ return v <= 0 ? "0" : (v / 1e12).toFixed(0) + "M"; };
     put("sv-ecoa", '<div class=sv-ph><h3>ATONE</h3><span class=sv-gkey><i class=sup></i>supply<i class=bon></i>bonded</span>' + tp("atone", pr.atone, "var(--sv-amber)") + '<span class=sv-trole style="--c:var(--sv-amber)">Staking and Governance token</span><div class=sv-rt>' +
