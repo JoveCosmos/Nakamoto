@@ -1245,7 +1245,7 @@
     var h = '<div class="sv-ph gp-ph">' +
       st("Proposals", L ? String(L.length) : "-", psub, pfull) +
       st("Voting now", L ? (live.length ? String(live.length) : "None") : "-", L ? (live.length ? "#" + live[live.length - 1].id + " ends " + pday(live[live.length - 1].ve) : "no proposal is open") : "") +
-      st("To pass", tp.threshold ? "&gt;" + (tp.threshold * 100).toFixed(1) + "%" : "-", tp.quorum ? "of votes yes, " + (tp.quorum * 100).toFixed(1) + "% quorum" + (tp.law_threshold ? ", laws " + (tp.law_threshold * 100).toFixed(0) + "%" : "") : "of votes yes", tfull) + '</div>';
+      st("To pass", tp.threshold ? "&gt;" + (tp.threshold * 100).toFixed(1) + "%" : "-", tp.quorum ? "yes, " + (tp.quorum * 100).toFixed(1) + "% quorum" + (tp.law_threshold ? ", law change " + (tp.law_threshold * 100).toFixed(0) + "% yes" : "") : "yes", tfull) + '</div>';
     if(GP.err && !L){ put("sv-proplist", h + govEmpty("Could not read the proposals")); return; }
     if(!L){ put("sv-proplist", h + govEmpty("Reading the proposals…")); return; }
     if(!L.length){ put("sv-proplist", h + govEmpty("No proposals yet")); return; }
@@ -1254,7 +1254,7 @@
       var when = p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? "ends " + pday(p.ve) : p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? "deposit until " + pday(p.de) : "ended " + pday(p.ve);
       var row = '<div class="gp-r' + (open ? ' open' : '') + '" data-gp="' + p.id + '" tabindex=0 role=button aria-expanded=' + open + '>' +
         '<span class=gp-id>#' + p.id + '</span>' +
-        '<span class=gp-t><b>' + esc(p.title) + '</b><s>' + esc(pkind(p)) + ', ' + when + (p.endorsed ? ', endorsed by the Steering DAO' : '') + (p.ext ? ', voting extended ' + p.ext + '×' : '') + '</s></span>' +
+        '<span class=gp-t><b>' + esc(p.title) + '</b><s>' + esc(pkind(p)) + ', ' + when + (p.endorsed ? ', endorsed by the Steering DAO' : '') + (p.ext ? ', voting extended ' + p.ext + '×' : '') + (open ? ', tap to close' : '') + '</s></span>' +
         '<span class="gp-st ' + s[1] + '">' + s[0] + '</span>' +
         '<span class=gp-v>' + (t.s ? '<span class=gp-bar><i class=y style="width:' + pc(t.y).toFixed(2) + '%"></i><i class=n style="width:' + pc(t.n).toFixed(2) + '%"></i><i class=a style="width:' + pc(t.a).toFixed(2) + '%"></i></span>' +
           '<em>Yes ' + pc(t.y).toFixed(1) + '%</em><small>No ' + pc(t.n).toFixed(1) + '%, abstain ' + pc(t.a).toFixed(1) + '%</small>' : '<small>no votes' + (p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? ' yet' : '') + '</small>') + '</span></div>';
@@ -1553,7 +1553,7 @@
     var wname = (window.__WALLET && String(window.__WALLET.label || "").trim()) || "Your wallet";
     var row = function(k, v, u, extra){ return '<div class=you-r><span>' + k + '</span>' + (extra || '') + '<b>' + v + '</b><i>' + u + '</i></div>'; };
     var h = '<div class=you-h><h3 title="' + esc(wname) + '">' + esc(wname) + '</h3>' + wmeta() + '</div>';
-    h += '<div class=you-apr>' + rsx(pos, mine) + '<em>Your APR</em><b' + (mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '>' + (mine ? pct(pos.rate) : '-') + '</b>' +
+    h += '<div class=you-apr><em>Your APR</em><span class=you-big><b' + (mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '>' + (mine ? pct(pos.rate) : '-') + '</b>' + rsx(pos, mine) + '</span>' +
       '<small>' + (!a ? 'connect a wallet to see yours' : !pos ? 'reading…' : mine ? 'on ' + onNow(pos) + ' validator' + (onNow(pos) === 1 ? '' : 's') : 'Nothing staked') + '</small></div>';
     /* Pro on Redelegate: what can move now, the ticked delegations' free stake when any are ticked (operator, 2026-09-30) */
     var proRd = root.getAttribute("data-sv") === "dashboard/self" && matchMedia("(min-width:1100px)").matches && !root.getAttribute("data-pro");

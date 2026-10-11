@@ -2665,7 +2665,7 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .pop .card.stcard{width:min(520px,94vw);max-width:520px;max-height:92vh;max-height:92svh}
 /* Mint PHOTON (operator, 2026-10-04): the amount, what it becomes at today's rate, the burn note, the fee */
 .pop .card.mtcard{width:min(440px,94vw);max-width:440px}
-.mtcard .mtout{margin:12px 20px 0;padding:12px 14px;border:1px solid var(--wbd);border-radius:8px;display:grid;grid-template-columns:minmax(0,1fr) auto;row-gap:4px;align-items:baseline}
+.mtcard .mtout{margin:12px 20px 0;padding:12px 14px;min-height:92px;box-sizing:border-box;border:1px solid var(--wbd);border-radius:8px;display:grid;grid-template-columns:minmax(0,1fr) auto;row-gap:4px;align-items:baseline}
 .mtcard .mtout:empty{display:none}
 .mtcard .mtout em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
 .mtcard .mtout b{grid-column:1/-1;font-size:24px;font-weight:700;letter-spacing:-.01em;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -4672,7 +4672,11 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gp-list{display:flex;flex-direction:column;min-height:0;overflow-y:auto;flex:1 1 auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin-right:-8px;padding-right:4px}
 .gp-r{display:grid;grid-template-columns:44px minmax(0,1fr) 82px minmax(150px,230px);align-items:center;gap:14px;padding:10px 8px;border-top:1px solid var(--wbd);cursor:pointer}
 .gp-r:hover{background:rgba(255,255,255,.03)}.gp-r:focus-visible{outline:2px solid var(--sv-teal);outline-offset:-2px}
-.gp-r.open{background:rgba(255,255,255,.025)}
+.gp-r.open{background:rgba(43,200,189,.06);box-shadow:inset 3px 0 0 var(--sv-teal)}
+.gp-r.open .gp-id{background:var(--sv-teal);border-color:var(--sv-teal);color:#071a18}
+.gp-r>.gp-t>b::after{content:"\25BE";margin-left:7px;font-size:11px;color:var(--wf)}
+.gp-r.open>.gp-t>b::after{content:"\25B4";color:var(--sv-teal)}
+.gp-vote{min-height:46px;box-sizing:border-box}
 .gp-id{font-family:var(--wmono);font-size:12px;color:var(--wf)}
 .gp-t{display:flex;flex-direction:column;gap:2px;min-width:0}
 .gp-t b{font-size:13.5px;font-weight:700;color:var(--wt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -5552,6 +5556,8 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 /* Restake's addition in the APR block's upper corner, two lines: "+11.7% APR", then a blinking dot and "restake" (operator,
    2026-10-08). Inside the block's own padding box, so it never touches the section's border */
 .you-apr,.mv-yk{position:relative}
+.you-big{position:relative;display:inline-flex;align-self:flex-start}
+.you-big .you-rsx{right:auto;left:100%;margin-left:8px;align-items:flex-start;white-space:nowrap}
 .you-rsx{position:absolute;top:0;right:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-family:var(--wmono);font-size:11px;line-height:1.2;font-style:italic;letter-spacing:.03em;color:var(--sv-green);white-space:nowrap;font-weight:500;pointer-events:none}
 .you-rsx span{display:inline-flex;align-items:center;gap:5px}
 .you-rsx span+span{font-size:9.5px;opacity:.85}
@@ -6884,7 +6890,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <div class=txlock id=mtlock></div>
   <div class=txfee id=mtfee></div>
   <div class=txstep id=mtstep></div>
-  <div class=txbtns><button class=wk-btn id=mtcancel type=button>Cancel</button><button class="wk-btn wk-go" id=mtsign type=button disabled>Mint</button></div>
+  <div class=txbtns><button class="wk-btn wk-go" id=mtsign type=button disabled>Mint</button></div>
 </div></div>
 
 <div class=pop id=stpop><div class="card txcard uncard stcard">

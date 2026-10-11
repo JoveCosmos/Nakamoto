@@ -2736,9 +2736,10 @@ rememberGridH();
     var mx = E("mtmaxv"); if(mx) mx.textContent = exact(mtMax(), 2);
     var fld = E("mtamt") && E("mtamt").closest(".unfield"); if(fld) fld.classList.toggle("bad", !!over);
     var hint = E("mthint"); if(hint){ hint.className = "unhint" + (over ? " bad" : ""); hint.textContent = ""; }
-    if(out) out.innerHTML = !(MT.rate > 0) ? (MT.rate < 0 ? '<span>The chain\'s rate could not be read. Try again in a moment.</span>' : '<span>Reading today\'s rate\u2026</span>')
-      : '<em>You receive</em><b>' + (u > 0 ? '\u2248 ' + fmt(Math.floor(u * MT.rate)) : '0') + '<small>PHOTON</small></b>' +
-        '<span>1 ATONE = ' + MT.rate.toFixed(4) + ' PHOTON, the chain\'s rate now</span>';
+    /* one shape whatever the state (operator, 2026-10-11: the box must not change size as the rate arrives): the
+       label, the figure line and the note are always there; only their words change */
+    if(out) out.innerHTML = '<em>You receive</em><b>' + (MT.rate > 0 && u > 0 ? '\u2248 ' + fmt(Math.floor(u * MT.rate)) : MT.rate > 0 ? '0' : '\u2026') + '<small>PHOTON</small></b>' +
+        '<span>' + (MT.rate > 0 ? '1 ATONE = ' + MT.rate.toFixed(4) + ' PHOTON, the chain\'s rate now' : MT.rate < 0 ? 'The chain\'s rate could not be read. Try again in a moment.' : 'Reading today\'s rate\u2026') + '</span>';
     var sm = E("mtsum"); if(sm) sm.innerHTML = ok ? fmt(u) + " ATONE<br>to \u2248 " + fmt(Math.floor(u * MT.rate)) + " PHOTON" : "";
     var lk = E("mtlock"); if(lk) lk.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.5"/></svg>' +
       '<span>Minting <b>burns</b> the ATONE for good; PHOTON cannot be turned back into ATONE. The chain sets the rate, and it falls as more PHOTON is minted.</span>';
@@ -2756,7 +2757,6 @@ rememberGridH();
   if(mtpop) mtpop.__onclose = function(){ mtFeeSoon(null, false); };
   var mtamtEl = E("mtamt"); if(mtamtEl) mtamtEl.addEventListener("input", mtState);
   var mtmax = E("mtmax"); if(mtmax) mtmax.addEventListener("click", function(){ if(!(mtMax() > 0)) return; E("mtamt").value = exact(mtMax()); mtState(); });
-  var mtcancel = E("mtcancel"); if(mtcancel) mtcancel.addEventListener("click", function(){ POP.close(mtpop); });
   var mtsign = E("mtsign");
   if(mtsign) mtsign.addEventListener("click", function(){
     var msgs = mtMsgs(), u = mtAmount(); if(!msgs.length || !window.__TX || !window.__WALLET || !(MT.rate > 0)) return;

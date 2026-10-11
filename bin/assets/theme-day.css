@@ -796,7 +796,8 @@
   html[data-theme=light]:not([data-mono]) .sv-gkey i.sk{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-gkey i.to{background:transparent}
   html[data-theme=light]:not([data-mono]) .gp-r:hover{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .gp-r.open{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .gp-r.open{background:var(--accent-soft);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .gp-r.open .gp-id{color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .gp-t s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .gp-st{border-color:currentColor}
   html[data-theme=light]:not([data-mono]) .gp-d{background:var(--surface-2)}
