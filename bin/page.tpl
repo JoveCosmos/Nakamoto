@@ -195,17 +195,14 @@ background:var(--edge);border:1px solid var(--edge2);margin-bottom:26px}
 .sbox .k{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);margin-top:8px}
 .sbox .s{font-size:12px;color:var(--ink2);margin-top:5px}
 /* the Projection's figures read label first: started at, today, cap, next - then the value */
-:is(#p-eta,#p-effect) .sbox>*>.k:first-child{margin:0 0 7px}
+#p-eta .sbox>*>.k:first-child{margin:0 0 7px}
 /* the two Trend panels side by side: each subtitle keeps room for two lines, so the graphs and the
    boxes under them start on the same line whichever subtitle is longer */
-@media(min-width:901px){:is(#p-eta,#p-effect) .panel>.sub{min-height:2.9em}}
+@media(min-width:901px){#p-eta .panel>.sub{min-height:2.9em}}
 /* the graphs keep their 42% when it fits and give way on a short window, so the boxes under them are
    never cut: nothing in a pane may fall below its frame (it is clipped, with no scroll to reach it) */
-@media(min-width:901px){:is(#p-eta,#p-effect) .panel>svg[viewBox]{flex:0 1 42%;height:auto;min-height:80px}
-:is(#p-eta,#p-effect) .panel>.sbox{flex:0 0 auto}}
-/* Trend holds the Projection alone (the Effect has its own tab, 2026-10-11): one panel on the whole width */
-.duo2.solo{grid-template-columns:1fr}
-#ctrend{cursor:default}
+@media(min-width:901px){#p-eta .panel>svg[viewBox]{flex:0 1 42%;height:auto;min-height:80px}
+#p-eta .panel>.sbox{flex:0 0 auto}}
 
 table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13.5px;font-variant-numeric:tabular-nums}
 th{text-align:right;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);
@@ -1160,7 +1157,7 @@ color:var(--ink3);pointer-events:none}
 /* visibility is driven by an attribute on <html>, which the head script can set
    before the body is parsed; the .on class stays for the buttons */
 html:not([data-tab]) #p-home,
-html[data-tab=home] #p-home,html[data-tab=eta] #p-eta,html[data-tab=effect] #p-effect,
+html[data-tab=home] #p-home,html[data-tab=eta] #p-eta,
 html[data-tab=pays] #p-pays,html[data-tab=empty] #p-empty,html[data-tab=connect] #p-connect,html[data-tab=dele] #p-dele,html[data-ui=simple][data-tab=dele] #sv,html[data-tab=intro] #p-intro{display:flex;
 flex-direction:column;justify-content:flex-start;flex:0 0 auto;
 height:var(--paneh,auto);min-height:0;
@@ -1169,7 +1166,7 @@ animation:panein .22s ease}
 /* Home is sized to what it needs; every other screen takes the room the window
    really has (frame() measures it as --roomh), so Picks, Manage and the
    placeholders never leave a dead band under clipped content */
-html[data-tab=eta] #p-eta,html[data-tab=effect] #p-effect,html[data-tab=pays] #p-pays,html[data-tab=empty] #p-empty,html[data-tab=connect] #p-connect,
+html[data-tab=eta] #p-eta,html[data-tab=pays] #p-pays,html[data-tab=empty] #p-empty,html[data-tab=connect] #p-connect,
 html[data-tab=dele] #p-dele,html[data-tab=dele] #sv,html[data-tab=intro] #p-intro{height:var(--roomh,var(--paneh,auto))}
 .pane>.pw{height:100%;min-height:0;display:flex;flex-direction:column}
 .pane>.pw>.duo2{flex:1 1 auto;min-height:0}
@@ -1376,10 +1373,10 @@ margin:16px 0 -6px}
    resize when you switch tabs - and scroll within it. Home never scrolls: it is
    the thing every other page is measured against. */
 @media(max-width:620px){
-  #p-eta,#p-effect,#p-pays,#p-empty,#p-connect,#p-dele{overflow-y:auto;overscroll-behavior:contain}
-  #p-eta>.pw,#p-effect>.pw,#p-pays>.pw{height:auto;min-height:100%}
+  #p-eta,#p-pays,#p-empty,#p-connect,#p-dele{overflow-y:auto;overscroll-behavior:contain}
+  #p-eta>.pw,#p-pays>.pw{height:auto;min-height:100%}
   .duo2{grid-template-rows:auto auto;height:auto;gap:10px}
-  #p-eta>.pw>.duo2,#p-effect>.pw>.duo2,#p-pays>.pw>.duotab{flex:0 0 auto}
+  #p-eta>.pw>.duo2,#p-pays>.pw>.duotab{flex:0 0 auto}
   .panel{overflow:visible}
   .panel svg[viewBox]{flex:0 0 auto;height:auto;min-height:0;margin:6px 0 4px}
   .panel .sbox .s{display:block;font-size:9px;margin-top:2px}
@@ -3354,11 +3351,11 @@ box-shadow:0 22px 50px -26px rgba(0,0,0,.95),0 0 26px -18px #b9b0ff;animation:no
    left a dead band under it. Now the PHONE scrolls, as on the dashboard; the bar stays at the top */
 @media(max-width:620px){
   html:is([data-tab=home],[data-tab=eta],[data-tab=pays]) .below{height:auto;min-height:100svh;overflow:visible}
-  html:is([data-tab=home],[data-tab=eta],[data-tab=effect],[data-tab=pays]) .panes{overflow:visible;height:auto}
-  html:is([data-tab=home],[data-tab=eta],[data-tab=effect],[data-tab=pays]) .w#calc{overflow:visible;height:auto}
-  html[data-tab=home] .w#calc>#p-home,html[data-tab=eta] .w#calc>#p-eta,html[data-tab=effect] .w#calc>#p-effect,html[data-tab=pays] .w#calc>#p-pays,
-  html[data-tab=home] #p-home,html[data-tab=eta] #p-eta,html[data-tab=effect] #p-effect,html[data-tab=pays] #p-pays{height:auto;max-height:none;margin-top:0;flex:1 1 auto;overflow:visible;overscroll-behavior:auto}
-  html:is([data-tab=eta],[data-tab=effect],[data-tab=pays]) :is(#p-eta,#p-effect,#p-pays)>.pw{height:auto;min-height:0}
+  html:is([data-tab=home],[data-tab=eta],[data-tab=pays]) .panes{overflow:visible;height:auto}
+  html:is([data-tab=home],[data-tab=eta],[data-tab=pays]) .w#calc{overflow:visible;height:auto}
+  html[data-tab=home] .w#calc>#p-home,html[data-tab=eta] .w#calc>#p-eta,html[data-tab=pays] .w#calc>#p-pays,
+  html[data-tab=home] #p-home,html[data-tab=eta] #p-eta,html[data-tab=pays] #p-pays{height:auto;max-height:none;margin-top:0;flex:1 1 auto;overflow:visible;overscroll-behavior:auto}
+  html:is([data-tab=eta],[data-tab=pays]) :is(#p-eta,#p-pays)>.pw{height:auto;min-height:0}
   html:is([data-tab=home],[data-tab=eta],[data-tab=pays]) .folder{position:sticky;top:0;z-index:20;background:var(--void)}
 }
 /* ── the phone's Redelegate list: four real columns (its markup is its own), laid out
@@ -6563,7 +6560,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   </section>
 
   <section class=pane id=p-eta><div class=pw>
-    <div class="duo2 solo">
+    <div class=duo2>
       <div class=panel><div class=ptitle>Projection</div>
 <p class=sub>&eta; steps {{STEP}} every week: up while the BONDED ATONE <b class=hotc>concentration</b> is &ge; {{THRESH}}&times;, down while &lt; {{THRESH}}.</p>
     <svg id=etacurve viewBox="0 0 900 300" role=img
@@ -6577,12 +6574,6 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
       <div><div class=k>next</div><div class=v>{{ETA_NEXT}}</div><div class=s>{{NEXT_DATE}}</div></div>
     </div>
       </div>
-    </div>
-  </div></section>
-
-
-  <section class=pane id=p-effect><div class=pw>
-    <div class=duo2>
       <div class=panel><div class=ptitle>Effect</div>
 <p class=sub>{{T10LINE}}</p>
     <svg id=trend viewBox="0 0 900 300" role=img tabindex=0
@@ -6594,18 +6585,9 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
       <div><div class=k>net new bonded</div><div class=v>{{MV_NEW}}</div><div class=s>ATONE</div></div>
     </div>
       </div>
-      <div class=panel><div class=ptitle>Concentration</div>
-<p class=sub id=csub>How concentrated bonded ATONE is, week by week since the bonus: the average stake of the largest third over the smallest third.</p>
-    <svg id=ctrend viewBox="0 0 900 300" role=img aria-label="Concentration of bonded ATONE, week by week"></svg>
-    <div class=sbox>
-      <div><div class=k>now</div><div class=v style="color:var(--hot)" id=cnow>-</div><div class=s id=cnows>largest third over smallest</div></div>
-      <div><div class=k>at the bonus start</div><div class=v id=cstart>-</div><div class=s id=cstarts>-</div></div>
-      <div><div class=k>the rule turns at</div><div class=v id=cthr>-</div><div class=s id=cthrs>below it &eta; falls, above it &eta; rises</div></div>
-      <div><div class=k>to turn it</div><div class=v style="color:var(--burn)" id=cmove>-</div><div class=s id=cmoves>ATONE down the set</div></div>
-    </div>
-      </div>
     </div>
   </div></section>
+
 
   <section class=pane id=p-pays><div class=pw>
     <div class=duotab>

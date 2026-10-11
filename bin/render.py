@@ -214,7 +214,6 @@ payload = json.dumps({"generated": D["generated"], "thresh": th["threshold"],
                       # history, and where the chain's record starts
                       "p24": D.get("p24"), "act7": D.get("act7"), "txday": D.get("txday"), "b10k": D.get("b10k"), "prices": D.get("prices"), "econ": D.get("econ"), "prop_all": D.get("prop_all"),
                       "coverage": D.get("coverage"),
-                      "rule": D.get("rule"),            # the concentration the eta rule reads, for the Effect tab
                       # the network this page is for: its endpoints for the scripts, and the other
                       # network's page for the switch
                       "net": NETCFG}, separators=(",", ":"))

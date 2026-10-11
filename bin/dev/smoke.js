@@ -10,10 +10,10 @@ function at(){ return location.pathname.indexOf(BASE)===0 ? location.pathname.sl
 var TESTNET = document.documentElement.getAttribute('data-net') === 'testnet';
 
 /* the staking views, through their level-2 tabs */
-['bonus','trend','effect','picks'].forEach(function(k){
+['bonus','trend','picks'].forEach(function(k){
   t('tab-'+k, function(){
     document.getElementById('l2-staking-'+k).click();
-    var p=document.getElementById({bonus:'p-home',trend:'p-eta',effect:'p-effect',picks:'p-pays'}[k]);
+    var p=document.getElementById({bonus:'p-home',trend:'p-eta',picks:'p-pays'}[k]);
     return p.getBoundingClientRect().height>100 || 'pane '+p.getBoundingClientRect().height;
   });
 });
