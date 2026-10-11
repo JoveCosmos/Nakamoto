@@ -82,7 +82,7 @@ WDRAW_URL = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward"
 # and its own state (mainnet keeps the defaults)
 DATA = os.environ.get("KEEPER_DATA", "/srv/atomone-app/web/data.json")
 STATE = os.environ.get("KEEPER_STATE", "/srv/atomone-app/keeper/state/keeper.db")
-REPORTS = os.environ.get("KEEPER_REPORTS", "/srv/atomone-app/web/keeper")
+REPORTS = os.environ.get("KEEPER_REPORTS", "/srv/atomone-app/web/pilot")   # the public path says pilot (operator, 2026-10-11)
 SITE = os.environ.get("SITE_URL", "https://atomone.gatahub.zone")
 TICK = int(os.environ.get("KEEPER_TICK", "60"))           # the loop: new grants and retries are picked up this fast
 TYPE_URL = "/cosmos.staking.v1beta1.MsgBeginRedelegate"
@@ -599,7 +599,7 @@ def restake_step(c, granter, rgs, vals, m, dry):
             # a failed restake alerts (it is tried again at the next 12-hour turn); while the signer is known to be
             # down its own alert covers every delegator, so no flood
             if not ok and not c.execute("SELECT 1 FROM alert_sent WHERE granter='_signer' AND k='down'").fetchone():
-                alert("crit", "Restake failed: " + short(granter), "The keeper tries again at the next 12-hour turn.",
+                alert("crit", "Restake failed: " + short(granter), "Restake tries again at the next 12-hour turn.",
                       {"Delegator": granter, "Rewards": "{:,.4f} ATONE".format(p["rewards"] / 1e6), "Error": json.dumps(r.get("error"))[:300]})
             log("restake granter=%s rewards=%d staked=%d sent=%d -> %s" % (granter, p["rewards"], amt, p["send"], r))
         else:
@@ -1054,8 +1054,8 @@ def schedule_retry(c, gr, kind, why, h, moves, f):
               json.dumps([{"src": e["src"], "dst": e["dst"], "amount": int(e["amount"]), "gain": e.get("gain", 0)} for e in moves]), since))
     c.commit()
     if tries == 1:
-        alert("warn", "Autopilot move failed, trying again: " + short(gr), ("Sent, not yet seen on chain: the keeper looks it up by hash"
-              if kind == "pending" else "A fee, network or RPC problem: the keeper tries again") + " in %d minutes." % (wait // 60), f)
+        alert("warn", "Autopilot move failed, trying again: " + short(gr), ("Sent, not yet seen on chain: Autopilot looks it up by hash"
+              if kind == "pending" else "A fee, network or RPC problem: Autopilot tries again") + " in %d minutes." % (wait // 60), f)
 
 def landed_since(gr, since, h=None):
     """an Autopilot tx for this wallet that landed at or after `since`: {"txhash", "moves", "code"}; None when there is none;
@@ -1345,7 +1345,7 @@ def main():
         try: once(c)
         except Exception as e:
             log("run failed: %s" % e); n += 1
-            if n == 10 or (n > 10 and n % 360 == 0): alert("warn", "Autopilot keeper cannot run", str(e)[:300])   # again every 6 hours
+            if n == 10 or (n > 10 and n % 360 == 0): alert("warn", "Autopilot cannot run", str(e)[:300])   # again every 6 hours
         else: n = 0
         time.sleep(TICK)
 

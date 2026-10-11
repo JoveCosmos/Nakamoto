@@ -49,7 +49,7 @@ VALWATCH = os.environ.get("VALWATCH_JSON", os.path.join(STATE, "valwatch-mainnet
 BACKUP = os.path.join(STATE, "subs.backup.db")
 # a wallet's own alerts (2026-10-01): what the keeper did for it, read from the report it writes per wallet (the page
 # reads the same file); the explorer the messages link to
-REPORTS = os.environ.get("KEEPER_REPORTS", "/srv/atomone-app/web/keeper")
+REPORTS = os.environ.get("KEEPER_REPORTS", "/srv/atomone-app/web/pilot")
 EXPLORER = os.environ.get("EXPLORER_TX", "https://explorer.gatahub.zone/atomone-1/txs/")
 API    = "https://api.telegram.org/bot" + TOKEN + "/"
 

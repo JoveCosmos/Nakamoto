@@ -201,7 +201,7 @@ def step(L, allg, now=None):
         if terms(old) != terms(g) or (g.get("cap") or 0) > (old.get("cap") or 0):
             e["history"].append({"at": now, "what": "changed"})
             e["cap0"], e["warned"] = g.get("cap"), []
-            ev.append(("info", "Autopilot grant changed: " + short(gr), "The delegator changed the validators or the cap. The keeper plans again.", {
+            ev.append(("info", "Autopilot grant changed: " + short(gr), "The delegator changed the validators or the cap. Autopilot plans again.", {
                 "Delegator": gr, "Cap": cap(g), "Validators": str(allow_n(g)) if allow_n(g) else "any, the rule picks", "Restake": "on" if gr in on else "off"}))
         e["grant"] = g
         left = (g.get("exp") or 0) - now if g.get("exp") else None

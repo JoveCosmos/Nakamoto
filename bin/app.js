@@ -2931,7 +2931,7 @@ rememberGridH();
   /* ── Autopilot: a StakeAuthorization REDELEGATE grant to GATA's keeper address, with
      an allow-list, a cap and an expiry the reader sets; the keeper (a separate signer,
      its own key, off this box) executes inside those bounds; the chain enforces them.
-     The keeper's address and standing come from keeper/_status.json. The card is one
+     The pilot's address and standing come from pilot/_status.json (the public path says pilot, never keeper: operator, 2026-10-11). The card is one
      screen: the terms on the left, the validator set on the right to choose from. ── */
   var atpop = E("atpop"), atcard = atpop && atpop.querySelector(".atcard");
   var AT = { addr: null, dry: true, grant: null, grants: [], days: 90, report: null, who: null };
@@ -2940,7 +2940,7 @@ rememberGridH();
      and the card's own view: a standing grant shows its terms until "Change" */
   var ATSEL = {}, AT_EDIT = false, AT_FIND = "", AT_OPEN = 0;
   function atStatus(){
-    return fetch("keeper/_status.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
+    return fetch("pilot/_status.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
       AT.addr = j && j.grantee ? j.grantee : null; AT.dry = !j || j.dry !== false; 
       return j; }).catch(function(){ AT.addr = null; return null; });
   }
@@ -3017,7 +3017,7 @@ rememberGridH();
      and ignored: GATA's validator is one validator like any other in this app */
   function atReport(){
     if(!window.__ADDR) return Promise.resolve(null);
-    return fetch("keeper/" + window.__ADDR + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+    return fetch("pilot/" + window.__ADDR + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
   }
   /* no strategies: one fixed rule for Autopilot's own picks (never jailed, 95%+ uptime, the smaller validators) */
   function atPreset(){ return "below"; }
@@ -3332,7 +3332,7 @@ rememberGridH();
     var done = false;
     return atStatus().then(function(){ return atGrant(); }).then(function(r){
       atKeep(r);
-      if(!AT.addr) throw new Error("Restake opens once GATA's keeper is live");
+      if(!AT.addr) throw new Error("Restake opens once GATA's pilot is live");
       var on = rsOn(), msgs = rsMsgs(!on);
       if(!msgs.length) throw new Error(on ? "Nothing to disable" : "Stake with a validator first");
       return (on ? Promise.resolve([]) : otherRestake()).then(function(rv){

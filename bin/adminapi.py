@@ -235,7 +235,7 @@ def overview(net):
     for g, e in (led.get("grants") or {}).items():
         e["paused"] = g in adm.get("paused", {})
         e["notes"] = adm.get("notes", {}).get(g, [])
-        rep = jload(os.path.join(WEB[net], "keeper", g + ".json"), None)
+        rep = jload(os.path.join(WEB[net], "pilot", g + ".json"), None)
         if rep: e["report"] = {k: rep.get(k) for k in ("checked", "staked", "now", "after", "gain", "moves", "history", "record", "restake", "last", "admin", "dry")}
     # validator names for the plans (the page's own data)
     D = jload(os.path.join(WEB[net], "data.json"), {})
@@ -247,7 +247,7 @@ def overview(net):
     inc = []
     for c, i in (vw.get("inc") or {}).items():
         inc.append({"cons": c, "name": cons.get(c), **{k: i.get(k) for k in ("down", "crit", "jailed", "tomb")}})
-    return {"net": net, "ledger": led, "keeper": jload(os.path.join(WEB[net], "keeper", "_status.json"), None),
+    return {"net": net, "ledger": led, "keeper": jload(os.path.join(WEB[net], "pilot", "_status.json"), None),
             "valwatch": {"checked": (vw.get("samples") or [{}])[-1].get("t"), "active": len(vw.get("active") or []), "incidents": inc},
             "admin": {"pauses": len(adm.get("paused", {}))}, "names": names}
 
