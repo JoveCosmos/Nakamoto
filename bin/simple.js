@@ -1224,16 +1224,20 @@
   }
   function drawProps(){
     loadProps();
-    var L = GP.list, tp = GP.tp || {}, C = ["var(--sv-teal)", "var(--sv-amber)", "var(--sv-green)"], ci = 0, c = function(k, v, sub){ return gstat(k, v, sub, C[ci++ % 3]); };
+    var L = GP.list, tp = GP.tp || {};
     var n = function(st){ return L ? L.filter(function(p){ return p.st === st; }).length : 0; }, live = L ? L.filter(function(p){ return p.st === "PROPOSAL_STATUS_VOTING_PERIOD"; }) : [];
-    put("sv-propcards",
-      c("Proposals", L ? String(L.length) : "-", L ? n("PROPOSAL_STATUS_PASSED") + " passed, " + n("PROPOSAL_STATUS_REJECTED") + " rejected" + (n("PROPOSAL_STATUS_FAILED") ? ", " + n("PROPOSAL_STATUS_FAILED") + " failed" : "") +
-        /* ids run to the newest; a proposal that never met its deposit is deleted by the chain, so
-           the count can be lower - said, so "20" beside "#21" does not read as a mistake */
-        (L.length && L[0].id > L.length ? ", " + (L[0].id - L.length) + " dropped (deposit not met)" : "") : "reading the chain…") +
-      c("Voting now", L ? (live.length ? String(live.length) : "None") : "-", L ? (live.length ? "#" + live[live.length - 1].id + " ends " + pday(live[live.length - 1].ve) : "no proposal is open") : "") +
-      c("To pass", tp.threshold ? "&gt;" + (tp.threshold * 100).toFixed(1) + "%" : "-", tp.quorum ? "of votes yes, with " + (tp.quorum * 100).toFixed(1) + "% of bonded ATONE voting" + (tp.law_threshold ? "; laws and amendments " + (tp.law_threshold * 100).toFixed(0) + "%" : "") : "of votes yes"));
-    var h = '<div class=sv-ph><h3>Proposals</h3><span class=sv-gkey>newest first; tap one to read it</span></div>';
+    /* the three figures sit in the section's own header bar (operator, 2026-10-11: the page title already says Proposals,
+       and the cards above took the room the list needs); the short line shows, the full one is the title */
+    var st = function(k, v, sub, full){ return '<span class=gp-k' + (full ? ' title="' + esc(full) + '"' : '') + '><em>' + k + '</em><b>' + v + '</b><s>' + sub + '</s></span>'; };
+    var dropped = L && L.length && L[0].id > L.length ? L[0].id - L.length : 0;
+    /* ids run to the newest; a proposal that never met its deposit is deleted by the chain, so the count can be lower */
+    var psub = L ? n("PROPOSAL_STATUS_PASSED") + " passed, " + n("PROPOSAL_STATUS_REJECTED") + " rejected" + (n("PROPOSAL_STATUS_FAILED") ? ", " + n("PROPOSAL_STATUS_FAILED") + " failed" : "") + (dropped ? ", " + dropped + " dropped" : "") : "reading the chain…";
+    var pfull = dropped ? psub.replace(/(\d+) dropped/, "$1 dropped (deposit not met)") : "";
+    var tfull = tp.quorum ? "More than " + (tp.threshold * 100).toFixed(1) + "% of votes yes, with at least " + (tp.quorum * 100).toFixed(1) + "% of bonded ATONE voting" + (tp.law_threshold ? "; laws and constitutional amendments need " + (tp.law_threshold * 100).toFixed(0) + "%" : "") : "";
+    var h = '<div class="sv-ph gp-ph">' +
+      st("Proposals", L ? String(L.length) : "-", psub, pfull) +
+      st("Voting now", L ? (live.length ? String(live.length) : "None") : "-", L ? (live.length ? "#" + live[live.length - 1].id + " ends " + pday(live[live.length - 1].ve) : "no proposal is open") : "") +
+      st("To pass", tp.threshold ? "&gt;" + (tp.threshold * 100).toFixed(1) + "%" : "-", tp.quorum ? "of votes yes, " + (tp.quorum * 100).toFixed(1) + "% quorum" + (tp.law_threshold ? ", laws " + (tp.law_threshold * 100).toFixed(0) + "%" : "") : "of votes yes", tfull) + '</div>';
     if(GP.err && !L){ put("sv-proplist", h + govEmpty("Could not read the proposals")); return; }
     if(!L){ put("sv-proplist", h + govEmpty("Reading the proposals…")); return; }
     if(!L.length){ put("sv-proplist", h + govEmpty("No proposals yet")); return; }

@@ -4708,6 +4708,13 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 :is(#sv-proplist,#sv-daop,#sv-govlist)>.sv-ph h3::before{background:rgba(255,255,255,.9);box-shadow:none}
 :is(#sv-proplist,#sv-daop,#sv-govlist)>.sv-ph .sv-gkey{color:rgba(255,255,255,.75);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #sv-proplist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#1d4f8f,#173257 58%,#141633)}
+/* the proposals bar carries the three figures (2026-10-11): label, value, one short line each */
+#sv-proplist>.sv-ph.gp-ph{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 16px;padding:6px 15px 7px;flex:0 0 auto}   /* never squeezed by the panel's column flex */
+.gp-k{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.gp-k em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.72)}
+.gp-k b{font-size:15px;color:#fff;white-space:nowrap}
+.gp-k s{text-decoration:none;font-size:11px;color:rgba(255,255,255,.78);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:900px){#sv-proplist>.sv-ph.gp-ph{gap:0 10px}.gp-k b{font-size:14px}.gp-k s{font-size:10.5px}}
 #sv-daop>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#5f6216,#393b15 58%,#19191f)}
 #sv-govlist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#7d2e6e,#461f45 58%,#1a1230)}
 /* proposals: the id a small key, the status a clear tag, the tally a firmer bar, Yes the figure */
@@ -4839,8 +4846,8 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin-right:-8px;p
    (the proposal list scrolls inside it; the DAOs' panel sits right under the cards) */
 #sv-props,#sv-daos{justify-content:flex-start;gap:12px}
 #sv-props>*,#sv-daos>*,#sv-props>*:not(:first-child),#sv-daos>*:not(:first-child){margin-top:0}
-#sv-propcards,#sv-daocards{grid-template-columns:repeat(3,minmax(0,1fr))}
-#sv-propcards .sv-card,#sv-daocards .sv-card{--tc:var(--sv-teal)}
+#sv-daocards{grid-template-columns:repeat(3,minmax(0,1fr))}
+#sv-daocards .sv-card{--tc:var(--sv-teal)}
 #sv-proplist{flex:1 1 0;min-height:0;--tc:var(--sv-teal)}
 #sv-daop{flex:0 1 auto;min-height:0;overflow-y:auto;--tc:var(--sv-teal)}
 .sv-glist{overflow-y:auto;flex:1 1 auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
@@ -5500,7 +5507,7 @@ html[data-tab=connect] .l2host{display:none}
 @media(max-width:620px){
   #sv-proplist,#sv-govlist,#sv-mygovlist{flex:0 0 auto;min-height:0}
   #sv-proplist .gp-list,.sv-glist{flex:0 0 auto;overflow:visible;max-height:none}
-  #sv-propcards,#sv-daocards,#sv-govcards{grid-template-columns:minmax(0,1fr)}
+  #sv-daocards,#sv-govcards{grid-template-columns:minmax(0,1fr)}
   .sv-gkey{white-space:normal;flex-wrap:wrap;row-gap:4px}
   /* a date axis at quarters is eight labels; the phone shows every other one (half-years) */
   .sv-gxt span:nth-child(even){display:none}
@@ -6684,7 +6691,6 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
         <div class=sv-panel id=sv-actlive></div>
       </section>
       <section class=sv-screen id=sv-props data-sc=props aria-label=Proposals>
-        <div class="sv-cards gv-strip" id=sv-propcards></div>
         <div class=sv-panel id=sv-proplist><div class=sv-ph><h3>Proposals</h3></div><div class=sv-upwait>Reading the proposals…</div></div>
       </section>
       <section class=sv-screen id=sv-cons data-sc=cons aria-label=Constitution>

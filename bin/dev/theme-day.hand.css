@@ -137,6 +137,19 @@
   html[data-theme=light]:not([data-mono]) #sv .sv-lc .ar.tpb{fill:rgba(107,95,208,.13)}
   html[data-theme=light]:not([data-mono]) #sv .sv-lc .ln.tpb{stroke:#6b5fd0}
   /* open places in the active set: a light grey box with a dashed edge on the ivory ground */
+  /* every mode but Map paints the tiles one flat night colour inline (NEUT); on paper the tile is the sunk ivory and
+     the figure its accent ink (2026-10-11) */
+  html[data-theme=light]:not([data-mono]) .grid.flat .cell:not(.pad){background-color:var(--surface-sunk)!important}
+  html[data-theme=light]:not([data-mono]) .grid.flat .cell{border-color:var(--line)}
+  /* the gloss over the three range tracks: night's translucent sheen became an opaque ivory bar in the shadow and hid
+     the ramps (operator, 2026-10-11: "too white, mixes in background"); on paper it is a faint sheen again, and the
+     track gets a hairline so its cream end does not melt into the card */
+  html[data-theme=light]:not([data-mono]) .trackwrap::before{background:linear-gradient(180deg,rgba(255,255,255,.22) 0,rgba(255,255,255,.06) 45%,rgba(0,0,0,0) 55%,rgba(0,0,0,.10) 100%)}
+  html[data-theme=light]:not([data-mono]) input[type=range].gradrange:not(#z){box-shadow:inset 0 0 0 1px rgba(23,25,28,.16)}
+  /* the proposals bar's three figures stay white on their blue band, as the band's own title does */
+  html[data-theme=light]:not([data-mono]) #sv-proplist>.sv-ph.gp-ph .gp-k b{color:#fff}
+  html[data-theme=light]:not([data-mono]) #sv-proplist>.sv-ph.gp-ph .gp-k em{color:rgba(255,255,255,.72)}
+  html[data-theme=light]:not([data-mono]) #sv-proplist>.sv-ph.gp-ph .gp-k s{color:rgba(255,255,255,.78)}
   html[data-theme=light]:not([data-mono]) .cell.pad{background:rgba(40,30,20,.05);border:1px dashed rgba(40,30,20,.16)}
 
   /* home: the headline's last words are gradient TEXT. The shadow's background shorthand resets
