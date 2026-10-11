@@ -42,6 +42,7 @@
       "sub": [
         {"id": "bonus", "label": "Bonus", "route": "bonus", "tab": "home", "panel": "p-home", "accent": "#ffb02e"},
         {"id": "trend", "label": "Trend", "route": "trend", "tab": "eta",  "panel": "p-eta",  "accent": "#2bc8bd"},
+        {"id": "effect", "label": "Effect", "route": "effect", "tab": "effect", "panel": "p-effect", "accent": "#ff4d1f"},
         {"id": "picks", "label": "Picks", "route": "picks", "tab": "pays", "panel": "p-pays", "accent": "#2ee06a"}
       ]
     },

@@ -551,6 +551,47 @@ window.addEventListener("pageshow", function(ev){ if(ev.persisted) window.__mapM
   E("trend").innerHTML=s;
 })();
 
+/* concentration: the figure the eta rule reads, week by week since the bonus (the schedule carries each week's
+   reading), with the rule's threshold drawn across it; the same frame as the Effect chart beside it */
+(function(){
+  var el=E("ctrend"); if(!el) return;
+  var sm = window.innerWidth < 620;
+  var S=(D.schedule||[]).filter(function(w){ return (w.past || w.now) && w.c != null; });
+  var Ru=D.rule||{}, thr=+Ru.threshold || 0;
+  var W=sm?460:900, H=300, PL=sm?44:64, PR=sm?16:28, PT=sm?20:26, PB=sm?34:46;
+  var put=function(id,t){ var e=E(id); if(e) e.textContent=t; };
+  var x=function(v){ return v.toFixed(2)+"\u00d7"; };
+  if(S.length){
+    var first=S[0], last=S[S.length-1], live=Ru.ratio!=null?+Ru.ratio:last.c;
+    put("cnow", x(live)); put("cnows", (live>=thr?"above":"below")+" the rule's "+x(thr)+", \u03b7 "+(Ru.rising?"rising":"falling"));
+    put("cstart", x(first.c)); put("cstarts", first.date+", "+(live<first.c?"\u2212":"+")+Math.abs((live/first.c-1)*100).toFixed(1)+"% since");
+    put("cthr", x(thr));
+    if(Ru.move_to_reverse!=null){ var mv=+Ru.move_to_reverse/1e6; put("cmove", mv>=1e6?(mv/1e6).toFixed(2)+"M":Math.round(mv).toLocaleString("en-US")); put("cmoves", "ATONE down the set, "+(+Ru.move_pct_bonded).toFixed(1)+"% of bonded"); }
+  }
+  if(S.length<2){ el.innerHTML=""; return; }
+  var vs=S.map(function(w){return w.c;}).concat(thr?[thr]:[]);
+  var lo=Math.max(0,Math.floor(Math.min.apply(null,vs))-1), hi=Math.ceil(Math.max.apply(null,vs))+1;
+  var X=function(i){return PL+i/(S.length-1)*(W-PL-PR);};
+  var Y=function(v){return PT+(1-(v-lo)/(hi-lo))*(H-PT-PB);};
+  var s="",d="";
+  var step=Math.max(1,Math.ceil((hi-lo)/6));
+  for(var g=lo;g<=hi;g+=step) s+='<line x1="'+PL+'" y1="'+Y(g)+'" x2="'+(W-PR)+'" y2="'+Y(g)+
+    '" stroke="#232342"/><text x="'+(PL-11)+'" y="'+(Y(g)+4)+'" text-anchor="end" font-size="11.5" fill="#6f6d94">'+g+'\u00d7</text>';
+  if(thr){ s+='<line x1="'+PL+'" y1="'+Y(thr)+'" x2="'+(W-PR)+'" y2="'+Y(thr)+'" stroke="#6f66c8" stroke-width="1.5" stroke-dasharray="6 5"/>'+
+    '<text x="'+(W-PR)+'" y="'+(Y(thr)-7)+'" text-anchor="end" font-size="11" fill="#6f66c8">\u03b7 TURNS AT '+thr.toFixed(2)+'\u00d7</text>'; }
+  S.forEach(function(w,i){ d+=(i?"L":"M")+X(i).toFixed(1)+" "+Y(w.c).toFixed(1); });
+  s+='<path d="'+d+'" fill="none" stroke="#fff8dc" stroke-width="2.4"/>';
+  var lab=Math.ceil(S.length/9);
+  S.forEach(function(w,i){
+    s+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(w.c).toFixed(1)+'" r="'+(w.now?5.2:4.2)+'" fill="'+(w.now?"#ffb02e":"#ff4d1f")+
+      '" stroke="#06060c" stroke-width="1.2"><title>week '+w.week+", "+w.date+": "+x(w.c)+", \u03b7 "+(+w.eta).toFixed(2)+'</title></circle>';
+    if(i===0 || i%lab===0 || i===S.length-1)
+      s+='<text x="'+X(i).toFixed(1)+'" y="'+(H-PB+23)+'" text-anchor="middle" font-size="10.5" fill="#6f6d94">'+w.date+'</text>'; });
+  s+='<text x="'+PL+'" y="'+(PT+17)+'" font-size="12.5" fill="#a5a3c4">'+(sm?"CONCENTRATION":"CONCENTRATION, WEEKLY SINCE THE BONUS")+'</text>';
+  el.setAttribute("viewBox","0 0 "+W+" "+H);
+  el.innerHTML=s;
+})();
+
 /* pivot */
 /* the arithmetic pane and its plot() were retired; simple() below draws the
    fold chart for Graph mode from the same maths */
