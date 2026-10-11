@@ -4851,6 +4851,14 @@ color:#6fe3da;font:600 11.5px var(--wsans);cursor:pointer;white-space:nowrap}
 .sv-gbtn:hover{border-color:#2bc8bd;color:#a6f1eb}
 .sv-gbtn.stop{border-color:rgba(255,122,87,.5);background:transparent;color:#ff9b7a}
 .sv-gbtn.stop:hover{border-color:#ff7a57;color:#ffb89f}
+/* a proposal's vote row (2026-10-11): the three options as the governor buttons, the cast one filled */
+.gp-vote{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.03)}
+.gp-vote em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
+.gp-vb{display:flex;gap:6px}
+.sv-gbtn.vote.on{background:#2bc8bd;border-color:#2bc8bd;color:#071a18}
+.sv-gbtn.vote.on:hover{color:#071a18}
+.sv-gbtn.busy{opacity:.6;cursor:progress}
+.gp-vn{font-size:12px;color:var(--ws)}
 .sv-gbtn.busy{opacity:.55;cursor:progress}
 .sv-gbtn:focus-visible{outline:2px solid #2bc8bd;outline-offset:2px}
 .sv-glist .sv-vr.me{border-color:var(--sv-violet)}

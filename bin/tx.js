@@ -55,6 +55,11 @@ function msgBytes(m){
       strField(1, m.value.delegator_address), strField(2, m.value.governor_address)));
   if(m.type === "atomone/v1/MsgUndelegateGovernor")
     return any("/atomone.gov.v1.MsgUndelegateGovernor", strField(1, m.value.delegator_address));
+  /* voting on a proposal: MsgVote{proposal_id uint64(1), voter(2), option enum(3: 1 yes, 2 abstain, 3 no), metadata(4)};
+     the amino value carries proposal_id as a string and the option as its number, as the chain renders them (2026-10-11) */
+  if(m.type === "atomone/v1/MsgVote")
+    return any("/atomone.gov.v1.MsgVote", cat(uintField(1, BigInt(m.value.proposal_id)), strField(2, m.value.voter),
+      uintField(3, m.value.option), strField(4, m.value.metadata || "")));
   /* becoming a governor, or editing one: {address(1), description(2){moniker(1), identity(2), website(3),
      security_contact(4), details(5)}}; the amino value leaves empty fields out, as the chain does */
   if(m.type === "atomone/v1/MsgCreateGovernor" || m.type === "atomone/v1/MsgEditGovernor"){

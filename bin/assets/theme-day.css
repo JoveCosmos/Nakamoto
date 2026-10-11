@@ -843,6 +843,9 @@
   html[data-theme=light]:not([data-mono]) .sv-gbtn:hover{border-color:var(--accent);color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-gbtn.stop{border-color:var(--danger-bar);background:transparent;color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .sv-gbtn.stop:hover{border-color:var(--danger-bar);color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .gp-vote{border-color:var(--surface-2);background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sv-gbtn.vote.on{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .sv-gbtn.vote.on:hover{color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .sv-gbtn:focus-visible{outline-color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-glist .sv-lgo .lg{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .sv-gst em{border-color:currentColor}

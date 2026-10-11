@@ -1146,7 +1146,7 @@
 
   /* ════ Proposals: every AtomOne proposal, read from the chain every 5 min (the one being voted on
      gets its running tally); the tallying rules and the core DAOs' parameters come with them ════ */
-  var GP = { at: 0, busy: false, list: null, err: null, tp: null, dao: null, open: {} };
+  var GP = { at: 0, busy: false, list: null, err: null, tp: null, dao: null, open: {}, votes: {} };
   function loadProps(){
     if(GP.busy || (GP.list && Date.now() - GP.at < 300000)) return;
     GP.busy = true;
@@ -1184,6 +1184,44 @@
   function gstat(k, v, sub, rc){ return '<div class=gv-ro style="--rc:' + (rc || 'var(--sv-teal)') + '"><em>' + k + '</em><div class=sd-well><b>' + v + '</b></div>' + (sub ? '<small>' + sub + '</small>' : '<small>&nbsp;</small>') + '</div>'; }
   function ptally(t){ var y = +(t.yes_count || 0), n = +(t.no_count || 0), a = +(t.abstain_count || 0), s = y + n + a; return { y: y, n: n, a: a, s: s }; }
   function pday(t){ return t && window.__dayFull ? window.__dayFull(new Date(t).getTime()) : "-"; }
+  /* ── voting (operator, 2026-10-11): an open proposal's details carry the wallet's vote - Yes, Abstain or No - signed in
+     the wallet as MsgVote, broadcast through our node at the chain's own gas price. The vote read from the chain is cached
+     per wallet and proposal until the wallet votes again. A wallet that follows a governor is told the governor votes for
+     it unless it votes itself (the chain gives the wallet's own vote precedence) ── */
+  var VOPT = { VOTE_OPTION_YES: "yes", VOTE_OPTION_ABSTAIN: "abstain", VOTE_OPTION_NO: "no" }, VNUM = { yes: 1, abstain: 2, no: 3 };
+  function myVote(pid){
+    var a = window.__ADDR; if(!a) return "";
+    var k = a + ":" + pid, c = GP.votes[k];
+    if(c === undefined){ GP.votes[k] = null;
+      gapi("/atomone/gov/v1/proposals/" + pid + "/votes/" + a)
+        .then(function(d){ var o = d.vote && d.vote.options && d.vote.options[0]; GP.votes[k] = o ? (VOPT[o.option] || "") : ""; })
+        .catch(function(){ GP.votes[k] = ""; })
+        .then(function(){ if(screen() === "props") drawProps(); }); }
+    return c;
+  }
+  function voteBox(p){
+    if(!window.__ADDR || !window.__WALLET || !window.__TX) return '<div class=gp-vote><em>Your vote</em><span class=gp-vn>Connect a wallet to vote on this proposal.</span></div>';
+    /* the chain refuses a vote from a wallet with under 1 ATONE staked ("insufficient stake for voting", 2026-10-11) */
+    var pos = window.__POS, staked = pos ? pos.total : null;
+    if(staked !== null && staked < 1e6) return '<div class=gp-vote><em>Your vote</em><span class=gp-vn>Stake at least 1 ATONE to vote on proposals.</span></div>';
+    var v = myVote(p.id), g = myGov();
+    if(v === null) return '<div class=gp-vote><em>Your vote</em><span class=gp-vn>Reading your vote…</span></div>';
+    var btn = function(o, t){ return '<button class="sv-gbtn vote' + (v === o ? ' on' : '') + '" type=button data-act=vote data-pid="' + p.id + '" data-opt="' + VNUM[o] + '"' +
+      (v === o ? ' aria-pressed=true' : '') + '>' + t + '</button>'; };
+    var note = v ? 'You voted ' + v + '. You can change it until voting ends.' : g ? 'Your governor votes for your stake unless you vote yourself.' : 'Signed in your wallet, fee at the chain\'s own gas price.';
+    return '<div class=gp-vote><em>Your vote</em><span class=gp-vb>' + btn("yes", "Yes") + btn("abstain", "Abstain") + btn("no", "No") + '</span><span class=gp-vn>' + note + '</span></div>';
+  }
+  function voteSend(t, pid, opt){
+    if(!window.__TX || !window.__WALLET || !window.__ADDR || t.classList.contains("busy")) return;
+    var a = window.__ADDR, n = window.__notify ? window.__notify() : null, row = t.closest(".gp-vote");
+    if(row) row.querySelectorAll("button").forEach(function(b){ b.disabled = true; }); t.classList.add("busy");
+    (window.__TX.sendDirect || window.__TX.send)(window.__WALLET, [{ type: "atomone/v1/MsgVote", value: { proposal_id: String(pid), voter: a, option: opt } }], "", function(){})
+      .then(function(){ if(n) n.ok(); delete GP.votes[a + ":" + pid]; GP.at = 0; drawProps();
+        /* the next block carries it: the tally is read again then */
+        setTimeout(function(){ GP.at = 0; drawProps(); }, 7000); })
+      .catch(function(e){ if(n) n.fail(e && e.message || String(e)); })
+      .then(function(){ t.classList.remove("busy"); if(row) row.querySelectorAll("button").forEach(function(b){ b.disabled = false; }); });
+  }
   function drawProps(){
     loadProps();
     var L = GP.list, tp = GP.tp || {}, C = ["var(--sv-teal)", "var(--sv-amber)", "var(--sv-green)"], ci = 0, c = function(k, v, sub){ return gstat(k, v, sub, C[ci++ % 3]); };
@@ -1216,7 +1254,7 @@
           '<span><em>Submitted</em>' + pday(p.submit) + '</span>' +
           '<span><em>Voting</em>' + (p.vs ? pday(p.vs) + ' to ' + pday(p.ve) : 'not started') + '</span>' +
           (t.s ? '<span><em>Votes cast</em>' + fmt(t.s) + ' ATONE</span>' : '') + '</div>' +
-          (sm ? '<div class=gp-sum>' + esc(sm) + '</div>' : '') + '</div>';
+          (sm ? '<div class=gp-sum>' + esc(sm) + '</div>' : '') + (p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? voteBox(p) : '') + '</div>';
       }
       return row; }).join("") + '</div>');
   }
@@ -1819,6 +1857,7 @@
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "mint"){ if(window.__mint) window.__mint(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
+    if(act === "vote"){ ev.stopPropagation(); voteSend(t, +t.dataset.pid, +t.dataset.opt); return; }
     if(act === "gfollow"){ govSend(t, { type: "atomone/v1/MsgDelegateGovernor", value: { delegator_address: window.__ADDR, governor_address: t.dataset.g } }); return; }
     if(act === "greg"){ if(GOV_REG) govForm(); return; }
     if(act === "grclose"){ grClose(); return; }
