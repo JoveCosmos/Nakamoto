@@ -585,8 +585,7 @@ window.addEventListener("pageshow", function(ev){ if(ev.persisted) window.__mapM
   S.forEach(function(w,i){
     s+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(w.c).toFixed(1)+'" r="'+(w.now?5.2:4.2)+'" fill="'+(w.now?"#ffb02e":"#ff4d1f")+
       '" stroke="#06060c" stroke-width="1.2"><title>week '+w.week+", "+w.date+": "+x(w.c)+", \u03b7 "+(+w.eta).toFixed(2)+'</title></circle>';
-    /* a label every few weeks and one on the last; a periodic label within one slot of the last would touch it */
-    if(i===0 || i===S.length-1 || (i%lab===0 && S.length-1-i>=lab))
+    if(i===0 || i%lab===0 || i===S.length-1)
       s+='<text x="'+X(i).toFixed(1)+'" y="'+(H-PB+23)+'" text-anchor="middle" font-size="10.5" fill="#6f6d94">'+w.date+'</text>'; });
   s+='<text x="'+PL+'" y="'+(PT+17)+'" font-size="12.5" fill="#a5a3c4">'+(sm?"CONCENTRATION":"CONCENTRATION, WEEKLY SINCE THE BONUS")+'</text>';
   el.setAttribute("viewBox","0 0 "+W+" "+H);
