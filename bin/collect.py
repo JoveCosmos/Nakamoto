@@ -561,22 +561,25 @@ SELECT t.wk::text, t.c::text,
        coalesce((SELECT min(rk) FROM r WHERE r.wk=t.wk AND r.cum*3 > t.s),0)::text,
        round((SELECT sum(n) FROM (SELECT n FROM w WHERE w.wk=t.wk ORDER BY n DESC LIMIT 10) q)
              /t.s*100,2)::text
-FROM t WHERE t.wk < {week-1} ORDER BY t.wk;""")
-weekly = [{"wk": int(r[0]), "week": int(r[0]) + 1,
+FROM t WHERE t.wk <= {week-1} ORDER BY t.wk;""")
+# the running week comes back too (operator, 2026-10-11): the Effect window ends at it, so the sentence measures the
+# bonus's own age in weeks, the number the coefficient card shows; the graph and the slopes keep complete weeks only
+_allw = [{"wk": int(r[0]), "week": int(r[0]) + 1,
            "date": (EPOCH_START + timedelta(days=7*int(r[0]))).strftime("%b %-d"),
            "proposers": int(r[1]), "nakamoto": int(r[2]), "top10": float(r[3])}
           for r in wrows if int(r[2])]
+weekly = [w for w in _allw if w["wk"] < week - 1]
+wk_cur = next((w for w in _allw if w["wk"] == week - 1), None)
 # the bonus went live at wk 0, so the split needs no date arithmetic
-# the headline sentence: how the top-ten share moved over the last 90 days, as a
-# relative change. 13 weekly points is 91 days - the closest the chain's own epoch
-# grid gets - and the window is stated in the sentence so the two agree.
+# the headline sentence: how the top-ten share has moved since the bonus began, from its first week to the running
+# one, so the window is the bonus's age in weeks (the coefficient card's number) and grows with it (operator,
+# 2026-10-11; until then a fixed 13-week window)
 t10 = None
-if len(weekly) >= 14:
-    _b, _l = weekly[-14], weekly[-1]
-    if _b["top10"]:
-        t10 = {"pct": round((_l["top10"] - _b["top10"]) / _b["top10"] * 100, 1),
-               "days": (_l["wk"] - _b["wk"]) * 7,
-               "from": _b["top10"], "to": _l["top10"]}
+_b0 = next((w for w in weekly if w["wk"] >= 0), None)
+_l0 = wk_cur or (weekly[-1] if weekly else None)
+if _b0 and _l0 and _l0["wk"] > _b0["wk"] and _b0["top10"]:
+    t10 = {"pct": round((_l0["top10"] - _b0["top10"]) / _b0["top10"] * 100, 1),
+           "weeks": week, "days": week * 7, "from": _b0["top10"], "to": _l0["top10"]}
 
 # ── how many addresses are actually delegating ──────────────────────────────
 # One address delegating to three validators is one delegator, not three, so the
@@ -635,29 +638,21 @@ except Exception as _ex_err:
     print(f"atomone-app: delegator count: {_ex_err}", file=sys.stderr)
 
 # ── where the stake moved over the same window the trend sentence measures ───
-# The validator sets at the two ends of the 13-week window, differenced. "To the
-# smaller end" is stake gained by validators outside the ten largest as they
-# stood at the start - the group the bonus is meant to feed.
+# The validator sets at the bonus's start and now, differenced. "To the smaller end" is stake gained by validators
+# outside the ten largest as they stood at the start - the group the bonus is meant to feed. (Kept under the key
+# move13 for the page; the window is the bonus's age, not 13 weeks, since 2026-10-11.)
 move13 = None
-if len(weekly) >= 14:
-    _wk0, _wk1 = weekly[-14]["wk"], weekly[-1]["wk"]
-    _t0 = (EPOCH_START + timedelta(days=7*_wk0)).isoformat()
-    _t1 = (EPOCH_START + timedelta(days=7*_wk1)).isoformat()
-    _hh = sql(f"""
-WITH wk AS (SELECT t, i FROM unnest(ARRAY['{_t0}','{_t1}']::timestamptz[])
-            WITH ORDINALITY AS u(t, i))
-SELECT wk.i::text, coalesce((SELECT b.height::text FROM block b
-        WHERE b.chain_id='{CHAIN}' AND b.time >= wk.t ORDER BY b.time LIMIT 1), '0')
-FROM wk ORDER BY wk.i;""")
-    _H2 = {int(i): int(h) for i, h in _hh if h != '0'}
-
-if move13 is None and len(weekly) >= 14 and len(_H2) == 2:
-    _a, _b = vset_at(_H2[1]), vset_at(_H2[2])
+_t0 = EPOCH_START.isoformat()
+_h0 = sql(f"""SELECT coalesce((SELECT b.height::text FROM block b WHERE b.chain_id='{CHAIN}' AND b.time >= timestamptz '{_t0}'
+              ORDER BY b.time LIMIT 1), '0');""")
+_h0 = int(_h0[0][0]) if _h0 and _h0[0][0] != '0' else 0
+if _h0 and week >= 2:
+    _a, _b = vset_at(_h0), vset_at(head)
     if _a and _b:
         _top10 = set(sorted(_a, key=lambda k: -_a[k])[:10])
         _grew = {k: _b.get(k, 0) - _a.get(k, 0) for k in set(_a) | set(_b)}
         move13 = {
-            "weeks": (_wk1 - _wk0),
+            "weeks": week,
             "bonded_delta": sum(_b.values()) - sum(_a.values()),
             "to_small": sum(d for k, d in _grew.items() if d > 0 and k not in _top10),
             "from_top": -sum(d for k, d in _grew.items() if d < 0 and k in _top10),

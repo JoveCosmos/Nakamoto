@@ -46,7 +46,7 @@ t10 = nk.get("t10_change")
 if t10:
     t10_line = (f"Blocks proposed by the 10 largest validators "
                 f"{'decreased' if t10['pct'] < 0 else 'increased'} by "
-                f"{abs(t10['pct']):.1f}% last {t10['days'] // 7}W")
+                f"{abs(t10['pct']):.1f}% in the {t10.get('weeks', t10['days'] // 7)} weeks since the bonus")
 else:
     t10_line = "Share of blocks proposed by the ten largest validators" + (": N/A on testnet" if TESTNET else "")
 

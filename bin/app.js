@@ -903,8 +903,8 @@ function whatif(){
     row.classList.toggle("dirty", d);
     /* the reset names the live value it returns to: read off the readout while it shows live -
        a frame later, since a reset rewrites the readout after this runs */
-    var rv = row.querySelector(".rval"), rl = row.querySelector(".rlive");
-    if(!d && rv && rl) requestAnimationFrame(function(){ if(!row.classList.contains("dirty")) rl.textContent = rv.textContent; });
+    var rv = row.querySelector(".rval"), rl = row.querySelector(".rlive"), rb = row.querySelector(".rreset");
+    if(!d && rv && rl) requestAnimationFrame(function(){ if(!row.classList.contains("dirty")){ rl.textContent = rv.textContent; if(rb) rb.title = "Reset to " + rv.textContent + " (Esc on the slider does the same)"; } });
   });
   document.documentElement.toggleAttribute("data-dirty", dirty);
   var wn = E("wifnote"), tn = E("tapnote"), wc = E("wifn");
