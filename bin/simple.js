@@ -991,14 +991,16 @@
   function govVotes(g){
     var P = GP.list; if(!P) return null;
     var h = votesOf(govAcctOf(g.addr), 1); if(!h || !h.map) return null;
-    var since = g.since ? new Date(g.since).getTime() : 0, from = h.part && (window.__D || {}).hist_from ? new Date(window.__D.hist_from).getTime() : 0;
-    if(h.part && !from) return [0, 0];      /* a partial record with no known window claims nothing: never an undercount */
+    var since = g.since ? new Date(g.since).getTime() : 0;
+    /* decided since it became active, and its vote KNOWN either way: voted, or confirmed not voted; an open proposal
+       counts once it has voted. Unknown ones are left out of both sides, so the count never understates */
     var el = P.filter(function(p){
       if(!p.vs || !p.ve || new Date(p.ve).getTime() <= since) return false;
-      if(from && new Date(p.vs).getTime() < from) return false;
-      return p.st !== "PROPOSAL_STATUS_VOTING_PERIOD" || !!h.map[p.id]; });
+      if(h.map[p.id]) return true;
+      return p.st !== "PROPOSAL_STATUS_VOTING_PERIOD" && noVoteSure(h, p); });
     return [el.filter(function(p){ return !!h.map[p.id]; }).length, el.length];
   }
+
   function govTable(list, mine){
     loadProps();
     var by = function(a, b){ return (b.vp || 0) - (a.vp || 0); };
@@ -1179,7 +1181,9 @@
     var VW = { yes: ["y", "Yes"], no: ["n", "No"], abstain: ["a", "Abstain"] };
     var votes = !h || !h.map ? '<span class=gvc-wait>Reading its votes\u2026</span>' : !rec.length ? '<span class=gvc-wait>No proposal since it became active' + (h.part ? ' within the record we can read' : '') + '</span>' :
       rec.map(function(p){ var v = h.map[p.id], w = v ? VW[v] : null;
-        return '<span class="gvc-v ' + (w ? w[0] : 'none') + '" title="#' + p.id + ' ' + esc(p.title) + '"><em>#' + p.id + '</em>' + (w ? w[1] : p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? "Not yet" : "No vote") + '</span>'; }).join("");
+        var sure = !w && noVoteSure(h, p);
+        return '<span class="gvc-v ' + (w ? w[0] : sure ? 'none' : 'na') + '" title="#' + p.id + ' ' + esc(p.title) + '"><em>#' + p.id + '</em>' +
+          (w ? w[1] : !sure ? "N/A" : p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? "Not yet" : "No vote") + '</span>'; }).join("");
     var tag = window.__ADDR && g.addr === govAddrOf(window.__ADDR) ? '<span class="badge up">YOU</span>' : g.addr === mine ? '<span class="badge up">YOU FOLLOW</span>' : '';
     return '<div class="card vcard gvcard" role=dialog aria-modal=true aria-label="Governor ' + esc(g.m) + '">' +
       '<div class="vhead vwrap">' + (govAv(g.ident) ? '<img class=vlogo src="assets/val/' + esc(g.ident) + '.jpg" alt="">' :
@@ -1261,7 +1265,7 @@
 
   /* ════ Proposals: every AtomOne proposal, read from the chain every 5 min (the one being voted on
      gets its running tally); the tallying rules and the core DAOs' parameters come with them ════ */
-  var GP = { at: 0, busy: false, list: null, err: null, tp: null, dao: null, open: {}, votes: {}, sel: 0, hist: {} };
+  var GP = { at: 0, busy: false, list: null, err: null, tp: null, dao: null, open: {}, votes: {}, vknown: {}, sel: 0, hist: {} };
   function loadProps(){
     if(GP.busy || (GP.list && Date.now() - GP.at < 300000)) return;
     GP.busy = true;
@@ -1304,13 +1308,18 @@
      per wallet and proposal until the wallet votes again. A wallet that follows a governor is told the governor votes for
      it unless it votes itself (the chain gives the wallet's own vote precedence) ── */
   var VOPT = { VOTE_OPTION_YES: "yes", VOTE_OPTION_ABSTAIN: "abstain", VOTE_OPTION_NO: "no" }, VNUM = { yes: 1, abstain: 2, no: 3 };
-  function myVote(pid){
-    var a = window.__ADDR; if(!a) return "";
+  function myVote(pid){ return window.__ADDR ? acctVote(window.__ADDR, pid) : ""; }
+  function acctVote(a, pid){
+    if(!a) return "";
     var k = a + ":" + pid, c = GP.votes[k];
     if(c === undefined){ GP.votes[k] = null;
+      /* "not voted" is CONFIRMED only by the chain's own answer for a missing vote ("voter ... not found for proposal",
+         a 400 on AtomOne); any other failure leaves it unknown (operator, 2026-10-12: "only when really confirmed") */
       gapi("/atomone/gov/v1/proposals/" + pid + "/votes/" + a)
-        .then(function(d){ var o = d.vote && d.vote.options && d.vote.options[0]; GP.votes[k] = o ? (VOPT[o.option] || "") : ""; })
-        .catch(function(){ GP.votes[k] = ""; })
+        .then(function(d){ var o = d.vote && d.vote.options && d.vote.options[0];
+          if(o){ GP.votes[k] = VOPT[o.option] || ""; GP.vknown[k] = true; }
+          else { GP.votes[k] = ""; GP.vknown[k] = /not found for proposal/.test(String(d.message || "")); } })
+        .catch(function(){ GP.votes[k] = ""; GP.vknown[k] = false; })
         .then(function(){ if(screen() === "props") drawProps(); }); }
     return c;
   }
@@ -1321,34 +1330,58 @@
     if(!a) return null;
     var c = GP.hist[a]; if(c) return c;
     GP.hist[a] = { map: null, part: false };
-    var map = {}, seen = 0, baked = false;
+    var map = {}, seen = 0, baked = false, recentFull = false;
     /* the whole record first: every vote since genesis, baked per voter from our own history (the public node holds
        only since 2026-08-21, before every past proposal); the node's recent transactions then add anything newer */
     var BK = { y: "yes", n: "no", a: "abstain" };
     var base = fetch("votes/" + a.charAt(6) + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; })
       .then(function(d){ if(!d) return; baked = true; var m = d[a] || {}; Object.keys(m).forEach(function(k){ map[+k] = BK[m[k]] || null; }); })
       .catch(function(){});
+    /* the node's recent votes FOR this account (2026-10-12): searched by the vote event's own voter, which is the
+       account whose vote counts - a vote cast for it through authz (MsgExec by a grantee) names the granter there,
+       so it is found too; a re-vote is newest first, so the first seen per proposal wins */
+    var ONUM = { 1: "yes", 2: "abstain", 3: "no" }, got = {};
     var page = function(k){
-      return actSearch("message.sender='" + a + "'", k, 100).then(function(d){
+      return actSearch("proposal_vote.voter='" + a + "'", k, 100).then(function(d){
         if(!d || d.message) throw 0;
-        (d.txs || []).forEach(function(t, i){
-          var r = (d.tx_responses || [])[i] || {}; if(+r.code) return;
-          (((t.body || {}).messages) || []).forEach(function(m){
-            var ty = String(m["@type"] || "");
-            if(/\.MsgVote$/.test(ty) && m.voter === a) map[+m.proposal_id] = VOPT[m.option] || null;
-            else if(/MsgVoteWeighted$/.test(ty) && m.voter === a && (m.options || [])[0]) map[+m.proposal_id] = VOPT[m.options[0].option] || null;
+        (d.tx_responses || []).forEach(function(r){
+          if(+r.code) return;
+          (r.events || []).forEach(function(e){
+            if(e.type !== "proposal_vote") return;
+            var at = {}; (e.attributes || []).forEach(function(q){ at[q.key] = q.value; });
+            if(at.voter !== a || !at.proposal_id || got[at.proposal_id]) return;
+            var o = null; try { var j = JSON.parse(at.option); o = ONUM[(j[0] || {}).option] || null; } catch(x){ o = VOPT[at.option] || null; }
+            got[at.proposal_id] = 1; map[+at.proposal_id] = o;
           });
         });
-        seen += (d.txs || []).length;
+        seen += (d.tx_responses || []).length;
         var total = +d.total || 0;
         if(seen < total && k < (pages || 3)) return page(k + 1);
+        recentFull = seen >= total;
       });
     };
     /* complete when the baked record was read: the node's search only tops it up, so its depth claims nothing */
     base.then(function(){ return page(1).catch(function(){}); })
-      .then(function(){ GP.hist[a] = { map: map, part: !baked }; var sc = screen(); if(sc === "props") drawProps(); else if(sc === "govs"){ render(); gvRefresh(); } });
+      .then(function(){ GP.hist[a] = { map: map, part: !baked, baked: baked, recentFull: recentFull }; var sc = screen(); if(sc === "props") drawProps(); else if(sc === "govs"){ render(); gvRefresh(); } });
     return GP.hist[a];
   }
+  /* CAN a missing vote on p be stated for this record? Only when every vote that could exist was read: the baked
+     record (all history) topped up to the end by the node's search - or, for a proposal that ended over an hour ago,
+     the baked record alone; without it, the node's search read to its end AND the proposal inside the node's history.
+     Anything else is unknown, shown N/A, never "no vote" (operator, 2026-10-12) */
+  function noVoteSure(h, p){
+    if(!h || !h.map || !p.vs) return false;
+    var end = p.ve ? new Date(p.ve).getTime() : 0, from = (window.__D || {}).hist_from ? new Date(window.__D.hist_from).getTime() : 0;
+    if(h.baked) return h.recentFull || (p.st !== "PROPOSAL_STATUS_VOTING_PERIOD" && end && end < Date.now() - 36e5);
+    return h.recentFull && !!from && new Date(p.vs).getTime() >= from;
+  }
+  /* an account's missing vote, confirmed: on an open proposal by the chain's own answer, else by its full record */
+  function acctNoVoteSure(a, p){
+    if(!a) return false;
+    if(p.st === "PROPOSAL_STATUS_VOTING_PERIOD"){ acctVote(a, p.id); if(GP.vknown[a + ":" + p.id] && !GP.votes[a + ":" + p.id]) return true; }
+    return noVoteSure(GP.hist[a], p);
+  }
+  function meNoVoteSure(p){ return acctNoVoteSure(window.__ADDR, p); }
   /* the row's mark: filled = this wallet voted, outlined = its governor did (and so voted for it); colour = the vote */
   function vmark(p){
     var A = window.__ADDR; if(!A) return '';
@@ -1356,10 +1389,10 @@
     if(p.st === "PROPOSAL_STATUS_VOTING_PERIOD"){ var lv = myVote(p.id); if(lv) mv = lv; }
     if(mv) return '<i class="gp-vm me ' + mv + '" title="You voted ' + mv + '">' + mv.charAt(0).toUpperCase() + '</i>';
     var mine = myGov(), ga = mine ? govAcctOf(mine) : null, gh = ga ? GP.hist[ga] : null, gv = gh && gh.map ? gh.map[p.id] : null;
+    if(ga && p.st === "PROPOSAL_STATUS_VOTING_PERIOD"){ var go = acctVote(ga, p.id); if(go) gv = go; }
     if(gv) return '<i class="gp-vm gov ' + gv + '" title="Your governor voted ' + gv + '">' + gv.charAt(0).toUpperCase() + '</i>';
-    /* neither voted (operator, 2026-10-12: "not voted is empty, should show"): only once the record is read in full,
-       and only for proposals that reached a vote; a partial record claims nothing */
-    if(mh && mh.map && !mh.part && (!gh || (gh.map && !gh.part)) && p.vs && p.st !== "PROPOSAL_STATUS_DEPOSIT_PERIOD")
+    /* neither voted, CONFIRMED for both the wallet and its governor (if it follows one) */
+    if(p.vs && p.st !== "PROPOSAL_STATUS_DEPOSIT_PERIOD" && meNoVoteSure(p) && (!ga || acctNoVoteSure(ga, p)))
       return '<i class="gp-vm none" title="' + (p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? "You have not voted yet" : "You did not vote") + '">-</i>';
     return '';
   }
@@ -1372,26 +1405,24 @@
     if((mh && !mh.map) || (gh && !gh.map) || mine === null) return '<div class=gp-you><small>Reading your votes…</small></div>';
     var g = mine && GV.list ? GV.list.filter(function(x){ return x.addr === mine; })[0] : null;
     if(mine && !GV.list) loadGovs();
-    var gv = gh && gh.map ? gh.map[p.id] : null;
+    var gv = (open && ga ? acctVote(ga, p.id) : null) || (gh && gh.map ? gh.map[p.id] : null);
     var cap = function(v){ return v.charAt(0).toUpperCase() + v.slice(1); };
-    var part0 = (mh && mh.part) || (gh && gh.part);
-    var chip = function(cls, who, v){ return '<span class="gp-sv ' + cls + (v ? ' ' + v : '') + '"><em>' + who + '</em><b>' + (v ? cap(v) : part0 ? "N/A" : "No vote") + '</b></span>'; };
-    var h = chip("me", "You", mv);
-    if(mine) h += chip("gov", "Governor " + esc(g ? g.m : mine.slice(0, 12) + "\u2026"), gv);
-    var part = (mh && mh.part) || (gh && gh.part);
+    var chip = function(cls, who, v, sure){ return '<span class="gp-sv ' + cls + (v ? ' ' + v : '') + '"><em>' + who + '</em><b>' + (v ? cap(v) : sure ? "No vote" : "N/A") + '</b></span>'; };
+    var h = chip("me", "You", mv, !mv && meNoVoteSure(p));
+    if(mine) h += chip("gov", "Governor " + esc(g ? g.m : mine.slice(0, 12) + "\u2026"), gv, !gv && acctNoVoteSure(ga, p));
     return '<div class=gp-you>' + h + '</div>';
   }
   function voteBox(p){
-    if(!window.__ADDR || !window.__WALLET || !window.__TX) return '<div class=gp-vote><em>Your vote</em><span class=gp-vn>Connect a wallet to vote on this proposal.</span></div>';
+    if(!window.__ADDR || !window.__WALLET || !window.__TX) return '<div class=gp-vote><span class=gp-vn>Connect a wallet to vote on this proposal.</span></div>';
     /* the chain refuses a vote from a wallet with under 1 ATONE staked ("insufficient stake for voting", 2026-10-11) */
     var pos = window.__POS, staked = pos ? pos.total : null;
-    if(staked !== null && staked < 1e6) return '<div class=gp-vote><em>Your vote</em><span class=gp-vn>Stake at least 1 ATONE to vote on proposals.</span></div>';
+    if(staked !== null && staked < 1e6) return '<div class=gp-vote><span class=gp-vn>Stake at least 1 ATONE to vote on proposals.</span></div>';
     var v = myVote(p.id), g = myGov();
-    if(v === null) return '<div class=gp-vote><em>Your vote</em><span class=gp-vn>Reading your vote…</span></div>';
+    if(v === null) return '<div class=gp-vote><span class=gp-vn>Reading your vote…</span></div>';
     var btn = function(o, t){ return '<button class="sv-gbtn vote' + (v === o ? ' on' : '') + '" type=button data-act=vote data-pid="' + p.id + '" data-opt="' + VNUM[o] + '"' +
       (v === o ? ' aria-pressed=true' : '') + '>' + t + '</button>'; };
     var note = v ? 'You voted ' + v + '. You can change it until voting ends.' : g ? 'Your governor votes for your stake unless you vote yourself.' : '';
-    return '<div class=gp-vote><em>Your vote</em><span class=gp-vb>' + btn("yes", "Yes") + btn("abstain", "Abstain") + btn("no", "No") + '</span>' + (note ? '<span class=gp-vn>' + note + '</span>' : '') + '</div>';
+    return '<div class=gp-vote><span class=gp-vb>' + btn("yes", "Yes") + btn("abstain", "Abstain") + btn("no", "No") + '</span>' + (note ? '<span class=gp-vn>' + note + '</span>' : '') + '</div>';
   }
   function voteSend(t, pid, opt){
     if(!window.__TX || !window.__WALLET || !window.__ADDR || t.classList.contains("busy")) return;

@@ -4937,6 +4937,7 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gvc-v em{font-style:normal;font-family:var(--mono,monospace);font-size:10px;color:var(--ink3,#8f8db4);font-weight:500}
 .gvc-v.y{border-color:var(--sv-green);color:var(--sv-green)}.gvc-v.n{border-color:var(--wburn,#ff6b4a);color:var(--wburn,#ff6b4a)}.gvc-v.a{color:var(--ink2,#a5a3c4)}
 .gvc-v.none{border-style:dashed;color:var(--ink3,#8f8db4)}
+.gvc-v.na{border-style:dotted;color:var(--ink3,#8f8db4);opacity:.8}
 .gvc-wait{font-size:12px;color:var(--ink3,#8f8db4)}
 /* a phone keeps every word whole: no Since column, names may wrap, the share sits under the figure */
 @media(max-width:620px){.gvt{table-layout:auto}.gvt :is(th,td).gvt-s{display:none}.gvt :is(th,td):is(.gvt-vp,.gvt-d,.gvt-v){width:1%;white-space:nowrap}

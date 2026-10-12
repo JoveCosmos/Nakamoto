@@ -879,6 +879,7 @@
   html[data-theme=light]:not([data-mono]) .gvc-v.n{border-color:var(--wburn,var(--danger-bar));color:var(--wburn,var(--danger))}
   html[data-theme=light]:not([data-mono]) .gvc-v.a{color:var(--ink2,var(--muted))}
   html[data-theme=light]:not([data-mono]) .gvc-v.none{color:var(--ink3,var(--muted))}
+  html[data-theme=light]:not([data-mono]) .gvc-v.na{color:var(--ink3,var(--muted))}
   html[data-theme=light]:not([data-mono]) .gvc-wait{color:var(--ink3,var(--muted))}
   html[data-theme=light]:not([data-mono]) .gvtab .gvh{background:none;box-shadow:none}
   html[data-theme=light]:not([data-mono]) .gvtab .gvh:hover{background:none}
