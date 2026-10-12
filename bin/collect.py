@@ -917,5 +917,37 @@ os.makedirs(OUT, exist_ok=True)
 tmp = os.path.join(OUT, ".data.json.tmp")
 with open(tmp, "w") as f: json.dump(out, f, separators=(",", ":"))
 os.replace(tmp, os.path.join(OUT, "data.json"))
+# ── every vote ever cast, per voter (operator, 2026-10-12: "no historical vote data"): the chain deletes votes at
+# tally and the public node keeps history only since 2026-08-21, so an account's record comes from our index. Sharded
+# by the first character after "atone1" (32 small files) so a wallet fetches only its own slice. Non-fatal: if the
+# index or its grant is missing, the page simply claims no "not voted" (votes/_meta.json absent).
+def bake_votes():
+    if TESTNET:
+        return
+    try:
+        p = subprocess.run(["psql", DSN_SAFE, "-tAF", "\x1f", "-c",
+                            f"select voter, proposal_id, option from vote where chain_id='{CHAIN}'"],
+                           capture_output=True, text=True, timeout=120, env=PGENV)
+        if p.returncode != 0:
+            print(f"votes: skipped ({p.stderr.strip()[:120]})"); return
+        short = {"VOTE_OPTION_YES": "y", "VOTE_OPTION_NO": "n", "VOTE_OPTION_ABSTAIN": "a"}
+        shards = {}
+        for line in p.stdout.strip().split("\n"):
+            if not line: continue
+            voter, pid, opt = line.split("\x1f")
+            if not voter.startswith("atone1") or len(voter) < 8: continue
+            shards.setdefault(voter[6], {}).setdefault(voter, {})[pid] = short.get(opt, "?")
+        vdir = os.path.join(OUT, "votes"); os.makedirs(vdir, exist_ok=True)
+        for c in _CH:
+            t = os.path.join(vdir, f".{c}.json.tmp")
+            with open(t, "w") as f: json.dump(shards.get(c, {}), f, separators=(",", ":"))
+            os.replace(t, os.path.join(vdir, c + ".json"))
+        t = os.path.join(vdir, ".meta.tmp")
+        with open(t, "w") as f: json.dump({"height": head, "at": int(time.time()), "voters": sum(len(v) for v in shards.values())}, f)
+        os.replace(t, os.path.join(vdir, "_meta.json"))
+    except Exception as e:
+        print(f"votes: skipped ({e})")
+bake_votes()
+
 print(f"atomone-app: ok height={head} eta={coef} ratio={ratio:.2f} "
       f"validators={N} trend_months={len(trend)}")

@@ -1201,7 +1201,13 @@
     if(!a) return null;
     var c = GP.hist[a]; if(c) return c;
     GP.hist[a] = { map: null, part: false };
-    var map = {}, seen = 0;
+    var map = {}, seen = 0, baked = false;
+    /* the whole record first: every vote since genesis, baked per voter from our own history (the public node holds
+       only since 2026-08-21, before every past proposal); the node's recent transactions then add anything newer */
+    var BK = { y: "yes", n: "no", a: "abstain" };
+    var base = fetch("votes/" + a.charAt(6) + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){ if(!d) return; baked = true; var m = d[a] || {}; Object.keys(m).forEach(function(k){ map[+k] = BK[m[k]] || null; }); })
+      .catch(function(){});
     var page = function(k){
       return actSearch("message.sender='" + a + "'", k, 100).then(function(d){
         if(!d || d.message) throw 0;
@@ -1216,11 +1222,11 @@
         seen += (d.txs || []).length;
         var total = +d.total || 0;
         if(seen < total && k < 3) return page(k + 1);
-        GP.hist[a] = { map: map, part: seen < total };
       });
     };
-    page(1).catch(function(){ GP.hist[a] = { map: map, part: true }; })
-      .then(function(){ if(screen() === "props") drawProps(); });
+    /* complete when the baked record was read: the node's search only tops it up, so its depth claims nothing */
+    base.then(function(){ return page(1).catch(function(){}); })
+      .then(function(){ GP.hist[a] = { map: map, part: !baked }; if(screen() === "props") drawProps(); });
     return GP.hist[a];
   }
   /* the row's mark: filled = this wallet voted, outlined = its governor did (and so voted for it); colour = the vote */
@@ -1248,11 +1254,12 @@
     if(mine && !GV.list) loadGovs();
     var gv = gh && gh.map ? gh.map[p.id] : null;
     var cap = function(v){ return v.charAt(0).toUpperCase() + v.slice(1); };
-    var chip = function(cls, who, v, sub){ return '<span class="gp-sv ' + cls + (v ? ' ' + v : '') + '"><em>' + who + '</em><b>' + (v ? cap(v) : "No vote") + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</span>'; };
+    var part0 = (mh && mh.part) || (gh && gh.part);
+    var chip = function(cls, who, v, sub){ return '<span class="gp-sv ' + cls + (v ? ' ' + v : '') + '"><em>' + who + '</em><b>' + (v ? cap(v) : part0 ? "Not on record" : "No vote") + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</span>'; };
     var h = chip("me", "You", mv, !mv && gv ? "" : "");
     if(mine) h += chip("gov", "Governor " + esc(g ? g.m : mine.slice(0, 12) + "\u2026"), gv, !mv && gv ? "counts for your stake" : "");
     var part = (mh && mh.part) || (gh && gh.part);
-    return '<div class=gp-you>' + h + (part ? '<small>older votes may be missing (long history)</small>' : '') + '</div>';
+    return '<div class=gp-you>' + h + '</div>';
   }
   function voteBox(p){
     if(!window.__ADDR || !window.__WALLET || !window.__TX) return '<div class=gp-vote><em>Your vote</em><span class=gp-vn>Connect a wallet to vote on this proposal.</span></div>';
@@ -1342,7 +1349,7 @@
   }
   /* one proposal's substance - the fact tiles, your side, the text, and the vote while it is open - used by the
      phone's inline view and by the wide screen's detail pane alike */
-  function pfacts(p, t){
+  function pfacts(p, t, wide){
     var sm = p.sum.length > 2400 ? p.sum.slice(0, 2400) + "…" : p.sum;
     /* the facts as a row of tiles (operator, 2026-10-12: "beautify"): label, figure, and for the voting window its length */
     var vy = p.vs && p.ve && new Date(p.vs).getUTCFullYear() === new Date(p.ve).getUTCFullYear();
@@ -1354,18 +1361,20 @@
       tile("gpf-sub", "Submitted", pday(p.submit)) +
       tile("gpf-vote", "Voting", p.vs ? (vy ? pday(p.vs).replace(/ \d{4}$/, "") : pday(p.vs)) + ' to ' + pday(p.ve) : 'Not started', vdays ? vdays + ' days' : '') +
       (t.s ? tile("gpf-cast", "Votes cast", Math.round(t.s / 1e6).toLocaleString("en-US") + ' ATONE') : '') + '</div>' +
-      pside(p) +
+      (wide ? '' : pside(p)) +
       (sm ? '<div class=gp-sum><div>' + esc(sm) + '</div></div>' : '') + (p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? voteBox(p) : '');
   }
   function pwhen(p){ return p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? "ends " + pday(p.ve) : p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? "deposit until " + pday(p.de) : "ended " + pday(p.ve); }
   /* the wide screen's detail pane: the chosen proposal, whole */
   function pdet(p){
     var s = PST[p.st] || ["unknown", "d"], t = ptally(p.tally), pc = function(v){ return t.s ? (v / t.s * 100) : 0; };
-    return '<div class=gpx-dh><span class=gp-id>#' + p.id + '</span><b>' + esc(p.title) + '</b><span class="gp-st ' + s[1] + '">' + s[0] + '</span></div>' +
+    /* the header carries your side where the status tag was: the index row already says passed or rejected */
+    var side = window.__ADDR ? pside(p).replace(/^<div class=gp-you>/, '<div class="gp-you gpx-you">') : '<span class="gp-st ' + s[1] + '">' + s[0] + '</span>';
+    return '<div class=gpx-dh><span class=gp-id>#' + p.id + '</span><b>' + esc(p.title) + '</b>' + side + '</div>' +
       '<div class=gpx-ds>' + esc(pkind(p)) + ', ' + pwhen(p) + (p.endorsed ? ', endorsed by the Steering DAO' : '') + (p.ext ? ', voting extended ' + p.ext + '\u00d7' : '') + '</div>' +
       '<div class="gp-v gpx-v">' + (t.s ? '<span class=gp-bar><i class=y style="width:' + pc(t.y).toFixed(2) + '%"></i><i class=n style="width:' + pc(t.n).toFixed(2) + '%"></i><i class=a style="width:' + pc(t.a).toFixed(2) + '%"></i></span>' +
         '<em>Yes ' + pc(t.y).toFixed(1) + '%</em><small>No ' + pc(t.n).toFixed(1) + '%, abstain ' + pc(t.a).toFixed(1) + '%</small>' : '<small>no votes' + (p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? ' yet' : '') + '</small>') + '</div>' +
-      pfacts(p, t);
+      pfacts(p, t, true);
   }
   var GPW = window.matchMedia ? matchMedia("(min-width:1100px)") : null;
   function gpWide(){ return !!(GPW && GPW.matches); }

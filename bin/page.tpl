@@ -4791,6 +4791,8 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gpx-dh{display:flex;align-items:center;gap:10px;min-width:0}
 .gpx-dh b{flex:1 1 auto;min-width:0;font-size:16px;color:var(--wt)}
 .gpx-ds{font-size:11.5px;color:var(--ws)}
+.gpx-dh .gpx-you{min-height:0;flex:none;gap:6px;flex-wrap:nowrap}
+.gpx-dh .gpx-you .gp-sv{padding:4px 9px}
 .gpx-det .gp-sum{flex:1 1 auto;max-height:none;min-height:60px}
 }
 .gd-list{display:flex;flex-direction:column;gap:12px}
