@@ -862,6 +862,8 @@
   html[data-theme=light]:not([data-mono]) .gd-r+.gd-r{background:transparent}
   html[data-theme=light]:not([data-mono]) .gvt-v s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .gvt-r:hover td,html[data-theme=light]:not([data-mono]) .gvt-r:focus-visible td{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .gvt-tag{color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .gvt-tag.you{color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .gvt-lg img,html[data-theme=light]:not([data-mono]) .gvt-lg .lg{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .gvt-vp s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .gvtab .gvh{background:none;box-shadow:none}
@@ -1319,6 +1321,8 @@
   html[data-theme=light]:not([data-mono]) .gp-sv{background:rgba(60,50,20,.035)}
   html[data-theme=light]:not([data-mono]) .gp-vm.me{color:#fbf9f3}
   html[data-theme=light]:not([data-mono]) .act-tile{background:rgba(60,50,20,.035)}
+  html[data-theme=light]:not([data-mono]) .gvt-tag{background:var(--accent);color:#fff}
+  html[data-theme=light]:not([data-mono]) .gvt-tag.you{background:#b86a00;color:#fff}
   html[data-theme=light]:not([data-mono]) .gvt-r:hover td,html[data-theme=light]:not([data-mono]) .gvt-r:focus-visible td{background:rgba(44,41,64,.04)}
   html[data-theme=light]:not([data-mono]) .cell.pad{background:rgba(40,30,20,.05);border:1px dashed rgba(40,30,20,.16)}
 

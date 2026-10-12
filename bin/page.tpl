@@ -4902,6 +4902,8 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gvt-r.off td{color:var(--ws)}
 .gvt-n{display:flex;align-items:center;gap:10px;min-width:0}
 .gvt-n b{font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.gvt-tag{flex:none;margin-left:14px;padding:2px 9px;border-radius:999px;font:700 9px/1.4 var(--wmono);font-style:normal;letter-spacing:.12em;text-transform:uppercase;background:var(--sv-teal);color:#071a18}
+.gvt-tag.you{background:var(--sv-amber);color:#1a1000}
 .gvt-lg{flex:none;width:22px;height:22px;border-radius:50%;overflow:hidden;display:grid;place-items:center}
 .gvt-lg img,.gvt-lg .lg{width:22px;height:22px;object-fit:cover;display:grid;place-items:center;font-size:10px;font-weight:700;color:#fff}
 .gvt-vp b{font-weight:600}.gvt-vp s{text-decoration:none;margin-left:8px;font-size:11px;color:var(--wf)}

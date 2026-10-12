@@ -986,6 +986,7 @@
     var P = GP.list; if(!P) return null;
     var h = votesOf(govAcctOf(g.addr), 1); if(!h || !h.map) return null;
     var since = g.since ? new Date(g.since).getTime() : 0, from = h.part && (window.__D || {}).hist_from ? new Date(window.__D.hist_from).getTime() : 0;
+    if(h.part && !from) return [0, 0];      /* a partial record with no known window claims nothing: never an undercount */
     var el = P.filter(function(p){
       if(!p.vs || !p.ve || new Date(p.ve).getTime() <= since) return false;
       if(from && new Date(p.vs).getTime() < from) return false;
@@ -998,7 +999,9 @@
     var act = list.filter(function(g){ return g.active; }).sort(by), ina = list.filter(function(g){ return !g.active; }).sort(by);
     var row = function(g){ var sh = GV.bonded ? (g.vp || 0) / GV.bonded * 100 : null;
       return '<tr class="gvt-r' + (g.active ? '' : ' off') + (g.addr === mine ? ' me' : '') + '" data-gv="' + esc(g.addr) + '" tabindex=0 title="Open ' + esc(g.m) + '">' +
-        '<td><div class=gvt-n><span class=gvt-lg>' + govLogo(g) + '</span><b>' + esc(g.m) + '</b>' + (g.addr === mine ? '<i class=sd-al>yours</i>' : '') + '</div></td>' +
+        /* the wallet's own governor reads You; the one it follows reads Yours (operator, 2026-10-12), a pill set apart */
+        '<td><div class=gvt-n><span class=gvt-lg>' + govLogo(g) + '</span><b>' + esc(g.m) + '</b>' +
+          (window.__ADDR && g.addr === govAddrOf(window.__ADDR) ? '<i class="gvt-tag you">You</i>' : g.addr === mine ? '<i class=gvt-tag>Yours</i>' : '') + '</div></td>' +
         '<td class=gvt-vp><b>' + (g.vp != null ? fmt(g.vp) : NA) + '</b>' + (sh != null ? '<s>' + sh.toFixed(2) + '%</s>' : '') + '</td>' +
         '<td class=gvt-d>' + (g.n != null ? g.n : NA) + '</td>' +
         (function(){ var c = govVotes(g); return '<td class=gvt-v' + (!c ? '' : c[1] ? ' title="Voted on ' + c[0] + ' of the ' + c[1] + ' proposals decided since it became active"' :
@@ -1152,7 +1155,7 @@
       '<div class="vhead vwrap">' + (((window.__D || {}).gav || []).indexOf(g.ident) >= 0 && g.ident ? '<img class=vlogo src="assets/val/' + esc(g.ident) + '.jpg" alt="">' :
         '<span class=vmono style="display:flex;background:hsl(' + (g.m.charCodeAt(0) * 37 % 360) + ',42%,30%)">' + esc(g.m.charAt(0).toUpperCase()) + '</span>') +
         '<div class=vcol><div class=vname><span class=vnm>' + esc(g.m) + '</span></div><div class=vsub>' + web + '</div></div></div>' +
-      '<div class=vbadges><span class="badge ' + (g.active ? 'ok' : 'dn') + '">' + (g.active ? 'ACTIVE' : 'INACTIVE') + '</span>' + (g.addr === mine ? '<span class="badge up">YOU FOLLOW</span>' : '') + '</div>' +
+      '<div class=vbadges><span class="badge ' + (g.active ? 'ok' : 'dn') + '">' + (g.active ? 'ACTIVE' : 'INACTIVE') + '</span>' + (window.__ADDR && g.addr === govAddrOf(window.__ADDR) ? '<span class="badge up">YOU</span>' : g.addr === mine ? '<span class="badge up">YOU FOLLOW</span>' : '') + '</div>' +
       (g.det ? '<p class=gv-det>' + esc(g.det) + '</p>' : '') +
       '<div class=vgrid>' +
         st("voting power", g.vp != null ? fmt(g.vp) : NA, sh != null ? sh.toFixed(2) + "% of bonded ATONE" : "") +
