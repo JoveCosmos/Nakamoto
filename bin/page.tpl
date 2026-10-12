@@ -4818,7 +4818,8 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 #sv-proplist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#1d4f8f,#173257 58%,#141633)}
 /* the proposals bar carries the three figures (2026-10-11): label, value, one short line each */
 :is(#sv-proplist,#sv-govlist,#sv-daop)>.sv-ph.gp-ph{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start;gap:0 16px;padding:6px 15px 7px;flex:0 0 auto}   /* never squeezed by the panel's column flex */
-#sv-govlist>.sv-ph.gv-ph{grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}
+#sv-govlist>.sv-ph.gv-ph{grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:start}
+#sv-govlist>.sv-ph.gv-ph>.gv-reg{align-self:center}
 #sv-govlist>.sv-ph .gv-reg:disabled{opacity:.45;cursor:default}
 #sv-govlist>.sv-ph .gv-reg{white-space:nowrap;color:#fff;border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.12)}
 .gv-none{display:flex;flex-direction:column;gap:12px;padding:14px 2px}
@@ -4872,7 +4873,8 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gvt{width:100%;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}
 .gvt th{position:sticky;top:0;z-index:1;background:var(--wc);padding:6px 10px 8px;border-bottom:1px solid var(--wbd2);text-align:left;font:500 8.5px/1.2 var(--wmono);letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
 .gvt td{padding:11px 10px;border-bottom:1px solid var(--wbd);font-size:13px;color:var(--wt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gvt :is(th,td).gvt-vp{width:30%;text-align:right}.gvt :is(th,td).gvt-d{width:14%;text-align:right}.gvt :is(th,td).gvt-s{width:18%;text-align:right}
+.gvt :is(th,td).gvt-vp{width:27%;text-align:right}.gvt :is(th,td).gvt-d{width:12%;text-align:right}.gvt :is(th,td).gvt-v{width:11%;text-align:right}.gvt :is(th,td).gvt-s{width:16%;text-align:right}
+.gvt-v b{font-weight:600}.gvt-v s{text-decoration:none;color:var(--wf)}.gvt-wait{font-style:normal;color:var(--wf)}
 .gvt-r{cursor:pointer}
 .gvt-r:hover td,.gvt-r:focus-visible td{background:rgba(255,255,255,.03)}
 .gvt-r:focus-visible{outline:2px solid var(--sv-teal);outline-offset:-2px}
@@ -4885,7 +4887,8 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gvt .gvt-band td{padding:10px 0 6px;border-bottom:0;overflow:visible;white-space:normal}
 .gvcard .vlogo{width:54px;height:54px;border-radius:50%;object-fit:cover;flex:none}
 /* a phone keeps every word whole: no Since column, names may wrap, the share sits under the figure */
-@media(max-width:620px){.gvt :is(th,td).gvt-s{display:none}.gvt :is(th,td).gvt-vp{width:38%}.gvt :is(th,td).gvt-d{width:22%}
+@media(max-width:620px){.gvt{table-layout:auto}.gvt :is(th,td).gvt-s{display:none}.gvt :is(th,td):is(.gvt-vp,.gvt-d,.gvt-v){width:1%;white-space:nowrap}
+  .gvt th{letter-spacing:.06em;padding:6px 6px 8px}.gvt th:first-child,.gvt td:first-child{width:auto}
   .gvt td{white-space:normal;padding:10px 8px}.gvt-n b{overflow:visible;overflow-wrap:anywhere}
   .gvt-vp s{display:block;margin:2px 0 0}}
 .gvtab .gvh{--c:transparent;align-items:end;padding:0 12px 6px;min-height:0;height:auto;border:0;border-bottom:1px solid var(--wbd2);border-radius:0;background:none;box-shadow:none;cursor:default}

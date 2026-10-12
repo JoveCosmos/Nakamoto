@@ -857,6 +857,7 @@
   html[data-theme=light]:not([data-mono]) .gp-st.d{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .gd-r{background:transparent}
   html[data-theme=light]:not([data-mono]) .gd-r+.gd-r{background:transparent}
+  html[data-theme=light]:not([data-mono]) .gvt-v s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .gvt-r:hover td,html[data-theme=light]:not([data-mono]) .gvt-r:focus-visible td{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .gvt-lg img,html[data-theme=light]:not([data-mono]) .gvt-lg .lg{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .gvt-vp s{text-decoration:none}

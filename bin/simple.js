@@ -979,7 +979,21 @@
   /* the Governors tab as the redelegation list (operator, 2026-10-12): one flat table, column heads apart, no status
      or address (both in the card a row opens), voting power as its figure and share; inactive governors close the
      list in a band that opens, as inactive validators do */
+  /* a governor's turnout (operator, 2026-10-12: "11/15"): the proposals it voted on, of those whose vote ended after it
+     became active; an open proposal counts once it has voted. A record read only from the node's transactions
+     counts only proposals inside the node's history */
+  function govVotes(g){
+    var P = GP.list; if(!P) return null;
+    var h = votesOf(govAcctOf(g.addr), 1); if(!h || !h.map) return null;
+    var since = g.since ? new Date(g.since).getTime() : 0, from = h.part && (window.__D || {}).hist_from ? new Date(window.__D.hist_from).getTime() : 0;
+    var el = P.filter(function(p){
+      if(!p.vs || !p.ve || new Date(p.ve).getTime() <= since) return false;
+      if(from && new Date(p.vs).getTime() < from) return false;
+      return p.st !== "PROPOSAL_STATUS_VOTING_PERIOD" || !!h.map[p.id]; });
+    return [el.filter(function(p){ return !!h.map[p.id]; }).length, el.length];
+  }
   function govTable(list, mine){
+    loadProps();
     var by = function(a, b){ return (b.vp || 0) - (a.vp || 0); };
     var act = list.filter(function(g){ return g.active; }).sort(by), ina = list.filter(function(g){ return !g.active; }).sort(by);
     var row = function(g){ var sh = GV.bonded ? (g.vp || 0) / GV.bonded * 100 : null;
@@ -987,15 +1001,18 @@
         '<td><div class=gvt-n><span class=gvt-lg>' + govLogo(g) + '</span><b>' + esc(g.m) + '</b>' + (g.addr === mine ? '<i class=sd-al>yours</i>' : '') + '</div></td>' +
         '<td class=gvt-vp><b>' + (g.vp != null ? fmt(g.vp) : NA) + '</b>' + (sh != null ? '<s>' + sh.toFixed(2) + '%</s>' : '') + '</td>' +
         '<td class=gvt-d>' + (g.n != null ? g.n : NA) + '</td>' +
+        (function(){ var c = govVotes(g); return '<td class=gvt-v' + (!c ? '' : c[1] ? ' title="Voted on ' + c[0] + ' of the ' + c[1] + ' proposals decided since it became active"' :
+          ' title="No proposal has been decided since it became active' + (votesOf(govAcctOf(g.addr), 1).part ? ' within the record we can read' : '') + '"') + '>' +
+          (!c ? '<i class=gvt-wait>…</i>' : c[1] ? '<b>' + c[0] + '</b><s>/' + c[1] + '</s>' : '-') + '</td>'; })() +
         '<td class=gvt-s>' + (g.since ? window.__dayFull(g.since) : NA) + '</td></tr>'; };
-    var h = '<div class=gvt-w><table class=gvt><thead><tr><th>Governor</th><th class=gvt-vp>Voting power</th><th class=gvt-d>Delegators</th><th class=gvt-s>Since</th></tr></thead><tbody>' +
+    var h = '<div class=gvt-w><table class=gvt><thead><tr><th>Governor</th><th class=gvt-vp>Voting power</th><th class=gvt-d>Delegators</th><th class=gvt-v>Votes</th><th class=gvt-s>Since</th></tr></thead><tbody>' +
       act.map(row).join("");
     /* the band always stands, with its 0 when empty, as the redelegation list's inactive validators do */
     if(ina.length){
-      h += '<tr class="ij-t gvt-band' + (GV.inopen ? ' open' : '') + '"><td colspan=4><button type=button class=ij-b data-act=gvinact aria-expanded=' + !!GV.inopen + '>' +
+      h += '<tr class="ij-t gvt-band' + (GV.inopen ? ' open' : '') + '"><td colspan=5><button type=button class=ij-b data-act=gvinact aria-expanded=' + !!GV.inopen + '>' +
         '<span>Inactive governors</span><i>' + ina.length + '</i><em>their votes count for no one</em><u aria-hidden=true></u></button></td></tr>';
       if(GV.inopen) h += ina.map(row).join("");
-    } else h += '<tr class="ij-t ij-0 gvt-band"><td colspan=4><button type=button class=ij-b disabled aria-disabled=true><span>Inactive governors</span><i>0</i><em>none right now</em></button></td></tr>';
+    } else h += '<tr class="ij-t ij-0 gvt-band"><td colspan=5><button type=button class=ij-b disabled aria-disabled=true><span>Inactive governors</span><i>0</i><em>none right now</em></button></td></tr>';
     return h + '</tbody></table></div>';
   }
   function govRows(list, mine){
@@ -1159,7 +1176,8 @@
     var your = !window.__ADDR ? ["-", "connect a wallet"] : (mine === null || mine === undefined) ? ["\u2026", "reading"] : me ? [esc(me.m), "you govern"]
       : mine ? [esc(g ? g.m : mine.slice(0, 12) + "\u2026"), g && !g.active ? "inactive, its votes do not count" : "votes for you unless you vote"] : ["None", "your stake votes only when you do"];
     /* the button stands from the first paint (idle until the list is read), so the header never grows a row */
-    var reg = '';      /* no register button in this section (operator, 2026-10-12); becoming one lives in the Dashboard's Govern */
+    /* Become a governor sits in the Governors header (operator, 2026-10-12: the Dashboard's Govern is gone) */
+    var reg = !GOV_REG ? '' : '<button class="sv-gbtn gr-open gv-reg" type=button data-act=greg' + (L && window.__ADDR && window.__WALLET ? '' : ' disabled title="Connect a wallet to register"') + '>' + (me ? 'Edit your governor' : 'Become a governor') + '</button>';
     var h = '<div class="sv-ph gp-ph gv-ph">' +
       st("Governors", L ? String(L.length) : "-", L ? act.length + " active" : "reading the chain\u2026") +
       st("Following", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(1) + "%" : "-", L ? n + " wallets, " + fmt(vp) + " ATONE" : "") +
@@ -1226,7 +1244,7 @@
   /* ── the address's PAST votes: the chain deletes votes once a proposal is tallied, so history is read from the
      address's own transactions (by message.sender, as Activity reads them), once per session and cached. Up to 300
      transactions are scanned; beyond that the record is marked partial and shown as far as it goes ── */
-  function votesOf(a){
+  function votesOf(a, pages){
     if(!a) return null;
     var c = GP.hist[a]; if(c) return c;
     GP.hist[a] = { map: null, part: false };
@@ -1250,12 +1268,12 @@
         });
         seen += (d.txs || []).length;
         var total = +d.total || 0;
-        if(seen < total && k < 3) return page(k + 1);
+        if(seen < total && k < (pages || 3)) return page(k + 1);
       });
     };
     /* complete when the baked record was read: the node's search only tops it up, so its depth claims nothing */
     base.then(function(){ return page(1).catch(function(){}); })
-      .then(function(){ GP.hist[a] = { map: map, part: !baked }; if(screen() === "props") drawProps(); });
+      .then(function(){ GP.hist[a] = { map: map, part: !baked }; var sc = screen(); if(sc === "props") drawProps(); else if(sc === "govs") render(); });
     return GP.hist[a];
   }
   /* the row's mark: filled = this wallet voted, outlined = its governor did (and so voted for it); colour = the vote */

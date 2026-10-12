@@ -200,6 +200,7 @@ VD_KEYS = ("op", "chex", "id", "vid", "m", "t", "c", "jail", "tomb", "burned", "
 payload = json.dumps({"generated": D["generated"], "thresh": th["threshold"],
                       "bot": D.get("bot"),
                       "gav": D.get("gav") or [],      # governor identities with a published Keybase tile
+                      "hist_from": D.get("hist_from"),  # the public node's first block time (partial vote records)
                       "alert": D.get("alert"),
                       "weekly": nk["weekly"], "schedule": D["schedule"], "eta_stats": es,
                       "vdetail": [{k: v[k] for k in VD_KEYS if k in v} for v in D["validators"]],

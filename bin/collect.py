@@ -917,6 +917,8 @@ for v in out["validators"]:
     v["av"] = bool(v["id"]) and v["id"] in HAVE_AV
 # the governor identities that have a published tile, so the page asks only for pictures that exist
 out["gav"] = sorted({i for i in GOV_IDS if i in HAVE_AV})
+# the public node's first block time: a record read from its transactions alone covers nothing before it
+out["hist_from"] = status["sync_info"].get("earliest_block_time")
 # testnet: what only our index knows is not known - None, which the page shows as N/A
 if TESTNET:
     for v in out["validators"]:
