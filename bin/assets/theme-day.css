@@ -826,6 +826,7 @@
   html[data-theme=light]:not([data-mono]) .gp-fi{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .gp-vm.me{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .gp-vm.gov{background:transparent}
+  html[data-theme=light]:not([data-mono]) .gp-vm.none{background:transparent}
   html[data-theme=light]:not([data-mono]) .gp-sv{background:var(--surface-2)}
   @media(min-width:1100px){
     html[data-theme=light]:not([data-mono]) .gpx-r:hover{background:var(--surface-2)}

@@ -992,7 +992,9 @@
      outside the Dashboard */
   /* the Governance section only reads: following is done from the Dashboard's Governance tab */
   function govBtn(g, mine){
-    if(screen() !== "mygov") return '';      /* follow and stop live in the Dashboard's Govern alone (operator, 2026-10-12) */
+    /* the Governors table has no button column (operator, 2026-10-12): following is done from a governor's card, which
+       opens on a row; the Dashboard's Govern screen keeps its own buttons */
+    if(screen() !== "mygov" && screen() !== "govs") return '';
     if(!window.__ADDR || !window.__WALLET || mine === null || mine === undefined) return '';
     if(g.addr === govAddrOf(window.__ADDR)) return !GOV_REG ? '' : '<button class=sv-gbtn type=button data-act=greg title="Change what the chain shows about your governor">Edit</button>';
     /* an ACTIVE governor cannot follow another - the chain refuses the delegation - so its wallet gets no
@@ -1276,6 +1278,10 @@
     if(mv) return '<i class="gp-vm me ' + mv + '" title="You voted ' + mv + '">' + mv.charAt(0).toUpperCase() + '</i>';
     var mine = myGov(), ga = mine ? govAcctOf(mine) : null, gh = ga ? GP.hist[ga] : null, gv = gh && gh.map ? gh.map[p.id] : null;
     if(gv) return '<i class="gp-vm gov ' + gv + '" title="Your governor voted ' + gv + '">' + gv.charAt(0).toUpperCase() + '</i>';
+    /* neither voted (operator, 2026-10-12: "not voted is empty, should show"): only once the record is read in full,
+       and only for proposals that reached a vote; a partial record claims nothing */
+    if(mh && mh.map && !mh.part && (!gh || (gh.map && !gh.part)) && p.vs && p.st !== "PROPOSAL_STATUS_DEPOSIT_PERIOD")
+      return '<i class="gp-vm none" title="' + (p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? "You have not voted yet" : "You did not vote") + '">-</i>';
     return '';
   }
   /* your side of one proposal: your vote and your governor's, read or reading */

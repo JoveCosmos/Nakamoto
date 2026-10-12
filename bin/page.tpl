@@ -4764,6 +4764,7 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gp-vm.yes{--vc:var(--sv-green)}.gp-vm.no{--vc:var(--wburn)}.gp-vm.abstain{--vc:var(--wf)}
 .gp-vm.me{background:var(--vc);color:#06060c}
 .gp-vm.gov{border:1.5px solid var(--vc);color:var(--vc);background:transparent}
+.gp-vm.none{border:1.5px dashed var(--wbd2);color:var(--wf);background:transparent}
 /* your side of a proposal: your vote and your governor's, as chips; one height read or reading */
 .gp-you{display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-height:38px}
 .gp-sv{display:inline-flex;align-items:baseline;gap:8px;padding:6px 11px;border:1px solid var(--wbd);border-radius:8px;background:rgba(255,255,255,.03)}
@@ -5011,6 +5012,11 @@ color:#6fe3da;font:600 11.5px var(--wsans);cursor:pointer;white-space:nowrap}
   .gvcard .vstat{padding-top:6px;padding-bottom:6px}
   .gvcard .vhead{padding-top:16px}
   .gvcard .gv-rules{margin-top:6px;font-size:10.5px;line-height:1.4}
+  /* with the Follow button aboard (2026-10-12) the short window needs a little more air back */
+  #gvpop .gvcard .vhead{padding-bottom:12px}
+  #gvpop .gvcard .vbadges{padding-top:6px}
+  #gvpop .gvcard .vgrid{margin-top:6px}
+  #gvpop .gvcard .gv-go{padding:10px 28px 14px}
 }
 .gvcard .vbadges{padding:14px 28px 0}
 .gv-det{margin:12px 28px 0;font-size:12.5px;line-height:1.5;color:var(--ink2)}
