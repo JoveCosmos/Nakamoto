@@ -955,7 +955,7 @@
       })
       .then(function(gs){ gs.sort(function(a, b){ return (b.active - a.active) || (b.vp - a.vp); }); GV.list = gs; GV.at = Date.now(); GV.err = null; })
       .catch(function(e){ GV.err = String(e && e.message || e); })
-      .then(function(){ GV.busy = false; var sc = screen(); if(sc === "govs" || sc === "mygov") render(); });
+      .then(function(){ GV.busy = false; var sc = screen(); if(sc === "govs" || sc === "mygov") render(); if(sc === "props") drawProps(); });
   }
   function myGov(){
     var a = window.__ADDR; if(!a) return undefined;
@@ -981,9 +981,8 @@
         '<span class=sv-gn2><b>' + (g.vp != null ? fmt(g.vp) : NA) + '</b><s>ATONE' + (sh != null ? ', ' + sh.toFixed(2) + '% of bonded' : '') + '</s></span>' +
         '<span class=sv-gn2><b>' + (g.n != null ? g.n : NA) + '</b><s>delegator' + (g.n === 1 ? '' : 's') + '</s></span>' +
         '<span class=sv-gn2><b>' + (g.since ? window.__dayFull(g.since) : NA) + '</b><s>' + (g.active ? 'active since' : 'inactive since') + '</s></span>' +
-        /* two fixed slots, the button and the site link, so every row's button stands in one column */
-        '<span class=sv-gact>' + (govBtn(g, mine) || '<span></span>') +
-        (gweb(g.web) ? '<a class=sv-gweb href="' + esc(gweb(g.web)) + '" target=_blank rel="noopener noreferrer">site</a>' : '<span></span>') + '</span></div>'; }).join("") + '</div>';
+        /* one fixed slot, the button alone (operator, 2026-10-12: the popup carries the website) */
+        '<span class=sv-gact>' + (govBtn(g, mine) || '<span></span>') + '</span></div>'; }).join("") + '</div>';
   }
   /* following a governor is one signature: Follow (Switch when another one is followed) on an active
      governor, Stop on the one followed; nothing without a wallet, while the reading is pending, or
@@ -1030,6 +1029,16 @@
     d.forEach(function(v){ out += B32.charAt(v); }); for(i = 0; i < 6; i++) out += B32.charAt((c >>> (5 * (5 - i))) & 31);
     return out;
   }
+  function govAcctOf(a){
+    var p = a ? a.lastIndexOf("1") : -1, d = [], i; if(p < 1) return null;
+    for(i = p + 1; i < a.length; i++){ var k = B32.indexOf(a.charAt(i)); if(k < 0) return null; d.push(k); }
+    d = d.slice(0, -6);
+    var h = "atone", x = [], out = h + "1";
+    for(i = 0; i < h.length; i++) x.push(h.charCodeAt(i) >> 5); x.push(0); for(i = 0; i < h.length; i++) x.push(h.charCodeAt(i) & 31);
+    var c = b32poly(x.concat(d, [0, 0, 0, 0, 0, 0])) ^ 1;
+    d.forEach(function(v){ out += B32.charAt(v); }); for(i = 0; i < 6; i++) out += B32.charAt((c >>> (5 * (5 - i))) & 31);
+    return out;
+  }
   window.__govAddrOf = govAddrOf;
   function myGovRec(){ var ga = govAddrOf(window.__ADDR); return ga && GV.list ? GV.list.filter(function(x){ return x.addr === ga; })[0] || null : null; }
   /* the stake the chain counts for a governor: delegations to validators in the active set */
@@ -1069,7 +1078,7 @@
                 : '<input class=gr-in id=gr-' + f[0] + ' type=text autocomplete=off spellcheck=false placeholder="' + esc(f[3]) + '" value="' + esc(val(f[0])) + '">') + '</label>'; }).join("") + '</div>' +
       (me ? '' : '<div class=gr-need id=grneed></div>') +
       '<p class=gr-note>' + (me ? 'The new details show once the next block carries them.'
-        : 'Your own stake follows you from the moment you register, and as a governor you cannot follow another one. Keep ' + (R.minSelf ? whole(R.minSelf) : "10,000") + ' ATONE staked: fall under it and the chain sets you inactive, and any status change holds ' + (R.period ? Math.round(R.period / 86400) : 28) + ' days before the next. The role carries no reward and nothing extra at risk; only your vote\'s reach changes.') +
+        : 'Your own stake follows you from the moment you register, and as a governor you cannot follow another one. Keep ' + (R.minSelf ? whole(R.minSelf) : "10,000") + ' ATONE staked: fall under it and the chain sets you inactive, and after any change of status ' + (R.period ? Math.round(R.period / 86400) : 28) + ' days must pass before it can change again. The role carries no reward and nothing extra at risk; only your vote\'s reach changes.') +
         ' Signed in ' + esc(window.__WALLET.name || "your wallet") + ', sent through GATA\'s node.</p>' +
       '<div class=txbtns><button class=wk-btn type=button data-act=grclose>Cancel</button><button class="wk-btn wk-go" id=grgo type=button data-act=grsend disabled>' + (me ? 'Save' : 'Register') + '</button></div></div>';
     if(P) P.open(pop);
@@ -1099,8 +1108,8 @@
         st("identity", g.ident ? esc(g.ident) : "-", g.ident ? "Keybase" : "") +
         st("address", esc(g.addr.slice(0, 12) + "\u2026" + g.addr.slice(-6)), "") +
       '</div>' +
-      '<p class=gv-rules>A governor keeps at least <b>' + (R.minSelf ? whole(R.minSelf) : NA) + ' ATONE</b> staked from its own wallet. If its stake falls under that, the chain sets it inactive on its own, and a status change holds for <b>' +
-        (R.period ? Math.round(R.period / 86400) + ' days' : NA) + '</b> before the next one, so an inactive spell lasts at least that long. While inactive, its vote counts for no one who follows it; followers stay and nothing of theirs is at risk.</p>' +
+      '<p class=gv-rules>A governor keeps at least <b>' + (R.minSelf ? whole(R.minSelf) : NA) + ' ATONE</b> staked from its own wallet. If its stake falls under that, the chain sets it inactive on its own. After any change of status, <b>' +
+        (R.period ? Math.round(R.period / 86400) + ' days' : NA) + '</b> must pass before its status can change again, so an inactive governor stays inactive at least that long. While inactive, its vote counts for no one who follows it; followers stay and nothing of theirs is at risk.</p>' +
       (govBtn(g, mine) ? '<div class=gv-go>' + govBtn(g, mine) + '</div>' : '') +
     '</div>';
     if(P) P.open(pop);
@@ -1174,7 +1183,7 @@
 
   /* ════ Proposals: every AtomOne proposal, read from the chain every 5 min (the one being voted on
      gets its running tally); the tallying rules and the core DAOs' parameters come with them ════ */
-  var GP = { at: 0, busy: false, list: null, err: null, tp: null, dao: null, open: {}, votes: {} };
+  var GP = { at: 0, busy: false, list: null, err: null, tp: null, dao: null, open: {}, votes: {}, sel: 0, hist: {} };
   function loadProps(){
     if(GP.busy || (GP.list && Date.now() - GP.at < 300000)) return;
     GP.busy = true;
@@ -1227,6 +1236,62 @@
         .then(function(){ if(screen() === "props") drawProps(); }); }
     return c;
   }
+  /* ── the address's PAST votes: the chain deletes votes once a proposal is tallied, so history is read from the
+     address's own transactions (by message.sender, as Activity reads them), once per session and cached. Up to 300
+     transactions are scanned; beyond that the record is marked partial and shown as far as it goes ── */
+  function votesOf(a){
+    if(!a) return null;
+    var c = GP.hist[a]; if(c) return c;
+    GP.hist[a] = { map: null, part: false };
+    var map = {}, seen = 0;
+    var page = function(k){
+      return actSearch("message.sender='" + a + "'", k, 100).then(function(d){
+        if(!d || d.message) throw 0;
+        (d.txs || []).forEach(function(t, i){
+          var r = (d.tx_responses || [])[i] || {}; if(+r.code) return;
+          (((t.body || {}).messages) || []).forEach(function(m){
+            var ty = String(m["@type"] || "");
+            if(/\.MsgVote$/.test(ty) && m.voter === a) map[+m.proposal_id] = VOPT[m.option] || null;
+            else if(/MsgVoteWeighted$/.test(ty) && m.voter === a && (m.options || [])[0]) map[+m.proposal_id] = VOPT[m.options[0].option] || null;
+          });
+        });
+        seen += (d.txs || []).length;
+        var total = +d.total || 0;
+        if(seen < total && k < 3) return page(k + 1);
+        GP.hist[a] = { map: map, part: seen < total };
+      });
+    };
+    page(1).catch(function(){ GP.hist[a] = { map: map, part: true }; })
+      .then(function(){ if(screen() === "props") drawProps(); });
+    return GP.hist[a];
+  }
+  /* the row's mark: filled = this wallet voted, outlined = its governor did (and so voted for it); colour = the vote */
+  function vmark(p){
+    var A = window.__ADDR; if(!A) return '';
+    var mh = GP.hist[A], mv = mh && mh.map ? mh.map[p.id] : null;
+    if(p.st === "PROPOSAL_STATUS_VOTING_PERIOD"){ var lv = myVote(p.id); if(lv) mv = lv; }
+    if(mv) return '<i class="gp-vm me ' + mv + '" title="You voted ' + mv + '">' + mv.charAt(0).toUpperCase() + '</i>';
+    var mine = myGov(), ga = mine ? govAcctOf(mine) : null, gh = ga ? GP.hist[ga] : null, gv = gh && gh.map ? gh.map[p.id] : null;
+    if(gv) return '<i class="gp-vm gov ' + gv + '" title="Your governor voted ' + gv + '">' + gv.charAt(0).toUpperCase() + '</i>';
+    return '';
+  }
+  /* your side of one proposal: your vote and your governor's, read or reading */
+  function pside(p){
+    var A = window.__ADDR; if(!A) return '';
+    var open = p.st === "PROPOSAL_STATUS_VOTING_PERIOD";
+    var mh = votesOf(A), mv = (open ? myVote(p.id) : null) || (mh && mh.map ? mh.map[p.id] : null);
+    var mine = myGov(), ga = mine ? govAcctOf(mine) : null, gh = ga ? votesOf(ga) : null;
+    if((mh && !mh.map) || (gh && !gh.map) || mine === null) return '<div class=gp-you><small>Reading your votes…</small></div>';
+    var g = mine && GV.list ? GV.list.filter(function(x){ return x.addr === mine; })[0] : null;
+    if(mine && !GV.list) loadGovs();
+    var gv = gh && gh.map ? gh.map[p.id] : null;
+    var cap = function(v){ return v.charAt(0).toUpperCase() + v.slice(1); };
+    var chip = function(cls, who, v, sub){ return '<span class="gp-sv ' + cls + (v ? ' ' + v : '') + '"><em>' + who + '</em><b>' + (v ? cap(v) : "No vote") + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</span>'; };
+    var h = chip("me", "You", mv, !mv && gv ? "" : "");
+    if(mine) h += chip("gov", "Governor " + esc(g ? g.m : mine.slice(0, 12) + "\u2026"), gv, !mv && gv ? "counts for your stake" : "");
+    var part = (mh && mh.part) || (gh && gh.part);
+    return '<div class=gp-you>' + h + (part ? '<small>older votes may be missing (long history)</small>' : '') + '</div>';
+  }
   function voteBox(p){
     if(!window.__ADDR || !window.__WALLET || !window.__TX) return '<div class=gp-vote><em>Your vote</em><span class=gp-vn>Connect a wallet to vote on this proposal.</span></div>';
     /* the chain refuses a vote from a wallet with under 1 ATONE staked ("insufficient stake for voting", 2026-10-11) */
@@ -1244,7 +1309,9 @@
     var a = window.__ADDR, n = window.__notify ? window.__notify() : null, row = t.closest(".gp-vote");
     if(row) row.querySelectorAll("button").forEach(function(b){ b.disabled = true; }); t.classList.add("busy");
     (window.__TX.sendDirect || window.__TX.send)(window.__WALLET, [{ type: "atomone/v1/MsgVote", value: { proposal_id: String(pid), voter: a, option: opt } }], "", function(){})
-      .then(function(){ if(n) n.ok(); delete GP.votes[a + ":" + pid]; GP.at = 0; drawProps();
+      .then(function(){ if(n) n.ok(); delete GP.votes[a + ":" + pid];
+        var hm = GP.hist[a]; if(hm && hm.map) hm.map[+pid] = { 1: "yes", 2: "abstain", 3: "no" }[+opt];
+        GP.at = 0; drawProps();
         /* the next block carries it: the tally is read again then */
         setTimeout(function(){ GP.at = 0; drawProps(); }, 7000); })
       .catch(function(e){ if(n) n.fail(e && e.message || String(e)); })
@@ -1278,31 +1345,69 @@
     if(GP.err && !L){ put("sv-proplist", h + govEmpty("Could not read the proposals")); return; }
     if(!L){ put("sv-proplist", h + govEmpty("Reading the proposals…")); return; }
     if(!L.length){ put("sv-proplist", h + govEmpty("No proposals yet")); return; }
+    if(window.__ADDR){ votesOf(window.__ADDR); var gmm = myGov(); if(gmm) votesOf(govAcctOf(gmm)); }
+    /* a wide screen splits the panel (operator, 2026-10-12 redesign): a slim index on the left - one line a proposal,
+       your vote's mark on it, the tally a sliver on the row's floor - and the chosen proposal whole on the right, its
+       vote always on screen. Phones keep the tap-to-open rows */
+    if(gpWide()){
+      var sel = GP.sel && L.some(function(p){ return p.id === GP.sel; }) ? GP.sel
+        : (live.length ? live[live.length - 1].id : L[0].id);
+      GP.sel = sel;
+      var rows = L.map(function(p){
+        var s = PST[p.st] || ["unknown", "d"], t = ptally(p.tally), pc = function(v){ return t.s ? (v / t.s * 100) : 0; };
+        return '<div class="gpx-r' + (p.id === sel ? ' sel' : '') + '" data-gp="' + p.id + '" tabindex=0 role=button aria-pressed=' + (p.id === sel) + ' title="' + esc(pwhen(p)) + '">' +
+          '<span class=gp-id>#' + p.id + '</span><b class=gpx-t>' + esc(p.title) + '</b>' + vmark(p) +
+          '<span class="gp-st ' + s[1] + '">' + s[0] + '</span>' +
+          (t.s ? '<span class=gpx-sl><i class=y style="width:' + pc(t.y).toFixed(1) + '%"></i><i class=n style="width:' + pc(t.n).toFixed(1) + '%"></i><i class=a style="width:' + pc(t.a).toFixed(1) + '%"></i></span>' : '') +
+          '</div>'; }).join("");
+      var P0 = L.filter(function(p){ return p.id === sel; })[0];
+      var keep = E("gpxlist"), top = keep ? keep.scrollTop : 0;
+      put("sv-proplist", h + '<div class=gpx-split><div class=gpx-list id=gpxlist>' + rows + '</div><div class=gpx-det>' + pdet(P0) + '</div></div>');
+      var nw = E("gpxlist"); if(nw && top) nw.scrollTop = top;
+      return;
+    }
     put("sv-proplist", h + '<div class=gp-list>' + L.map(function(p){
       var s = PST[p.st] || ["unknown", "d"], t = ptally(p.tally), pc = function(v){ return t.s ? (v / t.s * 100) : 0; }, open = !!GP.open[p.id];
-      var when = p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? "ends " + pday(p.ve) : p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? "deposit until " + pday(p.de) : "ended " + pday(p.ve);
+      var when = pwhen(p);
       var row = '<div class="gp-r' + (open ? ' open' : '') + '" data-gp="' + p.id + '" tabindex=0 role=button aria-expanded=' + open + '>' +
         '<span class=gp-id>#' + p.id + '</span>' +
-        '<span class=gp-t><b>' + esc(p.title) + '</b><s>' + esc(pkind(p)) + ', ' + when + (p.endorsed ? ', endorsed by the Steering DAO' : '') + (p.ext ? ', voting extended ' + p.ext + '×' : '') + (open ? ', tap to close' : '') + '</s></span>' +
+        '<span class=gp-t><b>' + vmark(p) + esc(p.title) + '</b><s>' + esc(pkind(p)) + ', ' + when + (p.endorsed ? ', endorsed by the Steering DAO' : '') + (p.ext ? ', voting extended ' + p.ext + '×' : '') + (open ? ', tap to close' : '') + '</s></span>' +
         '<span class="gp-st ' + s[1] + '">' + s[0] + '</span>' +
         '<span class=gp-v>' + (t.s ? '<span class=gp-bar><i class=y style="width:' + pc(t.y).toFixed(2) + '%"></i><i class=n style="width:' + pc(t.n).toFixed(2) + '%"></i><i class=a style="width:' + pc(t.a).toFixed(2) + '%"></i></span>' +
           '<em>Yes ' + pc(t.y).toFixed(1) + '%</em><small>No ' + pc(t.n).toFixed(1) + '%, abstain ' + pc(t.a).toFixed(1) + '%</small>' : '<small>no votes' + (p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? ' yet' : '') + '</small>') + '</span></div>';
-      if(open){
-        var sm = p.sum.length > 2400 ? p.sum.slice(0, 2400) + "…" : p.sum;
-        /* the facts as a row of tiles (operator, 2026-10-12: "beautify"): label, figure, and for the voting window its length */
-        var vy = p.vs && p.ve && new Date(p.vs).getUTCFullYear() === new Date(p.ve).getUTCFullYear();
-        var vdays = p.vs && p.ve ? Math.round((new Date(p.ve) - new Date(p.vs)) / 864e5) : 0;
-        var tile = function(cls, k, v, sub){ return '<span class="gp-fi ' + cls + '"><em>' + k + '</em><b>' + v + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</span>'; };
-        row += '<div class=gp-d><div class=gp-f>' +
-          tile("gpf-by", "Proposer", p.by ? '<i class=gp-mono title="' + esc(p.by) + '">' + esc(p.by.slice(0, 10) + "…" + p.by.slice(-6)) + '</i>' : "-") +
-          tile("gpf-dep", "Deposit", p.dep ? fmt(p.dep) + ' ATONE' : '-') +
-          tile("gpf-sub", "Submitted", pday(p.submit)) +
-          tile("gpf-vote", "Voting", p.vs ? (vy ? pday(p.vs).replace(/ \d{4}$/, "") : pday(p.vs)) + ' to ' + pday(p.ve) : 'Not started', vdays ? vdays + ' days' : '') +
-          (t.s ? tile("gpf-cast", "Votes cast", Math.round(t.s / 1e6).toLocaleString("en-US") + ' ATONE') : '') + '</div>' +
-          (sm ? '<div class=gp-sum>' + esc(sm) + '</div>' : '') + (p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? voteBox(p) : '') + '</div>';
-      }
+      if(open) row += '<div class=gp-d>' + pfacts(p, t) + '</div>';
       return row; }).join("") + '</div>');
   }
+  /* one proposal's substance - the fact tiles, your side, the text, and the vote while it is open - used by the
+     phone's inline view and by the wide screen's detail pane alike */
+  function pfacts(p, t){
+    var sm = p.sum.length > 2400 ? p.sum.slice(0, 2400) + "…" : p.sum;
+    /* the facts as a row of tiles (operator, 2026-10-12: "beautify"): label, figure, and for the voting window its length */
+    var vy = p.vs && p.ve && new Date(p.vs).getUTCFullYear() === new Date(p.ve).getUTCFullYear();
+    var vdays = p.vs && p.ve ? Math.round((new Date(p.ve) - new Date(p.vs)) / 864e5) : 0;
+    var tile = function(cls, k, v, sub){ return '<span class="gp-fi ' + cls + '"><em>' + k + '</em><b>' + v + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</span>'; };
+    return '<div class=gp-f>' +
+      tile("gpf-by", "Proposer", p.by ? '<i class=gp-mono title="' + esc(p.by) + '">' + esc(p.by.slice(0, 10) + "…" + p.by.slice(-6)) + '</i>' : "-") +
+      tile("gpf-dep", "Deposit", p.dep ? fmt(p.dep) + ' ATONE' : '-') +
+      tile("gpf-sub", "Submitted", pday(p.submit)) +
+      tile("gpf-vote", "Voting", p.vs ? (vy ? pday(p.vs).replace(/ \d{4}$/, "") : pday(p.vs)) + ' to ' + pday(p.ve) : 'Not started', vdays ? vdays + ' days' : '') +
+      (t.s ? tile("gpf-cast", "Votes cast", Math.round(t.s / 1e6).toLocaleString("en-US") + ' ATONE') : '') + '</div>' +
+      pside(p) +
+      (sm ? '<div class=gp-sum><div>' + esc(sm) + '</div></div>' : '') + (p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? voteBox(p) : '');
+  }
+  function pwhen(p){ return p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? "ends " + pday(p.ve) : p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? "deposit until " + pday(p.de) : "ended " + pday(p.ve); }
+  /* the wide screen's detail pane: the chosen proposal, whole */
+  function pdet(p){
+    var s = PST[p.st] || ["unknown", "d"], t = ptally(p.tally), pc = function(v){ return t.s ? (v / t.s * 100) : 0; };
+    return '<div class=gpx-dh><span class=gp-id>#' + p.id + '</span><b>' + esc(p.title) + '</b><span class="gp-st ' + s[1] + '">' + s[0] + '</span></div>' +
+      '<div class=gpx-ds>' + esc(pkind(p)) + ', ' + pwhen(p) + (p.endorsed ? ', endorsed by the Steering DAO' : '') + (p.ext ? ', voting extended ' + p.ext + '\u00d7' : '') + '</div>' +
+      '<div class="gp-v gpx-v">' + (t.s ? '<span class=gp-bar><i class=y style="width:' + pc(t.y).toFixed(2) + '%"></i><i class=n style="width:' + pc(t.n).toFixed(2) + '%"></i><i class=a style="width:' + pc(t.a).toFixed(2) + '%"></i></span>' +
+        '<em>Yes ' + pc(t.y).toFixed(1) + '%</em><small>No ' + pc(t.n).toFixed(1) + '%, abstain ' + pc(t.a).toFixed(1) + '%</small>' : '<small>no votes' + (p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? ' yet' : '') + '</small>') + '</div>' +
+      pfacts(p, t);
+  }
+  var GPW = window.matchMedia ? matchMedia("(min-width:1100px)") : null;
+  function gpWide(){ return !!(GPW && GPW.matches); }
+  if(GPW && GPW.addEventListener) GPW.addEventListener("change", function(){ if(screen() === "props") drawProps(); });
   /* ════ Core DAOs: the Steering and Oversight DAOs the constitution provides for - who holds them
      on chain (x/coredaos params), what each may do, and what has been endorsed so far ════ */
   function drawDaos(){
@@ -1367,8 +1472,10 @@
   function gpToggle(ev){
     var r = ev.target.closest ? ev.target.closest(".gp-r") : null; if(!r) return;
     if(ev.type === "keydown"){ if(ev.key !== "Enter" && ev.key !== " ") return; ev.preventDefault(); }
-    var id = +r.dataset.gp; GP.open[id] = !GP.open[id]; drawProps();
-    var again = document.querySelector('.gp-r[data-gp="' + id + '"]'); if(again && ev.type === "keydown") again.focus();
+    var id = +r.dataset.gp;
+    if(r.classList.contains("gpx-r")){ if(GP.sel !== id){ GP.sel = id; drawProps(); } }
+    else { GP.open[id] = !GP.open[id]; drawProps(); }
+    var again = document.querySelector('.gp-r[data-gp="' + id + '"],.gpx-r[data-gp="' + id + '"]'); if(again && ev.type === "keydown") again.focus();
   }
   sv.addEventListener("click", gpToggle);
   sv.addEventListener("keydown", gpToggle);
@@ -1655,8 +1762,8 @@
   function actTx(h){ return h ? '<a class=act-tx href="' + actX() + esc(h) + '" target=_blank rel="noopener noreferrer">' + esc(h.slice(0, 8)) + '</a>' : '<span class=act-tx></span>'; }
   function actRow(d, main, sub, h, amt){ return '<div class=act-r><span class=act-d>' + d + '</span><span class=act-m><b>' + main + '</b>' + (sub ? '<s>' + sub + '</s>' : '') + '</span>' +
     '<span class=act-x>' + (amt ? '<b>' + amt + '</b>' : '') + actTx(h) + '</span></div>'; }
-  function actSearch(q){ return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/tx/v1beta1/txs?query=" + encodeURIComponent(q) +
-      "&order_by=ORDER_BY_DESC&limit=20&page=1&pagination.limit=20", { cache: "no-store" }).then(function(r){ return r.json(); }); }
+  function actSearch(q, pg, lim){ pg = pg || 1; lim = lim || 20; return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/tx/v1beta1/txs?query=" + encodeURIComponent(q) +
+      "&order_by=ORDER_BY_DESC&limit=" + lim + "&page=" + pg + "&pagination.limit=" + lim, { cache: "no-store" }).then(function(r){ return r.json(); }); }
   var ACT_KIND = { MsgDelegate: "Stake", MsgUndelegate: "Unstake", MsgBeginRedelegate: "Redelegate", MsgWithdrawDelegatorReward: "Claim rewards",
     MsgWithdrawValidatorCommission: "Claim commission", MsgGrant: "Grant", MsgRevoke: "Revoke", MsgVote: "Vote", MsgVoteWeighted: "Vote", MsgSend: "Send",
     MsgMultiSend: "Send", MsgMintPhoton: "Mint PHOTON", MsgExec: "Authorized", MsgDelegateGovernor: "Follow a governor", MsgUndelegateGovernor: "Stop following",
@@ -1743,7 +1850,7 @@
     var el = E("actpop"), a = window.__ADDR; if(!el || typeof POP === "undefined" || !a) return;
     if(ACT.addr !== a){ ACT.cache = {}; ACT.addr = a; }
     var ad = E("actaddr"); if(ad) ad.textContent = a.slice(0, 12) + "\u2026" + a.slice(-6);
-    ACT.k = "pilot"; actShow(); POP.open(el);
+    ACT.k = "account"; actShow(); POP.open(el);
   }
   var actp = E("actpop"); if(actp) actp.addEventListener("click", function(ev){ var b = ev.target.closest ? ev.target.closest(".actabs button") : null; if(b){ ACT.k = b.dataset.k; actShow(); } });
   function wtOpen(){

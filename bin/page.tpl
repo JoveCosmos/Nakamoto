@@ -4759,6 +4759,40 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gp-mono{font-style:normal;font-family:var(--wmono);font-size:11.5px;font-weight:600}
 @media(max-width:700px){.gp-f{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:row dense}.gp-fi.gpf-vote{grid-column:1/-1}}
 .gp-sum{font-size:12px;line-height:1.55;color:var(--ws);white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow-y:auto;padding:10px 12px;border:1px solid var(--wbd);border-radius:8px}
+/* your mark on a proposal row: filled = you voted, outlined = your governor did; the colour is the vote */
+.gp-vm{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;margin-right:7px;border-radius:4px;font-family:var(--wmono);font-size:9px;font-weight:700;vertical-align:1px;flex:none}
+.gp-vm.yes{--vc:var(--sv-green)}.gp-vm.no{--vc:var(--wburn)}.gp-vm.abstain{--vc:var(--wf)}
+.gp-vm.me{background:var(--vc);color:#06060c}
+.gp-vm.gov{border:1.5px solid var(--vc);color:var(--vc);background:transparent}
+/* your side of a proposal: your vote and your governor's, as chips; one height read or reading */
+.gp-you{display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-height:38px}
+.gp-sv{display:inline-flex;align-items:baseline;gap:8px;padding:6px 11px;border:1px solid var(--wbd);border-radius:8px;background:rgba(255,255,255,.03)}
+.gp-sv em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--wf)}
+.gp-sv b{font-size:12.5px;color:var(--wt)}
+.gp-sv.yes b{color:var(--sv-green)}.gp-sv.no b{color:var(--wburn)}.gp-sv.abstain b{color:var(--ws)}
+.gp-sv small{font-size:10px;color:var(--wf)}
+.gp-you>small{font-size:11px;color:var(--wf)}
+/* Proposals on a wide screen (operator, 2026-10-12): a slim index on the left - one line a proposal, your vote's
+   mark on it, the whole tally a sliver on the row's floor - and the chosen proposal whole on the right: facts,
+   your side, the text scrolling in its well, the vote on screen. Nothing ever grows the page */
+@media(min-width:1100px){
+.gpx-split{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:14px}
+.gpx-list{min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;padding-right:4px;align-content:start}
+.gpx-r{position:relative;display:grid;grid-template-columns:44px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:10px 10px 13px 10px;border-bottom:1px solid var(--wbd);cursor:pointer}
+.gpx-r:focus-visible{outline:2px solid var(--sv-teal);outline-offset:-2px}
+.gpx-r:hover{background:rgba(255,255,255,.03)}
+.gpx-r.sel{background:rgba(43,200,189,.07);box-shadow:inset 3px 0 0 var(--sv-teal)}
+.gpx-r.sel .gp-id{background:var(--sv-teal);border-color:var(--sv-teal);color:#071a18}
+.gpx-t{min-width:0;font-size:12.5px;font-weight:600;color:var(--wt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gpx-r .gp-vm{margin:0}
+.gpx-sl{position:absolute;left:10px;right:10px;bottom:5px;height:3px;border-radius:2px;overflow:hidden;background:var(--wbd);display:flex}
+.gpx-sl i{display:block;height:100%}.gpx-sl i.y{background:var(--sv-green)}.gpx-sl i.n{background:var(--wburn)}.gpx-sl i.a{background:var(--wf)}
+.gpx-det{min-height:0;display:flex;flex-direction:column;gap:10px;padding:12px 14px;border:1px solid var(--wbd);border-radius:10px;background:rgba(255,255,255,.02);overflow:hidden}
+.gpx-dh{display:flex;align-items:center;gap:10px;min-width:0}
+.gpx-dh b{flex:1 1 auto;min-width:0;font-size:15px;color:var(--wt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gpx-ds{font-size:11.5px;color:var(--ws)}
+.gpx-det .gp-sum{flex:1 1 auto;max-height:none;min-height:60px}
+}
 .gd-list{display:flex;flex-direction:column;gap:12px}
 .gd-r{padding:12px 14px;border:1px solid var(--wbd);border-radius:10px}
 .gd-h{display:flex;align-items:center;gap:10px}.gd-h b{font-size:14px;color:var(--wt)}
@@ -4963,6 +4997,18 @@ color:#6fe3da;font:600 11.5px var(--wsans);cursor:pointer;white-space:nowrap}
 .sv-glist .sv-vr.click{cursor:pointer}
 /* the governor's card */
 .gvcard{max-width:460px}
+/* the governor card never scrolls (operator, 2026-10-12): the about text is clamped, and a short window
+   shrinks the card's air instead of growing a scrollbar */
+.gvcard{overflow:hidden}
+.gvcard .gv-det{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+@media(max-height:700px){
+  .gvcard .vbadges{padding-top:8px}
+  .gvcard .gv-det{-webkit-line-clamp:2;margin:8px 28px 0}
+  .gvcard .vgrid{margin-top:10px;row-gap:6px;padding-top:8px;padding-bottom:8px}
+  .gvcard .vstat{padding-top:6px;padding-bottom:6px}
+  .gvcard .vhead{padding-top:16px}
+  .gvcard .gv-rules{margin-top:6px;font-size:10.5px;line-height:1.4}
+}
 .gvcard .vbadges{padding:14px 28px 0}
 .gv-det{margin:12px 28px 0;font-size:12.5px;line-height:1.5;color:var(--ink2)}
 .gvcard .vgrid .vv{font-size:13px;overflow-wrap:anywhere}
@@ -5643,7 +5689,9 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
    2026-10-08). Inside the block's own padding box, so it never touches the section's border */
 .you-apr,.mv-yk{position:relative}
 .you-big{position:relative;display:inline-flex;align-self:flex-start}
-.you-big .you-rsx{right:auto;left:100%;margin-left:8px;align-items:flex-start;white-space:nowrap}
+/* the restake tag hangs low (operator, 2026-10-12): the dot and the word sit level with the "on N validators"
+   line under the APR, and the restake APR rides just above them */
+.you-big .you-rsx{right:auto;left:100%;margin-left:8px;align-items:flex-start;white-space:nowrap;top:auto;bottom:-17px}
 .you-rsx{position:absolute;top:0;right:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-family:var(--wmono);font-size:11px;line-height:1.2;font-style:italic;letter-spacing:.03em;color:var(--sv-green);white-space:nowrap;font-weight:500;pointer-events:none}
 .you-rsx span{display:inline-flex;align-items:center;gap:5px}
 .you-rsx span+span{font-size:9.5px;opacity:.85}
@@ -7039,7 +7087,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
 
 <div class=pop id=actpop><div class="card vcard actcard" role=dialog aria-modal=true aria-labelledby=actttl>
   <div class="vhead vwrap"><div class=vcol><div class=vname><span class=vnm id=actttl>Activity</span></div><div class=vsub><span class=iop id=actaddr></span></div></div></div>
-  <div class=actabs role=group aria-label="Activity"><button type=button data-k=pilot aria-pressed=true>Autopilot</button><button type=button data-k=restake aria-pressed=false>Restake</button><button type=button data-k=account aria-pressed=false>Account</button></div>
+  <div class=actabs role=group aria-label="Activity"><button type=button data-k=account aria-pressed=true>Account</button><button type=button data-k=pilot aria-pressed=false>Autopilot</button><button type=button data-k=restake aria-pressed=false>Restake</button></div>
   <div class=actsum id=actsum></div>
   <div class=actlist id=actlist></div>
 </div></div>

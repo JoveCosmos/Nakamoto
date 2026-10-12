@@ -165,6 +165,13 @@
   html[data-theme=light]:not([data-mono]) :is(#sv-proplist,#sv-govlist,#sv-daop)>.sv-ph.gp-ph .gp-k em{color:rgba(255,255,255,.72)}
   html[data-theme=light]:not([data-mono]) :is(#sv-proplist,#sv-govlist,#sv-daop)>.sv-ph.gp-ph .gp-k s,html[data-theme=light]:not([data-mono]) .gp-kx{color:rgba(255,255,255,.78)}
   html[data-theme=light]:not([data-mono]) .gp-fi{background:rgba(60,50,20,.035)}
+  /* the proposals split on paper: the chosen row and the detail pane keep their recess, the chips their ground */
+  html[data-theme=light]:not([data-mono]) .gpx-r:hover{background:rgba(44,41,64,.05)}
+  html[data-theme=light]:not([data-mono]) .gpx-r.sel{background:rgba(15,122,114,.08)}
+  html[data-theme=light]:not([data-mono]) .gpx-r.sel .gp-id{background:var(--accent);border-color:var(--accent);color:#fff}
+  html[data-theme=light]:not([data-mono]) .gpx-det{background:rgba(60,50,20,.02)}
+  html[data-theme=light]:not([data-mono]) .gp-sv{background:rgba(60,50,20,.035)}
+  html[data-theme=light]:not([data-mono]) .gp-vm.me{color:#fbf9f3}
   html[data-theme=light]:not([data-mono]) .cell.pad{background:rgba(40,30,20,.05);border:1px dashed rgba(40,30,20,.16)}
 
   /* home: the headline's last words are gradient TEXT. The shadow's background shorthand resets
