@@ -39,7 +39,7 @@
     var at = window.__atInfo ? window.__atInfo() : null, r = mine && pos ? pos.rate : 0;
     if(!(at && at.restake) || !(r > 0)) return '';
     /* two lines in the block's upper corner (operator, 2026-10-08): the addition, then a live dot and the word */
-    return '<span class=you-rsx><span>+' + pct(Math.pow(1 + r / 730, 730) - 1 - r) + ' APR</span><span><i aria-hidden=true></i>restake</span></span>';
+    return '<span class=you-rsx><span>+' + pct(Math.pow(1 + r / 730, 730) - 1 - r) + '</span><span><i aria-hidden=true></i>restake</span></span>';
   }
   function pp(x){ return (x >= 0 ? "+" : "−") + Math.abs(x * 100).toFixed(1) + "%"; }
   function hueOf(n){ var h = 0, s = String(n || "?"); for(var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return h; }

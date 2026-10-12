@@ -5711,6 +5711,12 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 /* the restake tag hangs low (operator, 2026-10-12): the dot and the word sit level with the "on N validators"
    line under the APR, and the restake APR rides just above them */
 .you-big .you-rsx{right:auto;left:100%;margin-left:8px;align-items:flex-start;white-space:nowrap;top:auto;bottom:-17px}
+/* smaller, and one text edge (operator, 2026-10-12): the dot hangs in the gutter, so the figure and the word start
+   at the same x */
+.you-big .you-rsx{font-size:10px;gap:1px}
+.you-big .you-rsx span+span{font-size:9px}
+.you-big .you-rsx i{width:5px;height:5px}
+.you-big .you-rsx span:first-child{padding-left:10px}
 .you-rsx{position:absolute;top:0;right:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-family:var(--wmono);font-size:11px;line-height:1.2;font-style:italic;letter-spacing:.03em;color:var(--sv-green);white-space:nowrap;font-weight:500;pointer-events:none}
 .you-rsx span{display:inline-flex;align-items:center;gap:5px}
 .you-rsx span+span{font-size:9.5px;opacity:.85}
