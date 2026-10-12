@@ -1000,7 +1000,7 @@
     /* an ACTIVE governor cannot follow another - the chain refuses the delegation - so its wallet gets no
        Follow or Switch anywhere (its stake already votes through its own governor) */
     var meg = myGovRec(); if(meg && meg.active) return '';
-    if(g.addr === mine) return '<button class="sv-gbtn stop" type=button data-act=gstop title="Stop following this governor: your stake votes only when you vote">Stop</button>';
+    if(g.addr === mine) return '<button class="sv-gbtn stop" type=button data-act=gstop title="Unfollow this governor: your stake votes only when you vote">Unfollow</button>';
     if(!g.active) return '';
     return '<button class=sv-gbtn type=button data-act=gfollow data-g="' + esc(g.addr) + '" title="' + (mine ? 'Follow this governor instead' : 'Let this governor vote for your stake when you do not vote') + '">' + (mine ? 'Switch' : 'Follow') + '</button>';
   }
@@ -1103,7 +1103,7 @@
     pop.innerHTML = '<div class="card vcard gvcard" role=dialog aria-modal=true aria-label="Governor ' + esc(g.m) + '">' +
       '<div class="vhead vwrap"><span class=vmono style="display:flex;background:hsl(' + (g.m.charCodeAt(0) * 37 % 360) + ',42%,30%)">' + esc(g.m.charAt(0).toUpperCase()) + '</span>' +
         '<div class=vcol><div class=vname><span class=vnm>' + esc(g.m) + '</span></div><div class=vsub>' + web + '</div></div></div>' +
-      '<div class=vbadges><span class="badge ' + (g.active ? 'ok' : 'dn') + '">' + (g.active ? 'ACTIVE' : 'INACTIVE') + '</span>' + (g.addr === mine ? '<span class="badge up">YOU FOLLOW IT</span>' : '') + '</div>' +
+      '<div class=vbadges><span class="badge ' + (g.active ? 'ok' : 'dn') + '">' + (g.active ? 'ACTIVE' : 'INACTIVE') + '</span>' + (g.addr === mine ? '<span class="badge up">YOU FOLLOW</span>' : '') + '</div>' +
       (g.det ? '<p class=gv-det>' + esc(g.det) + '</p>' : '') +
       '<div class=vgrid>' +
         st("voting power", g.vp != null ? fmt(g.vp) : NA, sh != null ? sh.toFixed(2) + "% of bonded ATONE" : "") +
@@ -1775,7 +1775,7 @@
       "&order_by=ORDER_BY_DESC&limit=" + lim + "&page=" + pg + "&pagination.limit=" + lim, { cache: "no-store" }).then(function(r){ return r.json(); }); }
   var ACT_KIND = { MsgDelegate: "Stake", MsgUndelegate: "Unstake", MsgBeginRedelegate: "Redelegate", MsgWithdrawDelegatorReward: "Claim rewards",
     MsgWithdrawValidatorCommission: "Claim commission", MsgGrant: "Grant", MsgRevoke: "Revoke", MsgVote: "Vote", MsgVoteWeighted: "Vote", MsgSend: "Send",
-    MsgMultiSend: "Send", MsgMintPhoton: "Mint PHOTON", MsgExec: "Authorized", MsgDelegateGovernor: "Follow a governor", MsgUndelegateGovernor: "Stop following",
+    MsgMultiSend: "Send", MsgMintPhoton: "Mint PHOTON", MsgExec: "Authorized", MsgDelegateGovernor: "Follow a governor", MsgUndelegateGovernor: "Unfollow a governor",
     MsgCancelUnbondingDelegation: "Cancel unstaking", MsgTransfer: "IBC transfer", MsgSubmitProposal: "Submit proposal", MsgDeposit: "Deposit", MsgSetWithdrawAddress: "Set reward address" };
   function actCoin(c){ if(!c) return ""; var u = parseInt(c.amount, 10) || 0, d = c.denom === "uatone" ? "ATONE" : c.denom === "uphoton" ? "PHOTON" : /^ibc\//.test(c.denom) ? "IBC" : c.denom;
     return u ? fmt(u) + " " + d : ""; }
