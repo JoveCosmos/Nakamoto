@@ -6521,6 +6521,8 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <aside class=you id=you aria-label="Your wallet"></aside>
   <div class=panes id=well>
   <div class=w id=calc>
+    <!-- the home page's "powered by", in the same place on the Nakamoto Bonus page (operator, 2026-10-08; kept 2026-10-12) -->
+    <a class="introby pby" href="https://gatahub.zone/" target=_blank rel="noopener noreferrer" title="GATA HUB"><span>powered by</span><img src="assets/gata.png" alt="GATA HUB"></a>
       <span class=calclab>Nakamoto</span>
     <header class=brandbar>
       <div class=bwrap data-title-for=staking><div class=bt><span class=btx><i class=nk>Nakamoto </i><i class=tsfx id=tsfx>Bonus</i></span></div></div>
