@@ -4867,6 +4867,27 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 /* governors, read only here: the action column holds the site link alone */
 #sv-govs .sv-glist .sv-vr{grid-template-columns:28px minmax(0,1.4fr) 90px minmax(0,1fr) 100px minmax(0,1fr)}
 /* the Governors table's column heads, set like the redelegation list's */
+/* the Governors table, set as the redelegation list: hairline rows, column heads apart in small caps, figures right */
+.gvt-w{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;margin-top:12px;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
+.gvt{width:100%;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}
+.gvt th{position:sticky;top:0;z-index:1;background:var(--wc);padding:6px 10px 8px;border-bottom:1px solid var(--wbd2);text-align:left;font:500 8.5px/1.2 var(--wmono);letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
+.gvt td{padding:11px 10px;border-bottom:1px solid var(--wbd);font-size:13px;color:var(--wt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gvt :is(th,td).gvt-vp{width:30%;text-align:right}.gvt :is(th,td).gvt-d{width:14%;text-align:right}.gvt :is(th,td).gvt-s{width:18%;text-align:right}
+.gvt-r{cursor:pointer}
+.gvt-r:hover td,.gvt-r:focus-visible td{background:rgba(255,255,255,.03)}
+.gvt-r:focus-visible{outline:2px solid var(--sv-teal);outline-offset:-2px}
+.gvt-r.off td{color:var(--ws)}
+.gvt-n{display:flex;align-items:center;gap:10px;min-width:0}
+.gvt-n b{font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.gvt-lg{flex:none;width:22px;height:22px;border-radius:50%;overflow:hidden;display:grid;place-items:center}
+.gvt-lg img,.gvt-lg .lg{width:22px;height:22px;object-fit:cover;display:grid;place-items:center;font-size:10px;font-weight:700;color:#fff}
+.gvt-vp b{font-weight:600}.gvt-vp s{text-decoration:none;margin-left:8px;font-size:11px;color:var(--wf)}
+.gvt .gvt-band td{padding:10px 0 6px;border-bottom:0;overflow:visible;white-space:normal}
+.gvcard .vlogo{width:54px;height:54px;border-radius:50%;object-fit:cover;flex:none}
+/* a phone keeps every word whole: no Since column, names may wrap, the share sits under the figure */
+@media(max-width:620px){.gvt :is(th,td).gvt-s{display:none}.gvt :is(th,td).gvt-vp{width:38%}.gvt :is(th,td).gvt-d{width:22%}
+  .gvt td{white-space:normal;padding:10px 8px}.gvt-n b{overflow:visible;overflow-wrap:anywhere}
+  .gvt-vp s{display:block;margin:2px 0 0}}
 .gvtab .gvh{--c:transparent;align-items:end;padding:0 12px 6px;min-height:0;height:auto;border:0;border-bottom:1px solid var(--wbd2);border-radius:0;background:none;box-shadow:none;cursor:default}
 .gvtab .gvh:hover{background:none;transform:none}
 .gvtab .gvh span{font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}

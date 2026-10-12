@@ -891,8 +891,17 @@ out = {
 
 # Refresh the avatar cache. Only unseen identities cost a request, so this is a
 # no-op in steady state; a failure here is cosmetic and must not fail the build.
+# governors carry a Keybase identity too (2026-10-12): theirs join the refresh, so a governor that is not also a
+# validator still gets its picture
+GOV_IDS = []
 try:
-    ids = "\n".join(_ident(v["id"]) for v in V if _ident(v["id"]))
+    for g in get(f"{API}/atomone/gov/v1/governors?pagination.limit=500").get("governors", []):
+        i = ((g.get("description") or {}).get("identity") or "").strip()
+        if re.fullmatch(r"[A-Za-z0-9_.-]{1,32}", i): GOV_IDS.append(i)
+except Exception as e:
+    print(f"atomone-app: governor identities skipped ({e})", file=sys.stderr)
+try:
+    ids = "\n".join([_ident(v["id"]) for v in V if _ident(v["id"])] + GOV_IDS)
     subprocess.run(["python3", os.path.join(os.path.dirname(os.path.abspath(__file__)), "avatars.py")],
                    input=ids, text=True, timeout=240, capture_output=True)
 except Exception as e:
@@ -906,6 +915,8 @@ AVDIR = "/srv/atomone-app/state/avatars"
 HAVE_AV = {f[:-4] for f in os.listdir(AVDIR)} if os.path.isdir(AVDIR) else set()
 for v in out["validators"]:
     v["av"] = bool(v["id"]) and v["id"] in HAVE_AV
+# the governor identities that have a published tile, so the page asks only for pictures that exist
+out["gav"] = sorted({i for i in GOV_IDS if i in HAVE_AV})
 # testnet: what only our index knows is not known - None, which the page shows as N/A
 if TESTNET:
     for v in out["validators"]:

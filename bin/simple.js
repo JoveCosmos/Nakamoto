@@ -970,6 +970,34 @@
   function gweb(u){ u = String(u || "").trim(); if(!u) return "";
     if(!/^https?:\/\//i.test(u) && /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}(\/[^\s"'<>]*)?$/i.test(u)) u = "https://" + u;
     return /^https?:\/\/[^\s"'<>]+$/i.test(u) ? u : ""; }
+  /* a governor's picture: its Keybase tile when the build published one, else its letter */
+  function govLogo(g){
+    var av = ((window.__D || {}).gav || []);
+    if(g.ident && av.indexOf(g.ident) >= 0) return '<img src="assets/val/' + esc(g.ident) + '.jpg" alt="" loading=lazy>';
+    return '<span class=lg style="background:hsl(' + (g.m.charCodeAt(0) * 37 % 360) + ',42%,30%)">' + esc(g.m.charAt(0).toUpperCase()) + '</span>';
+  }
+  /* the Governors tab as the redelegation list (operator, 2026-10-12): one flat table, column heads apart, no status
+     or address (both in the card a row opens), voting power as its figure and share; inactive governors close the
+     list in a band that opens, as inactive validators do */
+  function govTable(list, mine){
+    var by = function(a, b){ return (b.vp || 0) - (a.vp || 0); };
+    var act = list.filter(function(g){ return g.active; }).sort(by), ina = list.filter(function(g){ return !g.active; }).sort(by);
+    var row = function(g){ var sh = GV.bonded ? (g.vp || 0) / GV.bonded * 100 : null;
+      return '<tr class="gvt-r' + (g.active ? '' : ' off') + (g.addr === mine ? ' me' : '') + '" data-gv="' + esc(g.addr) + '" tabindex=0 title="Open ' + esc(g.m) + '">' +
+        '<td><div class=gvt-n><span class=gvt-lg>' + govLogo(g) + '</span><b>' + esc(g.m) + '</b>' + (g.addr === mine ? '<i class=sd-al>yours</i>' : '') + '</div></td>' +
+        '<td class=gvt-vp><b>' + (g.vp != null ? fmt(g.vp) : NA) + '</b>' + (sh != null ? '<s>' + sh.toFixed(2) + '%</s>' : '') + '</td>' +
+        '<td class=gvt-d>' + (g.n != null ? g.n : NA) + '</td>' +
+        '<td class=gvt-s>' + (g.since ? window.__dayFull(g.since) : NA) + '</td></tr>'; };
+    var h = '<div class=gvt-w><table class=gvt><thead><tr><th>Governor</th><th class=gvt-vp>Voting power</th><th class=gvt-d>Delegators</th><th class=gvt-s>Since</th></tr></thead><tbody>' +
+      act.map(row).join("");
+    /* the band always stands, with its 0 when empty, as the redelegation list's inactive validators do */
+    if(ina.length){
+      h += '<tr class="ij-t gvt-band' + (GV.inopen ? ' open' : '') + '"><td colspan=4><button type=button class=ij-b data-act=gvinact aria-expanded=' + !!GV.inopen + '>' +
+        '<span>Inactive governors</span><i>' + ina.length + '</i><em>their votes count for no one</em><u aria-hidden=true></u></button></td></tr>';
+      if(GV.inopen) h += ina.map(row).join("");
+    } else h += '<tr class="ij-t ij-0 gvt-band"><td colspan=4><button type=button class=ij-b disabled aria-disabled=true><span>Inactive governors</span><i>0</i><em>none right now</em></button></td></tr>';
+    return h + '</tbody></table></div>';
+  }
   function govRows(list, mine){
     var tot = 0; list.forEach(function(g){ tot += g.vp || 0; });
     var tab = screen() === "govs";
@@ -1100,7 +1128,8 @@
     var st = function(k, v, sub){ return '<div class=vstat><span class=vk>' + k + '</span><span class=vv>' + v + '</span>' + (sub ? '<i class=vsubn>' + sub + '</i>' : '') + '</div>'; };
     var gw = gweb(g.web), web = gw ? '<a class=vweb href="' + esc(gw) + '" target=_blank rel="noopener noreferrer">' + esc(gw.replace(/^https?:\/\//, "").replace(/\/+$/, "")) + '</a>' : '<span class="vweb none">no website</span>';
     pop.innerHTML = '<div class="card vcard gvcard" role=dialog aria-modal=true aria-label="Governor ' + esc(g.m) + '">' +
-      '<div class="vhead vwrap"><span class=vmono style="display:flex;background:hsl(' + (g.m.charCodeAt(0) * 37 % 360) + ',42%,30%)">' + esc(g.m.charAt(0).toUpperCase()) + '</span>' +
+      '<div class="vhead vwrap">' + (((window.__D || {}).gav || []).indexOf(g.ident) >= 0 && g.ident ? '<img class=vlogo src="assets/val/' + esc(g.ident) + '.jpg" alt="">' :
+        '<span class=vmono style="display:flex;background:hsl(' + (g.m.charCodeAt(0) * 37 % 360) + ',42%,30%)">' + esc(g.m.charAt(0).toUpperCase()) + '</span>') +
         '<div class=vcol><div class=vname><span class=vnm>' + esc(g.m) + '</span></div><div class=vsub>' + web + '</div></div></div>' +
       '<div class=vbadges><span class="badge ' + (g.active ? 'ok' : 'dn') + '">' + (g.active ? 'ACTIVE' : 'INACTIVE') + '</span>' + (g.addr === mine ? '<span class="badge up">YOU FOLLOW</span>' : '') + '</div>' +
       (g.det ? '<p class=gv-det>' + esc(g.det) + '</p>' : '') +
@@ -1136,7 +1165,7 @@
       st("Following", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(1) + "%" : "-", L ? n + " wallets, " + fmt(vp) + " ATONE" : "") +
       st("Your governor", your[0], your[1]) + reg + '</div>';
     put("sv-govlist", h + (GV.err && !L ? govEmpty("Could not read the governors") : !L ? govEmpty("Reading the governors\u2026")
-      : !L.length ? '<div class=gv-none><p class=gv-say>No governors on AtomOne yet. A governor votes for every staker who follows it; a staker who votes still counts.</p></div>' : govRows(L, mine)));
+      : !L.length ? '<div class=gv-none><p class=gv-say>No governors on AtomOne yet. A governor votes for every staker who follows it; a staker who votes still counts.</p></div>' : govTable(L, mine)));
   }
 
   /* ════ Proposals: every AtomOne proposal, read from the chain every 5 min (the one being voted on
@@ -2092,6 +2121,7 @@
     if(act === "vote"){ ev.stopPropagation(); voteSend(t, +t.dataset.pid, +t.dataset.opt); return; }
     if(act === "gfollow"){ govSend(t, { type: "atomone/v1/MsgDelegateGovernor", value: { delegator_address: window.__ADDR, governor_address: t.dataset.g } }); return; }
     if(act === "greg"){ if(GOV_REG) govForm(); return; }
+    if(act === "gvinact"){ GV.inopen = !GV.inopen; render(); return; }
     if(act === "grclose"){ grClose(); return; }
     if(act === "grsend" && GOV_REG){
       var gv = grVals(), gd = {}, gme = myGovRec();
