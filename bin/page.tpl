@@ -6786,7 +6786,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
         <div class=sv-panel id=sv-actlive></div>
       </section>
       <section class=sv-screen id=sv-props data-sc=props aria-label=Proposals>
-        <div class=sv-panel id=sv-proplist><div class=sv-ph><h3>Proposals</h3></div><div class=sv-upwait>Reading the proposals…</div></div>
+        <div class=sv-panel id=sv-proplist><div class="sv-ph gp-ph"><span class=gp-k><em>Proposals</em><b>-</b><s>reading the chain…</s></span><span class=gp-k><em>Voting now</em><b>-</b><s></s></span><span class=gp-k><em>To pass</em><b>-</b><s></s></span></div><div class=sv-upwait>Reading the proposals…</div></div>
       </section>
       <section class=sv-screen id=sv-cons data-sc=cons aria-label=Constitution>
         <div class=cn-wrap id=sv-consp><div class=sv-upwait>Opening the constitution…</div></div>
