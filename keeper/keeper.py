@@ -627,6 +627,35 @@ def position(addr, vals):
         rows.append({"op": op, "x": amt, "locked": amt if op in lock else 0})
     return rows, reds
 
+# ── stake on a validator out of the active set (operator, 2026-10-11): it earns nothing until it moves. An ops alert
+# once per wallet and validator, with how much can move now and how much is held by a 21-day lock and until when;
+# the key clears when the stake is gone, so a later return alerts again ──────────────────────────────────────────────
+PREV_ACTIVE = set()
+def inactive_alert(c, gr, rows, reds, vals):
+    held = {}
+    for r in rows:
+        if r["op"] in vals or r["x"] < MIN_MOVE: continue
+        held["inact:" + r["op"]] = r
+    for k, r in held.items():
+        if c.execute("SELECT 1 FROM alert_sent WHERE granter=? AND k=?", (gr, k)).fetchone(): continue
+        try: v = get("/cosmos/staking/v1beta1/validators/%s" % r["op"]).get("validator", {})
+        except Exception: v = {}
+        name = (v.get("description") or {}).get("moniker") or r["op"][-10:]
+        why = "jailed" if v.get("jailed") else "out of the active set"
+        until = [calendar.timegm(time.strptime(e["redelegation_entry"]["completion_time"][:19], "%Y-%m-%dT%H:%M:%S"))
+                 for x in reds if x["redelegation"]["validator_dst_address"] == r["op"] for e in x.get("entries", [])]
+        until = [t for t in until if t > time.time()]
+        free, lock = r["x"] - r["locked"], r["locked"]
+        text = "%s ATONE on %s, %s, earning nothing. %s ATONE can move now%s." % (
+            "{:,.1f}".format(r["x"] / 1e6), name, why, "{:,.1f}".format(free / 1e6),
+            (", %s ATONE is locked until %s" % ("{:,.1f}".format(lock / 1e6), time.strftime("%d %b %H:%M UTC", time.gmtime(max(until))))) if lock and until else "")
+        alert("warn", "Autopilot stake on an inactive validator: " + short(gr), text,
+              {"Wallet": gr, "Validator": r["op"], "Movable": "{:,.1f} ATONE".format(free / 1e6), "Locked": "{:,.1f} ATONE".format(lock / 1e6)})
+        c.execute("INSERT OR REPLACE INTO alert_sent VALUES(?, ?, ?)", (gr, k, int(time.time())))
+    for (k,) in c.execute("SELECT k FROM alert_sent WHERE granter=? AND k LIKE 'inact:%'", (gr,)).fetchall():
+        if k not in held: c.execute("DELETE FROM alert_sent WHERE granter=? AND k=?", (gr, k))
+    c.commit()
+
 def pairs_used(reds):
     u = {}
     for r in reds:
@@ -1151,6 +1180,17 @@ def once(c, only=None, live=None, force=False):
             if mv["dst"] in work: work[mv["dst"]]["t"] += amt
     tick0 = int(time.time()); run_reset()
     gs = [g for g in grants() if not only or g["granter"] == only]; acted = 0
+    # a validator that left the active set since the last tick: every Autopilot wallet is checked for stake on it now,
+    # not at its next 12-hour run
+    global PREV_ACTIVE
+    left = PREV_ACTIVE - set(vals) if PREV_ACTIVE else set()
+    PREV_ACTIVE = set(vals)
+    if left:
+        for g in gs:
+            try:
+                rows_, reds_ = position(g["granter"], vals)
+                if any(r["op"] in left for r in rows_): inactive_alert(c, g["granter"], rows_, reds_, vals)
+            except Exception as e: log("inactive check failed for %s: %s" % (short(g["granter"]), e))
     led = ledger()                                    # once per tick (red team 2026-10-01)
     gs.sort(key=lambda g: granted_at(g["granter"], c, led))
     try: rgs = restake_grants()
@@ -1191,6 +1231,8 @@ def once(c, only=None, live=None, force=False):
             p = None
             if due:
                 rows, reds = position(gr, work)
+                try: inactive_alert(c, gr, rows, reds, work)
+                except Exception as e: log("inactive alert failed for %s: %s" % (short(gr), e))
                 p = plan(g, rows, reds, work, m, room=MAX_MOVES_DAY - moves_today(c, gr)) or {"moves": []}
                 c.execute("INSERT INTO run_g VALUES(?,?)", (int(time.time()), gr)); c.commit()
                 RUN["ap_checked"] += 1
