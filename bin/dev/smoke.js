@@ -217,7 +217,8 @@ t('shell-groups', function(){
   else { go('dashboard/self'); if(!vis('p-dele')) bad.push('pro is not the three panes'); }
   var pt=document.querySelectorAll('#protabs [role=tab]');
   if(pt.length!==4 || [].filter.call(pt,function(b){ return b.tabIndex===0; }).length!==1) bad.push('Pro tabs: '+pt.length+' tabs, not one Tab stop');
-  go('dashboard/governance'); if(at()!=='dashboard/governance' || !vis('sv-mygov')) bad.push('governance page '+at());
+  /* the Dashboard's Govern screen was removed (operator, 2026-10-12): its old route must not resolve to a screen */
+  go('governance/governors'); if(at()!=='governance/governors' || !vis('sv-govs')) bad.push('governors page '+at());
   go('network/uptime'); if(at()!=='network/uptime' || !vis('sv-net')) bad.push('network '+at());
   go('staking/bonus');
   return !bad.length || bad.join(', ');

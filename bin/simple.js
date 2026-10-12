@@ -56,7 +56,7 @@
   /* governance figures on phones (operator, 2026-10-02: "your governor boxes values overflow if big"): a figure wider
      than its box steps its size down until it fits (12px at the least, then the ellipsis); wider screens keep the
      stylesheet's size. Run on every draw, on resize and when the view changes (a hidden box measures nothing) */
-  var FIGS = ".gv-ro .sd-well>b,#sd-gstrip .sd-well>b,.gv-rules3>div>b";
+  var FIGS = ".gv-ro .sd-well>b";
   function fitFigs(el){
     if(!el || !el.querySelectorAll) return;
     var ph = window.matchMedia && matchMedia("(max-width:620px)").matches;
@@ -64,7 +64,7 @@
       x.style.fontSize = "";
       /* the figure (with its unit, when it sits in a well) against its cell's inner edges, and any of it the
          figure's own ellipsis hides */
-      var cell = x.closest(".sd-ro,.gv-ro,.gv-rules3>div"), w = x.parentNode.classList.contains("sd-well") ? x.parentNode : x;
+      var cell = x.closest(".sd-ro,.gv-ro"), w = x.parentNode.classList.contains("sd-well") ? x.parentNode : x;
       if(!ph || !cell || !cell.clientWidth) return;
       var cs = getComputedStyle(cell), fs = parseFloat(getComputedStyle(x).fontSize);
       /* the text's own width from a range: scrollWidth rounds to whole pixels and hides the sub-pixel overflow
@@ -955,14 +955,14 @@
       })
       .then(function(gs){ gs.sort(function(a, b){ return (b.active - a.active) || (b.vp - a.vp); }); GV.list = gs; GV.at = Date.now(); GV.err = null; })
       .catch(function(e){ GV.err = String(e && e.message || e); })
-      .then(function(){ GV.busy = false; var sc = screen(); if(sc === "govs" || sc === "mygov") render(); if(sc === "props") drawProps(); });
+      .then(function(){ GV.busy = false; var sc = screen(); if(sc === "govs") render(); if(sc === "props") drawProps(); });
   }
   function myGov(){
     var a = window.__ADDR; if(!a) return undefined;
     var c = GV.mine[a];
     if(c === undefined){ GV.mine[a] = null;
       gapi("/atomone/gov/v1/delegations/" + a).then(function(d){ GV.mine[a] = d.governor_address || ""; }).catch(function(){ GV.mine[a] = ""; })
-        .then(function(){ if(screen() === "mygov" || screen() === "govs") render(); }); }
+        .then(function(){ if(screen() === "govs") render(); }); }
     return GV.mine[a];
   }
   /* a governor's website the way the validator card reads one: a full http(s) address, or a bare domain ("gatahub.zone")
@@ -992,9 +992,8 @@
      outside the Dashboard */
   /* the Governance section only reads: following is done from the Dashboard's Governance tab */
   function govBtn(g, mine){
-    /* the Governors table has no button column (operator, 2026-10-12): following is done from a governor's card, which
-       opens on a row; the Dashboard's Govern screen keeps its own buttons */
-    if(screen() !== "mygov" && screen() !== "govs") return '';
+    /* the Governors table has no button column (operator, 2026-10-12): following is done from a governor's card */
+    if(screen() !== "govs") return '';
     if(!window.__ADDR || !window.__WALLET || mine === null || mine === undefined) return '';
     if(g.addr === govAddrOf(window.__ADDR)) return !GOV_REG ? '' : '<button class=sv-gbtn type=button data-act=greg title="Change what the chain shows about your governor">Edit</button>';
     /* an ACTIVE governor cannot follow another - the chain refuses the delegation - so its wallet gets no
@@ -1139,52 +1138,6 @@
     put("sv-govlist", h + (GV.err && !L ? govEmpty("Could not read the governors") : !L ? govEmpty("Reading the governors\u2026")
       : !L.length ? '<div class=gv-none><p class=gv-say>No governors on AtomOne yet. A governor votes for every staker who follows it; a staker who votes still counts.</p></div>' : govRows(L, mine)));
   }
-  /* ── Govern: the Dashboard's governance, built as its other tabs - a strip (the Govern card and five figures), then
-     Your governor under the card, the governors in the middle, what is being voted on now at the right ── */
-  /* no governors yet: what one is, and the chain's rules for becoming one */
-  function govNone(){
-    var R = GV.rules || {};
-    return '<div class=gv-rules3><div><em>To become one</em><b>' + (R.minSelf ? whole(R.minSelf) : '-') + '</b><small>ATONE of its own stake</small></div>' +
-      '<div><em>Status holds</em><b>' + (R.period ? Math.round(R.period / 86400) + ' days' : '-') + '</b><small>between changes, forced ones too</small></div>' +
-      '<div><em>Its vote</em><b>Follows</b><small>for every staker who follows it</small></div></div>';
-  }
-  function drawMyGov(){
-    loadGovs(); loadProps();
-    var L = GV.list, mine = myGov(), g = L && mine ? L.filter(function(x){ return x.addr === mine; })[0] : null, pos = window.__POS;
-    var act = L ? L.filter(function(x){ return x.active; }) : [], vp = 0; (L || []).forEach(function(x){ vp += x.vp || 0; });
-    var P = GP.list, live = P ? P.filter(function(p){ return p.st === "PROPOSAL_STATUS_VOTING_PERIOD"; }) : [];
-    var following = !!(window.__ADDR && mine);
-    var me = window.__ADDR ? myGovRec() : null;
-    put("sd-gstrip", wcard() +
-      ro(me ? "You govern" : "Your governor", me ? esc(me.m) : following ? esc(g ? g.m : mine.slice(0, 12) + "…") : window.__ADDR && mine === "" ? "None" : "-", "", null, "var(--sv-violet)") +
-      ro("Your vote weight", pos && pos.rows.length ? fmt(pos.total) : "-", "", null, "var(--sv-amber)", "", false, pos && pos.rows.length ? "ATONE" : "") +
-      ro("Voting now", P ? String(live.length) : "-", "", null, "var(--sv-teal)", "", false, P ? (live.length === 1 ? "proposal" : "proposals") : "") +
-      ro("Governors", L ? String(act.length) : "-", "", null, "var(--sv-violet)", "", false, L ? "active" : "") +
-      ro("Follows governors", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(1) + "%" : "-", "", null, "var(--sv-green)", "", false, L && GV.bonded ? "of bonded" : ""));
-    /* Your governor: plain words, then its card when there is one */
-    var h = '<div class=sv-ph><h3>Your governor</h3></div>';
-    if(!window.__ADDR) h += '<p class=gv-say>Connect a wallet to see the governor it follows.</p>';
-    else if(mine === null || (mine && !L)) h += '<p class=gv-say>Reading…</p>';
-    else if(me) h += govRows([me], mine);
-    else if(!mine) h += '<div class=gv-how><div><em>You vote</em><b>Your vote counts</b></div><div><em>You don\'t vote</em><b>No vote is cast</b></div></div>';
-    else h += (g && !g.active ? '<p class=gv-say>Inactive: its votes do not count for you.</p>' : '') + (g ? govRows([g], mine) : '<p class=gv-say>' + esc(mine) + '</p>');
-    put("sv-mygovp", h);
-    var reg = GOV_REG && L && window.__ADDR && window.__WALLET ? '<button class="sv-gbtn gr-open" type=button data-act=greg><span class=gr-lg>' + (me ? 'Edit your governor' : 'Become a governor') + '</span><span class=gr-sm>' + (me ? 'Edit' : 'Register') + '</span></button>' : '';
-    put("sv-mygovlist", '<div class=sv-ph><h3>Governors</h3>' + (L ? tag("q", L.length + " Governors") : '') + reg + '</div>' +
-      (!L ? '<p class="gv-say gv-wait">Reading the governors…</p>' : !L.length ? govNone() : govRows(L, mine)));
-    /* voting now: each open proposal, its yes share, when it ends; none open, the last result */
-    var v = '<div class=sv-ph><h3>Voting now</h3>' + (P ? tag("q", String(live.length)) : '') + '</div>';
-    if(!P) v += '<p class="gv-say gv-wait">Reading the proposals…</p>';
-    else {
-      var card = function(p, open){ var t = ptally(p.tally), y = t.s ? t.y / t.s * 100 : 0, st = PST[p.st] || ["ended", "d"];
-        return '<a class=gv-lp href="governance/proposals" data-route="governance/proposals"><span class=gv-lh><em>#' + p.id + '</em><i class="gp-st ' + st[1] + '">' + st[0] + '</i></span><b>' + esc(p.title) + '</b>' +
-          '<span class=gp-bar><i class=y style="width:' + y.toFixed(1) + '%"></i><i class=n style="width:' + (t.s ? t.n / t.s * 100 : 0).toFixed(1) + '%"></i></span>' +
-          '<small>Yes ' + y.toFixed(1) + '%, ' + (open ? 'ends ' : 'ended ') + pday(p.ve) + '</small></a>'; };
-      v += live.length ? '<div class=gv-live>' + live.map(function(p){ return card(p, true); }).join("") + '</div>'
-        : '<u class=gv-rl>Latest results</u><div class=gv-live>' + P.slice(0, 4).map(function(p){ return card(p, false); }).join("") + '</div>';
-    }
-    put("sd-gvote", v);
-  }
 
   /* ════ Proposals: every AtomOne proposal, read from the chain every 5 min (the one being voted on
      gets its running tally); the tallying rules and the core DAOs' parameters come with them ════ */
@@ -1208,7 +1161,7 @@
           .then(function(){ GP.list = L; GP.tp = x[1].tally_params || x[1].params || null; GP.dao = x[2].params || null; GP.err = null; GP.at = Date.now(); });
       })
       .catch(function(e){ GP.err = (e && e.message) || "error"; })
-      .then(function(){ GP.busy = false; var sc = screen(); if(sc === "props" || sc === "daos" || sc === "mygov") render(); });
+      .then(function(){ GP.busy = false; var sc = screen(); if(sc === "props" || sc === "daos") render(); });
   }
   var PST = { PROPOSAL_STATUS_VOTING_PERIOD: ["voting", "v"], PROPOSAL_STATUS_PASSED: ["passed", "p"], PROPOSAL_STATUS_REJECTED: ["rejected", "r"],
               PROPOSAL_STATUS_FAILED: ["failed", "f"], PROPOSAL_STATUS_DEPOSIT_PERIOD: ["deposit", "d"] };
@@ -2084,7 +2037,6 @@
     else if(s === "props") drawProps();
     else if(s === "daos") drawDaos();
     else if(s === "cons") drawCons();
-    else if(s === "mygov") drawMyGov();
     else drawNet();
   }
   function schedule(){

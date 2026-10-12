@@ -328,16 +328,16 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-alist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#3d4a66,#262f45 58%,#141827)}
   html[data-theme=light]:not([data-mono]) #atpop .atidle b{color:var(--ink)}html[data-theme=light]:not([data-mono]) #atpop .atidle b.n{color:#b3261e}
   /* Easy's strip in day: the violet in a light shade, dark type, light plain boxes */
-  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip,#sd-gstrip) .sd-ro:not(#z){background:none;border-left-color:rgba(91,79,196,.18)}
-  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip,#sd-gstrip) .sd-ro em:not(#z){color:#4a4466}
-  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip,#sd-gstrip) .sd-ro .sd-well:not(#z){border:1px solid rgba(91,79,196,.2);background:rgba(255,255,255,.55);box-shadow:none}
-  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip,#sd-gstrip) .sd-idw:not(#z){background:none;color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip,#sd-gstrip) .sd-idw h3,html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip,#sd-gstrip) .sd-idw .sv-wn{color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip,#sd-gstrip) .sd-idw .sd-wch i.app{color:#4b3fb0;border-color:rgba(91,79,196,.4);background:rgba(91,79,196,.08)}
-  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip,#sd-gstrip) .sd-idw .sd-wch i.net{color:#0b5a53;border-color:rgba(15,122,114,.4);background:rgba(15,122,114,.08)}
-  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip,#sd-gstrip) .sd-idw .sd-wch i.net.tn{color:#8a5200;border-color:rgba(200,120,0,.4);background:rgba(200,120,0,.08)}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-ro:not(#z){background:none;border-left-color:rgba(91,79,196,.18)}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-ro em:not(#z){color:#4a4466}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-ro .sd-well:not(#z){border:1px solid rgba(91,79,196,.2);background:rgba(255,255,255,.55);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-idw:not(#z){background:none;color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-idw h3,html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-idw .sv-wn{color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-idw .sd-wch i.app{color:#4b3fb0;border-color:rgba(91,79,196,.4);background:rgba(91,79,196,.08)}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-idw .sd-wch i.net{color:#0b5a53;border-color:rgba(15,122,114,.4);background:rgba(15,122,114,.08)}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#sd-mstrip) .sd-idw .sd-wch i.net.tn{color:#8a5200;border-color:rgba(200,120,0,.4);background:rgba(200,120,0,.08)}
   /* Pro's strip in day: the panels' ivory, a touch more lit */
-  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#p-dele #sd-mstrip,#sd-gstrip).sd-strip:not(#z){border-color:var(--line-strong,#d9d3c4);box-shadow:0 0 22px -12px rgba(91,79,196,.35);background:radial-gradient(55% 160% at 0% 0%,rgba(91,79,196,.08),transparent 60%),radial-gradient(45% 140% at 100% 110%,rgba(15,122,114,.05),transparent 60%),#fffdf8}
+  html[data-theme=light]:not([data-mono]) :is(#sd-wstrip,#p-dele #sd-mstrip).sd-strip:not(#z){border-color:var(--line-strong,#d9d3c4);box-shadow:0 0 22px -12px rgba(91,79,196,.35);background:radial-gradient(55% 160% at 0% 0%,rgba(91,79,196,.08),transparent 60%),radial-gradient(45% 140% at 100% 110%,rgba(15,122,114,.05),transparent 60%),#fffdf8}
   /* Easy as one dashboard in day: one ivory surface, plain titles, neutral tags */
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid:not(#z){background:#fffdf8;border-color:#e3ded3;box-shadow:0 1px 0 rgba(255,255,255,.8)}
   html[data-theme=light]:not([data-mono]) #sv-over .sd-wgrid>.sd-col>.sv-ph h3:not(#z):not(#y){color:var(--ink)!important}
@@ -387,19 +387,19 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky{--bandf:#3a2f8f,#241d63 58%,#141033}
   html[data-theme=light]:not([data-mono]) #sv-auto #sd-asky>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.12),transparent 60%),linear-gradient(315deg,#3a2f8f,#241d63 58%,#141033)}
   /* Govern in day: the bands, frames and card keep their night face; plain words in ink */
-  html[data-theme=light]:not([data-mono]) #sv-mygov #sv-mygovp>.sv-ph{background:linear-gradient(315deg,#4a3aa8,#2c2170 58%,#150f3b)}
-  html[data-theme=light]:not([data-mono]) #sv-mygov #sv-mygovlist>.sv-ph{background:linear-gradient(315deg,#7d2e6e,#461f45 58%,#1a1230)}
-  html[data-theme=light]:not([data-mono]) #sv-mygov #sd-gvote>.sv-ph{background:linear-gradient(315deg,#1d4f8f,#173257 58%,#141633)}
-  html[data-theme=light]:not([data-mono]) #sv-mygov .sd-col>.sv-ph h3{color:#fff!important}
-  html[data-theme=light]:not([data-mono]) #sv-mygov .sd-col>.sv-ph .sv-tag{color:#fff;border-color:rgba(255,255,255,.42);background:rgba(8,6,20,.3)}
-  html[data-theme=light]:not([data-mono]) #sv-mygov .sd-col::after{background:linear-gradient(315deg,var(--bandf))}
-  html[data-theme=light]:not([data-mono]) #sv-mygov .gv-say{color:var(--ink)}html[data-theme=light]:not([data-mono]) #sv-mygov .gv-say b{color:#4b3fb0}
-  html[data-theme=light]:not([data-mono]) #sv-mygov .gv-lp{border-color:#e3ded3;background:linear-gradient(0deg,rgba(29,79,143,.06),#fbf9f3 70%)}
-  html[data-theme=light]:not([data-mono]) #sv-mygov #sv-mygovp::after{background:linear-gradient(315deg,#4a3aa8,#2c2170 58%,#150f3b)}
-  html[data-theme=light]:not([data-mono]) #sv-mygov #sv-mygovlist::after{background:linear-gradient(315deg,#7d2e6e,#461f45 58%,#1a1230)}
-  html[data-theme=light]:not([data-mono]) #sv-mygov #sd-gvote::after{background:linear-gradient(315deg,#1d4f8f,#173257 58%,#141633)}
-  html[data-theme=light]:not([data-mono]) #sv-mygov .gv-how>div,html[data-theme=light]:not([data-mono]) #sv-mygov .gv-rules3>div{border-color:#e3ded3;background:#fbf9f3}
-  html[data-theme=light]:not([data-mono]) #sv-mygov .gv-how b,html[data-theme=light]:not([data-mono]) #sv-mygov .gv-rules3 b{color:var(--ink)}
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   html[data-theme=light]:not([data-mono]) #atpop .atsb>div{border-color:#e3ded3;background:#fbf9f3}html[data-theme=light]:not([data-mono]) #atpop .atsb b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #atpop .atstate:not(#z){background:none;border:0;color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .grcard .gr-in{background:#fffdf8;border-color:#d9d3c4;color:var(--ink)}

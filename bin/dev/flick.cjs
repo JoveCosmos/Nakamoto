@@ -9,7 +9,7 @@ addEventListener("load",()=>setTimeout(()=>window.__wconnect&&window.__wconnect(
 const WATCH = `[...document.querySelectorAll('.sv-panel,.sv-card,.panel,.sec,.wk-pane,.you,.you-apr,.sd-col,.sv-ph,.pop.on .card,.pop.on .txfee,.pop.on .mtout,.pop.on .unout,.atcard,.gp-vote,.mv-hl,.sd-strip')].filter(e=>e.offsetParent||e.closest('.pop.on'))`;
 const SNAP = `(()=>{const o={};${WATCH}.forEach((e,i)=>{const r=e.getBoundingClientRect();const id=(e.id?'#'+e.id:'')+'.'+String(e.className).split(' ').slice(0,2).join('.')+'@'+i;o[id]=[Math.round(r.width),Math.round(r.height),(e.innerText||'').slice(0,40).replace(/\\s+/g,' ')];});return JSON.stringify(o)})()`;
 const ROUTES = [["/dashboard/wallet"], ["/dashboard/self"], ["/staking/bonus"], ["/staking/trend"], ["/staking/picks"], ["/network/uptime"], ["/network/signing"],
-  ["/network/proposers"], ["/network/activity"], ["/network/economics"], ["/governance/proposals"], ["/governance/governors"], ["/governance/core-daos"], ["/dashboard/governance"],
+  ["/network/proposers"], ["/network/activity"], ["/network/economics"], ["/governance/proposals"], ["/governance/governors"], ["/governance/core-daos"],
   ["/dashboard/wallet", "document.querySelector('[data-act=mint]')&&document.querySelector('[data-act=mint]').click()", "mint popup"],
   ["/dashboard/wallet", "(()=>{const b=[...document.querySelectorAll('button')].find(b=>/Activate Autopilot/.test(b.textContent)&&b.offsetParent);b&&b.click()})()", "autopilot popup"],
   ["/dashboard/wallet", "document.querySelector('.wact')&&document.querySelector('.wact').click()", "activity popup"],
