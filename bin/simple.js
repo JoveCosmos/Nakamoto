@@ -1188,7 +1188,9 @@
           '<button type=button class=gvc-addr data-act=gvcopy data-a="' + esc(g.addr) + '" title="Copy ' + esc(g.addr) + '">' + esc(g.addr.slice(0, 12) + "\u2026" + g.addr.slice(-6)) +
           '<svg viewBox="0 0 24 24" aria-hidden=true><rect x=9 y=9 width=11 height=11 rx=2 /><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg></button></div>' +
         '<div class=vsub>' + web + '</div></div></div>' +
-      '<div class=vbadges><span class="badge ' + (g.active ? 'ok' : 'dn') + '">' + (g.active ? 'ACTIVE' : 'INACTIVE') + '</span>' + tag + '</div>' +
+      '<div class=vbadges><span class="badge ' + (g.active ? 'ok' : 'dn') + '">' + (g.active ? 'ACTIVE' : 'INACTIVE') + '</span>' + tag +
+        (window.__BOT && !TN() ? '<button type=button class=gvc-al data-act=gvalert data-a="' + esc(g.addr) + '" title="Telegram alerts for this governor">' +
+          '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Alerts</button>' : '') + '</div>' +
       (g.det ? '<p class=gv-det>' + esc(g.det) + '</p>' : '') +
       '<div class=vgrid>' +
         st("own stake", ownV, ownS, own !== null && own >= 0 && min && own < min ? "warn" : "") +
@@ -1200,6 +1202,33 @@
       (govBtn(g, mine) ? '<div class=gv-go>' + govBtn(g, mine) + '</div>' : '') +
     '</div>';
   }
+  /* a governor's alerts (operator, 2026-10-12: "like the validator popup"): the reader ticks what to hear, the Telegram
+     link carries the governor (all 38 characters after atonegov1, checksum included) and the letters */
+  var GA_OPTS = [["v", "It votes", "each vote it casts, and on which proposal"],
+                 ["m", "It has not voted, a day before the end", "so you can still vote yourself"],
+                 ["s", "Its status changes", "active or inactive"]];
+  function gaBuild(){
+    var pop = E("galpop"), btn = E("galbtn"); if(!pop || !btn) return;
+    var f = [].slice.call(pop.querySelectorAll(".aopt input")).filter(function(b){ return b.checked; }).map(function(b){ return b.dataset.f; }).join("");
+    btn.classList.toggle("off", !f);
+    if(f) btn.href = "https://t.me/" + window.__BOT + "?start=g_" + pop.dataset.gv.slice(9) + "_" + f; else btn.removeAttribute("href");
+  }
+  function govAlerts(addr){
+    var g = (GV.list || []).filter(function(x){ return x.addr === addr; })[0]; if(!g || !window.__BOT || !/^atonegov1[02-9ac-hj-np-z]{38}$/.test(g.addr)) return;
+    var P = window.__POP, pop = E("galpop");
+    if(!pop){ pop = document.createElement("div"); pop.className = "pop"; pop.id = "galpop"; document.body.appendChild(pop);
+      pop.addEventListener("change", gaBuild); }
+    pop.dataset.gv = g.addr;
+    pop.innerHTML = '<div class="card vcard acard" role=dialog aria-modal=true aria-label="Alerts for governor ' + esc(g.m) + '">' +
+      '<div class="vhead vwrap">' + (govAv(g.ident) ? '<img class=vlogo src="assets/val/' + esc(g.ident) + '.jpg" alt="">' :
+        '<span class=vmono style="display:flex;background:hsl(' + (g.m.charCodeAt(0) * 37 % 360) + ',42%,30%)">' + esc(g.m.charAt(0).toUpperCase()) + '</span>') +
+        '<div class=vcol><div class=vname><span class=vnm>' + esc(g.m) + '</span></div><div class=vsub>governor alerts in Telegram</div></div></div>' +
+      '<div class=alist>' + GA_OPTS.map(function(o){ return '<label class=aopt><input type=checkbox data-f=' + o[0] + ' checked><span>' + o[1] + '<i>' + o[2] + '</i></span></label>'; }).join("") + '</div>' +
+      '<a class=tgbtn id=galbtn target=_blank rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden=true><path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.8.8 l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.35-.1-.55-.6-.2L6.2 13.1 1.4 11.6c-1-.3-1-1 .2-1.5l19-7.3c.85-.3 1.6.2 1.3 1.5z"/></svg>Continue in Telegram</a>' +
+      '<div class=vnote>Subscribe again to change your choices.<br>/list shows everything you watch.<br>/stop &lt;name&gt; stops one governor.</div></div>';
+    gaBuild(); if(P) P.open(pop);
+  }
+  window.__govAlerts = govAlerts;
   function govCard(addr){
     var g = (GV.list || []).filter(function(x){ return x.addr === addr; })[0]; if(!g) return;
     var P = window.__POP, pop = E("gvpop");
@@ -2204,6 +2233,7 @@
     if(act === "gfollow"){ govSend(t, { type: "atomone/v1/MsgDelegateGovernor", value: { delegator_address: window.__ADDR, governor_address: t.dataset.g } }); return; }
     if(act === "greg"){ if(GOV_REG) govForm(); return; }
     if(act === "gvinact"){ GV.inopen = !GV.inopen; render(); return; }
+    if(act === "gvalert"){ govAlerts(t.dataset.a); return; }
     if(act === "gvcopy"){ var ad = t.dataset.a; if(ad && typeof copyText === "function") copyText(ad, function(){ t.classList.add("ok"); setTimeout(function(){ t.classList.remove("ok"); }, 1400); }); return; }
     if(act === "grclose"){ grClose(); return; }
     if(act === "grsend" && GOV_REG){

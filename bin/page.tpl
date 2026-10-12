@@ -4920,6 +4920,11 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gvc-addr.ok{color:var(--sv-teal);border-color:var(--sv-teal)}
 .gvc-addr.ok svg{display:none}.gvc-addr.ok::after{content:"copied";font-size:10px}
 .gvcard .vstat.warn .vv{color:#ff7a57}
+/* the governor card's Alerts button, at the end of its badge row */
+.gvcard .vbadges{display:flex;align-items:center;gap:8px}
+.gvc-al{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;border:1px solid var(--sv-teal);background:transparent;color:var(--sv-teal);font:600 11.5px var(--sans);cursor:pointer}
+.gvc-al svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gvc-al:hover{background:rgba(43,200,189,.1)}
 .gvcard .gvc-full{grid-column:1/-1}
 .gvc-votes{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:4px}
 .gvc-v{display:inline-flex;align-items:baseline;gap:6px;padding:3px 9px;border-radius:999px;border:1px solid var(--edge2,#2a2850);font-size:12px;font-weight:600}

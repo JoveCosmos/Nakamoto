@@ -10,7 +10,7 @@ cannot touch it.
 A Telegram token allows exactly ONE getUpdates consumer, which is the whole
 reason this cannot live on @ChainsPingBot.
 """
-import html, json, os, re, sqlite3, subprocess, sys, time, urllib.error, urllib.parse, urllib.request
+import calendar, html, json, os, re, sqlite3, subprocess, sys, time, urllib.error, urllib.parse, urllib.request
 
 TOKEN  = os.environ.get("TG_BOT_TOKEN", "").strip()
 DSN    = os.environ["ATOMONE_APP_DSN"]
@@ -52,6 +52,10 @@ BACKUP = os.path.join(STATE, "subs.backup.db")
 REPORTS = os.environ.get("KEEPER_REPORTS", "/srv/atomone-app/web/pilot")
 EXPLORER = os.environ.get("EXPLORER_TX", "https://explorer.gatahub.zone/atomone-1/txs/")
 API    = "https://api.telegram.org/bot" + TOKEN + "/"
+# governor alerts (2026-10-12) read the chain's own REST: governors, open proposals, a governor's vote on each
+CHAIN_API = os.environ.get("CHAIN_API", "http://127.0.0.1:3999").rstrip("/")
+GCHECK    = int(os.environ.get("GOV_CHECK_SECONDS", "300"))
+REMIND_S  = int(os.environ.get("GOV_REMIND_SECONDS", str(24 * 3600)))   # "has not voted" this long before the end
 
 if not TOKEN:
     print("atomone-app-bot: TG_BOT_TOKEN is empty - nothing to poll", file=sys.stderr)
@@ -118,6 +122,9 @@ def store():
     try: c.execute("ALTER TABLE wsub ADD COLUMN flags TEXT DEFAULT 'ar'")
     except sqlite3.OperationalError: pass
     c.execute("CREATE TABLE IF NOT EXISTS wstate(addr TEXT PRIMARY KEY, mv_at INTEGER, rs_total INTEGER)")
+    # governors (2026-10-12): who watches which governor and what was last told about it
+    c.execute("CREATE TABLE IF NOT EXISTS gsub(chat INTEGER, gov TEXT, made INTEGER, flags TEXT DEFAULT 'vms', PRIMARY KEY(chat, gov))")
+    c.execute("CREATE TABLE IF NOT EXISTS gstate(gov TEXT PRIMARY KEY, m TEXT, active INTEGER, told TEXT, reminded TEXT)")
     c.commit()
     return c
 
@@ -203,6 +210,140 @@ def wallet(arg):
     hrp, data = "atone", [CS.index(ch) for ch in m.group(1)]
     if _polymod([ord(x) >> 5 for x in hrp] + [0] + [ord(x) & 31 for x in hrp] + data) != 1: return None, ""
     return "atone1" + m.group(1), "".join(f for f in "ar" if f in (m.group(2) or "ar"))
+
+
+# ── a governor's alerts (operator, 2026-10-12: "alert in the governor popup, like the validator one") ─────────────────
+GALERTS = {"v": ("It votes", "each vote it casts, and on which proposal"),
+           "m": ("It has not voted, a day before the end", "so you can still vote yourself"),
+           "s": ("Its status changes", "active or inactive")}
+GVOTE = {"VOTE_OPTION_YES": "Yes", "VOTE_OPTION_NO": "No", "VOTE_OPTION_ABSTAIN": "Abstain"}
+GSHORT = {"v": "votes", "m": "not-voted reminder", "s": "status"}
+
+
+def _bech(hrp, data):
+    pm = _polymod([ord(x) >> 5 for x in hrp] + [0] + [ord(x) & 31 for x in hrp] + data + [0] * 6) ^ 1
+    return hrp + "1" + "".join(CS[d] for d in data + [(pm >> 5 * (5 - i)) & 31 for i in range(6)])
+
+
+def governor(arg):
+    """`g_<the 38 characters after atonegov1>[_<v, m and/or s>]` from the governor card: (the governor address, its
+    checksum verified, the alerts chosen - all three when the link names none), or (None, "")"""
+    m = re.fullmatch(r"g_([02-9ac-hj-np-z]{38})(?:_([vms]{1,3}))?", arg or "")
+    if not m: return None, ""
+    hrp, data = "atonegov", [CS.index(ch) for ch in m.group(1)]
+    if _polymod([ord(x) >> 5 for x in hrp] + [0] + [ord(x) & 31 for x in hrp] + data) != 1: return None, ""
+    return "atonegov1" + m.group(1), "".join(f for f in "vms" if f in (m.group(2) or "vms"))
+
+
+def gov_acct(gov):
+    """the governor's own account (same key, atone prefix): the address its votes are cast from"""
+    data = [CS.index(ch) for ch in gov.split("1", 1)[1][:-6]]
+    return _bech("atone", data)
+
+
+def chain(path, missing=None):
+    """GET from the chain's REST; `missing` is returned for a 404 (a vote not cast), None for any other failure"""
+    try:
+        with urllib.request.urlopen(CHAIN_API + path, timeout=15) as r:
+            return json.load(r)
+    except urllib.error.HTTPError as e:
+        # "no such vote" comes back as 400 InvalidArgument "voter: ... not found for proposal" on AtomOne, not a 404;
+        # that exact answer means missing, any other failure means unknown (never read as "has not voted")
+        try: body = e.read().decode("utf-8", "replace")
+        except Exception: body = ""
+        if e.code == 404 or (e.code == 400 and "not found for proposal" in body): return missing
+        log("chain %s: HTTP %s" % (path[:60], e.code)); return None
+    except Exception as e:
+        log("chain %s: %s" % (path[:60], e)); return None
+
+
+def gov_state(c, gov):
+    r = c.execute("SELECT m, active, told, reminded FROM gstate WHERE gov=?", (gov,)).fetchone()
+    if not r: return None
+    return {"m": r[0], "active": r[1], "told": json.loads(r[2] or "{}"), "reminded": json.loads(r[3] or "[]")}
+
+
+def gov_save(c, gov, st):
+    c.execute("INSERT INTO gstate(gov, m, active, told, reminded) VALUES(?,?,?,?,?) ON CONFLICT(gov) DO UPDATE SET "
+              "m=excluded.m, active=excluded.active, told=excluded.told, reminded=excluded.reminded",
+              (gov, st["m"], st["active"], json.dumps(st["told"]), json.dumps(st["reminded"])))
+
+
+def gov_snapshot():
+    """(governors {addr: (moniker, active)}, open proposals [(id, title, end_ts)]) or (None, None) on a failed read"""
+    G = chain("/atomone/gov/v1/governors?pagination.limit=500")
+    P = chain("/atomone/gov/v1/proposals?proposal_status=2&pagination.limit=50")     # 2 = voting period (the API takes the number)
+    if G is None or P is None: return None, None
+    gs = {g["governor_address"]: (((g.get("description") or {}).get("moniker") or "").strip() or g["governor_address"][:14],
+                                  g.get("status") == "GOVERNOR_STATUS_ACTIVE") for g in G.get("governors", [])}
+    ps = []
+    for p in P.get("proposals", []):
+        t = p.get("voting_end_time") or ""
+        try:
+            end = calendar.timegm(time.strptime(t[:19], "%Y-%m-%dT%H:%M:%S"))       # the chain writes UTC
+        except Exception:
+            continue
+        ps.append((int(p["id"]), (p.get("title") or "").strip() or "Proposal %s" % p["id"], end))
+    return gs, ps
+
+
+def gov_vote(acct, pid):
+    """the governor's vote on an open proposal: its option name, "" when it has not voted, None when unreadable"""
+    d = chain("/atomone/gov/v1/proposals/%d/votes/%s" % (pid, acct), missing={})
+    if d is None: return None
+    o = (((d.get("vote") or {}).get("options") or [{}])[0]).get("option")
+    return GVOTE.get(o, "") if o else ""
+
+
+def gov_until(end):
+    h = max(0, int((end - time.time()) // 3600))
+    return "%d hour%s" % (h, "" if h == 1 else "s") if h < 48 else "%d days" % (h // 24)
+
+
+def govcheck(c):
+    """One pass over every watched governor: a status change, each vote it casts on an open proposal (told once per
+    proposal, again if it changes its vote), and a reminder when an open proposal ends within a day and it has not
+    voted. State is kept per governor, so a message goes out once per change, not once per pass."""
+    subs = {}
+    for gov, chat, fl in c.execute("SELECT gov, chat, flags FROM gsub").fetchall():
+        subs.setdefault(gov, []).append((chat, fl or "vms"))
+    if not subs: return
+    gs, ps = gov_snapshot()
+    if gs is None: return
+    now = time.time()
+    for gov, watchers in subs.items():
+        if gov not in gs: continue                     # gone from the chain: nothing to watch until it returns
+        m, active = gs[gov]
+        st = gov_state(c, gov) or {"m": m, "active": int(active), "told": {}, "reminded": []}
+        events = []
+        if bool(st["active"]) != active:
+            events.append(("s", ("<b>%s</b> is active again.\nIts vote counts for the stakers who follow it." % md(m)) if active else
+                                ("<b>%s</b> is now inactive.\nIts vote counts for no one who follows it until it is active again. "
+                                 "Vote yourself, or follow another governor." % md(m))))
+        acct, open_ids = gov_acct(gov), set()
+        for pid, title, end in ps:
+            open_ids.add(str(pid))
+            v = gov_vote(acct, pid)
+            if v is None: continue                     # unreadable this pass: claim nothing
+            was = st["told"].get(str(pid))
+            if v and v != was:
+                events.append(("v", ("<b>%s</b> changed its vote on #%d to <b>%s</b>.\n%s" if was else "<b>%s</b> voted <b>%s</b> on #%d.\n%s")
+                               % ((md(m), pid, v, md(title)) if was else (md(m), v, pid, md(title)))
+                               + "\nVoting ends in %s. Your own vote, if you cast one, counts instead of its." % gov_until(end)))
+                st["told"][str(pid)] = v
+            if not v and end - now <= REMIND_S and str(pid) not in st["reminded"]:
+                events.append(("m", "<b>%s</b> has not voted on #%d, and voting ends in %s.\n%s\n"
+                                    "If you want your stake to count, vote yourself in the app." % (md(m), pid, gov_until(end), md(title))))
+                st["reminded"].append(str(pid))
+        st["told"] = {k: v for k, v in st["told"].items() if k in open_ids}
+        st["reminded"] = [k for k in st["reminded"] if k in open_ids]
+        st["m"], st["active"] = m, int(active)
+        gov_save(c, gov, st); c.commit()
+        for letter, msg in events:
+            for chat, fl in watchers:
+                if letter in fl:
+                    send(chat, msg); time.sleep(0.05)
+            log("governor %s: %s" % (m, GALERTS[letter][0]))
 
 
 def short(a): return a[:10] + "..." + a[-4:]
@@ -370,6 +511,8 @@ HELP = ("Alerts for AtomOne validators: when one stops signing, misses half its 
         "about.\n\n"
         "Your own wallet: the Alerts button under Hands-free in the app's wallet column tells you "
         "each time Autopilot moves your stake or Restake stakes your rewards.\n\n"
+        "A governor: Alerts on a governor's card in the app tells you each vote it casts, reminds you a day before "
+        "a vote ends if it has not voted, and when it goes inactive or comes back.\n\n"
         + HELPERS + "\n\n" + PAGE)
 
 
@@ -412,7 +555,7 @@ def send(chat, text):
 def drop_gone(c):
     while GONE:
         chat = GONE.pop()
-        c.execute("DELETE FROM sub WHERE chat=?", (chat,)); c.execute("DELETE FROM wsub WHERE chat=?", (chat,)); c.commit()
+        c.execute("DELETE FROM sub WHERE chat=?", (chat,)); c.execute("DELETE FROM wsub WHERE chat=?", (chat,)); c.execute("DELETE FROM gsub WHERE chat=?", (chat,)); c.commit()
         log("removed the subscriptions of chat %s" % chat)
 
 
@@ -464,6 +607,35 @@ def handle(c, msg, V):
                           "/list shows your wallet and every validator you watch.\n/stop %s stops this wallet, /stop stops everything." % (
                           short(addr), "\n".join("- %s: %s" % WALERTS[f] for f in fl), addr))
 
+    if cmd == "/start" and arg.startswith("g_"):
+        gov, fl = governor(arg)
+        if not gov:
+            return send(chat, "That link does not carry a valid governor address, so nothing was changed. Open the app and use Alerts on the governor's card.")
+        gs, ps = gov_snapshot()
+        if gs is not None and gov not in gs:
+            return send(chat, "That governor is not registered on AtomOne, so nothing was changed.")
+        had = c.execute("SELECT flags FROM gsub WHERE chat=? AND gov=?", (chat, gov)).fetchone()
+        c.execute("INSERT INTO gsub(chat, gov, made, flags) VALUES(?,?,?,?) ON CONFLICT(chat, gov) DO UPDATE SET flags=excluded.flags",
+                  (chat, gov, int(time.time()), fl))
+        m = gs[gov][0] if gs else gov[:14]
+        # from now on: its votes already cast are stated here, not announced again
+        st = gov_state(c, gov)
+        now_votes = []
+        if gs is not None:
+            if not st:
+                st = {"m": m, "active": int(gs[gov][1]), "told": {}, "reminded": []}
+            for pid, title, end in ps:
+                v = gov_vote(gov_acct(gov), pid)
+                if v: st["told"][str(pid)] = v; now_votes.append("#%d: %s" % (pid, v))
+                elif v == "": now_votes.append("#%d: not voted yet, ends in %s" % (pid, gov_until(end)))
+            gov_save(c, gov, st)
+        c.commit()
+        head = ("Already watching governor <b>%s</b>, with the same alerts:" if had and (had[0] or "vms") == fl else
+                "Updated governor <b>%s</b>. Its alerts are now:" if had else "Watching governor <b>%s</b>. Its alerts are:") % md(m)
+        standing_g = ("\n\nOpen proposals now:\n" + "\n".join("- " + x for x in now_votes)) if now_votes else ""
+        return send(chat, head + "\n\n%s%s\n\n/list shows everything you watch.\n/stop %s stops this governor, /stop stops everything." % (
+                          "\n".join("- %s: %s" % GALERTS[f] for f in fl), standing_g, md(m)))
+
     if cmd == "/start":
         amb = []                                     # prefixes that named more than one validator
         many = resolve_bits(arg, V) or resolve_many(arg, V, amb)
@@ -512,9 +684,11 @@ def handle(c, msg, V):
     if cmd == "/list":
         rows = c.execute("SELECT op, flags FROM sub WHERE chat=?", (chat,)).fetchall()
         ws = c.execute("SELECT addr, flags FROM wsub WHERE chat=?", (chat,)).fetchall()
-        if not rows and not ws:
+        gw = c.execute("SELECT s.gov, s.flags, g.m FROM gsub s LEFT JOIN gstate g ON g.gov = s.gov WHERE s.chat=?", (chat,)).fetchall()
+        gl = "".join("Governor <b>%s</b>: %s\n" % (md(m or gv[:14]), ", ".join(GSHORT[f] for f in (fl or "vms") if f in GSHORT)) for gv, fl, m in gw)
+        if not rows and not ws and not gw:
             return send(chat, "You are not watching a wallet or a validator yet.\n\n" + PAGE)
-        return send(chat, "".join("Your wallet <code>%s</code>: %s\n" % (short(a), " and ".join(WALERTS[f][0] for f in (fl or "ar") if f in WALERTS)) for a, fl in ws) +
+        return send(chat, gl + ("\n" if gl and (ws or rows) else "") + "".join("Your wallet <code>%s</code>: %s\n" % (short(a), " and ".join(WALERTS[f][0] for f in (fl or "ar") if f in WALERTS)) for a, fl in ws) +
                           ("\n" if ws and rows else "") + ("Watching:\n" if rows else "") + "\n".join(
             "- <b>%s</b> - %s" % (md(name(c, op, V)),
                              ", ".join(ALERTS[f][1] for f in (fl or "d") if f in ALERTS))
@@ -527,6 +701,11 @@ def handle(c, msg, V):
         if arg:
             # match among what this chat watches, by today's moniker or the stored one,
             # so a validator that has left the set can still be dropped by name
+            gh = [gv for gv, m in c.execute("SELECT s.gov, g.m FROM gsub s LEFT JOIN gstate g ON g.gov = s.gov WHERE s.chat=?", (chat,)).fetchall()
+                  if gv == arg or (m or "").lower() == arg.lower()]
+            if gh:
+                c.execute("DELETE FROM gsub WHERE chat=? AND gov=?", (chat, gh[0])); c.commit()
+                return send(chat, "Stopped watching governor <b>%s</b>." % md(arg))
             mine = [r[0] for r in c.execute("SELECT op FROM sub WHERE chat=?", (chat,)).fetchall()]
             hit = [op for op in mine if name(c, op, V).lower() == arg.lower() or op == arg]
             if not hit:
@@ -731,7 +910,7 @@ def main():
     heartbeat(me["username"])
 
     offset = int(meta_get(c, "offset", 0))
-    last = last_backup = 0
+    last = last_backup = last_gov = 0
     fails = 0
     while True:
         V = vals()
@@ -763,6 +942,12 @@ def main():
             except Exception as e:
                 log("wallets: %s" % e)
             heartbeat(me["username"])
+        if time.time() - last_gov >= GCHECK:
+            last_gov = time.time()
+            try:
+                govcheck(c)
+            except Exception as e:
+                log("governors: %s" % e)
         if time.time() - last_backup >= 3600:
             last_backup = time.time(); backup(c)
 
