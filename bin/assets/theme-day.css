@@ -857,6 +857,8 @@
   html[data-theme=light]:not([data-mono]) .gp-st.d{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .gd-r{background:transparent}
   html[data-theme=light]:not([data-mono]) .gd-r+.gd-r{background:transparent}
+  html[data-theme=light]:not([data-mono]) .gvtab .gvh{background:none;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .gvtab .gvh:hover{background:none}
   html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd{border-bottom-color:var(--surface-2);background:var(--amber-bar)}
   html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd h1{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd p{color:var(--ink)}

@@ -972,7 +972,10 @@
     return /^https?:\/\/[^\s"'<>]+$/i.test(u) ? u : ""; }
   function govRows(list, mine){
     var tot = 0; list.forEach(function(g){ tot += g.vp || 0; });
-    return '<div class="sv-vlist sv-glist">' + list.map(function(g){
+    var tab = screen() === "govs";
+    var head = !tab ? '' : '<div class="sv-vr gvh" aria-hidden=true><span></span><span>Governor</span><span>Status</span>' +
+      '<span>Voting power</span><span>Delegators</span><span>Since</span></div>';
+    return '<div class="sv-vlist sv-glist' + (tab ? ' gvtab' : '') + '">' + head + list.map(function(g){
       var sh = GV.bonded ? (g.vp || 0) / GV.bonded * 100 : null;
       return '<div class="sv-vr click' + (g.addr === mine ? ' me' : '') + '" data-gv="' + esc(g.addr) + '" tabindex=0 title="Open this governor" style="--c:' + (g.active ? 'var(--sv-teal)' : 'var(--wbd2)') + '">' +
         '<span class=sv-lgo><span class="lg" style="background:hsl(' + (g.m.charCodeAt(0) * 37 % 360) + ',42%,30%)">' + esc(g.m.charAt(0).toUpperCase()) + '</span></span>' +
@@ -981,15 +984,15 @@
         '<span class=sv-gn2><b>' + (g.vp != null ? fmt(g.vp) : NA) + '</b><s>ATONE' + (sh != null ? ', ' + sh.toFixed(2) + '% of bonded' : '') + '</s></span>' +
         '<span class=sv-gn2><b>' + (g.n != null ? g.n : NA) + '</b><s>delegator' + (g.n === 1 ? '' : 's') + '</s></span>' +
         '<span class=sv-gn2><b>' + (g.since ? window.__dayFull(g.since) : NA) + '</b><s>' + (g.active ? 'active since' : 'inactive since') + '</s></span>' +
-        /* one fixed slot, the button alone (operator, 2026-10-12: the popup carries the website) */
-        '<span class=sv-gact>' + (govBtn(g, mine) || '<span></span>') + '</span></div>'; }).join("") + '</div>';
+        /* the Governors tab is read-only (operator, 2026-10-12); the dashboard's Govern keeps the button slot */
+        (tab ? '' : '<span class=sv-gact>' + (govBtn(g, mine) || '<span></span>') + '</span>') + '</div>'; }).join("") + '</div>';
   }
   /* following a governor is one signature: Follow (Switch when another one is followed) on an active
      governor, Stop on the one followed; nothing without a wallet, while the reading is pending, or
      outside the Dashboard */
   /* the Governance section only reads: following is done from the Dashboard's Governance tab */
   function govBtn(g, mine){
-    if(screen() !== "mygov" && screen() !== "govs") return '';      /* the Governors tab follows and stops too (2026-10-12) */
+    if(screen() !== "mygov") return '';      /* follow and stop live in the Dashboard's Govern alone (operator, 2026-10-12) */
     if(!window.__ADDR || !window.__WALLET || mine === null || mine === undefined) return '';
     if(g.addr === govAddrOf(window.__ADDR)) return !GOV_REG ? '' : '<button class=sv-gbtn type=button data-act=greg title="Change what the chain shows about your governor">Edit</button>';
     /* an ACTIVE governor cannot follow another - the chain refuses the delegation - so its wallet gets no
@@ -1108,7 +1111,7 @@
         st("identity", g.ident ? esc(g.ident) : "-", g.ident ? "Keybase" : "") +
         st("address", esc(g.addr.slice(0, 12) + "\u2026" + g.addr.slice(-6)), "") +
       '</div>' +
-      '<p class=gv-rules>A governor keeps at least <b>' + (R.minSelf ? whole(R.minSelf) : NA) + ' ATONE</b> staked from its own wallet. If its stake falls under that, the chain sets it inactive on its own. After any change of status, <b>' +
+      '<p class=gv-rules>A governor keeps at least <b>' + (R.minSelf ? whole(R.minSelf) : NA) + ' ATONE</b> staked from its own wallet. If its stake falls under that, the chain sets it inactive. <b>' +
         (R.period ? Math.round(R.period / 86400) + ' days' : NA) + '</b> must pass before its status can change again, so an inactive governor stays inactive at least that long. While inactive, its vote counts for no one who follows it; followers stay and nothing of theirs is at risk.</p>' +
       (govBtn(g, mine) ? '<div class=gv-go>' + govBtn(g, mine) + '</div>' : '') +
     '</div>';
@@ -1126,13 +1129,13 @@
     var your = !window.__ADDR ? ["-", "connect a wallet"] : (mine === null || mine === undefined) ? ["\u2026", "reading"] : me ? [esc(me.m), "you govern"]
       : mine ? [esc(g ? g.m : mine.slice(0, 12) + "\u2026"), g && !g.active ? "inactive, its votes do not count" : "votes for you unless you vote"] : ["None", "your stake votes only when you do"];
     /* the button stands from the first paint (idle until the list is read), so the header never grows a row */
-    var reg = !GOV_REG ? '' : '<button class="sv-gbtn gr-open gv-reg" type=button data-act=greg' + (L && window.__ADDR && window.__WALLET ? '' : ' disabled title="Connect a wallet to register"') + '>' + (me ? 'Edit your governor' : 'Become a governor') + '</button>';
+    var reg = '';      /* no register button in this section (operator, 2026-10-12); becoming one lives in the Dashboard's Govern */
     var h = '<div class="sv-ph gp-ph gv-ph">' +
       st("Governors", L ? String(L.length) : "-", L ? act.length + " active" : "reading the chain\u2026") +
       st("Following", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(1) + "%" : "-", L ? n + " wallets, " + fmt(vp) + " ATONE" : "") +
       st("Your governor", your[0], your[1]) + reg + '</div>';
     put("sv-govlist", h + (GV.err && !L ? govEmpty("Could not read the governors") : !L ? govEmpty("Reading the governors\u2026")
-      : !L.length ? '<div class=gv-none><p class=gv-say>No governors on AtomOne yet. A governor votes for every staker who follows it; a staker who votes still counts.</p>' + govNone() + '</div>' : govRows(L, mine)));
+      : !L.length ? '<div class=gv-none><p class=gv-say>No governors on AtomOne yet. A governor votes for every staker who follows it; a staker who votes still counts.</p></div>' : govRows(L, mine)));
   }
   /* ── Govern: the Dashboard's governance, built as its other tabs - a strip (the Govern card and five figures), then
      Your governor under the card, the governors in the middle, what is being voted on now at the right ── */

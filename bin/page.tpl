@@ -4816,8 +4816,7 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 #sv-proplist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#1d4f8f,#173257 58%,#141633)}
 /* the proposals bar carries the three figures (2026-10-11): label, value, one short line each */
 :is(#sv-proplist,#sv-govlist,#sv-daop)>.sv-ph.gp-ph{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start;gap:0 16px;padding:6px 15px 7px;flex:0 0 auto}   /* never squeezed by the panel's column flex */
-#sv-govlist>.sv-ph.gv-ph{grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:start}
-#sv-govlist>.sv-ph.gv-ph>.gv-reg{align-self:center}
+#sv-govlist>.sv-ph.gv-ph{grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}
 #sv-govlist>.sv-ph .gv-reg:disabled{opacity:.45;cursor:default}
 #sv-govlist>.sv-ph .gv-reg{white-space:nowrap;color:#fff;border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.12)}
 .gv-none{display:flex;flex-direction:column;gap:12px;padding:14px 2px}
@@ -4864,7 +4863,11 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gd-h b{font-size:15px}
 .gd-note{grid-column:1/-1}
 /* governors, read only here: the action column holds the site link alone */
-#sv-govs .sv-glist .sv-vr{grid-template-columns:28px minmax(0,1.4fr) 84px minmax(0,1fr) 90px minmax(0,1fr) 44px}
+#sv-govs .sv-glist .sv-vr{grid-template-columns:28px minmax(0,1.4fr) 90px minmax(0,1fr) 100px minmax(0,1fr)}
+/* the Governors table's column heads, set like the redelegation list's */
+.gvtab .gvh{--c:transparent;align-items:end;padding:0 12px 6px;min-height:0;height:auto;border:0;border-bottom:1px solid var(--wbd2);border-radius:0;background:none;box-shadow:none;cursor:default}
+.gvtab .gvh:hover{background:none;transform:none}
+.gvtab .gvh span{font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
 /* the constitution reads across the whole panel */
 #sv-cons .cn-in{max-width:none;margin:0;padding:0 40px 64px}
 /* its header a sepia band across the top of the text, the Governance section's fourth colour */
@@ -5017,6 +5020,22 @@ color:#6fe3da;font:600 11.5px var(--wsans);cursor:pointer;white-space:nowrap}
 .gv-go{display:flex;padding:16px 28px 24px}.gv-go .sv-gbtn{flex:1 1 auto;height:36px;font-size:12.5px}
 .gvcard:not(:has(.gv-go)){padding-bottom:20px}
 .sv-glist .sv-lgo .lg{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff}
+/* the well a governor's 28px letter tile sits in is 28px too: the validator rows' 24px well clipped its edges */
+.sv-glist .sv-vr .sv-lgo{width:28px;height:28px;border-radius:8px}
+/* the Governors table on a phone (operator, 2026-10-12): name and status on the first line, the three figures
+   under it in their own columns; no column heads, and the short lines wrap instead of cutting */
+@media(max-width:620px){
+  #sv-govs .sv-glist.gvtab{grid-auto-rows:auto}
+  #sv-govs .sv-glist.gvtab .gvh{display:none}
+  #sv-govs .sv-glist.gvtab .sv-vr{grid-template-columns:28px repeat(3,minmax(0,1fr));row-gap:8px;column-gap:10px;align-items:start}
+  #sv-govs .sv-glist.gvtab .sv-vr>.sd-vn{grid-column:2/4;min-width:0}
+  #sv-govs .sv-glist.gvtab .sv-vr>.sv-gst{grid-column:4;justify-self:end}
+  #sv-govs .sv-glist.gvtab .sv-vr>.sv-gn2:nth-child(4){grid-column:2;grid-row:2}
+  #sv-govs .sv-glist.gvtab .sv-vr>.sv-gn2:nth-child(5){grid-column:3;grid-row:2}
+  #sv-govs .sv-glist.gvtab .sv-vr>.sv-gn2:nth-child(6){grid-column:4;grid-row:2}
+  #sv-govs .sv-glist.gvtab .sv-gn2 s{white-space:normal;overflow:visible}
+  #sv-govs .sv-glist.gvtab .sd-vn s{white-space:normal;overflow-wrap:anywhere}
+}
 .sv-gst em{font-style:normal;font-family:var(--wmono);font-size:10px;padding:1px 8px;border-radius:999px;border:1px solid currentColor}
 .sv-gst em.on{color:var(--sv-green)}.sv-gst em.off{color:var(--wf)}
 .sv-gn2{display:flex;flex-direction:column;min-width:0}
