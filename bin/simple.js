@@ -1253,11 +1253,18 @@
     /* ids run to the newest; a proposal that never met its deposit is deleted by the chain, so the count can be lower */
     var psub = L ? n("PROPOSAL_STATUS_PASSED") + " passed, " + n("PROPOSAL_STATUS_REJECTED") + " rejected" + (n("PROPOSAL_STATUS_FAILED") ? ", " + n("PROPOSAL_STATUS_FAILED") + " failed" : "") + (dropped ? ", " + dropped + " dropped" : "") : "reading the chain…";
     var pfull = dropped ? psub.replace(/(\d+) dropped/, "$1 dropped (deposit not met)") : "";
-    var tfull = tp.quorum ? "More than " + (tp.threshold * 100).toFixed(1) + "% of votes yes, with at least " + (tp.quorum * 100).toFixed(1) + "% of bonded ATONE voting" + (tp.law_threshold ? "; laws and constitutional amendments need " + (tp.law_threshold * 100).toFixed(0) + "%" : "") : "";
+    /* the chain's own rule (x/gov tally, checked 2026-10-12): Yes must be MORE than the threshold of the Yes and No votes
+       (Abstain counts toward quorum only); quorum is every vote, Abstain too, over bonded ATONE; a Law or a Constitution
+       change takes the higher threshold and the higher quorum of its kind and the general one */
+    var q1 = function(x){ return (x * 100).toFixed(1).replace(/\.0$/, "") + "%"; }, Q = +tp.quorum || 0;
+    var lth = Math.max(+tp.law_threshold || 0, +tp.constitution_amendment_threshold || 0), lq = Math.max(Q, +tp.law_quorum || 0, +tp.constitution_amendment_quorum || 0);
+    var tfull = Q ? "More than " + q1(+tp.threshold) + " of the Yes and No votes must be Yes (Abstain counts toward quorum only), with at least " + (Q * 100).toFixed(1) + "% of bonded ATONE voting" +
+      (lth ? ". A Law or a Constitution change needs more than " + q1(lth) + " Yes, with at least " + (lq * 100).toFixed(1) + "% voting" : "") : "";
+    var tsub = Q ? "yes, " + (Q * 100).toFixed(1) + "% quorum" + (lth ? "<br>Law or Constitution change &gt;" + q1(lth) : "") : "yes";
     var h = '<div class="sv-ph gp-ph">' +
       st("Proposals", L ? String(L.length) : "-", psub, pfull) +
       st("Voting now", L ? (live.length ? String(live.length) : "None") : "-", L ? (live.length ? "#" + live[live.length - 1].id + " ends " + pday(live[live.length - 1].ve) : "no proposal is open") : "") +
-      st("To pass", tp.threshold ? "&gt;" + (tp.threshold * 100).toFixed(1) + "%" : "-", tp.quorum ? "yes, " + (tp.quorum * 100).toFixed(1) + "% quorum" + (tp.law_threshold ? ", law change " + (tp.law_threshold * 100).toFixed(0) + "% yes" : "") : "yes", tfull) + '</div>';
+      st("To pass", tp.threshold ? "&gt;" + (tp.threshold * 100).toFixed(1) + "%" : "-", tsub, tfull) + '</div>';
     if(GP.err && !L){ put("sv-proplist", h + govEmpty("Could not read the proposals")); return; }
     if(!L){ put("sv-proplist", h + govEmpty("Reading the proposals…")); return; }
     if(!L.length){ put("sv-proplist", h + govEmpty("No proposals yet")); return; }
@@ -1272,12 +1279,16 @@
           '<em>Yes ' + pc(t.y).toFixed(1) + '%</em><small>No ' + pc(t.n).toFixed(1) + '%, abstain ' + pc(t.a).toFixed(1) + '%</small>' : '<small>no votes' + (p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? ' yet' : '') + '</small>') + '</span></div>';
       if(open){
         var sm = p.sum.length > 2400 ? p.sum.slice(0, 2400) + "…" : p.sum;
+        /* the facts as a row of tiles (operator, 2026-10-12: "beautify"): label, figure, and for the voting window its length */
+        var vy = p.vs && p.ve && new Date(p.vs).getUTCFullYear() === new Date(p.ve).getUTCFullYear();
+        var vdays = p.vs && p.ve ? Math.round((new Date(p.ve) - new Date(p.vs)) / 864e5) : 0;
+        var tile = function(cls, k, v, sub){ return '<span class="gp-fi ' + cls + '"><em>' + k + '</em><b>' + v + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</span>'; };
         row += '<div class=gp-d><div class=gp-f>' +
-          '<span><em>Proposer</em>' + esc(p.by ? p.by.slice(0, 12) + "…" + p.by.slice(-6) : "-") + '</span>' +
-          '<span><em>Deposit</em>' + (p.dep ? fmt(p.dep) + ' ATONE' : '-') + '</span>' +
-          '<span><em>Submitted</em>' + pday(p.submit) + '</span>' +
-          '<span><em>Voting</em>' + (p.vs ? pday(p.vs) + ' to ' + pday(p.ve) : 'not started') + '</span>' +
-          (t.s ? '<span><em>Votes cast</em>' + fmt(t.s) + ' ATONE</span>' : '') + '</div>' +
+          tile("gpf-by", "Proposer", p.by ? '<i class=gp-mono title="' + esc(p.by) + '">' + esc(p.by.slice(0, 10) + "…" + p.by.slice(-6)) + '</i>' : "-") +
+          tile("gpf-dep", "Deposit", p.dep ? fmt(p.dep) + ' ATONE' : '-') +
+          tile("gpf-sub", "Submitted", pday(p.submit)) +
+          tile("gpf-vote", "Voting", p.vs ? (vy ? pday(p.vs).replace(/ \d{4}$/, "") : pday(p.vs)) + ' to ' + pday(p.ve) : 'Not started', vdays ? vdays + ' days' : '') +
+          (t.s ? tile("gpf-cast", "Votes cast", Math.round(t.s / 1e6).toLocaleString("en-US") + ' ATONE') : '') + '</div>' +
           (sm ? '<div class=gp-sum>' + esc(sm) + '</div>' : '') + (p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? voteBox(p) : '') + '</div>';
       }
       return row; }).join("") + '</div>');
@@ -1288,19 +1299,22 @@
     loadProps();
     var d = GP.dao, L = GP.list, net = TN() ? "testnet" : "mainnet";
     var C = ["var(--sv-teal)", "var(--sv-amber)", "var(--sv-green)"], ci = 0, c = function(k, v, sub){ return gstat(k, v, sub, C[ci++ % 3]); };
-    var who = function(a){ return !d ? "-" : a ? esc(a.slice(0, 10) + "…" + a.slice(-6)) : "Not appointed"; };
+    var who = function(a){ return !d ? "-" : a ? esc(a.slice(0, 10) + "…" + a.slice(-6)) : "None"; };
     var ext = d ? +(d.voting_period_extensions_limit || 0) : null, dur = d ? Math.round(parseInt(d.voting_period_extension_duration || "0", 10) / 86400) : null;
-    put("sv-daocards", c("Steering DAO", who(d && d.steering_dao_address), d ? (d.steering_dao_address ? "on chain" : "none on " + net + " yet") : "reading the chain…") +
-      c("Oversight DAO", who(d && d.oversight_dao_address), d ? (d.oversight_dao_address ? "on chain" : "none on " + net + " yet") : "") +
-      c("Endorsed proposals", L ? String(L.filter(function(p){ return p.endorsed; }).length) : "-", L ? "of " + L.length + " proposals" : ""));
+    /* one section like Proposals and Governors (operator, 2026-10-12): the three figures ride in the panel's header bar */
+    var st = function(k, v, sub){ return '<span class=gp-k><em>' + k + '</em><b>' + v + '</b><s>' + sub + '</s></span>'; };
+    var head = '<div class="sv-ph gp-ph">' +
+      st("Steering DAO", who(d && d.steering_dao_address), d ? (d.steering_dao_address ? "on chain" : "not appointed on " + net) : "reading the chain…") +
+      st("Oversight DAO", who(d && d.oversight_dao_address), d ? (d.oversight_dao_address ? "on chain" : "not appointed on " + net) : "") +
+      st("Endorsed", L ? String(L.filter(function(p){ return p.endorsed; }).length) : "-", L ? "of " + L.length + " proposals" : "") + '</div>';
     var row = function(name, has, text){ return '<div class=gd-r><div class=gd-h><b>' + name + '</b><span class="gp-st ' + (has ? 'p' : 'd') + '">' + (has ? 'appointed' : 'not appointed') + '</span></div><p>' + text + '</p></div>'; };
-    put("sv-daop", '<div class=sv-ph><h3>What they are for</h3></div>' + (GP.err && !d ? govEmpty("Could not read the chain") : !d ? govEmpty("Reading the chain…") :
+    put("sv-daop", head + (GP.err && !d ? govEmpty("Could not read the chain") : !d ? govEmpty("Reading the chain…") :
       '<div class=gd-list>' +
       row("Steering DAO", !!d.steering_dao_address, "At most one. It can add advisory notes to proposals, make announcements on chain and extend a proposal's voting period. Its endorsement lets a law pass with more than two thirds instead of 90%.") +
       row("Oversight DAO", !!d.oversight_dao_address, "It can veto a proposal that breaks a governing document, with proof, and extend a proposal's voting period. It cannot act on proposals about its own members.") +
       '<div class=gd-note>' + (ext != null ? 'A proposal\'s voting period can be extended up to <b>' + ext + ' times</b>, <b>' + dur + ' days</b> each. ' : '') +
         'Members of both are appointed by governance and must be public, real people. ' +
-        '<a href="https://github.com/atomone-hub/genesis/blob/main/CONSTITUTION.md" target=_blank rel="noopener noreferrer">The constitution</a> sets the rules.</div></div>'));
+        'The constitution sets the rules.</div></div>'));
   }
 
   /* ════ Constitution: the official text, as the build converted it (constitution.html), fetched

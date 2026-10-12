@@ -3743,7 +3743,7 @@ background:var(--wc);border:1px solid var(--wbd2);padding:1px 6px;border-radius:
   #sv-actlive .sv-upwait{min-height:188px}
   #sv-proplist .sv-upwait{min-height:100svh}
   #sv-govlist .sv-upwait{min-height:488px}
-  #sv-daop .sv-upwait{min-height:403px}
+  #sv-daop .sv-upwait{min-height:384px}
   #sv-mygovlist .gv-wait{min-height:136px}
   #sd-gvote .gv-wait{min-height:262px}
   .mv-hl{min-height:57px}
@@ -4749,8 +4749,15 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gp-v em{font-style:normal;font-size:12px;font-weight:700;color:var(--wt);font-variant-numeric:tabular-nums}
 .gp-v small{font-size:10.5px;color:var(--wf);white-space:nowrap}
 .gp-d{padding:4px 8px 14px 66px;border-top:0;display:flex;flex-direction:column;gap:10px;background:rgba(255,255,255,.025)}
-.gp-f{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:12px;color:var(--wt)}
+/* an open proposal's facts: one row of tiles on a wide screen, the voting window the widest; two columns on a phone
+   with the window across both */
+.gp-f{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--wt)}
+.gp-fi{flex:1 1 auto;display:flex;flex-direction:column;justify-content:flex-start;gap:3px;margin:0;padding:7px 10px;border:1px solid var(--wbd);border-radius:8px;background:rgba(255,255,255,.03)}
 .gp-f em{display:block;font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
+.gp-fi b{font-size:12.5px;font-weight:700;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}
+.gp-fi small{font-size:10.5px;color:var(--wf)}
+.gp-mono{font-style:normal;font-family:var(--wmono);font-size:11.5px;font-weight:600}
+@media(max-width:700px){.gp-f{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:row dense}.gp-fi.gpf-vote{grid-column:1/-1}}
 .gp-sum{font-size:12px;line-height:1.55;color:var(--ws);white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow-y:auto;padding:10px 12px;border:1px solid var(--wbd);border-radius:8px}
 .gd-list{display:flex;flex-direction:column;gap:12px}
 .gd-r{padding:12px 14px;border:1px solid var(--wbd);border-radius:10px}
@@ -4774,8 +4781,9 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 :is(#sv-proplist,#sv-daop,#sv-govlist)>.sv-ph .sv-gkey{color:rgba(255,255,255,.75);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #sv-proplist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#1d4f8f,#173257 58%,#141633)}
 /* the proposals bar carries the three figures (2026-10-11): label, value, one short line each */
-:is(#sv-proplist,#sv-govlist)>.sv-ph.gp-ph{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 16px;padding:6px 15px 7px;flex:0 0 auto}   /* never squeezed by the panel's column flex */
-#sv-govlist>.sv-ph.gv-ph{grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:center}
+:is(#sv-proplist,#sv-govlist,#sv-daop)>.sv-ph.gp-ph{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start;gap:0 16px;padding:6px 15px 7px;flex:0 0 auto}   /* never squeezed by the panel's column flex */
+#sv-govlist>.sv-ph.gv-ph{grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:start}
+#sv-govlist>.sv-ph.gv-ph>.gv-reg{align-self:center}
 #sv-govlist>.sv-ph .gv-reg:disabled{opacity:.45;cursor:default}
 #sv-govlist>.sv-ph .gv-reg{white-space:nowrap;color:#fff;border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.12)}
 .gv-none{display:flex;flex-direction:column;gap:12px;padding:14px 2px}
@@ -4787,13 +4795,21 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 @media(max-width:520px){#sv-govs .gv-rules3{grid-template-columns:minmax(0,1fr)}}
 /* Proposals and Governors are one section each, like the Redelegate list: the screen's own card goes, the banded
    panel is the frame (operator, 2026-10-12: "section inside section") */
-#sv-props.sv-screen,#sv-govs.sv-screen{padding:0;background:transparent;border:0;box-shadow:none}
-#sv-props>.sv-panel,#sv-govs>.sv-panel{flex:1 1 auto;min-height:0}
+#sv-props.sv-screen,#sv-govs.sv-screen,#sv-daos.sv-screen{padding:0;background:transparent;border:0;box-shadow:none}
+#sv-props>.sv-panel,#sv-govs>.sv-panel,#sv-daos>.sv-panel{flex:1 1 auto;min-height:0}
+/* nothing in these panels scrolls sideways: a vertical scroller makes overflow-x auto too, so it is pinned */
+:is(#sv-daop,.gp-list,.sv-glist,.gp-sum){overflow-x:hidden}
 .gp-k{display:flex;flex-direction:column;min-width:0;line-height:1.25}
 .gp-k em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.72)}
 .gp-k b{font-size:15px;color:#fff;white-space:nowrap}
 .gp-k s{text-decoration:none;font-size:11px;color:rgba(255,255,255,.78);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-@media(max-width:900px){:is(#sv-proplist,#sv-govlist)>.sv-ph.gp-ph{gap:0 10px}#sv-govlist>.sv-ph.gv-ph{grid-template-columns:repeat(3,minmax(0,1fr))}#sv-govlist>.sv-ph .gv-reg{grid-column:1/-1;justify-self:start;margin-top:6px}.gp-k b{font-size:14px}.gp-k s{font-size:10.5px}}
+/* the bar's short lines wrap rather than cut (the pixel-fit rule); To pass always holds two lines, so the bar has one
+   height before and after the chain is read */
+.gp-k s{white-space:normal;overflow:visible;text-overflow:clip}
+#sv-proplist>.gp-ph>.gp-k:last-child s{min-height:2.5em}
+/* a phone gives To pass the bar's full width under the other two, so its two lines stay two lines */
+@media(max-width:620px){.gp-k s{min-height:2.5em}#sv-proplist>.sv-ph.gp-ph{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:6px}#sv-proplist>.gp-ph>.gp-k:last-child{grid-column:1/-1;margin-top:6px}}
+@media(max-width:900px){:is(#sv-proplist,#sv-govlist,#sv-daop)>.sv-ph.gp-ph{gap:0 10px}#sv-govlist>.sv-ph.gv-ph{grid-template-columns:repeat(3,minmax(0,1fr))}#sv-govlist>.sv-ph .gv-reg{grid-column:1/-1;justify-self:start;margin-top:6px}.gp-k b{font-size:14px}.gp-k s{font-size:10.5px}}
 #sv-daop>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#5f6216,#393b15 58%,#19191f)}
 #sv-govlist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#7d2e6e,#461f45 58%,#1a1230)}
 /* proposals: the id a small key, the status a clear tag, the tally a firmer bar, Yes the figure */
@@ -4923,10 +4939,8 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin-right:-8px;p
    (the proposal list scrolls inside it; the DAOs' panel sits right under the cards) */
 #sv-props,#sv-daos{justify-content:flex-start;gap:12px}
 #sv-props>*,#sv-daos>*,#sv-props>*:not(:first-child),#sv-daos>*:not(:first-child){margin-top:0}
-#sv-daocards{grid-template-columns:repeat(3,minmax(0,1fr))}
-#sv-daocards .sv-card{--tc:var(--sv-teal)}
 #sv-proplist{flex:1 1 0;min-height:0;--tc:var(--sv-teal)}
-#sv-daop{flex:0 1 auto;min-height:0;overflow-y:auto;--tc:var(--sv-teal)}
+#sv-daop{flex:1 1 auto;min-height:0;overflow-y:auto;--tc:var(--sv-teal)}
 .sv-glist{overflow-y:auto;flex:1 1 auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .sv-glist .sv-vr{flex:0 0 52px;grid-template-columns:28px minmax(0,1.4fr) 84px minmax(0,1fr) 90px minmax(0,1fr) 116px}
 .sv-gact{display:grid;grid-template-columns:minmax(0,1fr) 26px;align-items:center;justify-items:end;column-gap:10px}
@@ -5584,7 +5598,7 @@ html[data-tab=connect] .l2host{display:none}
 @media(max-width:620px){
   #sv-proplist,#sv-govlist,#sv-mygovlist{flex:0 0 auto;min-height:0}
   #sv-proplist .gp-list,.sv-glist{flex:0 0 auto;overflow:visible;max-height:none}
-  #sv-daocards,#sv-govcards{grid-template-columns:minmax(0,1fr)}
+  #sv-govcards{grid-template-columns:minmax(0,1fr)}
   .sv-gkey{white-space:normal;flex-wrap:wrap;row-gap:4px}
   /* a date axis at quarters is eight labels; the phone shows every other one (half-years) */
   .sv-gxt span:nth-child(even){display:none}
@@ -6778,8 +6792,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
         <div class=cn-wrap id=sv-consp><div class=sv-upwait>Opening the constitution…</div></div>
       </section>
       <section class=sv-screen id=sv-daos data-sc=daos aria-label="Core DAOs">
-        <div class="sv-cards gv-strip" id=sv-daocards></div>
-        <div class=sv-panel id=sv-daop><div class=sv-ph><h3>Core DAOs</h3></div><div class=sv-upwait>Reading the chain…</div></div>
+        <div class=sv-panel id=sv-daop><div class="sv-ph gp-ph"><span class=gp-k><em>Steering DAO</em><b>-</b><s>reading the chain…</s></span><span class=gp-k><em>Oversight DAO</em><b>-</b><s></s></span><span class=gp-k><em>Endorsed</em><b>-</b><s></s></span></div><div class=sv-upwait>Reading the chain…</div></div>
       </section>
       <section class=sv-screen id=sv-govs data-sc=govs aria-label=Governors>
         <div class=sv-panel id=sv-govlist><div class=sv-ph><h3>Governors</h3></div><div class=sv-upwait>Reading the governors…</div></div>
