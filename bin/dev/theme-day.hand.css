@@ -172,6 +172,7 @@
   html[data-theme=light]:not([data-mono]) .gpx-det{background:rgba(60,50,20,.02)}
   html[data-theme=light]:not([data-mono]) .gp-sv{background:rgba(60,50,20,.035)}
   html[data-theme=light]:not([data-mono]) .gp-vm.me{color:#fbf9f3}
+  html[data-theme=light]:not([data-mono]) .act-tile{background:rgba(60,50,20,.035)}
   html[data-theme=light]:not([data-mono]) .gvt-r:hover td,html[data-theme=light]:not([data-mono]) .gvt-r:focus-visible td{background:rgba(44,41,64,.04)}
   html[data-theme=light]:not([data-mono]) .cell.pad{background:rgba(40,30,20,.05);border:1px dashed rgba(40,30,20,.16)}
 

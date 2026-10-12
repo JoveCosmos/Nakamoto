@@ -4303,7 +4303,13 @@ border:1px solid var(--sv-amber);background:rgba(255,176,46,.14);color:var(--sv-
 .actabs button{flex:1 1 0;border:0;border-radius:99px;padding:7px 10px;background:transparent;color:var(--ws,#c1bfdc);font:600 12.5px var(--wsans,var(--sans));cursor:pointer}
 .actabs button[aria-pressed=true]{background:var(--sv-teal,#2bc8bd);color:#071a18}
 .actabs button:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offset:2px}
-.actsum{margin:12px 18px 0;min-height:2.6em;font-size:12.5px;line-height:1.35;color:var(--ws,#c1bfdc)}
+.actsum{margin:12px 18px 0;min-height:52px;display:flex;align-items:center;font-size:12.5px;line-height:1.35;color:var(--ws,#c1bfdc)}
+/* the tab's record as figures: one row of tiles, the figure over its label */
+.act-tiles{flex:1 1 auto;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
+.act-tile{display:flex;flex-direction:column;gap:3px;min-width:0;padding:8px 10px;border:1px solid var(--wbd,#232342);border-radius:8px;background:rgba(255,255,255,.03)}
+.act-tile b{font-size:15px;font-weight:700;color:var(--wt,#f0eef8);font-variant-numeric:tabular-nums;white-space:nowrap}
+.act-tile em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--wf,#8f8db4);line-height:1.25}
+@media(max-width:520px){.act-tiles{gap:6px}.act-tile{padding:7px 8px}.act-tile b{font-size:13.5px}.act-tile em{letter-spacing:.06em}}
 /* one set of columns for every row (operator, 2026-10-12: "all should be aligned"): the list is the grid and each row
    a subgrid of it, so the date, the move and the amount line up down the list and sit on one baseline */
 .actlist{margin:6px 18px 16px;height:min(340px,52vh);overflow-y:auto;border-top:1px solid var(--wbd,#232342);scrollbar-width:thin;
