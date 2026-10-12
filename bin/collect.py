@@ -951,10 +951,20 @@ def bake_votes():
             if not voter.startswith("atone1") or len(voter) < 8: continue
             shards.setdefault(voter[6], {}).setdefault(voter, {})[pid] = short.get(opt, "?")
         vdir = os.path.join(OUT, "votes"); os.makedirs(vdir, exist_ok=True)
+        wrote = 0
         for c in _CH:
+            body = json.dumps(shards.get(c, {}), separators=(",", ":"), sort_keys=True)
+            dst = os.path.join(vdir, c + ".json")
+            # a shard is rewritten only when its votes changed: a new vote touches one file, an idle build none
+            # (the NVMe mirrors are near their rated write life - memory: nvme-wear-critical)
+            try:
+                if open(dst).read() == body: continue
+            except OSError:
+                pass
             t = os.path.join(vdir, f".{c}.json.tmp")
-            with open(t, "w") as f: json.dump(shards.get(c, {}), f, separators=(",", ":"))
-            os.replace(t, os.path.join(vdir, c + ".json"))
+            with open(t, "w") as f: f.write(body)
+            os.replace(t, dst); wrote += 1
+        print(f"votes: {wrote} of 32 shards changed")
         t = os.path.join(vdir, ".meta.tmp")
         with open(t, "w") as f: json.dump({"height": head, "at": int(time.time()), "voters": sum(len(v) for v in shards.values())}, f)
         os.replace(t, os.path.join(vdir, "_meta.json"))

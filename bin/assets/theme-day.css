@@ -830,6 +830,7 @@
   html[data-theme=light]:not([data-mono]) .gp-vm.me{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .gp-vm.gov{background:transparent}
   html[data-theme=light]:not([data-mono]) .gp-vm.none{background:transparent}
+  html[data-theme=light]:not([data-mono]) .gp-vm.na{background:transparent}
   html[data-theme=light]:not([data-mono]) .gp-sv{background:var(--surface-2)}
   @media(min-width:1100px){
     html[data-theme=light]:not([data-mono]) .gpx-r:hover{background:var(--surface-2)}
@@ -861,6 +862,7 @@
   html[data-theme=light]:not([data-mono]) .gd-r{background:transparent}
   html[data-theme=light]:not([data-mono]) .gd-r+.gd-r{background:transparent}
   html[data-theme=light]:not([data-mono]) .gvt th{box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .gvt-o.low{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .gvt-v s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .gvt-r:hover td,html[data-theme=light]:not([data-mono]) .gvt-r:focus-visible td{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .gvt-tag{color:#FFFFFF}
@@ -869,6 +871,7 @@
   html[data-theme=light]:not([data-mono]) .gvt-vp s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .gvc-addr{border-color:var(--edge2,var(--surface-2));background:transparent;color:var(--ink2,var(--muted))}
   html[data-theme=light]:not([data-mono]) .gvc-addr svg{fill:none;stroke:currentColor}
+  html[data-theme=light]:not([data-mono]) .gvc-addr{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .gvc-addr:hover{color:var(--ink,var(--ink))}
   html[data-theme=light]:not([data-mono]) .gvcard .vstat.warn .vv{color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .gvc-al{background:transparent}

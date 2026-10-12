@@ -4779,11 +4779,12 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 @media(max-width:700px){.gp-f{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:row dense}.gp-fi.gpf-vote{grid-column:1/-1}}
 .gp-sum{font-size:12px;line-height:1.55;color:var(--ws);white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow-y:auto;padding:10px 12px;border:1px solid var(--wbd);border-radius:8px}
 /* your mark on a proposal row: filled = you voted, outlined = your governor did; the colour is the vote */
-.gp-vm{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;margin-right:7px;border-radius:4px;font-family:var(--wmono);font-size:9px;font-weight:700;vertical-align:1px;flex:none}
+.gp-vm{font-style:normal;display:inline-flex;align-items:center;justify-content:center;height:17px;padding:0 7px;margin-right:7px;border-radius:999px;font-family:var(--wmono);font-size:9px;letter-spacing:.06em;font-weight:700;white-space:nowrap;vertical-align:1px;flex:none}
 .gp-vm.yes{--vc:var(--sv-green)}.gp-vm.no{--vc:var(--wburn)}.gp-vm.abstain{--vc:var(--wf)}
 .gp-vm.me{background:var(--vc);color:#06060c}
 .gp-vm.gov{border:1.5px solid var(--vc);color:var(--vc);background:transparent}
 .gp-vm.none{border:1.5px dashed var(--wbd2);color:var(--wf);background:transparent}
+.gp-vm.na{border:1px dotted var(--wbd2);color:var(--wf);background:transparent;opacity:.85}
 /* your side of a proposal: your vote and your governor's, as chips; one height read or reading */
 .gp-you{display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-height:38px}
 .gp-sv{display:inline-flex;align-items:baseline;gap:8px;padding:6px 11px;border:1px solid var(--wbd);border-radius:8px;background:rgba(255,255,255,.03)}
@@ -4798,7 +4799,7 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 @media(min-width:1100px){
 .gpx-split{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:228px minmax(0,1fr);gap:16px}
 .gpx-list{min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;padding-right:4px;align-content:start}
-.gpx-r{position:relative;display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 10px 13px 10px;border-bottom:1px solid var(--wbd);cursor:pointer}
+.gpx-r{position:relative;display:grid;grid-template-columns:46px auto minmax(0,1fr);gap:10px;align-items:center;padding:10px 10px 13px 10px;border-bottom:1px solid var(--wbd);cursor:pointer}
 .gpx-r .gp-st{justify-self:start}
 .gpx-r:focus-visible{outline:2px solid var(--sv-teal);outline-offset:-2px}
 .gpx-r:hover{background:rgba(255,255,255,.03)}
@@ -4806,9 +4807,8 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
    pointer toward the detail it opened */
 .gpx-r.sel{background:rgba(43,200,189,.16);box-shadow:inset 4px 0 0 var(--sv-teal),inset 0 0 0 1px rgba(43,200,189,.55);border-radius:6px}
 .gpx-r.sel::after{content:"";position:absolute;right:6px;top:50%;width:8px;height:8px;margin-top:-6px;border-right:2px solid var(--sv-teal);border-bottom:2px solid var(--sv-teal);transform:rotate(-45deg)}
-.gpx-r.sel .gp-vm{margin-right:12px}
 .gpx-r.sel .gp-id{background:var(--sv-teal);border-color:var(--sv-teal);color:#071a18}
-.gpx-r .gp-vm{margin:0}
+.gpx-r .gp-vm{margin:0;justify-self:start}
 .gpx-sl{position:absolute;left:10px;right:10px;bottom:5px;height:3px;border-radius:2px;overflow:hidden;background:var(--wbd);display:flex}
 .gpx-sl i{display:block;height:100%}.gpx-sl i.y{background:var(--sv-green)}.gpx-sl i.n{background:var(--wburn)}.gpx-sl i.a{background:var(--wf)}
 .gpx-det{min-height:0;display:flex;flex-direction:column;gap:10px;padding:12px 14px;border:1px solid var(--wbd);border-radius:10px;background:rgba(255,255,255,.02);overflow:hidden}
@@ -4903,7 +4903,10 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gvt{width:100%;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}
 .gvt th{position:sticky;top:0;z-index:1;background:var(--wc);padding:6px 10px 8px;border-bottom:1px solid var(--wbd2);box-shadow:inset 0 -1px 0 var(--wbd2);text-align:left;font:500 8.5px/1.2 var(--wmono);letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
 .gvt td{padding:11px 10px;border-bottom:1px solid var(--wbd);font-size:13px;color:var(--wt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gvt :is(th,td).gvt-vp{width:27%;text-align:right}.gvt :is(th,td).gvt-d{width:12%;text-align:right}.gvt :is(th,td).gvt-v{width:11%;text-align:right}.gvt :is(th,td).gvt-s{width:16%;text-align:right}
+.gvt :is(th,td).gvt-vp{width:24%;text-align:right}.gvt :is(th,td).gvt-o{width:15%;text-align:right}.gvt :is(th,td).gvt-d{width:11%;text-align:right}.gvt :is(th,td).gvt-v{width:9%;text-align:right}.gvt :is(th,td).gvt-s{width:14%;text-align:right}
+.gvt-o.low{color:#ff7a57}
+.gf-s{display:none}
+@media(max-width:620px){.gvt .gf-l{display:none}.gvt .gf-s{display:inline}}
 .gvt-v b{font-weight:600}.gvt-v s{text-decoration:none;color:var(--wf)}.gvt-wait{font-style:normal;color:var(--wf)}
 .gvt-r{cursor:pointer}
 .gvt-r:hover td,.gvt-r:focus-visible td{background:rgba(255,255,255,.03)}
@@ -4922,9 +4925,8 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gvcard .vname{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px}
 .gvc-addr{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border:1px solid var(--edge2,#2a2850);border-radius:6px;background:transparent;font:500 11px var(--mono,monospace);color:var(--ink2,#a5a3c4);cursor:pointer}
 .gvc-addr svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2}
+.gvc-addr{text-decoration:none}
 .gvc-addr:hover{color:var(--ink,#e6e4f0);border-color:var(--sv-teal)}
-.gvc-addr.ok{color:var(--sv-teal);border-color:var(--sv-teal)}
-.gvc-addr.ok svg{display:none}.gvc-addr.ok::after{content:"copied";font-size:10px}
 .gvcard .vstat.warn .vv{color:#ff7a57}
 /* the governor card's Alerts button, at the end of its badge row */
 .gvcard .vbadges{display:flex;align-items:center;gap:8px}
@@ -4940,9 +4942,10 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gvc-v.na{border-style:dotted;color:var(--ink3,#8f8db4);opacity:.8}
 .gvc-wait{font-size:12px;color:var(--ink3,#8f8db4)}
 /* a phone keeps every word whole: no Since column, names may wrap, the share sits under the figure */
-@media(max-width:620px){.gvt{table-layout:auto}.gvt :is(th,td).gvt-s{display:none}.gvt :is(th,td):is(.gvt-vp,.gvt-d,.gvt-v){width:1%;white-space:nowrap}
+@media(max-width:620px){.gvt{table-layout:auto}.gvt :is(th,td):is(.gvt-s,.gvt-d){display:none}.gvt :is(th,td):is(.gvt-vp,.gvt-o,.gvt-d,.gvt-v){width:1%;white-space:nowrap}
   .gvt th{letter-spacing:.06em;padding:6px 6px 8px}.gvt th:first-child,.gvt td:first-child{width:auto}
-  .gvt td{white-space:normal;padding:10px 8px}.gvt-n b{overflow:visible;overflow-wrap:anywhere}
+  .gvt td{white-space:normal;padding:10px 8px}.gvt-n{flex-wrap:wrap;row-gap:4px}.gvt-n b{overflow:visible;overflow-wrap:break-word;word-break:normal}
+  .gvt-n .gvt-tag{margin-left:32px}
   .gvt-vp s{display:block;margin:2px 0 0}}
 .gvtab .gvh{--c:transparent;align-items:end;padding:0 12px 6px;min-height:0;height:auto;border:0;border-bottom:1px solid var(--wbd2);border-radius:0;background:none;box-shadow:none;cursor:default}
 .gvtab .gvh:hover{background:none;transform:none}

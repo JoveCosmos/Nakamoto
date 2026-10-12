@@ -1001,6 +1001,8 @@
     return [el.filter(function(p){ return !!h.map[p.id]; }).length, el.length];
   }
 
+  function gfig(u){ var a = u / 1e6, sh = a >= 1e6 ? (a / 1e6).toFixed(2) + "M" : a >= 1e3 ? (a / 1e3).toFixed(1) + "K" : a.toFixed(1);
+    return '<span class=gf-l>' + fmt(u) + '</span><span class=gf-s>' + sh + '</span>'; }
   function govTable(list, mine){
     loadProps();
     var by = function(a, b){ return (b.vp || 0) - (a.vp || 0); };
@@ -1010,20 +1012,23 @@
         /* the wallet's own governor reads You; the one it follows reads Yours (operator, 2026-10-12), a pill set apart */
         '<td><div class=gvt-n><span class=gvt-lg>' + govLogo(g) + '</span><b>' + esc(g.m) + '</b>' +
           (window.__ADDR && g.addr === govAddrOf(window.__ADDR) ? '<i class="gvt-tag you">You</i>' : g.addr === mine ? '<i class=gvt-tag>Yours</i>' : '') + '</div></td>' +
-        '<td class=gvt-vp><b>' + (g.vp != null ? fmt(g.vp) : NA) + '</b>' + (sh != null ? '<s>' + sh.toFixed(2) + '%</s>' : '') + '</td>' +
+        '<td class=gvt-vp><b>' + (g.vp != null ? gfig(g.vp) : NA) + '</b>' + (sh != null ? '<s>' + sh.toFixed(2) + '%</s>' : '') + '</td>' +
+        (function(){ var o = govOwn(g), min = (GV.rules || {}).minSelf || 0;
+          return '<td class="gvt-o' + (o >= 0 && min && o < min ? ' low' : '') + '"' + (o >= 0 && min ? ' title="' + (o / min).toFixed(1) + '\u00d7 the ' + whole(min) + ' ATONE minimum"' : '') + '>' +
+            (o === null ? '<i class=gvt-wait>\u2026</i>' : o < 0 ? NA : gfig(o)) + '</td>'; })() +
         '<td class=gvt-d>' + (g.n != null ? g.n : NA) + '</td>' +
         (function(){ var c = govVotes(g); return '<td class=gvt-v' + (!c ? '' : c[1] ? ' title="Voted on ' + c[0] + ' of the ' + c[1] + ' proposals decided since it became active"' :
           ' title="No proposal has been decided since it became active' + (votesOf(govAcctOf(g.addr), 1).part ? ' within the record we can read' : '') + '"') + '>' +
           (!c ? '<i class=gvt-wait>…</i>' : c[1] ? '<b>' + c[0] + '</b><s>/' + c[1] + '</s>' : '-') + '</td>'; })() +
         '<td class=gvt-s>' + (g.since ? window.__dayFull(g.since) : NA) + '</td></tr>'; };
-    var h = '<div class=gvt-w><table class=gvt><thead><tr><th>Governor</th><th class=gvt-vp>Voting power</th><th class=gvt-d>Delegators</th><th class=gvt-v>Votes</th><th class=gvt-s>Since</th></tr></thead><tbody>' +
+    var h = '<div class=gvt-w><table class=gvt><thead><tr><th>Governor</th><th class=gvt-vp>Voting power</th><th class=gvt-o>Self</th><th class=gvt-d>Delegators</th><th class=gvt-v>Votes</th><th class=gvt-s>Since</th></tr></thead><tbody>' +
       act.map(row).join("");
     /* the band always stands, with its 0 when empty, as the redelegation list's inactive validators do */
     if(ina.length){
-      h += '<tr class="ij-t gvt-band' + (GV.inopen ? ' open' : '') + '"><td colspan=5><button type=button class=ij-b data-act=gvinact aria-expanded=' + !!GV.inopen + '>' +
+      h += '<tr class="ij-t gvt-band' + (GV.inopen ? ' open' : '') + '"><td colspan=6><button type=button class=ij-b data-act=gvinact aria-expanded=' + !!GV.inopen + '>' +
         '<span>Inactive governors</span><i>' + ina.length + '</i><em>their votes count for no one</em><u aria-hidden=true></u></button></td></tr>';
       if(GV.inopen) h += ina.map(row).join("");
-    } else h += '<tr class="ij-t ij-0 gvt-band"><td colspan=5><button type=button class=ij-b disabled aria-disabled=true><span>Inactive governors</span><i>0</i><em>none right now</em></button></td></tr>';
+    } else h += '<tr class="ij-t ij-0 gvt-band"><td colspan=6><button type=button class=ij-b disabled aria-disabled=true><span>Inactive governors</span><i>0</i><em>none right now</em></button></td></tr>';
     return h + '</tbody></table></div>';
   }
   function govRows(list, mine){
@@ -1142,9 +1147,8 @@
         /* the one place the governor rules are spelled out (operator, 2026-10-12: merged, register card only) */
         : 'Your own stake follows you from the moment you register, and as a governor you cannot follow another one. Keep at least ' + (R.minSelf ? whole(R.minSelf) : "10,000") +
           ' ATONE staked from your own wallet: if your stake falls under that, the chain sets you inactive, and ' + (R.period ? Math.round(R.period / 86400) : 28) +
-          ' days must pass before your status can change again. While inactive, your vote counts for no one who follows you; your followers stay and nothing of theirs is at risk. ' +
-          'The role carries no reward and nothing extra at risk; only your vote\'s reach changes.') +
-        ' Signed in ' + esc(window.__WALLET.name || "your wallet") + ', sent through GATA\'s node.</p>' +
+          ' days must pass before your status can change again. While inactive, your vote counts for no one who follows you.') +
+        '</p>' +
       '<div class=txbtns><button class="wk-btn wk-go" id=grgo type=button data-act=grsend disabled>' + (me ? 'Save' : 'Register') + '</button></div></div>';
     if(P) P.open(pop);
     grCheck();
@@ -1159,7 +1163,7 @@
     if(GV.own[a] === undefined){ GV.own[a] = null;
       gapi("/cosmos/staking/v1beta1/delegations/" + a + "?pagination.limit=200").then(function(d){ var t = 0;
         (d.delegation_responses || []).forEach(function(x){ t += +((x.balance || {}).amount || 0); }); GV.own[a] = t; })
-        .catch(function(){ GV.own[a] = -1; }).then(gvRefresh); }
+        .catch(function(){ GV.own[a] = -1; }).then(function(){ if(screen() === "govs") render(); }); }
     return GV.own[a];
   }
   function gvRefresh(){ var pop = E("gvpop"); if(pop && pop.classList.contains("on") && pop.dataset.gv){ var g = (GV.list || []).filter(function(x){ return x.addr === pop.dataset.gv; })[0]; if(g) pop.innerHTML = gvHtml(g); } }
@@ -1189,20 +1193,15 @@
       '<div class="vhead vwrap">' + (govAv(g.ident) ? '<img class=vlogo src="assets/val/' + esc(g.ident) + '.jpg" alt="">' :
         '<span class=vmono style="display:flex;background:hsl(' + (g.m.charCodeAt(0) * 37 % 360) + ',42%,30%)">' + esc(g.m.charAt(0).toUpperCase()) + '</span>') +
         '<div class=vcol><div class=vname><span class=vnm>' + esc(g.m) + '</span>' +
-          '<button type=button class=gvc-addr data-act=gvcopy data-a="' + esc(g.addr) + '" title="Copy ' + esc(g.addr) + '">' + esc(g.addr.slice(0, 12) + "\u2026" + g.addr.slice(-6)) +
-          '<svg viewBox="0 0 24 24" aria-hidden=true><rect x=9 y=9 width=11 height=11 rx=2 /><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg></button></div>' +
+          /* the address opens its account on Scan (operator, 2026-10-12); Scan reads the account form (atone1) */
+          '<a class=gvc-addr href="https://explorer.gatahub.zone/' + (TN() ? "atomone-testnet-1" : "atomone-1") + '/accounts/' + esc(govAcctOf(g.addr)) +
+            '" target=_blank rel="noopener noreferrer" title="' + esc(g.addr) + ' on Scan">' + esc(g.addr.slice(0, 12) + "\u2026" + g.addr.slice(-6)) +
+          '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a></div>' +
         '<div class=vsub>' + web + '</div></div></div>' +
       '<div class=vbadges><span class="badge ' + (g.active ? 'ok' : 'dn') + '">' + (g.active ? 'ACTIVE' : 'INACTIVE') + '</span>' + tag +
         (window.__BOT && !TN() ? '<button type=button class=gvc-al data-act=gvalert data-a="' + esc(g.addr) + '" title="Telegram alerts for this governor">' +
           '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Alerts</button>' : '') + '</div>' +
       (g.det ? '<p class=gv-det>' + esc(g.det) + '</p>' : '') +
-      '<div class=vgrid>' +
-        st("own stake", ownV, ownS, own !== null && own >= 0 && min && own < min ? "warn" : "") +
-        st("followers' stake", foll, "votes with it when they do not") +
-        st("status can change", nxV, nxS) +
-        st("security contact", g.sec ? esc(g.sec) : "-", "") +
-        '<div class="vstat gvc-full"><span class=vk>latest votes</span><div class=gvc-votes>' + votes + '</div></div>' +
-      '</div>' +
       (govBtn(g, mine) ? '<div class=gv-go>' + govBtn(g, mine) + '</div>' : '') +
     '</div>';
   }
@@ -1384,18 +1383,22 @@
   function meNoVoteSure(p){ return acctNoVoteSure(window.__ADDR, p); }
   /* the row's mark: filled = this wallet voted, outlined = its governor did (and so voted for it); colour = the vote */
   function vmark(p){
-    var A = window.__ADDR; if(!A) return '';
+    /* the row's vote in full (operator, 2026-10-12): filled = this wallet voted, outlined = its governor voted for it,
+       dashed = confirmed neither voted, N/A = cannot be confirmed; nothing before a proposal reaches its vote */
+    var A = window.__ADDR; if(!A || !p.vs || p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD") return '';
+    var W = { yes: "Yes", no: "No", abstain: "Abstain" };
     var mh = GP.hist[A], mv = mh && mh.map ? mh.map[p.id] : null;
     if(p.st === "PROPOSAL_STATUS_VOTING_PERIOD"){ var lv = myVote(p.id); if(lv) mv = lv; }
-    if(mv) return '<i class="gp-vm me ' + mv + '" title="You voted ' + mv + '">' + mv.charAt(0).toUpperCase() + '</i>';
+    if(mv) return '<i class="gp-vm me ' + mv + '" title="You voted ' + mv + '">' + W[mv] + '</i>';
     var mine = myGov(), ga = mine ? govAcctOf(mine) : null, gh = ga ? GP.hist[ga] : null, gv = gh && gh.map ? gh.map[p.id] : null;
     if(ga && p.st === "PROPOSAL_STATUS_VOTING_PERIOD"){ var go = acctVote(ga, p.id); if(go) gv = go; }
-    if(gv) return '<i class="gp-vm gov ' + gv + '" title="Your governor voted ' + gv + '">' + gv.charAt(0).toUpperCase() + '</i>';
-    /* neither voted, CONFIRMED for both the wallet and its governor (if it follows one) */
-    if(p.vs && p.st !== "PROPOSAL_STATUS_DEPOSIT_PERIOD" && meNoVoteSure(p) && (!ga || acctNoVoteSure(ga, p)))
-      return '<i class="gp-vm none" title="' + (p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? "You have not voted yet" : "You did not vote") + '">-</i>';
-    return '';
+    if(gv) return '<i class="gp-vm gov ' + gv + '" title="Your governor voted ' + gv + ' for your stake">' + W[gv] + '</i>';
+    if(!mh || !mh.map) return '';                      /* still reading */
+    if(meNoVoteSure(p) && (!ga || acctNoVoteSure(ga, p)))
+      return '<i class="gp-vm none" title="' + (p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? "You have not voted yet" : "You did not vote") + '">Not voted</i>';
+    return '<i class="gp-vm na" title="Your vote on this proposal is outside the record we can read">N/A</i>';
   }
+
   /* your side of one proposal: your vote and your governor's, read or reading */
   function pside(p){
     var A = window.__ADDR; if(!A) return '';
@@ -2265,7 +2268,6 @@
     if(act === "greg"){ if(GOV_REG) govForm(); return; }
     if(act === "gvinact"){ GV.inopen = !GV.inopen; render(); return; }
     if(act === "gvalert"){ govAlerts(t.dataset.a); return; }
-    if(act === "gvcopy"){ var ad = t.dataset.a; if(ad && typeof copyText === "function") copyText(ad, function(){ t.classList.add("ok"); setTimeout(function(){ t.classList.remove("ok"); }, 1400); }); return; }
     if(act === "grclose"){ grClose(); return; }
     if(act === "grsend" && GOV_REG){
       var gv = grVals(), gd = {}, gme = myGovRec();
