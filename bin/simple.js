@@ -982,7 +982,7 @@
      outside the Dashboard */
   /* the Governance section only reads: following is done from the Dashboard's Governance tab */
   function govBtn(g, mine){
-    if(screen() !== "mygov") return '';
+    if(screen() !== "mygov" && screen() !== "govs") return '';      /* the Governors tab follows and stops too (2026-10-12) */
     if(!window.__ADDR || !window.__WALLET || mine === null || mine === undefined) return '';
     if(g.addr === govAddrOf(window.__ADDR)) return !GOV_REG ? '' : '<button class=sv-gbtn type=button data-act=greg title="Change what the chain shows about your governor">Edit</button>';
     if(g.addr === mine) return '<button class="sv-gbtn stop" type=button data-act=gstop title="Stop following this governor: your stake votes only when you vote">Stop</button>';
@@ -1096,16 +1096,22 @@
   }
   function govEmpty(t){ return '<div class=sv-upwait>' + t + '</div>'; }
   function drawGovs(){
+    /* one section (operator, 2026-10-12): the figures in its header bar as on Proposals, then every governor with its
+       Follow / Stop button; what was under Your governor lives here now - who you follow and, on dev, becoming one */
     loadGovs();
     var L = GV.list, act = L ? L.filter(function(g){ return g.active; }) : [], vp = 0, n = 0;
     (L || []).forEach(function(g){ vp += g.vp || 0; n += g.n || 0; });
-    var C = ["var(--sv-teal)", "var(--sv-violet)", "var(--sv-green)"], ci = 0, c = function(k, v, sub){ return gstat(k, v, sub, C[ci++ % 3]); };
-    put("sv-govcards", c("Governors", L ? String(L.length) : "-", L ? "Active " + act.length : "reading the chain\u2026") +
-      c("Voting power", L ? fmt(vp) : "-", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(2) + "% of bonded ATONE follows a governor" : "ATONE") +
-      c("Delegators", L ? String(n) : "-", "wallets that follow a governor"));
-    var h = '<div class=sv-ph><h3>Governors</h3><span class=sv-gkey>a delegator\'s vote goes with its governor unless it votes itself</span></div>';
+    var mine = myGov(), me = window.__ADDR ? myGovRec() : null, g = L && mine ? L.filter(function(x){ return x.addr === mine; })[0] : null;
+    var st = function(k, v, sub){ return '<span class=gp-k><em>' + k + '</em><b>' + v + '</b><s>' + sub + '</s></span>'; };
+    var your = !window.__ADDR ? ["-", "connect a wallet"] : (mine === null || mine === undefined) ? ["\u2026", "reading"] : me ? [esc(me.m), "you govern"]
+      : mine ? [esc(g ? g.m : mine.slice(0, 12) + "\u2026"), g && !g.active ? "inactive, its votes do not count" : "votes for you unless you vote"] : ["None", "your stake votes only when you do"];
+    var reg = GOV_REG && L && window.__ADDR && window.__WALLET ? '<button class="sv-gbtn gr-open gv-reg" type=button data-act=greg>' + (me ? 'Edit your governor' : 'Become a governor') + '</button>' : '';
+    var h = '<div class="sv-ph gp-ph gv-ph">' +
+      st("Governors", L ? String(L.length) : "-", L ? act.length + " active" : "reading the chain\u2026") +
+      st("Following", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(1) + "%" : "-", L ? n + " wallets, " + fmt(vp) + " ATONE" : "") +
+      st("Your governor", your[0], your[1]) + reg + '</div>';
     put("sv-govlist", h + (GV.err && !L ? govEmpty("Could not read the governors") : !L ? govEmpty("Reading the governors\u2026")
-      : !L.length ? govEmpty("No governors on AtomOne yet") : govRows(L, myGov())));
+      : !L.length ? '<div class=gv-none><p class=gv-say>No governors on AtomOne yet. A governor votes for every staker who follows it; a staker who votes still counts.</p>' + govNone() + '</div>' : govRows(L, mine)));
   }
   /* ── Govern: the Dashboard's governance, built as its other tabs - a strip (the Govern card and five figures), then
      Your governor under the card, the governors in the middle, what is being voted on now at the right ── */

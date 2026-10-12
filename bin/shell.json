@@ -54,8 +54,7 @@
         {"id": "constitution", "label": "Constitution", "route": "constitution", "tab": "dele", "ui": "simple", "screen": "cons", "panel": "sv-cons", "accent": "#2bc8bd"},
         {"id": "core-daos", "label": "Core DAOs", "route": "core-daos",
          "tab": "dele", "ui": "simple", "screen": "daos", "panel": "sv-daos", "accent": "#2bc8bd"},
-        {"id": "governors", "label": "Governors", "route": "governors", "tab": "dele", "ui": "simple", "screen": "govs", "panel": "sv-govs", "accent": "#2bc8bd"},
-        {"id": "mine", "label": "Your governor", "route": "yours", "tab": "dele", "ui": "simple", "screen": "mygov", "panel": "sv-mygov", "accent": "#2bc8bd"}
+        {"id": "governors", "label": "Governors", "route": "governors", "tab": "dele", "ui": "simple", "screen": "govs", "panel": "sv-govs", "accent": "#2bc8bd"}
       ]
     },
     {

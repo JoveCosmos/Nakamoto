@@ -4775,12 +4775,25 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 :is(#sv-proplist,#sv-daop,#sv-govlist)>.sv-ph .sv-gkey{color:rgba(255,255,255,.75);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #sv-proplist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#1d4f8f,#173257 58%,#141633)}
 /* the proposals bar carries the three figures (2026-10-11): label, value, one short line each */
-#sv-proplist>.sv-ph.gp-ph{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 16px;padding:6px 15px 7px;flex:0 0 auto}   /* never squeezed by the panel's column flex */
+:is(#sv-proplist,#sv-govlist)>.sv-ph.gp-ph{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 16px;padding:6px 15px 7px;flex:0 0 auto}   /* never squeezed by the panel's column flex */
+#sv-govlist>.sv-ph.gv-ph{grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:center}
+#sv-govlist>.sv-ph .gv-reg{white-space:nowrap;color:#fff;border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.12)}
+.gv-none{display:flex;flex-direction:column;gap:12px;padding:14px 2px}
+#sv-govs .gv-rules3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-width:720px}
+#sv-govs .gv-rules3>div{display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 8px;border:1px solid var(--wbd2);border-radius:10px;text-align:center;background:linear-gradient(0deg,rgba(213,90,180,.1),rgba(255,255,255,.012) 70%)}
+#sv-govs .gv-rules3 em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ws)}
+#sv-govs .gv-rules3 b{font-size:22px;font-weight:800;color:var(--wt)}
+#sv-govs .gv-rules3 small{font-size:11px;color:var(--ws)}
+@media(max-width:520px){#sv-govs .gv-rules3{grid-template-columns:minmax(0,1fr)}}
+/* Proposals and Governors are one section each, like the Redelegate list: the screen's own card goes, the banded
+   panel is the frame (operator, 2026-10-12: "section inside section") */
+#sv-props.sv-screen,#sv-govs.sv-screen{padding:0;background:transparent;border:0;box-shadow:none}
+#sv-props>.sv-panel,#sv-govs>.sv-panel{flex:1 1 auto;min-height:0}
 .gp-k{display:flex;flex-direction:column;min-width:0;line-height:1.25}
 .gp-k em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.72)}
 .gp-k b{font-size:15px;color:#fff;white-space:nowrap}
 .gp-k s{text-decoration:none;font-size:11px;color:rgba(255,255,255,.78);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-@media(max-width:900px){#sv-proplist>.sv-ph.gp-ph{gap:0 10px}.gp-k b{font-size:14px}.gp-k s{font-size:10.5px}}
+@media(max-width:900px){:is(#sv-proplist,#sv-govlist)>.sv-ph.gp-ph{gap:0 10px}#sv-govlist>.sv-ph.gv-ph{grid-template-columns:repeat(3,minmax(0,1fr))}#sv-govlist>.sv-ph .gv-reg{grid-column:1/-1;justify-self:start;margin-top:6px}.gp-k b{font-size:14px}.gp-k s{font-size:10.5px}}
 #sv-daop>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#5f6216,#393b15 58%,#19191f)}
 #sv-govlist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#7d2e6e,#461f45 58%,#1a1230)}
 /* proposals: the id a small key, the status a clear tag, the tally a firmer bar, Yes the figure */
@@ -4904,8 +4917,6 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin-right:-8px;p
 /* ══ Governors ══ */
 #sv-govs,#sv-mygov{justify-content:flex-start;gap:12px}
 #sv-govs>*,#sv-mygov>*,#sv-govs>*:not(:first-child),#sv-mygov>*:not(:first-child){margin-top:0}
-#sv-govcards{grid-template-columns:repeat(3,minmax(0,1fr))}
-#sv-govcards .sv-card{--tc:var(--sv-teal)}
 #sv-govlist,#sv-mygovlist{flex:1 1 0;min-height:0;--tc:var(--sv-teal)}
 #sv-mygovp{--tc:var(--sv-violet)}
 /* Proposals and Core DAOs sit in the same frame: cards on top, the panel under them taking the rest
@@ -6791,7 +6802,6 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
         <div class=sv-panel id=sv-daop><div class=sv-ph><h3>Core DAOs</h3></div><div class=sv-upwait>Reading the chain…</div></div>
       </section>
       <section class=sv-screen id=sv-govs data-sc=govs aria-label=Governors>
-        <div class="sv-cards gv-strip" id=sv-govcards></div>
         <div class=sv-panel id=sv-govlist><div class=sv-ph><h3>Governors</h3></div><div class=sv-upwait>Reading the governors…</div></div>
       </section>
       <section class=sv-screen id=sv-mygov data-sc=mygov aria-label="Your governor">
