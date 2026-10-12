@@ -4815,8 +4815,14 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gpx-dh{display:flex;align-items:center;gap:10px;min-width:0}
 .gpx-dh b{flex:1 1 auto;min-width:0;font-size:16px;color:var(--wt)}
 .gpx-ds{font-size:11.5px;color:var(--ws)}
-.gpx-dh .gpx-you{min-height:0;flex:none;gap:6px;flex-wrap:nowrap}
-.gpx-dh .gpx-you .gp-sv{padding:4px 9px}
+/* your side in the detail header (operator, 2026-10-12): small, stacked in the right corner, one above the other, so
+   the title keeps its width; each a pill with its label left and the vote right, both pills one width */
+.gpx-dh{align-items:flex-start}
+.gpx-dh .gpx-you{min-height:0;flex:none;display:flex;flex-direction:column;align-items:stretch;gap:4px;max-width:44%}
+.gpx-dh .gpx-you .gp-sv{display:flex;justify-content:space-between;align-items:baseline;gap:10px;min-width:118px;padding:2px 9px;border-radius:999px}
+.gpx-dh .gpx-you .gp-sv em{font-size:7.5px;letter-spacing:.1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.gpx-dh .gpx-you .gp-sv b{font-size:11.5px;white-space:nowrap}
+.gpx-dh b{white-space:normal;line-height:1.25}
 .gpx-det .gp-sum{flex:1 1 auto;max-height:none;min-height:60px}
 }
 .gd-list{display:flex;flex-direction:column;gap:12px}
@@ -5061,9 +5067,13 @@ color:#6fe3da;font:600 11.5px var(--wsans);cursor:pointer;white-space:nowrap}
 /* a proposal's vote row (2026-10-11): the three options as the governor buttons, the cast one filled */
 .gp-vote{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.03)}
 .gp-vote em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
-.gp-vb{display:flex;gap:6px}
-.sv-gbtn.vote.on{background:#2bc8bd;border-color:#2bc8bd;color:#071a18}
-.sv-gbtn.vote.on:hover{color:#071a18}
+/* the vote buttons say what they mean (operator, 2026-10-12: "not clear in day mode"): Yes green, Abstain grey, No red,
+   outlined until chosen, the chosen one filled; larger than a row button, one width each */
+.gp-vb{display:flex;gap:8px}
+.sv-gbtn.vote{--vc:var(--sv-teal);min-width:84px;height:32px;font-size:13px;font-weight:700;border-color:var(--vc);color:var(--vc);background:transparent}
+.sv-gbtn.vote[data-opt="1"]{--vc:var(--sv-green)}.sv-gbtn.vote[data-opt="2"]{--vc:var(--ws)}.sv-gbtn.vote[data-opt="3"]{--vc:var(--wburn)}
+.sv-gbtn.vote:hover{background:color-mix(in srgb,var(--vc) 12%,transparent);color:var(--vc)}
+.sv-gbtn.vote.on,.sv-gbtn.vote.on:hover{background:var(--vc);border-color:var(--vc);color:#071a18}
 .sv-gbtn.busy{opacity:.6;cursor:progress}
 .gp-vn{font-size:12px;color:var(--ws)}
 .sv-gbtn.busy{opacity:.55;cursor:progress}

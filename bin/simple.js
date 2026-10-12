@@ -1375,9 +1375,9 @@
     var gv = gh && gh.map ? gh.map[p.id] : null;
     var cap = function(v){ return v.charAt(0).toUpperCase() + v.slice(1); };
     var part0 = (mh && mh.part) || (gh && gh.part);
-    var chip = function(cls, who, v, sub){ return '<span class="gp-sv ' + cls + (v ? ' ' + v : '') + '"><em>' + who + '</em><b>' + (v ? cap(v) : part0 ? "Not on record" : "No vote") + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</span>'; };
-    var h = chip("me", "You", mv, !mv && gv ? "" : "");
-    if(mine) h += chip("gov", "Governor " + esc(g ? g.m : mine.slice(0, 12) + "\u2026"), gv, !mv && gv ? "counts for your stake" : "");
+    var chip = function(cls, who, v){ return '<span class="gp-sv ' + cls + (v ? ' ' + v : '') + '"><em>' + who + '</em><b>' + (v ? cap(v) : part0 ? "N/A" : "No vote") + '</b></span>'; };
+    var h = chip("me", "You", mv);
+    if(mine) h += chip("gov", "Governor " + esc(g ? g.m : mine.slice(0, 12) + "\u2026"), gv);
     var part = (mh && mh.part) || (gh && gh.part);
     return '<div class=gp-you>' + h + '</div>';
   }

@@ -911,8 +911,8 @@
   html[data-theme=light]:not([data-mono]) .sv-gbtn.stop{border-color:var(--danger-bar);background:transparent;color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .sv-gbtn.stop:hover{border-color:var(--danger-bar);color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .gp-vote{border-color:var(--surface-2);background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .sv-gbtn.vote.on{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
-  html[data-theme=light]:not([data-mono]) .sv-gbtn.vote.on:hover{color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .sv-gbtn.vote{background:transparent}
+  html[data-theme=light]:not([data-mono]) .sv-gbtn.vote.on,html[data-theme=light]:not([data-mono]) .sv-gbtn.vote.on:hover{color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .sv-gbtn:focus-visible{outline-color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-glist .sv-lgo .lg{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .sv-gst em{border-color:currentColor}
@@ -1337,6 +1337,13 @@
   html[data-theme=light]:not([data-mono]) .act-tile{background:rgba(60,50,20,.035)}
   html[data-theme=light]:not([data-mono]) .gvt-tag{background:var(--accent);color:#fff}
   html[data-theme=light]:not([data-mono]) .gvc-al{border-color:var(--accent);color:var(--accent)}
+  /* the vote box on paper: a clear white panel, and buttons in deep, readable colours of their meaning */
+  html[data-theme=light]:not([data-mono]) .gp-vote{background:#fff;border-color:rgba(15,122,114,.35)}
+  html[data-theme=light]:not([data-mono]) .sv-gbtn.vote{background:#fff}
+  html[data-theme=light]:not([data-mono]) .sv-gbtn.vote[data-opt="1"]{--vc:#1d7a43}
+  html[data-theme=light]:not([data-mono]) .sv-gbtn.vote[data-opt="2"]{--vc:#5d5a74}
+  html[data-theme=light]:not([data-mono]) .sv-gbtn.vote[data-opt="3"]{--vc:#b23a1e}
+  html[data-theme=light]:not([data-mono]) .sv-gbtn.vote.on,html[data-theme=light]:not([data-mono]) .sv-gbtn.vote.on:hover{background:var(--vc);color:#fff}
   html[data-theme=light]:not([data-mono]) .gvc-al:hover{background:rgba(15,122,114,.08)}
   html[data-theme=light]:not([data-mono]) .gvt-tag.you{background:#b86a00;color:#fff}
   html[data-theme=light]:not([data-mono]) .gvt-r:hover td,html[data-theme=light]:not([data-mono]) .gvt-r:focus-visible td{background:rgba(44,41,64,.04)}
