@@ -1056,7 +1056,7 @@
     /* the Governors table has no button column (operator, 2026-10-12): following is done from a governor's card */
     if(screen() !== "govs") return '';
     if(!window.__ADDR || !window.__WALLET || mine === null || mine === undefined) return '';
-    if(g.addr === govAddrOf(window.__ADDR)) return !GOV_REG ? '' : '<button class=sv-gbtn type=button data-act=greg title="Change what the chain shows about your governor">Edit</button>';
+    if(g.addr === govAddrOf(window.__ADDR)) return '<button class=sv-gbtn type=button data-act=greg title="Change what the chain shows about your governor">Edit</button>';
     /* an ACTIVE governor cannot follow another - the chain refuses the delegation - so its wallet gets no
        Follow or Switch anywhere (its stake already votes through its own governor) */
     var meg = myGovRec(); if(meg && meg.active) return '';
@@ -1077,10 +1077,9 @@
   }
   /* ── becoming a governor. A governor is the wallet's own key under the "atonegov" prefix; the chain wants
      10,000 ATONE staked on ACTIVE validators (its min_governor_self_delegation) and caps each field in bytes.
-     Registering makes the wallet follow itself. Signed in the wallet, broadcast through our node. ── */
-  /* registering and editing a governor: switched off 2026-09-28; held back from production 2026-10-02 but shown on dev
-     (operator: "Register governor should be visible in dev"); render stamps data-stage=dev on the dev tree only */
-  var GOV_REG = root.getAttribute("data-stage") === "dev";
+     Registering makes the wallet follow itself. Signed in the wallet, broadcast through our node. Released to production
+     2026-10-13 (operator: "i want every feature live"), after a testnet proof: the form's MsgCreateGovernor decoded
+     right and was refused only for stake, and Create and Edit amino signatures passed the chain's own verifier ── */
   var B32 = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
   function b32poly(v){ var G = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3], c = 1;
     v.forEach(function(x){ var b = c >>> 25; c = ((c & 0x1ffffff) << 5) ^ x; for(var i = 0; i < 5; i++) if((b >>> i) & 1) c ^= G[i]; }); return c; }
@@ -1253,7 +1252,7 @@
       : mine ? [esc(g ? g.m : mine.slice(0, 12) + "\u2026"), g && !g.active ? "inactive, its votes do not count" : "votes for you unless you vote"] : ["None", "your stake votes only when you do"];
     /* the button stands from the first paint (idle until the list is read), so the header never grows a row */
     /* Become a governor sits in the Governors header (operator, 2026-10-12: the Dashboard's Govern is gone) */
-    var reg = !GOV_REG ? '' : '<button class="sv-gbtn gr-open gv-reg" type=button data-act=greg' + (L && window.__ADDR && window.__WALLET ? '' : ' disabled title="Connect a wallet to register"') + '>' + (me ? 'Edit your governor' : 'Become a governor') + '</button>';
+    var reg = '<button class="sv-gbtn gr-open gv-reg" type=button data-act=greg' + (L && window.__ADDR && window.__WALLET ? '' : ' disabled title="Connect a wallet to register"') + '>' + (me ? 'Edit your governor' : 'Become a governor') + '</button>';
     var h = '<div class="sv-ph gp-ph gv-ph">' +
       st("Governors", L ? String(L.length) : "-", L ? act.length + " active" : "reading the chain\u2026") +
       st("Following", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(1) + "%" : "-", L ? n + " wallets, " + fmt(vp) + " ATONE" : "") +
@@ -1830,9 +1829,9 @@
       row("Movable Stake", pos ? fmt(movable(pos)) : '-', "ATONE") +
       row("Available", bal ? fmt(bal.uatone) : '-', "ATONE") +
       row("Rewards", window.__REW != null ? fmt(window.__REW) : '-', "ATONE") +
-      /* Mint where the unit would be (operator, 2026-10-04): ATONE burned for PHOTON, the Mint PHOTON card. Dev only
-         until the operator releases it (held back from the 2026-10-04 publish), as Register governor is */
-      row("PHOTON", bal ? fmt(bal.uphoton) : '-', a && bal && root.getAttribute("data-stage") === "dev" ? '<button type=button class=you-mint data-act=mint title="Mint PHOTON from ATONE">Mint</button>' : "") + '</div>';
+      /* Mint where the unit would be (operator, 2026-10-04): ATONE burned for PHOTON, the Mint PHOTON card. Held back
+         from production until 2026-10-13, released with Register governor */
+      row("PHOTON", bal ? fmt(bal.uphoton) : '-', a && bal ? '<button type=button class=you-mint data-act=mint title="Mint PHOTON from ATONE">Mint</button>' : "") + '</div>';
     var rp = at && at.report, adm = rp && rp.admin, st = adm && adm.state;
     var asub = !auto ? "keeps your stake at the best APR" : "checks every 12 hours";
     /* Pro on a wide screen (operator, 2026-09-30): the wallet column holds your delegations and the action menu
@@ -2265,11 +2264,11 @@
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
     if(act === "vote"){ ev.stopPropagation(); voteSend(t, +t.dataset.pid, +t.dataset.opt); return; }
     if(act === "gfollow"){ govSend(t, { type: "atomone/v1/MsgDelegateGovernor", value: { delegator_address: window.__ADDR, governor_address: t.dataset.g } }); return; }
-    if(act === "greg"){ if(GOV_REG) govForm(); return; }
+    if(act === "greg"){ govForm(); return; }
     if(act === "gvinact"){ GV.inopen = !GV.inopen; render(); return; }
     if(act === "gvalert"){ govAlerts(t.dataset.a); return; }
     if(act === "grclose"){ grClose(); return; }
-    if(act === "grsend" && GOV_REG){
+    if(act === "grsend"){
       var gv = grVals(), gd = {}, gme = myGovRec();
       Object.keys(gv).forEach(function(k){ if(gv[k]) gd[k] = gv[k]; });
       govSend(t, { type: gme ? "atomone/v1/MsgEditGovernor" : "atomone/v1/MsgCreateGovernor", value: { address: window.__ADDR, description: gd } }, grClose);

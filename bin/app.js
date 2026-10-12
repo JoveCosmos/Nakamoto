@@ -2779,7 +2779,7 @@ rememberGridH();
     mtFeeSoon(E("mtfee"), ok);
   }
   window.__mint = function(){
-    if(!mtpop || !window.__ADDR || document.documentElement.getAttribute("data-stage") !== "dev") return;   /* dev only for now */
+    if(!mtpop || !window.__ADDR) return;
     var a = E("mtamt"); if(a) a.value = "";
     var go = E("mtsign"); if(go){ go.disabled = true; go.textContent = "Mint"; }
     MT.rate = 0; mtState(); POP.open(mtpop); if(a) a.focus();
