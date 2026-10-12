@@ -99,6 +99,20 @@ position:relative;top:.06em}
    chart can stand in for the grid without the page jumping */
 .grid{display:grid;grid-template-columns:repeat(20,1fr);gap:4px}
 #cwrap{flex:none;width:100%}
+/* Bars (operator, 2026-10-12): every validator one bar of its APR, largest on the left, in the map's own box. Each
+   bar is a full-height column, so the whole column is the tap target and a thin bar on a phone still opens its card */
+#bwrap{flex:none;width:100%}
+.vbars{display:flex;align-items:stretch;gap:3px;height:100%;padding-top:4px;box-sizing:border-box}
+.vbar{flex:1 1 0;min-width:0;position:relative;cursor:pointer;border-radius:3px}
+.vbar::after{content:"";position:absolute;left:0;right:0;bottom:0;height:var(--h);border-radius:3px 3px 1px 1px;background:#3a3958;
+transition:filter .16s,box-shadow .16s}
+.vbar.big::after{background:#5a5878}
+.vbar.hot::after{background:#2bc8bd}
+.vbar.halt::after{box-shadow:0 0 0 1.5px var(--burn),0 0 10px 1px #ff4d1f66}
+.vbar:hover,.vbar:focus-visible{outline:0;background:#ffffff0d}
+.vbar:hover::after,.vbar:focus-visible::after{filter:brightness(1.35);box-shadow:0 0 0 1.5px #fff8,0 0 12px #ffb02e66}
+@media(max-width:620px){.vbars{gap:1px}.vbar,.vbar::after{border-radius:1.5px}}
+@media(prefers-reduced-motion:reduce){.vbar::after{transition:none}}
 #foldchart{display:block;max-height:none;margin:0}
 /* The grid is built by script, so before it runs the section has no height and
    the panels below it jump up the page, then jump back. Reserve the space the
@@ -6545,9 +6559,11 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
         <button class=mbtn data-m=stake aria-pressed=false>Stake</button>
         <button class=mbtn data-m=rank aria-pressed=false>Rank</button>
         <button class=mbtn data-m=logo aria-pressed=false>Logo</button>
+        <button class=mbtn data-m=bars aria-pressed=false>Bars</button>
         <button class=mbtn data-m=graph aria-pressed=false>Graph</button>
       </div></div>
     <div id=gwrap><div class=grid id=g2></div></div>
+    <div id=bwrap style="display:none"><div class=vbars id=vbars role=group aria-label="APR of every validator, largest first"></div></div>
     <div id=cwrap style="display:none"><svg id=foldchart viewBox="0 0 900 232" role=img
       aria-label="Yield against stake, every curve crossing at the mean"></svg></div>
     <div class=aprbar>

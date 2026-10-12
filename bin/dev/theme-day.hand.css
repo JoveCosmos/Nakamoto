@@ -184,11 +184,22 @@
   html[data-theme=light]:not([data-mono]) :is(#trend,#trendbig) text[fill="#a5a3c4"]{fill:#5d5a74}
   /* the Bonus page's Graph draws with the same night attributes: its validator dots and the two end
      figures are cream, which vanished on ivory */
-  html[data-theme=light]:not([data-mono]) #foldchart circle[fill="#fff8dc"]{fill:#2c2940;fill-opacity:.4}
+  html[data-theme=light]:not([data-mono]) #foldchart circle[fill="#fff8dc"]{fill:#2c2940;fill-opacity:.62}
+  html[data-theme=light]:not([data-mono]) #foldchart path[stroke="#ffb02e"]{stroke:#c47a00}
+  html[data-theme=light]:not([data-mono]) #foldchart stop[stop-color="#ffb02e"]{stop-color:#e0900f}
+  html[data-theme=light]:not([data-mono]) #foldchart stop[offset="0"]{stop-opacity:.42}
+  html[data-theme=light]:not([data-mono]) #foldchart stop[offset="1"]{stop-opacity:.06}
+  html[data-theme=light]:not([data-mono]) #foldchart text[fill="#6f6d94"]{fill:#5d5a74}
   html[data-theme=light]:not([data-mono]) #foldchart circle[stroke="#06060c"]{stroke:#fbf9f3}
   html[data-theme=light]:not([data-mono]) #foldchart text[fill="#fff8dc"]{fill:#2c2940}
-  html[data-theme=light]:not([data-mono]) #foldchart line[stroke="#232342"]{stroke:#e2ddd0}
+  html[data-theme=light]:not([data-mono]) #foldchart line[stroke="#232342"]{stroke:#d3ccbd}
   html[data-theme=light]:not([data-mono]) #foldchart text[fill="#a5a3c4"]{fill:#5d5a74}
+  /* Bars on paper: the set in two warm greys, the smallest fifth in the accent */
+  html[data-theme=light]:not([data-mono]) .vbar::after{background:#d9d3c6}
+  html[data-theme=light]:not([data-mono]) .vbar.big::after{background:#b3ada0}
+  html[data-theme=light]:not([data-mono]) .vbar.hot::after{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .vbar:hover,html[data-theme=light]:not([data-mono]) .vbar:focus-visible{background:rgba(44,41,64,.06)}
+  html[data-theme=light]:not([data-mono]) .vbar:hover::after,html[data-theme=light]:not([data-mono]) .vbar:focus-visible::after{filter:brightness(.85);box-shadow:0 0 0 1.5px var(--accent)}
 
   /* the wallet card keeps its night face in day: the strip's one hard colour */
   html[data-theme=light]:not([data-mono]) .sd-idw{color:#fff;

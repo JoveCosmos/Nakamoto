@@ -422,11 +422,11 @@ function fields(e){
      anyway is what made the Graph button feel slow - a hundred cells parsed on
      every switch for something nobody can see. The APR band below it is still
      on screen, so that part of this function still has to run. */
-  if(MODE === "graph"){
+  if(MODE === "graph" || MODE === "bars"){
     E("aprlo").textContent = (lo*100).toFixed(0) + "%";
     E("aprhi").textContent = (hi*100).toFixed(0) + "%";
     E("g2n").textContent = sp < 1e-9 ? "flat" : (hi/lo).toFixed(1) + "\u00d7";
-    simple(e);
+    if(MODE === "graph") simple(e); else bars(ys);
     return;
   }
   E("g2").classList.toggle("flat", !heat);
@@ -469,10 +469,13 @@ function fields(e){
     ax.classList.add("hov");
   }
   function hide(){ if(base !== null){ ax.innerHTML = base; base = null; } ax.classList.remove("hov"); }
-  g.addEventListener("mouseover", function(ev){ var c = ev.target.closest(".cell"); if(c) show(c); });
-  g.addEventListener("mouseleave", hide);
-  g.addEventListener("focusin", function(ev){ var c = ev.target.closest(".cell"); if(c) show(c); });
-  g.addEventListener("focusout", hide);
+  [g, E("vbars")].forEach(function(g){
+    if(!g) return;
+    g.addEventListener("mouseover", function(ev){ var c = ev.target.closest(".cell,.vbar"); if(c) show(c); });
+    g.addEventListener("mouseleave", hide);
+    g.addEventListener("focusin", function(ev){ var c = ev.target.closest(".cell,.vbar"); if(c) show(c); });
+    g.addEventListener("focusout", hide);
+  });
   /* a redraw replaces the cells and the band text; forget the old base */
   window.addEventListener("thermo:redraw", function(){ base = null; ax.classList.remove("hov"); });
 })();
@@ -485,17 +488,19 @@ Array.prototype.forEach.call(document.querySelectorAll(".mbtn"), function(b){
     Array.prototype.forEach.call(document.querySelectorAll(".mbtn"), function(o){
       o.setAttribute("aria-pressed", o === b ? "true" : "false");
     });
-    var g = E("gwrap"), c = E("cwrap");
-    if(g && c){
-      var graph = MODE === "graph";
+    var g = E("gwrap"), c = E("cwrap"), bw = E("bwrap");
+    if(g && c && bw){
+      var graph = MODE === "graph", bar = MODE === "bars";
       /* measure BEFORE hiding: a display:none element reports zero height, and
          the chart needs that number to occupy the same space */
-      if(graph) rememberGridH();
-      g.style.display = graph ? "none" : "";
+      if(graph || bar) rememberGridH();
+      g.style.display = graph || bar ? "none" : "";
       c.style.display = graph ? "" : "none";
+      bw.style.display = bar ? "" : "none";
       /* hand the chart the grid's height as a hard number - flex will not give
          it back on its own, and a short chart drags the whole pane up */
       c.style.height = graph && gridH ? gridH + "px" : "";   /* the box, not the svg */
+      bw.style.height = bar && gridH ? gridH + "px" : "";
     }
     var ev = +E("eta").value / 100;
     fields(ev);
@@ -561,6 +566,22 @@ var gridH = 0;
 function rememberGridH(){
   var g = E("gwrap");
   if(g && g.offsetHeight) gridH = g.offsetHeight;
+}
+/* Bars: one bar per validator, in the map's order (largest first) and on the map's percentile scale, so one outlier
+   tops out instead of flattening the rest; the smallest fifth, where the bonus pays most, stands out. A bar opens
+   its validator's card as a map box does */
+function bars(ys){
+  var el = E("vbars"); if(!el) return;
+  var n = ys.length, rp = ramp(ys), top = (rp[0] + rp[1]) * 1.04;
+  var base = Math.max(0, Math.floor(Math.min.apply(null, ys) * 100 / 5) * 5 - 5) / 100;
+  var hot = Math.max(1, Math.round(n * 0.2)), s = "";
+  for(var i = 0; i < n; i++){
+    var h = Math.max(.04, Math.min(1, (ys[i] - base) / ((top - base) || 1)));
+    s += '<div class="vbar' + (i >= n - hot ? ' hot' : i < hot ? ' big' : '') + (i < HALT ? ' halt' : '') + '" data-v="' + i +
+         '" data-apr="' + (ys[i] * 100).toFixed(1) + '" tabindex="0" role="button" style="--h:' + (h * 100).toFixed(1) + '%" title="' +
+         att('#' + (i + 1) + ' ' + VALS[i][0] + ' - ' + (ys[i] * 100).toFixed(1) + '% APR') + '"></div>';
+  }
+  if(el.__h !== s){ el.__h = s; el.innerHTML = s; }
 }
 function simple(e){
   var el = E("foldchart"); if(!el) return;
@@ -729,7 +750,8 @@ function placeKnob(){ place(sl, E("knob")); place(E("bondr"), E("knob2"));
                       place(E("concr"), E("knob3")); }
 centerKnobs();
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(centerKnobs);
-window.addEventListener("resize", function(){ placeKnob(); if(MODE!=="graph") rememberGridH(); if(MODE==="graph") simple(+sl.value/100); });
+window.addEventListener("resize", function(){ placeKnob(); if(MODE!=="graph" && MODE!=="bars") rememberGridH(); if(MODE==="graph") simple(+sl.value/100);
+  if(MODE==="bars"){ var bw = E("bwrap"); if(bw && gridH) bw.style.height = gridH + "px"; } });
 sl.value = Math.round(D.eta.now*100);
 bd.value = 0;   // 0 = follow the live ratio
 /* ── the live vector ──────────────────────────────────────────────────────────
@@ -1262,12 +1284,12 @@ rememberGridH();
 
   vpop.__onclose = pingStop;                       /* however it closes, the poll stops */
   document.addEventListener("click", function(ev){
-    var c = ev.target.closest ? ev.target.closest(".cell, tr.vrow") : null;
+    var c = ev.target.closest ? ev.target.closest(".cell, .vbar, tr.vrow") : null;
     if(c && c.dataset.v !== undefined) vshow(+c.dataset.v); });
   document.addEventListener("keydown", function(ev){
     if(ev.key!=="Enter" && ev.key!==" ") return;
     var c = document.activeElement;
-    if(c && c.classList && c.classList.contains("cell")){ ev.preventDefault(); vshow(+c.dataset.v); } });
+    if(c && c.classList && (c.classList.contains("cell") || c.classList.contains("vbar"))){ ev.preventDefault(); vshow(+c.dataset.v); } });
 
   E("qbtn").addEventListener("click", function(){ POP.open(qpop); kpLive(true); });
   var spop = E("spop");
