@@ -843,43 +843,6 @@ window.__ETA = function(){ return D.eta.now; };      /* the live coefficient, fo
 window.__N = function(){ return N; };
 window.__R = function(){ return R; };
 window.__VALS = function(){ return VALS; };
-/* How it works (operator, 2026-10-12): the Bonus pane's second view. Opening fills it from the set as it stands; Back,
-   Esc or any Nakamoto tab brings the map back, which stays the default */
-(function(){
-  var R0 = document.documentElement;
-  function rate(v){ return window.__rateAfter ? window.__rateAfter(v[1], v[2], 0) : 0; }
-  function pc(x){ return (x * 100).toFixed(1) + "%"; }
-  function draw(){
-    var V = VALS.slice().sort(function(a, b){ return b[1] - a[1]; }), n = V.length; if(!n) return;
-    var ys = V.map(rate), lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys);
-    var put = function(id, t){ var e = E(id); if(e) e.textContent = t; };
-    put("hiweta", Math.round(((D.eta || {}).now || 0) * 100) + "%"); put("hiwn", String(n));
-    put("hiwhi", pc(ys[n - 1])); put("hiwlo", pc(ys[0]));
-    var mid = Math.round(n / 2);
-    put("hiwr1", pc(ys[0])); put("hiwmk", "Rank " + mid); put("hiwr50", pc(ys[mid - 1])); put("hiwlk", "Rank " + n); put("hiwr100", pc(ys[n - 1]));
-    var W = 600, H = 300, base = Math.max(0, Math.floor(lo * 100 / 5) * 5 - 5) / 100, top = hi * 1.04, bw = W / n, s = "";
-    var hot = Math.max(1, Math.round(n * 0.2));                       /* the smallest fifth, where the bonus pays most */
-    for(var i = 0; i < n; i++){
-      var h = (ys[i] - base) / (top - base) * H, x = i * bw;
-      s += '<rect x="' + (x + bw * 0.18).toFixed(2) + '" y="' + (H - h).toFixed(1) + '" width="' + (bw * 0.64).toFixed(2) + '" height="' + h.toFixed(1) +
-        '" rx="1" fill="' + (i >= n - hot ? "#2bc8bd" : i < Math.round(n * 0.2) ? "#5a5878" : "#3a3958") + '"><title>#' + (i + 1) + " " + V[i][0] + ": " + pc(ys[i]) + '</title></rect>';
-    }
-    var c = E("hiwchart"); if(c) c.innerHTML = s;
-    var ax = E("hiwax"); if(ax) ax.innerHTML = [1, Math.round(n * 0.2), Math.round(n * 0.4), Math.round(n * 0.6), Math.round(n * 0.8), n]
-      .map(function(k){ return "<span>#" + k + "</span>"; }).join("");
-  }
-  function open(){ draw(); R0.setAttribute("data-hiw", ""); var b = E("hiwback"); if(b) b.focus(); }
-  function close(){ if(!R0.hasAttribute("data-hiw")) return; R0.removeAttribute("data-hiw"); }
-  ["hiwgo", "hiwgo2"].forEach(function(id){ var b = E(id); if(b) b.addEventListener("click", open); });
-  var bk = E("hiwback"); if(bk) bk.addEventListener("click", function(){ close(); var g = E("hiwgo"); if(g && g.offsetParent) g.focus(); });
-  document.addEventListener("keydown", function(ev){ if(ev.key === "Escape" && R0.hasAttribute("data-hiw") && !document.querySelector(".pop.on")) close(); });
-  /* a Nakamoto tab (Bonus, Trend, Picks) or any way into them restores the default view */
-  document.addEventListener("click", function(ev){
-    var t = ev.target.closest ? ev.target.closest('[id^="l2-staking-"],[data-route^="staking"],[data-route="bonus"]') : null;
-    if(t) close();
-  }, true);
-  window.__hiw = { open: open, close: close };
-})();
 window.__D = D;
 window.__ratio = function(){ return ratioOf(VALS.map(function(v){ return v[1]; })); };   /* largest third against smallest */
 window.__thresh = function(){ return +D.thresh || 3; };                                        /* the page's own vector: set, eta, trend, detail */

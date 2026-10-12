@@ -146,6 +146,7 @@
      track gets a hairline so its cream end does not melt into the card */
   html[data-theme=light]:not([data-mono]) .trackwrap::before{background:linear-gradient(180deg,rgba(255,255,255,.22) 0,rgba(255,255,255,.06) 45%,rgba(0,0,0,0) 55%,rgba(0,0,0,.10) 100%)}
   html[data-theme=light]:not([data-mono]) input[type=range].gradrange:not(#z){box-shadow:inset 0 0 0 1px rgba(23,25,28,.16)}
+<<<<<<< HEAD
   /* the frameless Proposals and Governors screens stay frameless on paper */
   html[data-theme=light]:not([data-mono]) :is(#sv-props,#sv-govs).sv-screen:not(#z){background:transparent;border:0;box-shadow:none}
   html[data-theme=light]:not([data-mono]) #sv-govlist>.sv-ph .gv-reg{color:#fff;border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.12)}
@@ -168,6 +169,8 @@
   html[data-theme=light]:not([data-mono]) #hiwchart rect[fill="#3a3958"]{fill:#d9d3c6}
   html[data-theme=light]:not([data-mono]) #hiwchart rect[fill="#5a5878"]{fill:#b3ada0}
   html[data-theme=light]:not([data-mono]) .hiwgo{color:var(--warn)}
+=======
+>>>>>>> parent of d360f12 (Nakamoto Bonus: 'How it works' above 'powered by' (in the flow on phones) switches the map and range bars to a How it works view: three steps with the live bonus share, set size and the smallest and largest APR, and a live APR-by-rank chart of every validator with rank 1, middle and last; Back, Esc or any Nakamoto tab returns to the map, which stays the default. Both themes, phone; clip and phone audits clean)
   /* the proposals bar's three figures stay white on their blue band, as the band's own title does */
   html[data-theme=light]:not([data-mono]) :is(#sv-proplist,#sv-govlist)>.sv-ph.gp-ph .gp-k b{color:#fff}
   html[data-theme=light]:not([data-mono]) :is(#sv-proplist,#sv-govlist)>.sv-ph.gp-ph .gp-k em{color:rgba(255,255,255,.72)}
