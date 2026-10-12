@@ -1642,7 +1642,7 @@
       var x0 = inner[0] || {}; sub = ity === "MsgBeginRedelegate" ? esc(actName(x0.validator_src_address)) + " &rarr; " + (inner.length > 1 ? inner.length + " validators" : esc(actName(x0.validator_dst_address))) : esc(actName(x0.validator_address)) + (inner.length > 1 ? " and " + (inner.length - 1) + " more" : "");
       if(kind === "Restake"){ var st = ev("delegate", "delegator"); amt = st ? fmt(st) + " ATONE" : amt; } }
     else if(/WithdrawDelegatorReward/.test(ity)){ var w = ev("withdraw_rewards", "delegator"), nv = inner.filter(function(x){ return /WithdrawDelegatorReward/.test(x["@type"] || ""); }).length;
-      if(kind === "Restake"){ var sb = ev("delegate", "delegator"); amt = fmt(sb || w) + " ATONE"; sub = "rewards from " + nv + " validator" + (nv === 1 ? "" : "s") + ", staked back"; }
+      if(kind === "Restake"){ var sb = ev("delegate", "delegator"); amt = fmt(sb || w) + " ATONE"; sub = "from " + nv + " validator" + (nv === 1 ? "" : "s"); }
       else { amt = w ? "+" + fmt(w) + " ATONE" : ""; sub = "from " + nv + " validator" + (nv === 1 ? "" : "s"); } }
     else if(/MsgVote/.test(ity)){ sub = "proposal #" + (inner[0] || {}).proposal_id; amt = ACT_VOTE[(inner[0] || {}).option] || ""; }
     else if(ity === "MsgMintPhoton"){ amt = "\u2212" + actCoin((inner[0] || {}).amount); sub = "ATONE burned for PHOTON"; }
