@@ -1355,9 +1355,9 @@
       GP.sel = sel;
       var rows = L.map(function(p){
         var s = PST[p.st] || ["unknown", "d"], t = ptally(p.tally), pc = function(v){ return t.s ? (v / t.s * 100) : 0; };
-        return '<div class="gpx-r' + (p.id === sel ? ' sel' : '') + '" data-gp="' + p.id + '" tabindex=0 role=button aria-pressed=' + (p.id === sel) + ' title="' + esc(pwhen(p)) + '">' +
-          '<span class=gp-id>#' + p.id + '</span><b class=gpx-t>' + esc(p.title) + '</b>' + vmark(p) +
-          '<span class="gp-st ' + s[1] + '">' + s[0] + '</span>' +
+        return '<div class="gpx-r' + (p.id === sel ? ' sel' : '') + '" data-gp="' + p.id + '" tabindex=0 role=button aria-pressed=' + (p.id === sel) + ' title="' + esc(p.title) + ', ' + esc(pwhen(p)) + '">' +
+          '<span class=gp-id>#' + p.id + '</span>' +
+          '<span class="gp-st ' + s[1] + '">' + s[0] + '</span>' + vmark(p) +
           (t.s ? '<span class=gpx-sl><i class=y style="width:' + pc(t.y).toFixed(1) + '%"></i><i class=n style="width:' + pc(t.n).toFixed(1) + '%"></i><i class=a style="width:' + pc(t.a).toFixed(1) + '%"></i></span>' : '') +
           '</div>'; }).join("");
       var P0 = L.filter(function(p){ return p.id === sel; })[0];
@@ -1470,7 +1470,7 @@
 
   /* a proposal row opens and closes its details: a tap, or Enter / Space on it */
   function gpToggle(ev){
-    var r = ev.target.closest ? ev.target.closest(".gp-r") : null; if(!r) return;
+    var r = ev.target.closest ? ev.target.closest(".gp-r,.gpx-r") : null; if(!r) return;
     if(ev.type === "keydown"){ if(ev.key !== "Enter" && ev.key !== " ") return; ev.preventDefault(); }
     var id = +r.dataset.gp;
     if(r.classList.contains("gpx-r")){ if(GP.sel !== id){ GP.sel = id; drawProps(); } }

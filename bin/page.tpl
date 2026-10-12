@@ -4776,20 +4776,20 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
    mark on it, the whole tally a sliver on the row's floor - and the chosen proposal whole on the right: facts,
    your side, the text scrolling in its well, the vote on screen. Nothing ever grows the page */
 @media(min-width:1100px){
-.gpx-split{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:14px}
+.gpx-split{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:228px minmax(0,1fr);gap:16px}
 .gpx-list{min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;padding-right:4px;align-content:start}
-.gpx-r{position:relative;display:grid;grid-template-columns:44px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:10px 10px 13px 10px;border-bottom:1px solid var(--wbd);cursor:pointer}
+.gpx-r{position:relative;display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 10px 13px 10px;border-bottom:1px solid var(--wbd);cursor:pointer}
+.gpx-r .gp-st{justify-self:start}
 .gpx-r:focus-visible{outline:2px solid var(--sv-teal);outline-offset:-2px}
 .gpx-r:hover{background:rgba(255,255,255,.03)}
 .gpx-r.sel{background:rgba(43,200,189,.07);box-shadow:inset 3px 0 0 var(--sv-teal)}
 .gpx-r.sel .gp-id{background:var(--sv-teal);border-color:var(--sv-teal);color:#071a18}
-.gpx-t{min-width:0;font-size:12.5px;font-weight:600;color:var(--wt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gpx-r .gp-vm{margin:0}
 .gpx-sl{position:absolute;left:10px;right:10px;bottom:5px;height:3px;border-radius:2px;overflow:hidden;background:var(--wbd);display:flex}
 .gpx-sl i{display:block;height:100%}.gpx-sl i.y{background:var(--sv-green)}.gpx-sl i.n{background:var(--wburn)}.gpx-sl i.a{background:var(--wf)}
 .gpx-det{min-height:0;display:flex;flex-direction:column;gap:10px;padding:12px 14px;border:1px solid var(--wbd);border-radius:10px;background:rgba(255,255,255,.02);overflow:hidden}
 .gpx-dh{display:flex;align-items:center;gap:10px;min-width:0}
-.gpx-dh b{flex:1 1 auto;min-width:0;font-size:15px;color:var(--wt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gpx-dh b{flex:1 1 auto;min-width:0;font-size:16px;color:var(--wt)}
 .gpx-ds{font-size:11.5px;color:var(--ws)}
 .gpx-det .gp-sum{flex:1 1 auto;max-height:none;min-height:60px}
 }
