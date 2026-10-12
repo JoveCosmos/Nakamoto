@@ -1319,6 +1319,13 @@
   html[data-theme=light]:not([data-mono]) :is(#trend,#trendbig,#etacurve) circle[stroke="#06060c"]{stroke:#fbf9f3}
   html[data-theme=light]:not([data-mono]) :is(#trend,#trendbig,#etacurve) line[stroke="#232342"]{stroke:#e2ddd0}
   html[data-theme=light]:not([data-mono]) :is(#trend,#trendbig) text[fill="#a5a3c4"]{fill:#5d5a74}
+  /* the Bonus page's Graph draws with the same night attributes: its validator dots and the two end
+     figures are cream, which vanished on ivory */
+  html[data-theme=light]:not([data-mono]) #foldchart circle[fill="#fff8dc"]{fill:#2c2940;fill-opacity:.4}
+  html[data-theme=light]:not([data-mono]) #foldchart circle[stroke="#06060c"]{stroke:#fbf9f3}
+  html[data-theme=light]:not([data-mono]) #foldchart text[fill="#fff8dc"]{fill:#2c2940}
+  html[data-theme=light]:not([data-mono]) #foldchart line[stroke="#232342"]{stroke:#e2ddd0}
+  html[data-theme=light]:not([data-mono]) #foldchart text[fill="#a5a3c4"]{fill:#5d5a74}
 
   /* the wallet card keeps its night face in day: the strip's one hard colour */
   html[data-theme=light]:not([data-mono]) .sd-idw{color:#fff;

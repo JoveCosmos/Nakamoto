@@ -573,8 +573,12 @@ function simple(e){
   var cw = box.clientWidth || W;
   var ch = box.clientHeight || gridH;
   var H = ch && cw ? Math.round(W * ch / cw) : 250;
-  H = Math.max(H, small ? 190 : 170);
-  var L = small ? 44 : 62, Rr = small ? 14 : 24;
+  /* a short box keeps a readable chart by widening the drawing, never by letterboxing it:
+     the viewBox always has the box's own shape, so the plot reaches both of its sides */
+  var Hmin = small ? 190 : 170;
+  if(H < Hmin){ H = Hmin; if(ch && cw) W = Math.round(H * cw / ch); }
+  /* edge to edge, like the map's cells: the per-cent figures sit inside the plot, under their rules */
+  var L = 0, Rr = 0;
   var T = small ? 22 : 24, B = small ? 40 : 42;
   var FS = small ? 13 : 11, FB = small ? 14 : 13;
   el.setAttribute("viewBox", "0 0 " + W + " " + H);
@@ -611,9 +615,9 @@ function simple(e){
 
   for(var i = 0; i <= 2; i++){
     var gv = YM * i / 2;
-    s += '<line x1="' + L + '" y1="' + Y(gv) + '" x2="' + (W - Rr) + '" y2="' + Y(gv) +
-         '" stroke="#232342"/><text x="' + (L - 8) + '" y="' + (Y(gv) + FS * 0.36) +
-         '" text-anchor="end" font-size="' + FS + '" fill="#6f6d94">' +
+    s += '<line x1="' + L + '" y1="' + Y(gv) + '" x2="' + (W - Rr) + '" y2="' + Y(gv) + '" stroke="#232342"/>';
+    /* 0% needs no figure: the floor is the floor, and the end labels sit right under it */
+    if(i) s += '<text x="' + (L + 2) + '" y="' + (Y(gv) + FS + 4) + '" font-size="' + FS + '" fill="#6f6d94">' +
          (gv * 100).toFixed(0) + '%</text>';
   }
 
