@@ -1798,8 +1798,19 @@
     var add = function(c){ if(c && c.amount){ sum += parseInt(c.amount, 10) || 0; den = c.denom; } };
     var ev = function(type, key){ var tot = 0; (r.events || []).forEach(function(e){ if(e.type !== type) return; var at = {}; (e.attributes || []).forEach(function(q){ at[q.key] = q.value; });
       if(key && at[key] && at[key] !== a) return; var mm = /^(\d+)uatone/.exec(at.amount || ""); if(mm) tot += +mm[1]; }); return tot; };
+    /* a transfer seen from this wallet's side (operator, 2026-10-12: "why receive also shows as send"): coins that
+       arrived are a Receive, whatever message moved them */
+    var inc = function(){ var c = null; (r.events || []).forEach(function(e){ if(c || e.type !== "transfer") return; var at = {};
+      (e.attributes || []).forEach(function(q){ at[q.key] = q.value; }); if(at.recipient !== a || at.sender === a) return;
+      var mm = /^(\d+)([a-z][a-z0-9/]*)/i.exec(at.amount || ""); if(mm) c = { amount: mm[1], denom: mm[2], from: at.sender }; }); return c; };
+    var ibcIn = ms.some(function(x){ return /MsgRecvPacket$/.test(String(x["@type"] || "")); });
     if(ity === "MsgSend" || ty === "MsgSend"){ var s0 = ty === "MsgSend" ? m0 : inner[0]; (s0.amount || []).forEach(add);
-      var out = s0.from_address === a; amt = (out ? "\u2212" : "+") + actCoin({ amount: sum, denom: den }); sub = (out ? "to " : "from ") + esc(String(out ? s0.to_address : s0.from_address).slice(0, 12)) + "\u2026"; }
+      var out = s0.from_address === a; amt = (out ? "\u2212" : "+") + actCoin({ amount: sum, denom: den }); sub = (out ? "to " : "from ") + esc(String(out ? s0.to_address : s0.from_address).slice(0, 12)) + "\u2026";
+      if(!out && ty === "MsgSend") kind = "Receive"; }
+    else if(ty === "MsgMultiSend"){ var mo = ((m0.outputs || []).filter(function(o){ return o.address === a; })[0] || {}), mi = (m0.inputs || [])[0] || {};
+      if(mi.address === a){ (mi.coins || []).forEach(add); amt = "\u2212" + actCoin({ amount: sum, denom: den }); sub = "to " + (m0.outputs || []).length + " addresses"; }
+      else { (mo.coins || []).forEach(add); kind = "Receive"; amt = "+" + actCoin({ amount: sum, denom: den }); sub = "from " + esc(String(mi.address || "").slice(0, 12)) + "\u2026"; } }
+    else if(ibcIn){ var ci = inc(); kind = "IBC receive"; if(ci){ amt = "+" + actCoin(ci); sub = "from another chain"; } }
     else if(/Delegate$|Undelegate$|BeginRedelegate$|CancelUnbonding/.test(ity)){ inner.forEach(function(x){ add(x.amount); }); amt = actCoin({ amount: sum, denom: den });
       var x0 = inner[0] || {}; sub = ity === "MsgBeginRedelegate" ? esc(actName(x0.validator_src_address)) + " &rarr; " + (inner.length > 1 ? inner.length + " validators" : esc(actName(x0.validator_dst_address))) : esc(actName(x0.validator_address)) + (inner.length > 1 ? " and " + (inner.length - 1) + " more" : "");
       if(kind === "Restake"){ var st = ev("delegate", "delegator"); amt = st ? fmt(st) + " ATONE" : amt; } }
@@ -1810,7 +1821,7 @@
     else if(ity === "MsgMintPhoton"){ amt = "\u2212" + actCoin((inner[0] || {}).amount); sub = "ATONE burned for PHOTON"; }
     else if(ity === "MsgTransfer"){ amt = "\u2212" + actCoin((inner[0] || {}).token); sub = "to " + esc(String((inner[0] || {}).receiver || "").slice(0, 14)) + "\u2026"; }
     else if(ity === "MsgGrant" || ity === "MsgRevoke"){ sub = /GATA/.test(memo) ? memo.replace(/^GATA AtomOne /, "") : ""; }
-    if(ms.length > 1 && ty !== "MsgExec") kind += " (" + ms.length + ")";
+    if(ms.length > 1 && ty !== "MsgExec" && !ibcIn) kind += " (" + ms.length + ")";      /* an IBC receive rides with its relayer's client update */
     var fee = ((t.auth_info || {}).fee || {}).amount || [], signer = !!(((t.auth_info || {}).signer_infos || []).length) && ty !== "MsgExec" || ty === "MsgExec" && false;
     if(r.code) sub = (sub ? sub + ", " : "") + "failed";
     return { h: +r.height, row: actRow(actWhen(new Date(r.timestamp).getTime()), esc(kind), sub, r.txhash, amt) };
