@@ -53,6 +53,10 @@ cd web && python3 -m http.server 8089              # or any static server
 The keeper, signer, bot and faucet each carry their systemd unit next to their code; all credentials come
 from the environment or sealed files, never from this repo.
 
+## Licence
+
+MIT. See [LICENSE](LICENSE).
+
 ## Credit
 
 Built and run by [GATA HUB](https://gatahub.zone), a community validator on AtomOne. The Nakamoto Bonus
