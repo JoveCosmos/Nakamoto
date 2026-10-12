@@ -83,7 +83,10 @@
      write the readouts in the heading's .sv-rt; this lifts them out beside the body. */
   var RAIL = { "sv-up": 1, "sv-pace": 1, "sv-signp": 1, "sv-prop24": 1, "sv-act7": 1, "sv-actlive": 1, "sv-ecoa": 1, "sv-ecop": 1 };
   function rail(h){
-    var i = h.indexOf("<div class=sv-rt>"); if(i < 0 || h.indexOf("sv-rd", i) < 0) return h;
+    var i = h.indexOf("<div class=sv-rt>");
+    /* a panel still reading keeps its rail's column, empty, so the heading and body open at their final width */
+    if(i < 0 && h.indexOf("sv-upwait") >= 0) return '<div class=sv-rbody><div class=sv-rmain>' + h + '</div><div class=sv-rail aria-hidden=true></div></div>';
+    if(i < 0 || h.indexOf("sv-rd", i) < 0) return h;
     var j = h.indexOf("</div>", i), k = h.indexOf("</div>", j + 6); if(j < 0 || k < 0) return h;
     var stats = h.slice(i + 17, j);
     return '<div class=sv-rbody><div class=sv-rmain>' + h.slice(0, i) + h.slice(j + 6) + '</div><div class=sv-rail>' + stats + '</div></div>';
@@ -1105,7 +1108,8 @@
     var st = function(k, v, sub){ return '<span class=gp-k><em>' + k + '</em><b>' + v + '</b><s>' + sub + '</s></span>'; };
     var your = !window.__ADDR ? ["-", "connect a wallet"] : (mine === null || mine === undefined) ? ["\u2026", "reading"] : me ? [esc(me.m), "you govern"]
       : mine ? [esc(g ? g.m : mine.slice(0, 12) + "\u2026"), g && !g.active ? "inactive, its votes do not count" : "votes for you unless you vote"] : ["None", "your stake votes only when you do"];
-    var reg = GOV_REG && L && window.__ADDR && window.__WALLET ? '<button class="sv-gbtn gr-open gv-reg" type=button data-act=greg>' + (me ? 'Edit your governor' : 'Become a governor') + '</button>' : '';
+    /* the button stands from the first paint (idle until the list is read), so the header never grows a row */
+    var reg = !GOV_REG ? '' : '<button class="sv-gbtn gr-open gv-reg" type=button data-act=greg' + (L && window.__ADDR && window.__WALLET ? '' : ' disabled title="Connect a wallet to register"') + '>' + (me ? 'Edit your governor' : 'Become a governor') + '</button>';
     var h = '<div class="sv-ph gp-ph gv-ph">' +
       st("Governors", L ? String(L.length) : "-", L ? act.length + " active" : "reading the chain\u2026") +
       st("Following", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(1) + "%" : "-", L ? n + " wallets, " + fmt(vp) + " ATONE" : "") +
@@ -1145,10 +1149,10 @@
     put("sv-mygovp", h);
     var reg = GOV_REG && L && window.__ADDR && window.__WALLET ? '<button class="sv-gbtn gr-open" type=button data-act=greg><span class=gr-lg>' + (me ? 'Edit your governor' : 'Become a governor') + '</span><span class=gr-sm>' + (me ? 'Edit' : 'Register') + '</span></button>' : '';
     put("sv-mygovlist", '<div class=sv-ph><h3>Governors</h3>' + (L ? tag("q", L.length + " Governors") : '') + reg + '</div>' +
-      (!L ? '<p class=gv-say>Reading the governors…</p>' : !L.length ? govNone() : govRows(L, mine)));
+      (!L ? '<p class="gv-say gv-wait">Reading the governors…</p>' : !L.length ? govNone() : govRows(L, mine)));
     /* voting now: each open proposal, its yes share, when it ends; none open, the last result */
     var v = '<div class=sv-ph><h3>Voting now</h3>' + (P ? tag("q", String(live.length)) : '') + '</div>';
-    if(!P) v += '<p class=gv-say>Reading the proposals…</p>';
+    if(!P) v += '<p class="gv-say gv-wait">Reading the proposals…</p>';
     else {
       var card = function(p, open){ var t = ptally(p.tally), y = t.s ? t.y / t.s * 100 : 0, st = PST[p.st] || ["ended", "d"];
         return '<a class=gv-lp href="governance/proposals" data-route="governance/proposals"><span class=gv-lh><em>#' + p.id + '</em><i class="gp-st ' + st[1] + '">' + st[0] + '</i></span><b>' + esc(p.title) + '</b>' +
@@ -1625,7 +1629,7 @@
   function actRow(d, main, sub, h, amt){ return '<div class=act-r><span class=act-d>' + d + '</span><span class=act-m><b>' + main + '</b>' + (sub ? '<s>' + sub + '</s>' : '') + '</span>' +
     '<span class=act-x>' + (amt ? '<b>' + amt + '</b>' : '') + actTx(h) + '</span></div>'; }
   function actSearch(q){ return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/tx/v1beta1/txs?query=" + encodeURIComponent(q) +
-      "&order_by=ORDER_BY_DESC&limit=30&page=1&pagination.limit=30", { cache: "no-store" }).then(function(r){ return r.json(); }); }
+      "&order_by=ORDER_BY_DESC&limit=20&page=1&pagination.limit=20", { cache: "no-store" }).then(function(r){ return r.json(); }); }
   var ACT_KIND = { MsgDelegate: "Stake", MsgUndelegate: "Unstake", MsgBeginRedelegate: "Redelegate", MsgWithdrawDelegatorReward: "Claim rewards",
     MsgWithdrawValidatorCommission: "Claim commission", MsgGrant: "Grant", MsgRevoke: "Revoke", MsgVote: "Vote", MsgVoteWeighted: "Vote", MsgSend: "Send",
     MsgMultiSend: "Send", MsgMintPhoton: "Mint PHOTON", MsgExec: "Authorized", MsgDelegateGovernor: "Follow a governor", MsgUndelegateGovernor: "Stop following",
@@ -1669,7 +1673,7 @@
       var H = ((R && R.activity && R.activity.moves) || (R && R.history) || []).filter(function(x){ return x.uatone > 0; }), mv = 0, gn = 0;
       H.forEach(function(x){ mv += x.uatone; gn += +x.gain || 0; });
       return { sum: (on ? "Autopilot is on" : "Autopilot is off") + (H.length ? ": " + H.length + " moves, " + fmt(mv) + " ATONE moved, " + g1(gn) + since(H) : ", no moves yet"),
-        rows: H.map(function(x){ return actRow(actDay(x.at * 1000), esc(actName(x.src)) + " &rarr; " + esc(actName(x.dst)), g1(x.gain), x.txhash, fmt(x.uatone) + " ATONE"); }) }; });
+        rows: H.map(function(x){ return actRow(actDay(x.at * 1000), esc(actName(x.src)) + " &rarr; " + esc(actName(x.dst)), "", x.txhash, fmt(x.uatone) + " ATONE"); }) }; });
     if(k === "restake") return rep().then(function(R){
       var on = !!(window.__atInfo && window.__atInfo() && window.__atInfo().restake);
       var L = ((R && R.activity && R.activity.restakes) || []).filter(function(x){ return x.staked > 0; }), tot = 0; L.forEach(function(x){ tot += x.staked; });
@@ -1681,11 +1685,20 @@
         rows: L.map(function(x){ return actRow(actDay(x.at * 1000), "Rewards staked back", x.target ? "onto " + esc(actName(x.target)) + (x.staked > 0 ? "" : "") : "", x.txhash, fmt(x.staked) + " ATONE"); }) }; });
     /* Account: the address as an explorer shows it - what it signed, what it received, and what was done on its behalf */
     var qs = ["message.sender='" + a + "'", "transfer.recipient='" + a + "'", "delegate.delegator='" + a + "'", "withdraw_rewards.delegator='" + a + "'"];
-    return Promise.all(qs.map(function(q){ return actSearch(q).catch(function(){ return {}; }); })).then(function(R){
+    /* the latest 20 (operator, 2026-10-12); a search that fails is asked once more, and if it still fails the count
+       says "latest", never "all", since part of the history was not read */
+    var ACT_N = 20, bad = 0;
+    var one = function(q){ return actSearch(q).then(function(d){ if(!d || d.code || d.message) throw 0; return d; })
+      .catch(function(){ return actSearch(q).then(function(d){ if(!d || d.code || d.message) throw 0; return d; }); })
+      .catch(function(){ bad++; return {}; }); };
+    return Promise.all(qs.map(one)).then(function(R){
       var seen = {}, rows = [];
       R.forEach(function(d){ (d.txs || []).forEach(function(t, i){ var r = (d.tx_responses || [])[i] || {}; if(!r.txhash || seen[r.txhash]) return; seen[r.txhash] = 1; rows.push(actAcct(t, r, a)); }); });
-      rows.sort(function(x, y){ return y.h - x.h; }); rows = rows.slice(0, 30);
-      return { sum: rows.length ? "Latest " + rows.length + " transactions on this address" : "No transactions on this address yet", rows: rows.map(function(o){ return o.row; }) }; })
+      rows.sort(function(x, y){ return y.h - x.h; }); rows = rows.slice(0, ACT_N);
+      var sum = !rows.length ? (bad ? "Could not read the chain. Try again in a moment." : "No transactions on this address yet")
+        : rows.length >= ACT_N ? "Latest " + ACT_N + " transactions on this address"
+        : bad ? "Latest " + rows.length + " transactions on this address" : "All " + rows.length + " transactions on this address";
+      return { sum: sum, rows: rows.map(function(o){ return o.row; }) }; })
       .catch(function(){ return { sum: "Could not read the chain. Try again in a moment.", rows: [] }; });
   }
   function actShow(){

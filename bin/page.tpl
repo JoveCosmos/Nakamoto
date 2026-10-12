@@ -3730,6 +3730,24 @@ background:var(--wc);border:1px solid var(--wbd2);padding:1px 6px;border-radius:
 .sv-uptip b{display:block;color:var(--wt);font-weight:700}
 .sv-upx{display:flex;justify-content:space-between;font-family:var(--wmono);font-size:9px;letter-spacing:.06em;color:var(--wf)}
 .sv-upwait{flex:1 1 auto;display:grid;place-items:center;color:var(--wf);font-size:12px;min-height:90px}
+/* nothing grows as it loads (operator, 2026-10-11): a panel's "Reading..." stub holds the height its content takes,
+   so the panel opens at its final size and the content fills it in place. Measured by dev/flick.cjs on mainnet: the
+   latest-blocks strip is shorter than the default stub; on phones each stacked panel reserves its own body */
+#sv-proplive .sv-upwait{min-height:61px}
+#sv-daop .sv-upwait{min-height:182px}
+@media(max-width:620px){
+  #sv-up .sv-upwait{min-height:281px}
+  #sv-pace .sv-upwait{min-height:222px}
+  #sv-signp .sv-upwait{min-height:542px}
+  #sv-proplive .sv-upwait{min-height:45px}
+  #sv-actlive .sv-upwait{min-height:188px}
+  #sv-proplist .sv-upwait{min-height:100svh}
+  #sv-govlist .sv-upwait{min-height:488px}
+  #sv-daop .sv-upwait{min-height:403px}
+  #sv-mygovlist .gv-wait{min-height:136px}
+  #sd-gvote .gv-wait{min-height:262px}
+  .mv-hl{min-height:57px}
+}
 .sv-upx i{font-style:normal}
 @media(max-width:620px){
   .sv-screen>.sv-up{min-height:360px}.sv-upchart{min-height:190px}.sv-upm b{display:none}
@@ -4187,6 +4205,7 @@ background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.01))}
    the compact readout from a taller screen down, so every bottom line (the 30-day change) shows */
 @media(max-width:900px){
   .sv-rbody{grid-template-columns:minmax(0,1fr);row-gap:10px}
+  .sv-rail:empty{display:none}
   .sv-rail{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin-right:0;width:auto}
   #sv-netcards .sv-span:last-child:nth-child(odd){grid-column:1/-1}
   .sv-rd{border-right:1px solid var(--wbd2);border-radius:10px;min-width:0;padding:7px 10px}
@@ -4752,6 +4771,7 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 /* the proposals bar carries the three figures (2026-10-11): label, value, one short line each */
 :is(#sv-proplist,#sv-govlist)>.sv-ph.gp-ph{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 16px;padding:6px 15px 7px;flex:0 0 auto}   /* never squeezed by the panel's column flex */
 #sv-govlist>.sv-ph.gv-ph{grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:center}
+#sv-govlist>.sv-ph .gv-reg:disabled{opacity:.45;cursor:default}
 #sv-govlist>.sv-ph .gv-reg{white-space:nowrap;color:#fff;border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.12)}
 .gv-none{display:flex;flex-direction:column;gap:12px;padding:14px 2px}
 #sv-govs .gv-rules3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-width:720px}
