@@ -4298,6 +4298,26 @@ linear-gradient(150deg,#02358a 0%,#00205f 45%,#001347 100%);box-shadow:inset 0 1
 .sd-wch i.app{color:var(--sv-violet);border-color:rgba(185,176,255,.4);background:rgba(185,176,255,.08)}
 .sd-wch i.net{color:var(--sv-teal);border-color:rgba(43,200,189,.4);background:rgba(43,200,189,.08)}
 .sd-wch i.net.tn{color:var(--sv-amber);border-color:rgba(255,176,46,.4);background:rgba(255,176,46,.08)}
+/* Activity: the third chip, the one that does something (operator, 2026-10-12) */
+.sd-wch .wact{font-family:var(--wmono);font-size:8.5px;line-height:1;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:999px;
+border:1px solid var(--sv-amber);background:rgba(255,176,46,.14);color:var(--sv-amber);cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.sd-wch .wact:hover{background:var(--sv-amber);color:#1a1200}
+.sd-wch .wact:focus-visible{outline:2px solid var(--sv-amber);outline-offset:2px}
+/* the Activity card: three tabs, one line of summary, a list of one fixed height */
+.actcard{width:min(560px,94vw)}
+.actabs{display:flex;gap:4px;margin:4px 18px 0;padding:3px;border:1px solid var(--wbd,#232342);border-radius:99px}
+.actabs button{flex:1 1 0;border:0;border-radius:99px;padding:7px 10px;background:transparent;color:var(--ws,#c1bfdc);font:600 12.5px var(--wsans,var(--sans));cursor:pointer}
+.actabs button[aria-selected=true]{background:var(--sv-teal,#2bc8bd);color:#071a18}
+.actabs button:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offset:2px}
+.actsum{margin:12px 18px 0;min-height:2.6em;font-size:12.5px;line-height:1.35;color:var(--ws,#c1bfdc)}
+.actlist{margin:6px 18px 16px;height:min(340px,52vh);overflow-y:auto;border-top:1px solid var(--wbd,#232342);scrollbar-width:thin}
+.act-r{display:grid;grid-template-columns:86px minmax(0,1fr) 64px;gap:10px;align-items:baseline;padding:9px 2px;border-bottom:1px solid var(--wbd,#232342)}
+.act-d{font-family:var(--wmono);font-size:10.5px;color:var(--wf,#8f8db4)}
+.act-m b{display:block;font-size:13px;color:var(--wt,#f0eef8);font-variant-numeric:tabular-nums}
+.act-m s{display:block;text-decoration:none;font-size:11.5px;color:var(--ws,#c1bfdc);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.act-tx{font-family:var(--wmono);font-size:10.5px;color:var(--sv-teal,#2bc8bd);text-align:right}
+.act-empty{padding:30px 0;text-align:center;font-size:12.5px;color:var(--wf,#8f8db4)}
+@media(max-width:520px){.act-r{grid-template-columns:70px minmax(0,1fr) 56px;gap:8px}}
 .sd-wnone{font-size:12px;color:var(--wf)}
 .sd-wbtn{height:30px;padding:0 14px;border-radius:8px;border:1px solid rgba(255,176,46,.55);background:linear-gradient(180deg,rgba(255,176,46,.22),rgba(255,176,46,.1));color:#ffc453;font:600 12px var(--wsans);cursor:pointer}
 .sd-wbtn:hover{border-color:#ffb02e;color:#ffd58a}
@@ -7012,6 +7032,12 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <div class=rsfoot><div class=atfs><div class=txfee id=rsfee></div></div><button class="wk-btn wk-go" id=rsgo type=button>Activate</button></div>
 </div></div>
 
+<div class=pop id=actpop><div class="card vcard actcard" role=dialog aria-modal=true aria-labelledby=actttl>
+  <div class="vhead vwrap"><div class=vcol><div class=vname><span class=vnm id=actttl>Activity</span></div><div class=vsub><span class=iop id=actaddr></span></div></div></div>
+  <div class=actabs role=tablist aria-label="Activity"><button type=button role=tab data-k=pilot aria-selected=true>Autopilot</button><button type=button role=tab data-k=restake aria-selected=false>Restake</button><button type=button role=tab data-k=account aria-selected=false>Account</button></div>
+  <div class=actsum id=actsum></div>
+  <div class=actlist id=actlist></div>
+</div></div>
 <div class=pop id=wtpop><div class="card vcard acard wtcard" role=dialog aria-modal=true aria-labelledby=wtttl>
   <div class="vhead vwrap"><span class="vmono wtic"><svg viewBox="0 0 24 24" aria-hidden=true><path fill="currentColor" d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.8.8 l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.35-.1-.55-.6-.2L6.2 13.1 1.4 11.6c-1-.3-1-1 .2-1.5l19-7.3c.85-.3 1.6.2 1.3 1.5z"/></svg></span>
     <div class=vcol><div class=vname><span class=vnm id=wtttl>Telegram alerts</span></div><div class=vsub><span class=iop id=wtaddr></span></div></div></div>

@@ -279,7 +279,9 @@
   function wmeta(){
     var W = window.__WALLET, a = window.__ADDR, net = TN() ? "Testnet" : "Mainnet";
     if(!W || !a) return '';
-    return '<div class=sd-wmeta><span class=sd-wch><i class=app>' + esc(W.name || "Wallet") + '</i>' + (W.ledger ? '<i class=app>Ledger</i>' : '') + '<i class="net' + (TN() ? ' tn' : '') + '">' + net + '</i></span></div>';
+    return '<div class=sd-wmeta><span class=sd-wch><i class=app>' + esc(W.name || "Wallet") + '</i>' + (W.ledger ? '<i class=app>Ledger</i>' : '') + '<i class="net' + (TN() ? ' tn' : '') + '">' + net + '</i>' +
+      /* the wallet's record (operator, 2026-10-12): Autopilot, Restake and the account's own transactions */
+      '<button type=button class=wact data-act=activity>Activity <span aria-hidden=true>&rarr;</span></button></span></div>';
   }
   /* the wallet strip, one builder for Overview and Manage: the wallet box, then Total, Staked,
      Available, Rewards and APR, each figure in its engraved well */
@@ -1604,6 +1606,66 @@
      Enable or Disable - never a signature straight from the switch */
   /* the wallet's Telegram card: Autopilot and Restake rows (a service that is off is greyed), the bot's link for this
      wallet, its commands */
+  /* ── Activity (operator, 2026-10-12): the wallet's record in three tabs. Autopilot reads the pilot report (its last
+     moves); Restake reads the chain (every claim-and-stake GATA signed for this wallet); Account reads the chain (the
+     wallet's own transactions). The list keeps one height whatever it holds, so nothing jumps as it loads ── */
+  var ACT = { k: "pilot", cache: {}, addr: null };
+  function actX(){ return "https://explorer.gatahub.zone/" + (TN() ? "atomone-testnet-1" : "atomone-1") + "/txs/"; }
+  function actName(id){ var V = window.__VALS ? window.__VALS() : []; for(var i = 0; i < V.length; i++) if(V[i][3] === id) return V[i][0];
+    var x = (window.__INACT || {})[id]; return x && x.m ? x.m : String(id || "").slice(-6); }
+  function actDay(t){ return window.__dayFull ? window.__dayFull(t) : new Date(t).toISOString().slice(0, 10); }
+  function actTx(h){ return h ? '<a class=act-tx href="' + actX() + esc(h) + '" target=_blank rel="noopener noreferrer">' + esc(h.slice(0, 8)) + '</a>' : '<span class=act-tx></span>'; }
+  function actRow(d, main, sub, h){ return '<div class=act-r><span class=act-d>' + d + '</span><span class=act-m><b>' + main + '</b>' + (sub ? '<s>' + sub + '</s>' : '') + '</span>' + actTx(h) + '</div>'; }
+  function actSearch(q){ return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/tx/v1beta1/txs?query=" + encodeURIComponent(q) +
+      "&order_by=ORDER_BY_DESC&limit=30&page=1&pagination.limit=30", { cache: "no-store" }).then(function(r){ return r.json(); }); }
+  var ACT_KIND = { MsgDelegate: "Stake", MsgUndelegate: "Unstake", MsgBeginRedelegate: "Redelegate", MsgWithdrawDelegatorReward: "Claim rewards",
+    MsgGrant: "Grant", MsgRevoke: "Revoke", MsgVote: "Vote", MsgSend: "Send", MsgMintPhoton: "Mint PHOTON", MsgExec: "Authorized action",
+    MsgDelegateGovernor: "Follow a governor", MsgUndelegateGovernor: "Stop following", MsgCancelUnbondingDelegation: "Cancel unstaking", MsgTransfer: "IBC transfer" };
+  function actLoad(k){
+    var a = window.__ADDR; if(!a) return Promise.resolve({ sum: "Connect a wallet", rows: [] });
+    if(k === "pilot") return fetch("pilot/" + a + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }).then(function(rep){
+      var at = window.__atInfo ? window.__atInfo() : null, on = !!(at && at.grant);
+      var H = (rep && rep.history) || [], mv = 0, gn = 0; H.forEach(function(x){ mv += x.uatone || 0; gn += x.gain || 0; });
+      var g1 = function(v){ return "+" + (+v).toLocaleString("en-US", { maximumFractionDigits: v >= 100 ? 0 : 2 }) + " ATONE a year"; };
+      return { sum: (on ? "Autopilot is on" : "Autopilot is off") + (H.length ? ", last " + H.length + " moves: " + fmt(mv) + " ATONE moved, " + g1(gn) : ", no moves yet"),
+        rows: H.map(function(x){ return actRow(actDay(x.at * 1000), fmt(x.uatone) + " ATONE, " + g1(x.gain), esc(actName(x.src)) + " &rarr; " + esc(actName(x.dst)), x.txhash); }) }; });
+    if(k === "restake") return Promise.all([
+        fetch("pilot/" + a + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }),
+        actSearch("withdraw_rewards.delegator='" + a + "'").catch(function(){ return {}; })]).then(function(x){
+      var rs = (x[0] && x[0].restake) || {}, on = !!(window.__atInfo && window.__atInfo() && window.__atInfo().restake);
+      var rows = [];
+      (x[1].txs || []).forEach(function(t, i){
+        var r = (x[1].tx_responses || [])[i] || {}; if(!/GATA AtomOne Restake/.test((t.body || {}).memo || "")) return;
+        var u = 0, to = [];
+        (r.events || []).forEach(function(e){ if(e.type !== "delegate") return; var at = {}; (e.attributes || []).forEach(function(q){ at[q.key] = q.value; });
+          if(at.delegator && at.delegator !== a) return; u += parseInt(at.amount || "0", 10) || 0; if(at.validator) to.push(actName(at.validator)); });
+        rows.push(actRow(actDay(new Date(r.timestamp).getTime()), fmt(u) + " ATONE restaked", to.length ? "onto " + esc(to.slice(0, 3).join(", ")) + (to.length > 3 ? " and " + (to.length - 3) + " more" : "") : "", r.txhash));
+      });
+      return { sum: (on ? "Restake is on" : "Restake is off") + (rs.count ? ", " + rs.count + " restakes, " + fmt(rs.total || 0) + " ATONE staked back" : ", no restakes yet"), rows: rows }; });
+    return actSearch("message.sender='" + a + "'").then(function(d){
+      var rows = (d.txs || []).slice(0, 30).map(function(t, i){
+        var r = (d.tx_responses || [])[i] || {}, ms = ((t.body || {}).messages || []).map(function(m){ var n = String(m["@type"] || "").split(".").pop(); return ACT_KIND[n] || n.replace(/^Msg/, ""); });
+        var uniq = ms.filter(function(m, j){ return ms.indexOf(m) === j; });
+        return actRow(actDay(new Date(r.timestamp).getTime()), esc(uniq.join(", ") || "Transaction") + (ms.length > 1 ? " (" + ms.length + ")" : ""), r.code ? "failed" : "", r.txhash); });
+      return { sum: rows.length ? "The wallet's latest " + rows.length + " transaction" + (rows.length === 1 ? "" : "s") : "No transactions signed by this wallet yet", rows: rows }; })
+      .catch(function(){ return { sum: "Could not read the chain. Try again in a moment.", rows: [] }; });
+  }
+  function actShow(){
+    var k = ACT.k, el = E("actlist"), sm = E("actsum");
+    [].forEach.call(document.querySelectorAll("#actpop .actabs button"), function(b){ b.setAttribute("aria-selected", b.dataset.k === k ? "true" : "false"); });
+    var c = ACT.cache[k];
+    if(!c){ if(sm) sm.textContent = "Reading\u2026"; if(el) el.innerHTML = '<div class=act-empty>Reading\u2026</div>';
+      actLoad(k).then(function(r){ ACT.cache[k] = r; if(ACT.k === k) actShow(); }); return; }
+    if(sm) sm.textContent = c.sum;
+    if(el) el.innerHTML = c.rows.length ? c.rows.join("") : '<div class=act-empty>Nothing yet</div>';
+  }
+  function actOpen(){
+    var el = E("actpop"), a = window.__ADDR; if(!el || typeof POP === "undefined" || !a) return;
+    if(ACT.addr !== a){ ACT.cache = {}; ACT.addr = a; }
+    var ad = E("actaddr"); if(ad) ad.textContent = a.slice(0, 12) + "\u2026" + a.slice(-6);
+    ACT.k = "pilot"; actShow(); POP.open(el);
+  }
+  var actp = E("actpop"); if(actp) actp.addEventListener("click", function(ev){ var b = ev.target.closest ? ev.target.closest(".actabs button") : null; if(b){ ACT.k = b.dataset.k; actShow(); } });
   function wtOpen(){
     var el = E("wtpop"), a = window.__ADDR; if(!el || typeof POP === "undefined" || !a || !window.__BOT) return;
     var at = window.__atInfo ? window.__atInfo() : null, on = { wtap: !!(at && at.grant), wtrs: !!(at && at.restake) };
@@ -1868,6 +1930,7 @@
     if(act === "wtalerts"){ if(t.getAttribute("aria-disabled") !== "true") wtOpen(); return; }
     if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "mint"){ if(window.__mint) window.__mint(); return; }
+    if(act === "activity"){ actOpen(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
     if(act === "vote"){ ev.stopPropagation(); voteSend(t, +t.dataset.pid, +t.dataset.opt); return; }
     if(act === "gfollow"){ govSend(t, { type: "atomone/v1/MsgDelegateGovernor", value: { delegator_address: window.__ADDR, governor_address: t.dataset.g } }); return; }
