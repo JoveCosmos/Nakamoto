@@ -1127,7 +1127,11 @@
                 : '<input class=gr-in id=gr-' + f[0] + ' type=text autocomplete=off spellcheck=false placeholder="' + esc(f[3]) + '" value="' + esc(val(f[0])) + '">') + '</label>'; }).join("") + '</div>' +
       (me ? '' : '<div class=gr-need id=grneed></div>') +
       '<p class=gr-note>' + (me ? 'The new details show once the next block carries them.'
-        : 'Your own stake follows you from the moment you register, and as a governor you cannot follow another one. Keep ' + (R.minSelf ? whole(R.minSelf) : "10,000") + ' ATONE staked: fall under it and the chain sets you inactive, and after any change of status ' + (R.period ? Math.round(R.period / 86400) : 28) + ' days must pass before it can change again. The role carries no reward and nothing extra at risk; only your vote\'s reach changes.') +
+        /* the one place the governor rules are spelled out (operator, 2026-10-12: merged, register card only) */
+        : 'Your own stake follows you from the moment you register, and as a governor you cannot follow another one. Keep at least ' + (R.minSelf ? whole(R.minSelf) : "10,000") +
+          ' ATONE staked from your own wallet: if your stake falls under that, the chain sets you inactive, and ' + (R.period ? Math.round(R.period / 86400) : 28) +
+          ' days must pass before your status can change again. While inactive, your vote counts for no one who follows you; your followers stay and nothing of theirs is at risk. ' +
+          'The role carries no reward and nothing extra at risk; only your vote\'s reach changes.') +
         ' Signed in ' + esc(window.__WALLET.name || "your wallet") + ', sent through GATA\'s node.</p>' +
       '<div class=txbtns><button class="wk-btn wk-go" id=grgo type=button data-act=grsend disabled>' + (me ? 'Save' : 'Register') + '</button></div></div>';
     if(P) P.open(pop);
@@ -1158,8 +1162,6 @@
         st("identity", g.ident ? esc(g.ident) : "-", g.ident ? "Keybase" : "") +
         st("address", esc(g.addr.slice(0, 12) + "\u2026" + g.addr.slice(-6)), "") +
       '</div>' +
-      '<p class=gv-rules>A governor keeps at least <b>' + (R.minSelf ? whole(R.minSelf) : NA) + ' ATONE</b> staked from its own wallet. If its stake falls under that, the chain sets it inactive. <b>' +
-        (R.period ? Math.round(R.period / 86400) + ' days' : NA) + '</b> must pass before its status can change again, so an inactive governor stays inactive at least that long. While inactive, its vote counts for no one who follows it; followers stay and nothing of theirs is at risk.</p>' +
       (govBtn(g, mine) ? '<div class=gv-go>' + govBtn(g, mine) + '</div>' : '') +
     '</div>';
     if(P) P.open(pop);

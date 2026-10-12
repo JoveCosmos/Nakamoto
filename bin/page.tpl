@@ -4559,7 +4559,8 @@ background:radial-gradient(55% 160% at 0% 0%,rgba(185,176,255,.14),transparent 6
 /* a phone fits the whole form without a scroll (the popup rule leaves the page showing above and below) */
 @media(max-width:620px){.grcard .gr-f{gap:7px;padding-top:10px}.grcard .gr-l{gap:3px}.grcard textarea.gr-in{min-height:44px}
   .grcard .gr-who{padding-top:10px}.grcard .gr-need{padding-top:8px;gap:8px}.grcard .gr-note{margin-top:8px;font-size:10.5px;line-height:1.4}
-  .grcard .txbtns{padding:10px 20px 12px}}
+  .grcard .txbtns{padding:10px 20px 12px}
+  .grcard .wk-txh:not(#z){padding:12px 20px 9px}.grcard .gr-need>div{padding:7px 8px;gap:2px}.grcard .gr-in{padding:6px 10px}}
 .grcard .txbtns{padding:16px 22px 20px}
 /* Outcome's content starts on Delegations' and Redelegate's line */
 @media(min-width:901px){#p-dele #wbody #wk-mv>.wk-ph+*{margin-top:10px!important}}
@@ -4798,7 +4799,11 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gpx-r .gp-st{justify-self:start}
 .gpx-r:focus-visible{outline:2px solid var(--sv-teal);outline-offset:-2px}
 .gpx-r:hover{background:rgba(255,255,255,.03)}
-.gpx-r.sel{background:rgba(43,200,189,.07);box-shadow:inset 3px 0 0 var(--sv-teal)}
+/* the chosen row reads at a glance (operator, 2026-10-12: "not prominent"): a filled band, a rail, an outline, and a
+   pointer toward the detail it opened */
+.gpx-r.sel{background:rgba(43,200,189,.16);box-shadow:inset 4px 0 0 var(--sv-teal),inset 0 0 0 1px rgba(43,200,189,.55);border-radius:6px}
+.gpx-r.sel::after{content:"";position:absolute;right:6px;top:50%;width:8px;height:8px;margin-top:-6px;border-right:2px solid var(--sv-teal);border-bottom:2px solid var(--sv-teal);transform:rotate(-45deg)}
+.gpx-r.sel .gp-vm{margin-right:12px}
 .gpx-r.sel .gp-id{background:var(--sv-teal);border-color:var(--sv-teal);color:#071a18}
 .gpx-r .gp-vm{margin:0}
 .gpx-sl{position:absolute;left:10px;right:10px;bottom:5px;height:3px;border-radius:2px;overflow:hidden;background:var(--wbd);display:flex}
