@@ -502,6 +502,7 @@ Array.prototype.forEach.call(document.querySelectorAll(".mbtn"), function(b){
       c.style.height = graph && gridH ? gridH + "px" : "";   /* the box, not the svg */
       bw.style.height = bar && gridH ? gridH + "px" : "";
     }
+    tapNote();
     var ev = +E("eta").value / 100;
     fields(ev);
   });
@@ -936,12 +937,16 @@ function whatif(){
   var wn = E("wifnote"), tn = E("tapnote"), wc = E("wifn");
   if(wn) wn.hidden = !dirty;
   if(tn) tn.hidden = dirty;
+  tapNote();
   if(wc) wc.textContent = moved + (moved === 1 ? " slider" : " sliders") + " moved from live";
   tickAt(sl, E("tke"), liveOf("e"));
   tickAt(cr, E("tkc"), liveOf("c"));
   tickAt(cr, E("tkt"), +(E("tkt") || {dataset:{}}).dataset.v || 0);
   tickAt(br, E("tks"), liveOf("s"));
 }
+/* "tap any box" belongs to Map alone (operator, 2026-10-12); in the other views it keeps its place unseen, so the
+   row under it never moves when the view changes */
+function tapNote(){ var tn = E("tapnote"); if(tn) tn.style.visibility = MODE === "color" ? "" : "hidden"; }
 function resetLive(k){
   if(!k || k === "e") sl.value = liveOf("e");
   if(!k || k === "c"){ CTARGET = null; if(cr) cr.value = liveOf("c"); }

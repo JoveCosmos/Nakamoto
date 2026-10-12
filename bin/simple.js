@@ -1625,6 +1625,9 @@
     var x = (window.__INACT || {})[id]; return x && x.m ? x.m : String(id || "").slice(-6); }
   var ACT_MO = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   function actDay(t){ var d = new Date(t), y = d.getUTCFullYear(); return d.getUTCDate() + " " + ACT_MO[d.getUTCMonth()] + (y !== new Date().getUTCFullYear() ? " " + y : ""); }
+  /* a row's date, and under it the hour it landed, in UTC (operator, 2026-10-12) */
+  function actWhen(t){ var d = new Date(t), p = function(n){ return (n < 10 ? "0" : "") + n; };
+    return actDay(t) + '<small>' + p(d.getUTCHours()) + ':' + p(d.getUTCMinutes()) + ' UTC</small>'; }
   function actTx(h){ return h ? '<a class=act-tx href="' + actX() + esc(h) + '" target=_blank rel="noopener noreferrer">' + esc(h.slice(0, 8)) + '</a>' : '<span class=act-tx></span>'; }
   function actRow(d, main, sub, h, amt){ return '<div class=act-r><span class=act-d>' + d + '</span><span class=act-m><b>' + main + '</b>' + (sub ? '<s>' + sub + '</s>' : '') + '</span>' +
     '<span class=act-x>' + (amt ? '<b>' + amt + '</b>' : '') + actTx(h) + '</span></div>'; }
@@ -1661,7 +1664,7 @@
     if(ms.length > 1 && ty !== "MsgExec") kind += " (" + ms.length + ")";
     var fee = ((t.auth_info || {}).fee || {}).amount || [], signer = !!(((t.auth_info || {}).signer_infos || []).length) && ty !== "MsgExec" || ty === "MsgExec" && false;
     if(r.code) sub = (sub ? sub + ", " : "") + "failed";
-    return { h: +r.height, row: actRow(actDay(new Date(r.timestamp).getTime()), esc(kind), sub, r.txhash, amt) };
+    return { h: +r.height, row: actRow(actWhen(new Date(r.timestamp).getTime()), esc(kind), sub, r.txhash, amt) };
   }
   function actLoad(k){
     var a = window.__ADDR; if(!a) return Promise.resolve({ sum: "Connect a wallet", rows: [] });
@@ -1669,20 +1672,22 @@
     var g1 = function(v){ return "+" + (+v).toLocaleString("en-US", { maximumFractionDigits: v >= 100 ? 0 : 2 }) + " ATONE a year"; };
     var since = function(L){ return L.length ? ", since " + actDay(L[L.length - 1].at * 1000) : ""; };
     if(k === "pilot") return rep().then(function(R){
-      var at = window.__atInfo ? window.__atInfo() : null, on = !!(at && at.grant);
+      /* the top line is the wallet's whole record (operator, 2026-10-12), from the pilot's own state; a report that only
+         carries the last ten moves says "Latest" when it may be holding back older ones */
+      var full = !!(R && R.activity);
       var H = ((R && R.activity && R.activity.moves) || (R && R.history) || []).filter(function(x){ return x.uatone > 0; }), mv = 0, gn = 0;
       H.forEach(function(x){ mv += x.uatone; gn += +x.gain || 0; });
-      return { sum: (on ? "Autopilot is on" : "Autopilot is off") + (H.length ? ": " + H.length + " moves, " + fmt(mv) + " ATONE moved, " + g1(gn) + since(H) : ", no moves yet"),
-        rows: H.map(function(x){ return actRow(actDay(x.at * 1000), esc(actName(x.src)) + " &rarr; " + esc(actName(x.dst)), "", x.txhash, fmt(x.uatone) + " ATONE"); }) }; });
+      var part = !full && H.length >= 10;
+      return { sum: H.length ? (part ? "Latest " : "") + H.length + (H.length === 1 ? " move, " : " moves, ") + fmt(mv) + " ATONE moved, " + g1(gn) + (part ? "" : since(H)) : "No moves yet",
+        rows: H.map(function(x){ return actRow(actWhen(x.at * 1000), esc(actName(x.src)) + " &rarr; " + esc(actName(x.dst)), "", x.txhash, fmt(x.uatone) + " ATONE"); }) }; });
     if(k === "restake") return rep().then(function(R){
-      var on = !!(window.__atInfo && window.__atInfo() && window.__atInfo().restake);
       var L = ((R && R.activity && R.activity.restakes) || []).filter(function(x){ return x.staked > 0; }), tot = 0; L.forEach(function(x){ tot += x.staked; });
       if(!(R && R.activity)) return actSearch("withdraw_rewards.delegator='" + a + "'").catch(function(){ return {}; }).then(function(d){
         var rows = []; (d.txs || []).forEach(function(t, i){ var r = (d.tx_responses || [])[i] || {}; if(!/GATA AtomOne Restake/.test((t.body || {}).memo || "")) return;
           var o = actAcct(t, r, a); rows.push(o.row); });
-        return { sum: (on ? "Restake is on" : "Restake is off") + (rows.length ? ": " + rows.length + " restakes" : ", no restakes yet"), rows: rows }; });
-      return { sum: (on ? "Restake is on" : "Restake is off") + (L.length ? ": " + L.length + " restakes, " + fmt(tot) + " ATONE of rewards staked back" + since(L) : ", no restakes yet"),
-        rows: L.map(function(x){ return actRow(actDay(x.at * 1000), "Rewards staked back", x.target ? "onto " + esc(actName(x.target)) + (x.staked > 0 ? "" : "") : "", x.txhash, fmt(x.staked) + " ATONE"); }) }; });
+        return { sum: rows.length ? "Latest " + rows.length + (rows.length === 1 ? " restake" : " restakes") : "No restakes in the latest claims", rows: rows }; });
+      return { sum: L.length ? L.length + (L.length === 1 ? " restake, " : " restakes, ") + fmt(tot) + " ATONE of rewards staked back" + since(L) : "No restakes yet",
+        rows: L.map(function(x){ return actRow(actWhen(x.at * 1000), "Rewards staked back", x.target ? "onto " + esc(actName(x.target)) + (x.staked > 0 ? "" : "") : "", x.txhash, fmt(x.staked) + " ATONE"); }) }; });
     /* Account: the address as an explorer shows it - what it signed, what it received, and what was done on its behalf */
     var qs = ["message.sender='" + a + "'", "transfer.recipient='" + a + "'", "delegate.delegator='" + a + "'", "withdraw_rewards.delegator='" + a + "'"];
     /* the latest 20 (operator, 2026-10-12); a search that fails is asked once more, and if it still fails the count

@@ -292,6 +292,8 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .gp-st.f{color:#8a5200;border-color:rgba(200,120,0,.55);background:rgba(200,120,0,.1)}
   html[data-theme=light]:not([data-mono]) .gp-st.v{color:#0b5a53;border-color:rgba(15,122,114,.55);background:rgba(15,122,114,.1)}
   html[data-theme=light]:not([data-mono]) .gp-id{background:rgba(60,50,20,.05)}
+  /* an open proposal's number keeps its filled chip on paper: the accent behind white, not white on the light chip */
+  html[data-theme=light]:not([data-mono]) .gp-r.open .gp-id{background:var(--accent);border-color:var(--accent);color:#fff}
   html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#6b5a3a,#3b3226 58%,#19171d)}
   html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd h1,html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd p b{color:#fff}
   html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd p{color:rgba(255,255,255,.78)}html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd a{color:#ffe2b0}
