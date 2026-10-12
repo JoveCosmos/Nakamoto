@@ -4535,10 +4535,13 @@ background:radial-gradient(55% 160% at 0% 0%,rgba(185,176,255,.14),transparent 6
 .gr-open .gr-sm{display:none}
 @media(max-width:900px){.gr-open .gr-lg{display:none}.gr-open .gr-sm{display:inline}}
 #grpop .grcard{width:min(520px,calc(100vw - 32px));max-height:92svh;overflow:auto}
-.grcard .gr-who{display:flex;flex-direction:column;gap:3px;padding:14px 22px 0}
+/* compact (operator, 2026-10-12): the address on one line, short fields two to a row, the stake check as header pills */
+.grcard .gr-h{flex-wrap:wrap;row-gap:8px}
+.grcard .gr-who{display:flex;align-items:baseline;gap:10px;padding:12px 22px 0}
 .grcard .gr-who em,.grcard .gr-k,.grcard .gr-need em{font:normal 600 8.5px var(--wmono);letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
 .grcard .gr-who b{font:500 12px var(--wmono);color:var(--ws);overflow-wrap:anywhere}
-.grcard .gr-f{display:flex;flex-direction:column;gap:11px;padding:14px 22px 4px}
+.grcard .gr-f{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 12px;padding:12px 22px 4px}
+.grcard .gr-f>.gr-l:last-child{grid-column:1/-1}
 .grcard .gr-l{display:flex;flex-direction:column;gap:5px}
 .grcard .gr-k{display:flex;align-items:baseline;gap:8px}
 .grcard .gr-k i{font-style:normal;color:#b9b0ff;letter-spacing:.12em}
@@ -4549,15 +4552,15 @@ background:radial-gradient(55% 160% at 0% 0%,rgba(185,176,255,.14),transparent 6
 .grcard .gr-in::placeholder{color:var(--wf);opacity:.75}
 .grcard .gr-in:focus{border-color:#b9b0ff;box-shadow:0 0 0 3px rgba(185,176,255,.13)}
 .grcard .gr-in.bad,.grcard .gr-in.bad:focus{border-color:var(--wburn);background:rgba(255,77,31,.1);box-shadow:0 0 0 3px rgba(255,77,31,.2)}
-.grcard .gr-need{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 22px 0}
-.grcard .gr-need>div{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 8px;border-radius:8px;border:1px solid var(--wbd2);background:var(--wh);text-align:center}
-.grcard .gr-need b{font:700 18px var(--wsans);color:var(--wt)}
+.grcard .gr-need{display:flex;gap:6px;margin-left:auto}
+.grcard .gr-need>div{display:flex;align-items:baseline;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--wbd2);background:var(--wh);white-space:nowrap}
+.grcard .gr-need b{font:700 12.5px var(--wsans);color:var(--wt);font-variant-numeric:tabular-nums}
 .grcard .gr-need small{font-size:10.5px;color:var(--wf)}
 .grcard .gr-need>div.ok{border-color:rgba(46,224,106,.45)}.grcard .gr-need>div.ok b{color:var(--wgreen)}
 .grcard .gr-need>div.no{border-color:rgba(255,122,87,.5)}.grcard .gr-need>div.no b{color:#ff9b7a}
-.grcard .gr-note{margin:12px 22px 0;font-size:11.5px;line-height:1.5;color:var(--ws)}
+.grcard .gr-note{margin:10px 22px 0;font-size:11px;line-height:1.45;color:var(--ws)}
 /* a phone fits the whole form without a scroll (the popup rule leaves the page showing above and below) */
-@media(max-width:620px){.grcard .gr-f{gap:7px;padding-top:10px}.grcard .gr-l{gap:3px}.grcard textarea.gr-in{min-height:44px}
+@media(max-width:620px){.grcard .gr-f{grid-template-columns:minmax(0,1fr);gap:7px;padding-top:10px}.grcard .gr-need{margin-left:0}.grcard .gr-l{gap:3px}.grcard textarea.gr-in{min-height:44px}
   .grcard .gr-who{padding-top:10px}.grcard .gr-need{padding-top:8px;gap:8px}.grcard .gr-note{margin-top:8px;font-size:10.5px;line-height:1.4}
   .grcard .txbtns{padding:10px 20px 12px}
   .grcard .wk-txh:not(#z){padding:12px 20px 9px}.grcard .gr-need>div{padding:7px 8px;gap:2px}.grcard .gr-in{padding:6px 10px}}
@@ -4892,7 +4895,7 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 /* the Governors table, set as the redelegation list: hairline rows, column heads apart in small caps, figures right */
 .gvt-w{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;margin-top:12px;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .gvt{width:100%;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}
-.gvt th{position:sticky;top:0;z-index:1;background:var(--wc);padding:6px 10px 8px;border-bottom:1px solid var(--wbd2);text-align:left;font:500 8.5px/1.2 var(--wmono);letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
+.gvt th{position:sticky;top:0;z-index:1;background:var(--wc);padding:6px 10px 8px;border-bottom:1px solid var(--wbd2);box-shadow:inset 0 -1px 0 var(--wbd2);text-align:left;font:500 8.5px/1.2 var(--wmono);letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
 .gvt td{padding:11px 10px;border-bottom:1px solid var(--wbd);font-size:13px;color:var(--wt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gvt :is(th,td).gvt-vp{width:27%;text-align:right}.gvt :is(th,td).gvt-d{width:12%;text-align:right}.gvt :is(th,td).gvt-v{width:11%;text-align:right}.gvt :is(th,td).gvt-s{width:16%;text-align:right}
 .gvt-v b{font-weight:600}.gvt-v s{text-decoration:none;color:var(--wf)}.gvt-wait{font-style:normal;color:var(--wf)}
@@ -4909,6 +4912,21 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gvt-vp b{font-weight:600}.gvt-vp s{text-decoration:none;margin-left:8px;font-size:11px;color:var(--wf)}
 .gvt .gvt-band td{padding:10px 0 6px;border-bottom:0;overflow:visible;white-space:normal}
 .gvcard .vlogo{width:54px;height:54px;border-radius:50%;object-fit:cover;flex:none}
+/* the governor card's address chip by its name: copies on a tap, a check for a moment after */
+.gvcard .vname{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px}
+.gvc-addr{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border:1px solid var(--edge2,#2a2850);border-radius:6px;background:transparent;font:500 11px var(--mono,monospace);color:var(--ink2,#a5a3c4);cursor:pointer}
+.gvc-addr svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2}
+.gvc-addr:hover{color:var(--ink,#e6e4f0);border-color:var(--sv-teal)}
+.gvc-addr.ok{color:var(--sv-teal);border-color:var(--sv-teal)}
+.gvc-addr.ok svg{display:none}.gvc-addr.ok::after{content:"copied";font-size:10px}
+.gvcard .vstat.warn .vv{color:#ff7a57}
+.gvcard .gvc-full{grid-column:1/-1}
+.gvc-votes{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:4px}
+.gvc-v{display:inline-flex;align-items:baseline;gap:6px;padding:3px 9px;border-radius:999px;border:1px solid var(--edge2,#2a2850);font-size:12px;font-weight:600}
+.gvc-v em{font-style:normal;font-family:var(--mono,monospace);font-size:10px;color:var(--ink3,#8f8db4);font-weight:500}
+.gvc-v.y{border-color:var(--sv-green);color:var(--sv-green)}.gvc-v.n{border-color:var(--wburn,#ff6b4a);color:var(--wburn,#ff6b4a)}.gvc-v.a{color:var(--ink2,#a5a3c4)}
+.gvc-v.none{border-style:dashed;color:var(--ink3,#8f8db4)}
+.gvc-wait{font-size:12px;color:var(--ink3,#8f8db4)}
 /* a phone keeps every word whole: no Since column, names may wrap, the share sits under the figure */
 @media(max-width:620px){.gvt{table-layout:auto}.gvt :is(th,td).gvt-s{display:none}.gvt :is(th,td):is(.gvt-vp,.gvt-d,.gvt-v){width:1%;white-space:nowrap}
   .gvt th{letter-spacing:.06em;padding:6px 6px 8px}.gvt th:first-child,.gvt td:first-child{width:auto}

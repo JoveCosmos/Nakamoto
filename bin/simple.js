@@ -971,9 +971,15 @@
     if(!/^https?:\/\//i.test(u) && /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}(\/[^\s"'<>]*)?$/i.test(u)) u = "https://" + u;
     return /^https?:\/\/[^\s"'<>]+$/i.test(u) ? u : ""; }
   /* a governor's picture: its Keybase tile when the build published one, else its letter */
+  /* a published Keybase tile for this identity: listed by the build for governors, or already known as a validator's */
+  function govAv(ident){
+    if(!ident) return false;
+    if(((window.__D || {}).gav || []).indexOf(ident) >= 0) return true;
+    var VD = window.__VDBY || {}; for(var k in VD) if(VD[k] && VD[k].id === ident && VD[k].av) return true;
+    return false;
+  }
   function govLogo(g){
-    var av = ((window.__D || {}).gav || []);
-    if(g.ident && av.indexOf(g.ident) >= 0) return '<img src="assets/val/' + esc(g.ident) + '.jpg" alt="" loading=lazy>';
+    if(govAv(g.ident)) return '<img src="assets/val/' + esc(g.ident) + '.jpg" alt="" loading=lazy>';
     return '<span class=lg style="background:hsl(' + (g.m.charCodeAt(0) * 37 % 360) + ',42%,30%)">' + esc(g.m.charAt(0).toUpperCase()) + '</span>';
   }
   /* the Governors tab as the redelegation list (operator, 2026-10-12): one flat table, column heads apart, no status
@@ -1096,7 +1102,7 @@
   /* the stake the chain counts for a governor: delegations to validators in the active set */
   function bondedStake(){ var pos = window.__POS, t = 0; if(!pos) return null; pos.rows.forEach(function(r){ if(!r.inactive) t += r.x; }); return t; }
   /* [field, label, byte limit, placeholder, required, long] */
-  var GR_F = [["moniker", "Name", 70, "shown in every governor list", true], ["identity", "Keybase ID", 3000, "optional, 16-character key ID"],
+  var GR_F = [["moniker", "Name", 70, "shown in every list", true], ["identity", "Keybase ID", 3000, "optional, 16-character ID"],
               ["website", "Website", 140, "optional, https://"], ["security_contact", "Security contact", 140, "optional, an e-mail address"],
               ["details", "About", 280, "optional, what you stand for and how you vote", false, true]];
   function grVals(){ var o = {}; GR_F.forEach(function(f){ var el = E("gr-" + f[0]); o[f[0]] = el ? el.value.trim() : ""; }); return o; }
@@ -1109,8 +1115,8 @@
       if(v.moniker === me.m && v.identity === me.ident && v.website === me.web && v.security_contact === me.sec && v.details === me.det) ok = false;
     } else {
       var need = GV.rules && GV.rules.minSelf, have = bondedStake(), enough = !!(need && have != null && have >= need), nd = E("grneed");
-      if(nd) nd.innerHTML = '<div><em>Needs</em><b>' + (need ? whole(need) : "-") + '</b><small>ATONE staked</small></div>' +
-        '<div class=' + (enough ? 'ok' : 'no') + '><em>You have</em><b>' + (have != null ? fmt(have) : "-") + '</b><small>ATONE on active validators</small></div>';
+      if(nd) nd.innerHTML = '<div title="ATONE staked from your own wallet"><em>Needs</em><b>' + (need ? whole(need) : "-") + '</b></div>' +
+        '<div class=' + (enough ? 'ok' : 'no') + ' title="ATONE you have staked on active validators"><em>You have</em><b>' + (have != null ? fmt(have) : "-") + '</b></div>';
       if(!enough) ok = false;
     }
     go.disabled = !ok;
@@ -1122,13 +1128,14 @@
       pop.addEventListener("click", onClick); pop.addEventListener("input", grCheck); }
     var val = function(k){ return me ? ({ moniker: me.m, identity: me.ident, website: me.web, security_contact: me.sec, details: me.det })[k] || "" : ""; };
     pop.innerHTML = '<div class="card txcard grcard" role=dialog aria-modal=true aria-labelledby=grttl>' +
-      '<header class=wk-txh><div><b id=grttl>' + (me ? 'Edit your governor' : 'Become a governor') + '</b><span>' + esc(window.__TX ? window.__TX.CHAIN : "") + '</span></div></header>' +
-      '<div class=gr-who><em>Governor address</em><b>' + esc(govAddrOf(window.__ADDR) || "") + '</b></div>' +
+      /* the stake check rides in the header, as two small pills (operator, 2026-10-12: the boxes were too big) */
+      '<header class="wk-txh gr-h"><div><b id=grttl>' + (me ? 'Edit your governor' : 'Become a governor') + '</b><span>' + esc(window.__TX ? window.__TX.CHAIN : "") + '</span></div>' +
+        (me ? '' : '<div class=gr-need id=grneed></div>') + '</header>' +
+      (function(){ var ga = govAddrOf(window.__ADDR) || ""; return '<div class=gr-who><em>Governor address</em><b title="' + esc(ga) + '">' + esc(ga.slice(0, 16) + "\u2026" + ga.slice(-8)) + '</b></div>'; })() +
       '<div class=gr-f>' + GR_F.map(function(f){
         return '<label class=gr-l for=gr-' + f[0] + '><span class=gr-k>' + f[1] + (f[4] ? '<i>required</i>' : '') + '<small id=grc-' + f[0] + '></small></span>' +
           (f[5] ? '<textarea class=gr-in id=gr-' + f[0] + ' rows=3 spellcheck=true placeholder="' + esc(f[3]) + '">' + esc(val(f[0])) + '</textarea>'
                 : '<input class=gr-in id=gr-' + f[0] + ' type=text autocomplete=off spellcheck=false placeholder="' + esc(f[3]) + '" value="' + esc(val(f[0])) + '">') + '</label>'; }).join("") + '</div>' +
-      (me ? '' : '<div class=gr-need id=grneed></div>') +
       '<p class=gr-note>' + (me ? 'The new details show once the next block carries them.'
         /* the one place the governor rules are spelled out (operator, 2026-10-12: merged, register card only) */
         : 'Your own stake follows you from the moment you register, and as a governor you cannot follow another one. Keep at least ' + (R.minSelf ? whole(R.minSelf) : "10,000") +
@@ -1143,30 +1150,62 @@
   }
   function grClose(){ var p = E("grpop"); if(p && window.__POP) window.__POP.close(p); }
   /* a governor's card, as a validator's: who it is, what it holds, and the chain's rules for governors */
+  /* the governor card (operator, 2026-10-12): what the rows do not show - its own stake against the minimum, the stake
+     that follows it, when its status can next change, how it voted lately - with its address, copyable, by its name */
+  function govOwn(g){
+    var a = govAcctOf(g.addr); GV.own = GV.own || {};
+    if(GV.own[a] === undefined){ GV.own[a] = null;
+      gapi("/cosmos/staking/v1beta1/delegations/" + a + "?pagination.limit=200").then(function(d){ var t = 0;
+        (d.delegation_responses || []).forEach(function(x){ t += +((x.balance || {}).amount || 0); }); GV.own[a] = t; })
+        .catch(function(){ GV.own[a] = -1; }).then(gvRefresh); }
+    return GV.own[a];
+  }
+  function gvRefresh(){ var pop = E("gvpop"); if(pop && pop.classList.contains("on") && pop.dataset.gv){ var g = (GV.list || []).filter(function(x){ return x.addr === pop.dataset.gv; })[0]; if(g) pop.innerHTML = gvHtml(g); } }
+  function gvHtml(g){
+    var R = GV.rules || {}, mine = myGov(), own = govOwn(g), min = R.minSelf || 0;
+    var st = function(k, v, sub, cls){ return '<div class="vstat' + (cls ? ' ' + cls : '') + '"><span class=vk>' + k + '</span><span class=vv>' + v + '</span>' + (sub ? '<i class=vsubn>' + sub + '</i>' : '') + '</div>'; };
+    var gw = gweb(g.web), web = gw ? '<a class=vweb href="' + esc(gw) + '" target=_blank rel="noopener noreferrer">' + esc(gw.replace(/^https?:\/\//, "").replace(/\/+$/, "")) + '</a>' : '<span class="vweb none">no website</span>';
+    /* own stake against the chain's minimum: how far it is from being set inactive */
+    var ownV = own === null ? "\u2026" : own < 0 ? NA : fmt(own) + " ATONE";
+    var ownS = own === null || own < 0 || !min ? "" : own >= min ? (own / min).toFixed(1).replace(/\.0$/, "") + "\u00d7 the " + whole(min) + " minimum" : "under the " + whole(min) + " minimum";
+    var foll = own === null || own < 0 || g.vp == null ? "\u2026" : fmt(Math.max(0, g.vp - own)) + " ATONE";
+    /* when its status may change next: the chain holds any change for the status-change period */
+    var nx = g.since && R.period ? new Date(g.since).getTime() + R.period * 1000 : 0, now = Date.now();
+    var nxV = !nx ? NA : nx <= now ? "Now" : window.__dayFull(nx), nxS = !nx ? "" : nx <= now ? "its " + Math.round(R.period / 86400) + " days have passed" : Math.round(R.period / 86400) + " days after its last change";
+    /* how it voted on the latest proposals since it became active */
+    var h = votesOf(govAcctOf(g.addr), 1), P = GP.list || [], since = g.since ? new Date(g.since).getTime() : 0;
+    var from = h && h.part && (window.__D || {}).hist_from ? new Date(window.__D.hist_from).getTime() : 0;
+    var rec = P.filter(function(p){ return p.vs && p.ve && new Date(p.ve).getTime() > since && (!from || new Date(p.vs).getTime() >= from); }).slice(0, 6);
+    var VW = { yes: ["y", "Yes"], no: ["n", "No"], abstain: ["a", "Abstain"] };
+    var votes = !h || !h.map ? '<span class=gvc-wait>Reading its votes\u2026</span>' : !rec.length ? '<span class=gvc-wait>No proposal since it became active' + (h.part ? ' within the record we can read' : '') + '</span>' :
+      rec.map(function(p){ var v = h.map[p.id], w = v ? VW[v] : null;
+        return '<span class="gvc-v ' + (w ? w[0] : 'none') + '" title="#' + p.id + ' ' + esc(p.title) + '"><em>#' + p.id + '</em>' + (w ? w[1] : p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? "Not yet" : "No vote") + '</span>'; }).join("");
+    var tag = window.__ADDR && g.addr === govAddrOf(window.__ADDR) ? '<span class="badge up">YOU</span>' : g.addr === mine ? '<span class="badge up">YOU FOLLOW</span>' : '';
+    return '<div class="card vcard gvcard" role=dialog aria-modal=true aria-label="Governor ' + esc(g.m) + '">' +
+      '<div class="vhead vwrap">' + (govAv(g.ident) ? '<img class=vlogo src="assets/val/' + esc(g.ident) + '.jpg" alt="">' :
+        '<span class=vmono style="display:flex;background:hsl(' + (g.m.charCodeAt(0) * 37 % 360) + ',42%,30%)">' + esc(g.m.charAt(0).toUpperCase()) + '</span>') +
+        '<div class=vcol><div class=vname><span class=vnm>' + esc(g.m) + '</span>' +
+          '<button type=button class=gvc-addr data-act=gvcopy data-a="' + esc(g.addr) + '" title="Copy ' + esc(g.addr) + '">' + esc(g.addr.slice(0, 12) + "\u2026" + g.addr.slice(-6)) +
+          '<svg viewBox="0 0 24 24" aria-hidden=true><rect x=9 y=9 width=11 height=11 rx=2 /><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg></button></div>' +
+        '<div class=vsub>' + web + '</div></div></div>' +
+      '<div class=vbadges><span class="badge ' + (g.active ? 'ok' : 'dn') + '">' + (g.active ? 'ACTIVE' : 'INACTIVE') + '</span>' + tag + '</div>' +
+      (g.det ? '<p class=gv-det>' + esc(g.det) + '</p>' : '') +
+      '<div class=vgrid>' +
+        st("own stake", ownV, ownS, own !== null && own >= 0 && min && own < min ? "warn" : "") +
+        st("followers' stake", foll, "votes with it when they do not") +
+        st("status can change", nxV, nxS) +
+        st("security contact", g.sec ? esc(g.sec) : "-", "") +
+        '<div class="vstat gvc-full"><span class=vk>latest votes</span><div class=gvc-votes>' + votes + '</div></div>' +
+      '</div>' +
+      (govBtn(g, mine) ? '<div class=gv-go>' + govBtn(g, mine) + '</div>' : '') +
+    '</div>';
+  }
   function govCard(addr){
     var g = (GV.list || []).filter(function(x){ return x.addr === addr; })[0]; if(!g) return;
     var P = window.__POP, pop = E("gvpop");
     if(!pop){ pop = document.createElement("div"); pop.className = "pop"; pop.id = "gvpop"; document.body.appendChild(pop);
       pop.addEventListener("click", onClick); }
-    var R = GV.rules || {}, mine = myGov(), sh = GV.bonded ? (g.vp || 0) / GV.bonded * 100 : null;
-    var st = function(k, v, sub){ return '<div class=vstat><span class=vk>' + k + '</span><span class=vv>' + v + '</span>' + (sub ? '<i class=vsubn>' + sub + '</i>' : '') + '</div>'; };
-    var gw = gweb(g.web), web = gw ? '<a class=vweb href="' + esc(gw) + '" target=_blank rel="noopener noreferrer">' + esc(gw.replace(/^https?:\/\//, "").replace(/\/+$/, "")) + '</a>' : '<span class="vweb none">no website</span>';
-    pop.innerHTML = '<div class="card vcard gvcard" role=dialog aria-modal=true aria-label="Governor ' + esc(g.m) + '">' +
-      '<div class="vhead vwrap">' + (((window.__D || {}).gav || []).indexOf(g.ident) >= 0 && g.ident ? '<img class=vlogo src="assets/val/' + esc(g.ident) + '.jpg" alt="">' :
-        '<span class=vmono style="display:flex;background:hsl(' + (g.m.charCodeAt(0) * 37 % 360) + ',42%,30%)">' + esc(g.m.charAt(0).toUpperCase()) + '</span>') +
-        '<div class=vcol><div class=vname><span class=vnm>' + esc(g.m) + '</span></div><div class=vsub>' + web + '</div></div></div>' +
-      '<div class=vbadges><span class="badge ' + (g.active ? 'ok' : 'dn') + '">' + (g.active ? 'ACTIVE' : 'INACTIVE') + '</span>' + (window.__ADDR && g.addr === govAddrOf(window.__ADDR) ? '<span class="badge up">YOU</span>' : g.addr === mine ? '<span class="badge up">YOU FOLLOW</span>' : '') + '</div>' +
-      (g.det ? '<p class=gv-det>' + esc(g.det) + '</p>' : '') +
-      '<div class=vgrid>' +
-        st("voting power", g.vp != null ? fmt(g.vp) : NA, sh != null ? sh.toFixed(2) + "% of bonded ATONE" : "") +
-        st("delegators", g.n != null ? String(g.n) : NA, "wallets that follow it") +
-        st(g.active ? "active since" : "inactive since", g.since && window.__dayFull ? window.__dayFull(g.since) : NA, "") +
-        st("security contact", g.sec ? esc(g.sec) : "-", "") +
-        st("identity", g.ident ? esc(g.ident) : "-", g.ident ? "Keybase" : "") +
-        st("address", esc(g.addr.slice(0, 12) + "\u2026" + g.addr.slice(-6)), "") +
-      '</div>' +
-      (govBtn(g, mine) ? '<div class=gv-go>' + govBtn(g, mine) + '</div>' : '') +
-    '</div>';
+    loadProps(); pop.dataset.gv = addr; pop.innerHTML = gvHtml(g);
     if(P) P.open(pop);
   }
   function govEmpty(t){ return '<div class=sv-upwait>' + t + '</div>'; }
@@ -1278,7 +1317,7 @@
     };
     /* complete when the baked record was read: the node's search only tops it up, so its depth claims nothing */
     base.then(function(){ return page(1).catch(function(){}); })
-      .then(function(){ GP.hist[a] = { map: map, part: !baked }; var sc = screen(); if(sc === "props") drawProps(); else if(sc === "govs") render(); });
+      .then(function(){ GP.hist[a] = { map: map, part: !baked }; var sc = screen(); if(sc === "props") drawProps(); else if(sc === "govs"){ render(); gvRefresh(); } });
     return GP.hist[a];
   }
   /* the row's mark: filled = this wallet voted, outlined = its governor did (and so voted for it); colour = the vote */
@@ -2165,6 +2204,7 @@
     if(act === "gfollow"){ govSend(t, { type: "atomone/v1/MsgDelegateGovernor", value: { delegator_address: window.__ADDR, governor_address: t.dataset.g } }); return; }
     if(act === "greg"){ if(GOV_REG) govForm(); return; }
     if(act === "gvinact"){ GV.inopen = !GV.inopen; render(); return; }
+    if(act === "gvcopy"){ var ad = t.dataset.a; if(ad && typeof copyText === "function") copyText(ad, function(){ t.classList.add("ok"); setTimeout(function(){ t.classList.remove("ok"); }, 1400); }); return; }
     if(act === "grclose"){ grClose(); return; }
     if(act === "grsend" && GOV_REG){
       var gv = grVals(), gd = {}, gme = myGovRec();

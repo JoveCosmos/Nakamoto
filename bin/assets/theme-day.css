@@ -860,12 +860,23 @@
   html[data-theme=light]:not([data-mono]) .gp-st.d{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .gd-r{background:transparent}
   html[data-theme=light]:not([data-mono]) .gd-r+.gd-r{background:transparent}
+  html[data-theme=light]:not([data-mono]) .gvt th{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .gvt-v s{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .gvt-r:hover td,html[data-theme=light]:not([data-mono]) .gvt-r:focus-visible td{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .gvt-tag{color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .gvt-tag.you{color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .gvt-lg img,html[data-theme=light]:not([data-mono]) .gvt-lg .lg{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .gvt-vp s{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .gvc-addr{border-color:var(--edge2,var(--surface-2));background:transparent;color:var(--ink2,var(--muted))}
+  html[data-theme=light]:not([data-mono]) .gvc-addr svg{fill:none;stroke:currentColor}
+  html[data-theme=light]:not([data-mono]) .gvc-addr:hover{color:var(--ink,var(--ink))}
+  html[data-theme=light]:not([data-mono]) .gvcard .vstat.warn .vv{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .gvc-v{border-color:var(--edge2,var(--surface-2))}
+  html[data-theme=light]:not([data-mono]) .gvc-v em{color:var(--ink3,var(--muted))}
+  html[data-theme=light]:not([data-mono]) .gvc-v.n{border-color:var(--wburn,var(--danger-bar));color:var(--wburn,var(--danger))}
+  html[data-theme=light]:not([data-mono]) .gvc-v.a{color:var(--ink2,var(--muted))}
+  html[data-theme=light]:not([data-mono]) .gvc-v.none{color:var(--ink3,var(--muted))}
+  html[data-theme=light]:not([data-mono]) .gvc-wait{color:var(--ink3,var(--muted))}
   html[data-theme=light]:not([data-mono]) .gvtab .gvh{background:none;box-shadow:none}
   html[data-theme=light]:not([data-mono]) .gvtab .gvh:hover{background:none}
   html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd{border-bottom-color:var(--surface-2);background:var(--amber-bar)}
