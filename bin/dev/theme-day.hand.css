@@ -151,7 +151,7 @@
   html[data-theme=light]:not([data-mono]) .sd-wch .wact:hover{background:var(--warn);color:#fff}
   html[data-theme=light]:not([data-mono]) .actabs{border-color:var(--line)}
   html[data-theme=light]:not([data-mono]) .actabs button{color:var(--muted)}
-  html[data-theme=light]:not([data-mono]) .actabs button[aria-selected=true]{background:var(--accent);color:#fff}
+  html[data-theme=light]:not([data-mono]) .actabs button[aria-pressed=true]{background:var(--accent);color:#fff}
   html[data-theme=light]:not([data-mono]) .actsum,html[data-theme=light]:not([data-mono]) .act-m s{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .act-m b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .act-d,html[data-theme=light]:not([data-mono]) .act-empty{color:var(--faint)}

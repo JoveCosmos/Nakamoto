@@ -717,7 +717,7 @@
   html[data-theme=light]:not([data-mono]) .sd-wch .wact:hover{color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .actabs{border-color:var(--wbd,var(--line))}
   html[data-theme=light]:not([data-mono]) .actabs button{background:transparent;color:var(--ws,var(--muted))}
-  html[data-theme=light]:not([data-mono]) .actabs button[aria-selected=true]{background:var(--sv-teal,var(--accent));color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .actabs button[aria-pressed=true]{background:var(--sv-teal,var(--accent));color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .actabs button:focus-visible{outline-color:var(--sv-teal,var(--accent))}
   html[data-theme=light]:not([data-mono]) .actsum{color:var(--ws,var(--muted))}
   html[data-theme=light]:not([data-mono]) .actlist{border-top-color:var(--wbd,var(--line))}
@@ -1291,7 +1291,7 @@
   html[data-theme=light]:not([data-mono]) .sd-wch .wact:hover{background:var(--warn);color:#fff}
   html[data-theme=light]:not([data-mono]) .actabs{border-color:var(--line)}
   html[data-theme=light]:not([data-mono]) .actabs button{color:var(--muted)}
-  html[data-theme=light]:not([data-mono]) .actabs button[aria-selected=true]{background:var(--accent);color:#fff}
+  html[data-theme=light]:not([data-mono]) .actabs button[aria-pressed=true]{background:var(--accent);color:#fff}
   html[data-theme=light]:not([data-mono]) .actsum,html[data-theme=light]:not([data-mono]) .act-m s{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .act-m b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .act-d,html[data-theme=light]:not([data-mono]) .act-empty{color:var(--faint)}

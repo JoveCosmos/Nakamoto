@@ -1628,7 +1628,7 @@
       var H = (rep && rep.history) || [], mv = 0, gn = 0; H.forEach(function(x){ mv += x.uatone || 0; gn += x.gain || 0; });
       var g1 = function(v){ return "+" + (+v).toLocaleString("en-US", { maximumFractionDigits: v >= 100 ? 0 : 2 }) + " ATONE a year"; };
       return { sum: (on ? "Autopilot is on" : "Autopilot is off") + (H.length ? ", last " + H.length + " moves: " + fmt(mv) + " ATONE moved, " + g1(gn) : ", no moves yet"),
-        rows: H.map(function(x){ return actRow(actDay(x.at * 1000), fmt(x.uatone) + " ATONE, " + g1(x.gain), esc(actName(x.src)) + " &rarr; " + esc(actName(x.dst)), x.txhash); }) }; });
+        rows: H.map(function(x){ return actRow(actDay(x.at * 1000), fmt(x.uatone) + " ATONE", g1(x.gain) + ", " + esc(actName(x.src)) + " &rarr; " + esc(actName(x.dst)), x.txhash); }) }; });
     if(k === "restake") return Promise.all([
         fetch("pilot/" + a + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }),
         actSearch("withdraw_rewards.delegator='" + a + "'").catch(function(){ return {}; })]).then(function(x){
@@ -1652,7 +1652,7 @@
   }
   function actShow(){
     var k = ACT.k, el = E("actlist"), sm = E("actsum");
-    [].forEach.call(document.querySelectorAll("#actpop .actabs button"), function(b){ b.setAttribute("aria-selected", b.dataset.k === k ? "true" : "false"); });
+    [].forEach.call(document.querySelectorAll("#actpop .actabs button"), function(b){ b.setAttribute("aria-pressed", b.dataset.k === k ? "true" : "false"); });
     var c = ACT.cache[k];
     if(!c){ if(sm) sm.textContent = "Reading\u2026"; if(el) el.innerHTML = '<div class=act-empty>Reading\u2026</div>';
       actLoad(k).then(function(r){ ACT.cache[k] = r; if(ACT.k === k) actShow(); }); return; }

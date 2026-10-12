@@ -4307,7 +4307,7 @@ border:1px solid var(--sv-amber);background:rgba(255,176,46,.14);color:var(--sv-
 .actcard{width:min(560px,94vw)}
 .actabs{display:flex;gap:4px;margin:4px 18px 0;padding:3px;border:1px solid var(--wbd,#232342);border-radius:99px}
 .actabs button{flex:1 1 0;border:0;border-radius:99px;padding:7px 10px;background:transparent;color:var(--ws,#c1bfdc);font:600 12.5px var(--wsans,var(--sans));cursor:pointer}
-.actabs button[aria-selected=true]{background:var(--sv-teal,#2bc8bd);color:#071a18}
+.actabs button[aria-pressed=true]{background:var(--sv-teal,#2bc8bd);color:#071a18}
 .actabs button:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offset:2px}
 .actsum{margin:12px 18px 0;min-height:2.6em;font-size:12.5px;line-height:1.35;color:var(--ws,#c1bfdc)}
 .actlist{margin:6px 18px 16px;height:min(340px,52vh);overflow-y:auto;border-top:1px solid var(--wbd,#232342);scrollbar-width:thin}
@@ -7034,7 +7034,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
 
 <div class=pop id=actpop><div class="card vcard actcard" role=dialog aria-modal=true aria-labelledby=actttl>
   <div class="vhead vwrap"><div class=vcol><div class=vname><span class=vnm id=actttl>Activity</span></div><div class=vsub><span class=iop id=actaddr></span></div></div></div>
-  <div class=actabs role=tablist aria-label="Activity"><button type=button role=tab data-k=pilot aria-selected=true>Autopilot</button><button type=button role=tab data-k=restake aria-selected=false>Restake</button><button type=button role=tab data-k=account aria-selected=false>Account</button></div>
+  <div class=actabs role=group aria-label="Activity"><button type=button data-k=pilot aria-pressed=true>Autopilot</button><button type=button data-k=restake aria-pressed=false>Restake</button><button type=button data-k=account aria-pressed=false>Account</button></div>
   <div class=actsum id=actsum></div>
   <div class=actlist id=actlist></div>
 </div></div>
