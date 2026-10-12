@@ -1613,41 +1613,73 @@
   function actX(){ return "https://explorer.gatahub.zone/" + (TN() ? "atomone-testnet-1" : "atomone-1") + "/txs/"; }
   function actName(id){ var V = window.__VALS ? window.__VALS() : []; for(var i = 0; i < V.length; i++) if(V[i][3] === id) return V[i][0];
     var x = (window.__INACT || {})[id]; return x && x.m ? x.m : String(id || "").slice(-6); }
-  function actDay(t){ return window.__dayFull ? window.__dayFull(t) : new Date(t).toISOString().slice(0, 10); }
+  var ACT_MO = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function actDay(t){ var d = new Date(t), y = d.getUTCFullYear(); return d.getUTCDate() + " " + ACT_MO[d.getUTCMonth()] + (y !== new Date().getUTCFullYear() ? " " + y : ""); }
   function actTx(h){ return h ? '<a class=act-tx href="' + actX() + esc(h) + '" target=_blank rel="noopener noreferrer">' + esc(h.slice(0, 8)) + '</a>' : '<span class=act-tx></span>'; }
-  function actRow(d, main, sub, h){ return '<div class=act-r><span class=act-d>' + d + '</span><span class=act-m><b>' + main + '</b>' + (sub ? '<s>' + sub + '</s>' : '') + '</span>' + actTx(h) + '</div>'; }
+  function actRow(d, main, sub, h, amt){ return '<div class=act-r><span class=act-d>' + d + '</span><span class=act-m><b>' + main + '</b>' + (sub ? '<s>' + sub + '</s>' : '') + '</span>' +
+    '<span class=act-x>' + (amt ? '<b>' + amt + '</b>' : '') + actTx(h) + '</span></div>'; }
   function actSearch(q){ return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/tx/v1beta1/txs?query=" + encodeURIComponent(q) +
       "&order_by=ORDER_BY_DESC&limit=30&page=1&pagination.limit=30", { cache: "no-store" }).then(function(r){ return r.json(); }); }
   var ACT_KIND = { MsgDelegate: "Stake", MsgUndelegate: "Unstake", MsgBeginRedelegate: "Redelegate", MsgWithdrawDelegatorReward: "Claim rewards",
-    MsgGrant: "Grant", MsgRevoke: "Revoke", MsgVote: "Vote", MsgSend: "Send", MsgMintPhoton: "Mint PHOTON", MsgExec: "Authorized action",
-    MsgDelegateGovernor: "Follow a governor", MsgUndelegateGovernor: "Stop following", MsgCancelUnbondingDelegation: "Cancel unstaking", MsgTransfer: "IBC transfer" };
+    MsgWithdrawValidatorCommission: "Claim commission", MsgGrant: "Grant", MsgRevoke: "Revoke", MsgVote: "Vote", MsgVoteWeighted: "Vote", MsgSend: "Send",
+    MsgMultiSend: "Send", MsgMintPhoton: "Mint PHOTON", MsgExec: "Authorized", MsgDelegateGovernor: "Follow a governor", MsgUndelegateGovernor: "Stop following",
+    MsgCancelUnbondingDelegation: "Cancel unstaking", MsgTransfer: "IBC transfer", MsgSubmitProposal: "Submit proposal", MsgDeposit: "Deposit", MsgSetWithdrawAddress: "Set reward address" };
+  function actCoin(c){ if(!c) return ""; var u = parseInt(c.amount, 10) || 0, d = c.denom === "uatone" ? "ATONE" : c.denom === "uphoton" ? "PHOTON" : /^ibc\//.test(c.denom) ? "IBC" : c.denom;
+    return u ? fmt(u) + " " + d : ""; }
+  var ACT_VOTE = { VOTE_OPTION_YES: "Yes", VOTE_OPTION_NO: "No", VOTE_OPTION_ABSTAIN: "Abstain", 1: "Yes", 2: "Abstain", 3: "No" };
+  /* one explorer row from a transaction, seen from this wallet: what happened, the amount and its direction */
+  function actAcct(t, r, a){
+    var ms = (t.body || {}).messages || [], memo = (t.body || {}).memo || "", m0 = ms[0] || {}, ty = String(m0["@type"] || "").split(".").pop();
+    var inner = ty === "MsgExec" ? (m0.msgs || []) : ms, ity = String((inner[0] || {})["@type"] || "").split(".").pop();
+    var kind = ty === "MsgExec" ? (/Restake/.test(memo) ? "Restake" : /Autopilot/.test(memo) ? "Autopilot move" : "Authorized " + (ACT_KIND[ity] || ity).toLowerCase()) : (ACT_KIND[ty] || ty.replace(/^Msg/, "") || "Transaction");
+    var amt = "", sub = "", sum = 0, den = "";
+    var add = function(c){ if(c && c.amount){ sum += parseInt(c.amount, 10) || 0; den = c.denom; } };
+    var ev = function(type, key){ var tot = 0; (r.events || []).forEach(function(e){ if(e.type !== type) return; var at = {}; (e.attributes || []).forEach(function(q){ at[q.key] = q.value; });
+      if(key && at[key] && at[key] !== a) return; var mm = /^(\d+)uatone/.exec(at.amount || ""); if(mm) tot += +mm[1]; }); return tot; };
+    if(ity === "MsgSend" || ty === "MsgSend"){ var s0 = ty === "MsgSend" ? m0 : inner[0]; (s0.amount || []).forEach(add);
+      var out = s0.from_address === a; amt = (out ? "\u2212" : "+") + actCoin({ amount: sum, denom: den }); sub = (out ? "to " : "from ") + esc(String(out ? s0.to_address : s0.from_address).slice(0, 12)) + "\u2026"; }
+    else if(/Delegate$|Undelegate$|BeginRedelegate$|CancelUnbonding/.test(ity)){ inner.forEach(function(x){ add(x.amount); }); amt = actCoin({ amount: sum, denom: den });
+      var x0 = inner[0] || {}; sub = ity === "MsgBeginRedelegate" ? esc(actName(x0.validator_src_address)) + " &rarr; " + (inner.length > 1 ? inner.length + " validators" : esc(actName(x0.validator_dst_address))) : esc(actName(x0.validator_address)) + (inner.length > 1 ? " and " + (inner.length - 1) + " more" : "");
+      if(kind === "Restake"){ var st = ev("delegate", "delegator"); amt = st ? fmt(st) + " ATONE" : amt; } }
+    else if(/WithdrawDelegatorReward/.test(ity)){ var w = ev("withdraw_rewards", "delegator"), nv = inner.filter(function(x){ return /WithdrawDelegatorReward/.test(x["@type"] || ""); }).length;
+      if(kind === "Restake"){ var sb = ev("delegate", "delegator"); amt = fmt(sb || w) + " ATONE"; sub = "rewards from " + nv + " validator" + (nv === 1 ? "" : "s") + ", staked back"; }
+      else { amt = w ? "+" + fmt(w) + " ATONE" : ""; sub = "from " + nv + " validator" + (nv === 1 ? "" : "s"); } }
+    else if(/MsgVote/.test(ity)){ sub = "proposal #" + (inner[0] || {}).proposal_id; amt = ACT_VOTE[(inner[0] || {}).option] || ""; }
+    else if(ity === "MsgMintPhoton"){ amt = "\u2212" + actCoin((inner[0] || {}).amount); sub = "ATONE burned for PHOTON"; }
+    else if(ity === "MsgTransfer"){ amt = "\u2212" + actCoin((inner[0] || {}).token); sub = "to " + esc(String((inner[0] || {}).receiver || "").slice(0, 14)) + "\u2026"; }
+    else if(ity === "MsgGrant" || ity === "MsgRevoke"){ sub = /GATA/.test(memo) ? memo.replace(/^GATA AtomOne /, "") : ""; }
+    if(ms.length > 1 && ty !== "MsgExec") kind += " (" + ms.length + ")";
+    var fee = ((t.auth_info || {}).fee || {}).amount || [], signer = !!(((t.auth_info || {}).signer_infos || []).length) && ty !== "MsgExec" || ty === "MsgExec" && false;
+    if(r.code) sub = (sub ? sub + ", " : "") + "failed";
+    return { h: +r.height, row: actRow(actDay(new Date(r.timestamp).getTime()), esc(kind), sub, r.txhash, amt) };
+  }
   function actLoad(k){
     var a = window.__ADDR; if(!a) return Promise.resolve({ sum: "Connect a wallet", rows: [] });
-    if(k === "pilot") return fetch("pilot/" + a + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }).then(function(rep){
+    var rep = function(){ return fetch("pilot/" + a + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }); };
+    var g1 = function(v){ return "+" + (+v).toLocaleString("en-US", { maximumFractionDigits: v >= 100 ? 0 : 2 }) + " ATONE a year"; };
+    var since = function(L){ return L.length ? ", since " + actDay(L[L.length - 1].at * 1000) : ""; };
+    if(k === "pilot") return rep().then(function(R){
       var at = window.__atInfo ? window.__atInfo() : null, on = !!(at && at.grant);
-      var H = (rep && rep.history) || [], mv = 0, gn = 0; H.forEach(function(x){ mv += x.uatone || 0; gn += x.gain || 0; });
-      var g1 = function(v){ return "+" + (+v).toLocaleString("en-US", { maximumFractionDigits: v >= 100 ? 0 : 2 }) + " ATONE a year"; };
-      return { sum: (on ? "Autopilot is on" : "Autopilot is off") + (H.length ? ", last " + H.length + " moves: " + fmt(mv) + " ATONE moved, " + g1(gn) : ", no moves yet"),
-        rows: H.map(function(x){ return actRow(actDay(x.at * 1000), fmt(x.uatone) + " ATONE", g1(x.gain) + ", " + esc(actName(x.src)) + " &rarr; " + esc(actName(x.dst)), x.txhash); }) }; });
-    if(k === "restake") return Promise.all([
-        fetch("pilot/" + a + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }),
-        actSearch("withdraw_rewards.delegator='" + a + "'").catch(function(){ return {}; })]).then(function(x){
-      var rs = (x[0] && x[0].restake) || {}, on = !!(window.__atInfo && window.__atInfo() && window.__atInfo().restake);
-      var rows = [];
-      (x[1].txs || []).forEach(function(t, i){
-        var r = (x[1].tx_responses || [])[i] || {}; if(!/GATA AtomOne Restake/.test((t.body || {}).memo || "")) return;
-        var u = 0, to = [];
-        (r.events || []).forEach(function(e){ if(e.type !== "delegate") return; var at = {}; (e.attributes || []).forEach(function(q){ at[q.key] = q.value; });
-          if(at.delegator && at.delegator !== a) return; u += parseInt(at.amount || "0", 10) || 0; if(at.validator) to.push(actName(at.validator)); });
-        rows.push(actRow(actDay(new Date(r.timestamp).getTime()), fmt(u) + " ATONE restaked", to.length ? "onto " + esc(to.slice(0, 3).join(", ")) + (to.length > 3 ? " and " + (to.length - 3) + " more" : "") : "", r.txhash));
-      });
-      return { sum: (on ? "Restake is on" : "Restake is off") + (rs.count ? ", " + rs.count + " restakes, " + fmt(rs.total || 0) + " ATONE staked back" : ", no restakes yet"), rows: rows }; });
-    return actSearch("message.sender='" + a + "'").then(function(d){
-      var rows = (d.txs || []).slice(0, 30).map(function(t, i){
-        var r = (d.tx_responses || [])[i] || {}, ms = ((t.body || {}).messages || []).map(function(m){ var n = String(m["@type"] || "").split(".").pop(); return ACT_KIND[n] || n.replace(/^Msg/, ""); });
-        var uniq = ms.filter(function(m, j){ return ms.indexOf(m) === j; });
-        return actRow(actDay(new Date(r.timestamp).getTime()), esc(uniq.join(", ") || "Transaction") + (ms.length > 1 ? " (" + ms.length + ")" : ""), r.code ? "failed" : "", r.txhash); });
-      return { sum: rows.length ? "The wallet's latest " + rows.length + " transaction" + (rows.length === 1 ? "" : "s") : "No transactions signed by this wallet yet", rows: rows }; })
+      var H = ((R && R.activity && R.activity.moves) || (R && R.history) || []).filter(function(x){ return x.uatone > 0; }), mv = 0, gn = 0;
+      H.forEach(function(x){ mv += x.uatone; gn += +x.gain || 0; });
+      return { sum: (on ? "Autopilot is on" : "Autopilot is off") + (H.length ? ": " + H.length + " moves, " + fmt(mv) + " ATONE moved, " + g1(gn) + since(H) : ", no moves yet"),
+        rows: H.map(function(x){ return actRow(actDay(x.at * 1000), esc(actName(x.src)) + " &rarr; " + esc(actName(x.dst)), g1(x.gain), x.txhash, fmt(x.uatone) + " ATONE"); }) }; });
+    if(k === "restake") return rep().then(function(R){
+      var on = !!(window.__atInfo && window.__atInfo() && window.__atInfo().restake);
+      var L = ((R && R.activity && R.activity.restakes) || []).filter(function(x){ return x.staked > 0; }), tot = 0; L.forEach(function(x){ tot += x.staked; });
+      if(!(R && R.activity)) return actSearch("withdraw_rewards.delegator='" + a + "'").catch(function(){ return {}; }).then(function(d){
+        var rows = []; (d.txs || []).forEach(function(t, i){ var r = (d.tx_responses || [])[i] || {}; if(!/GATA AtomOne Restake/.test((t.body || {}).memo || "")) return;
+          var o = actAcct(t, r, a); rows.push(o.row); });
+        return { sum: (on ? "Restake is on" : "Restake is off") + (rows.length ? ": " + rows.length + " restakes" : ", no restakes yet"), rows: rows }; });
+      return { sum: (on ? "Restake is on" : "Restake is off") + (L.length ? ": " + L.length + " restakes, " + fmt(tot) + " ATONE of rewards staked back" + since(L) : ", no restakes yet"),
+        rows: L.map(function(x){ return actRow(actDay(x.at * 1000), "Rewards staked back", x.target ? "onto " + esc(actName(x.target)) + (x.staked > 0 ? "" : "") : "", x.txhash, fmt(x.staked) + " ATONE"); }) }; });
+    /* Account: the address as an explorer shows it - what it signed, what it received, and what was done on its behalf */
+    var qs = ["message.sender='" + a + "'", "transfer.recipient='" + a + "'", "delegate.delegator='" + a + "'", "withdraw_rewards.delegator='" + a + "'"];
+    return Promise.all(qs.map(function(q){ return actSearch(q).catch(function(){ return {}; }); })).then(function(R){
+      var seen = {}, rows = [];
+      R.forEach(function(d){ (d.txs || []).forEach(function(t, i){ var r = (d.tx_responses || [])[i] || {}; if(!r.txhash || seen[r.txhash]) return; seen[r.txhash] = 1; rows.push(actAcct(t, r, a)); }); });
+      rows.sort(function(x, y){ return y.h - x.h; }); rows = rows.slice(0, 30);
+      return { sum: rows.length ? "Latest " + rows.length + " transactions on this address" : "No transactions on this address yet", rows: rows.map(function(o){ return o.row; }) }; })
       .catch(function(){ return { sum: "Could not read the chain. Try again in a moment.", rows: [] }; });
   }
   function actShow(){

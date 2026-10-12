@@ -947,8 +947,24 @@ def held_log(gr, svc, h):
         elif k in HELD: log("%s hold lifted granter=%s" % (svc, gr))
         HELD[k] = v
 
+def activity(granter):
+    """the wallet's whole record, for the app's Activity card (operator, 2026-10-12): every Autopilot move and every
+    restake that landed, non-zero only, newest first. Read from our own state, so it is the full history, not the chain's"""
+    try:
+        c2 = sqlite3.connect("file:%s?mode=ro" % STATE, uri=True, timeout=5)
+        mv = [{"at": r[0], "src": r[1], "dst": r[2], "uatone": r[3], "gain": round(r[4] or 0, 3), "txhash": r[5]} for r in c2.execute(
+            "SELECT at, src, dst, uatone, gain, txhash FROM move WHERE granter=? AND dry=0 AND txhash IS NOT NULL AND uatone>0 ORDER BY at DESC, rowid DESC", (granter,))]
+        rs = [{"at": r[0], "rewards": r[1], "staked": r[2], "target": r[3], "txhash": r[4]} for r in c2.execute(
+            "SELECT at, rewards, staked, target, txhash FROM restake WHERE granter=? AND dry=0 AND txhash IS NOT NULL AND staked>0 ORDER BY at DESC", (granter,))]
+        c2.close()
+        return {"moves": mv, "restakes": rs}
+    except Exception as e:
+        log("activity unreadable for %s: %s" % (short(granter), e)); return None
+
 def report(granter, obj):
     # the public file never carries the signer's answer, an older report's included (audit 2026-09-30)
+    act = activity(granter)
+    if act is not None: obj["activity"] = act
     if "last" in obj: obj["last"] = public_last(obj["last"])
     if isinstance(obj.get("restake"), dict) and "result" in obj["restake"]: obj["restake"]["result"] = public_last(obj["restake"]["result"])
     os.makedirs(REPORTS, exist_ok=True)
