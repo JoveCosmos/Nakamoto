@@ -2028,6 +2028,45 @@ background:transparent;border:0;box-shadow:none;padding:0;color:var(--ink2)}
 html:is(:not([data-tab]),[data-tab=home]) #calc>.pby{display:inline-flex}
 /* under 1100px the paths become the fixed bottom bar and the Bonus page fills to it: no free space, so no badge */
 @media(max-width:1099px){#calc>.pby{display:none!important}}
+/* How it works: the link above "powered by" on the Bonus tab, and the view that takes the map's place */
+.hiwgo{position:absolute;left:50%;bottom:48px;transform:translateX(-50%);display:none;align-items:center;gap:6px;z-index:1;
+background:transparent;border:0;padding:4px 8px;font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--hot);cursor:pointer}
+.hiwgo:hover{text-decoration:underline;text-underline-offset:3px}
+.hiwgo:focus-visible{outline:2px solid var(--hot);outline-offset:2px;border-radius:4px}
+html:is(:not([data-tab]),[data-tab=home]):not([data-hiw]) #calc>.hiwgo{display:inline-flex}
+html[data-hiw] #calc>.pby{display:none}
+.hiw{display:none}
+html[data-hiw] #p-home>.w{display:none}
+html[data-hiw] #p-home>.hiw{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:stretch;padding:12px 0 14px;min-height:0;flex:1 1 auto}
+.hiw-l{display:flex;flex-direction:column;gap:12px;min-width:0}
+.hiw-back{align-self:flex-start;background:transparent;border:1px solid var(--edge2);border-radius:99px;padding:5px 12px;font:600 12px var(--sans);color:var(--ink);cursor:pointer}
+.hiw-back:hover{border-color:var(--hot);color:var(--hot)}
+.hiw-back:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
+.hiw-eb{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--hot)}
+.hiw-h{margin:0;font-family:var(--display,Georgia,serif);font-weight:600;font-size:clamp(24px,2.4vw,36px);line-height:1.08;letter-spacing:-.01em;color:var(--ink);text-wrap:balance}
+.hiw-h em{font-style:normal;color:#2bc8bd}
+.hiw-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.hiw-steps li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;padding:12px 14px;border:1px solid var(--edge2);border-radius:10px;background:linear-gradient(180deg,#111124 0,#0b0b16 100%)}
+.hiw-n{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(43,200,189,.14);color:#2bc8bd;font:600 17px var(--display,Georgia,serif)}
+.hiw-steps b{display:block;font-size:14px;color:var(--ink);margin-bottom:3px}
+.hiw-steps p{margin:0;font-size:12.5px;line-height:1.5;color:var(--ink2)}
+.hiw-steps p span{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.hiw-r{display:flex;flex-direction:column;min-width:0;padding:14px 16px;border:1px solid var(--edge2);border-radius:12px;background:linear-gradient(180deg,#111124 0,#0b0b16 100%)}
+.hiw-ct b{display:block;font-size:14px;color:var(--ink)}
+.hiw-ct span{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin-top:3px}
+#hiwchart{flex:1 1 auto;width:100%;min-height:140px;height:auto;margin-top:12px;display:block}
+.hiw-ax{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--ink2);margin-top:6px}
+.hiw-fig{display:flex;justify-content:space-between;margin-top:12px;gap:10px}
+.hiw-fig em{display:block;font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+.hiw-fig b{display:block;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums;margin-top:3px}
+.hiw-fig .hi{text-align:right}.hiw-fig .hi b{color:#2bc8bd}
+@media(max-width:1099px){
+  html:is(:not([data-tab]),[data-tab=home]):not([data-hiw]) #calc>.hiwgo{display:none!important}
+  html[data-hiw] #p-home>.hiw{grid-template-columns:minmax(0,1fr);gap:14px}
+  .hiwgo.inl{display:inline-flex;position:static;transform:none;align-self:center;margin:6px auto 0}
+}
+@media(min-width:1100px){.hiwgo.inl{display:none!important}}
+
 :is(#p-intro .introby,#calc>.pby) img{width:18px;height:18px;border-radius:5px;display:block;opacity:.85;transform:translateY(-1px);margin-left:-2px}
 .introby span{font-family:var(--mono);font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;white-space:nowrap}
 .introby:hover{color:var(--ink)}
@@ -6489,6 +6528,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <div class=panes id=well>
   <div class=w id=calc>
     <!-- the home page's "powered by", in the same place on the Nakamoto Bonus page (operator, 2026-10-08) -->
+    <button class=hiwgo id=hiwgo type=button>How it works <span aria-hidden=true>&rarr;</span></button>
     <a class="introby pby" href="https://gatahub.zone/" target=_blank rel="noopener noreferrer" title="GATA HUB"><span>powered by</span><img src="assets/gata.png" alt="GATA HUB"></a>
       <span class=calclab>Nakamoto</span>
     <header class=brandbar>
@@ -6562,7 +6602,28 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
     <input type=hidden id=bond value=0>
   </div>
   </div>
+  <button class="hiwgo inl" id=hiwgo2 type=button>How it works <span aria-hidden=true>&rarr;</span></button>
 </div></div>
+  <!-- How it works (operator, 2026-10-12): the map and the range bars give way to this view; Back, Esc or any Nakamoto
+       tab returns to them. Figures are live, filled by app.js each time it opens -->
+  <div class=hiw id=hiw role=region aria-label="How the Nakamoto Bonus works">
+    <div class=hiw-l>
+      <button class=hiw-back id=hiwback type=button>&larr; Back</button>
+      <div class=hiw-eb>How it works</div>
+      <h2 class=hiw-h>Why smaller validators <em>pay more</em></h2>
+      <ol class=hiw-steps>
+        <li><span class=hiw-n>1</span><div><b>A slice of every reward is shared equally</b><p><span id=hiweta>-</span> of AtomOne's staking rewards go into one pool that is split evenly across all <span id=hiwn>-</span> validators, whatever their size.</p></div></li>
+        <li><span class=hiw-n>2</span><div><b>On a small validator, that slice is spread over fewer coins</b><p>So each ATONE staked there earns more. Today the smallest validator pays <span id=hiwhi>-</span> and the largest <span id=hiwlo>-</span>, for the same coin.</p></div></li>
+        <li><span class=hiw-n>3</span><div><b>The app shows your move and keeps it</b><p>Connect a wallet, see the gain in ATONE a year, approve once. Autopilot keeps your stake at the best-paying validators, never changing anyone's rank.</p></div></li>
+      </ol>
+    </div>
+    <div class=hiw-r>
+      <div class=hiw-ct><b>APR by validator rank, live</b><span>largest validator on the left, smallest on the right</span></div>
+      <svg id=hiwchart viewBox="0 0 600 300" preserveAspectRatio="none" role=img aria-label="APR of every validator, largest first"></svg>
+      <div class=hiw-ax id=hiwax></div>
+      <div class=hiw-fig><div><em>Rank 1</em><b id=hiwr1>-</b></div><div><em id=hiwmk>Rank 50</em><b id=hiwr50>-</b></div><div class=hi><em id=hiwlk>Rank 100</em><b id=hiwr100>-</b></div></div>
+    </div>
+  </div>
   </section>
 
   <section class=pane id=p-eta><div class=pw>
