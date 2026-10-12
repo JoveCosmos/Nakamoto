@@ -2692,11 +2692,14 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .mtcard .mtout b small{font-family:var(--wmono);font-size:10px;font-weight:400;letter-spacing:.08em;color:var(--wf);margin-left:6px}
 .mtcard .mtout span{grid-column:1/-1;font-family:var(--wmono);font-size:10px;letter-spacing:.04em;color:var(--ws)}
 .mtcard .unamt>.unfield{flex:1 1 auto}
-/* the wallet column's PHOTON row: Mint where the unit would be */
-.you-r i .you-mint{display:inline-flex;align-items:center;justify-content:center;height:22px;padding:0 9px;border:1px solid var(--sv-teal,#2bc8bd);border-radius:6px;background:transparent;
+/* the wallet column's PHOTON row: Mint where the unit would be; under 1100px the PHOTON balance box carries it in its
+   lower corner, level with the figure, and the figure keeps clear of it (fitBoxes steps the type down if needed) */
+.you-r i .you-mint,.mv-yk .you-mint{display:inline-flex;align-items:center;justify-content:center;height:22px;padding:0 9px;border:1px solid var(--sv-teal,#2bc8bd);border-radius:6px;background:transparent;
   color:var(--sv-teal,#2bc8bd);font:500 10px var(--wmono);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
-.you-r i .you-mint:hover{background:rgba(43,200,189,.10)}
-.you-r i .you-mint:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offset:2px}
+.you-r i .you-mint:hover,.mv-yk .you-mint:hover{background:rgba(43,200,189,.10)}
+.you-r i .you-mint:focus-visible,.mv-yk .you-mint:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offset:2px}
+.mv-yk .you-mint{position:absolute;right:10px;bottom:9px}
+.mv-yk .you-mint~b{padding-right:50px}
 .pop .card.stcard::before{background:linear-gradient(90deg,transparent,var(--wgreen),transparent)}
 .stcard .txsum{color:var(--wgreen)}
 

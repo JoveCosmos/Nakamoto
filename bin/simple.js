@@ -308,7 +308,9 @@
     return '<div class="mv-yg mv-bal">' +
       /* the order (operator, 2026-10-02): what is in the wallet, what is staked, then what it earns */
       yk("ATONE available", bal ? fmt(bal.uatone) : '-') +
-      yk("PHOTON available", bal ? fmt(bal.uphoton) : '-') +
+      /* Mint in the PHOTON box's lower corner, level with the figure: the wallet column that carries it on wide
+         screens is not shown under 1100px (operator, 2026-10-13: every feature live, phones too) */
+      yk("PHOTON available", bal ? fmt(bal.uphoton) : '-', '', window.__ADDR && bal ? '<button type=button class=you-mint data-act=mint title="Mint PHOTON from ATONE">Mint</button>' : '') +
       yk("ATONE staked", pos ? fmt(pos.total) : '-') +
       yk("Movable stake", mv != null ? fmt(mv) : '-') +
       yk("ATONE rewards", window.__REW != null ? fmt(window.__REW) : '-') +
