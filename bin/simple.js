@@ -965,6 +965,11 @@
         .then(function(){ if(screen() === "mygov" || screen() === "govs") render(); }); }
     return GV.mine[a];
   }
+  /* a governor's website the way the validator card reads one: a full http(s) address, or a bare domain ("gatahub.zone")
+     taken as https; anything else ("website") is not a link */
+  function gweb(u){ u = String(u || "").trim(); if(!u) return "";
+    if(!/^https?:\/\//i.test(u) && /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}(\/[^\s"'<>]*)?$/i.test(u)) u = "https://" + u;
+    return /^https?:\/\/[^\s"'<>]+$/i.test(u) ? u : ""; }
   function govRows(list, mine){
     var tot = 0; list.forEach(function(g){ tot += g.vp || 0; });
     return '<div class="sv-vlist sv-glist">' + list.map(function(g){
@@ -978,7 +983,7 @@
         '<span class=sv-gn2><b>' + (g.since ? window.__dayFull(g.since) : NA) + '</b><s>' + (g.active ? 'active since' : 'inactive since') + '</s></span>' +
         /* two fixed slots, the button and the site link, so every row's button stands in one column */
         '<span class=sv-gact>' + (govBtn(g, mine) || '<span></span>') +
-        (g.web && /^https?:\/\//.test(g.web) ? '<a class=sv-gweb href="' + esc(g.web) + '" target=_blank rel="noopener noreferrer">site</a>' : '<span></span>') + '</span></div>'; }).join("") + '</div>';
+        (gweb(g.web) ? '<a class=sv-gweb href="' + esc(gweb(g.web)) + '" target=_blank rel="noopener noreferrer">site</a>' : '<span></span>') + '</span></div>'; }).join("") + '</div>';
   }
   /* following a governor is one signature: Follow (Switch when another one is followed) on an active
      governor, Stop on the one followed; nothing without a wallet, while the reading is pending, or
@@ -988,6 +993,9 @@
     if(screen() !== "mygov" && screen() !== "govs") return '';      /* the Governors tab follows and stops too (2026-10-12) */
     if(!window.__ADDR || !window.__WALLET || mine === null || mine === undefined) return '';
     if(g.addr === govAddrOf(window.__ADDR)) return !GOV_REG ? '' : '<button class=sv-gbtn type=button data-act=greg title="Change what the chain shows about your governor">Edit</button>';
+    /* an ACTIVE governor cannot follow another - the chain refuses the delegation - so its wallet gets no
+       Follow or Switch anywhere (its stake already votes through its own governor) */
+    var meg = myGovRec(); if(meg && meg.active) return '';
     if(g.addr === mine) return '<button class="sv-gbtn stop" type=button data-act=gstop title="Stop following this governor: your stake votes only when you vote">Stop</button>';
     if(!g.active) return '';
     return '<button class=sv-gbtn type=button data-act=gfollow data-g="' + esc(g.addr) + '" title="' + (mine ? 'Follow this governor instead' : 'Let this governor vote for your stake when you do not vote') + '">' + (mine ? 'Switch' : 'Follow') + '</button>';
@@ -1061,7 +1069,7 @@
                 : '<input class=gr-in id=gr-' + f[0] + ' type=text autocomplete=off spellcheck=false placeholder="' + esc(f[3]) + '" value="' + esc(val(f[0])) + '">') + '</label>'; }).join("") + '</div>' +
       (me ? '' : '<div class=gr-need id=grneed></div>') +
       '<p class=gr-note>' + (me ? 'The new details show once the next block carries them.'
-        : 'Your own stake follows you from the moment you register. You can go inactive, and back, at most once every ' + (R.period ? Math.round(R.period / 86400) : 28) + ' days.') +
+        : 'Your own stake follows you from the moment you register, and as a governor you cannot follow another one. Keep ' + (R.minSelf ? whole(R.minSelf) : "10,000") + ' ATONE staked: fall under it and the chain sets you inactive, and any status change holds ' + (R.period ? Math.round(R.period / 86400) : 28) + ' days before the next. The role carries no reward and nothing extra at risk; only your vote\'s reach changes.') +
         ' Signed in ' + esc(window.__WALLET.name || "your wallet") + ', sent through GATA\'s node.</p>' +
       '<div class=txbtns><button class=wk-btn type=button data-act=grclose>Cancel</button><button class="wk-btn wk-go" id=grgo type=button data-act=grsend disabled>' + (me ? 'Save' : 'Register') + '</button></div></div>';
     if(P) P.open(pop);
@@ -1077,7 +1085,7 @@
       pop.addEventListener("click", onClick); }
     var R = GV.rules || {}, mine = myGov(), sh = GV.bonded ? (g.vp || 0) / GV.bonded * 100 : null;
     var st = function(k, v, sub){ return '<div class=vstat><span class=vk>' + k + '</span><span class=vv>' + v + '</span>' + (sub ? '<i class=vsubn>' + sub + '</i>' : '') + '</div>'; };
-    var web = g.web && /^https?:\/\//.test(g.web) ? '<a class=vweb href="' + esc(g.web) + '" target=_blank rel="noopener noreferrer">' + esc(g.web.replace(/^https?:\/\//, "").replace(/\/+$/, "")) + '</a>' : '<span class="vweb none">no website</span>';
+    var gw = gweb(g.web), web = gw ? '<a class=vweb href="' + esc(gw) + '" target=_blank rel="noopener noreferrer">' + esc(gw.replace(/^https?:\/\//, "").replace(/\/+$/, "")) + '</a>' : '<span class="vweb none">no website</span>';
     pop.innerHTML = '<div class="card vcard gvcard" role=dialog aria-modal=true aria-label="Governor ' + esc(g.m) + '">' +
       '<div class="vhead vwrap"><span class=vmono style="display:flex;background:hsl(' + (g.m.charCodeAt(0) * 37 % 360) + ',42%,30%)">' + esc(g.m.charAt(0).toUpperCase()) + '</span>' +
         '<div class=vcol><div class=vname><span class=vnm>' + esc(g.m) + '</span></div><div class=vsub>' + web + '</div></div></div>' +
@@ -1091,8 +1099,8 @@
         st("identity", g.ident ? esc(g.ident) : "-", g.ident ? "Keybase" : "") +
         st("address", esc(g.addr.slice(0, 12) + "\u2026" + g.addr.slice(-6)), "") +
       '</div>' +
-      '<p class=gv-rules>A governor must hold at least <b>' + (R.minSelf ? whole(R.minSelf) : NA) + ' ATONE</b> of its own stake, and may change its status once every <b>' +
-        (R.period ? Math.round(R.period / 86400) + ' days' : NA) + '</b>. While inactive, its votes do not count for those who follow it.</p>' +
+      '<p class=gv-rules>A governor keeps at least <b>' + (R.minSelf ? whole(R.minSelf) : NA) + ' ATONE</b> staked from its own wallet. If its stake falls under that, the chain sets it inactive on its own, and a status change holds for <b>' +
+        (R.period ? Math.round(R.period / 86400) + ' days' : NA) + '</b> before the next one, so an inactive spell lasts at least that long. While inactive, its vote counts for no one who follows it; followers stay and nothing of theirs is at risk.</p>' +
       (govBtn(g, mine) ? '<div class=gv-go>' + govBtn(g, mine) + '</div>' : '') +
     '</div>';
     if(P) P.open(pop);
@@ -1123,7 +1131,7 @@
   function govNone(){
     var R = GV.rules || {};
     return '<div class=gv-rules3><div><em>To become one</em><b>' + (R.minSelf ? whole(R.minSelf) : '-') + '</b><small>ATONE of its own stake</small></div>' +
-      '<div><em>Status change</em><b>' + (R.period ? Math.round(R.period / 86400) + ' days' : '-') + '</b><small>at most once in</small></div>' +
+      '<div><em>Status holds</em><b>' + (R.period ? Math.round(R.period / 86400) + ' days' : '-') + '</b><small>between changes, forced ones too</small></div>' +
       '<div><em>Its vote</em><b>Follows</b><small>for every staker who follows it</small></div></div>';
   }
   function drawMyGov(){
@@ -1228,8 +1236,8 @@
     if(v === null) return '<div class=gp-vote><em>Your vote</em><span class=gp-vn>Reading your vote…</span></div>';
     var btn = function(o, t){ return '<button class="sv-gbtn vote' + (v === o ? ' on' : '') + '" type=button data-act=vote data-pid="' + p.id + '" data-opt="' + VNUM[o] + '"' +
       (v === o ? ' aria-pressed=true' : '') + '>' + t + '</button>'; };
-    var note = v ? 'You voted ' + v + '. You can change it until voting ends.' : g ? 'Your governor votes for your stake unless you vote yourself.' : 'Signed in your wallet, fee at the chain\'s own gas price.';
-    return '<div class=gp-vote><em>Your vote</em><span class=gp-vb>' + btn("yes", "Yes") + btn("abstain", "Abstain") + btn("no", "No") + '</span><span class=gp-vn>' + note + '</span></div>';
+    var note = v ? 'You voted ' + v + '. You can change it until voting ends.' : g ? 'Your governor votes for your stake unless you vote yourself.' : '';
+    return '<div class=gp-vote><em>Your vote</em><span class=gp-vb>' + btn("yes", "Yes") + btn("abstain", "Abstain") + btn("no", "No") + '</span>' + (note ? '<span class=gp-vn>' + note + '</span>' : '') + '</div>';
   }
   function voteSend(t, pid, opt){
     if(!window.__TX || !window.__WALLET || !window.__ADDR || t.classList.contains("busy")) return;

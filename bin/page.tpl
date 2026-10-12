@@ -4808,7 +4808,7 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gp-k s{white-space:normal;overflow:visible;text-overflow:clip}
 .gp-kx{font-style:normal;font-size:11px;font-weight:400;color:rgba(255,255,255,.78);margin-left:8px}
 /* a phone gives To pass the bar's full width under the other two, so its two lines stay two lines */
-@media(max-width:620px){.gp-k s{min-height:2.5em}#sv-proplist>.gp-ph>.gp-k:last-child s{min-height:0}#sv-proplist>.sv-ph.gp-ph{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:6px}#sv-proplist>.gp-ph>.gp-k:last-child{grid-column:1/-1;margin-top:6px}}
+@media(max-width:620px){.gp-k s{min-height:2.5em}#sv-proplist>.gp-ph>.gp-k:last-child s{min-height:1.25em}#sv-proplist>.sv-ph.gp-ph{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:6px}#sv-proplist>.gp-ph>.gp-k:last-child{grid-column:1/-1;margin-top:6px}}
 @media(max-width:900px){:is(#sv-proplist,#sv-govlist,#sv-daop)>.sv-ph.gp-ph{gap:0 10px}#sv-govlist>.sv-ph.gv-ph{grid-template-columns:repeat(3,minmax(0,1fr))}#sv-govlist>.sv-ph .gv-reg{grid-column:1/-1;justify-self:start;margin-top:6px}.gp-k b{font-size:14px}.gp-k s{font-size:10.5px}}
 #sv-daop>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#5f6216,#393b15 58%,#19191f)}
 #sv-govlist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#7d2e6e,#461f45 58%,#1a1230)}
@@ -6769,16 +6769,16 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
         </div>
       </section>
       <section class=sv-screen id=sv-net data-sc=net aria-label=Network>
-        <div class="sv-panel sv-up" id=sv-up></div>
+        <div class="sv-panel sv-up" id=sv-up><div class=sv-rbody><div class=sv-rmain><div class=sv-ph><h3>Uptime</h3></div><div class=sv-upwait>Reading the latest blocks…</div></div><div class=sv-rail aria-hidden=true></div></div></div>
         <div class=sv-row2 id=sv-netrow>
-          <div class=sv-panel id=sv-pace></div>
+          <div class=sv-panel id=sv-pace><div class=sv-rbody><div class=sv-rmain><div class=sv-ph><h3>Chain pace</h3></div><div class=sv-upwait>Reading block times…</div></div><div class=sv-rail aria-hidden=true></div></div></div>
         </div>
       </section>
       <section class=sv-screen id=sv-sign data-sc=sign aria-label=Signing>
         <div class="sv-panel sv-gridp" id=sv-signp></div>
       </section>
       <section class=sv-screen id=sv-prop data-sc=prop aria-label=Proposers>
-        <div class=sv-panel id=sv-proplive></div>
+        <div class=sv-panel id=sv-proplive><div class=sv-ph><h3>Latest blocks</h3></div><div class=sv-upwait>Waiting for the live feed…</div></div>
         <div class="sv-panel sv-gridp" id=sv-prop24></div>
       </section>
       <section class=sv-screen id=sv-act data-sc=act aria-label=Activity>
