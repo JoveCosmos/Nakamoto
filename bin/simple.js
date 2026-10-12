@@ -1129,7 +1129,7 @@
       '<p class=gr-note>' + (me ? 'The new details show once the next block carries them.'
         : 'Your own stake follows you from the moment you register, and as a governor you cannot follow another one. Keep ' + (R.minSelf ? whole(R.minSelf) : "10,000") + ' ATONE staked: fall under it and the chain sets you inactive, and after any change of status ' + (R.period ? Math.round(R.period / 86400) : 28) + ' days must pass before it can change again. The role carries no reward and nothing extra at risk; only your vote\'s reach changes.') +
         ' Signed in ' + esc(window.__WALLET.name || "your wallet") + ', sent through GATA\'s node.</p>' +
-      '<div class=txbtns><button class=wk-btn type=button data-act=grclose>Cancel</button><button class="wk-btn wk-go" id=grgo type=button data-act=grsend disabled>' + (me ? 'Save' : 'Register') + '</button></div></div>';
+      '<div class=txbtns><button class="wk-btn wk-go" id=grgo type=button data-act=grsend disabled>' + (me ? 'Save' : 'Register') + '</button></div></div>';
     if(P) P.open(pop);
     grCheck();
     var first = E("gr-moniker"); if(first) setTimeout(function(){ first.focus(); }, 60);

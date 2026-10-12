@@ -240,6 +240,12 @@ footer{padding:42px 0 64px;font-family:var(--mono);font-size:11px;color:var(--in
 .pop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;
 z-index:50;}
 .pop.on{display:flex}
+/* APP-WIDE RULE (operator, 2026-10-12): no popup carries a Cancel or a cross - a tap outside, or Esc, closes it. On a
+   phone every popup leaves the page showing above and below it, so there is always somewhere outside to tap */
+@media(max-width:620px){
+  .pop.on:not(#z){padding:52px 12px 44px;box-sizing:border-box;align-items:center}
+  .pop:not(#z)>.card:not(#z){max-height:100%!important}
+}
 .pop .card{max-width:470px;width:100%;
 padding:26px 28px 0;position:relative;
 overflow-y:auto;scrollbar-color:var(--edge2) #0b0b16;scrollbar-width:thin}
@@ -4550,6 +4556,10 @@ background:radial-gradient(55% 160% at 0% 0%,rgba(185,176,255,.14),transparent 6
 .grcard .gr-need>div.ok{border-color:rgba(46,224,106,.45)}.grcard .gr-need>div.ok b{color:var(--wgreen)}
 .grcard .gr-need>div.no{border-color:rgba(255,122,87,.5)}.grcard .gr-need>div.no b{color:#ff9b7a}
 .grcard .gr-note{margin:12px 22px 0;font-size:11.5px;line-height:1.5;color:var(--ws)}
+/* a phone fits the whole form without a scroll (the popup rule leaves the page showing above and below) */
+@media(max-width:620px){.grcard .gr-f{gap:7px;padding-top:10px}.grcard .gr-l{gap:3px}.grcard textarea.gr-in{min-height:44px}
+  .grcard .gr-who{padding-top:10px}.grcard .gr-need{padding-top:8px;gap:8px}.grcard .gr-note{margin-top:8px;font-size:10.5px;line-height:1.4}
+  .grcard .txbtns{padding:10px 20px 12px}}
 .grcard .txbtns{padding:16px 22px 20px}
 /* Outcome's content starts on Delegations' and Redelegate's line */
 @media(min-width:901px){#p-dele #wbody #wk-mv>.wk-ph+*{margin-top:10px!important}}
@@ -6287,7 +6297,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
   #one #proout .txbtns .wk-btn.wk-go:not(#z){flex:1 1 auto;height:46px;border-radius:12px;border:1px solid var(--wcyan);background:var(--wcyan);color:var(--wc);
     font:600 15px var(--wsans);letter-spacing:0;text-transform:none}
   #one #proout .txbtns .wk-btn.wk-go:disabled:not(#z){border-color:var(--wbd2);background:transparent;color:var(--wf)}
-  #one #proout .txbtns #uncancel,#one #proout .txbtns .wk-bell{display:none!important}
+  #one #proout .txbtns .wk-bell{display:none!important}
   /* every action's button is Redelegate's: full width, the same height, radius, type and fill */
   #one #proout .txbtns .wk-btn.wk-go:not(#z):not(#y),#one #p-dele #wk-mv #dgo:not(#z):not(#y){width:100%;flex:1 1 auto;height:46px;margin:0;padding:0 20px;border-radius:12px;
     border:1px solid var(--wcyan);background:var(--wcyan);color:var(--wc);font:600 15px var(--wsans);letter-spacing:0;text-transform:none;box-shadow:none}
@@ -7054,7 +7064,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <div class=txlock id=unlock></div>
   <div class=txfee id=unfee></div>
   <div class=txstep id=unstep></div>
-  <div class=txbtns><button class=wk-btn id=uncancel type=button>Cancel</button><button class="wk-btn wk-go" id=unsign type=button disabled>Unstake</button></div>
+  <div class=txbtns><button class="wk-btn wk-go" id=unsign type=button disabled>Unstake</button></div>
 </div></div>
 
 <div class=pop id=clpop><div class="card txcard uncard clcard" role=dialog aria-modal=true aria-labelledby=clttl>
