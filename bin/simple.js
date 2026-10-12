@@ -1260,11 +1260,13 @@
     var lth = Math.max(+tp.law_threshold || 0, +tp.constitution_amendment_threshold || 0), lq = Math.max(Q, +tp.law_quorum || 0, +tp.constitution_amendment_quorum || 0);
     var tfull = Q ? "More than " + q1(+tp.threshold) + " of the Yes and No votes must be Yes (Abstain counts toward quorum only), with at least " + (Q * 100).toFixed(1) + "% of bonded ATONE voting" +
       (lth ? ". A Law or a Constitution change needs more than " + q1(lth) + " Yes, with at least " + (lq * 100).toFixed(1) + "% voting" : "") : "";
-    var tsub = Q ? "yes, " + (Q * 100).toFixed(1) + "% quorum" + (lth ? "<br>Law or Constitution change &gt;" + q1(lth) : "") : "yes";
+    /* three rows like its neighbours (operator, 2026-10-12): the threshold with "yes, quorum" beside it, then the Law line */
+    var tval = tp.threshold ? "&gt;" + (tp.threshold * 100).toFixed(1) + "%" + (Q ? '<i class=gp-kx>yes, ' + (Q * 100).toFixed(1) + '% quorum</i>' : '') : "-";
+    var tsub = Q ? (lth ? "Law or Constitution change &gt;" + q1(lth) : "") : "";
     var h = '<div class="sv-ph gp-ph">' +
       st("Proposals", L ? String(L.length) : "-", psub, pfull) +
       st("Voting now", L ? (live.length ? String(live.length) : "None") : "-", L ? (live.length ? "#" + live[live.length - 1].id + " ends " + pday(live[live.length - 1].ve) : "no proposal is open") : "") +
-      st("To pass", tp.threshold ? "&gt;" + (tp.threshold * 100).toFixed(1) + "%" : "-", tsub, tfull) + '</div>';
+      st("To pass", tval, tsub, tfull) + '</div>';
     if(GP.err && !L){ put("sv-proplist", h + govEmpty("Could not read the proposals")); return; }
     if(!L){ put("sv-proplist", h + govEmpty("Reading the proposals…")); return; }
     if(!L.length){ put("sv-proplist", h + govEmpty("No proposals yet")); return; }

@@ -4806,9 +4806,9 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 /* the bar's short lines wrap rather than cut (the pixel-fit rule); To pass always holds two lines, so the bar has one
    height before and after the chain is read */
 .gp-k s{white-space:normal;overflow:visible;text-overflow:clip}
-#sv-proplist>.gp-ph>.gp-k:last-child s{min-height:2.5em}
+.gp-kx{font-style:normal;font-size:11px;font-weight:400;color:rgba(255,255,255,.78);margin-left:8px}
 /* a phone gives To pass the bar's full width under the other two, so its two lines stay two lines */
-@media(max-width:620px){.gp-k s{min-height:2.5em}#sv-proplist>.sv-ph.gp-ph{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:6px}#sv-proplist>.gp-ph>.gp-k:last-child{grid-column:1/-1;margin-top:6px}}
+@media(max-width:620px){.gp-k s{min-height:2.5em}#sv-proplist>.gp-ph>.gp-k:last-child s{min-height:0}#sv-proplist>.sv-ph.gp-ph{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:6px}#sv-proplist>.gp-ph>.gp-k:last-child{grid-column:1/-1;margin-top:6px}}
 @media(max-width:900px){:is(#sv-proplist,#sv-govlist,#sv-daop)>.sv-ph.gp-ph{gap:0 10px}#sv-govlist>.sv-ph.gv-ph{grid-template-columns:repeat(3,minmax(0,1fr))}#sv-govlist>.sv-ph .gv-reg{grid-column:1/-1;justify-self:start;margin-top:6px}.gp-k b{font-size:14px}.gp-k s{font-size:10.5px}}
 #sv-daop>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#5f6216,#393b15 58%,#19191f)}
 #sv-govlist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#7d2e6e,#461f45 58%,#1a1230)}

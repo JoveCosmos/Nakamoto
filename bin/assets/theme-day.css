@@ -836,6 +836,7 @@
   html[data-theme=light]:not([data-mono]) .gp-k em{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .gp-k b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .gp-k s{text-decoration:none;color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .gp-kx{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #sv-daop>.sv-ph{background:var(--line-strong)}
   html[data-theme=light]:not([data-mono]) #sv-govlist>.sv-ph{background:var(--line-strong)}
   html[data-theme=light]:not([data-mono]) .gp-id{background:var(--bg)}
@@ -1308,7 +1309,7 @@
   /* the proposals bar's three figures stay white on their blue band, as the band's own title does */
   html[data-theme=light]:not([data-mono]) :is(#sv-proplist,#sv-govlist,#sv-daop)>.sv-ph.gp-ph .gp-k b{color:#fff}
   html[data-theme=light]:not([data-mono]) :is(#sv-proplist,#sv-govlist,#sv-daop)>.sv-ph.gp-ph .gp-k em{color:rgba(255,255,255,.72)}
-  html[data-theme=light]:not([data-mono]) :is(#sv-proplist,#sv-govlist,#sv-daop)>.sv-ph.gp-ph .gp-k s{color:rgba(255,255,255,.78)}
+  html[data-theme=light]:not([data-mono]) :is(#sv-proplist,#sv-govlist,#sv-daop)>.sv-ph.gp-ph .gp-k s,html[data-theme=light]:not([data-mono]) .gp-kx{color:rgba(255,255,255,.78)}
   html[data-theme=light]:not([data-mono]) .gp-fi{background:rgba(60,50,20,.035)}
   html[data-theme=light]:not([data-mono]) .cell.pad{background:rgba(40,30,20,.05);border:1px dashed rgba(40,30,20,.16)}
 
