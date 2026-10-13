@@ -50,6 +50,10 @@ const GAS = process.env.ATOMONE_GAS_PRICE || "0.25uphoton";   // only when the c
 // fixed 0.25 paid 25 times what was needed. Each transaction now pays the live price times GAS_HEAD, room for the price
 // to rise while it waits for a block
 const GAS_HEAD = +(process.env.ATOMONE_GAS_HEADROOM || 2);
+// (audit 2026-10-13) the live price times the headroom is CAPPED at the old fixed price: x/dynamicfee can climb
+// 1.5x per congested block, and a runaway (or a wrong answer from a fallback RPC) must cost at most what the
+// fixed-price days did, never the treasury. 0.25 uphoton/gas caps a 30M-gas transaction at 7.5 PHOTON.
+const GAS_CAP = +(process.env.ATOMONE_GAS_PRICE_CAP || parseFloat(GAS) || 0.25);
 const RPCS = (process.env.ATOMONE_RPC || "https://atomone-rpc.gatadao.com,https://atomone-rpc.polkachu.com").split(",").map(s => s.trim()).filter(Boolean);
 const BIND = process.env.BIND || "10.9.0.2", PORT = +(process.env.PORT || 8788);
 const MAX_MOVES = +(process.env.MAX_MOVES || 60);              // messages in one request (one transaction); 60 moves ~ 20M gas of the block's 100M
@@ -284,7 +288,7 @@ async function gasPrice(client) {
     const coin = pbField(r.value, 1), amt = coin && pbField(coin, 2);
     const p = amt ? Number(new TextDecoder().decode(amt)) / 1e18 : 0;   // a LegacyDec travels as an integer of 18 decimals
     if (!(p > 0)) throw new Error("no price");
-    return GasPrice.fromString((p * GAS_HEAD).toFixed(9) + "uphoton");
+    return GasPrice.fromString(Math.min(p * GAS_HEAD, GAS_CAP).toFixed(9) + "uphoton");
   } catch (e) {
     console.log("autopilot-signer: chain gas price unreadable (" + (e.message || e) + "), paying " + GAS);
     return GasPrice.fromString(GAS);
