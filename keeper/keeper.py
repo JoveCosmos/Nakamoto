@@ -382,7 +382,21 @@ def _lines(text, lines, tail):
     if n < len(lines): out += "and %d more (the admin console lists them all)\n" % (len(lines) - n)
     return out + tail
 
-def run_summaries(c, n_ap, n_rs, dry):
+def subscribed(granters):
+    """(wallets, uatone staked) of a service's subscribers, read from the chain; None when any read fails (operator,
+    2026-10-13: every run message carries the service's subscribed total, as the new-grant message does)"""
+    try:
+        return len(granters), sum(int(x["balance"]["amount"]) for g in granters
+                                  for x in get("/cosmos/staking/v1beta1/delegations/%s?pagination.limit=500" % g).get("delegation_responses", []))
+    except Exception as e:
+        log("subscribed total unreadable: %s" % e); return None
+
+
+def _subline(name, sub):
+    return ("\n%s now has %d wallet%s and {:,.1f} ATONE staked.".format(sub[1] / 1e6) % (name, sub[0], "" if sub[0] == 1 else "s")) if sub else ""
+
+
+def run_summaries(c, n_ap, n_rs, dry, ap_gr=(), rs_gr=()):
     """Discord: one message per scheduled run of each service, and one for any other tick that did something"""
     slot, tag = slot0(), " (dry run)" if dry else ""
     RUN["slot_run"] = any((c.execute("SELECT at FROM alert_sent WHERE granter='_run' AND k=?", (k,)).fetchone() or [0])[0] < slot for k in ("autopilot", "restake"))
@@ -418,7 +432,7 @@ def run_summaries(c, n_ap, n_rs, dry):
                                  % (short(g), _vals(N, w["src"]), _vals(N, w["dst"]), w["n"], "" if w["n"] == 1 else "s", " ".join(_tx(h) for h in w["tx"])))
             lines = ["Failed: `%s`, %s." % (short(g), _why(w)) for g, w in RUN["ap_fail"]] + lines      # failures first
             tail = "\nSo far Autopilot has moved {:,.1f} ATONE for %d wallets onto %d smaller validators, +{:,.1f} ATONE a year.".format(
-                im["moved_uatone"] / 1e6, im["gain_atone_year"]) % (im["wallets"], im["validators"])
+                im["moved_uatone"] / 1e6, im["gain_atone_year"]) % (im["wallets"], im["validators"]) + _subline("Autopilot", subscribed(ap_gr))
             discord("crit" if RUN["ap_failed"] else "ok" if RUN["ap_moves"] else "info",
                     ("Autopilot run " + time.strftime("%H:%M UTC", time.gmtime(slot)) if scheduled else "Autopilot, new grant") + tag,
                     _lines(text, lines, tail))
@@ -442,7 +456,7 @@ def run_summaries(c, n_ap, n_rs, dry):
             if RUN["rs_list"]: text += "Onto %s.\n\n" % _vals(N, [v for x in RUN["rs_list"] for v in x[2]], 5)
             lines = ["Failed: `%s`, %s." % (short(g), _why(w)) for g, w in RUN["rs_fail"]]
             tail = "\nSo far Restake has staked {:,.2f} ATONE of rewards in %d restakes for %d wallets.".format(
-                im["restaked_uatone"] / 1e6) % (im["restakes"], im["restake_wallets"])
+                im["restaked_uatone"] / 1e6) % (im["restakes"], im["restake_wallets"]) + _subline("Restake", subscribed(rs_gr))
             discord("crit" if RUN["rs_failed"] else "ok" if RUN["rs_done"] else "info",
                     ("Restake run " + time.strftime("%H:%M UTC", time.gmtime(slot)) if scheduled else "Restake, turned on") + tag,
                     _lines(text, lines, tail))
@@ -1330,7 +1344,7 @@ def once(c, only=None, live=None, force=False):
     except Exception as e:
         log("status failed: %s" % e)
     if not only:
-        try: run_summaries(c, len(gs), len(rgs), dry)
+        try: run_summaries(c, len(gs), len(rgs), dry, [g["granter"] for g in gs], list(rgs))
         except Exception as e: log("run summary failed: %s" % e)
 
 SIGNER_FAILS = [0]                               # consecutive ticks the signer did not answer
