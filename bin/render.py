@@ -78,8 +78,12 @@ if TESTNET:
     mv_top = mv_small = mv_new = mv_grew = mv_wk = "N/A"
 
 def _pad5(rows, figs):
-    """every Picks table keeps five rows: a list shorter than five (testnet has no history)
-    is topped up with placeholder rows of the same height - a faded name bar, N/A figures"""
+    """every Picks table keeps five rows: a list shorter than five is topped up with placeholder rows of the
+    same height - a faded name bar, N/A figures. A table with NOTHING says why instead (audit 2026-10-13:
+    five permanent skeletons on testnet read as stuck loading)"""
+    if not rows:
+        return ("<tr class=phx><td colspan=" + str(figs + 2) + " class=dim>" +
+                ("N/A on testnet: the signing record covers mainnet" if TESTNET else "No record yet") + "</td></tr>")
     have = rows.count("<tr")
     ph = ("<tr class=phr aria-hidden=true><td class=rkc>&ndash;</td><td class=nm><span class='tlg tlgx'></span><i class=phb></i></td>"
           + "<td class=dim>N/A</td>" * figs + "</tr>")
@@ -270,13 +274,13 @@ page = (TPL
   .replace("{{BASE_APR}}", f"{s['base_apr']*100:.2f}")
   .replace("{{BONDED_C}}", f"{M(s['bonded'])/1e6:.1f}M")
   .replace("{{BONDED}}", f(M(s["bonded"]))).replace("{{BONDED_PCT}}", f"{s['bonded_pct']:.1f}")
-  .replace("{{INFL}}", f"{s['inflation']*100:.0f}")
+  .replace("{{INFL}}", f"{s['inflation']*s.get('pace', 1)*100:.1f}")
   .replace("{{SUPPLY}}", f(M(s["supply"]))).replace("{{TAX}}", f"{s['community_tax']*100:.0f}")
   .replace("{{BELOW}}", str(s["below_mean"]))
   .replace("{{REST_PCT}}", f"{100 - e['now']*100:.0f}")
   .replace("{{DELEG}}", f(D["delegators"]["unique"]) if D.get("delegators") else "-")
-  .replace("{{MINTED}}", f(M(s["inflation"] * s["supply"])))
-  .replace("{{CTAKE}}", f(M(s["inflation"] * s["supply"] * s["community_tax"])))
+  .replace("{{MINTED}}", f(M(s["inflation"] * s.get("pace", 1) * s["supply"])))   # at the real block pace (audit 2026-10-13)
+  .replace("{{CTAKE}}", f(M(s["inflation"] * s.get("pace", 1) * s["supply"] * s["community_tax"])))
   .replace("{{MINCOMM}}", f"{s['min_commission']*100:.0f}").replace("{{CPOOL}}", f(M(s["community_pool"])))
   # only one of these two can be true, and it is the live state, not a legend
   .replace("{{RISE_ON}}", "hot" if th["rising"] else "")

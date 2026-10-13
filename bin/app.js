@@ -519,12 +519,16 @@ window.__mapMode = function(m){
 window.addEventListener("pageshow", function(ev){ if(ev.persisted) window.__mapMode("color"); });
 
 /* trend */
-(function(){
+var drawTrend = (function(){
   /* Weekly on both sides of the bonus. Months could not resolve eight weeks of
      bonus - two points is one interval - and a measure that changes scale at the
      very line it is meant to test proves nothing. */
+  /* the viewBox takes the BOX's own shape (audit 2026-10-13: a fixed 900x300 letterboxed into the tall
+     Trend panel drew the whole chart at ~44% with 6px axis text), as the bonus Graph does; redrawn on resize */
   var sm = window.innerWidth < 620;
-  var T=D.weekly, W=sm?460:900, H=300,
+  var box = E("trend") ? E("trend").getBoundingClientRect() : null;
+  var T=D.weekly, W=box && box.width > 40 ? Math.round(box.width) : (sm?460:900),
+      H=box && box.height > 40 ? Math.round(box.height) : 300,
       PL=sm?44:64, PR=sm?16:28, PT=sm?20:26, PB=sm?34:46;
   if(!T || T.length<2){ E("trend").innerHTML=""; return; }
   var vs=T.map(function(x){return x.top10;});
@@ -555,8 +559,11 @@ window.addEventListener("pageshow", function(ev){ if(ev.persisted) window.__mapM
   s+='<text x="'+PL+'" y="'+(PT+17)+'" font-size="12.5" fill="#a5a3c4">'+
     (sm?"10 LARGEST VALS":"10 LARGEST VALIDATORS")+'</text>';
   E("trend").setAttribute("viewBox","0 0 "+W+" "+H);
+  E("trend").setAttribute("preserveAspectRatio","none");
   E("trend").innerHTML=s;
-})();
+});
+drawTrend();
+(function(){ var t; window.addEventListener("resize", function(){ clearTimeout(t); t = setTimeout(drawTrend, 180); }); })();
 
 /* pivot */
 /* the arithmetic pane and its plot() were retired; simple() below draws the
@@ -1356,8 +1363,11 @@ rememberGridH();
       kpSet("BONDED", whole(c.bonded)); kpSet("SUPPLY", whole(c.supply)); kpSet("BONDED_PCT", bp.toFixed(1));
       var bar = document.querySelector("#spop .kp-bar i"); if(bar) bar.style.width = bp.toFixed(1) + "%";
     }
-    if(c.infl >= 0) kpSet("INFL", (c.infl * 100).toFixed(0));
-    if(c.prov > 0 && c.tax >= 0){ kpSet("MINTED", whole(c.prov)); kpSet("POOL", whole(c.prov * (1 - c.tax))); kpSet("CTAKE", whole(c.prov * c.tax)); kpSet("TAX", (c.tax * 100).toFixed(0)); }
+    /* yearly figures at the REAL block pace (audit 2026-10-13): the chain mints its provisions figure per
+       nominal block count, and blocks arrive ~26% faster - the build publishes the measured factor */
+    var pace = (D.set && D.set.pace) || 1;
+    if(c.infl >= 0) kpSet("INFL", (c.infl * pace * 100).toFixed(1));
+    if(c.prov > 0 && c.tax >= 0){ kpSet("MINTED", whole(c.prov * pace)); kpSet("POOL", whole(c.prov * pace * (1 - c.tax))); kpSet("CTAKE", whole(c.prov * pace * c.tax)); kpSet("TAX", (c.tax * 100).toFixed(0)); }
     if(c.eta >= 0){
       var up = V.length >= 3 && document.querySelector("#qpop .kp-ru.hot") === document.querySelectorAll("#qpop .kp-ru")[0];
       kpSet("ETA", c.eta.toFixed(2)); kpSet("ETA_PCT", (c.eta * 100).toFixed(0));

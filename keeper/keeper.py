@@ -1366,6 +1366,27 @@ def once(c, only=None, live=None, force=False):
     except Exception as e:
         log("status failed: %s" % e)
     inactive_flush()
+    # (audit 2026-10-13) a wallet that revoked everything kept its last report forever, reading as a live
+    # Autopilot: a report whose granter holds neither grant is stamped revoked once, with the time it was seen
+    # gone, and its restake block told the same. The history stays - it happened.
+    if not only:
+        try:
+            have = set(g["granter"] for g in gs) | set(rgs)
+            for fn in os.listdir(REPORTS):
+                if not fn.startswith("atone1") or not fn.endswith(".json"): continue
+                gr2 = fn[:-5]
+                if gr2 in have: continue
+                path2 = os.path.join(REPORTS, fn)
+                try: rep2 = json.load(open(path2))
+                except Exception: continue
+                if rep2.get("revoked"): continue
+                rep2["revoked"] = int(time.time()); rep2["checked"] = int(time.time())
+                rep2.pop("strategy", None)
+                if isinstance(rep2.get("restake"), dict): rep2["restake"]["live"] = False
+                report(gr2, rep2)
+                log("report %s marked revoked (no grants remain)" % short(gr2))
+        except Exception as e:
+            log("revoked sweep failed: %s" % e)
     if not only:
         try: run_summaries(c, len(gs), len(rgs), dry, [g["granter"] for g in gs], list(rgs))
         except Exception as e: log("run summary failed: %s" % e)

@@ -8,7 +8,17 @@ requests on every visitor, leak the reader to another host, and break the page's
 every 15 minutes: re-fetching 100 avatars 96 times a day would be abuse. Only
 identities with no cached file are fetched, so a steady state costs zero requests.
 """
-import re, json, os, ssl, sys, time, urllib.request
+import re, json, os, resource, ssl, sys, time, urllib.request
+# (audit 2026-10-13) this is the one place the build decodes bytes another party authored. Two fences, cheap:
+# only the four formats a Keybase picture can be (Pillow ships 43 decoders; any other format is refused at the
+# header), and hard resource ceilings on this process - it runs as its own subprocess of the build, so a decoder
+# bug can exhaust 1 GB and 60 s of CPU and die here, never the build, never the web root's writer.
+try:
+    resource.setrlimit(resource.RLIMIT_AS, (1_073_741_824, 1_073_741_824))
+    resource.setrlimit(resource.RLIMIT_CPU, (60, 60))
+except Exception:
+    pass
+FORMATS = ["JPEG", "PNG", "WEBP", "GIF"]
 import urllib.parse
 # a Keybase username or a 16-hex PGP key suffix - nothing that can traverse
 SAFE_ID = re.compile(r"[A-Za-z0-9_.-]{1,32}")
@@ -31,7 +41,7 @@ def shrink(path):
     try:
         from PIL import Image
         Image.MAX_IMAGE_PIXELS = MAXPX * MAXPX          # PIL's own bomb guard, 16,777,216
-        im = Image.open(path)                           # reads the header only
+        im = Image.open(path, formats=FORMATS)          # reads the header only; four formats, not Pillow's 43
         w, h = im.size
         if w > MAXPX or h > MAXPX or w * h > MAXPX * MAXPX:
             raise ValueError("image too large: %dx%d" % (w, h))

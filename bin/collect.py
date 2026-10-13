@@ -863,7 +863,7 @@ out = {
           # how many validators SIT BELOW the average size - the ones a higher
           # coefficient pays more. Not the same set as the concentration thirds.
           "below_mean": sum(1 for v in V if v["t"] < MEAN),
-          "inflation": infl, "community_tax": tax,
+          "inflation": infl, "pace": round(PACE, 4), "community_tax": tax,
           "min_commission": mincom, "community_pool": cpool,
           "not_bonded": int(pool["not_bonded_tokens"])},
   "rule": {"ratio": ratio, "threshold": 3.0, "rising": rising,
@@ -1009,8 +1009,20 @@ def bake_votes():
             with open(t, "w") as f: f.write(body)
             os.replace(t, dst); wrote += 1
         print(f"votes: {wrote} of 32 shards changed")
+        # the index's OWN coverage window (audit 2026-10-13): the page may claim "Not voted" only for
+        # proposals that ended inside it. Unreadable -> the fields stay out and the page keeps its guards.
+        covrow = {}
+        try:
+            cp = subprocess.run(["psql", DSN_SAFE, "-tAF", "\x1f", "-c",
+                                 "select lo, hi, extract(epoch from hi_time)::bigint from indexer_coverage('%s','votes')" % CHAIN],
+                                capture_output=True, text=True, timeout=30, env=PGENV)
+            if cp.returncode == 0 and cp.stdout.strip():
+                lo_, hi_, ht_ = cp.stdout.strip().split("\x1f")
+                covrow = {"lo": int(lo_), "hi": int(hi_), "hi_time": int(ht_)}
+        except Exception as ce:
+            print(f"votes: coverage unreadable ({ce})")
         t = os.path.join(vdir, ".meta.tmp")
-        with open(t, "w") as f: json.dump({"height": head, "at": int(time.time()), "voters": nvoters}, f)
+        with open(t, "w") as f: json.dump(dict({"height": head, "at": int(time.time()), "voters": nvoters}, **covrow), f)
         os.replace(t, os.path.join(vdir, "_meta.json"))
     except Exception as e:
         print(f"votes: skipped ({e})")

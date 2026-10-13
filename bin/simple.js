@@ -657,7 +657,7 @@
       st("Most missed", bad.length ? esc(bad[0].m) : n ? "none" : "-", bad.length ? bad[0].k + " of " + n + " blocks" : n ? "all signed" : "", "#ff4d1f") + '</div></div>';
     if(!n){ put("sv-signp", h + '<div class=sv-upwait>Reading the latest blocks…</div>'); return; }
     h += '<div class=sv-grid><div class=sv-gnames>' + list.map(function(x){
-        return '<div class="sv-gn' + (x.k ? ' bad' : '') + '" data-v="' + esc(x.id) + '" title="Open ' + esc(x.m) + '"><span class=sv-lgo>' + logo(x.id, x.m) + '</span><b>' + esc(x.m) + '</b>' + (x.k ? '<em>' + x.k + '</em>' : '') + '</div>'; }).join("") +
+        return '<div class="sv-gn' + (x.k ? ' bad' : '') + '" data-v="' + esc(x.id) + '" tabindex=0 role=button title="Open ' + esc(x.m) + '"><span class=sv-lgo>' + logo(x.id, x.m) + '</span><b>' + esc(x.m) + '</b>' + (x.k ? '<em>' + x.k + '</em>' : '') + '</div>'; }).join("") +
       '</div><div class=sv-gcw><canvas class=sv-gc aria-label="Signatures by block"></canvas></div></div>' +
       '<div class=sv-gx><span>&larr; older, block ' + Number(rows[0][0]).toLocaleString() + '</span><span class=sv-gtip id=sv-signtip></span><span>now, block ' + Number(rows[n - 1][0]).toLocaleString() + ' &rarr;</span></div>';
     put("sv-signp", h);
@@ -702,7 +702,7 @@
     /* the latest blocks, newest on the right */
     var lv = rows.filter(live), last = lv.slice(-(innerWidth <= 620 ? 8 : 24));
     put("sv-proplive", '<div class=sv-ph><h3>Latest blocks</h3></div>' + (last.length ? '<div class=sv-plive>' + last.map(function(r){ var p = proposer(r, ix) || { m: "?" };
-        return '<div class=sv-pb' + (p.id ? ' data-v="' + esc(p.id) + '"' : '') + ' title="block ' + Number(r[0] + 1).toLocaleString() + ' by ' + esc(p.m) + '"><span class=sv-lgo>' + logo(p.id, p.m) + '</span><b>' + esc(p.m) + '</b><s>' + Number(r[0] + 1).toLocaleString() + '</s></div>'; }).join("") + '</div>'
+        return '<div class=sv-pb' + (p.id ? ' data-v="' + esc(p.id) + '" tabindex=0 role=button' : '') + ' title="block ' + Number(r[0] + 1).toLocaleString() + ' by ' + esc(p.m) + '"><span class=sv-lgo>' + logo(p.id, p.m) + '</span><b>' + esc(p.m) + '</b><s>' + Number(r[0] + 1).toLocaleString() + '</s></div>'; }).join("") + '</div>'
       : '<div class=sv-upwait>Waiting for the live feed…</div>'));
     var sw = '<span class=sv-sw role=group aria-label="Period">' +
       '<button type=button data-act=pwin data-w=24h aria-pressed=' + !all + '>24 hours</button><button type=button data-act=pwin data-w=all aria-pressed=' + all + '>Since genesis</button></span>';
@@ -1341,6 +1341,10 @@
     /* the whole record first: every vote since genesis, baked per voter from our own history (the public node holds
        only since 2026-08-21, before every past proposal); the node's recent transactions then add anything newer */
     var BK = { y: "yes", n: "no", a: "abstain" };
+    /* the bake's own coverage window, read once: "Not voted" is only claimed inside it (audit 2026-10-13) */
+    if(GP.vmeta === undefined){ GP.vmeta = null;
+      fetch("votes/_meta.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(m){ GP.vmeta = m || null; }).catch(function(){}); }
     var base = fetch("votes/" + a.charAt(6) + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; })
       .then(function(d){ if(!d) return; baked = true; var m = d[a] || {}; Object.keys(m).forEach(function(k){ map[+k] = BK[m[k]] || (m[k] ? "voted" : null); }); })   /* an option the bake did not recognise is still A VOTE, never "not voted" (audit 2026-10-13) */
       .catch(function(){});
@@ -1379,7 +1383,10 @@
   function noVoteSure(h, p){
     if(!h || !h.map || !p.vs) return false;
     var end = p.ve ? new Date(p.ve).getTime() : 0, from = (window.__D || {}).hist_from ? new Date(window.__D.hist_from).getTime() : 0;
-    if(h.baked) return h.recentFull || (p.st !== "PROPOSAL_STATUS_VOTING_PERIOD" && end && end < Date.now() - 36e5);
+    /* when the bake states its coverage, a closed proposal must have ENDED inside it (with the same hour of
+       settling room): a shard from an index that had not reached that far proves nothing (audit 2026-10-13) */
+    var cov = function(){ var m = GP.vmeta; if(!m || !m.hi_time) return true; return m.lo <= 1 && end && end < m.hi_time * 1000 - 36e5; };
+    if(h.baked) return h.recentFull || (p.st !== "PROPOSAL_STATUS_VOTING_PERIOD" && end && end < Date.now() - 36e5 && cov());
     return h.recentFull && !!from && new Date(p.vs).getTime() >= from;
   }
   /* an account's missing vote, confirmed: on an open proposal by the chain's own answer, else by its full record */
@@ -1528,7 +1535,7 @@
       tile("gpf-vote", "Voting", p.vs ? (vy ? pday(p.vs).replace(/ \d{4}$/, "") : pday(p.vs)) + ' to ' + pday(p.ve) : 'Not started', vdays ? vdays + ' days' : '') +
       (t.s ? tile("gpf-cast", "Votes cast", Math.round(t.s / 1e6).toLocaleString("en-US") + ' ATONE') : '') + '</div>' +
       (wide ? '' : pside(p)) +
-      (sm ? '<div class=gp-sum><div>' + esc(sm) + '</div></div>' : '') + (p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? voteBox(p) : '');
+      (sm ? '<div class="gp-sum md"><div>' + mdLite(sm) + '</div></div>' : '') + (p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? voteBox(p) : '');
   }
   /* an OPEN proposal's turnout against today's bonded stake, beside the quorum it must reach (audit 2026-10-13:
      a proposal can fail on quorum and the page never said how far it was); closed ones get none, since the bonded
@@ -1538,6 +1545,29 @@
     if(p.st !== "PROPOSAL_STATUS_VOTING_PERIOD" || !t.s || !(S > 0)) return '';
     return '<span class=t title="all votes over bonded stake; the proposal needs the quorum to count at all">Turnout <b>' +
       (t.s / S * 100).toFixed(1) + '%</b>' + (q ? ' of ' + (q * 100).toFixed(1) + '% needed' : '') + '</span>';
+  }
+  /* the proposal text, minimally rendered (audit 2026-10-13: raw Markdown read as "# AtomOne v4" and
+     "[here](https://...)"): escaped FIRST, then only what this builds - headings, bullet lists, re-flowed
+     paragraphs, **bold**, `code`, and [text](https://...) links whose address passed the scheme check */
+  function mdLite(t){
+    var inl = function(x){
+      x = x.replace(/\[([^\]]{1,120})\]\((https?:\/\/[^\s)<>"']{1,300})\)/g, function(_, a, u){
+        return '<a href="' + u + '" target=_blank rel="noopener noreferrer">' + a + '</a>'; });
+      x = x.replace(/\*\*([^*]{1,200})\*\*/g, "<b>$1</b>");
+      x = x.replace(/`([^`]{1,200})`/g, "<code>$1</code>");
+      return x;
+    };
+    return String(t).split(/\n{2,}/).map(function(b){
+      b = b.replace(/\s+$/, ""); if(!b.trim()) return "";
+      var m = /^(#{1,4})\s+(.+)$/.exec(b.trim());
+      if(m && b.indexOf("\n") < 0) return '<span class="gp-mdh h' + m[1].length + '">' + inl(esc(m[2])) + '</span>';
+      var ls = b.split("\n");
+      if(ls.length > 1 && ls.every(function(l){ return /^\s*[-*]\s+/.test(l) || !l.trim(); }))
+        return '<ul class=gp-mdl>' + ls.filter(function(l){ return l.trim(); }).map(function(l){
+          return '<li>' + inl(esc(l.replace(/^\s*[-*]\s+/, ""))) + '</li>'; }).join("") + '</ul>';
+      /* a hard-wrapped paragraph re-flows: single line ends become spaces */
+      return '<p>' + inl(esc(ls.map(function(l){ return l.trim(); }).join(" "))) + '</p>';
+    }).join("");
   }
   function pwhen(p){ return p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? "ends " + pday(p.ve) : p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? "deposit until " + pday(p.de) : "ended " + pday(p.ve); }
   /* the wide screen's detail pane: the chosen proposal, whole */
@@ -1777,9 +1807,10 @@
       return [sg >= n ? "All " + n + " signing" : sg + " of " + n + " signing", bt ? bt.toFixed(2) + " s a block, last " + r.length + " blocks" : ""];
     }
     if(id === "bonus"){
+      /* gross, before commission (operator 2026-10-13): the same basis as the map's own legend */
       var V = VALS(), lo = Infinity, hi = 0;
-      V.forEach(function(v){ var x = window.__rateAfter ? window.__rateAfter(v[1], v[2], 0) : 0; if(x > 0){ if(x < lo) lo = x; if(x > hi) hi = x; } });
-      return hi ? [pct(lo) + " to " + pct(hi), "smaller validators pay more"] : ["Reading the set…", ""];
+      V.forEach(function(v){ var x = window.__rateAfter ? window.__rateAfter(v[1], 0, 0) : 0; if(x > 0){ if(x < lo) lo = x; if(x > hi) hi = x; } });
+      return hi ? [pct(lo) + " to " + pct(hi), "smaller validators pay more, before commission"] : ["Reading the set…", ""];
     }
     if(id === "gov"){
       loadProps();
@@ -1977,7 +2008,8 @@
       var H = ((R && R.activity && R.activity.moves) || (R && R.history) || []).filter(function(x){ return x.uatone > 0; }), mv = 0, gn = 0;
       H.forEach(function(x){ mv += x.uatone; gn += +x.gain || 0; });
       var part = !full && H.length >= 10;
-      return { sum: H.length ? (part ? "Latest " : "") + H.length + (H.length === 1 ? " move, " : " moves, ") + fmt(mv) + " ATONE moved, " + g1(gn) + (part ? "" : since(H)) : "No moves yet",
+      var rvk = R && R.revoked ? "Autopilot revoked " + actDay(R.revoked * 1000) + ". " : "";
+      return { sum: rvk + (H.length ? (part ? "Latest " : "") + H.length + (H.length === 1 ? " move, " : " moves, ") + fmt(mv) + " ATONE moved, " + g1(gn) + (part ? "" : since(H)) : "No moves yet"),
         tiles: H.length ? [[String(H.length), part ? "latest moves" : (H.length === 1 ? "move" : "moves")], [wn(mv), "ATONE moved"],
           ["+" + Math.round(gn).toLocaleString("en-US"), "ATONE a year"]].concat(part ? [] : [[first(H), "since"]]) : null,
         rows: H.map(function(x){ return actRow(actWhen(x.at * 1000), esc(actName(x.src)) + " &rarr; " + esc(actName(x.dst)), "", x.txhash, fmt(x.uatone) + " ATONE"); }) }; });

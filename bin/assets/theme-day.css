@@ -827,6 +827,7 @@
   html[data-theme=light]:not([data-mono]) .gp-st{border-color:currentColor}
   html[data-theme=light]:not([data-mono]) .gp-d{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .gp-fi{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .gp-sum.md code{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .gp-vm.me{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .gp-vm.gov{background:transparent}
   html[data-theme=light]:not([data-mono]) .gp-vm.none{background:transparent}

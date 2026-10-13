@@ -4782,6 +4782,17 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gp-mono{font-style:normal;font-family:var(--wmono);font-size:11.5px;font-weight:600}
 @media(max-width:700px){.gp-f{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:row dense}.gp-fi.gpf-vote{grid-column:1/-1}}
 .gp-sum{font-size:12px;line-height:1.55;color:var(--ws);white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow-y:auto;padding:10px 12px;border:1px solid var(--wbd);border-radius:8px}
+/* the rendered proposal text: normal flow, quiet headings, tight lists */
+.gp-sum.md{white-space:normal}
+.gp-sum.md p{margin:0 0 9px}
+.gp-mdh{display:block;font-weight:700;color:var(--wt);margin:4px 0 7px}
+.gp-mdh.h1{font-size:14.5px}.gp-mdh.h2{font-size:13.5px}.gp-mdh.h3,.gp-mdh.h4{font-size:12.5px}
+.gp-sum.md ul.gp-mdl{margin:0 0 9px;padding-left:18px}
+.gp-sum.md li{margin:2px 0}
+.gp-sum.md a{color:var(--sv-teal)}
+.gp-sum.md code{font-family:var(--wmono);font-size:11px;padding:1px 4px;border-radius:4px;background:rgba(255,255,255,.07)}
+/* a table with nothing to show says why, once, instead of skeleton rows */
+.ptab tr.phx td{padding:16px 10px;text-align:center;font-size:12px;color:var(--wf)}
 /* your mark on a proposal row: filled = you voted, outlined = your governor did; the colour is the vote */
 .gp-vm{font-style:normal;display:inline-flex;align-items:center;justify-content:center;height:17px;padding:0 7px;margin-right:7px;border-radius:999px;font-family:var(--wmono);font-size:9px;letter-spacing:.06em;font-weight:700;white-space:nowrap;vertical-align:1px;flex:none}
 .gp-vm{--vc:var(--ws)}   /* a vote the bake could not name still reads "Voted", in the quiet colour */
@@ -5904,7 +5915,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .you-fct>em small{margin-left:6px;font-size:9px;letter-spacing:.06em;text-transform:none;color:var(--wf);opacity:.8}
 .you-fb{display:flex;flex-direction:column;gap:8px}
 .you-fw{position:relative;display:flex}
-@media(max-height:680px){.you-fct{margin-top:0}.you-fct em{display:none}.you-fb{flex-direction:row;gap:6px}.you-fq{height:26px;font-size:10px;padding:0 6px}.you-hf{margin-top:8px;gap:6px}.you-sw{min-height:34px}}
+@media(max-height:680px){.you-fct:not(#z){margin-top:0}.you-fct em{display:none}.you-fb{flex-direction:row;gap:6px}.you-fq:not(#z){height:26px;font-size:10px;padding:0 6px}.you-hf:not(#z){margin-top:8px;gap:6px}.you-sw:not(#z){padding:7px 12px}}
 .you-fq{flex:1 1 auto;min-width:0;height:34px;padding:0 12px;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-sizing:border-box;border:1px solid var(--sv-teal,#2bc8bd);border-radius:9px;background:transparent;color:var(--sv-teal,#2bc8bd);
   font:600 11.5px var(--wsans);cursor:pointer;white-space:nowrap}
 .you-fq:hover:not(:disabled){background:rgba(43,200,189,.10)}
@@ -6745,6 +6756,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   .mv-ap{flex-direction:column;align-items:stretch}
   .mv-cyc{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media(max-height:680px){.you-fct:not(#z){margin-top:0}.you-fct em{display:none}.you-fb{flex-direction:row;gap:6px}.you-fq:not(#z){height:26px;font-size:10px;padding:0 6px}.you-hf:not(#z){margin-top:8px;gap:6px}.you-sw:not(#z){padding:7px 12px}}
 </style>
 <link rel=stylesheet href="assets/theme-day.css">
 <!-- the shell's generated rules come last: they only name theme tokens, so they are right in
@@ -7095,7 +7107,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
     <div class=kp-big><b class=am><span data-kp=BONDED>{{BONDED}}</span></b><em>ATONE staked, <strong><span data-kp=BONDED_PCT>{{BONDED_PCT}}</span>%</strong> of <span data-kp=SUPPLY>{{SUPPLY}}</span></em>
       <span class=kp-bar><i style="width:{{BONDED_PCT}}%"></i></span></div>
     <div class=kp-g>
-      <div class=kp-f><em>Inflation</em><b><span data-kp=INFL>{{INFL}}</span>%</b><small>a year</small></div>
+      <div class=kp-f><em>Inflation</em><b><span data-kp=INFL>{{INFL}}</span>%</b><small>a year, at the real block pace</small></div>
       <div class=kp-f><em>Minted</em><b><span data-kp=MINTED>{{MINTED}}</span></b><small>ATONE a year</small></div>
       <div class=kp-f><em>Reward pool</em><b><span data-kp=POOL>{{POOL}}</span></b><small>ATONE a year, to stakers</small></div>
       <div class=kp-f><em>Community pool</em><b><span data-kp=CTAKE>{{CTAKE}}</span></b><small>ATONE a year, <span data-kp=TAX>{{TAX}}</span>% tax</small></div>
