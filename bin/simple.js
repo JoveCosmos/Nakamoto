@@ -616,7 +616,7 @@
     h = '<div class=sv-ph><h3>Chain pace</h3><div class=sv-rt>' +
       st("Block time", avg.toFixed(2) + " s", "slowest " + slow.s.toFixed(1) + " s") +
       st("Blocks a day", DAY.avg ? Math.round(86400 / DAY.avg).toLocaleString() : "-", DAY.avg ? "last 24 hours" : "measuring…") +
-      st("Total blocks", Number(src[src.length - 1][0] + 1).toLocaleString(), (DD().coverage || {}).from_date ? "since " + DD().coverage.from_date : "since genesis") +
+      st("Total blocks", Number(src[src.length - 1][0] + 1).toLocaleString(), (DD().coverage || {}).from_date ? "since " + dmyd(DD().coverage.from_date) : "since genesis") +
     '</div></div>' +
     '<div class=sv-pace><span class=sv-pavg style="bottom:' + (avg / top * 100).toFixed(1) + '%"><b>' + avg.toFixed(1) + ' s</b></span>' +
       iv.map(function(x){ return '<i class="' + (x.s > avg * 1.5 ? "slow" : "") + '" style="--h:' + Math.max(4, x.s / top * 100).toFixed(1) + '%" data-t="block ' + x.h.toLocaleString() + ': ' + x.s.toFixed(2) + ' s"></i>'; }).join("") +
@@ -694,7 +694,7 @@
     else if(p24){ for(var k in p24){ got += p24[k]; ever++; }
       V.forEach(function(v){ var d = VD[v[3]] || {}; list.push({ id: v[3], m: v[0], c: p24[String(d.chex || "").toUpperCase()] || 0 }); }); }
     list.sort(function(a, b){ return b.c - a.c; });
-    var top = list[0], since = (D.coverage || {}).from_date, have = all ? list.length : !!p24;
+    var top = list[0], since = dmyd((D.coverage || {}).from_date), have = all ? list.length : !!p24;
     var stats = '<div class=sv-rt>' +
       st("Blocks", have ? got.toLocaleString() : "-", all ? "since genesis" + (since ? ", " + since : "") : "last 24 hours, one every " + (got ? (86400 / got).toFixed(1) : "-") + " s") +
       st("Proposers", have ? ever.toLocaleString() : "-", all ? "validators that ever proposed" : "validators that proposed", "var(--sv-violet)") +
@@ -735,7 +735,7 @@
       return '<button type=button data-act=awin data-w=' + o[0] + ' aria-pressed=' + (AW === o[0]) + '>' + o[1] + '</button>'; }).join("") + '</span>';
     if(all){
       if(td) td.forEach(function(x){ tot += x[1]; bl += x[2]; if(!top || x[1] > top[1]) top = x; });
-      var since = (D.coverage || {}).from_date;
+      var since = dmyd((D.coverage || {}).from_date);
       stats = '<div class=sv-rt>' + st("Transactions", td ? tot.toLocaleString() : "-", since ? "since " + since : "since genesis") +
         st("Busiest day", top ? top[1].toLocaleString() : "-", top ? dl(top[0]) : "") +
         st("Per block", td && bl ? (tot / bl).toFixed(2) : "-", td ? "average over " + bl.toLocaleString() + " blocks" : "") + '</div>';
@@ -1006,7 +1006,7 @@
     return [el.filter(function(p){ return !!h.map[p.id]; }).length, el.length];
   }
 
-  function gfig(u){ var a = u / 1e6, sh = a >= 1e6 ? (a / 1e6).toFixed(2) + "M" : a >= 1e3 ? (a / 1e3).toFixed(1) + "K" : a.toFixed(1);
+  function gfig(u){ var a = u / 1e6, sh = a >= 1e6 ? (a / 1e6).toFixed(2) + "M" : a >= 1e3 ? (a / 1e3).toFixed(1) + "k" : a.toFixed(1);
     return '<span class=gf-l>' + fmt(u) + '</span><span class=gf-s>' + sh + '</span>'; }
   function govTable(list, mine){
     loadProps();
@@ -1342,7 +1342,7 @@
        only since 2026-08-21, before every past proposal); the node's recent transactions then add anything newer */
     var BK = { y: "yes", n: "no", a: "abstain" };
     var base = fetch("votes/" + a.charAt(6) + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; })
-      .then(function(d){ if(!d) return; baked = true; var m = d[a] || {}; Object.keys(m).forEach(function(k){ map[+k] = BK[m[k]] || null; }); })
+      .then(function(d){ if(!d) return; baked = true; var m = d[a] || {}; Object.keys(m).forEach(function(k){ map[+k] = BK[m[k]] || (m[k] ? "voted" : null); }); })   /* an option the bake did not recognise is still A VOTE, never "not voted" (audit 2026-10-13) */
       .catch(function(){});
     /* the node's recent votes FOR this account (2026-10-12): searched by the vote event's own voter, which is the
        account whose vote counts - a vote cast for it through authz (MsgExec by a grantee) names the granter there,
@@ -1903,6 +1903,7 @@
   function actName(id){ var V = window.__VALS ? window.__VALS() : []; for(var i = 0; i < V.length; i++) if(V[i][3] === id) return V[i][0];
     var x = (window.__INACT || {})[id]; return x && x.m ? x.m : String(id || "").slice(-6); }
   var ACT_MO = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function dmyd(x){ var m = /^([A-Za-z]{3}) (\d{1,2}) (\d{4})$/.exec(String(x || "")); return m ? m[2] + " " + m[1] + " " + m[3] : String(x || ""); }
   function actDay(t){ var d = new Date(t), y = d.getUTCFullYear(); return d.getUTCDate() + " " + ACT_MO[d.getUTCMonth()] + (y !== new Date().getUTCFullYear() ? " " + y : ""); }
   /* a row's date, and under it the hour it landed, in UTC (operator, 2026-10-12) */
   function actWhen(t){ var d = new Date(t), p = function(n){ return (n < 10 ? "0" : "") + n; };
@@ -1988,7 +1989,8 @@
         return { sum: rows.length ? "Latest " + rows.length + (rows.length === 1 ? " restake" : " restakes") : "No restakes in the latest claims", rows: rows }; });
       return { sum: L.length ? L.length + (L.length === 1 ? " restake, " : " restakes, ") + fmt(tot) + " ATONE of rewards staked back" + since(L) : "No restakes yet",
         tiles: L.length ? [[String(L.length), L.length === 1 ? "restake" : "restakes"], [wn(tot), "ATONE staked back"], [first(L), "since"]] : null,
-        rows: L.map(function(x){ return actRow(actWhen(x.at * 1000), "Rewards staked back", x.target ? "onto " + esc(actName(x.target)) + (x.staked > 0 ? "" : "") : "", x.txhash, fmt(x.staked) + " ATONE"); }) }; });
+        rows: L.map(function(x){ var nt = (x.targets || []).length; return actRow(actWhen(x.at * 1000), "Rewards staked back",
+          x.target ? "onto " + esc(actName(x.target)) + (nt > 1 ? " and " + (nt - 1) + " more" : "") : "", x.txhash, fmt(x.staked) + " ATONE"); }) }; });
     /* Account: the address as an explorer shows it - what it signed, what it received, and what was done on its behalf */
     var qs = ["message.sender='" + a + "'", "transfer.recipient='" + a + "'", "delegate.delegator='" + a + "'", "withdraw_rewards.delegator='" + a + "'",
               "proposal_vote.voter='" + a + "'"];
@@ -2124,7 +2126,7 @@
       var cls = src[v[3]] ? 's' : dst[v[3]] ? 'd' : '';
       return '<i class="' + cls + '" data-v="' + esc(v[3]) + '" title="#' + (i + 1) + ' ' + esc(v[0]) + '" style="height:' + Math.round(6 + 94 * Math.sqrt(v[1] / top)) + '%"></i>';
     }).join("");
-    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em>' + (document.documentElement.getAttribute("data-net") === "testnet" ? '' : '<em class=mv-tip>Tap any bar to setup telegram alerts</em>') + '</div><div class=mv-bars>' + bars + '</div></div>';
+    return '<div class=mv-set><div class=mv-sh><em>The set, ' + n + ' validators, largest first</em>' + (document.documentElement.getAttribute("data-net") === "testnet" ? '' : '<em class=mv-tip>Tap any bar to set up Telegram alerts</em>') + '</div><div class=mv-bars>' + bars + '</div></div>';
   }
 
   function drawMove(){

@@ -60,6 +60,13 @@ def get(url, timeout=25):
     except Exception as e:
         die(f"fetch {url}: {e}")
 
+def softget(url, timeout=25):
+    """for the OPTIONAL fetches: raises instead of exiting, so their try/except really skips them (audit
+    2026-10-13: get() called die(), whose SystemExit sailed past `except Exception` and killed the whole build,
+    testnet included, over an endpoint the comments said was skippable)"""
+    with urllib.request.urlopen(url, timeout=timeout) as r:
+        return json.loads(r.read())
+
 # The DSN carries a password, and a process's argv is world-readable through
 # /proc while it runs - `ps` would hand the database credential to any local
 # account. libpq takes the password from the environment instead, and
@@ -108,6 +115,25 @@ for c in get(f"{API}/cosmos/distribution/v1beta1/community_pool").get("pool", []
     if c.get("denom") == "uatone":
         cpool = float(c["amount"])
 supply= int(get(f"{API}/cosmos/bank/v1beta1/supply/by_denom?denom=uatone")["amount"]["amount"])
+# ── real block pace vs the mint parameter (audit 2026-10-13). x/mint credits annual_provisions/blocks_per_year
+# EVERY block (minter.go:80); blocks_per_year says 4.36M but blocks arrive every ~5.8s (~5.4M a year), so every
+# nominal yearly figure (APR, rewards, minted) ran about 20% low. PACE = measured blocks a year / the parameter,
+# measured over the last 100k blocks (~1 week); clamped, and 1.0 when it cannot be read (nominal, never wrong-high).
+SEC_YR = 31_557_600.0
+def _btime(h):
+    t = get(f"{API}/cosmos/base/tendermint/v1beta1/blocks/{h}")["block"]["header"]["time"]
+    d, _, f = t.rstrip("Z").partition(".")
+    return datetime.strptime(d, "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc).timestamp() + float("0." + f if f else 0)
+BPY = 0.0
+PACE = 1.0
+try:
+    BPY = float(get(f"{API}/cosmos/mint/v1beta1/params")["params"]["blocks_per_year"])
+    _pw = min(100_000, head - 2)
+    _dt = _btime(head) - _btime(head - _pw)
+    if _dt > 0 and BPY > 0:
+        PACE = max(0.8, min(1.6, (_pw / _dt) * SEC_YR / BPY))
+except Exception as _e:
+    print(f"collect: block pace unreadable ({_e}); yearly figures stay nominal", file=sys.stderr)
 vals_r= get(f"{API}/cosmos/staking/v1beta1/validators"
             "?status=BOND_STATUS_BONDED&pagination.limit=500")["validators"]
 all_r = get(f"{API}/cosmos/staking/v1beta1/validators?pagination.limit=1000")["validators"]
@@ -142,16 +168,17 @@ V = sorted([{"m": v["description"]["moniker"],
 N = len(V)
 if N < 3: die(f"only {N} bonded validators - the bonus needs 3 groups")
 S = sum(v["t"] for v in V)
-R = prov * (1.0 - tax)                      # annual validator reward pool, uatone
+R = prov * (1.0 - tax) * PACE               # annual validator reward pool, uatone, at the REAL block pace
 MEAN, BASE = S / N, R / S
 
 # ── the rule ────────────────────────────────────────────────────────────
-# ADR-004 splits the set into three groups by voting power and compares the
-# AVERAGE of the high group with the average of the low group. The remainder goes
-# to the LOW group, so at N=100 it is 33 / 33 / 34, not 33 / 33 / 33. Taking 33
-# on both ends quietly overstated the ratio (10.480 against 10.411 today).
+# The chain splits the set into three groups by voting power and compares the
+# AVERAGE of the high group with the average of the low group. groupSize is n/3 at
+# BOTH ends (x/distribution nakamoto_bonus.go:55-57, read 2026-10-13): at N=100 it
+# is 33 / 33, the remainder stays in the middle. (An earlier comment here claimed
+# the remainder went to the low group; the chain's code says otherwise.)
 g  = N // 3
-gl = N - 2 * g
+gl = g
 Hi = sum(v["t"] for v in V[:g]); Lo = sum(v["t"] for v in V[N-gl:])
 ratio = (Hi/g) / (Lo/gl) if Lo else float("inf")
 # At or above 3x the coefficient steps UP; below it the coefficient steps DOWN.
@@ -192,7 +219,7 @@ move_from, move_to = (("Largest", "smallest") if ratio > 3.0 else ("Smallest", "
 # a chain upgrade that moves the epoch can never silently desync the schedule.
 EPOCH_START = datetime(2026, 7, 22, 9, 24, 31, tzinfo=timezone.utc)
 try:
-    _eps = get(f"{API}/cosmos/epochs/v1beta1/epochs")
+    _eps = softget(f"{API}/cosmos/epochs/v1beta1/epochs")
     _wk = next((e for e in _eps.get("epochs", []) if e.get("identifier") == "week"), None)
     if _wk:
         _st = datetime.fromisoformat(_wk["start_time"].replace("Z", "+00:00")).replace(microsecond=0)
@@ -254,7 +281,7 @@ def ratio_at(h):
     n = len(pw)
     if n < 9: return None
     pw.sort(reverse=True)
-    gg = n // 3; gg_lo = n - 2*gg
+    gg = n // 3; gg_lo = gg          # n/3 at both ends, as the chain splits (2026-10-13)
     hi_a = sum(pw[:gg]) / gg; lo_a = sum(pw[n-gg_lo:]) / gg_lo
     if not lo_a: return None
     chist[k] = round(hi_a / lo_a, 2)
@@ -389,13 +416,19 @@ for _i, _w in enumerate(_done):
     _yrs = (len(_done) - 1 - _i) * 7 / 365.0
     _sup = supply / ((1 + infl) ** _yrs)
     _base = infl * (_sup / (_S * 1e6)) * (1 - tax)
-    _miss = {r[0]: int(r[1]) for r in sql(f"""
-        SELECT cons_addr, count(*)::text FROM missed_signature
-        WHERE chain_id='{CHAIN}' AND height >= {_h0} AND height < {_h1} GROUP BY 1;""")}
     _blocks = _h1 - _h0
+    # this window's own pace: its blocks over its own days (the open week over the days it has run so far)
+    try:
+        _t0 = datetime.fromisoformat(_w["ts"])
+        _t1 = datetime.fromisoformat(_done[_i+1]["ts"]) if _i + 1 < len(_done) else datetime.now(timezone.utc)
+        _dur = (_t1 - _t0).total_seconds()
+        _wf = max(0.8, min(1.6, (_blocks / _dur) * SEC_YR / BPY)) if _dur > 0 and BPY else PACE
+    except Exception:
+        _wf = PACE
     for _a, _p in _vs.items():
-        _up = 1 - _miss.get(_a, 0) / _blocks
-        _apr = _base * ((1 - _w["eta"]) + _w["eta"] * _S / (_N * _p)) * max(0.0, _up)
+        # no uptime multiplier: the chain pays a validator that missed a block the same as one that signed
+        # (allocation.go distributes over the whole last commit, absent included; read 2026-10-13)
+        _apr = _base * _wf * ((1 - _w["eta"]) + _w["eta"] * _S / (_N * _p))
         earn.setdefault(_a, []).append((_apr, _p))
 _tmp = VSETS + ".tmp"
 json.dump(vsets, open(_tmp, "w")); os.replace(_tmp, VSETS)
@@ -771,12 +804,12 @@ if not TESTNET:
 ECON = os.path.join(STATE, "econ.json")
 econ = None
 try:
-    phs = int(get(f"{API}/cosmos/bank/v1beta1/supply/by_denom?denom=uphoton")["amount"]["amount"])
+    phs = int(softget(f"{API}/cosmos/bank/v1beta1/supply/by_denom?denom=uphoton")["amount"]["amount"])
     cpp = 0.0
-    for c in get(f"{API}/cosmos/distribution/v1beta1/community_pool").get("pool", []):
+    for c in softget(f"{API}/cosmos/distribution/v1beta1/community_pool").get("pool", []):
         if c.get("denom") == "uphoton":
             cpp = float(c["amount"])
-    conv = float(get(f"{API}/atomone/photon/v1/conversion_rate")["conversion_rate"])
+    conv = float(softget(f"{API}/atomone/photon/v1/conversion_rate")["conversion_rate"])
     eday = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     ehist = json.load(open(ECON)) if os.path.exists(ECON) else []
     ehist = [p for p in ehist if p["d"] != eday] + [{"d": eday, "h": head, "atone": supply, "photon": phs,
@@ -895,7 +928,7 @@ out = {
 # validator still gets its picture
 GOV_IDS = []
 try:
-    for g in get(f"{API}/atomone/gov/v1/governors?pagination.limit=500").get("governors", []):
+    for g in softget(f"{API}/atomone/gov/v1/governors?pagination.limit=500").get("governors", []):
         i = ((g.get("description") or {}).get("identity") or "").strip()
         if re.fullmatch(r"[A-Za-z0-9_.-]{1,32}", i): GOV_IDS.append(i)
 except Exception as e:
@@ -951,6 +984,17 @@ def bake_votes():
             if not voter.startswith("atone1") or len(voter) < 8: continue
             shards.setdefault(voter[6], {}).setdefault(voter, {})[pid] = short.get(opt, "?")
         vdir = os.path.join(OUT, "votes"); os.makedirs(vdir, exist_ok=True)
+        # (audit 2026-10-13) the shards are the ground the app's "Not voted" stands on: a query that comes back
+        # thin (an index mid-rebuild, a block gap, an empty table) must NOT replace a fuller record. The bake
+        # keeps what stands unless the new sweep holds at least 90% of the voters the last one did.
+        nvoters = sum(len(v) for v in shards.values())
+        try:
+            was = json.load(open(os.path.join(vdir, "_meta.json"))).get("voters", 0)
+        except Exception:
+            was = 0
+        if nvoters < was * 0.9:
+            print(f"votes: KEPT the standing shards - the sweep returned {nvoters} voters against {was} before "
+                  f"(index mid-rebuild?); nothing rewritten"); return
         wrote = 0
         for c in _CH:
             body = json.dumps(shards.get(c, {}), separators=(",", ":"), sort_keys=True)
@@ -966,7 +1010,7 @@ def bake_votes():
             os.replace(t, dst); wrote += 1
         print(f"votes: {wrote} of 32 shards changed")
         t = os.path.join(vdir, ".meta.tmp")
-        with open(t, "w") as f: json.dump({"height": head, "at": int(time.time()), "voters": sum(len(v) for v in shards.values())}, f)
+        with open(t, "w") as f: json.dump({"height": head, "at": int(time.time()), "voters": nvoters}, f)
         os.replace(t, os.path.join(vdir, "_meta.json"))
     except Exception as e:
         print(f"votes: skipped ({e})")

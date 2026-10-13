@@ -359,7 +359,7 @@ def report(addr):
 
 def wallet_marks(r):
     """what has been announced is everything in the report now: the newest move's time, Restake's total"""
-    hist = (r or {}).get("history") or []
+    hist = (((r or {}).get("activity") or {}).get("moves")) or (r or {}).get("history") or []
     return max([int(h.get("at") or 0) for h in hist] or [0]), int(((r or {}).get("restake") or {}).get("total") or 0)
 
 
@@ -739,7 +739,7 @@ def wallets(c, V):
             mv, rs = wallet_marks(r)
             c.execute("INSERT OR REPLACE INTO wstate(addr, mv_at, rs_total) VALUES(?,?,?)", (addr, mv, rs)); c.commit(); continue
         msgs, mv_at, rs_total = [], st[0] or 0, st[1] or 0
-        new = [h for h in (r.get("history") or []) if int(h.get("at") or 0) > mv_at and h.get("txhash")]
+        new = [h for h in (((r.get("activity") or {}).get("moves")) or r.get("history") or []) if int(h.get("at") or 0) > mv_at and h.get("txhash")]
         for tx in sorted({h["txhash"] for h in new}, key=lambda t: min(int(h["at"]) for h in new if h["txhash"] == t)):
             hs = [h for h in new if h["txhash"] == tx]
             amt = sum(int(h.get("uatone") or 0) for h in hs); gain = sum(float(h.get("gain") or 0) for h in hs)
@@ -808,8 +808,9 @@ def check(c, V):
                                % (md(m), format(jh, ","))))
                 out = 1
             jail_h = jh
-        # back: the page lists it again and it is not jailed
-        if out and v and not v.get("jail"):
+        # back: the page lists it again (its "jail" is a lifetime COUNT, not a state - audit 2026-10-13: the
+        # return message could never fire for a validator with any past jailing; V holds only bonded, unjailed ones)
+        if out and v:
             events.append(("j", "<b>%s</b> is back in the active set." % md(m)))
             out = 0
 

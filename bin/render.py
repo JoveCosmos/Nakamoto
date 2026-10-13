@@ -19,7 +19,12 @@ AVATARS = os.environ.get("AVATAR_DIR", "/srv/atomone-app/state/avatars")   # one
 e, s, th, nk = D["eta"], D["set"], D["rule"], D["nakamoto"]
 M = lambda u: u / 1e6
 f = lambda n, d=0: f"{n:,.{d}f}"
-esc = html.escape
+# html.escape, and the template's own placeholder syntax neutralised: the page is built by a CHAIN of
+# .replace("{{X}}", ...) calls, and str.replace also rewrites inside values already inserted - so a validator
+# moniker of "{{DATA}}" would have pasted the whole payload into its table cell (audit 2026-10-13). "{" becomes
+# its entity and renders identically; no chain string can ever spell a placeholder.
+def esc(x, quote=True):
+    return html.escape(str(x), quote).replace("{", "&#123;")
 
 # ── the figure that decides the headline ─────────────────────────────────────
 rate_line = (f"falling {abs(nk['rate_before']):.2f} points a week before the bonus"

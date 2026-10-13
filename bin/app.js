@@ -266,7 +266,7 @@ var CTARGET = null;
 /* the thirds are taken over the validators actually drawn (t.length), never over the chain's
    count N: between rebuilds a validator can join the set before this page has a row for it,
    and reading past the end of the list made every ratio NaN */
-function thirds(t){ var n = t.length, g = Math.floor(n / 3); return { n: n, g: g, gl: n - 2 * g }; }
+function thirds(t){ var n = t.length, g = Math.floor(n / 3); return { n: n, g: g, gl: g }; }   /* n/3 at BOTH ends, as the chain splits (nakamoto_bonus.go, 2026-10-13) */
 
 /* Reshape by pulling every holding toward the mean by one factor:
      t(lambda) = mean + lambda * (t - mean)
@@ -2163,7 +2163,7 @@ rememberGridH();
     if(rw){ rw.textContent = window.__REW != null ? exact(window.__REW) : "-"; rw.className = window.__REW > 0 ? "ok" : ""; }
     var rt = E("ds-rewt"); if(rt) rt.setAttribute("aria-disabled", clRows().length ? "false" : "true");
     var sf = srcFree(pos);
-    if(mv){ mv.textContent = sf > 0 ? exact(sf, 2) : "0"; mv.title = sf > 0 ? exact(sf) + " ATONE can move" + (srcAny() ? " from the ticked delegations" : "") : "nothing can move until the cooldown ends"; mv.className = sf > 0 ? "" : "warn";
+    if(mv){ mv.textContent = sf > 0 ? exact(sf, 2) : "0"; mv.title = sf > 0 ? exact(sf, 1) + " ATONE can move" + (srcAny() ? " from the ticked delegations" : "") : "nothing can move until the cooldown ends"; mv.className = sf > 0 ? "" : "warn";
       var mxb = E("amtmax"); if(mxb) mxb.disabled = !(sf > 0); }
     var ap = E("ds-apr"); if(ap) ap.textContent = pos.rows.length ? pct(pos.rate) : "-";
     if(ph){ ph.textContent = b ? exact(b.uphoton) : "-";
@@ -2171,7 +2171,7 @@ rememberGridH();
   }
 
   /* ── the delegations, a page at a time ── */
-  var HEAD2 = '<table><colgroup><col style="width:28px"><col style="width:30px"><col><col style="width:80px"><col style="width:50px"><col style="width:56px"></colgroup>' +
+  var HEAD2 = '<table><colgroup><col style="width:28px"><col style="width:30px"><col><col style="width:80px"><col style="width:58px"><col style="width:56px"></colgroup>' +
     '<thead><tr><th class=ck></th><th class=c>rank</th><th class=l>validator</th><th>ATONE</th><th>APR</th><th>rewards</th></tr></thead><tbody>';
   function myRows(pos, V){
     var pn = E("dmyn");
@@ -2195,7 +2195,7 @@ rememberGridH();
     var LOCK = '<i class=lk><svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></i>';
     var RB = window.__REWBY || {};
     /* a box on each delegation: tick the ones to move from (stake in its cooldown cannot be ticked) */
-    h += '<table><colgroup><col style="width:28px"><col style="width:30px"><col><col style="width:80px"><col style="width:50px"><col style="width:56px"></colgroup><thead><tr><th class=ck>' +
+    h += '<table><colgroup><col style="width:28px"><col style="width:30px"><col><col style="width:80px"><col style="width:58px"><col style="width:56px"></colgroup><thead><tr><th class=ck>' +
          (movable.length ? '<input type=checkbox class=src-all aria-label="Tick every delegation that can move"' + (movable.length && movable.every(function(r){ return SRCSEL[r.id]; }) ? ' checked' : '') + '>' : '') +
          '</th><th class=c>rank</th><th class=l>validator</th><th>ATONE</th><th>APR</th><th>rewards</th></tr></thead><tbody>';
     for(k = 0; k < slice.length; k++){
@@ -2448,6 +2448,11 @@ rememberGridH();
     if(ev.type === "keydown" && ev.key !== "Enter" && ev.key !== " ") return;
     ev.preventDefault(); window.__vshow(tr.getAttribute("data-v"));
   }
+  document.addEventListener("keydown", function(ev){
+    if(ev.defaultPrevented || (ev.key !== "Enter" && ev.key !== " ")) return;
+    var tr = ev.target.closest ? ev.target.closest("tr.vrow[data-v]") : null;
+    if(tr && window.__vshow){ ev.preventDefault(); window.__vshow(tr.getAttribute("data-v")); }
+  });
   if(dmy){ dmy.addEventListener("click", rowCard); dmy.addEventListener("keydown", rowCard);
     dmy.addEventListener("change", function(ev){
       var c = ev.target, pos = window.__POS; if(!c || c.type !== "checkbox" || !pos) return;

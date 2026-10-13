@@ -138,6 +138,10 @@ def db():
     c.execute("CREATE TABLE IF NOT EXISTS hold(granter TEXT PRIMARY KEY, until INT, why TEXT, at INT, err TEXT)")
     try: c.execute("ALTER TABLE restake ADD COLUMN error TEXT")
     except sqlite3.OperationalError: pass
+    # (audit 2026-10-13) a restake can stake up to RS_LEGS validators since 9ebf01a: the legs count in the wallet's
+    # day as the signer counts them, and the targets are published whole
+    try: c.execute("ALTER TABLE restake ADD COLUMN legs INT")
+    except sqlite3.OperationalError: pass
     for ix in ("run_g(granter, at)", "applied(granter, at)", "move(granter, at)", "move(txhash)", "restake(granter, at)", "rate_log(granter, at)", "tx_log(granter, at)", "failed_tx(granter, at)"):
         c.execute("CREATE INDEX IF NOT EXISTS ix_%s ON %s" % (ix.split("(")[0] + "_" + ix.split("(")[1].split(",")[1 if "," in ix else 0].strip(" )"), ix))
     c.execute("PRAGMA busy_timeout=5000")
@@ -593,6 +597,10 @@ def restake_step(c, granter, rgs, vals, m, dry):
     live = RESTAKE and not dry
     if "claim" in p:
         amt = sum(s["amount"] for s in p["stake"])
+        # (audit 2026-10-13) the signer counts every stake leg against the day; a plan past the room fails there and
+        # pages ops, so it is not sent at all - the wallet goes again once the day has room
+        if live and moves_today(c, granter) + len(p["stake"]) > MAX_MOVES_DAY:
+            return {"skip": "day full", "until": int(time.time()) + 3600}
         if live:
             r = execute_restake(granter, p); p["result"] = r
             ok = "txhash" in r and "error" not in r
@@ -606,9 +614,9 @@ def restake_step(c, granter, rgs, vals, m, dry):
                 # or stake that is gone holds the wallet 24 hours
                 record_failed(c, granter, "restake", classify(r)[2], len(p["stake"]))
                 hold_if(c, granter, r.get("error"))
-            c.execute("INSERT INTO restake(at, granter, rewards, staked, sent, target, txhash, dry, error) VALUES(?,?,?,?,?,?,?,?,?)",
-                      (int(time.time()), granter, p["rewards"], amt, p["send"], p["stake"][0]["validator"], r.get("txhash") if ok else None, 0,
-                       None if ok else json.dumps(r.get("error"))[:500]))
+            c.execute("INSERT INTO restake(at, granter, rewards, staked, sent, target, txhash, dry, error, legs) VALUES(?,?,?,?,?,?,?,?,?,?)",
+                      (int(time.time()), granter, p["rewards"], amt, p["send"], ",".join(x["validator"] for x in p["stake"]), r.get("txhash") if ok else None, 0,
+                       None if ok else json.dumps(r.get("error"))[:500], len(p["stake"])))
             c.commit()
             # a failed restake alerts (it is tried again at the next 12-hour turn); while the signer is known to be
             # down its own alert covers every delegator, so no flood
@@ -645,30 +653,43 @@ def position(addr, vals):
 # once per wallet and validator, with how much can move now and how much is held by a 21-day lock and until when;
 # the key clears when the stake is gone, so a later return alerts again ──────────────────────────────────────────────
 PREV_ACTIVE = set()
+# (audit 2026-10-13) one ops message per tick, not one per wallet and validator: a wallet could grant and dust 50
+# inactive validators for free, and the per-message sends stalled the tick on Telegram's own limits. New findings
+# collect here and inactive_flush sends ONE capped message at the end of the tick. Dust under INACT_ALERT_MIN still
+# moves at the wallet's run; it is just not worth a page.
+INACT_Q = []
+INACT_ALERT_MIN = int(os.environ.get("KEEPER_INACT_ALERT_UATONE", str(10 * 1_000_000)))
 def inactive_alert(c, gr, rows, reds, vals):
     held = {}
     for r in rows:
         if r["op"] in vals or r["x"] < MIN_MOVE: continue
         held["inact:" + r["op"]] = r
     for k, r in held.items():
+        if r["x"] < INACT_ALERT_MIN: continue
         if c.execute("SELECT 1 FROM alert_sent WHERE granter=? AND k=?", (gr, k)).fetchone(): continue
-        try: v = get("/cosmos/staking/v1beta1/validators/%s" % r["op"]).get("validator", {})
-        except Exception: v = {}
-        name = (v.get("description") or {}).get("moniker") or r["op"][-10:]
-        why = "jailed" if v.get("jailed") else "out of the active set"
         until = [calendar.timegm(time.strptime(e["redelegation_entry"]["completion_time"][:19], "%Y-%m-%dT%H:%M:%S"))
                  for x in reds if x["redelegation"]["validator_dst_address"] == r["op"] for e in x.get("entries", [])]
         until = [t for t in until if t > time.time()]
         free, lock = r["x"] - r["locked"], r["locked"]
-        text = "%s ATONE on %s, %s, earning nothing. %s ATONE can move now%s." % (
-            "{:,.1f}".format(r["x"] / 1e6), name, why, "{:,.1f}".format(free / 1e6),
-            (", %s ATONE is locked until %s" % ("{:,.1f}".format(lock / 1e6), time.strftime("%d %b %H:%M UTC", time.gmtime(max(until))))) if lock and until else "")
-        alert("warn", "Autopilot stake on an inactive validator: " + short(gr), text,
-              {"Wallet": gr, "Validator": r["op"], "Movable": "{:,.1f} ATONE".format(free / 1e6), "Locked": "{:,.1f} ATONE".format(lock / 1e6)})
+        INACT_Q.append("%s: %s ATONE on %s, %s movable%s" % (
+            short(gr), "{:,.1f}".format(r["x"] / 1e6), _names().get(r["op"], (r["op"][-10:], None))[0],
+            "{:,.1f}".format(free / 1e6),
+            (", %s locked until %s" % ("{:,.1f}".format(lock / 1e6), time.strftime("%d %b %H:%M UTC", time.gmtime(max(until))))) if lock and until else ""))
         c.execute("INSERT OR REPLACE INTO alert_sent VALUES(?, ?, ?)", (gr, k, int(time.time())))
     for (k,) in c.execute("SELECT k FROM alert_sent WHERE granter=? AND k LIKE 'inact:%'", (gr,)).fetchall():
         if k not in held: c.execute("DELETE FROM alert_sent WHERE granter=? AND k=?", (gr, k))
     c.commit()
+
+
+def inactive_flush():
+    """the tick's inactive-stake findings as one ops message, at most 8 lines spelled out"""
+    global INACT_Q
+    if not INACT_Q: return
+    q, INACT_Q = INACT_Q, []
+    head = "Autopilot stake on inactive validators (%d)" % len(q)
+    body = "\n".join(q[:8]) + ("" if len(q) <= 8 else "\nand %d more (the admin console lists them)" % (len(q) - 8))
+    try: alert("warn", head, body, None)
+    except Exception as e: log("inactive flush failed: %s" % e)
 
 def pairs_used(reds):
     u = {}
@@ -916,7 +937,7 @@ def moves_today(c, granter):
     each). The signer counts the same and refuses past MAX_MOVES_DAY, so a plan is made to fit (audit 2026-09-30)"""
     t = int(time.time()) - 86400
     return (c.execute("SELECT count(*) FROM move WHERE granter=? AND at>? AND dry=0", (granter, t)).fetchone()[0]
-            + c.execute("SELECT count(*) FROM restake WHERE granter=? AND at>? AND dry=0 AND txhash IS NOT NULL", (granter, t)).fetchone()[0]
+            + c.execute("SELECT coalesce(sum(coalesce(legs, 1)), 0) FROM restake WHERE granter=? AND at>? AND dry=0 AND txhash IS NOT NULL", (granter, t)).fetchone()[0]
             # (red team 2026-10-01) and every broadcast that did not land as a success: the signer pays for those too
             + c.execute("SELECT coalesce(sum(msgs), 0) FROM failed_tx WHERE granter=? AND at>?", (granter, t)).fetchone()[0])
 
@@ -997,7 +1018,8 @@ def activity(granter):
         c2 = sqlite3.connect("file:%s?mode=ro" % STATE, uri=True, timeout=5)
         mv = [{"at": r[0], "src": r[1], "dst": r[2], "uatone": r[3], "gain": round(r[4] or 0, 3), "txhash": r[5]} for r in c2.execute(
             "SELECT at, src, dst, uatone, gain, txhash FROM move WHERE granter=? AND dry=0 AND txhash IS NOT NULL AND uatone>0 ORDER BY at DESC, rowid DESC", (granter,))]
-        rs = [{"at": r[0], "rewards": r[1], "staked": r[2], "target": r[3], "txhash": r[4]} for r in c2.execute(
+        rs = [{"at": r[0], "rewards": r[1], "staked": r[2], "target": (r[3] or "").split(",")[0],
+               "targets": (r[3] or "").split(",") if r[3] else [], "txhash": r[4]} for r in c2.execute(
             "SELECT at, rewards, staked, target, txhash FROM restake WHERE granter=? AND dry=0 AND txhash IS NOT NULL AND staked>0 ORDER BY at DESC", (granter,))]
         c2.close()
         return {"moves": mv, "restakes": rs}
@@ -1343,6 +1365,7 @@ def once(c, only=None, live=None, force=False):
         signer_health(c)
     except Exception as e:
         log("status failed: %s" % e)
+    inactive_flush()
     if not only:
         try: run_summaries(c, len(gs), len(rgs), dry, [g["granter"] for g in gs], list(rgs))
         except Exception as e: log("run summary failed: %s" % e)

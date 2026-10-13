@@ -324,7 +324,7 @@ font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:5px 11px;cur
    A blank disc reads as a broken image; an initial reads as a validator without
    a logo, which is what it is. */
 .vmono{width:54px;height:54px;border-radius:50%;flex:0 0 auto;display:none;
-align-items:center;justify-content:center;font-weight:800;color:#0b0b16}
+align-items:center;justify-content:center;font-weight:800;color:#fff}
 .cell .mono{position:absolute;inset:11%;width:78%;height:78%;border-radius:50%;
 display:flex;align-items:center;justify-content:center;font-weight:800;
 font-size:clamp(11px,1.1vw,17px);color:#0b0b16;pointer-events:none;
@@ -1627,7 +1627,7 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
   :is(#sv-over,#sv-auto) .sd-col>.sv-ph h3{color:#fff}:is(#sv-over,#sv-auto) .sd-col>.sv-ph h3::before{background:rgba(255,255,255,.9);box-shadow:none}}
 @media(min-width:901px){
   /* the wider padding leaves the Delegations table 4px less: its figures keep their room, the name gives */
-  #p-dele #wbody #dmy col:nth-child(2){width:30px!important}#p-dele #wbody #dmy col:nth-child(4){width:66px!important}
+  #p-dele #wbody #dmy col:nth-child(2){width:30px!important}#p-dele #wbody #dmy col:nth-child(4){width:80px!important}
   #p-dele #wbody #dmy col:nth-child(5){width:48px!important}#p-dele #wbody #dmy col:nth-child(6){width:50px!important}
   /* and its doors a touch smaller beside the larger title */
   #p-dele #wbody #wk-mine .wk-t1 .wk-unb{padding:0 6px;font-size:10px}
@@ -1638,7 +1638,7 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
   #p-dele #wbody #wk-mine .wk-t1 .wk-unb.wk-stb{margin-left:auto}
 }
 @media(min-width:901px) and (max-width:1399px){
-  #p-dele #wbody #dmy col:nth-child(2){width:26px!important}#p-dele #wbody #dmy col:nth-child(4){width:58px!important}
+  #p-dele #wbody #dmy col:nth-child(2){width:26px!important}#p-dele #wbody #dmy col:nth-child(4){width:72px!important}
   #p-dele #wbody #dmy col:nth-child(5){width:46px!important}#p-dele #wbody #dmy col:nth-child(6){width:38px!important}
   #p-dele #wbody #dmy td{font-size:11px}
 }
@@ -4090,7 +4090,7 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .sv-pb b{font-size:9.5px;font-weight:500;color:var(--ws);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sv-pb s{text-decoration:none;font-family:var(--wmono);font-size:8.5px;color:var(--wf)}
 .sv-pb:last-child .sv-lgo{box-shadow:0 0 0 2px var(--sv-teal)}
-@media(max-width:1400px){.sv-pb s{display:none}}
+@media(max-width:1919px){.sv-pb s{display:none}}
 .sv-plist{flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:5px;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .sv-plist .sv-vr{flex:0 0 34px}
 .sv-vr u.ok{color:var(--sv-green)}.sv-vr u.warn{color:var(--sv-amber)}.sv-vr u.bad{color:#ff6a3d}
@@ -4783,6 +4783,7 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gp-sum{font-size:12px;line-height:1.55;color:var(--ws);white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow-y:auto;padding:10px 12px;border:1px solid var(--wbd);border-radius:8px}
 /* your mark on a proposal row: filled = you voted, outlined = your governor did; the colour is the vote */
 .gp-vm{font-style:normal;display:inline-flex;align-items:center;justify-content:center;height:17px;padding:0 7px;margin-right:7px;border-radius:999px;font-family:var(--wmono);font-size:9px;letter-spacing:.06em;font-weight:700;white-space:nowrap;vertical-align:1px;flex:none}
+.gp-vm{--vc:var(--ws)}   /* a vote the bake could not name still reads "Voted", in the quiet colour */
 .gp-vm.yes{--vc:var(--sv-green)}.gp-vm.no{--vc:var(--wburn)}.gp-vm.abstain{--vc:var(--wf)}
 .gp-vm.me{background:var(--vc);color:#06060c}
 .gp-vm.gov{border:1.5px solid var(--vc);color:var(--vc);background:transparent}
@@ -4801,6 +4802,8 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gp-sv.abstain{border-color:rgba(154,163,190,.45);background:rgba(154,163,190,.10)}
 .gp-sv.none{border-color:rgba(255,177,85,.55);background:rgba(255,177,85,.12)}.gp-sv.none b{color:var(--wamber)}
 .gp-sv.na{border-style:dashed;background:transparent}.gp-sv.na b{color:var(--wf);font-weight:500}
+@media(max-width:620px){#sv-actlive .sv-ph{flex-wrap:wrap}#sv-actlive .sv-ph .sv-sw{flex:1 1 100%;justify-content:flex-start}}
+.gvcard::after{display:none}   /* no bare divider band under the card's buttons (audit 2026-10-13) */
 /* the restake card's cancellation note: amber, it changes other services */
 .atnote.rswarn{color:var(--wamber);border-color:rgba(255,177,85,.3);background:rgba(255,177,85,.06);white-space:normal}.atnote.rswarn svg{stroke:var(--wamber);flex:0 0 auto}
 button.gp-sv{font:inherit;color:inherit;cursor:pointer;text-align:left}
@@ -4860,6 +4863,9 @@ button.gp-sv:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offs
 .gpx-dh .gpx-you .gp-sv b{font-size:11.5px;white-space:nowrap}
 .gpx-dh b{white-space:normal;line-height:1.25}
 .gpx-det .gp-sum{flex:1 1 auto;max-height:none;min-height:60px}
+/* short windows: the proposal text gives way first and the pane itself scrolls as a last resort, so the vote
+   buttons are never below the clip (audit 2026-10-13: at 1366x563 only their top edges showed) */
+@media(max-height:740px){.gpx-det{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}.gpx-det .gp-sum{min-height:40px;max-height:170px}}
 }
 .gd-list{display:flex;flex-direction:column;gap:12px}
 .gd-r{padding:12px 14px;border:1px solid var(--wbd);border-radius:10px}
@@ -4998,7 +5004,9 @@ background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent
 @media(max-width:900px){#sv-cons .cn-in{padding:0 16px 48px}#sv-cons .cn-hd{margin:0 -16px 20px;padding:18px 16px 14px}}
 @media(max-width:700px){.gv-strip{grid-template-columns:minmax(0,1fr)!important}.gv-ro{border-left:0;border-top:1px solid var(--wbd)}.gv-ro:first-child{border-top:0}
   .gd-list{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:700px){.gp-r{grid-template-columns:34px minmax(0,1fr) auto;gap:10px}.gp-v{grid-column:2/-1}.gp-d{padding-left:12px}}
+@media(max-width:700px){.gp-r{grid-template-columns:34px minmax(0,1fr) auto;gap:10px}.gp-v{grid-column:2/-1}.gp-d{padding-left:12px}
+  .gp-t s{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .gp-t>b{display:block;min-height:19px}}
 /* Constitution (cn-): the contents on the left, the text in a reading column on the right; each
    scrolls on its own, and the contents follow what is being read */
 #sv-cons{justify-content:flex-start}
@@ -5894,6 +5902,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .you-fct>em small{margin-left:6px;font-size:9px;letter-spacing:.06em;text-transform:none;color:var(--wf);opacity:.8}
 .you-fb{display:flex;flex-direction:column;gap:8px}
 .you-fw{position:relative;display:flex}
+@media(max-height:680px){.you-fct{margin-top:0}.you-fct em{display:none}.you-fb{flex-direction:row;gap:6px}.you-fq{height:26px;font-size:10px;padding:0 6px}.you-hf{margin-top:8px;gap:6px}.you-sw{min-height:34px}}
 .you-fq{flex:1 1 auto;min-width:0;height:34px;padding:0 12px;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-sizing:border-box;border:1px solid var(--sv-teal,#2bc8bd);border-radius:9px;background:transparent;color:var(--sv-teal,#2bc8bd);
   font:600 11.5px var(--wsans);cursor:pointer;white-space:nowrap}
 .you-fq:hover:not(:disabled){background:rgba(43,200,189,.10)}
@@ -6103,7 +6112,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .rscard{width:min(460px,94vw)}
 .rsbody{padding:6px 20px 4px}
 .rsfoot{display:flex;justify-content:flex-end;gap:10px;padding:12px 20px 16px;border-top:1px solid var(--wbd)}
-.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .bn li{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:12px;padding:13px 0;border-top:1px solid var(--wbd)}
 .bn li:first-child{border-top:0}
 .bn-ic{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;background:rgba(43,200,189,.12)}

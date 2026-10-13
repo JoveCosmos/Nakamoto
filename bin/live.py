@@ -80,6 +80,26 @@ def snapshot():
 # asking the node. From the time on, the fields are block h's own: consecutive times give the
 # block time, and the proposer, transactions, gas and fees are the block's that carries the commit.
 _up = {}
+# the real block pace against x/mint's blocks_per_year (audit 2026-10-13): the chain credits
+# annual_provisions/blocks_per_year EVERY block, and blocks arrive ~20% faster than the parameter says, so the
+# nominal pool understated every APR. The factor comes from the up-list's own timestamps (~100 blocks); the
+# parameter is re-read daily. Unreadable -> the last factor, or nominal.
+_mint = {"at": 0.0, "bpy": 0.0, "f": 1.0}
+
+
+def pace_factor():
+    try:
+        if time.time() - _mint["at"] > 86400:
+            _mint["bpy"] = float(get(f"{API}/cosmos/mint/v1beta1/params")["params"]["blocks_per_year"])
+            _mint["at"] = time.time()
+        ks = sorted(_up)
+        if len(ks) >= 20 and _mint["bpy"]:
+            dt = (_up[ks[-1]][4] - _up[ks[0]][4]) / 1000.0
+            if dt > 0:
+                _mint["f"] = max(0.8, min(1.6, (ks[-1] - ks[0]) / dt * 31_557_600 / _mint["bpy"]))
+    except Exception as e:
+        print(f"live: pace: {e}", file=sys.stderr, flush=True)
+    return _mint["f"]
 
 
 def ms(t):
@@ -175,6 +195,7 @@ def main():
                 snap["up"], snap["px"] = pack(uptime(snap["h"]))
             except Exception as e:      # the stake vector matters more than the graph
                 print(f"live: uptime: {e}", file=sys.stderr, flush=True)
+            snap["r"] *= pace_factor()  # the pool at the REAL block pace (audit 2026-10-13)
             write(snap)
             fails = 0
         except Exception as e:
