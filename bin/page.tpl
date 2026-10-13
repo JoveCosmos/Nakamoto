@@ -3752,7 +3752,7 @@ background:var(--wc);border:1px solid var(--wbd2);padding:1px 6px;border-radius:
   #sv-actlive .sv-upwait{min-height:188px}
   #sv-proplist .sv-upwait{min-height:100svh}
   #sv-govlist .sv-upwait{min-height:488px}
-  #sv-daop .sv-upwait{min-height:384px}
+  #sv-daop .sv-upwait{min-height:391px}
   
   
   .mv-hl{min-height:57px}
@@ -4090,7 +4090,8 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .sv-pb b{font-size:9.5px;font-weight:500;color:var(--ws);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sv-pb s{text-decoration:none;font-family:var(--wmono);font-size:8.5px;color:var(--wf)}
 .sv-pb:last-child .sv-lgo{box-shadow:0 0 0 2px var(--sv-teal)}
-@media(max-width:1919px){.sv-pb s{display:none}}
+@media(max-width:1919px){.sv-pb s{visibility:hidden}}
+@media(max-width:1400px){.sv-pb s{display:none}}
 .sv-plist{flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:5px;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .sv-plist .sv-vr{flex:0 0 34px}
 .sv-vr u.ok{color:var(--sv-green)}.sv-vr u.warn{color:var(--sv-amber)}.sv-vr u.bad{color:#ff6a3d}
@@ -4898,6 +4899,7 @@ ul.gd-note li::before{content:"";position:absolute;left:2px;top:.62em;width:5px;
 #sv-govlist>.sv-ph .gv-reg:disabled{opacity:.45;cursor:default}
 #sv-govlist>.sv-ph .gv-reg{white-space:nowrap;color:#fff;border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.12)}
 .gv-none{display:flex;flex-direction:column;gap:12px;padding:14px 2px}
+@media(max-width:900px){#sv-govlist .gv-none{min-height:488px;box-sizing:border-box}}
 
 
 
