@@ -837,6 +837,7 @@
   html[data-theme=light]:not([data-mono]) .gp-sv.abstain{border-color:var(--line-strong);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .gp-sv.none{border-color:var(--amber-bar);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) .gp-sv.na{background:transparent}
+  html[data-theme=light]:not([data-mono]) .atnote.rswarn{border-color:var(--warn-bg);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) button.gp-sv{color:inherit}
   html[data-theme=light]:not([data-mono]) button.gp-sv:focus-visible{outline-color:var(--sv-teal,var(--accent))}
   @media(min-width:1100px){

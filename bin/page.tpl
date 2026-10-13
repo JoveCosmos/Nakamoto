@@ -4801,6 +4801,8 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gp-sv.abstain{border-color:rgba(154,163,190,.45);background:rgba(154,163,190,.10)}
 .gp-sv.none{border-color:rgba(255,177,85,.55);background:rgba(255,177,85,.12)}.gp-sv.none b{color:var(--wamber)}
 .gp-sv.na{border-style:dashed;background:transparent}.gp-sv.na b{color:var(--wf);font-weight:500}
+/* the restake card's cancellation note: amber, it changes other services */
+.atnote.rswarn{color:var(--wamber);border-color:rgba(255,177,85,.3);background:rgba(255,177,85,.06);white-space:normal}.atnote.rswarn svg{stroke:var(--wamber);flex:0 0 auto}
 button.gp-sv{font:inherit;color:inherit;cursor:pointer;text-align:left}
 button.gp-sv em{text-decoration:underline dotted;text-underline-offset:2px}
 button.gp-sv:hover{filter:brightness(1.15)}
@@ -7220,6 +7222,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <div class=rsbody>
     <ul class=bn><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></i><span class=bn-t><b>Compounds your rewards</b><small><b id=rsadd>your rewards</b> more a year</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 20V10M10 20V6M15 20v-8M20 20V4"/></svg></i><span class=bn-t><b>Into the best-paying validators</b><small>not back onto the same one</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Claims and stakes, nothing else</b><small>GATA funds your restake, no fees for you</small></span></li></ul>
     <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Runs every <b>12 hours</b>, minimum 1 ATONE, you can revoke anytime.</span></div>
+    <div class="atnote rswarn" id=rsoth hidden><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.5"/></svg><span id=rsothn></span></div>
   </div>
   <div class=rsfoot><div class=atfs><div class=txfee id=rsfee></div></div><button class="wk-btn wk-go" id=rsgo type=button>Activate</button></div>
 </div></div>

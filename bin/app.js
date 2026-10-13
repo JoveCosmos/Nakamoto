@@ -15,10 +15,11 @@
    Indonesian, Spanish...) made MAX read back as a thousandth of the balance */
 window.__amountIn = function(v){
   var s = String(v || "").replace(/[\s\u00a0\u202f'\u2019_]/g, ""), c = s.lastIndexOf(","), d = s.lastIndexOf(".");
+  if(/[^0-9.,]/.test(s)) return 0;               /* a sign, an exponent or any letter is refused, never stripped (audit 2026-10-13: "-5" read 5, "1e5" read 15) */
   if(c > -1 && d > -1) s = c > d ? s.replace(/\./g, "").replace(",", ".") : s.replace(/,/g, "");
-  else if(c > -1){ var p = s.split(","); s = p.length === 2 && p[1].length !== 3 ? p[0] + "." + p[1] : s.replace(/,/g, ""); }
+  else if(c > -1){ var p = s.split(","); s = p.length === 2 && (p[1].length !== 3 || p[0] === "" || p[0] === "0") ? p[0] + "." + p[1] : s.replace(/,/g, ""); }
   else if(s.split(".").length > 2) s = s.replace(/\./g, "");
-  var n = parseFloat(s.replace(/[^0-9.]/g, ""));
+  var n = parseFloat(s);
   return isFinite(n) && n > 0 ? n : 0;
 };
 
@@ -826,6 +827,7 @@ function applyData(d){
   N = VALS.length; MEAN = S / N; BASE = R / S; maxT = VALS[0][1];
   LIVE_C = ratioOf(VALS.map(function(v){ return v[1]; }));
   if(window.__setVD) window.__setVD(d.validators);
+  if(window.__rebuildInact) window.__rebuildInact(d.inactive);   /* a jailing since the page opened is not an offer (audit 2026-10-13) */
   return true;
 }
 window.__applyData = applyData;
@@ -1080,7 +1082,12 @@ rememberGridH();
   /* the validators outside the active set, by the same id: an inactive one (not jailed) may be
      staked to or redelegated to from the lists' closing row, and its moves need its operator */
   window.__INACT = {};
-  (D.inactive || []).forEach(function(v){ if(v[5] && !VDBY[v[3]]) window.__INACT[v[3]] = { id: v[3], m: v[0], t: v[1], c: v[2], jailed: !!v[4], op: v[5] }; });
+  window.__rebuildInact = function(list){
+    if(list) D.inactive = list;
+    window.__INACT = {};
+    (D.inactive || []).forEach(function(v){ if(v[5] && !VDBY[v[3]]) window.__INACT[v[3]] = { id: v[3], m: v[0], t: v[1], c: v[2], jailed: !!v[4], op: v[5] }; });
+  };
+  window.__rebuildInact();
   function inactOk(id){ var x = window.__INACT[id]; return x && !x.jailed ? x : null; }
   window.__inactOk = inactOk;
   /* a refresh brings a new detail list: the same map, refilled, so every holder of it reads the new rows */
@@ -2245,7 +2252,7 @@ rememberGridH();
         (tiny ? '' : '<th title="the validator\'s stake">stake</th>') + '<th>' + (lay ? 'APR' : 'APR') + '</th></tr></thead><tbody>'
       : '<table><colgroup><col style="width:' + (lay ? 30 : 22) + 'px"><col style="width:36px"><col><col style="width:64px">' + (wide ? '<col style="width:70px">' : '') + '<col style="width:72px">' + (wide ? '<col style="width:64px">' : '') + '<col style="width:50px"><col style="width:' + (lay ? 104 : 60) + 'px"></colgroup>' +
             '<thead><tr><th class=ck>' + (pos ? '<input type=checkbox id=ckall aria-label="Tick every validator"' + (sel.n && sel.n === opt.length ? ' checked' : '') + '>' : '') + '</th><th class=c>rank</th><th class=l>validator</th>' +
-            '<th title="the validator\'s stake; green below the average size, where the bonus pays">stake</th>' + (wide ? '<th title="blocks signed over every block indexed">signed</th>' : '') + '<th>90<span class=lc>d</span> uptime</th>' + (wide ? '<th title="blocks proposed">proposed</th>' : '') + '<th>jailed</th>' +
+            '<th title="the validator\'s stake; green below the average size, where the bonus pays">stake</th>' + (wide ? '<th title="blocks signed over every block on record">signed</th>' : '') + '<th>90<span class=lc>d</span> uptime</th>' + (wide ? '<th title="blocks proposed">proposed</th>' : '') + '<th>jailed</th>' +
             '<th>' + (lay ? 'APR now → there' : 'APR') + '</th></tr></thead><tbody>';
     slice.forEach(function(o){
       var on = !!SEL[o.id], m = by[o.id], there = m ? m.after : o.rate0;
@@ -2342,7 +2349,7 @@ rememberGridH();
         h += '<tr class=stay>' + nm(m.id, m.m) + '<td class=ar></td><td class="l dim">already here</td><td class=amt>' + fmt(t) + '</td><td class="gn dim">-</td></tr>'; } });
       src.forEach(function(sv){ if(need <= 0 || sv.free <= 0 || sv.id === m.id) return;
         var t = Math.min(sv.free, need), left = 7 - (used[sv.id + ">" + m.id] || 0); sv.free -= t; need -= t;
-        MSGS.push({ from: sv.id, to: m.id, amt: Math.floor(t) });
+        if(Math.floor(t) >= 1) MSGS.push({ from: sv.id, to: m.id, amt: Math.floor(t) });   /* a float remainder under 1 uatone is no move (audit 2026-10-13) */
         var was = srcRate[sv.id] || 0, gain = t * (m.after - was) / 1e6;
         SCOPE.t += t; SCOPE.was += t * was; SCOPE.aft += t * m.after;
         GAINBY[m.id] = (GAINBY[m.id] || 0) + gain; MOVED[m.id] = (MOVED[m.id] || 0) + t;
@@ -2481,6 +2488,9 @@ rememberGridH();
                validator_dst_address: d.op, amount: { denom: "uatone", amount: String(m.amt) } } };
     }).filter(Boolean);
   }
+  /* the card signs EXACTLY what it listed when it opened (audit 2026-10-13): the messages are snapshotted here,
+     so a redraw, resize or live tick while the card is open can neither change nor empty what the button sends */
+  var TXSNAP = null;
   window.__goSign = function(){
     if(!txpop) return;
     var msgs = txMsgs(), list = E("txlist"), step = E("txstep"), fee = E("txfee"), sign = E("txsign");
@@ -2512,8 +2522,12 @@ rememberGridH();
       '<span>Redelegated stake cannot be redelegated again for <b>21 days</b>, until <b>' + window.__day(until.getTime()) + '</b></span>';
     fee.textContent = "fee: estimating…"; step.textContent = ""; step.className = "txstep";
     sign.disabled = false; sign.textContent = TXAP ? "Activate Autopilot" : "Redelegate";
-    var ap = E("txap"); if(ap) ap.hidden = !TXAP;
-    if(TXAP) msgs = txAll();
+    /* the grant travels in the same approval: the card SAYS so as its own row (audit 2026-10-13: the button's
+       label alone was the only hint) */
+    if(TXAP){ msgs = txAll();
+      list.innerHTML += '<div class="txrow txgrant"><span class=f><b>plus the Autopilot grant</b></span>' +
+        '<span class=a>redelegate only, revoke anytime</span></div>'; }
+    TXSNAP = msgs;
     POP.open(txpop);
     /* a first pass estimates the fee so the reader sees it before signing; an answer for an
        earlier opening of the card (another plan) is dropped */
@@ -2522,15 +2536,16 @@ rememberGridH();
       window.__TX.account(window.__ADDR).then(function(acc){
         return window.__TX.simulate(msgs, "", window.__WALLET.pubKey, acc.sequence); })
       .then(function(g){ if(tok !== TXS) return; var f = window.__TX.feeFor(g, msgs.length); fee.textContent = "fee ≈ " + (parseInt(f.amount[0].amount, 10) / 1e6).toFixed(3) + " PHOTON, gas " + f.gas.toLocaleString(); })
-      .catch(function(e){ if(tok !== TXS) return; fee.textContent = "the node could not simulate it: " + String(e && e.message || e); });
+      .catch(function(e){ if(tok !== TXS) return; fee.textContent = "the chain could not price it: " + String(e && e.message || e); });
     }
   };
   var TXS = 0;
   var txsign = E("txsign");
   /* the flow: the button spins, the notify at the top right spins with it until the
      chain confirms the transaction, then answers green or red; the card closes on green */
+  if(txpop) txpop.__onclose = function(){ TXAP = false; TXSNAP = null; };   /* a declined or abandoned card leaves nothing behind (audit 2026-10-13: the grant carried over into a later manual Redelegate) */
   if(txsign) txsign.addEventListener("click", function(){
-    var msgs = txAll(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
+    var msgs = TXSNAP || txAll(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
     txsign.disabled = true; txsign.classList.add("busy");
     var n = window.__notify(), ap = TXAP;
     (ap ? window.__TX.sendDirect(window.__WALLET, msgs, "GATA AtomOne Autopilot", function(){}) : window.__TX.send(window.__WALLET, msgs, "", function(){}))
@@ -2600,7 +2615,7 @@ rememberGridH();
   window.__unRows = function(){ unRows(); unState(); };
   function unRow(){ var rs = unSelRows(); if(!rs.length) return null; if(rs.length === 1) return rs[0];
     var x = 0; rs.forEach(function(r){ x += r.x; }); return { id: "*", m: rs.length + " validators", x: x }; }
-  function unAmount(){ var a = E("unamt"), n = window.__amountIn(a.value); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
+  function unAmount(){ var a = E("unamt"), n = window.__amountIn(a.value); return isFinite(n) && n > 0 ? Math.round(n * 1e6) : 0; }
   function unState(){
     var r = unRow(), u = unAmount(), mx = E("unmaxv"), hint = E("unhint"), fld = E("unamt") && E("unamt").closest(".unfield"), go = E("unsign"), sm = E("unsum"), lk = E("unlock");
     if(mx) mx.textContent = r ? exact(r.x, 2) : "-";
@@ -2746,7 +2761,7 @@ rememberGridH();
      reader's own address. The fee is paid in ATONE - a mint is the chain's one fee exception - so a wallet that
      holds no PHOTON yet can still mint some. Max keeps a little ATONE back for that fee ── */
   var mtpop = E("mtpop"), MT = { rate: 0, q: 0, t: 0 }, MT_KEEP = 50000;   /* 0.05 ATONE: the fee is under 0.01 today */
-  function mtAmount(){ var a = E("mtamt"), n = window.__amountIn(a && a.value); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
+  function mtAmount(){ var a = E("mtamt"), n = window.__amountIn(a && a.value); return isFinite(n) && n > 0 ? Math.round(n * 1e6) : 0; }
   function mtHave(){ var b = window.__BAL; return b && b.uatone > 0 ? b.uatone : 0; }
   function mtMax(){ return Math.max(0, mtHave() - MT_KEEP); }
   function mtMsgs(){ var u = mtAmount(); return u > 0 && window.__ADDR ? [{ type: "atomone/photon/v1/MsgMintPhoton", value: { to_address: window.__ADDR, amount: { denom: "uatone", amount: String(u) } } }] : []; }
@@ -2809,14 +2824,17 @@ rememberGridH();
     return window.__candidates({ except: {}, cleanRecord: CLEAN }).map(function(v){ v.rate0 = window.__rateAfter(v.t, v.c, 0); return v; })
       .sort(function(a, b){ return a.rank - b.rank; });
   }
-  function stAmount(){ var a = E("stamt"), n = window.__amountIn(a.value); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
+  function stAmount(){ var a = E("stamt"), n = window.__amountIn(a.value); return isFinite(n) && n > 0 ? Math.round(n * 1e6) : 0; }
   function stBal(){ var b = window.__BAL; return b && b.uatone > 0 ? b.uatone : 0; }
   function stPlan(){
     var u = stAmount(), ids = Object.keys(STSEL), n = ids.length, share = n ? Math.floor(u / n) : 0, earned = 0, rows = [];
     if(u > 0 && n) stCands().forEach(function(v){ if(!STSEL[v.id]) return; var aft = window.__rateAfterNew(v.t, v.c, share, u); earned += share * aft; rows.push({ id: v.id, m: v.m, x: share, after: aft }); });
     /* an inactive validator ticked in the closing row: its share earns nothing while it is out */
     if(u > 0 && n) ids.forEach(function(id){ var x = window.__inactOk(id); if(x) rows.push({ id: id, m: x.m, x: share, after: 0 }); });
-    ids.forEach(function(id){ if(!window.__inactOk(id) && !(window.__VDBY || {})[id]) n--; });   /* a tick that no longer resolves is not counted */
+    /* the count IS the rows that will be signed (audit 2026-10-13: a ticked validator missing from the candidate
+       list but still in the directory was counted, so "to 3 validators" could sign 2 messages) */
+    if(u > 0){ n = rows.length; }
+    else ids.forEach(function(id){ if(!window.__inactOk(id) && !(window.__VDBY || {})[id]) n--; });
     if(n < ids.length){ share = n ? Math.floor(u / n) : 0; rows.forEach(function(r){ r.x = share; }); earned = 0; rows.forEach(function(r){ earned += share * r.after; }); }
     /* the rest of the wallet (operator, 2026-10-08): the stake it already has earns the rate after this stake lands - lower
        on a validator that receives some, a little lower everywhere as the bonded total grows */
@@ -2842,7 +2860,7 @@ rememberGridH();
     var h = '<table' + (ph ? ' class=cmp' : '') + '><colgroup>' + (ph ? '<col style="width:26px"><col style="width:30px"><col><col style="width:52px"><col style="width:58px">'
             : '<col style="width:30px"><col style="width:36px"><col><col style="width:64px">' + (wide ? '<col style="width:70px">' : '') + '<col style="width:72px">' + (wide ? '<col style="width:64px">' : '') + '<col style="width:50px"><col style="width:104px">') + '</colgroup>' +
             '<thead><tr><th class=ck><input type=checkbox class=pro-all aria-label="Tick every validator"' + (allOn ? ' checked' : '') + '></th><th class=c>rank</th><th class=l>validator</th>' +
-            '<th title="the validator\'s stake; green below the average size, where the bonus pays">stake</th>' + (wide ? '<th title="blocks signed over every block indexed">signed</th>' : '') + (ph ? '' : '<th>90<span class=lc>d</span> uptime</th>') + (wide ? '<th title="blocks proposed">proposed</th>' : '') + (ph ? '' : '<th>jailed</th>') +
+            '<th title="the validator\'s stake; green below the average size, where the bonus pays">stake</th>' + (wide ? '<th title="blocks signed over every block on record">signed</th>' : '') + (ph ? '' : '<th>90<span class=lc>d</span> uptime</th>') + (wide ? '<th title="blocks proposed">proposed</th>' : '') + (ph ? '' : '<th>jailed</th>') +
             '<th>APR</th></tr></thead><tbody>';
     cands.forEach(function(o){
       var on = !!STSEL[o.id], m = by[o.id], there = m ? m.after : o.rate0;
@@ -2999,6 +3017,7 @@ rememberGridH();
   /* other operators' restake, cancelled in the same approval that turns ours on (operator, 2026-09-30): any other grantee
      holding a delegate grant is a restake service; its delegate grant and its claim grant are revoked. Its other grants
      (vote, redelegate, anything else) are left alone. Unreadable grants: nothing is cancelled, ours still goes on */
+  window.__rsOthers = function(){ return otherRestake().then(function(rv){ return rv.grantees || []; }).catch(function(){ return []; }); };
   function otherRestake(){
     var who = window.__ADDR;
     return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/authz/v1beta1/grants/granter/" + who + "?pagination.limit=500", { cache: "no-store" })
@@ -3007,8 +3026,8 @@ rememberGridH();
         var by = {};
         (d.grants || []).forEach(function(x){ if(!x.grantee || x.grantee === AT.addr || x.granter !== who) return;
           var k = grantType(x); if(k === DELEG || k === WDRAW) (by[x.grantee] = by[x.grantee] || {})[k] = 1; });
-        var out = [];
-        Object.keys(by).forEach(function(g){ if(!by[g][DELEG]) return;
+        var out = []; out.grantees = [];
+        Object.keys(by).forEach(function(g){ if(!by[g][DELEG]) return; out.grantees.push(g);
           out.push(revokeMsg(DELEG, g)); if(by[g][WDRAW]) out.push(revokeMsg(WDRAW, g)); });
         return out; })
       .catch(function(){ return []; });
@@ -3100,7 +3119,7 @@ rememberGridH();
   /* the memo on the reader's grant: a plain label, nothing reads it */
   function atMemo(){ return "GATA AtomOne Autopilot"; }
   function atMonths(){ return AT.days >= 365 ? "12 months" : AT.days >= 180 ? "6 months" : "3 months"; }
-  function atCap(){ var a = E("atcap"), n = window.__amountIn(a.value); return isFinite(n) && n > 0 ? Math.floor(n * 1e6) : 0; }
+  function atCap(){ var a = E("atcap"), n = window.__amountIn(a.value); return isFinite(n) && n > 0 ? Math.round(n * 1e6) : 0; }
   function atMsgs(){
     var pos = window.__POS;
     if(!AT.addr || !pos) return [];

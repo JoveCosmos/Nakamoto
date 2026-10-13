@@ -127,13 +127,14 @@ function call(method, path, bodyObj){
     x.setRequestHeader("content-type", "application/json");
     x.onload = function(){ var d; try{ d = JSON.parse(x.responseText); }catch(e){ return rej(new Error("bad reply")); }
       if(x.status >= 200 && x.status < 300) res(d); else rej(new Error(d.message || ("HTTP " + x.status))); };
-    x.onerror = x.ontimeout = function(){ rej(new Error("node unreachable")); };
+    x.onerror = x.ontimeout = function(){ rej(new Error("network unreachable")); };
     x.send(bodyObj ? JSON.stringify(bodyObj) : null);
   });
 }
 function account(addr){
   return call("GET", "/cosmos/auth/v1beta1/accounts/" + addr).then(function(d){
-    var a = d.account || {}; if(a.base_account) a = a.base_account;
+    var a = d.account || {}; if(a.base_vesting_account) a = a.base_vesting_account;   /* a vesting account keeps its number one layer deeper (audit 2026-10-13) */
+    if(a.base_account) a = a.base_account;
     if(!a.account_number) throw new Error("account not found on chain");
     return { number: String(a.account_number), sequence: String(a.sequence || 0) };
   });
@@ -186,7 +187,7 @@ function feeShort(fee, b){
    flat gas estimate. */
 function gasFallback(e){
   var m = (e && e.message) || "";
-  if(m === "node unreachable" || m === "bad reply") return 0;
+  if(m === "network unreachable" || m === "bad reply") return 0;
   throw new Error("The chain refused this transaction: " + m.replace(/^rpc error: code = \w+ desc = /, "").slice(0, 300));
 }
 
@@ -273,7 +274,7 @@ function waitFor(hash, tries){
     }).catch(function(e){
       if(e && e.final) throw e;
       if(tries < 20) return waitFor(hash, tries + 1);
-      throw new Error("still pending after a minute: " + hash);
+      var w = new Error("Still waiting for the chain to confirm " + hash.slice(0, 12) + "\u2026 It may yet land: check Activity before trying again."); w.final = true; throw w;
     });
   });
 }

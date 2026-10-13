@@ -942,10 +942,10 @@
       GV.rules = { minSelf: +q.min_governor_self_delegation || null, period: parseInt(q.governor_status_change_period, 10) || null }; }).catch(function(){});
     Promise.all([gapi("/atomone/gov/v1/governors?pagination.limit=500"), gapi("/cosmos/staking/v1beta1/validators?pagination.limit=500")])
       .then(function(x){
-        var per = {}, bonded = 0;
+        var per = {}, bonded = 0, bnd = {};
         (x[1].validators || []).forEach(function(v){ var sh = parseFloat(v.delegator_shares); per[v.operator_address] = sh > 0 ? parseFloat(v.tokens) / sh : 1;
-          if(v.status === "BOND_STATUS_BONDED") bonded += parseFloat(v.tokens); });
-        GV.bonded = bonded;
+          if(v.status === "BOND_STATUS_BONDED"){ bonded += parseFloat(v.tokens); bnd[v.operator_address] = 1; } });
+        GV.bonded = bonded; GV.bset = bnd;
         var gs = (x[0].governors || []).map(function(g){ var d = g.description || {};
           return { addr: g.governor_address, m: (d.moniker || "").trim() || g.governor_address.slice(0, 14), web: d.website || "", det: d.details || "",
                    ident: d.identity || "", sec: d.security_contact || "",
@@ -953,7 +953,8 @@
         return Promise.all(gs.map(function(g){
           return Promise.all([gapi("/atomone/gov/v1/vshares/" + g.addr + "?pagination.limit=500").catch(function(){ return {}; }),
                               gapi("/atomone/gov/v1/governors/" + g.addr + "/delegations?pagination.limit=1&pagination.count_total=true").catch(function(){ return {}; })])
-            .then(function(y){ var vp = 0; (y[0].val_shares || []).forEach(function(s){ vp += parseFloat(s.shares) * (per[s.validator_address] || 1); });
+            .then(function(y){ var vp = 0; (y[0].val_shares || []).forEach(function(s){ if(!bnd[s.validator_address]) return;   /* the chain tallies bonded validators only (audit 2026-10-13) */
+                vp += parseFloat(s.shares) * (per[s.validator_address] || 1); });
               g.vp = vp; g.n = y[1].pagination ? +y[1].pagination.total : null; return g; }); }));
       })
       .then(function(gs){ gs.sort(function(a, b){ return (b.active - a.active) || (b.vp - a.vp); }); GV.list = gs; GV.at = Date.now(); GV.err = null; })
@@ -999,8 +1000,9 @@
        counts once it has voted. Unknown ones are left out of both sides, so the count never understates */
     var el = P.filter(function(p){
       if(!p.vs || !p.ve || new Date(p.ve).getTime() <= since) return false;
+      if(p.st === "PROPOSAL_STATUS_VOTING_PERIOD") return false;      /* the label says "decided" (audit 2026-10-13) */
       if(h.map[p.id]) return true;
-      return p.st !== "PROPOSAL_STATUS_VOTING_PERIOD" && noVoteSure(h, p); });
+      return noVoteSure(h, p); });
     return [el.filter(function(p){ return !!h.map[p.id]; }).length, el.length];
   }
 
@@ -1163,8 +1165,9 @@
   function govOwn(g){
     var a = govAcctOf(g.addr); GV.own = GV.own || {};
     if(GV.own[a] === undefined){ GV.own[a] = null;
-      gapi("/cosmos/staking/v1beta1/delegations/" + a + "?pagination.limit=200").then(function(d){ var t = 0;
-        (d.delegation_responses || []).forEach(function(x){ t += +((x.balance || {}).amount || 0); }); GV.own[a] = t; })
+      gapi("/cosmos/staking/v1beta1/delegations/" + a + "?pagination.limit=200").then(function(d){ var t = 0, B = GV.bset;
+        (d.delegation_responses || []).forEach(function(x){ if(B && !B[(x.delegation || {}).validator_address]) return;   /* the chain's minimum counts bonded stake only (audit 2026-10-13) */
+          t += +((x.balance || {}).amount || 0); }); GV.own[a] = t; })
         .catch(function(){ GV.own[a] = -1; }).then(function(){ if(screen() === "govs") render(); }); }
     return GV.own[a];
   }
@@ -1283,7 +1286,10 @@
         L.sort(function(a, b){ return b.id - a.id; });
         var live = L.filter(function(p){ return p.st === "PROPOSAL_STATUS_VOTING_PERIOD"; });
         return Promise.all(live.map(function(p){ return gapi("/atomone/gov/v1/proposals/" + p.id + "/tally").then(function(t){ if(t.tally) p.tally = t.tally; }).catch(function(){}); }))
-          .then(function(){ GP.list = L; GP.tp = x[1].tally_params || x[1].params || null; GP.dao = x[2].params || null; GP.err = null; GP.at = Date.now(); });
+          .then(function(){ GP.list = L; GP.tp = x[1].tally_params || x[1].params || null; GP.dao = x[2].params || null; GP.err = null; GP.at = Date.now();
+            /* open-proposal votes expire with this 5-minute cycle: a vote cast from another tab, or the governor's,
+               shows without a reload (audit 2026-10-13: the caches never aged) */
+            live.forEach(function(p){ for(var k in GP.votes) if(k.slice(k.indexOf(":") + 1) === String(p.id)){ delete GP.votes[k]; delete GP.vknown[k]; } }); });
       })
       .catch(function(e){ GP.err = (e && e.message) || "error"; })
       .then(function(){ GP.busy = false; var sc = screen(); if(sc === "props" || sc === "daos") render(); });
@@ -1524,6 +1530,15 @@
       (wide ? '' : pside(p)) +
       (sm ? '<div class=gp-sum><div>' + esc(sm) + '</div></div>' : '') + (p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? voteBox(p) : '');
   }
+  /* an OPEN proposal's turnout against today's bonded stake, beside the quorum it must reach (audit 2026-10-13:
+     a proposal can fail on quorum and the page never said how far it was); closed ones get none, since the bonded
+     stake of their day is not known here */
+  function pturn(p, t){
+    var S = window.__S ? window.__S() : 0, q = GP.tp ? parseFloat(GP.tp.quorum) : 0;
+    if(p.st !== "PROPOSAL_STATUS_VOTING_PERIOD" || !t.s || !(S > 0)) return '';
+    return '<span class=t title="all votes over bonded stake; the proposal needs the quorum to count at all">Turnout <b>' +
+      (t.s / S * 100).toFixed(1) + '%</b>' + (q ? ' of ' + (q * 100).toFixed(1) + '% needed' : '') + '</span>';
+  }
   function pwhen(p){ return p.st === "PROPOSAL_STATUS_VOTING_PERIOD" ? "ends " + pday(p.ve) : p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? "deposit until " + pday(p.de) : "ended " + pday(p.ve); }
   /* the wide screen's detail pane: the chosen proposal, whole */
   function pdet(p){
@@ -1534,7 +1549,7 @@
       '<div class=gpx-ds>' + esc(pkind(p)) + ', ' + pwhen(p) + (p.endorsed ? ', endorsed by the Steering DAO' : '') + (p.ext ? ', voting extended ' + p.ext + '\u00d7' : '') + '</div>' +
       '<div class="gp-v gpx-v">' + (t.s ? '<span class=gp-bar><i class=y style="width:' + pc(t.y).toFixed(2) + '%"></i><i class=n style="width:' + pc(t.n).toFixed(2) + '%"></i><i class=a style="width:' + pc(t.a).toFixed(2) + '%"></i></span>' +
         '<span class=gpx-lg><span class=y><i></i>Yes <b>' + pc(t.y).toFixed(1) + '%</b></span><span class=n><i></i>No <b>' + pc(t.n).toFixed(1) + '%</b></span>' +
-        '<span class=a><i></i>Abstain <b>' + pc(t.a).toFixed(1) + '%</b></span></span>' : '<small>no votes' + (p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? ' yet' : '') + '</small>') + '</div>' +
+        '<span class=a><i></i>Abstain <b>' + pc(t.a).toFixed(1) + '%</b></span>' + pturn(p, t) + '</span>' : '<small>no votes' + (p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? ' yet' : '') + '</small>') + '</div>' +
       pfacts(p, t, true);
   }
   var GPW = window.matchMedia ? matchMedia("(min-width:1100px)") : null;
@@ -1901,7 +1916,7 @@
     MsgWithdrawValidatorCommission: "Claim commission", MsgGrant: "Grant", MsgRevoke: "Revoke", MsgVote: "Vote", MsgVoteWeighted: "Vote", MsgSend: "Send",
     MsgMultiSend: "Send", MsgMintPhoton: "Mint PHOTON", MsgExec: "Authorized", MsgDelegateGovernor: "Follow a governor", MsgUndelegateGovernor: "Unfollow a governor",
     MsgCancelUnbondingDelegation: "Cancel unstaking", MsgTransfer: "IBC transfer", MsgSubmitProposal: "Submit proposal", MsgDeposit: "Deposit", MsgSetWithdrawAddress: "Set reward address" };
-  function actCoin(c){ if(!c) return ""; var u = parseInt(c.amount, 10) || 0, d = c.denom === "uatone" ? "ATONE" : c.denom === "uphoton" ? "PHOTON" : /^ibc\//.test(c.denom) ? "IBC" : c.denom;
+  function actCoin(c){ if(!c) return ""; var u = parseInt(c.amount, 10) || 0, d = c.denom === "uatone" ? "ATONE" : c.denom === "uphoton" ? "PHOTON" : /^ibc\//.test(c.denom) ? "IBC" : esc(c.denom);
     return u ? fmt(u) + " " + d : ""; }
   var ACT_VOTE = { VOTE_OPTION_YES: "Yes", VOTE_OPTION_NO: "No", VOTE_OPTION_ABSTAIN: "Abstain", 1: "Yes", 2: "Abstain", 3: "No" };
   /* one explorer row from a transaction, seen from this wallet: what happened, the amount and its direction */
@@ -1919,9 +1934,13 @@
       (e.attributes || []).forEach(function(q){ at[q.key] = q.value; }); if(at.recipient !== a || at.sender === a) return;
       var mm = /^(\d+)([a-z][a-z0-9/]*)/i.exec(at.amount || ""); if(mm) c = { amount: mm[1], denom: mm[2], from: at.sender }; }); return c; };
     var ibcIn = ms.some(function(x){ return /MsgRecvPacket$/.test(String(x["@type"] || "")); });
-    if(ity === "MsgSend" || ty === "MsgSend"){ var s0 = ty === "MsgSend" ? m0 : inner[0]; (s0.amount || []).forEach(add);
-      var out = s0.from_address === a; amt = (out ? "\u2212" : "+") + actCoin({ amount: sum, denom: den }); sub = (out ? "to " : "from ") + esc(String(out ? s0.to_address : s0.from_address).slice(0, 12)) + "\u2026";
-      if(!out && ty === "MsgSend") kind = "Receive"; }
+    if(ity === "MsgSend" || ty === "MsgSend"){ var legs = (ty === "MsgExec" ? inner : ms).filter(function(x){ return /MsgSend$/.test(String(x["@type"] || "")); });
+      var out = legs.some(function(x){ return x.from_address === a; }), far = {};
+      legs.forEach(function(x){ if(out ? x.from_address === a : x.to_address === a){ (x.amount || []).forEach(add); far[out ? x.to_address : x.from_address] = 1; } });
+      var fk = Object.keys(far);
+      amt = (out ? "\u2212" : "+") + actCoin({ amount: sum, denom: den });
+      sub = (out ? "to " : "from ") + (fk.length > 1 ? fk.length + " addresses" : esc(String(fk[0] || "").slice(0, 12)) + "\u2026");
+      if(!out && ty !== "MsgExec") kind = "Receive"; }
     else if(ty === "MsgMultiSend"){ var mo = ((m0.outputs || []).filter(function(o){ return o.address === a; })[0] || {}), mi = (m0.inputs || [])[0] || {};
       if(mi.address === a){ (mi.coins || []).forEach(add); amt = "\u2212" + actCoin({ amount: sum, denom: den }); sub = "to " + (m0.outputs || []).length + " addresses"; }
       else { (mo.coins || []).forEach(add); kind = "Receive"; amt = "+" + actCoin({ amount: sum, denom: den }); sub = "from " + esc(String(mi.address || "").slice(0, 12)) + "\u2026"; } }
@@ -1935,11 +1954,12 @@
     else if(/MsgVote/.test(ity)){ sub = "proposal #" + (inner[0] || {}).proposal_id; amt = ACT_VOTE[(inner[0] || {}).option] || ""; }
     else if(ity === "MsgMintPhoton"){ amt = "\u2212" + actCoin((inner[0] || {}).amount); sub = "ATONE burned for PHOTON"; }
     else if(ity === "MsgTransfer"){ amt = "\u2212" + actCoin((inner[0] || {}).token); sub = "to " + esc(String((inner[0] || {}).receiver || "").slice(0, 14)) + "\u2026"; }
-    else if(ity === "MsgGrant" || ity === "MsgRevoke"){ sub = /GATA/.test(memo) ? memo.replace(/^GATA AtomOne /, "") : ""; }
+    else if(ity === "MsgGrant" || ity === "MsgRevoke"){ sub = /GATA/.test(memo) ? esc(memo.replace(/^GATA AtomOne /, "")) : ""; }
     if(ms.length > 1 && ty !== "MsgExec" && !ibcIn) kind += " (" + ms.length + ")";      /* an IBC receive rides with its relayer's client update */
     var fee = ((t.auth_info || {}).fee || {}).amount || [], signer = !!(((t.auth_info || {}).signer_infos || []).length) && ty !== "MsgExec" || ty === "MsgExec" && false;
-    if(r.code) sub = (sub ? sub + ", " : "") + "failed";
-    return { h: +r.height, kind: kind, row: actRow(actWhen(new Date(r.timestamp).getTime()), esc(kind), sub, r.txhash, amt) };
+    if(r.code){ sub = (sub ? sub + ", " : "") + "failed, only the fee moved";
+      var fc = (((t.auth_info || {}).fee || {}).amount || [])[0]; amt = fc ? "\u2212" + actCoin(fc) : ""; }
+    return { h: +r.height, kind: kind, failed: !!r.code, row: actRow(actWhen(new Date(r.timestamp).getTime()), esc(kind), sub, r.txhash, amt) };
   }
   function actLoad(k){
     var a = window.__ADDR; if(!a) return Promise.resolve({ sum: "Connect a wallet", rows: [] });
@@ -1970,7 +1990,8 @@
         tiles: L.length ? [[String(L.length), L.length === 1 ? "restake" : "restakes"], [wn(tot), "ATONE staked back"], [first(L), "since"]] : null,
         rows: L.map(function(x){ return actRow(actWhen(x.at * 1000), "Rewards staked back", x.target ? "onto " + esc(actName(x.target)) + (x.staked > 0 ? "" : "") : "", x.txhash, fmt(x.staked) + " ATONE"); }) }; });
     /* Account: the address as an explorer shows it - what it signed, what it received, and what was done on its behalf */
-    var qs = ["message.sender='" + a + "'", "transfer.recipient='" + a + "'", "delegate.delegator='" + a + "'", "withdraw_rewards.delegator='" + a + "'"];
+    var qs = ["message.sender='" + a + "'", "transfer.recipient='" + a + "'", "delegate.delegator='" + a + "'", "withdraw_rewards.delegator='" + a + "'",
+              "proposal_vote.voter='" + a + "'"];
     /* the latest 20 (operator, 2026-10-12); a search that fails is asked once more, and if it still fails the count
        says "latest", never "all", since part of the history was not read */
     var ACT_N = 20, bad = 0;
@@ -1981,12 +2002,14 @@
       var seen = {}, rows = [];
       R.forEach(function(d){ (d.txs || []).forEach(function(t, i){ var r = (d.tx_responses || [])[i] || {}; if(!r.txhash || seen[r.txhash]) return; seen[r.txhash] = 1; rows.push(actAcct(t, r, a)); }); });
       rows.sort(function(x, y){ return y.h - x.h; }); rows = rows.slice(0, ACT_N);
+      var hf = (window.__D || {}).hist_from, hfd = hf ? actDay(new Date(hf).getTime()) : "";
       var sum = !rows.length ? (bad ? "Could not read the chain. Try again in a moment." : "No transactions on this address yet")
         : rows.length >= ACT_N ? "Latest " + ACT_N + " transactions on this address"
-        : bad ? "Latest " + rows.length + " transactions on this address" : "All " + rows.length + " transactions on this address";
-      var nIn = rows.filter(function(o){ return /^(Receive|IBC receive)$/.test(o.kind); }).length, nOut = rows.filter(function(o){ return /^(Send|IBC transfer)/.test(o.kind); }).length;
+        : bad ? "Latest " + rows.length + " transactions on this address"
+        : rows.length + (rows.length === 1 ? " transaction" : " transactions") + (hfd ? " since " + hfd : " on this address");
+      var nIn = rows.filter(function(o){ return !o.failed && /^(Receive|IBC receive)$/.test(o.kind); }).length, nOut = rows.filter(function(o){ return !o.failed && /^(Send|IBC transfer)/.test(o.kind); }).length;
       return { sum: sum, rows: rows.map(function(o){ return o.row; }),
-        tiles: rows.length ? [[String(rows.length), rows.length >= ACT_N || bad ? "latest transactions" : "transactions, all"], [String(nOut), "sent"], [String(nIn), "received"]] : null }; })
+        tiles: rows.length ? [[String(rows.length), rows.length >= ACT_N || bad ? "latest transactions" : hfd ? "transactions since " + hfd : "transactions"], [String(nOut), "sent"], [String(nIn), "received"]] : null }; })
       .catch(function(){ return { sum: "Could not read the chain. Try again in a moment.", rows: [] }; });
   }
   function actShow(){
@@ -2030,6 +2053,14 @@
     var ad = E("rsadd"); if(ad) ad.textContent = add > 0 ? "+" + fmt(pos.total * add) + " ATONE" : "Your rewards";
     var sm = E("rssum"); if(sm) sm.innerHTML = on ? '<i class="you-tag on">Active</i>' : '<i class=you-tag>Inactive</i>';
     var b = E("rsgo"); if(b){ b.textContent = on ? "Revoke" : "Activate"; b.className = "wk-btn " + (on ? "wk-danger" : "wk-go"); }
+    /* another service already compounds this wallet: activating cancels its claim-and-stake grants in the same
+       approval, and the card says so BEFORE the wallet lists the revokes (audit 2026-10-13) */
+    var oh = E("rsoth"); if(oh){ oh.hidden = true;
+      if(!on && window.__rsOthers) window.__rsOthers().then(function(gs){
+        if(!gs.length || !E("rspop").classList.contains("on")) return;
+        var t = E("rsothn"); if(t) t.textContent = "Activating also turns off " + (gs.length === 1 ? "another restake service" : gs.length + " other restake services") +
+          " this wallet has authorized (" + gs.map(function(g){ return g.slice(0, 10) + "\u2026"; }).join(", ") + "): one service claims and stakes, not two.";
+        oh.hidden = false; }); }
     if(window.__rsFee) window.__rsFee();
     POP.open(el);
   }
