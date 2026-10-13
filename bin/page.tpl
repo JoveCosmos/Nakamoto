@@ -4864,6 +4864,9 @@ button.gp-sv:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offs
 .gd-h{display:flex;align-items:center;gap:10px}.gd-h b{font-size:14px;color:var(--wt)}
 .gd-r p{margin:6px 0 0;font-size:12.5px;line-height:1.55;color:var(--ws)}
 .gd-note{font-size:12px;line-height:1.55;color:var(--wf)}.gd-note b{color:var(--wt)}.gd-note a{color:var(--sv-teal)}
+ul.gd-note{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+ul.gd-note li{position:relative;padding-left:14px}
+ul.gd-note li::before{content:"";position:absolute;left:2px;top:.62em;width:5px;height:5px;border-radius:50%;background:var(--sv-teal)}
 /* ════ Governance, in the Dashboard's parts: its figures a strip of boxes with engraved wells, each panel's
    title a filled band of its own colour, tags that read clearly on any ground ════ */
 .gv-strip{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:0!important;border:1px solid var(--wbd);border-radius:12px;background:var(--wc);overflow:hidden}

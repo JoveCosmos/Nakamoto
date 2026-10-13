@@ -1558,9 +1558,10 @@
       '<div class=gd-list>' +
       row("Steering DAO", !!d.steering_dao_address, "At most one. It can add advisory notes to proposals, make announcements on chain and extend a proposal's voting period. Its endorsement lets a law pass with more than two thirds instead of 90%.") +
       row("Oversight DAO", !!d.oversight_dao_address, "It can veto a proposal that breaks a governing document, with proof, and extend a proposal's voting period. It cannot act on proposals about its own members.") +
-      '<div class=gd-note>' + (ext != null ? 'A proposal\'s voting period can be extended up to <b>' + ext + ' times</b>, <b>' + dur + ' days</b> each. ' : '') +
-        'Members of both are appointed by governance and must be public, real people. ' +
-        'The constitution sets the rules.</div></div>'));
+      /* three bullets (operator, 2026-10-13) */
+      '<ul class=gd-note>' + (ext != null ? '<li>A proposal\'s voting period can be extended up to <b>' + ext + ' times</b>, <b>' + dur + ' days</b> each.</li>' : '') +
+        '<li>Members of both are appointed by governance and must be public, real people.</li>' +
+        '<li>The constitution sets the rules.</li></ul></div>'));
   }
 
   /* ════ Constitution: the official text, as the build converted it (constitution.html), fetched
