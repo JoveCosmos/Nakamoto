@@ -331,7 +331,8 @@ def govcheck(c):
                                % ((md(m), pid, v, md(title)) if was else (md(m), v, pid, md(title)))
                                + "\nVoting ends in %s. Your own vote, if you cast one, counts instead of its." % gov_until(end)))
                 st["told"][str(pid)] = v
-            if not v and end - now <= REMIND_S and str(pid) not in st["reminded"]:
+            # only while voting is still open: a proposal ending mid-pass is not "not voted" (audit 2026-10-13)
+            if not v and now < end - 60 and end - now <= REMIND_S and str(pid) not in st["reminded"]:
                 events.append(("m", "<b>%s</b> has not voted on #%d, and voting ends in %s.\n%s\n"
                                     "If you want your stake to count, vote yourself in the app." % (md(m), pid, gov_until(end), md(title))))
                 st["reminded"].append(str(pid))
@@ -618,17 +619,21 @@ def handle(c, msg, V):
         c.execute("INSERT INTO gsub(chat, gov, made, flags) VALUES(?,?,?,?) ON CONFLICT(chat, gov) DO UPDATE SET flags=excluded.flags",
                   (chat, gov, int(time.time()), fl))
         m = gs[gov][0] if gs else gov[:14]
-        # from now on: its votes already cast are stated here, not announced again
+        # its votes already cast are stated here, not announced again - but only when nobody watched it before: an
+        # existing state belongs to the other watchers, whose next vote alert must not be silenced (audit 2026-10-13)
         st = gov_state(c, gov)
         now_votes = []
         if gs is not None:
-            if not st:
+            fresh = not st
+            if fresh:
                 st = {"m": m, "active": int(gs[gov][1]), "told": {}, "reminded": []}
             for pid, title, end in ps:
                 v = gov_vote(gov_acct(gov), pid)
-                if v: st["told"][str(pid)] = v; now_votes.append("#%d: %s" % (pid, v))
+                if v:
+                    if fresh: st["told"][str(pid)] = v
+                    now_votes.append("#%d: %s" % (pid, v))
                 elif v == "": now_votes.append("#%d: not voted yet, ends in %s" % (pid, gov_until(end)))
-            gov_save(c, gov, st)
+            if fresh: gov_save(c, gov, st)
         c.commit()
         head = ("Already watching governor <b>%s</b>, with the same alerts:" if had and (had[0] or "vms") == fl else
                 "Updated governor <b>%s</b>. Its alerts are now:" if had else "Watching governor <b>%s</b>. Its alerts are:") % md(m)
@@ -712,7 +717,8 @@ def handle(c, msg, V):
                 return send(chat, "You are not watching a validator by that name. /list shows who you watch.")
             c.execute("DELETE FROM sub WHERE chat=? AND op=?", (chat, hit[0])); c.commit()
             return send(chat, "Stopped watching <b>%s</b>." % md(name(c, hit[0], V)))
-        c.execute("DELETE FROM sub WHERE chat=?", (chat,)); c.execute("DELETE FROM wsub WHERE chat=?", (chat,)); c.commit()
+        c.execute("DELETE FROM sub WHERE chat=?", (chat,)); c.execute("DELETE FROM wsub WHERE chat=?", (chat,))
+        c.execute("DELETE FROM gsub WHERE chat=?", (chat,)); c.commit()
         return send(chat, "Stopped watching everything.")
 
     return send(chat, HELP)

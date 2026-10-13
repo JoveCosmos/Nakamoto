@@ -172,6 +172,11 @@
   html[data-theme=light]:not([data-mono]) .gpx-r.sel .gp-id{background:var(--accent);border-color:var(--accent);color:#fff}
   html[data-theme=light]:not([data-mono]) .gpx-det{background:rgba(60,50,20,.02)}
   html[data-theme=light]:not([data-mono]) .gp-sv{background:rgba(60,50,20,.035)}
+  html[data-theme=light]:not([data-mono]) .gp-sv.yes{background:rgba(29,122,67,.10);border-color:rgba(29,122,67,.45)}html[data-theme=light]:not([data-mono]) .gp-sv.yes b{color:#1d7a43}
+  html[data-theme=light]:not([data-mono]) .gp-sv.no{background:rgba(178,58,30,.09);border-color:rgba(178,58,30,.45)}html[data-theme=light]:not([data-mono]) .gp-sv.no b{color:#b23a1e}
+  html[data-theme=light]:not([data-mono]) .gp-sv.abstain{background:rgba(93,90,116,.08);border-color:rgba(93,90,116,.35)}html[data-theme=light]:not([data-mono]) .gp-sv.abstain b{color:#5d5a74}
+  html[data-theme=light]:not([data-mono]) .gp-sv.none{background:rgba(176,110,20,.10);border-color:rgba(176,110,20,.5)}html[data-theme=light]:not([data-mono]) .gp-sv.none b{color:#965a0c}
+  html[data-theme=light]:not([data-mono]) .gp-sv.na{background:transparent}
   html[data-theme=light]:not([data-mono]) .gp-vm.me{color:#fbf9f3}
   html[data-theme=light]:not([data-mono]) .act-tile{background:rgba(60,50,20,.035)}
   html[data-theme=light]:not([data-mono]) .gvt-tag{background:var(--accent);color:#fff}

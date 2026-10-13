@@ -1411,9 +1411,13 @@
     if(mine && !GV.list) loadGovs();
     var gv = (open && ga ? acctVote(ga, p.id) : null) || (gh && gh.map ? gh.map[p.id] : null);
     var cap = function(v){ return v.charAt(0).toUpperCase() + v.slice(1); };
-    var chip = function(cls, who, v, sure){ return '<span class="gp-sv ' + cls + (v ? ' ' + v : '') + '"><em>' + who + '</em><b>' + (v ? cap(v) : sure ? "No vote" : "N/A") + '</b></span>'; };
+    /* each chip coloured by the vote (operator, 2026-10-13): Yes, No, Abstain, Not voted (only when confirmed), N/A; the
+       governor chip is a button that opens the governor's card */
+    var chip = function(cls, who, v, sure, gvAddr){ var st = v || (sure ? "none" : "na");
+      return (gvAddr ? '<button type=button class="gp-sv ' + cls + ' ' + st + '" data-gv="' + esc(gvAddr) + '" title="Open this governor">' : '<span class="gp-sv ' + cls + ' ' + st + '">') +
+        '<em>' + who + '</em><b>' + (v ? cap(v) : sure ? "Not voted" : "N/A") + '</b>' + (gvAddr ? '</button>' : '</span>'); };
     var h = chip("me", "You", mv, !mv && meNoVoteSure(p));
-    if(mine) h += chip("gov", "Governor " + esc(g ? g.m : mine.slice(0, 12) + "\u2026"), gv, !gv && acctNoVoteSure(ga, p));
+    if(mine) h += chip("gov", esc(g ? g.m : mine.slice(0, 12) + "\u2026"), gv, !gv && acctNoVoteSure(ga, p), mine);
     return '<div class=gp-you>' + h + '</div>';
   }
   function voteBox(p){

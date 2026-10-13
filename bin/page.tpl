@@ -4794,6 +4794,17 @@ background:linear-gradient(90deg,rgba(46,224,106,.09),rgba(255,255,255,.012) 70%
 .gp-sv em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--wf)}
 .gp-sv b{font-size:12.5px;color:var(--wt)}
 .gp-sv.yes b{color:var(--sv-green)}.gp-sv.no b{color:var(--wburn)}.gp-sv.abstain b{color:var(--ws)}
+/* the vote chips coloured by the vote (operator, 2026-10-13): a tinted fill and edge per answer; Not voted amber, N/A faint
+   and dashed; the governor chip is a button that opens its card */
+.gp-sv.yes{border-color:rgba(54,211,153,.5);background:rgba(54,211,153,.12)}
+.gp-sv.no{border-color:rgba(255,122,69,.5);background:rgba(255,122,69,.12)}
+.gp-sv.abstain{border-color:rgba(154,163,190,.45);background:rgba(154,163,190,.10)}
+.gp-sv.none{border-color:rgba(255,177,85,.55);background:rgba(255,177,85,.12)}.gp-sv.none b{color:var(--wamber)}
+.gp-sv.na{border-style:dashed;background:transparent}.gp-sv.na b{color:var(--wf);font-weight:500}
+button.gp-sv{font:inherit;color:inherit;cursor:pointer;text-align:left}
+button.gp-sv em{text-decoration:underline dotted;text-underline-offset:2px}
+button.gp-sv:hover{filter:brightness(1.15)}
+button.gp-sv:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offset:2px}
 .gp-sv small{font-size:10px;color:var(--wf)}
 .gp-you>small{font-size:11px;color:var(--wf)}
 /* Proposals on a wide screen (operator, 2026-10-12): a slim index on the left - one line a proposal, your vote's
