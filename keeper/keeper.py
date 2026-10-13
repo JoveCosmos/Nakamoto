@@ -239,7 +239,7 @@ def grant_changed(g, prev):
     return g["cap"] is not None and g["cap"] > pcap
 
 # ── restake ────────────────────────────────────────────────────────────────
-ADMIN = os.environ.get("KEEPER_ADMIN", "/srv/atomone-app/state/admin-mainnet.json")
+ADMIN = os.environ.get("KEEPER_ADMIN", "/srv/atomone-app/state/admin/admin-mainnet.json")   # the admin state moved into state/admin on 2026-10-01; both env files set this anyway
 def admin():
     """what the operators decided in the admin console (adminapi writes it): the Disabled wallets ("paused").
     No file yet is a first run (nothing Disabled); a file that exists and does not parse raises, so the tick is

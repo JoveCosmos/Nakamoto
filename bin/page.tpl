@@ -1308,7 +1308,7 @@ padding-right:4px}
 .ptab .nm span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .ptab .tlg{border-radius:50%;flex:0 0 auto;object-fit:cover;
 background:#1b1b33;border:1px solid #ffffff14}
-.ptab .tlgx{background:#16162c}
+.ptab .tlgx{display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:9px;color:#fff}
 /* the last column was landing on the frame: the page's own td rule sets a zero
    left pad and the phone override shaved the right one to nothing */
 .ptab th:last-child,.ptab td:last-child{padding-right:13px}

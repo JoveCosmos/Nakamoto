@@ -183,7 +183,7 @@
   html[data-theme=light]:not([data-mono]) .ptab .rkc{color:var(--faint)}
   html[data-theme=light]:not([data-mono]) .ptab tr.vrow:hover .nm{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .ptab .tlg{background:var(--surface-2);border-color:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .ptab .tlgx{background:var(--line-soft)}
+  html[data-theme=light]:not([data-mono]) .ptab .tlgx{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .gcard #trendbig{background:var(--surface)}
   html[data-theme=light]:not([data-mono]) .ptab .ok{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .duotab .ptw{scrollbar-color:var(--edge2) var(--surface)}

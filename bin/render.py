@@ -123,7 +123,10 @@ def _vlogo(v):
     vid = v.get("id") or ""
     return (f"<img class=tlg src=\"assets/val/{esc(vid)}.jpg\" alt=\"\" loading=lazy>"
             if v.get("av") and re.fullmatch(r"[A-Za-z0-9_.-]{1,32}", vid)
-            else "<span class='tlg tlgx'></span>")
+            # no published tile: the moniker's letter on its hue disc, as every other list shows one
+            # (audit 2026-10-13: a bare grey disc read as a broken image)
+            else "<span class='tlg tlgx' style='background:hsl(%d,42%%,30%%)'>%s</span>"
+                 % (sum(ord(c) for c in (v.get("m") or "?")) * 37 % 360, esc((v.get("m") or "?")[:1].upper())))
 
 def prow(v, extra):
     return (f"<tr class=vrow tabindex=0 role=button data-v={v['rank']-1}>"

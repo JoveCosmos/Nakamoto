@@ -32,10 +32,10 @@ and is revocable in one click. Transaction fees for the automation are paid by u
 ## Layout
 
 - `bin/` - the site: templates, scripts, styles, and the render pipeline that bakes chain data into static
-  pages (`render.py`, `collect.py`). The built tree is served as plain files behind nginx; there is no
-  application server in front of users.
-- `keeper/` - the automation behind Autopilot and Restake (public name: the pilot): planning, state, run
-  reports, and its systemd units. It signs nothing itself.
+  pages (`render.py`, `collect.py`). The built tree is served as plain files; there is no application
+  server in front of users.
+- `keeper/` - the pilot, the automation behind Autopilot and Restake: planning, state, run reports, and its
+  systemd units. It signs nothing itself.
 - `vps/atomone-autopilot-signer/` - the small signer that holds the grantee key on a separate host and
   only signs the planned redelegations and restakes.
 - `bot/` - the Telegram alert bot. `faucet/` - the testnet faucet. `dev/` under `bin/` - the test and
@@ -43,15 +43,18 @@ and is revocable in one click. Transaction fees for the automation are paid by u
 
 ## Running it
 
-The site is static once rendered: point the render at an AtomOne RPC/API pair, then serve `web/`.
+The site is static once rendered: point the render at an AtomOne RPC/API pair and at a directory of your
+own, then serve it. `OUT_DIR` and `STATE_DIR` are not optional decoration - without them the scripts write
+to their default production paths.
 
 ```sh
-python3 bin/collect.py && python3 bin/render.py    # bake data and pages into web/
+export ATOMONE_RPC=... ATOMONE_API=... OUT_DIR=$PWD/web STATE_DIR=$PWD/state
+python3 bin/collect.py && python3 bin/render.py    # bake data and pages into $OUT_DIR
 cd web && python3 -m http.server 8089              # or any static server
 ```
 
-The keeper, signer, bot and faucet each carry their systemd unit next to their code; all credentials come
-from the environment or sealed files, never from this repo.
+The pilot, the signer, the bot and the faucet each carry their systemd unit next to their code; all
+credentials come from the environment or sealed files, never from this repo.
 
 ## Licence
 

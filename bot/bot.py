@@ -517,13 +517,17 @@ HELP = ("Alerts for AtomOne validators: when one stops signing, misses half its 
         + HELPERS + "\n\n" + PAGE)
 
 
-def md(name):
+def md(name, cap=220):
     """A moniker is chain data, and it reaches a formatted message. Messages are
     sent as HTML, where escaping is exact; the legacy Markdown they used to go out
     as allows no escape inside bold, so a moniker like "[NODERS]" or "a_b" broke
     the message (Telegram answers 400 and the alert is lost), and a [text](url)
-    shape could render a link - the one way chain data could name a destination."""
-    return html.escape(str(name), quote=False)
+    shape could render a link - the one way chain data could name a destination.
+    Capped (audit 2026-10-13): a proposal title can run to 10,200 bytes on chain,
+    and a message past Telegram's 4,096 is refused - with the alert marked told,
+    it would never have been retried."""
+    t = html.escape(str(name), quote=False)
+    return t if len(t) <= cap else t[:cap - 1] + "\u2026"
 
 
 GONE = set()          # chats Telegram says we can no longer reach, dropped after the pass
@@ -532,7 +536,17 @@ GONE = set()          # chats Telegram says we can no longer reach, dropped afte
 def send(chat, text):
     """One message. A 429 waits as long as Telegram asks and tries again; a 403 (the
     reader blocked the bot or deleted the chat) marks the chat for removal, so its
-    subscriptions do not live on forever."""
+    subscriptions do not live on forever. Over Telegram's 4,096-character limit the
+    message goes out in parts, split on line ends (audit 2026-10-13: a /list of many
+    validators was refused whole and the reader got nothing)."""
+    if len(text) > 4000:
+        lines, part, ok = text.split("\n"), "", True
+        for ln in lines:
+            if part and len(part) + len(ln) + 1 > 4000:
+                ok = send(chat, part) and ok; part = ln; time.sleep(0.1)
+            else:
+                part = part + "\n" + ln if part else ln
+        return (send(chat, part) if part else True) and ok
     body = urllib.parse.urlencode(dict(chat_id=chat, text=text, parse_mode="HTML",
                                        disable_web_page_preview="true")).encode()
     for attempt in range(3):
