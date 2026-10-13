@@ -4813,19 +4813,39 @@ button.gp-sv:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offs
 @media(min-width:1100px){
 .gpx-split{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:228px minmax(0,1fr);gap:16px}
 .gpx-list{min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;padding-right:4px;align-content:start}
-.gpx-r{position:relative;display:grid;grid-template-columns:46px auto minmax(0,1fr);gap:10px;align-items:center;padding:10px 10px 13px 10px;border-bottom:1px solid var(--wbd);cursor:pointer}
+/* the index as a stack of quiet cards (operator, 2026-10-13: "modern, elegant"): the chosen one lifts - a raised teal
+   surface, a glowing edge pill on the left, its number filled - and the rest step back a little; no arrow */
+.gpx-r{position:relative;display:grid;grid-template-columns:46px auto minmax(0,1fr);gap:10px;align-items:center;padding:10px 12px 14px 14px;margin-bottom:4px;
+  border:1px solid transparent;border-radius:10px;cursor:pointer;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease}
+.gpx-r:not(.sel) .gp-st,.gpx-r:not(.sel) .gpx-sl{opacity:.72}
+.gpx-r:not(.sel):hover .gp-st,.gpx-r:not(.sel):hover .gpx-sl{opacity:1}
 .gpx-r .gp-st{justify-self:start}
 .gpx-r:focus-visible{outline:2px solid var(--sv-teal);outline-offset:-2px}
-.gpx-r:hover{background:rgba(255,255,255,.03)}
+.gpx-r:hover{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.06)}
 /* the chosen row reads at a glance (operator, 2026-10-12: "not prominent"): a filled band, a rail, an outline, and a
    pointer toward the detail it opened */
-.gpx-r.sel{background:rgba(43,200,189,.16);box-shadow:inset 4px 0 0 var(--sv-teal),inset 0 0 0 1px rgba(43,200,189,.55);border-radius:6px}
-.gpx-r.sel::after{content:"";position:absolute;right:6px;top:50%;width:8px;height:8px;margin-top:-6px;border-right:2px solid var(--sv-teal);border-bottom:2px solid var(--sv-teal);transform:rotate(-45deg)}
+.gpx-r.sel{background:linear-gradient(100deg,rgba(43,200,189,.20),rgba(43,200,189,.06) 70%);border-color:rgba(43,200,189,.38);
+  box-shadow:0 10px 24px -14px rgba(43,200,189,.75),0 1px 0 rgba(255,255,255,.05) inset}
+.gpx-r.sel::before{content:"";position:absolute;left:-1px;top:22%;bottom:22%;width:3px;border-radius:0 3px 3px 0;background:var(--sv-teal);box-shadow:0 0 10px var(--sv-teal)}
 .gpx-r.sel .gp-id{background:var(--sv-teal);border-color:var(--sv-teal);color:#071a18}
 .gpx-r .gp-vm{margin:0;justify-self:start}
-.gpx-sl{position:absolute;left:10px;right:10px;bottom:5px;height:3px;border-radius:2px;overflow:hidden;background:var(--wbd);display:flex}
+.gpx-sl{position:absolute;left:14px;right:12px;bottom:6px;height:3px;border-radius:2px;overflow:hidden;background:var(--wbd);display:flex}
 .gpx-sl i{display:block;height:100%}.gpx-sl i.y{background:var(--sv-green)}.gpx-sl i.n{background:var(--wburn)}.gpx-sl i.a{background:var(--wf)}
-.gpx-det{min-height:0;display:flex;flex-direction:column;gap:10px;padding:12px 14px;border:1px solid var(--wbd);border-radius:10px;background:rgba(255,255,255,.02);overflow:hidden}
+.gpx-det{position:relative;min-height:0;display:flex;flex-direction:column;gap:10px;padding:14px 16px;border:1px solid rgba(43,200,189,.16);border-radius:12px;
+  background:linear-gradient(180deg,rgba(43,200,189,.045),rgba(255,255,255,.012) 140px);box-shadow:0 14px 34px -24px rgba(0,0,0,.8);overflow:hidden}
+/* a hairline of light along the pane's top edge */
+.gpx-det::before{content:"";position:absolute;left:16px;right:16px;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--sv-teal),transparent);opacity:.7}
+.gpx-dh .gp-id{border-color:rgba(43,200,189,.45);color:var(--sv-teal);background:rgba(43,200,189,.08)}
+.gpx-dh b{letter-spacing:-.005em}
+/* the tally: a thicker bar with hairline seams, then a legend of dots */
+.gpx-v .gp-bar{height:10px;border-radius:5px;gap:2px;background:transparent}
+.gpx-v .gp-bar i{border-radius:2px}.gpx-v .gp-bar i:first-child{border-radius:5px 2px 2px 5px}.gpx-v .gp-bar i:last-child{border-radius:2px 5px 5px 2px}
+.gpx-lg{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:11.5px;color:var(--ws)}
+.gpx-lg>span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.gpx-lg i{width:8px;height:8px;border-radius:50%;background:var(--wf)}
+.gpx-lg .y i{background:var(--sv-green)}.gpx-lg .n i{background:var(--wburn)}
+.gpx-lg b{font-weight:700;color:var(--wt);font-variant-numeric:tabular-nums}
+.gpx-lg .y b{font-size:15px}
 .gpx-dh{display:flex;align-items:center;gap:10px;min-width:0}
 .gpx-dh b{flex:1 1 auto;min-width:0;font-size:16px;color:var(--wt)}
 .gpx-ds{font-size:11.5px;color:var(--ws)}
@@ -5073,7 +5093,8 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;margin-right:-8px;p
 #sv-props,#sv-daos{justify-content:flex-start;gap:12px}
 #sv-props>*,#sv-daos>*,#sv-props>*:not(:first-child),#sv-daos>*:not(:first-child){margin-top:0}
 #sv-proplist{flex:1 1 0;min-height:0;--tc:var(--sv-teal)}
-#sv-daop{flex:1 1 auto;min-height:0;overflow-y:auto;--tc:var(--sv-teal)}
+/* Core DAOs fit their panel: no scroll (operator, 2026-10-13: "useless"; the frame's 1px edge made a scrollbar) */
+#sv-daop{flex:1 1 auto;min-height:0;overflow:hidden;--tc:var(--sv-teal)}
 .sv-glist{overflow-y:auto;flex:1 1 auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .sv-glist .sv-vr{flex:0 0 52px;grid-template-columns:28px minmax(0,1.4fr) 84px minmax(0,1fr) 90px minmax(0,1fr) 116px}
 .sv-gact{display:grid;grid-template-columns:minmax(0,1fr) 26px;align-items:center;justify-items:end;column-gap:10px}

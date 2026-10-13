@@ -1532,7 +1532,8 @@
     return '<div class=gpx-dh><span class=gp-id>#' + p.id + '</span><b>' + esc(p.title) + '</b>' + side + '</div>' +
       '<div class=gpx-ds>' + esc(pkind(p)) + ', ' + pwhen(p) + (p.endorsed ? ', endorsed by the Steering DAO' : '') + (p.ext ? ', voting extended ' + p.ext + '\u00d7' : '') + '</div>' +
       '<div class="gp-v gpx-v">' + (t.s ? '<span class=gp-bar><i class=y style="width:' + pc(t.y).toFixed(2) + '%"></i><i class=n style="width:' + pc(t.n).toFixed(2) + '%"></i><i class=a style="width:' + pc(t.a).toFixed(2) + '%"></i></span>' +
-        '<em>Yes ' + pc(t.y).toFixed(1) + '%</em><small>No ' + pc(t.n).toFixed(1) + '%, abstain ' + pc(t.a).toFixed(1) + '%</small>' : '<small>no votes' + (p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? ' yet' : '') + '</small>') + '</div>' +
+        '<span class=gpx-lg><span class=y><i></i>Yes <b>' + pc(t.y).toFixed(1) + '%</b></span><span class=n><i></i>No <b>' + pc(t.n).toFixed(1) + '%</b></span>' +
+        '<span class=a><i></i>Abstain <b>' + pc(t.a).toFixed(1) + '%</b></span></span>' : '<small>no votes' + (p.st === "PROPOSAL_STATUS_DEPOSIT_PERIOD" ? ' yet' : '') + '</small>') + '</div>' +
       pfacts(p, t, true);
   }
   var GPW = window.matchMedia ? matchMedia("(min-width:1100px)") : null;
