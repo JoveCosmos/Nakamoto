@@ -5856,10 +5856,10 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 /* Restake's addition in the APR block's upper corner, two lines: "+11.7% APR", then a blinking dot and "restake" (operator,
    2026-10-08). Inside the block's own padding box, so it never touches the section's border */
 .you-apr,.mv-yk{position:relative}
-.you-big{position:relative;display:inline-flex;align-self:flex-start}
-/* the restake tag sits in the upper corner where the APR figure's % ends (operator, 2026-10-13), like a superscript:
-   "+3% APR" upright and larger, "restake" small under it, no dot */
-.you-big .you-rsx{right:auto;left:100%;margin-left:6px;top:3px;bottom:auto;align-items:flex-start;gap:1px}
+.you-big{display:inline-flex;align-self:flex-start}   /* not positioned: the tag anchors to the APR block, so it can sit at the column's right */
+/* the restake tag at the RIGHT of the wallet's APR row, level with the figure (operator, 2026-10-13: "push
+   restake to right"): "+3% APR" with "restake" centred under it, no dot */
+.you-big .you-rsx{left:auto;right:0;margin-left:0;top:3px;bottom:auto;align-items:center;gap:1px}
 .you-big .you-rsx span:first-child{font-size:12.5px;font-weight:700}
 .you-big .you-rsx span+span{font-size:8.5px}
 .you-rsx{position:absolute;top:0;right:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-family:var(--wmono);font-size:11px;line-height:1.2;font-style:normal;letter-spacing:.03em;color:var(--sv-green);white-space:nowrap;font-weight:500;pointer-events:none}
@@ -5868,7 +5868,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .you-rsx i{width:6px;height:6px;border-radius:50%;background:var(--sv-green);box-shadow:0 0 6px var(--sv-green);animation:rsblink 1.6s ease-in-out infinite}
 @keyframes rsblink{50%{opacity:.2}}
 @media(prefers-reduced-motion:reduce){.you-rsx i{animation:none}}
-.mv-yk .you-rsx{top:10px;right:12px;font-size:12px}.mv-yk .you-rsx span:first-child{font-weight:700}.mv-yk .you-rsx span+span{font-size:8.5px}
+.mv-yk .you-rsx{top:10px;right:12px;font-size:12px;align-items:center}.mv-yk .you-rsx span:first-child{font-weight:700}.mv-yk .you-rsx span+span{font-size:8.5px}
 .you-bal{display:flex;flex-direction:column;border-bottom:1px solid var(--wbd)}
 .you-r{display:flex;align-items:center;gap:8px;min-height:40px;border-top:1px solid var(--wbd)}
 .you-r span{flex:1 1 auto;font-size:13.5px;color:var(--ws)}
