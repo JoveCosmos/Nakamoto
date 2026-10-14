@@ -1338,11 +1338,12 @@ rememberGridH();
   function kpSet(key, html){ Array.prototype.forEach.call(document.querySelectorAll('[data-kp="' + key + '"]'), function(e){ if(e.innerHTML !== html) e.innerHTML = html; }); }
   function kpFill(){
     var whole = function(u){ return Math.round(u / 1e6).toLocaleString("en-US"); }, TH = 3.0;
-    /* the set, this block: the rule's groups as the builder takes them (the remainder to the low group) */
+    /* the set, this block: n/3 at BOTH ends, as the chain splits (nakamoto_bonus.go) - the same
+       groups the concentration track reads, so the card and the bar never disagree */
     var V = VALS.slice().sort(function(a, b){ return b[1] - a[1]; }), N = V.length;
     if(N >= 3){
       var S = 0; V.forEach(function(v){ S += v[1]; });
-      var MEAN = S / N, g = Math.floor(N / 3), gl = N - 2 * g, Hi = 0, Lo = 0, i;
+      var MEAN = S / N, g = Math.floor(N / 3), gl = g, Hi = 0, Lo = 0, i;
       for(i = 0; i < g; i++) Hi += V[i][1];
       for(i = N - gl; i < N; i++) Lo += V[i][1];
       var ratio = Lo ? (Hi / g) / (Lo / gl) : Infinity, rising = ratio >= TH;
