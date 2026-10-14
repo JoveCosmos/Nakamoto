@@ -543,7 +543,8 @@ var drawTrend = (function(){
   var bx = bi>0 ? X(bi-0.5) : null;
   if(bx!==null){ s+='<rect x="'+bx+'" y="'+PT+'" width="'+(W-PR-bx)+'" height="'+(H-PT-PB)+'" fill="#ff4d1f12"/>'+
     '<line x1="'+bx+'" y1="'+PT+'" x2="'+bx+'" y2="'+(H-PB)+'" stroke="#ff4d1f" stroke-width="2"/>'+
-    '<text x="'+(bx-10)+'" y="'+(PT+17)+'" font-size="12.5" fill="#ff4d1f" text-anchor="end">BONUS ON</text>'; }
+    /* phones: the left label owns the top-left corner, so the tag moves inside the shaded span */
+    '<text x="'+(sm?bx+8:bx-10)+'" y="'+(PT+17)+'" font-size="12.5" fill="#ff4d1f" text-anchor="'+(sm?'start':'end')+'">BONUS ON</text>'; }
   T.forEach(function(x,i){ d+=(i?"L":"M")+X(i).toFixed(1)+" "+Y(x.top10).toFixed(1); });
   s+='<path d="'+d+'" fill="none" stroke="#fff8dc" stroke-width="2.4"/>';
   /* every week is a point, but a label every week would be a smear - one in four,
