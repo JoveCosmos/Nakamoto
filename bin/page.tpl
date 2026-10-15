@@ -6744,9 +6744,9 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
   #mv-stage .mv-hl>b:not(#z){font-size:30px;white-space:nowrap;overflow:hidden}
   #mv-stage .mv-hl>span:not(.mv-lock):not(#z){font-size:13.5px;white-space:nowrap;overflow:hidden}
   /* Stake more never leaves the line (2026-10-15): the words step down in size first (hlFit), then end in an
-     ellipsis, the link stays whole; a phone drops the words marked mv-wide ("The same", and Autopilot's every 12
-     hours, which its countdown above already says) */
-  #mv-stage .mv-hl>span.mv-more:not(#z){display:flex;align-items:baseline}
+     ellipsis, the link stays whole; a phone drops the words marked mv-wide (Autopilot's every 12 hours, which its
+     countdown above already says) */
+  #mv-stage .mv-hl>span.mv-sline:not(#z){display:flex;align-items:baseline}
   #mv-stage .mv-hl .mv-tx{min-width:0;overflow:hidden;text-overflow:ellipsis}
   #mv-stage .mv-hl .mv-stk:not(#z){flex:0 0 auto}
   #mv-stage .mv-hl .mv-wide{display:none}
@@ -6831,10 +6831,10 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
 }
 @media(min-width:1100px) and (max-height:680px){
   #mv-stage .mv-days small{display:none}
-  #mv-stage .mv-hl>span:not(.mv-more){display:none}
+  #mv-stage .mv-hl>span:not(.mv-sline){display:none}
   /* the sentence gives way, Stake more stays (2026-10-15) */
-  #mv-stage .mv-hl>span.mv-more .mv-tx{display:none}
-  #mv-stage .mv-hl>span.mv-more .mv-stk:not(#z){margin-left:0}
+  #mv-stage .mv-hl>span.mv-sline .mv-tx{display:none}
+  #mv-stage .mv-hl>span.mv-sline .mv-stk:not(#z){margin-left:0}
   #mv-stage .mv-set:not(#z){min-height:48px}
 }
 /* a short screen (a laptop at 600-780px): everything a size tighter, the switches without their line */
@@ -6877,6 +6877,9 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   #p-dele #sd-mstrip.sd-strip:not(#z):not(#y){display:block!important;padding:12px!important;overflow:visible}
   .mv-ysw{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .mv-ysw .you-sw{padding:8px 10px}
+  /* the whole box is the switch's button (operator, 2026-10-15) */
+  .mv-ysw .you-sw:not(.dis){cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .mv-ysw .you-sw:not(.dis):active{border-color:var(--wbd2)}
   .mv-ysw .you-swt small{display:none}
   .mv-hl>b{font-size:30px}
   .mv-flow{grid-template-columns:minmax(0,1fr);gap:8px}

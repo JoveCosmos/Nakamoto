@@ -2148,9 +2148,12 @@
     Array.prototype.forEach.call(el.querySelectorAll(".mv-hl>b, .mv-hl>span:not(.mv-lock)"), function(x){
       x.style.fontSize = "";
       if(!phone || !x.clientWidth) return;
-      /* a line carrying Stake more measures its words, the part that gives way */
-      var fs = parseFloat(getComputedStyle(x).fontSize), min = x.tagName === "B" ? 16 : 10, w = x.querySelector(".mv-tx") || x;
-      while(w.scrollWidth > w.clientWidth + 1 && fs > min){ fs -= 0.5; x.style.fontSize = fs + "px"; }
+      /* a line carrying Stake more measures its words, the part that gives way, to the fraction of a pixel (any
+         overflow at all draws the ellipsis): the words' own width, which a range reports in full, against their box */
+      var fs = parseFloat(getComputedStyle(x).fontSize), min = x.tagName === "B" ? 16 : 10, w = x.querySelector(".mv-tx");
+      var over = !w ? function(){ return x.scrollWidth > x.clientWidth + 1; } : function(){
+        var rg = document.createRange(); rg.selectNodeContents(w); return rg.getBoundingClientRect().width > w.getBoundingClientRect().width + 0.05; };
+      while(over() && fs > min){ fs -= 0.5; x.style.fontSize = fs + "px"; }
     });
   }
   window.addEventListener("resize", function(){ var el = E("mv-stage"); if(el) hlFit(el); });
@@ -2242,13 +2245,13 @@
     } else {
       var plan = planNow(pos), offer = plan && plan.after != null && plan.msgs && plan.msgs.length;
       var direct = !!(window.__canGrant && window.__canGrant());
-      /* Stake more: a text link right after the state's own sentence, on every screen with stake, whenever any ATONE
-         is available (operator, 2026-10-15: a wallet with a little fresh stake beside its locked stake read At its
-         best and lost the link the cooling-down screen had shown since 2026-10-04) */
+      /* Stake more: a text link right after the state's own sentence, whenever any ATONE is available, on the screens
+         with no move to make: cooling down and at its best (operator, 2026-10-15: a wallet with a little fresh stake
+         beside its locked stake read At its best and lost the link; not while a move is available, the move comes first) */
       var more = window.__BAL && window.__BAL.uatone > 0 ? ' <button type=button class=mv-stk data-act=stake>Stake more<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>' : '';
       /* the sentence under the headline; with the link, the words sit in their own box so a phone can shorten them
          and never the link */
-      var line = function(t){ return more ? '<span class=mv-more><span class=mv-tx>' + t + '</span>' + more + '</span>' : '<span>' + t + '</span>'; };
+      var line = function(t){ return more ? '<span class=mv-sline><span class=mv-tx>' + t + '</span>' + more + '</span>' : '<span>' + t + '</span>'; };
       if(offer){
         var fr = {}, to = {}, moved = 0;
         plan.msgs.forEach(function(m){ fr[m.from] = (fr[m.from] || 0) + m.amt; to[m.to] = (to[m.to] || 0) + m.amt; moved += m.amt; });
@@ -2257,7 +2260,7 @@
         var tL = Object.keys(to).sort(function(x, y){ return to[y] - to[x]; }).map(function(id){ dst[id] = 1; return { rank: rk(id), name: nm(id), amt: '+' + fmt(to[id]), apr: pct(rate(id, to[id])) }; });
         var lock = pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is under redelegate lock until ' + day(pos.until) + '</div>' : '';
         h = top('Best today', auto ? '' : 'Ready, 1 approval', 'ok', auto ? ACTIVE : btn('opt', direct ? 'Activate Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE')) +
-          '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b>' + line('<span class=mv-wide>The same </span>' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.mnow != null ? plan.mnow : plan.now) + '</i> to <i class=g>' + pct(plan.mafter != null ? plan.mafter : plan.after) + '</i> APR.') + lock + '</div>' +   /* the moved stake's own APR (operator, 2026-10-01) */
+          '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.mnow != null ? plan.mnow : plan.now) + '</i> to <i class=g>' + pct(plan.mafter != null ? plan.mafter : plan.after) + '</i> APR</span>' + lock + '</div>' +   /* the moved stake's own APR (operator, 2026-10-01) */
           '<div class=mv-flow><div class=mv-box><em>From, ' + fL.length + ' validator' + (fL.length === 1 ? '' : 's') + '</em>' + mvRows(fL, 'a', 'validators', 'from') + '</div>' +
           '<div class=mv-arr aria-hidden=true><svg viewBox="0 0 44 20"><path d="M2 10h38M32 3l8 7-8 7"/></svg></div>' +
           '<div class=mv-box><em>To, ' + tL.length + ' validator' + (tL.length === 1 ? '' : 's') + '</em>' + mvRows(tL, 'g', 'validators', 'to') + '</div></div>' +
@@ -2334,6 +2337,10 @@
   };
 
   function onClick(ev){
+    /* phones and tablets: the whole Autopilot or Restake box answers a tap, not only its switch (operator, 2026-10-15);
+       a box that cannot be used (nothing staked, no wallet) stays still */
+    var swb = ev.target.closest && ev.target.closest(".mv-ysw .you-sw");
+    if(swb && !ev.target.closest(".you-tg")){ var tg = swb.querySelector(".you-tg[data-act]"); if(tg) tg.click(); return; }
     if(ev.target.closest && ev.target.closest("td.ck, th.ck")) return;         /* a list's box ticks; it opens nothing */
     var t = ev.target.closest ? ev.target.closest("[data-act],[data-f],[data-v],[data-gv]") : null;
     if(!t) return;
