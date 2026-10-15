@@ -1264,16 +1264,17 @@
     var L = GV.list, act = L ? L.filter(function(g){ return g.active; }) : [], vp = 0, n = 0;
     (L || []).forEach(function(g){ vp += g.vp || 0; n += g.n || 0; });
     var mine = myGov(), me = window.__ADDR ? myGovRec() : null, g = L && mine ? L.filter(function(x){ return x.addr === mine; })[0] : null;
-    var st = function(k, v, sub){ return '<span class=gp-k><em>' + k + '</em><b>' + v + '</b><s>' + sub + '</s></span>'; };
-    var your = !window.__ADDR ? ["-", "connect a wallet"] : (mine === null || mine === undefined) ? ["\u2026", "reading"] : me ? [esc(me.m), "you govern"]
-      : mine ? [esc(g ? g.m : mine.slice(0, 12) + "\u2026"), g && !g.active ? "inactive, its votes do not count" : "votes for you unless you vote"] : ["None", "your stake votes only when you do"];
-    /* the button stands from the first paint (idle until the list is read), so the header never grows a row */
-    /* Become a governor sits in the Governors header (operator, 2026-10-12: the Dashboard's Govern is gone) */
-    var reg = '<button class="sv-gbtn gr-open gv-reg" type=button data-act=greg' + (L && window.__ADDR && window.__WALLET ? '' : ' disabled title="Connect a wallet to register"') + '>' + (me ? 'Edit your governor' : 'Become a governor') + '</button>';
+    /* the bar holds figures only (operator, 2026-10-15: "no need for details, only summarized numbers ... detail already
+       in constitution"): a label over each number, no short lines; Become a governor has a row of its own under them */
+    var st = function(k, v, tip){ return '<span class=gp-k' + (tip ? ' title="' + esc(tip) + '"' : '') + '><em>' + k + '</em><b>' + v + '</b></span>'; };
+    var your = !window.__ADDR ? "-" : (mine === null || mine === undefined) ? "\u2026" : me ? esc(me.m) : mine ? esc(g ? g.m : mine.slice(0, 12) + "\u2026") : "None";
+    var regOn = L && window.__ADDR && window.__WALLET;
+    var reg = '<div class=gv-regrow><button class="gv-reg" type=button data-act=greg' + (regOn ? '' : ' disabled title="Connect a wallet to register"') + '>' +
+      (me ? 'Edit your governor' : 'Become a governor') + '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></div>';
     var h = '<div class="sv-ph gp-ph gv-ph">' +
-      st("Governors", L ? String(L.length) : "-", L ? act.length + " active" : "reading the chain\u2026") +
+      st("Governors", L ? String(L.length) : "-", L ? act.length + " active" : "") +
       st("Following", L && GV.bonded ? (vp / GV.bonded * 100).toFixed(1) + "%" : "-", L ? n + " wallets, " + fmt(vp) + " ATONE" : "") +
-      st("Your governor", your[0], your[1]) + reg + '</div>';
+      st("Yours", your, mine && g && !g.active ? "inactive, its votes do not count" : "") + reg + '</div>';
     put("sv-govlist", h + (GV.err && !L ? govEmpty("Could not read the governors") : !L ? govEmpty("Reading the governors\u2026")
       : !L.length ? '<div class=gv-none><p class=gv-say>No governors on AtomOne yet. A governor votes for every staker who follows it; a staker who votes still counts.</p></div>' : govTable(L, mine)));
   }
@@ -1476,25 +1477,14 @@
     var n = function(st){ return L ? L.filter(function(p){ return p.st === st; }).length : 0; }, live = L ? L.filter(function(p){ return p.st === "PROPOSAL_STATUS_VOTING_PERIOD"; }) : [];
     /* the three figures sit in the section's own header bar (operator, 2026-10-11: the page title already says Proposals,
        and the cards above took the room the list needs); the short line shows, the full one is the title */
-    var st = function(k, v, sub, full){ return '<span class=gp-k' + (full ? ' title="' + esc(full) + '"' : '') + '><em>' + k + '</em><b>' + v + '</b><s>' + sub + '</s></span>'; };
-    var dropped = L && L.length && L[0].id > L.length ? L[0].id - L.length : 0;
-    /* ids run to the newest; a proposal that never met its deposit is deleted by the chain, so the count can be lower */
-    var psub = L ? n("PROPOSAL_STATUS_PASSED") + " passed, " + n("PROPOSAL_STATUS_REJECTED") + " rejected" + (n("PROPOSAL_STATUS_FAILED") ? ", " + n("PROPOSAL_STATUS_FAILED") + " failed" : "") + (dropped ? ", " + dropped + " dropped" : "") : "reading the chain…";
-    var pfull = dropped ? psub.replace(/(\d+) dropped/, "$1 dropped (deposit not met)") : "";
-    /* the chain's own rule (x/gov tally, checked 2026-10-12): Yes must be MORE than the threshold of the Yes and No votes
-       (Abstain counts toward quorum only); quorum is every vote, Abstain too, over bonded ATONE; a Law or a Constitution
-       change takes the higher threshold and the higher quorum of its kind and the general one */
-    var q1 = function(x){ return (x * 100).toFixed(1).replace(/\.0$/, "") + "%"; }, Q = +tp.quorum || 0;
-    var lth = Math.max(+tp.law_threshold || 0, +tp.constitution_amendment_threshold || 0), lq = Math.max(Q, +tp.law_quorum || 0, +tp.constitution_amendment_quorum || 0);
-    var tfull = Q ? "More than " + q1(+tp.threshold) + " of the Yes and No votes must be Yes (Abstain counts toward quorum only), with at least " + (Q * 100).toFixed(1) + "% of bonded ATONE voting" +
-      (lth ? ". A Law or a Constitution change needs more than " + q1(lth) + " Yes, with at least " + (lq * 100).toFixed(1) + "% voting" : "") : "";
-    /* three rows like its neighbours (operator, 2026-10-12): the threshold with "yes, quorum" beside it, then the Law line */
-    var tval = tp.threshold ? "&gt;" + (tp.threshold * 100).toFixed(1) + "%" + (Q ? '<i class=gp-kx>yes, ' + (Q * 100).toFixed(1) + '% quorum</i>' : '') : "-";
-    var tsub = Q ? (lth ? "Law or Constitution change &gt;" + q1(lth) : "") : "";
+    /* figures only (operator, 2026-10-15): how many, how many passed, how many fell, how many are open; the passing
+       rules are the Constitution's, on its own tab */
+    var st = function(k, v){ return '<span class=gp-k><em>' + k + '</em><b>' + v + '</b></span>'; };
     var h = '<div class="sv-ph gp-ph">' +
-      st("Proposals", L ? String(L.length) : "-", psub, pfull) +
-      st("Voting now", L ? (live.length ? String(live.length) : "None") : "-", L ? (live.length ? "#" + live[live.length - 1].id + " ends " + pday(live[live.length - 1].ve) : "no proposal is open") : "") +
-      st("To pass", tval, tsub, tfull) + '</div>';
+      st("Proposals", L ? String(L.length) : "-") +
+      st("Passed", L ? String(n("PROPOSAL_STATUS_PASSED")) : "-") +
+      st("Rejected", L ? String(n("PROPOSAL_STATUS_REJECTED") + n("PROPOSAL_STATUS_FAILED")) : "-") +
+      st("Voting now", L ? String(live.length) : "-") + '</div>';
     if(GP.err && !L){ put("sv-proplist", h + govEmpty("Could not read the proposals")); return; }
     if(!L){ put("sv-proplist", h + govEmpty("Reading the proposals…")); return; }
     if(!L.length){ put("sv-proplist", h + govEmpty("No proposals yet")); return; }
@@ -1600,16 +1590,17 @@
      on chain (x/coredaos params), what each may do, and what has been endorsed so far ════ */
   function drawDaos(){
     loadProps();
-    var d = GP.dao, L = GP.list, net = TN() ? "testnet" : "mainnet";
+    var d = GP.dao, L = GP.list;
     var C = ["var(--sv-teal)", "var(--sv-amber)", "var(--sv-green)"], ci = 0, c = function(k, v, sub){ return gstat(k, v, sub, C[ci++ % 3]); };
     var who = function(a){ return !d ? "-" : a ? esc(a.slice(0, 10) + "…" + a.slice(-6)) : "None"; };
     var ext = d ? +(d.voting_period_extensions_limit || 0) : null, dur = d ? Math.round(parseInt(d.voting_period_extension_duration || "0", 10) / 86400) : null;
     /* one section like Proposals and Governors (operator, 2026-10-12): the three figures ride in the panel's header bar */
-    var st = function(k, v, sub){ return '<span class=gp-k><em>' + k + '</em><b>' + v + '</b><s>' + sub + '</s></span>'; };
+    /* figures only (operator, 2026-10-15: "remove not appointed on mainnet ... only summarized numbers") */
+    var st = function(k, v){ return '<span class=gp-k><em>' + k + '</em><b>' + v + '</b></span>'; };
     var head = '<div class="sv-ph gp-ph">' +
-      st("Steering DAO", who(d && d.steering_dao_address), d ? (d.steering_dao_address ? "on chain" : "not appointed on " + net) : "reading the chain…") +
-      st("Oversight DAO", who(d && d.oversight_dao_address), d ? (d.oversight_dao_address ? "on chain" : "not appointed on " + net) : "") +
-      st("Endorsed", L ? String(L.filter(function(p){ return p.endorsed; }).length) : "-", L ? "of " + L.length + " proposals" : "") + '</div>';
+      st("Steering DAO", who(d && d.steering_dao_address)) +
+      st("Oversight DAO", who(d && d.oversight_dao_address)) +
+      st("Endorsed", L ? L.filter(function(p){ return p.endorsed; }).length + '<i class=gp-of> of ' + L.length + '</i>' : "-") + '</div>';
     var row = function(name, has, text){ return '<div class=gd-r><div class=gd-h><b>' + name + '</b><span class="gp-st ' + (has ? 'p' : 'd') + '">' + (has ? 'appointed' : 'not appointed') + '</span></div><p>' + text + '</p></div>'; };
     put("sv-daop", head + (GP.err && !d ? govEmpty("Could not read the chain") : !d ? govEmpty("Reading the chain…") :
       '<div class=gd-list>' +

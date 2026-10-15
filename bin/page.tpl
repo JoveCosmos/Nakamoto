@@ -4996,11 +4996,18 @@ ul.gd-note li::before{content:"";position:absolute;left:2px;top:.62em;width:5px;
 :is(#sv-proplist,#sv-daop,#sv-govlist)>.sv-ph .sv-gkey{color:rgba(255,255,255,.75);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #sv-proplist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#1d4f8f,#173257 58%,#141633)}
 /* the proposals bar carries the three figures (2026-10-11): label, value, one short line each */
-:is(#sv-proplist,#sv-govlist,#sv-daop)>.sv-ph.gp-ph{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start;gap:0 16px;padding:6px 15px 7px;flex:0 0 auto}   /* never squeezed by the panel's column flex */
-#sv-govlist>.sv-ph.gv-ph{grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:start}
-#sv-govlist>.sv-ph.gv-ph>.gv-reg{align-self:center}
-#sv-govlist>.sv-ph .gv-reg:disabled{opacity:.45;cursor:default}
-#sv-govlist>.sv-ph .gv-reg{white-space:nowrap;color:#fff;border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.12)}
+/* figures only (operator, 2026-10-15: "only summarized numbers ... present the remaining data better"): equal cells,
+   a label over a large figure, parted by hairlines; four on Proposals, three on Governors and Core DAOs */
+:is(#sv-proplist,#sv-govlist,#sv-daop)>.sv-ph.gp-ph{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:0;padding:10px 0 11px;flex:0 0 auto}   /* never squeezed by the panel's column flex */
+#sv-proplist>.sv-ph.gp-ph{grid-template-columns:repeat(4,minmax(0,1fr))}
+/* Become a governor has a row of its own under the figures (operator: "has no place of its own in phone"), a link with
+   its arrow as every secondary action in the app */
+.gv-regrow{grid-column:1/-1;display:flex;margin:10px 15px 0;padding-top:9px;border-top:1px solid rgba(255,255,255,.16)}
+.gv-reg{display:inline-flex;align-items:center;gap:7px;background:none;border:0;padding:2px 0;color:#fff;font-family:var(--wmono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.gv-reg svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.gv-reg:hover:not(:disabled) svg{transform:translateX(3px)}
+.gv-reg:disabled{opacity:.45;cursor:default}
+.gv-reg:focus-visible{outline:2px solid rgba(255,255,255,.8);outline-offset:3px;border-radius:3px}
 .gv-none{display:flex;flex-direction:column;gap:12px;padding:14px 2px}
 @media(max-width:900px){#sv-govlist .gv-none{min-height:488px;box-sizing:border-box}}
 
@@ -5015,17 +5022,12 @@ ul.gd-note li::before{content:"";position:absolute;left:2px;top:.62em;width:5px;
 #sv-props>.sv-panel,#sv-govs>.sv-panel,#sv-daos>.sv-panel{flex:1 1 auto;min-height:0}
 /* nothing in these panels scrolls sideways: a vertical scroller makes overflow-x auto too, so it is pinned */
 :is(#sv-daop,.gp-list,.sv-glist,.gp-sum){overflow-x:hidden}
-.gp-k{display:flex;flex-direction:column;min-width:0;line-height:1.25}
-.gp-k em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.72)}
-.gp-k b{font-size:15px;color:#fff;white-space:nowrap}
-.gp-k s{text-decoration:none;font-size:11px;color:rgba(255,255,255,.78);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-/* the bar's short lines wrap rather than cut (the pixel-fit rule); To pass always holds two lines, so the bar has one
-   height before and after the chain is read */
-.gp-k s{white-space:normal;overflow:visible;text-overflow:clip}
-.gp-kx{font-style:normal;font-size:11px;font-weight:400;color:rgba(255,255,255,.78);margin-left:8px}
-/* a phone gives To pass the bar's full width under the other two, so its two lines stay two lines */
-@media(max-width:620px){.gp-k s{min-height:2.5em}#sv-proplist>.gp-ph>.gp-k:last-child s{min-height:1.25em}#sv-proplist>.sv-ph.gp-ph{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:6px}#sv-proplist>.gp-ph>.gp-k:last-child{grid-column:1/-1;margin-top:6px}}
-@media(max-width:900px){:is(#sv-proplist,#sv-govlist,#sv-daop)>.sv-ph.gp-ph{gap:0 10px}#sv-govlist>.sv-ph.gv-ph{grid-template-columns:repeat(3,minmax(0,1fr))}#sv-govlist>.sv-ph .gv-reg{grid-column:1/-1;justify-self:start;margin-top:6px}.gp-k b{font-size:14px}.gp-k s{font-size:10.5px}}
+.gp-k{display:flex;flex-direction:column;gap:4px;min-width:0;padding:0 15px;line-height:1.15}
+.gp-k+.gp-k{border-left:1px solid rgba(255,255,255,.16)}
+.gp-k em{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.72);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gp-k b{font-size:21px;font-weight:700;letter-spacing:-.01em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.gp-of{font-style:normal;font-size:12px;font-weight:500;letter-spacing:0;color:rgba(255,255,255,.7)}
+@media(max-width:620px){.gp-k{padding:0 10px}.gp-k b{font-size:18px}.gv-regrow{margin:10px 10px 0}}
 #sv-daop>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#5f6216,#393b15 58%,#19191f)}
 #sv-govlist>.sv-ph{background:radial-gradient(90% 180% at 100% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(315deg,#7d2e6e,#461f45 58%,#1a1230)}
 /* proposals: the id a small key, the status a clear tag, the tally a firmer bar, Yes the figure */
