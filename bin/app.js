@@ -3155,6 +3155,180 @@ rememberGridH();
     .then(function(){ spsign.classList.remove("busy"); spState(); });
   });
 
+  /* ── Buy ATONE (operator, 2026-10-15: "buy button like mint ... direct buy from osmosis atone pool"): the
+     wallet signs ONE transaction on Osmosis that buys an exact amount of ATONE over the router's best single
+     route and sends exactly that home to this AtomOne address over IBC (tx.js osmo, proven by simulation on
+     Osmosis at 5, 50 and 500 USDC). A wallet short of PHOTON also gets 2 PHOTON for AtomOne's fees, bought and
+     sent in the same signature. Any ATONE already on Osmosis rides home with it, or alone ("Bring it home").
+     What is not spent stays in the Osmosis wallet as it was. Mainnet only: testnet has its faucet. ── */
+  var bypop = E("bypop"), BY = { key: null, bal: null, px: null, q: null, qn: 0, t: 0, busy: false, done: null, err: "" };
+  var BY_SQS = "https://sqs.osmosis.zone", BY_SLIP = 0.995, BY_PHO = 2000000, BY_PHO_PAY = 60000;
+  var BY_TOK = [{ d: "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4", s: "USDC" },
+                { d: "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", s: "ATOM" },
+                { d: "uosmo", s: "OSMO" }];
+  function byO(){ return window.__TX && window.__TX.osmo; }
+  function byTok(){ var s = E("bytok"), d = s && s.value; return BY_TOK.filter(function(t){ return t.d === d; })[0] || BY_TOK[0]; }
+  function byHave(d){ return (BY.bal && BY.bal[d]) || 0; }
+  function byAmount(){ var a = E("byamt"), n = window.__amountIn(a && a.value); return isFinite(n) && n > 0 ? Math.round(n * 1e6) : 0; }
+  /* the fee is paid in OSMO when the wallet holds some, else in the token it pays with; that token keeps room for it */
+  function byFeeDenom(){ return byHave("uosmo") >= 100000 && byTok().d !== "uosmo" ? "uosmo" : byTok().d; }
+  function byReserve(){ var t = byTok().d; return byFeeDenom() === t ? (t === "uosmo" ? 150000 : t === BY_TOK[0].d ? 50000 : 5000) : 0; }
+  function byNeedPho(){ var b = window.__BAL; return byTok().d === BY_TOK[0].d && !(b && b.uphoton >= 500000); }
+  function byMax(){ return Math.max(0, byHave(byTok().d) - byReserve() - (byNeedPho() ? BY_PHO_PAY : 0)); }
+  function byQuote(payD, outD, amt){
+    return fetch(BY_SQS + "/router/quote?tokenIn=" + amt + encodeURIComponent(payD) + "&tokenOutDenom=" + encodeURIComponent(outD) + "&singleRoute=true")
+      .then(function(r){ return r.json(); }).then(function(q){
+        if(!q || !q.route || !q.route.length || !(+q.amount_out > 0)) throw new Error(q && q.message || "no route");
+        /* the exact-in route forward, as exact-out wants it: each pool takes the previous pool's token out */
+        var tin = payD, pools = q.route[0].pools.map(function(p){ var x = { pool_id: p.id, token_in_denom: tin }; tin = p.token_out_denom; return x; });
+        var poolsIn = q.route[0].pools.map(function(p){ return { pool_id: p.id, token_out_denom: p.token_out_denom }; });
+        return { out: +q.amount_out, pools: pools, poolsIn: poolsIn, impact: Math.abs(+q.price_impact || 0) };
+      });
+  }
+  function byPrices(){
+    return fetch(BY_SQS + "/tokens/prices?base=" + encodeURIComponent(["uosmo", BY_TOK[1].d].join(","))).then(function(r){ return r.json(); }).then(function(p){
+      var usd = function(d){ var v = p[d] && Object.values(p[d])[0]; return v ? +v : 0; };
+      BY.px = { uosmo: usd("uosmo") }; BY.px[BY_TOK[1].d] = usd(BY_TOK[1].d); BY.px[BY_TOK[0].d] = 1;
+    }).catch(function(){});
+  }
+  function byLoad(){
+    var O = byO(); if(!O || !BY.key) return Promise.resolve();
+    return Promise.all([O.balances(BY.key.address).then(function(b){ BY.bal = b; }), byPrices()]).catch(function(e){ BY.err = e.message; });
+  }
+  /* the quote follows the amount: an answer for an older amount is dropped */
+  function byQuoteSoon(){
+    var n = ++BY.qn, u = byAmount(), t = byTok(), O = byO(); clearTimeout(BY.t); BY.q = null;
+    if(!(u > 0) || !O || u > byMax()) { byState(); return; }
+    BY.q = { wait: true }; byState();
+    BY.t = setTimeout(function(){
+      var pho = byNeedPho();
+      Promise.all([byQuote(t.d, O.cfg.atone, u), pho ? byQuote(t.d, O.cfg.photon, BY_PHO_PAY) : Promise.resolve(null)]).then(function(r){
+        if(n !== BY.qn) return;
+        /* PHOTON rides exact-in: a thin pool on its route can make an exact-out ask for far more than its worth, and the
+           router quotes exact-in to the unit; the minimum it guarantees is what goes home (2026-10-15, simulated) */
+        var pho = r[1] && Math.floor(r[1].out * 0.97) >= BY_PHO ? r[1] : null; if(pho) pho.min = Math.floor(pho.out * 0.97);
+        BY.q = { u: u, pay: t.d, atone: r[0], pho: pho, target: Math.floor(r[0].out * BY_SLIP) };
+        byState(); byFee();
+      }).catch(function(e){ if(n !== BY.qn) return; BY.q = { err: e.message || "no route" }; byState(); });
+    }, 300);
+  }
+  function byMsgs(){
+    var O = byO(), q = BY.q, k = BY.key; if(!O || !q || !q.target || !k || !window.__ADDR) return [];
+    var msgs = [], home = Date.now() + 20 * 60000, swap = function(r, outD, outAmt, maxIn){
+      return { type: "osmosis/poolmanager/split-amount-out", value: { sender: k.address, routes: [{ pools: r.pools, token_out_amount: String(outAmt) }], token_out_denom: outD, token_in_max_amount: String(maxIn) } }; };
+    var send = function(d, amt){ return { type: "cosmos-sdk/MsgTransfer", value: { source_port: "transfer", source_channel: O.cfg.channel, token: { denom: d, amount: String(amt) },
+      sender: k.address, receiver: window.__ADDR, timeout_timestamp: String(BigInt(home) * 1000000n), memo: "" } }; };
+    msgs.push(swap(q.atone, O.cfg.atone, q.target, q.u));
+    if(q.pho) msgs.push({ type: "osmosis/poolmanager/split-amount-in", value: { sender: k.address, routes: [{ pools: q.pho.poolsIn, token_in_amount: String(BY_PHO_PAY) }],
+      token_in_denom: q.pay, token_out_min_amount: String(q.pho.min) } });
+    msgs.push(send(O.cfg.atone, q.target + byHave(O.cfg.atone)));
+    if(q.pho) msgs.push(send(O.cfg.photon, q.pho.min + byHave(O.cfg.photon)));
+    return msgs;
+  }
+  /* bring home whatever ATONE (and PHOTON) already waits on Osmosis, in one transfer each */
+  function byHomeMsgs(){
+    var O = byO(), k = BY.key; if(!O || !k || !window.__ADDR) return [];
+    var home = Date.now() + 20 * 60000, out = [];
+    [O.cfg.atone, O.cfg.photon].forEach(function(d){ var a = byHave(d); if(a > 0) out.push({ type: "cosmos-sdk/MsgTransfer", value: { source_port: "transfer", source_channel: O.cfg.channel,
+      token: { denom: d, amount: String(a) }, sender: k.address, receiver: window.__ADDR, timeout_timestamp: String(BigInt(home) * 1000000n), memo: "" } }); });
+    return out;
+  }
+  function byFeeFor(msgs){
+    var O = byO(), k = BY.key, fd = byFeeDenom(); if(!O || !k || !msgs.length) return Promise.reject(new Error("nothing to send"));
+    return O.account(k.address).then(function(acc){ return O.simulate(msgs, "", k.pubKey, acc.sequence); }).then(function(g){
+      var usdPay = BY.px ? BY.px[fd] : 0; return O.fee(g, fd, BY.px ? BY.px.uosmo : 0, usdPay); });
+  }
+  function byFee(){
+    var el = E("byfee"), msgs = byMsgs(); if(!el) return;
+    if(!msgs.length){ el.textContent = ""; return; }
+    var n = BY.qn; el.textContent = "fee: estimating…";
+    byFeeFor(msgs).then(function(f){ if(n !== BY.qn) return; BY.fee = f; var c = f.amount[0];
+      el.textContent = "fee ≈ " + (parseInt(c.amount, 10) / 1e6).toFixed(c.denom === "uosmo" ? 4 : 5) + " " + (BY_TOK.filter(function(t){ return t.d === c.denom; })[0] || { s: c.denom }).s + " on Osmosis";
+      byState(); })
+    .catch(function(e){ if(n !== BY.qn) return; BY.fee = null; el.textContent = "Osmosis refused this: " + String(e.message || e).replace(/^.*desc = /, "").slice(0, 160); byState(); });
+  }
+  var byShort = function(a){ return a ? a.slice(0, 10) + "…" + a.slice(-4) : ""; };
+  var BY_ARROW = '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg>';
+  function byState(){
+    var O = byO(), t = byTok(), u = byAmount(), mx = byMax(), q = BY.q, out = E("byout"), more = E("bymore"), go = E("bysign");
+    var mv = E("bymaxv"); if(mv) mv.textContent = BY.key ? exact(mx, 2) : "-";
+    var over = BY.key && u > mx, fld = E("byamt") && E("byamt").closest(".unfield"); if(fld) fld.classList.toggle("bad", !!over);
+    var home = O ? byHave(O.cfg.atone) : 0, ok = false;
+    if(out){
+      if(BY.done){ out.className = "by-out done";
+        out.innerHTML = '<em>' + (BY.done.arrived ? 'Arrived in your AtomOne wallet' : 'On its way home') + '</em><b>' + fmt(BY.done.amt) + '<small>ATONE</small></b><span>' +
+          (BY.done.arrived ? 'Ready to stake' : 'Osmosis confirmed it; the transfer lands in a minute or two') + '</span>'; }
+      else if(!BY.key){ out.className = "by-out idle"; out.innerHTML = '<span>' + (BY.err ? att(BY.err) : 'Connecting to Osmosis…') + '</span>'; }
+      else if(q && q.target){ ok = !over && !!BY.fee;
+        out.className = "by-out"; var rate = q.u / q.atone.out;
+        out.innerHTML = '<em>You get, exactly' + (q.pho ? '<i>+ ' + Math.floor(q.pho.min / 1e6) + ' PHOTON for fees</i>' : '') + '</em><b>' + fmt(q.target) + '<small>ATONE</small></b>' +
+          '<span>at ' + rate.toFixed(4) + ' ' + t.s + ' per ATONE' + (q.atone.impact > 0.02 ? ', price impact ' + (q.atone.impact * 100).toFixed(1) + '%' : ', Osmosis pool') + '</span>'; }
+      else { out.className = "by-out idle";
+        out.innerHTML = '<span>' + (q && q.wait ? 'Asking the Osmosis pool…' : q && q.err ? 'No route right now: ' + att(q.err) : over ? 'More than this token holds on Osmosis' :
+          !byHave(t.d) ? 'No ' + t.s + ' in this Osmosis wallet yet' : 'Type how much ' + t.s + ' to spend') + '</span>'; }
+    }
+    var path = E("bypath"); if(path) path.innerHTML = BY.key && window.__ADDR ? '<div><em>From Osmosis</em><b>' + byShort(BY.key.address) + '</b></div>' + BY_ARROW.replace('<svg', '<svg class=ar') +
+      '<div><em>To AtomOne</em><b>' + byShort(window.__ADDR) + '</b></div>' : '';
+    if(more){
+      var bits = [];
+      if(BY.done && BY.done.arrived) bits.push('<button type=button id=bystake>Stake it with StakePilot' + BY_ARROW + '</button>');
+      else if(BY.key && home > 0 && !(q && q.target)) bits.push('<button type=button id=byhome' + (BY.busy ? ' disabled' : '') + '>Bring the ' + fmt(home) + ' ATONE on Osmosis home' + BY_ARROW + '</button>');
+      if(!BY.done) bits.push('<a href="https://go.skip.build/?dest_chain=osmosis-1&dest_asset=' + encodeURIComponent(O ? O.cfg.atone : "") + '" target=_blank rel=noopener>From another chain, with Skip' + BY_ARROW + '</a>');
+      more.innerHTML = bits.join("");
+      var bs = E("bystake"); if(bs) bs.addEventListener("click", function(){ var a = BY.done.amt; POP.close(bypop); setTimeout(function(){ if(window.__pilot){ window.__pilot(); var f = E("spamt"); if(f){ f.value = exact(a); f.dispatchEvent(new Event("input")); } } }, 0); });
+      var bh = E("byhome"); if(bh) bh.addEventListener("click", byHome);
+    }
+    var sm = E("bysum"); if(sm) sm.innerHTML = q && q.target && !BY.done ? fmt(q.u) + " " + t.s + "<br>for " + fmt(q.target) + " ATONE" : "";
+    if(go){ go.disabled = !ok || BY.busy || !!BY.done; if(!BY.busy) go.textContent = q && q.target ? "Buy " + fmt(q.target) + " ATONE" : "Buy"; }
+  }
+  /* after Osmosis confirms, the transfer still has to land: watch the AtomOne balance until it does */
+  function byArrive(amt, before){
+    var tries = 0, tick = function(){
+      if(!window.__TX || !BY.done) return;
+      window.__TX.balances(window.__ADDR).then(function(b){
+        if(b.uatone >= before + amt * 0.999){ BY.done.arrived = true; byState(); if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); }); return; }
+        if(++tries < 60) setTimeout(tick, 5000); else { BY.done.slow = true; byState(); }
+      }).catch(function(){ if(++tries < 60) setTimeout(tick, 5000); });
+    };
+    setTimeout(tick, 6000);
+  }
+  function byRun(msgs, amt){
+    var O = byO(), go = E("bysign"), st = E("bystep"); if(!O || !BY.key || !msgs.length) return;
+    BY.busy = true; if(go){ go.disabled = true; go.classList.add("busy"); }
+    var n = window.__notify(), before = (window.__BAL && window.__BAL.uatone) || 0;
+    byFeeFor(msgs).then(function(f){ return O.send(BY.key, msgs, "", f, function(s){ if(st) st.textContent = s === "signing" ? "Sign on Osmosis in your wallet" : s === "broadcasting" ? "Sending to Osmosis…" : s === "pending" ? "Waiting for Osmosis to confirm…" : ""; }); })
+    .then(function(){ n.ok(); BY.done = { amt: amt, arrived: false }; if(st) st.textContent = ""; byArrive(amt, before); return byLoad(); })
+    .catch(function(e){ n.fail(e && e.message || String(e)); if(st) st.textContent = ""; })
+    .then(function(){ BY.busy = false; if(go) go.classList.remove("busy"); byState(); });
+  }
+  function byHome(){ var O = byO(); if(!O) return; byRun(byHomeMsgs(), byHave(O.cfg.atone)); }
+  window.__buy = function(){
+    if(!bypop || !window.__ADDR || !window.__TX || window.__TX.CHAIN !== "atomone-1") return;
+    var a = E("byamt"); if(a) a.value = "";
+    var s = E("bytok"); if(s && !s.options.length) s.innerHTML = BY_TOK.map(function(t){ return '<option value="' + t.d + '">' + t.s + '</option>'; }).join("");
+    BY.q = null; BY.done = null; BY.err = ""; BY.fee = null; E("byfee").textContent = ""; E("bystep").textContent = "";
+    byState(); POP.open(bypop);
+    var kp = window.keplr;
+    if(!kp){ BY.err = "Buying here signs on Osmosis, and this wallet cannot. Buy on Osmosis's own app, then send it to this address."; byState(); return; }
+    kp.enable("osmosis-1").then(function(){ return kp.getKey("osmosis-1"); }).then(function(k){
+      if(k.isNanoLedger) throw new Error("A Ledger signs Osmosis swaps in Osmosis's own app; buy there, then send it to this address.");
+      BY.key = { address: k.bech32Address, pubKey: k.pubKey, signDirect: function(doc){ var n = parseInt(doc.accountNumber, 10);
+        return kp.signDirect("osmosis-1", k.bech32Address, { bodyBytes: doc.bodyBytes, authInfoBytes: doc.authInfoBytes, chainId: doc.chainId,
+          accountNumber: { low: n % 4294967296, high: Math.floor(n / 4294967296), unsigned: true, toString: function(){ return String(n); } } }, { preferNoSetFee: true }); } };
+      return byLoad();
+    }).then(function(){
+      /* pay with what the wallet holds most of, by value */
+      var best = BY_TOK.map(function(t){ return [t.d, byHave(t.d) * ((BY.px && BY.px[t.d]) || (t.d === BY_TOK[0].d ? 1 : 0))]; }).sort(function(x, y){ return y[1] - x[1]; })[0];
+      if(s && best && best[1] > 0) s.value = best[0];
+      byState(); if(a) a.focus();
+    }).catch(function(e){ BY.err = e && e.message || "Osmosis could not be reached"; byState(); });
+  };
+  if(bypop) bypop.__onclose = function(){ clearTimeout(BY.t); BY.qn++; };
+  var byamtEl = E("byamt"); if(byamtEl) byamtEl.addEventListener("input", byQuoteSoon);
+  var bytokEl = E("bytok"); if(bytokEl) bytokEl.addEventListener("change", function(){ E("byamt").value = ""; BY.q = null; byState(); });
+  var bymax = E("bymax"); if(bymax) bymax.addEventListener("click", function(){ if(!(byMax() > 0)) return; E("byamt").value = exact(byMax()); byQuoteSoon(); });
+  var bysign = E("bysign"); if(bysign) bysign.addEventListener("click", function(){ if(BY.q && BY.q.target) byRun(byMsgs(), BY.q.target); });
+
   /* ── Autopilot: a StakeAuthorization REDELEGATE grant to GATA's keeper address, with
      an allow-list, a cap and an expiry the reader sets; the keeper (a separate signer,
      its own key, off this box) executes inside those bounds; the chain enforces them.

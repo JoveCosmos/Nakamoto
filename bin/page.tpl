@@ -1534,7 +1534,7 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
    top edge), Inter at 600-800, solid gradient buttons, tinted tag pills, inset
    tracks. Every class here is prefixed wk- or scoped under #p-dele, so nothing
    the calculator names can reach in - and nothing here reaches out. */
-#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard,#sppop .txcard{
+#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard,#sppop .txcard,#bypop .txcard{
   --wsolid:rgba(14,24,38,.97);
   
   --wblue:#3B9EFF;--wcyan:#62D9FF;--wgreen:#36D399;--wamber:#FFB155;--wburn:#FF7A45;--wgold:#F5C66B;
@@ -1790,7 +1790,7 @@ html[data-tab=dele] .calclab,html[data-tab=empty] .calclab,html[data-tab=connect
 :root{--void:#06060c;--edge:#232342;--edge2:#34345c;--ink:#e6e4f0;--ink2:#a5a3c4;--ink3:#6f6d94;--faint:#3a3a54;
 --hot:#ffb02e;--burn:#ff4d1f;--cold:#6f66c8;--lit:#fff8dc;--card:#0b0b16;--card2:#111124;--inset:#0a0a14;
 --blue:#6f66c8;--cyan:#2bc8bd;--green:#2ee06a;--amber:#ffb02e}
-#sv,.hdr-r,.brandbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard,#sppop .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
+#sv,.hdr-r,.brandbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard,#sppop .txcard,#bypop .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
 --wt:#e6e4f0;--ws:#a5a3c4;--wf:#6f6d94;--wblue:#6f66c8;--wcyan:#2bc8bd;--wgreen:#2ee06a;--wamber:#ffb02e;--wburn:#ff4d1f;--wgold:#ffb02e;
 --wsans:"Helvetica Neue",Helvetica,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--wmono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
 body{background:var(--void);background-image:radial-gradient(130% 62% at 50% 0%,#16162e 0%,#0a0a16 42%,var(--void) 74%)}
@@ -2250,7 +2250,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 
 /* the wallet, lifted out of the dark: lighter grounds, brighter hairlines and
    type, so the figures read without leaning in */
-#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard,#sppop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
+#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard,#sppop .txcard,#bypop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
 
 .wk-pane{background:linear-gradient(180deg,#10101f,#0d0d1b)}
 .wk-tbl2 td{border-bottom-color:#22223c}
@@ -2744,6 +2744,39 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .sp-own svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
 .sp-own button:hover svg{transform:translateX(2px)}
 @media (prefers-reduced-motion:reduce){.sp-legs.new .sp-leg{animation:none}}
+/* Buy ATONE (operator, 2026-10-15): one signature on Osmosis buys an exact amount of ATONE from its pool and
+   sends it home; the token to pay with beside the amount; what arrives, the path it takes; one shape throughout */
+.pop .card.bycard{width:min(440px,94vw);max-width:440px}
+.pop .card.bycard::before{content:"";position:absolute;left:24px;right:24px;top:0;height:1px;opacity:.9;background:linear-gradient(90deg,transparent,var(--wcyan),transparent)}
+.bycard .txsum{color:var(--wcyan)}
+.bycard .unamt>.unfield{flex:1 1 auto;min-width:0}
+.bycard .unfield .wk-amt2{min-width:0}
+@media (max-width:480px){.bycard .wk-max b{display:none}.by-tok{padding-right:18px}}
+.by-tok{flex:0 0 auto;margin:0 6px 0 2px;padding:4px 20px 4px 8px;border:1px solid var(--wbd2);border-radius:5px;color:var(--wt);font-family:var(--wmono);font-size:10px;letter-spacing:.08em;cursor:pointer;-webkit-appearance:none;appearance:none;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238f8db4' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 7px center/8px 5px}
+.by-tok option{background:#0f0f1c;color:#e6e4f0}
+.by-out{margin:12px 20px 0;padding:0 16px;height:84px;box-sizing:border-box;border:1px solid var(--wbd);border-radius:8px;display:flex;flex-direction:column;justify-content:center;gap:5px;background:linear-gradient(180deg,#10101f,#0b0b18)}
+.by-out em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);display:flex;justify-content:space-between;gap:10px}
+.by-out em i{font-style:normal;letter-spacing:.06em;text-transform:none;color:var(--wcyan);white-space:nowrap}
+.by-out b{font-size:26px;font-weight:700;letter-spacing:-.01em;line-height:1.05;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.by-out b small{font-family:var(--wmono);font-size:10px;font-weight:400;letter-spacing:.08em;color:var(--wf);margin-left:6px}
+.by-out span{font-family:var(--wmono);font-size:9.5px;letter-spacing:.03em;color:var(--ws);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.by-out.idle{align-items:center;text-align:center}
+.by-out.idle span{white-space:normal;color:var(--wf);line-height:1.5}
+.by-out.done b{color:var(--wcyan)}
+.by-path{margin:8px 20px 0;height:40px;display:grid;grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr);align-items:center;gap:6px}
+.by-path:empty{visibility:hidden}
+.by-path div{display:flex;flex-direction:column;gap:2px;min-width:0;padding:5px 9px;border:1px solid var(--wbd);border-radius:6px}
+.by-path div em{font-style:normal;font-family:var(--wmono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
+.by-path div b{font-family:var(--wmono);font-size:10px;font-weight:400;color:var(--ws);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.by-path svg{width:14px;height:14px;fill:none;stroke:var(--wcyan);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.bycard .txbtns{padding-bottom:6px}
+.bycard .txfee{overflow-wrap:anywhere}
+.by-more{padding:0 22px 16px;display:flex;flex-direction:column;align-items:flex-end;gap:2px;min-height:20px}
+.by-more button,.by-more a{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:3px 0;font-family:var(--wmono);font-size:9.5px;letter-spacing:.06em;color:var(--wcyan);cursor:pointer;text-decoration:none}
+.by-more button[disabled]{opacity:.5;cursor:default}
+.by-more svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.by-more button:hover svg,.by-more a:hover svg{transform:translateX(2px)}
+.by-more span{font-family:var(--wmono);font-size:9.5px;letter-spacing:.04em;color:var(--wf)}
 /* the wallet column's PHOTON row: Mint where the unit would be; under 1100px the PHOTON balance box carries it in its
    lower corner, level with the figure, and the figure keeps clear of it (fitBoxes steps the type down if needed) */
 .you-r i .you-mint,.mv-yk .you-mint{display:inline-flex;align-items:center;justify-content:center;height:22px;padding:0 9px;border:1px solid var(--sv-teal,#2bc8bd);border-radius:6px;background:transparent;
@@ -3883,6 +3916,12 @@ border-radius:10px;background:rgba(8,8,18,.55);min-width:0}
 font-family:var(--wmono);font-size:11px;font-weight:700;color:#0b0b18;background:var(--sc);box-shadow:0 0 14px -2px var(--sc)}
 .sv-steps b{font-size:13.5px;color:var(--wt)}
 .sv-steps span{font-size:11.5px;color:var(--ws);line-height:1.4}
+/* the way in (operator, 2026-10-15): a step done wears a tick, the step to take now its colour, the rest wait dimmed */
+.sv-start li{transition:opacity .2s,border-color .2s}
+.sv-start li:not(.now):not(.done){opacity:.5}
+.sv-start li.now{border-color:var(--sc)}
+.sv-start li.done::before{content:"\2713"}
+.sv-start+.sd-go{margin-top:12px}
 /* a validator the stake sits on: its heat along the left edge and in its APR */
 .sv-chips{gap:8px}
 .sv-chip{grid-template-columns:auto minmax(0,1fr) auto;gap:1px 10px;padding:8px 12px 8px 13px;border-radius:10px;background:rgba(8,8,18,.55);border:1px solid var(--wbd);position:relative;overflow:hidden}
@@ -7241,6 +7280,20 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <div class=txfee id=mtfee></div>
   <div class=txstep id=mtstep></div>
   <div class=txbtns><button class="wk-btn wk-go" id=mtsign type=button disabled>Mint</button></div>
+</div></div>
+
+<div class=pop id=bypop><div class="card txcard uncard bycard" role=dialog aria-modal=true aria-labelledby=byttl>
+  <header class=wk-txh><div><b id=byttl>Buy ATONE</b><span>on Osmosis</span></div><span class=txsum id=bysum></span></header>
+  <div class=unamt>
+    <div class="wk-field unfield"><input class=wk-amt2 id=byamt type=text inputmode=decimal placeholder="amount to spend" autocomplete=off spellcheck=false aria-label="Amount to spend"><select class=by-tok id=bytok aria-label="Pay with"></select><button class=wk-max id=bymax type=button title="Everything this token holds on Osmosis, less the fee">max <b id=bymaxv>-</b></button></div>
+    <span class=unhint id=byhint></span>
+  </div>
+  <div class=by-out id=byout aria-live=polite></div>
+  <div class=by-path id=bypath></div>
+  <div class=txfee id=byfee></div>
+  <div class=txstep id=bystep></div>
+  <div class=txbtns><button class="wk-btn wk-go" id=bysign type=button disabled>Buy</button></div>
+  <div class=by-more id=bymore></div>
 </div></div>
 
 <div class=pop id=sppop><div class="card txcard uncard spcard" role=dialog aria-modal=true aria-labelledby=spttl>

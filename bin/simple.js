@@ -308,7 +308,7 @@
     var yk = function(k, v, st, x){ return '<div class=mv-yk>' + (x || '') + '<em>' + k + '</em><b' + (st || '') + '>' + v + '</b></div>'; };
     return '<div class="mv-yg mv-bal">' +
       /* the order (operator, 2026-10-02): what is in the wallet, what is staked, then what it earns */
-      yk("ATONE available", bal ? fmt(bal.uatone) : '-') +
+      yk("ATONE available", bal ? fmt(bal.uatone) : '-', '', window.__ADDR && bal && !TN() ? '<button type=button class="you-mint you-buy" data-act=buy title="Buy ATONE on Osmosis">Buy</button>' : '') +
       /* Mint in the PHOTON box's lower corner, level with the figure: the wallet column that carries it on wide
          screens is not shown under 1100px (operator, 2026-10-13: every feature live, phones too) */
       yk("PHOTON available", bal ? fmt(bal.uphoton) : '-', '', window.__ADDR && bal ? '<button type=button class=you-mint data-act=mint title="Mint PHOTON from ATONE">Mint</button>' : '') +
@@ -359,7 +359,18 @@
           '<li style="--sc:#2ee06a"><b>Redelegate</b><span>to the best earning place, in single signature</span></li>' +
         '</ol>';
     } else if(!pos.rows.length){
-      h = '<div class=sv-none><h3>No stake on AtomOne</h3><button class="sv-btn go" type=button data-act=stake>Stake ATONE</button></div>';
+      /* the way in for a wallet with nothing staked (operator, 2026-10-15: "the app is missing the new user base"): three
+         steps, the one to take now lit, and one door under them; on testnet the faucet stands in for buying */
+      var held = window.__BAL ? window.__BAL.uatone : 0, have = held >= 1e6;
+      h = '<div class=sv-ph><h3>Start earning on AtomOne</h3></div>' +
+        '<ol class="sv-steps col sv-start">' +
+          '<li class="' + (have ? 'done' : 'now') + '" style="--sc:#ffb02e"><b>Get ATONE</b><span>' + (have ? fmt(held) + ' ATONE in this wallet' :
+            TN() ? 'request test ATONE from the faucet in your wallet' : 'bought from the Osmosis pool, home in one signature') + '</span></li>' +
+          '<li class="' + (have ? 'now' : '') + '" style="--sc:#2bc8bd"><b>Stake with StakePilot</b><span>it finds where your ATONE earns most</span></li>' +
+          '<li style="--sc:#2ee06a"><b>Go hands-free</b><span>Autopilot and Restake keep it earning while you sleep</span></li>' +
+        '</ol>' +
+        (have ? '<button class="sv-btn go sd-go" type=button data-act=stake>Stake with StakePilot</button>' :
+          TN() ? '' : '<button class="sv-btn go sd-go" type=button data-act=buy>Buy ATONE</button>');
     } else if(!(pos.free >= 1e6)){                  /* under 1 ATONE free (redelegation dust) is nothing to move */
       h = '<div class=sv-ph><h3>Everything is under cooldown</h3>' + tag("a", "21 days") + '</div>' +
         fig("Your APR", pct(pos.rate), "on " + onNow(pos) + " validator" + (onNow(pos) === 1 ? "" : "s"), heat(pos.rate).fill) +
@@ -1882,7 +1893,8 @@
     h += '<div class=you-bal>' +
       row("Staked", pos ? fmt(pos.total) : '-', "ATONE") +
       row("Movable Stake", pos ? fmt(movable(pos)) : '-', "ATONE") +
-      row("Available", bal ? fmt(bal.uatone) : '-', "ATONE") +
+      /* Buy beside Available (operator, 2026-10-15), as Mint beside PHOTON: ATONE from the Osmosis pool, sent home in one signature */
+      row("Available", bal ? fmt(bal.uatone) : '-', a && bal && !TN() ? '<button type=button class="you-mint you-buy" data-act=buy title="Buy ATONE on Osmosis">Buy</button>' : "ATONE") +
       row("Rewards", window.__REW != null ? fmt(window.__REW) : '-', "ATONE") +
       /* Mint where the unit would be (operator, 2026-10-04): ATONE burned for PHOTON, the Mint PHOTON card. Held back
          from production until 2026-10-13, released with Register governor */
@@ -2221,8 +2233,11 @@
     } else if(!pos){
       h = top('') + '<div class=mv-hl><b>Reading your stake…</b></div>';
     } else if(!pos.rows.length){
-      h = top('', 'Nothing staked', 'q', btn('stake', 'Stake ATONE')) +
-        '<div class=mv-hl><b>Stake to start earning</b>' + (hi ? '<span>About ' + pct(hi) + ' APR with Autopilot</span>' : '') + '</div>' + cmp() + mvSet({}, {});
+      /* a wallet with no ATONE to stake starts with Buy (operator, 2026-10-15); one with some, with StakePilot */
+      var none = !(window.__BAL && window.__BAL.uatone >= 1e6) && !TN();
+      h = top('', 'Nothing staked', 'q', none ? btn('buy', 'Buy ATONE') : btn('stake', 'Stake ATONE')) +
+        '<div class=mv-hl><b>' + (none ? 'Get ATONE to start earning' : 'Stake to start earning') + '</b>' +
+        (none ? '<span>Bought from the Osmosis pool, home in one signature</span>' : hi ? '<span>About ' + pct(hi) + ' APR with Autopilot</span>' : '') + '</div>' + cmp() + mvSet({}, {});
     } else {
       var plan = planNow(pos), offer = plan && plan.after != null && plan.msgs && plan.msgs.length;
       var direct = !!(window.__canGrant && window.__canGrant());
@@ -2335,6 +2350,7 @@
     /* Stake goes to StakePilot (operator, 2026-10-15); its "choose validators myself" link opens the manual list */
     if(act === "stake"){ if(window.__pilot && window.__ADDR){ window.__pilot(); return; } var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "mint"){ if(window.__mint) window.__mint(); return; }
+    if(act === "buy"){ if(window.__buy) window.__buy(); return; }
     if(act === "activity"){ actOpen(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
     if(act === "vote"){ ev.stopPropagation(); voteSend(t, +t.dataset.pid, +t.dataset.opt); return; }

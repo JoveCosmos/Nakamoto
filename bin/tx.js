@@ -278,7 +278,111 @@ function waitFor(hash, tries){
     });
   });
 }
+/* ── Osmosis (operator, 2026-10-15: "buy ... direct from the Osmosis ATONE pool"): one transaction on Osmosis that
+   buys an EXACT amount of ATONE (and, for a wallet short of it, a little PHOTON for AtomOne's fees) and sends it
+   home over IBC in the same signature, so nothing is left behind on Osmosis. Exact-out is what makes the send
+   exact: the swap delivers the amount the transfer then moves. The swap's routes come from Osmosis's own router
+   (sqs), which lists each route's pools from the output back; the chain takes them input first, so each is
+   reversed. Fees in OSMO, or in USDC when the wallet holds no OSMO (Osmosis takes both). ── */
+var OSMO = { api: "https://lcd.osmosis.zone", chain: "osmosis-1", channel: "channel-94814",
+             atone: "ibc/BC26A7A805ECD6822719472BCB7842A48EF09DF206182F8F259B2593EB5D23FB",
+             photon: "ibc/D6E02C5AE8A37FC2E3AB1FC8AC168878ADB870549383DFFEA9FD020C234520A7",
+             usdc: "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4" };
+function osmoMsgBytes(m){
+  var v = m.value;
+  /* MsgSplitRouteSwapExactAmountOut{sender(1), routes(2): [{pools(1): [{pool_id(1), token_in_denom(2)}], token_out_amount(2)}],
+     token_out_denom(3), token_in_max_amount(4)} */
+  if(m.type === "osmosis/poolmanager/split-amount-out"){
+    var routes = [];
+    v.routes.forEach(function(r){
+      var pools = []; r.pools.forEach(function(p){ pools = pools.concat(bytesField(1, cat(uintField(1, p.pool_id), strField(2, p.token_in_denom)))); });
+      routes = routes.concat(bytesField(2, cat(pools, strField(2, r.token_out_amount))));
+    });
+    return any("/osmosis.poolmanager.v1beta1.MsgSplitRouteSwapExactAmountOut",
+      cat(strField(1, v.sender), routes, strField(3, v.token_out_denom), strField(4, v.token_in_max_amount)));
+  }
+  /* MsgSplitRouteSwapExactAmountIn{sender(1), routes(2): [{pools(1): [{pool_id(1), token_out_denom(2)}], token_in_amount(2)}],
+     token_in_denom(3), token_out_min_amount(4)} */
+  if(m.type === "osmosis/poolmanager/split-amount-in"){
+    var rin = [];
+    v.routes.forEach(function(r){
+      var pools = []; r.pools.forEach(function(p){ pools = pools.concat(bytesField(1, cat(uintField(1, p.pool_id), strField(2, p.token_out_denom)))); });
+      rin = rin.concat(bytesField(2, cat(pools, strField(2, r.token_in_amount))));
+    });
+    return any("/osmosis.poolmanager.v1beta1.MsgSplitRouteSwapExactAmountIn",
+      cat(strField(1, v.sender), rin, strField(3, v.token_in_denom), strField(4, v.token_out_min_amount)));
+  }
+  /* MsgTransfer{source_port(1), source_channel(2), token(3), sender(4), receiver(5), timeout_height(6) left empty,
+     timeout_timestamp(7) in nanoseconds, memo(8)} */
+  if(m.type === "cosmos-sdk/MsgTransfer")
+    return any("/ibc.applications.transfer.v1.MsgTransfer", cat(strField(1, v.source_port), strField(2, v.source_channel),
+      bytesField(3, coin(v.token)), strField(4, v.sender), strField(5, v.receiver), uintField(7, BigInt(v.timeout_timestamp)), strField(8, v.memo || "")));
+  throw new Error("unsupported Osmosis message " + m.type);
+}
+function osmoBody(msgs, memo){ var o = []; msgs.forEach(function(m){ o = o.concat(bytesField(1, osmoMsgBytes(m))); }); return cat(o, strField(2, memo || "")); }
+function osmoCall(method, path, bodyObj){
+  return fetch(OSMO.api + path, { method: method, headers: { "content-type": "application/json" }, body: bodyObj ? JSON.stringify(bodyObj) : undefined })
+    .then(function(r){ return r.json().then(function(d){ if(!r.ok) throw new Error(d.message || ("HTTP " + r.status)); return d; }); },
+          function(){ throw new Error("Osmosis unreachable"); });
+}
+function osmoAccount(addr){
+  return osmoCall("GET", "/cosmos/auth/v1beta1/accounts/" + addr).then(function(d){
+    var a = d.account || {}; if(a.base_account) a = a.base_account;
+    if(!a.account_number) throw new Error("This Osmosis address has never held anything");
+    return { number: String(a.account_number), sequence: String(a.sequence || 0) };
+  });
+}
+function osmoBalances(addr){
+  return osmoCall("GET", "/cosmos/bank/v1beta1/balances/" + addr + "?pagination.limit=500").then(function(d){
+    var o = {}; (d.balances || []).forEach(function(b){ o[b.denom] = parseInt(b.amount, 10); }); return o;
+  });
+}
+function osmoSimulate(msgs, memo, pubKey, sequence){
+  var raw = txRaw(osmoBody(msgs, memo), authInfo(pubKey, sequence, { amount: [], gas: 0 }, 1), []);
+  return osmoCall("POST", "/cosmos/tx/v1beta1/simulate", { tx_bytes: b64(raw) })
+    .then(function(d){ return parseInt((d.gas_info || {}).gas_used || "0", 10); });
+}
+/* Osmosis's fee market: the base fee in uosmo per gas; a fee in another accepted token is that, at the token's price */
+function osmoFee(gasUsed, payDenom, usdPerOsmo, usdPerPay){
+  return osmoCall("GET", "/osmosis/txfees/v1beta1/cur_eip_base_fee").then(function(d){
+    var base = parseFloat(d.base_fee) || 0.03, gas = Math.ceil(gasUsed * 1.4);
+    if(payDenom === "uosmo") return { gas: gas, amount: [{ denom: "uosmo", amount: String(Math.ceil(gas * base * 1.5)) }] };
+    var r = usdPerOsmo > 0 && usdPerPay > 0 ? usdPerOsmo / usdPerPay : 0;
+    if(!(r > 0)) throw new Error("No price to pay the Osmosis fee in this token");
+    return { gas: gas, amount: [{ denom: payDenom, amount: String(Math.max(1, Math.ceil(gas * base * r * 2))) }] };
+  });
+}
+/* key: {address, pubKey, signDirect(doc)} for osmosis-1; fee: from osmoFee */
+function osmoSend(key, msgs, memo, fee, onStep){
+  var step = onStep || function(){}, bodyB = osmoBody(msgs, memo), authB;
+  return osmoAccount(key.address).then(function(acc){
+    step("signing", fee);
+    authB = authInfo(key.pubKey, parseInt(acc.sequence, 10), fee, 1);
+    return key.signDirect({ bodyBytes: new Uint8Array(bodyB), authInfoBytes: new Uint8Array(authB), chainId: OSMO.chain, accountNumber: acc.number });
+  }).then(function(r){
+    var signed = r.signed || {}, bB = signed.bodyBytes ? Array.from(signed.bodyBytes) : bodyB, aB = signed.authInfoBytes ? Array.from(signed.authInfoBytes) : authB;
+    step("broadcasting");
+    return osmoCall("POST", "/cosmos/tx/v1beta1/txs", { tx_bytes: b64(txRaw(bB, aB, unb64(r.signature.signature))), mode: "BROADCAST_MODE_SYNC" });
+  }).then(function(d){
+    var tr = d.tx_response || {};
+    if(tr.code && tr.code !== 0) throw new Error("Osmosis rejected it: " + (tr.raw_log || ("code " + tr.code)));
+    step("pending", tr.txhash);
+    return osmoWait(tr.txhash, 0);
+  });
+}
+function osmoWait(hash, tries){
+  return new Promise(function(res){ setTimeout(res, 3000); }).then(function(){
+    return osmoCall("GET", "/cosmos/tx/v1beta1/txs/" + hash).then(function(d){
+      var tr = d.tx_response || {};
+      if(tr.height && tr.height !== "0"){ if(tr.code && tr.code !== 0){ var bad = new Error("failed on Osmosis: " + (tr.raw_log || tr.code)); bad.final = true; throw bad; } return { hash: hash, height: tr.height }; }
+      throw new Error("not yet");
+    }).catch(function(e){ if(e && e.final) throw e; if(tries < 20) return osmoWait(hash, tries + 1);
+      var w = new Error("Still waiting for Osmosis to confirm " + hash.slice(0, 12) + "…"); w.final = true; throw w; });
+  });
+}
+
 var TX = { body: body, authInfo: authInfo, txRaw: txRaw, b64: b64, unb64: unb64, account: account, balances: balances,
+           osmo: { cfg: OSMO, msgBytes: osmoMsgBytes, body: osmoBody, account: osmoAccount, balances: osmoBalances, simulate: osmoSimulate, fee: osmoFee, send: osmoSend },
            simulate: simulate, gasPrices: gasPrices, feeFor: feeFor, mintRate: mintRate, mintFeeOpt: mintFeeOpt, signDoc: signDoc, send: sendRedelegations, sendDirect: sendDirect, waitFor: waitFor, CHAIN: CHAIN,
            msgBytes: msgBytes };
 if(typeof module !== "undefined" && module.exports) module.exports = TX; else { root.__TX = TX; gasPrices(); }   /* read once at load, for the fee previews */

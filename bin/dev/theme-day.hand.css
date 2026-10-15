@@ -516,3 +516,5 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .sp-rng::-webkit-slider-thumb{background:var(--accent);border-color:var(--surface);box-shadow:0 0 0 1px var(--accent)}
   html[data-theme=light]:not([data-mono]) .sp-rng::-moz-range-thumb{background:var(--accent);border-color:var(--surface);box-shadow:0 0 0 1px var(--accent)}
   html[data-theme=light]:not([data-mono]) .sp-out .r b,html[data-theme=light]:not([data-mono]) .sp-out .y span i,html[data-theme=light]:not([data-mono]) .sp-own button,html[data-theme=light]:not([data-mono]) .spcard .txsum{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .by-out em i,html[data-theme=light]:not([data-mono]) .by-more button,html[data-theme=light]:not([data-mono]) .by-more a,html[data-theme=light]:not([data-mono]) .bycard .txsum,html[data-theme=light]:not([data-mono]) .by-out.done b{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .by-path svg{stroke:var(--accent)}
