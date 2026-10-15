@@ -2052,12 +2052,13 @@ html:is(:not([data-tab]),[data-tab=home]) #calc>.pby{display:inline-flex}
 .introby span{font-family:var(--mono);font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;white-space:nowrap}
 .introby:hover{color:var(--ink)}
 /* home's one door: plain words and an arrow under the headline, into the first tab */
-.introgo{position:relative;display:inline-flex;align-items:center;gap:10px;margin-top:30px;color:var(--ink2);text-decoration:none;
+.introgo{position:relative;display:inline-flex;align-items:baseline;gap:10px;margin-top:30px;color:var(--ink2);text-decoration:none;
 font-size:clamp(15px,1.4vw,18px);font-weight:600;letter-spacing:.01em;line-height:1}
-/* the arrow sits on the middle of the lower-case letters of "Your move" (measured on the pixels, 2026-10-01: 0.06em;
-   it was 0.3em, the middle of the capitals of "Network") */
-.intro .introgo svg{position:static;inset:auto;display:block;flex:0 0 20px;width:20px;height:20px;max-width:none;transform:translateY(-.06em);fill:none;stroke:#2bc8bd;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.introgo:hover{color:var(--ink)}.intro .introgo:hover svg{transform:translate(4px,-.06em)}
+/* the arrow sits on the middle of the lower-case letters of "Your move", whatever the typeface (operator, 2026-10-15:
+   "not aligned in phone"): its foot on the text's baseline, then lowered by half its 20px and raised by half an x-height
+   (.26em in Helvetica Neue, Plex and Arial alike); a fixed nudge held for one face and missed the other */
+.intro .introgo svg{position:static;inset:auto;display:block;flex:0 0 20px;width:20px;height:20px;max-width:none;transform:translateY(calc(10px - .26em));fill:none;stroke:#2bc8bd;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.introgo:hover{color:var(--ink)}.intro .introgo:hover svg{transform:translate(4px,calc(10px - .26em))}
 .introgo:focus-visible{outline:2px solid #2bc8bd;outline-offset:6px;border-radius:4px}
 @media(prefers-reduced-motion:no-preference){.intro .introgo svg{transition:transform .18s}}
 /* ── the connect section: the whole section is the screen. No card inside a
