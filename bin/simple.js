@@ -99,6 +99,12 @@
   /* the testnet page: what only our index knows (history, proposers, jailings, the
      30/90-day and lifetime records) is not known there - it reads N/A, never a zero */
   function TN(){ return ((DD().net || {}).net) === "testnet"; }
+  /* Buy and StakePilot are off on mainnet for now (operator, 2026-10-15: "hide the buy and stakepilot from mainnet"):
+     StakePilot runs on testnet, Buy (the Osmosis pool) only ever runs on mainnet, so it shows nowhere; Stake and
+     Stake more open the manual stake card on mainnet. Set either flag to bring it back */
+  var BUY_MAIN = false, PILOT_MAIN = false;
+  function BUY(){ return BUY_MAIN && !TN(); }
+  function PILOT(){ return PILOT_MAIN || TN(); }
   var NA = "N/A", NAMSG = '<div class=sv-upwait>N/A on testnet</div>';
   function tag(cls, t, title){ return '<span class="sv-tag ' + cls + '"' + (title ? ' title="' + esc(title) + '"' : '') + '>' + t + '</span>'; }
   /* a span of the set's record: centred, and the set itself as a strip of cells under the figure,
@@ -309,7 +315,7 @@
     var yk = function(k, v, st, x){ return '<div class=mv-yk>' + (x || '') + '<em>' + k + '</em><b' + (st || '') + '>' + v + '</b></div>'; };
     return '<div class="mv-yg mv-bal">' +
       /* the order (operator, 2026-10-02): what is in the wallet, what is staked, then what it earns */
-      yk("ATONE available", bal ? fmt(bal.uatone) : '-', '', window.__ADDR && bal && !TN() ? '<button type=button class="you-mint you-buy" data-act=buy title="Buy ATONE on Osmosis">Buy</button>' : '') +
+      yk("ATONE available", bal ? fmt(bal.uatone) : '-', '', window.__ADDR && bal && BUY() ? '<button type=button class="you-mint you-buy" data-act=buy title="Buy ATONE on Osmosis">Buy</button>' : '') +
       /* Mint in the PHOTON box's lower corner, level with the figure: the wallet column that carries it on wide
          screens is not shown under 1100px (operator, 2026-10-13: every feature live, phones too) */
       yk("PHOTON available", bal ? fmt(bal.uphoton) : '-', '', window.__ADDR && bal ? '<button type=button class=you-mint data-act=mint title="Mint PHOTON from ATONE">Mint</button>' : '') +
@@ -359,6 +365,8 @@
           '<li style="--sc:' + heat(S.mid).fill + '"><b>See what it earns</b><span>a day, a week, a year, in ATONE</span></li>' +
           '<li style="--sc:#2ee06a"><b>Redelegate</b><span>to the best earning place, in single signature</span></li>' +
         '</ol>';
+    } else if(!pos.rows.length && !PILOT()){
+      h = '<div class=sv-none><h3>No stake on AtomOne</h3><button class="sv-btn go" type=button data-act=stake>Stake ATONE</button></div>';
     } else if(!pos.rows.length){
       /* the way in for a wallet with nothing staked (operator, 2026-10-15: "the app is missing the new user base"): three
          steps, the one to take now lit, and one door under them; on testnet the faucet stands in for buying */
@@ -366,12 +374,12 @@
       h = '<div class=sv-ph><h3>Start earning on AtomOne</h3></div>' +
         '<ol class="sv-steps col sv-start">' +
           '<li class="' + (have ? 'done' : 'now') + '" style="--sc:#ffb02e"><b>Get ATONE</b><span>' + (have ? fmt(held) + ' ATONE in this wallet' :
-            TN() ? 'request test ATONE from the faucet in your wallet' : 'bought from the Osmosis pool, home in one signature') + '</span></li>' +
+            TN() ? 'request test ATONE from the faucet in your wallet' : BUY() ? 'bought from the Osmosis pool, home in one signature' : 'send ATONE to this wallet') + '</span></li>' +
           '<li class="' + (have ? 'now' : '') + '" style="--sc:#2bc8bd"><b>Stake with StakePilot</b><span>it finds where your ATONE earns most</span></li>' +
           '<li style="--sc:#2ee06a"><b>Go hands-free</b><span>Autopilot and Restake keep it earning while you sleep</span></li>' +
         '</ol>' +
         (have ? '<button class="sv-btn go sd-go" type=button data-act=stake>Stake with StakePilot</button>' :
-          TN() ? '' : '<button class="sv-btn go sd-go" type=button data-act=buy>Buy ATONE</button>');
+          BUY() ? '<button class="sv-btn go sd-go" type=button data-act=buy>Buy ATONE</button>' : '');
     } else if(!(pos.free >= 1e6)){                  /* under 1 ATONE free (redelegation dust) is nothing to move */
       h = '<div class=sv-ph><h3>Everything is under cooldown</h3>' + tag("a", "21 days") + '</div>' +
         fig("Your APR", pct(pos.rate), "on " + onNow(pos) + " validator" + (onNow(pos) === 1 ? "" : "s"), heat(pos.rate).fill) +
@@ -1886,7 +1894,7 @@
       row("Staked", pos ? fmt(pos.total) : '-', "ATONE") +
       row("Movable Stake", pos ? fmt(movable(pos)) : '-', "ATONE") +
       /* Buy beside Available (operator, 2026-10-15), as Mint beside PHOTON: ATONE from the Osmosis pool, sent home in one signature */
-      row("Available", bal ? fmt(bal.uatone) : '-', a && bal && !TN() ? '<button type=button class="you-mint you-buy" data-act=buy title="Buy ATONE on Osmosis">Buy</button>' : "ATONE") +
+      row("Available", bal ? fmt(bal.uatone) : '-', a && bal && BUY() ? '<button type=button class="you-mint you-buy" data-act=buy title="Buy ATONE on Osmosis">Buy</button>' : "ATONE") +
       row("Rewards", window.__REW != null ? fmt(window.__REW) : '-', "ATONE") +
       /* Mint where the unit would be (operator, 2026-10-04): ATONE burned for PHOTON, the Mint PHOTON card. Held back
          from production until 2026-10-13, released with Register governor */
@@ -2226,8 +2234,8 @@
     } else if(!pos){
       h = top('') + '<div class=mv-hl><b>Reading your stake…</b></div>';
     } else if(!pos.rows.length){
-      /* a wallet with no ATONE to stake starts with Buy (operator, 2026-10-15); one with some, with StakePilot */
-      var none = !(window.__BAL && window.__BAL.uatone >= 1e6) && !TN();
+      /* a wallet with no ATONE to stake starts with Buy where Buy is on (operator, 2026-10-15), else with Stake ATONE */
+      var none = BUY() && !(window.__BAL && window.__BAL.uatone >= 1e6);
       h = top('', 'Nothing staked', 'q', none ? btn('buy', 'Buy ATONE') : btn('stake', 'Stake ATONE')) +
         '<div class=mv-hl><b>' + (none ? 'Get ATONE to start earning' : 'Stake to start earning') + '</b>' +
         (none ? '<span>Bought from the Osmosis pool, home in one signature</span>' : hi ? '<span>About ' + pct(hi) + ' APR with Autopilot</span>' : '') + '</div>' + cmp() + mvSet({}, {});
@@ -2258,7 +2266,8 @@
         var t1 = pos.until || Date.now(), t0 = t1 - 21 * 864e5, k = Math.min(21, Math.max(1, Math.ceil((Date.now() - t0) / 864e5)));
         var cells = ''; for(var i = 1; i <= 21; i++) cells += '<i' + (i <= k ? ' class=on' : '') + '></i>';
         var hist = at && at.report && at.report.history && at.report.history.length ? at.report.history[0] : null;
-        h = top(auto ? 'Moved. Autopilot is active' : 'Moved. Cooling down', 'Day ' + k + ' of 21', 'warn', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
+        /* no Day k of 21 chip (operator, 2026-10-15: "too redundant"): the 21-day strip below already counts it */
+        h = top(auto ? 'Moved. Autopilot is active' : 'Moved. Cooling down', '', '', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
           /* the one move open while the stake cools down: staking what sits in the wallet (operator, 2026-10-04) */
           '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b>' + line('Free to move again on <b>' + day(t1) + '</b>.') + '</div>' +
           '<div class=mv-days><div class=mv-dh><span>Cooling down</span><span>' + day(t0) + ' to ' + day(t1) + '</span></div><div class=mv-dc>' + cells + '</div>' +
@@ -2346,9 +2355,9 @@
     if(act === "restakesw"){ rsOpen(); return; }
     if(act === "wtalerts"){ if(t.getAttribute("aria-disabled") !== "true") wtOpen(); return; }
     /* Stake goes to StakePilot (operator, 2026-10-15); its "choose validators myself" link opens the manual list */
-    if(act === "stake"){ if(window.__pilot && window.__ADDR){ window.__pilot(); return; } var sb = E("stbtn"); if(sb) sb.click(); return; }
+    if(act === "stake"){ if(PILOT() && window.__pilot && window.__ADDR){ window.__pilot(); return; } var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "mint"){ if(window.__mint) window.__mint(); return; }
-    if(act === "buy"){ if(window.__buy) window.__buy(); return; }
+    if(act === "buy"){ if(BUY() && window.__buy) window.__buy(); return; }
     if(act === "activity"){ actOpen(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
     if(act === "vote"){ ev.stopPropagation(); voteSend(t, +t.dataset.pid, +t.dataset.opt); return; }
