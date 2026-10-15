@@ -2332,7 +2332,8 @@
     if(act === "mvmore"){ MVOPEN[t.dataset.k] = !MVOPEN[t.dataset.k]; drawMove(); return; }
     if(act === "restakesw"){ rsOpen(); return; }
     if(act === "wtalerts"){ if(t.getAttribute("aria-disabled") !== "true") wtOpen(); return; }
-    if(act === "stake"){ var sb = E("stbtn"); if(sb) sb.click(); return; }
+    /* Stake goes to StakePilot (operator, 2026-10-15); its "choose validators myself" link opens the manual list */
+    if(act === "stake"){ if(window.__pilot && window.__ADDR){ window.__pilot(); return; } var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "mint"){ if(window.__mint) window.__mint(); return; }
     if(act === "activity"){ actOpen(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }

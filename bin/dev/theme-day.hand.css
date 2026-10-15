@@ -506,3 +506,13 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #dmy thead th.ck input:checked{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #dmy thead th.ck input:checked::after{border-color:var(--surface)}
   html[data-theme=light]:not([data-mono]) #dmy tbody tr.on td{background:var(--accent-soft)}
+
+  /* StakePilot (2026-10-15): the set's bars in the ivory line colour, the chosen ones and the slider in the accent */
+  html[data-theme=light]:not([data-mono]) .sp-bc i{background:#DCD7CB}
+  html[data-theme=light]:not([data-mono]) .sp-bc i.on{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sp-rng::-webkit-slider-runnable-track{background:linear-gradient(90deg,var(--accent) var(--sp-f,0%),#DCD7CB var(--sp-f,0%))}
+  html[data-theme=light]:not([data-mono]) .sp-rng::-moz-range-track{background:#DCD7CB}
+  html[data-theme=light]:not([data-mono]) .sp-rng::-moz-range-progress{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sp-rng::-webkit-slider-thumb{background:var(--accent);border-color:var(--surface);box-shadow:0 0 0 1px var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sp-rng::-moz-range-thumb{background:var(--accent);border-color:var(--surface);box-shadow:0 0 0 1px var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sp-out .r b,html[data-theme=light]:not([data-mono]) .sp-out .y span i,html[data-theme=light]:not([data-mono]) .sp-own button,html[data-theme=light]:not([data-mono]) .spcard .txsum{color:var(--accent)}

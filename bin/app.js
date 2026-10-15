@@ -1971,6 +1971,67 @@ rememberGridH();
   /* new stake (a delegation, not a redelegation) also grows the bonded total, so the proportional
      part is paid over S + added: every ATONE of it earns a little less, the reader's included */
   window.__rateAfterNew = function(t, c, x, added){ var m = model(), S = window.__S(); if(added > 0 && S > 0) m.a = m.a * S / (S + added); return rateAfter(m, t, c, x); };
+
+  /* ── StakePilot (operator, 2026-10-15): new ATONE where it earns most, for any amount, as it is typed.
+     The optimiser above priced for NEW stake: the bonded total grows by the amount, so the base share
+     thins; and a validator already holding some of the reader's stake is worth a little less to add
+     to, as more there also thins the bonus that stake earns (the marginal bonus is b(t-h)/(t+x)^2).
+     Candidates are the set Autopilot pours into, the largest fifth and the last 3 left out (the last
+     ones can be pushed out of the set), signing 99% or better now and over their life. Then the fewest
+     validators that keep the rate within a tenth of a point of the best: one while one is as good, more
+     as the amount grows. ── */
+  var PILOT_TOL = 0.001;
+  function pilotAlloc(cands, m, lambda){
+    var out = [], sum = 0;
+    for(var i = 0; i < cands.length; i++){
+      var v = cands[i], k = 1 - v.c, own = Math.max(0, v.t - v.h), den = lambda - k * m.a;
+      var x = den > 0 && own > 0 ? Math.sqrt(k * m.b * own / den) - v.t : 0;
+      if(!(x > 0)) x = 0;
+      out.push(x); sum += x;
+    }
+    return { x: out, sum: sum };
+  }
+  function pilotSolve(cands, u, m){
+    var hi = 0, lo = 0, i, it, r;
+    for(i = 0; i < cands.length; i++){
+      var k = 1 - cands[i].c;
+      hi = Math.max(hi, k * (m.a + m.b * Math.max(0, cands[i].t - cands[i].h) / cands[i].t));
+      lo = Math.max(lo, k * m.a);
+    }
+    lo *= 1.0000001;
+    for(it = 0; it < 80; it++){ var mid = (lo + hi) / 2; r = pilotAlloc(cands, m, mid); if(r.sum > u) lo = mid; else hi = mid; }
+    r = pilotAlloc(cands, m, (lo + hi) / 2);
+    var sc = r.sum > 0 ? u / r.sum : 0, rows = [];
+    for(i = 0; i < cands.length; i++){ var x = r.x[i] * sc; if(x >= u * 0.005) rows.push({ v: cands[i], x: x }); }
+    var got = rows.reduce(function(s, q){ return s + q.x; }, 0), f = got > 0 ? u / got : 0, earned = 0;
+    rows.forEach(function(q){ q.x *= f; q.after = rateAfter(m, q.v.t, q.v.c, q.x); earned += q.x * q.after; });
+    rows.sort(function(p, q){ return q.x - p.x; });
+    return { rows: rows, earned: earned, rate: u > 0 ? earned / u : 0 };
+  }
+  function pilotPlan(u, held){
+    var V = window.__VALS(), n = V.length, VD = window.__VDBY || {}, S = window.__S();
+    if(!(u > 0) || !n || !(S > 0)) return null;
+    var m = model(); m.a = m.a * S / (S + u);
+    var cands = [], i;
+    for(i = Math.floor(n / 5); i < n - 3; i++){
+      var v = V[i], d = VD[v[3]] || {};
+      if((d.up != null && +d.up < 99) || (v[5] != null && v[5] < 99)) continue;
+      cands.push({ id: v[3], m: v[0], t: v[1], c: v[2], h: (held && held[v[3]]) || 0, rank: i + 1 });
+    }
+    if(!cands.length) return null;
+    var full = pilotSolve(cands, u, m), best = full, k;
+    for(k = 1; k < full.rows.length; k++){
+      var keep = {}; full.rows.slice(0, k).forEach(function(q){ keep[q.v.id] = 1; });
+      var r = pilotSolve(cands.filter(function(c){ return keep[c.id]; }), u, m);
+      if(r.rate >= full.rate - PILOT_TOL){ best = r; break; }
+    }
+    /* whole uatone, the remainder on the largest leg, so the legs sum to the amount exactly */
+    var legs = best.rows.map(function(q){ return { id: q.v.id, m: q.v.m, rank: q.v.rank, x: Math.floor(q.x), after: q.after }; });
+    var left = u - legs.reduce(function(s, q){ return s + q.x; }, 0); if(legs.length) legs[0].x += left;
+    var big = V[0];
+    return { legs: legs, rate: best.rate, earned: best.earned, big: big ? rateAfter(m, big[1], big[2], u) : 0, bigName: big ? big[0] : "" };
+  }
+  window.__pilotPlan = pilotPlan;
 })();
 
 /* ── the plan view ────────────────────────────────────────────────────────────
@@ -2810,9 +2871,9 @@ rememberGridH();
     var st = E("mtstep"); if(st){ st.textContent = ""; st.className = "txstep"; }
     mtFeeSoon(E("mtfee"), ok);
   }
-  window.__mint = function(){
+  window.__mint = function(pre){
     if(!mtpop || !window.__ADDR) return;
-    var a = E("mtamt"); if(a) a.value = "";
+    var a = E("mtamt"); if(a) a.value = pre > 0 ? exact(pre) : "";
     var go = E("mtsign"); if(go){ go.disabled = true; go.textContent = "Mint"; }
     MT.rate = 0; mtState(); POP.open(mtpop); if(a) a.focus();
     if(window.__TX) window.__TX.mintRate().then(function(r){ MT.rate = r; mtState(); }).catch(function(){ MT.rate = -1; mtState(); });
@@ -2828,7 +2889,7 @@ rememberGridH();
     window.__TX.send(window.__WALLET, msgs, "", function(){}, opt)
     .then(function(){
       n.ok(); POP.close(mtpop);
-      if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); });
+      if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); if(window.__pilotRedo) window.__pilotRedo(); });
     })
     .catch(function(e){ n.fail(e && e.message || String(e)); })
     .then(function(){ mtsign.disabled = false; mtsign.classList.remove("busy"); });
@@ -2992,6 +3053,106 @@ rememberGridH();
     })
     .catch(function(e){ n.fail(e && e.message || String(e)); })
     .then(function(){ stsign.disabled = false; stsign.classList.remove("busy"); });
+  });
+
+  /* ── StakePilot card (operator, 2026-10-15: "suggest the validator for the stake amount, optimising in real
+     time ... very less data, very friendly"): an amount, typed or slid, re-planned on every change by
+     __pilotPlan; the rate it earns, where it lands, one signature. Fees on AtomOne are PHOTON: a wallet
+     without enough is offered a pinch of PHOTON minted from ATONE first (a mint is the one transaction that
+     pays its fee in ATONE), so a newcomer holding only ATONE can stake. One shape whatever the amount. ── */
+  var sppop = E("sppop"), SP = { key: "", plan: null }, SP_KEEP = 200000, SP_PHO = 20000;   /* 0.2 ATONE kept for a mint; 0.02 PHOTON covers a stake */
+  function spBal(){ var b = window.__BAL; return b && b.uatone > 0 ? b.uatone : 0; }
+  function spPho(){ var b = window.__BAL; return b && b.uphoton > 0 ? b.uphoton : 0; }
+  function spMax(){ return Math.max(0, spBal() - (spPho() >= SP_PHO ? 0 : SP_KEEP)); }
+  function spAmount(){ var a = E("spamt"), n = window.__amountIn(a && a.value); return isFinite(n) && n > 0 ? Math.round(n * 1e6) : 0; }
+  function spHeld(){ var h = {}, pos = window.__POS; if(pos) pos.rows.forEach(function(r){ h[r.id] = (h[r.id] || 0) + r.x; }); return h; }
+  function spMsgs(){
+    var P = SP.plan; if(!P || !P.legs.length || !window.__ADDR) return [];
+    var VD = window.__VDBY || {};
+    return P.legs.filter(function(q){ return q.x > 0 && VD[q.id] && VD[q.id].op; }).map(function(q){
+      return { type: "cosmos-sdk/MsgDelegate", value: { delegator_address: window.__ADDR, validator_address: VD[q.id].op, amount: { denom: "uatone", amount: String(q.x) } } }; });
+  }
+  /* the slider runs on a square law: fine steps among small amounts, the whole balance at the far end; a slid
+     amount rounds to two significant figures, a typed one is taken as it is */
+  function spNice(u){ if(u < 1e6) return Math.round(u / 1e5) * 1e5; var p = Math.pow(10, Math.floor(Math.log10(u)) - 1); return Math.round(u / p) * p; }
+  function spSlid(){ var r = E("sprng"), mx = spMax(); if(!r || !(mx > 0)) return 0; var s = +r.value / 1000; return s >= 1 ? mx : Math.min(mx, spNice(s * s * mx)); }
+  function spFill(){ var r = E("sprng"); if(r) r.style.setProperty("--sp-f", (+r.value / 10) + "%"); }
+  function spSyncRange(u){ var r = E("sprng"), mx = spMax(); if(r) r.value = mx > 0 ? Math.round(Math.sqrt(Math.min(1, u / mx)) * 1000) : 0; spFill(); }
+  function spLegs(P){
+    var el = E("splegs"); if(!el) return;
+    var legs = P ? P.legs : [], key = legs.map(function(q){ return q.id; }).join(",");
+    var show = legs.length > 3 ? legs.slice(0, 2) : legs, more = legs.length - show.length;
+    var rows = show.map(function(q){ return '<div class=sp-leg>' + logo(q.id, q.m) + '<span>' + att(q.m) + '</span><b>' + fmt(q.x) + ' <i>ATONE</i></b></div>'; });
+    if(more > 0){ var rest = legs.slice(2).reduce(function(s, q){ return s + q.x; }, 0);
+      rows.push('<div class="sp-leg more"><span>and ' + more + ' more validators</span><b>' + fmt(rest) + ' <i>ATONE</i></b></div>'); }
+    /* the same validators: the figures change in place; new ones fade in, so sliding never flickers */
+    if(key === SP.key && el.children.length === rows.length){
+      Array.prototype.forEach.call(el.children, function(c, i){ var b = c.querySelector("b"), nb = rows[i].match(/<b>(.*)<\/b>/); if(b && nb && b.innerHTML !== nb[1]) b.innerHTML = nb[1]; });
+    } else { el.innerHTML = rows.join(""); el.classList.remove("new"); void el.offsetWidth; el.classList.add("new"); }
+    SP.key = key;
+  }
+  function spCode(P){
+    var el = E("spbc"); if(!el) return;
+    var V = window.__VALS(), on = {}, hi = V.length ? V[0][1] : 0, i;
+    if(P) P.legs.forEach(function(q){ on[q.id] = 1; });
+    if(el.children.length !== V.length + 1){
+      var h = '';
+      for(i = 0; i < V.length; i++) h += '<i style="height:' + (hi ? 10 + 90 * Math.sqrt(V[i][1] / hi) : 10).toFixed(1) + '%"></i>';
+      el.innerHTML = h + '<span class=sp-ax><em>#1 largest</em><em>smallest #' + V.length + '</em></span>';
+    }
+    for(i = 0; i < V.length; i++){ var b = el.children[i]; if(b) b.classList.toggle("on", !!on[V[i][3]]); }
+  }
+  function spState(){
+    var u = spAmount(), bal = spBal(), mx = spMax(), over = u > mx, P = u > 0 && !over ? window.__pilotPlan(u, spHeld()) : null;
+    SP.plan = P;
+    var mv = E("spmaxv"); if(mv) mv.textContent = exact(mx, 2);
+    var fld = E("spamt") && E("spamt").closest(".unfield"); if(fld) fld.classList.toggle("bad", !!over);
+    var hint = E("sphint"); if(hint){ hint.className = "unhint" + (over ? " bad" : ""); hint.textContent = ""; }
+    var out = E("spout");
+    if(out){
+      if(P){ var yr = P.earned, more = (P.rate - P.big) * u;
+        out.className = "sp-out";
+        out.innerHTML = '<div class=r><b>' + pct(P.rate) + '</b><em>APR</em></div><div class=y><b>+' + fmt(yr) + ' ATONE a year</b>' +
+          (more > 1e6 ? '<span><i>+' + fmt(more) + '</i> a year more than on the largest validator</span>' : '<span>where your stake earns most today</span>') + '</div>';
+      } else { out.className = "sp-out idle";
+        out.innerHTML = '<span>' + (!bal ? 'No ATONE available to stake yet' : over ? 'More than you can stake now' : 'Type an amount or slide: StakePilot finds where it earns most') + '</span>'; }
+    }
+    spLegs(P); spCode(P);
+    /* fees are PHOTON: short of it, a pinch minted from ATONE first */
+    var ph = E("sppho"), need = spPho() < SP_PHO;
+    if(ph) ph.innerHTML = need && bal > SP_KEEP ? '<div><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.5"/></svg>' +
+      '<span>Fees on AtomOne are paid in PHOTON. Mint a little first, from 0.1 ATONE.</span><button type=button id=sppm>Mint PHOTON</button></div>' : '';
+    var pm = E("sppm"); if(pm) pm.addEventListener("click", function(){ if(window.__mint) window.__mint(100000); });
+    var ok = !!P && P.legs.length > 0 && !need;
+    var sm = E("spsum"); if(sm) sm.innerHTML = P ? fmt(u) + " ATONE<br>to " + P.legs.length + " validator" + (P.legs.length === 1 ? "" : "s") + " at " + pct(P.rate) : "";
+    var go = E("spsign"); if(go){ go.disabled = !ok || !window.__WALLET; if(!go.classList.contains("busy")) go.textContent = P ? "Stake " + fmt(u) + " ATONE" : "Stake"; }
+    var st = E("spstep"); if(st){ st.textContent = ""; st.className = "txstep"; }
+    feeSoon("sp", E("spfee"), ok ? spMsgs : null);
+  }
+  window.__pilot = function(){
+    if(!sppop || !window.__ADDR) return;
+    var a = E("spamt"); if(a) a.value = "";
+    SP.key = ""; var go = E("spsign"); if(go){ go.disabled = true; go.classList.remove("busy"); }
+    spSyncRange(0); spState(); POP.open(sppop); if(a) a.focus();
+  };
+  window.__pilotRedo = function(){ if(sppop && sppop.classList.contains("on")) spState(); };
+  if(sppop) sppop.__onclose = function(){ feeSoon("sp"); };
+  var spamtEl = E("spamt"); if(spamtEl) spamtEl.addEventListener("input", function(){ spSyncRange(spAmount()); spState(); });
+  var sprng = E("sprng"); if(sprng) sprng.addEventListener("input", function(){ var u = spSlid(); E("spamt").value = u > 0 ? exact(u) : ""; spFill(); spState(); });
+  var spmax = E("spmax"); if(spmax) spmax.addEventListener("click", function(){ if(!(spMax() > 0)) return; E("spamt").value = exact(spMax()); spSyncRange(spMax()); spState(); });
+  var spown = E("spown"); if(spown) spown.addEventListener("click", function(){ POP.close(sppop); var sb = E("stbtn"); if(sb) setTimeout(function(){ sb.click(); }, 0); });
+  var spsign = E("spsign");
+  if(spsign) spsign.addEventListener("click", function(){
+    var msgs = spMsgs(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
+    spsign.disabled = true; spsign.classList.add("busy");
+    var n = window.__notify();
+    window.__TX.send(window.__WALLET, msgs, "", function(){})
+    .then(function(){
+      n.ok(); POP.close(sppop);
+      if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); });
+    })
+    .catch(function(e){ n.fail(e && e.message || String(e)); })
+    .then(function(){ spsign.classList.remove("busy"); spState(); });
   });
 
   /* ── Autopilot: a StakeAuthorization REDELEGATE grant to GATA's keeper address, with

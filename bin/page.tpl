@@ -1534,7 +1534,7 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
    top edge), Inter at 600-800, solid gradient buttons, tinted tag pills, inset
    tracks. Every class here is prefixed wk- or scoped under #p-dele, so nothing
    the calculator names can reach in - and nothing here reaches out. */
-#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard{
+#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard,#sppop .txcard{
   --wsolid:rgba(14,24,38,.97);
   
   --wblue:#3B9EFF;--wcyan:#62D9FF;--wgreen:#36D399;--wamber:#FFB155;--wburn:#FF7A45;--wgold:#F5C66B;
@@ -1790,7 +1790,7 @@ html[data-tab=dele] .calclab,html[data-tab=empty] .calclab,html[data-tab=connect
 :root{--void:#06060c;--edge:#232342;--edge2:#34345c;--ink:#e6e4f0;--ink2:#a5a3c4;--ink3:#6f6d94;--faint:#3a3a54;
 --hot:#ffb02e;--burn:#ff4d1f;--cold:#6f66c8;--lit:#fff8dc;--card:#0b0b16;--card2:#111124;--inset:#0a0a14;
 --blue:#6f66c8;--cyan:#2bc8bd;--green:#2ee06a;--amber:#ffb02e}
-#sv,.hdr-r,.brandbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
+#sv,.hdr-r,.brandbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard,#sppop .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
 --wt:#e6e4f0;--ws:#a5a3c4;--wf:#6f6d94;--wblue:#6f66c8;--wcyan:#2bc8bd;--wgreen:#2ee06a;--wamber:#ffb02e;--wburn:#ff4d1f;--wgold:#ffb02e;
 --wsans:"Helvetica Neue",Helvetica,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--wmono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
 body{background:var(--void);background-image:radial-gradient(130% 62% at 50% 0%,#16162e 0%,#0a0a16 42%,var(--void) 74%)}
@@ -2250,7 +2250,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 
 /* the wallet, lifted out of the dark: lighter grounds, brighter hairlines and
    type, so the figures read without leaning in */
-#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
+#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard,#sppop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
 
 .wk-pane{background:linear-gradient(180deg,#10101f,#0d0d1b)}
 .wk-tbl2 td{border-bottom-color:#22223c}
@@ -2692,6 +2692,58 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .mtcard .mtout b small{font-family:var(--wmono);font-size:10px;font-weight:400;letter-spacing:.08em;color:var(--wf);margin-left:6px}
 .mtcard .mtout span{grid-column:1/-1;font-family:var(--wmono);font-size:10px;letter-spacing:.04em;color:var(--ws)}
 .mtcard .unamt>.unfield{flex:1 1 auto}
+/* StakePilot (operator, 2026-10-15): the amount, typed or slid; the rate it earns and where it lands, re-planned
+   as it changes; one shape whatever the amount (the boxes keep their heights, nothing below them moves) */
+.pop .card.spcard{width:min(440px,94vw);max-width:440px}
+.pop .card.spcard::before{content:"";position:absolute;left:24px;right:24px;top:0;height:1px;opacity:.9;background:linear-gradient(90deg,transparent,var(--wcyan),transparent)}
+.spcard .txsum{color:var(--wcyan)}
+.spcard .unamt>.unfield{flex:1 1 auto}
+.sp-rngw{padding:12px 20px 0}
+.sp-rng{display:block;width:100%;margin:0;height:18px;cursor:pointer;background:none;-webkit-appearance:none;appearance:none}
+.sp-rng::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--wcyan) var(--sp-f,0%),#2a2a4a var(--sp-f,0%))}
+.sp-rng::-moz-range-track{height:4px;border-radius:2px;background:#2a2a4a}
+.sp-rng::-moz-range-progress{height:4px;border-radius:2px;background:var(--wcyan)}
+.sp-rng::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;background:var(--wcyan);border:3px solid #0b0b18;box-shadow:0 0 0 1px var(--wcyan)}
+.sp-rng::-moz-range-thumb{width:10px;height:10px;border-radius:50%;background:var(--wcyan);border:3px solid #0b0b18;box-shadow:0 0 0 1px var(--wcyan)}
+.sp-rng:focus-visible{outline:none}.sp-rng:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 1px var(--wcyan),0 0 0 5px rgba(43,200,189,.25)}
+.sp-out{margin:12px 20px 0;padding:0 16px;height:78px;box-sizing:border-box;border:1px solid var(--wbd);border-radius:8px;display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:18px;align-items:center;background:linear-gradient(180deg,#10101f,#0b0b18)}
+.sp-out .r{display:flex;flex-direction:column;align-items:flex-start}
+.sp-out .r b{font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1;color:var(--wcyan);font-variant-numeric:tabular-nums}
+.sp-out .r em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);margin-top:6px}
+.sp-out .y{display:flex;flex-direction:column;gap:5px;min-width:0}
+.sp-out .y b{font-size:15px;font-weight:600;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-out .y span{font-family:var(--wmono);font-size:9.5px;letter-spacing:.03em;line-height:1.35;color:var(--ws)}
+.sp-out .y span i{font-style:normal;color:var(--wcyan)}
+.sp-out.idle{grid-template-columns:minmax(0,1fr)}
+.sp-out.idle span{font-family:var(--wmono);font-size:10px;letter-spacing:.04em;line-height:1.5;color:var(--wf);text-align:center}
+.sp-legs{margin:8px 20px 0;height:92px;display:grid;grid-auto-rows:28px;gap:4px;align-content:start}
+.sp-leg{display:grid;grid-template-columns:18px minmax(0,1fr) auto;align-items:center;gap:9px;padding:0 10px;border:1px solid var(--wbd);border-radius:6px;font-size:12px;min-width:0}
+.sp-leg .wk-lg{width:18px;height:18px;margin:0}.sp-leg .wk-lgx{line-height:18px;font-size:8px}
+.sp-leg span{color:var(--ws);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-leg b{font-weight:600;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sp-leg b i{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.08em;color:var(--wf);font-weight:400}
+.sp-leg.more{grid-template-columns:minmax(0,1fr) auto;border-style:dashed}
+.sp-legs.new .sp-leg{animation:spIn .26s ease both}
+.sp-legs.new .sp-leg:nth-child(2){animation-delay:.04s}.sp-legs.new .sp-leg:nth-child(3){animation-delay:.08s}
+@keyframes spIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.sp-bc{position:relative;margin:10px 20px 0;padding-bottom:14px;height:44px;display:flex;align-items:flex-end;gap:1px}
+.sp-bc i{flex:1 1 0;min-width:1px;border-radius:1px 1px 0 0;background:#24244a;transition:background .2s}
+.sp-bc i.on{background:var(--wcyan)}
+.sp-ax{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between}
+.sp-ax em{font-style:normal;font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--wf)}
+.sp-pho{margin:10px 20px 0}
+.sp-pho:empty{display:none}
+.sp-pho div{display:flex;align-items:center;gap:9px;padding:9px 12px;border:1px solid rgba(255,176,46,.32);border-radius:6px}
+.sp-pho svg{width:13px;height:13px;flex:0 0 auto;fill:none;stroke:var(--wamber);stroke-width:2;stroke-linecap:round}
+.sp-pho span{flex:1 1 auto;font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.45;color:var(--ws)}
+.sp-pho button{flex:0 0 auto;font-family:var(--wmono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:6px 10px;border-radius:5px;border:1px solid var(--wamber);background:transparent;color:var(--wamber);cursor:pointer}
+.sp-pho button:hover{background:rgba(255,176,46,.12)}
+.spcard .txbtns{padding-bottom:6px}
+.sp-own{padding:0 22px 16px;display:flex;justify-content:flex-end}
+.sp-own button{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:4px 0;font-family:var(--wmono);font-size:9.5px;letter-spacing:.08em;color:var(--wcyan);cursor:pointer}
+.sp-own svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.sp-own button:hover svg{transform:translateX(2px)}
+@media (prefers-reduced-motion:reduce){.sp-legs.new .sp-leg{animation:none}}
 /* the wallet column's PHOTON row: Mint where the unit would be; under 1100px the PHOTON balance box carries it in its
    lower corner, level with the figure, and the figure keeps clear of it (fitBoxes steps the type down if needed) */
 .you-r i .you-mint,.mv-yk .you-mint{display:inline-flex;align-items:center;justify-content:center;height:22px;padding:0 9px;border:1px solid var(--sv-teal,#2bc8bd);border-radius:6px;background:transparent;
@@ -7189,6 +7241,23 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <div class=txfee id=mtfee></div>
   <div class=txstep id=mtstep></div>
   <div class=txbtns><button class="wk-btn wk-go" id=mtsign type=button disabled>Mint</button></div>
+</div></div>
+
+<div class=pop id=sppop><div class="card txcard uncard spcard" role=dialog aria-modal=true aria-labelledby=spttl>
+  <header class=wk-txh><div><b id=spttl>StakePilot</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=spsum></span></header>
+  <div class=unamt>
+    <div class="wk-field unfield"><input class=wk-amt2 id=spamt type=text inputmode=decimal placeholder="ATONE to stake" autocomplete=off spellcheck=false aria-label="ATONE to stake"><button class=wk-max id=spmax type=button title="Every available ATONE">max <b id=spmaxv>-</b></button></div>
+    <span class=unhint id=sphint></span>
+  </div>
+  <div class=sp-rngw><input class=sp-rng id=sprng type=range min=0 max=1000 step=1 value=0 aria-label="Slide to choose how much to stake"></div>
+  <div class=sp-out id=spout aria-live=polite></div>
+  <div class=sp-legs id=splegs></div>
+  <div class=sp-bc id=spbc aria-hidden=true></div>
+  <div class=sp-pho id=sppho></div>
+  <div class=txfee id=spfee></div>
+  <div class=txstep id=spstep></div>
+  <div class=txbtns><button class="wk-btn wk-go" id=spsign type=button disabled>Stake</button></div>
+  <div class=sp-own><button type=button id=spown>Choose validators myself<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></div>
 </div></div>
 
 <div class=pop id=stpop><div class="card txcard uncard stcard">
