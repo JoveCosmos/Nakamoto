@@ -1972,64 +1972,48 @@ rememberGridH();
      part is paid over S + added: every ATONE of it earns a little less, the reader's included */
   window.__rateAfterNew = function(t, c, x, added){ var m = model(), S = window.__S(); if(added > 0 && S > 0) m.a = m.a * S / (S + added); return rateAfter(m, t, c, x); };
 
-  /* ── StakePilot (operator, 2026-10-15): new ATONE where it earns most, for any amount, as it is typed.
-     The optimiser above priced for NEW stake: the bonded total grows by the amount, so the base share
-     thins; and a validator already holding some of the reader's stake is worth a little less to add
-     to, as more there also thins the bonus that stake earns (the marginal bonus is b(t-h)/(t+x)^2).
-     Candidates are the set Autopilot pours into, the largest fifth and the last 3 left out (the last
-     ones can be pushed out of the set), signing 99% or better now and over their life. Then the fewest
-     validators that keep the rate within a tenth of a point of the best: one while one is as good, more
-     as the amount grows. ── */
-  var PILOT_TOL = 0.001;
-  function pilotAlloc(cands, m, lambda){
-    var out = [], sum = 0;
-    for(var i = 0; i < cands.length; i++){
-      var v = cands[i], k = 1 - v.c, own = Math.max(0, v.t - v.h), den = lambda - k * m.a;
-      var x = den > 0 && own > 0 ? Math.sqrt(k * m.b * own / den) - v.t : 0;
-      if(!(x > 0)) x = 0;
-      out.push(x); sum += x;
+  /* ── StakePilot (operator, 2026-10-15: "stakepilot should do same as autopilot, same rules ... leaving last 3 vals
+     and keep shelf rule"): new ATONE poured by Autopilot's own rule, the shelf rise (keeper.py fill, ported line for
+     line and checked against it at 10 to 1,000,000 ATONE). The smallest validator, leaving out the last 3 of the set,
+     rises first, to 300 ATONE under the validator above it; then the two rise together, each 300 ATONE under the one
+     above, and the shelf takes the next validator up as it reaches it. Nobody passes the validator above, so no rank
+     changes; the largest fifth never take stake; any validator of the active set may. As the amount grows the shelf
+     rises, and the plan follows it as it is typed. ── */
+  var SHELF_EDGE = 3, SHELF_GAP = 1e6, SHELF_STEP = 3e8, SHELF_MIN = 1e6;
+  function shelf(stakes, amount){
+    var n = stakes.length, TOP = Math.floor(n / 5), add = {}, left = Math.floor(amount), s = stakes.map(function(x){ return Math.floor(x); });
+    var i = n - 1 - SHELF_EDGE;
+    while(i >= TOP && left >= SHELF_GAP){
+      var b0 = i;
+      while(i - 1 >= TOP) i--;                       /* every validator may take stake: one segment, up to the fifth */
+      var k0 = i; i--;
+      var cost = function(k, L){ var c = 0; for(var j = k; j <= b0; j++){ var x = L - (j - k) * SHELF_STEP - s[j]; if(x > 0) c += x; } return c; };
+      var k = b0, lmax;
+      for(;;){ lmax = s[k - 1] - SHELF_STEP; if(cost(k, lmax) >= left || k === k0) break; k--; }
+      var hi = lmax, lo = Math.min(s[k], hi);
+      if(cost(k, hi) <= left) lo = hi;
+      else while(lo < hi){ var mid = Math.floor((lo + hi + 1) / 2); if(cost(k, mid) <= left) lo = mid; else hi = mid - 1; }
+      for(var j = k; j <= b0; j++){ var x = lo - (j - k) * SHELF_STEP - s[j]; if(x > 0){ add[j] = x; left -= x; } }
     }
-    return { x: out, sum: sum };
+    var out = {}; for(var q in add) if(add[q] >= SHELF_MIN) out[q] = add[q];
+    return out;
   }
-  function pilotSolve(cands, u, m){
-    var hi = 0, lo = 0, i, it, r;
-    for(i = 0; i < cands.length; i++){
-      var k = 1 - cands[i].c;
-      hi = Math.max(hi, k * (m.a + m.b * Math.max(0, cands[i].t - cands[i].h) / cands[i].t));
-      lo = Math.max(lo, k * m.a);
-    }
-    lo *= 1.0000001;
-    for(it = 0; it < 80; it++){ var mid = (lo + hi) / 2; r = pilotAlloc(cands, m, mid); if(r.sum > u) lo = mid; else hi = mid; }
-    r = pilotAlloc(cands, m, (lo + hi) / 2);
-    var sc = r.sum > 0 ? u / r.sum : 0, rows = [];
-    for(i = 0; i < cands.length; i++){ var x = r.x[i] * sc; if(x >= u * 0.005) rows.push({ v: cands[i], x: x }); }
-    var got = rows.reduce(function(s, q){ return s + q.x; }, 0), f = got > 0 ? u / got : 0, earned = 0;
-    rows.forEach(function(q){ q.x *= f; q.after = rateAfter(m, q.v.t, q.v.c, q.x); earned += q.x * q.after; });
-    rows.sort(function(p, q){ return q.x - p.x; });
-    return { rows: rows, earned: earned, rate: u > 0 ? earned / u : 0 };
-  }
-  function pilotPlan(u, held){
-    var V = window.__VALS(), n = V.length, VD = window.__VDBY || {}, S = window.__S();
+  function pilotPlan(u){
+    var V = window.__VALS(), n = V.length, S = window.__S();
     if(!(u > 0) || !n || !(S > 0)) return null;
     var m = model(); m.a = m.a * S / (S + u);
-    var cands = [], i;
-    for(i = Math.floor(n / 5); i < n - 3; i++){
-      var v = V[i], d = VD[v[3]] || {};
-      if((d.up != null && +d.up < 99) || (v[5] != null && v[5] < 99)) continue;
-      cands.push({ id: v[3], m: v[0], t: v[1], c: v[2], h: (held && held[v[3]]) || 0, rank: i + 1 });
-    }
-    if(!cands.length) return null;
-    var full = pilotSolve(cands, u, m), best = full, k;
-    for(k = 1; k < full.rows.length; k++){
-      var keep = {}; full.rows.slice(0, k).forEach(function(q){ keep[q.v.id] = 1; });
-      var r = pilotSolve(cands.filter(function(c){ return keep[c.id]; }), u, m);
-      if(r.rate >= full.rate - PILOT_TOL){ best = r; break; }
-    }
-    /* whole uatone, the remainder on the largest leg, so the legs sum to the amount exactly */
-    var legs = best.rows.map(function(q){ return { id: q.v.id, m: q.v.m, rank: q.v.rank, x: Math.floor(q.x), after: q.after }; });
-    var left = u - legs.reduce(function(s, q){ return s + q.x; }, 0); if(legs.length) legs[0].x += left;
+    var add = shelf(V.map(function(v){ return v[1]; }), u), legs = [], placed = 0, j;
+    for(j in add){ var v = V[+j]; legs.push({ id: v[3], m: v[0], rank: +j + 1, t: v[1], c: v[2], x: add[j] }); placed += add[j]; }
+    if(!legs.length) return null;
+    /* what the shelf leaves (dust under 1 ATONE, the last part of a step) goes on its top leg: that one sits 300 ATONE
+       under the validator above it, so a little more passes nobody */
+    legs.sort(function(p, q){ return p.rank - q.rank; });
+    var rest = u - placed; if(rest > 0 && rest < SHELF_STEP){ legs[0].x += rest; placed += rest; }
+    var earned = 0; legs.forEach(function(q){ q.after = rateAfter(m, q.t, q.c, q.x); earned += q.x * q.after; });
+    legs.sort(function(p, q){ return q.x - p.x; });
     var big = V[0];
-    return { legs: legs, rate: best.rate, earned: best.earned, big: big ? rateAfter(m, big[1], big[2], u) : 0, bigName: big ? big[0] : "" };
+    return { legs: legs, staked: placed, left: u - placed, rate: earned / placed, earned: earned,
+             big: big ? rateAfter(m, big[1], big[2], u) : 0, bigName: big ? big[0] : "" };
   }
   window.__pilotPlan = pilotPlan;
 })();
@@ -3065,7 +3049,6 @@ rememberGridH();
   function spPho(){ var b = window.__BAL; return b && b.uphoton > 0 ? b.uphoton : 0; }
   function spMax(){ return Math.max(0, spBal() - (spPho() >= SP_PHO ? 0 : SP_KEEP)); }
   function spAmount(){ var a = E("spamt"), n = window.__amountIn(a && a.value); return isFinite(n) && n > 0 ? Math.round(n * 1e6) : 0; }
-  function spHeld(){ var h = {}, pos = window.__POS; if(pos) pos.rows.forEach(function(r){ h[r.id] = (h[r.id] || 0) + r.x; }); return h; }
   function spMsgs(){
     var P = SP.plan; if(!P || !P.legs.length || !window.__ADDR) return [];
     var VD = window.__VDBY || {};
@@ -3103,7 +3086,7 @@ rememberGridH();
     for(i = 0; i < V.length; i++){ var b = el.children[i]; if(b) b.classList.toggle("on", !!on[V[i][3]]); }
   }
   function spState(){
-    var u = spAmount(), bal = spBal(), mx = spMax(), over = u > mx, P = u > 0 && !over ? window.__pilotPlan(u, spHeld()) : null;
+    var u = spAmount(), bal = spBal(), mx = spMax(), over = u > mx, P = u > 0 && !over ? window.__pilotPlan(u) : null;
     SP.plan = P;
     var mv = E("spmaxv"); if(mv) mv.textContent = exact(mx, 2);
     var fld = E("spamt") && E("spamt").closest(".unfield"); if(fld) fld.classList.toggle("bad", !!over);
@@ -3113,7 +3096,8 @@ rememberGridH();
       if(P){ var yr = P.earned, more = (P.rate - P.big) * u;
         out.className = "sp-out";
         out.innerHTML = '<div class=r><b>' + pct(P.rate) + '</b><em>APR</em></div><div class=y><b>+' + fmt(yr) + ' ATONE a year</b>' +
-          (more > 1e6 ? '<span><i>+' + fmt(more) + '</i> a year more than on the largest validator</span>' : '<span>where your stake earns most today</span>') + '</div>';
+          (P.left >= 1e6 ? '<span>the shelf takes ' + fmt(P.staked) + ' ATONE today; the rest stays in your wallet</span>' :
+           more > 1e6 ? '<span><i>+' + fmt(more) + '</i> a year more than on the largest validator</span>' : '<span>where your stake earns most today</span>') + '</div>';
       } else { out.className = "sp-out idle";
         out.innerHTML = '<span>' + (!bal ? 'No ATONE available to stake yet' : over ? 'More than you can stake now' : 'Type an amount or slide: StakePilot finds where it earns most') + '</span>'; }
     }
@@ -3124,8 +3108,8 @@ rememberGridH();
       '<span>Fees on AtomOne are paid in PHOTON. Mint a little first, from 0.1 ATONE.</span><button type=button id=sppm>Mint PHOTON</button></div>' : '';
     var pm = E("sppm"); if(pm) pm.addEventListener("click", function(){ if(window.__mint) window.__mint(100000); });
     var ok = !!P && P.legs.length > 0 && !need;
-    var sm = E("spsum"); if(sm) sm.innerHTML = P ? fmt(u) + " ATONE<br>to " + P.legs.length + " validator" + (P.legs.length === 1 ? "" : "s") + " at " + pct(P.rate) : "";
-    var go = E("spsign"); if(go){ go.disabled = !ok || !window.__WALLET; if(!go.classList.contains("busy")) go.textContent = P ? "Stake " + fmt(u) + " ATONE" : "Stake"; }
+    var sm = E("spsum"); if(sm) sm.innerHTML = P ? fmt(P.staked) + " ATONE<br>to " + P.legs.length + " validator" + (P.legs.length === 1 ? "" : "s") + " at " + pct(P.rate) : "";
+    var go = E("spsign"); if(go){ go.disabled = !ok || !window.__WALLET; if(!go.classList.contains("busy")) go.textContent = P ? "Stake " + fmt(P.staked) + " ATONE" : "Stake"; }
     var st = E("spstep"); if(st){ st.textContent = ""; st.className = "txstep"; }
     feeSoon("sp", E("spfee"), ok ? spMsgs : null);
   }
