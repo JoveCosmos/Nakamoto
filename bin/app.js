@@ -1620,6 +1620,17 @@ rememberGridH();
       POP.open(pop);
     };
     pop.__onclose = function(){ window.__AMULTI = null; var am = document.getElementById("amany"); if(am){ am.hidden = true; am.innerHTML = ""; } };
+    /* a phone wallet's own browser often drops a link that asks for a new window, silently (operator, 2026-10-15:
+       "alert button ... does nothing" on a phone): on a phone the Telegram link opens in place, where the phone hands
+       t.me to the Telegram app; elsewhere a new tab, and in place if a blocker refuses one */
+    pop.addEventListener("click", function(ev){
+      var a = ev.target.closest ? ev.target.closest('a[href^="https://t.me/"]') : null;
+      if(!a || a.classList.contains("off")) return;
+      ev.preventDefault();
+      if(/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)){ location.href = a.href; return; }
+      var w = null; try{ w = window.open(a.href, "_blank"); if(w) w.opener = null; }catch(e){ w = null; }
+      if(!w) location.href = a.href;
+    });
     boxes.forEach(function(b){ b.addEventListener("change", build); });
     trg.addEventListener("click", function(){
       if(!window.__ACUR) return;
