@@ -35,12 +35,13 @@
   }
   /* beside Your APR while Restake is on: what compounding adds, the Restake card's own figure (rewards staked back
      twice a day at today's rate, against the plain year), small, as Net sits beside a validator's APR (operator, 2026-10-08) */
-  function rsx(pos, mine){
+  function rsx(pos, mine, box){
     var at = window.__atInfo ? window.__atInfo() : null, r = mine && pos ? pos.rate : 0;
     if(!(at && at.restake) || !(r > 0)) return '';
     /* two lines in the block's upper corner (operator, 2026-10-08): the addition, then a live dot and the word */
     /* (operator, 2026-10-13) no dot; the addition reads "+3% APR", upright and larger, "restake" small under it */
-    return '<span class=you-rsx><span>+' + pct(Math.pow(1 + r / 730, 730) - 1 - r) + ' APR</span><span>restake</span></span>';
+    /* a balance box (phones, tablets) says it shorter: the box's own label already reads Your APR (2026-10-15) */
+    return '<span class=you-rsx><span>+' + pct(Math.pow(1 + r / 730, 730) - 1 - r) + (box ? '' : ' APR') + '</span><span>restake</span></span>';
   }
   function pp(x){ return (x >= 0 ? "+" : "−") + Math.abs(x * 100).toFixed(1) + "%"; }
   function hueOf(n){ var h = 0, s = String(n || "?"); for(var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return h; }
@@ -315,7 +316,7 @@
       yk("ATONE staked", pos ? fmt(pos.total) : '-') +
       yk("Movable stake", mv != null ? fmt(mv) : '-') +
       yk("ATONE rewards", window.__REW != null ? fmt(window.__REW) : '-') +
-      yk("Your APR", mine ? pct(pos.rate) : '-', mine ? ' style="color:' + heat(pos.rate).ink + '"' : '', rsx(pos, mine)) + '</div>';
+      yk("Your APR", mine ? pct(pos.rate) : '-', mine ? ' style="color:' + heat(pos.rate).ink + '"' : '', rsx(pos, mine, 1)) + '</div>';
   }
   /* a figure never overflows its box: the type steps down until it fits (phones and tablets) */
   function fitBoxes(el){
@@ -2139,8 +2140,9 @@
     Array.prototype.forEach.call(el.querySelectorAll(".mv-hl>b, .mv-hl>span:not(.mv-lock)"), function(x){
       x.style.fontSize = "";
       if(!phone || !x.clientWidth) return;
-      var fs = parseFloat(getComputedStyle(x).fontSize), min = x.tagName === "B" ? 16 : 10;
-      while(x.scrollWidth > x.clientWidth + 1 && fs > min){ fs -= 0.5; x.style.fontSize = fs + "px"; }
+      /* a line carrying Stake more measures its words, the part that gives way */
+      var fs = parseFloat(getComputedStyle(x).fontSize), min = x.tagName === "B" ? 16 : 10, w = x.querySelector(".mv-tx") || x;
+      while(w.scrollWidth > w.clientWidth + 1 && fs > min){ fs -= 0.5; x.style.fontSize = fs + "px"; }
     });
   }
   window.addEventListener("resize", function(){ var el = E("mv-stage"); if(el) hlFit(el); });
@@ -2232,6 +2234,13 @@
     } else {
       var plan = planNow(pos), offer = plan && plan.after != null && plan.msgs && plan.msgs.length;
       var direct = !!(window.__canGrant && window.__canGrant());
+      /* Stake more: a text link right after the state's own sentence, on every screen with stake, whenever any ATONE
+         is available (operator, 2026-10-15: a wallet with a little fresh stake beside its locked stake read At its
+         best and lost the link the cooling-down screen had shown since 2026-10-04) */
+      var more = window.__BAL && window.__BAL.uatone > 0 ? ' <button type=button class=mv-stk data-act=stake>Stake more<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>' : '';
+      /* the sentence under the headline; with the link, the words sit in their own box so a phone can shorten them
+         and never the link */
+      var line = function(t){ return more ? '<span class=mv-more><span class=mv-tx>' + t + '</span>' + more + '</span>' : '<span>' + t + '</span>'; };
       if(offer){
         var fr = {}, to = {}, moved = 0;
         plan.msgs.forEach(function(m){ fr[m.from] = (fr[m.from] || 0) + m.amt; to[m.to] = (to[m.to] || 0) + m.amt; moved += m.amt; });
@@ -2240,7 +2249,7 @@
         var tL = Object.keys(to).sort(function(x, y){ return to[y] - to[x]; }).map(function(id){ dst[id] = 1; return { rank: rk(id), name: nm(id), amt: '+' + fmt(to[id]), apr: pct(rate(id, to[id])) }; });
         var lock = pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is under redelegate lock until ' + day(pos.until) + '</div>' : '';
         h = top('Best today', auto ? '' : 'Ready, 1 approval', 'ok', auto ? ACTIVE : btn('opt', direct ? 'Activate Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE')) +
-          '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.mnow != null ? plan.mnow : plan.now) + '</i> to <i class=g>' + pct(plan.mafter != null ? plan.mafter : plan.after) + '</i> APR</span>' + lock + '</div>' +   /* the moved stake's own APR (operator, 2026-10-01) */
+          '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b>' + line('<span class=mv-wide>The same </span>' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.mnow != null ? plan.mnow : plan.now) + '</i> to <i class=g>' + pct(plan.mafter != null ? plan.mafter : plan.after) + '</i> APR.') + lock + '</div>' +   /* the moved stake's own APR (operator, 2026-10-01) */
           '<div class=mv-flow><div class=mv-box><em>From, ' + fL.length + ' validator' + (fL.length === 1 ? '' : 's') + '</em>' + mvRows(fL, 'a', 'validators', 'from') + '</div>' +
           '<div class=mv-arr aria-hidden=true><svg viewBox="0 0 44 20"><path d="M2 10h38M32 3l8 7-8 7"/></svg></div>' +
           '<div class=mv-box><em>To, ' + tL.length + ' validator' + (tL.length === 1 ? '' : 's') + '</em>' + mvRows(tL, 'g', 'validators', 'to') + '</div></div>' +
@@ -2250,10 +2259,8 @@
         var cells = ''; for(var i = 1; i <= 21; i++) cells += '<i' + (i <= k ? ' class=on' : '') + '></i>';
         var hist = at && at.report && at.report.history && at.report.history.length ? at.report.history[0] : null;
         h = top(auto ? 'Moved. Autopilot is active' : 'Moved. Cooling down', 'Day ' + k + ' of 21', 'warn', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
-          /* the one move open while the stake cools down: staking what sits in the wallet (operator, 2026-10-04), a
-             text link right after the sentence, shown whenever any ATONE is available */
-          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>Free to move again on <b>' + day(t1) + '</b>.' +
-          (window.__BAL && window.__BAL.uatone > 0 ? ' <button type=button class=mv-stk data-act=stake>Stake more<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>' : '') + '</span></div>' +
+          /* the one move open while the stake cools down: staking what sits in the wallet (operator, 2026-10-04) */
+          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b>' + line('Free to move again on <b>' + day(t1) + '</b>.') + '</div>' +
           '<div class=mv-days><div class=mv-dh><span>Cooling down</span><span>' + day(t0) + ' to ' + day(t1) + '</span></div><div class=mv-dc>' + cells + '</div>' +
           '<small>The chain holds redelegated stake for 21 days.</small></div>' + nowOn() +
           (auto ? '<div class=mv-cyc><div class=done><em>' + (hist ? day(hist.at * 1000) : 'Done') + '</em><b>Moved</b></div><div class=warn><em>Until ' + day(t1) + '</em><b>Cooling down</b></div>' +
@@ -2262,7 +2269,7 @@
           mvSet({}, mineIds());
       } else {
         h = top('Your stake today', 'At its best', 'ok', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
-          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b><span>No move earns 5 APR points more today.' + (auto ? ' Autopilot checks again every 12 hours.' : '') + '</span>' +
+          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b>' + line('No move earns 5 APR points more today.' + (auto ? '<span class=mv-wide> Autopilot checks again every 12 hours.</span>' : '')) +
           /* the same lock note as the offer's, in the same place (operator, 2026-10-01) */
           (pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is under redelegate lock until ' + day(pos.until) + '</div>' : '') + '</div>' +
           nowOn() + mvSet({}, mineIds());

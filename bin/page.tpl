@@ -5984,7 +5984,13 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .you-rsx i{width:6px;height:6px;border-radius:50%;background:var(--sv-green);box-shadow:0 0 6px var(--sv-green);animation:rsblink 1.6s ease-in-out infinite}
 @keyframes rsblink{50%{opacity:.2}}
 @media(prefers-reduced-motion:reduce){.you-rsx i{animation:none}}
-.mv-yk .you-rsx{top:10px;right:12px;font-size:12px;align-items:center}.mv-yk .you-rsx span:first-child{font-weight:700}.mv-yk .you-rsx span+span{font-size:8.5px}
+/* a balance box (phones, tablets): the restake addition low in the APR box's right corner, level with the figure as
+   Buy and Mint sit in theirs, smaller and quieter, clear of the label (operator, 2026-10-15: "mixing into wallet
+   apr, reduce size and place better") */
+.mv-yk .you-rsx{top:auto;right:11px;bottom:9px;gap:0;font-size:10.5px;line-height:1.15;align-items:flex-end}
+.mv-yk .you-rsx span:first-child{font-weight:600}
+.mv-yk .you-rsx span+span{font-size:8px;opacity:.8}
+.mv-yk .you-rsx~b{padding-right:48px}
 .you-bal{display:flex;flex-direction:column;border-bottom:1px solid var(--wbd)}
 .you-r{display:flex;align-items:center;gap:8px;min-height:40px;border-top:1px solid var(--wbd)}
 .you-r span{flex:1 1 auto;font-size:13.5px;color:var(--ws)}
@@ -6737,6 +6743,13 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
      fit (hlFit), starting smaller than the desktop's 40px (operator: "too big") */
   #mv-stage .mv-hl>b:not(#z){font-size:30px;white-space:nowrap;overflow:hidden}
   #mv-stage .mv-hl>span:not(.mv-lock):not(#z){font-size:13.5px;white-space:nowrap;overflow:hidden}
+  /* Stake more never leaves the line (2026-10-15): the words step down in size first (hlFit), then end in an
+     ellipsis, the link stays whole; a phone drops the words marked mv-wide ("The same", and Autopilot's every 12
+     hours, which its countdown above already says) */
+  #mv-stage .mv-hl>span.mv-more:not(#z){display:flex;align-items:baseline}
+  #mv-stage .mv-hl .mv-tx{min-width:0;overflow:hidden;text-overflow:ellipsis}
+  #mv-stage .mv-hl .mv-stk:not(#z){flex:0 0 auto}
+  #mv-stage .mv-hl .mv-wide{display:none}
 }
 #mv-stage .mv-tdis{position:relative;display:inline-flex;flex:0 0 auto}
 #mv-stage .mv-tdis .mv-tgo:disabled:not(#z):not(#y){opacity:.45;cursor:not-allowed;filter:grayscale(1)}
@@ -6818,7 +6831,10 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
 }
 @media(min-width:1100px) and (max-height:680px){
   #mv-stage .mv-days small{display:none}
-  #mv-stage .mv-hl>span{display:none}
+  #mv-stage .mv-hl>span:not(.mv-more){display:none}
+  /* the sentence gives way, Stake more stays (2026-10-15) */
+  #mv-stage .mv-hl>span.mv-more .mv-tx{display:none}
+  #mv-stage .mv-hl>span.mv-more .mv-stk:not(#z){margin-left:0}
   #mv-stage .mv-set:not(#z){min-height:48px}
 }
 /* a short screen (a laptop at 600-780px): everything a size tighter, the switches without their line */
