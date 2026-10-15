@@ -3140,7 +3140,7 @@ rememberGridH();
      sent in the same signature. Any ATONE already on Osmosis rides home with it, or alone ("Bring it home").
      What is not spent stays in the Osmosis wallet as it was. Mainnet only: testnet has its faucet. ── */
   var bypop = E("bypop"), BY = { key: null, bal: null, px: null, q: null, qn: 0, t: 0, busy: false, done: null, err: "" };
-  var BY_SQS = "https://sqs.osmosis.zone", BY_SLIP = 0.995, BY_PHO = 2000000, BY_PHO_PAY = 60000;
+  var BY_SQS = "https://sqs.osmosis.zone", BY_SLIP = 0.997, BY_PHO = 2000000, BY_PHO_PAY = 60000;
   var BY_TOK = [{ d: "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4", s: "USDC" },
                 { d: "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2", s: "ATOM" },
                 { d: "uosmo", s: "OSMO" }];
@@ -3174,31 +3174,42 @@ rememberGridH();
     return Promise.all([O.balances(BY.key.address).then(function(b){ BY.bal = b; }), byPrices()]).catch(function(e){ BY.err = e.message; });
   }
   /* the quote follows the amount: an answer for an older amount is dropped */
+  /* the quote is the chain's: the router picks the routes, then a simulation of those swaps on Osmosis answers what each
+     gives (exact-in; the router can be a percent off on some routes, the chain never). Home goes 99.7% of that, exactly;
+     PHOTON, a small leg, 97%. Re-read on every change of amount, and again just before signing */
+  function byChainQuote(u, t){
+    var O = byO(), k = BY.key, pho = byNeedPho();
+    return Promise.all([byQuote(t.d, O.cfg.atone, u), pho ? byQuote(t.d, O.cfg.photon, BY_PHO_PAY) : Promise.resolve(null)]).then(function(r){
+      var sw = function(route, amt){ return { type: "osmosis/poolmanager/split-amount-in", value: { sender: k.address, routes: [{ pools: route.poolsIn, token_in_amount: String(amt) }],
+        token_in_denom: t.d, token_out_min_amount: "1" } }; };
+      var probe = [sw(r[0], u)]; if(r[1]) probe.push(sw(r[1], BY_PHO_PAY));
+      return O.account(k.address).then(function(acc){ return O.probe(probe, "", k.pubKey, acc.sequence); }).then(function(outs){
+        var aOut = outs[0] || 0, pOut = r[1] ? (outs[1] || 0) : 0;
+        if(!(aOut > 0)) throw new Error("the pool gave nothing for this amount");
+        r[0].out = aOut;
+        var ph = r[1] && Math.floor(pOut * 0.97) >= BY_PHO ? r[1] : null; if(ph){ ph.out = pOut; ph.min = Math.floor(pOut * 0.97); }
+        return { u: u, pay: t.d, atone: r[0], pho: ph, target: Math.floor(aOut * BY_SLIP) };
+      });
+    });
+  }
   function byQuoteSoon(){
     var n = ++BY.qn, u = byAmount(), t = byTok(), O = byO(); clearTimeout(BY.t); BY.q = null;
-    if(!(u > 0) || !O || u > byMax()) { byState(); return; }
+    if(!(u > 0) || !O || !BY.key || u > byMax()) { byState(); return; }
     BY.q = { wait: true }; byState();
     BY.t = setTimeout(function(){
-      var pho = byNeedPho();
-      Promise.all([byQuote(t.d, O.cfg.atone, u), pho ? byQuote(t.d, O.cfg.photon, BY_PHO_PAY) : Promise.resolve(null)]).then(function(r){
-        if(n !== BY.qn) return;
-        /* PHOTON rides exact-in: a thin pool on its route can make an exact-out ask for far more than its worth, and the
-           router quotes exact-in to the unit; the minimum it guarantees is what goes home (2026-10-15, simulated) */
-        var pho = r[1] && Math.floor(r[1].out * 0.97) >= BY_PHO ? r[1] : null; if(pho) pho.min = Math.floor(pho.out * 0.97);
-        BY.q = { u: u, pay: t.d, atone: r[0], pho: pho, target: Math.floor(r[0].out * BY_SLIP) };
-        byState(); byFee();
-      }).catch(function(e){ if(n !== BY.qn) return; BY.q = { err: e.message || "no route" }; byState(); });
+      byChainQuote(u, t).then(function(q){ if(n !== BY.qn) return; BY.q = q; byState(); byFee(); })
+        .catch(function(e){ if(n !== BY.qn) return; BY.q = { err: String(e.message || e).replace(/^.*desc = /, "").slice(0, 120) || "no route" }; byState(); });
     }, 300);
   }
   function byMsgs(){
     var O = byO(), q = BY.q, k = BY.key; if(!O || !q || !q.target || !k || !window.__ADDR) return [];
-    var msgs = [], home = Date.now() + 20 * 60000, swap = function(r, outD, outAmt, maxIn){
-      return { type: "osmosis/poolmanager/split-amount-out", value: { sender: k.address, routes: [{ pools: r.pools, token_out_amount: String(outAmt) }], token_out_denom: outD, token_in_max_amount: String(maxIn) } }; };
+    var home = Date.now() + 20 * 60000;
+    var swap = function(route, amt, min){ return { type: "osmosis/poolmanager/split-amount-in", value: { sender: k.address, routes: [{ pools: route.poolsIn, token_in_amount: String(amt) }],
+      token_in_denom: q.pay, token_out_min_amount: String(min) } }; };
     var send = function(d, amt){ return { type: "cosmos-sdk/MsgTransfer", value: { source_port: "transfer", source_channel: O.cfg.channel, token: { denom: d, amount: String(amt) },
       sender: k.address, receiver: window.__ADDR, timeout_timestamp: String(BigInt(home) * 1000000n), memo: "" } }; };
-    msgs.push(swap(q.atone, O.cfg.atone, q.target, q.u));
-    if(q.pho) msgs.push({ type: "osmosis/poolmanager/split-amount-in", value: { sender: k.address, routes: [{ pools: q.pho.poolsIn, token_in_amount: String(BY_PHO_PAY) }],
-      token_in_denom: q.pay, token_out_min_amount: String(q.pho.min) } });
+    var msgs = [swap(q.atone, q.u, q.target)];
+    if(q.pho) msgs.push(swap(q.pho, BY_PHO_PAY, q.pho.min));
     msgs.push(send(O.cfg.atone, q.target + byHave(O.cfg.atone)));
     if(q.pho) msgs.push(send(O.cfg.photon, q.pho.min + byHave(O.cfg.photon)));
     return msgs;
@@ -3232,15 +3243,13 @@ rememberGridH();
     var mv = E("bymaxv"); if(mv) mv.textContent = BY.key ? exact(mx, 2) : "-";
     var over = BY.key && u > mx, fld = E("byamt") && E("byamt").closest(".unfield"); if(fld) fld.classList.toggle("bad", !!over);
     var home = O ? byHave(O.cfg.atone) : 0, ok = false;
+    trkDraw();
     if(out){
-      if(BY.done){ out.className = "by-out done";
-        out.innerHTML = '<em>' + (BY.done.arrived ? 'Arrived in your AtomOne wallet' : 'On its way home') + '</em><b>' + fmt(BY.done.amt) + '<small>ATONE</small></b><span>' +
-          (BY.done.arrived ? 'Ready to stake' : 'Osmosis confirmed it; the transfer lands in a minute or two') + '</span>'; }
-      else if(!BY.key){ out.className = "by-out idle"; out.innerHTML = '<span>' + (BY.err ? att(BY.err) : 'Connecting to Osmosis…') + '</span>'; }
+      if(!BY.key){ out.className = "by-out idle"; out.innerHTML = '<span>' + (BY.err ? att(BY.err) : 'Connecting to Osmosis…') + '</span>'; }
       else if(q && q.target){ ok = !over && !!BY.fee;
         out.className = "by-out"; var rate = q.u / q.atone.out;
         out.innerHTML = '<em>You get, exactly' + (q.pho ? '<i>+ ' + Math.floor(q.pho.min / 1e6) + ' PHOTON for fees</i>' : '') + '</em><b>' + fmt(q.target) + '<small>ATONE</small></b>' +
-          '<span>at ' + rate.toFixed(4) + ' ' + t.s + ' per ATONE' + (q.atone.impact > 0.02 ? ', price impact ' + (q.atone.impact * 100).toFixed(1) + '%' : ', Osmosis pool') + '</span>'; }
+          '<span>at ' + rate.toFixed(4) + ' ' + t.s + ' per ATONE' + (q.atone.impact > 0.05 ? ', price impact ' + (q.atone.impact * 100).toFixed(1) + '%' : ', Osmosis pool') + '</span>'; }
       else { out.className = "by-out idle";
         out.innerHTML = '<span>' + (q && q.wait ? 'Asking the Osmosis pool…' : q && q.err ? 'No route right now: ' + att(q.err) : over ? 'More than this token holds on Osmosis' :
           !byHave(t.d) ? 'No ' + t.s + ' in this Osmosis wallet yet' : 'Type how much ' + t.s + ' to spend') + '</span>'; }
@@ -3256,35 +3265,110 @@ rememberGridH();
       var bs = E("bystake"); if(bs) bs.addEventListener("click", function(){ var a = BY.done.amt; POP.close(bypop); setTimeout(function(){ if(window.__pilot){ window.__pilot(); var f = E("spamt"); if(f){ f.value = exact(a); f.dispatchEvent(new Event("input")); } } }, 0); });
       var bh = E("byhome"); if(bh) bh.addEventListener("click", byHome);
     }
-    var sm = E("bysum"); if(sm) sm.innerHTML = q && q.target && !BY.done ? fmt(q.u) + " " + t.s + "<br>for " + fmt(q.target) + " ATONE" : "";
-    if(go){ go.disabled = !ok || BY.busy || !!BY.done; if(!BY.busy) go.textContent = q && q.target ? "Buy " + fmt(q.target) + " ATONE" : "Buy"; }
+    var T = BY.trk, live = T && !T.done && !T.failed;
+    ["byamt", "bytok", "bymax"].forEach(function(id){ var x = E(id); if(x) x.disabled = !!live; });   /* nothing to change while a buy is on its way */
+    var sm = E("bysum"); if(sm) sm.innerHTML = q && q.target && !T ? fmt(q.u) + " " + t.s + "<br>for " + fmt(q.target) + " ATONE" : "";
+    if(go){
+      if(T){ go.disabled = live; go.textContent = live ? "Buying\u2026" : T.done ? "Buy again" : "Try again"; }
+      else { go.disabled = !ok || BY.busy; if(!BY.busy) go.textContent = q && q.target ? "Buy " + fmt(q.target) + " ATONE" : "Buy"; }
+    }
   }
-  /* after Osmosis confirms, the transfer still has to land: watch the AtomOne balance until it does */
-  function byArrive(amt, before){
-    var tries = 0, tick = function(){
-      if(!window.__TX || !BY.done) return;
-      window.__TX.balances(window.__ADDR).then(function(b){
-        if(b.uatone >= before + amt * 0.999){ BY.done.arrived = true; byState(); if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); }); return; }
-        if(++tries < 60) setTimeout(tick, 5000); else { BY.done.slow = true; byState(); }
-      }).catch(function(){ if(++tries < 60) setTimeout(tick, 5000); });
-    };
-    setTimeout(tick, 6000);
+  /* Skip-style live progress (operator, 2026-10-15: "our buy should ... display like skip showing live processing of tx"):
+     four stages, each lit as the chain answers: the signature, the Osmosis transaction (its link and its time), the IBC
+     packet received on AtomOne (AtomOne's own receipt for that packet sequence, not a balance guess), the ATONE home */
+  var BY_STAGES = { buy: ["Sign on Osmosis", "Buy on Osmosis", "Send home over IBC", "In your AtomOne wallet"],
+                    home: ["Sign on Osmosis", "Send from Osmosis", "Send home over IBC", "In your AtomOne wallet"] }, BY_TIMER = 0;
+  function bySecs(ms){ var s = ms / 1000; return s < 60 ? s.toFixed(s < 10 ? 1 : 0) + " s" : Math.floor(s / 60) + " min " + Math.round(s % 60) + " s"; }
+  function trkStart(kind){
+    BY.trk = { kind: kind, t0: Date.now(), done: false, failed: false, steps: BY_STAGES[kind].map(function(l){ return { l: l, s: "wait", t0: 0, t1: 0, note: "", link: "" }; }) };
+    clearInterval(BY_TIMER); BY_TIMER = setInterval(trkTick, 1000);
   }
-  function byRun(msgs, amt){
-    var O = byO(), go = E("bysign"), st = E("bystep"); if(!O || !BY.key || !msgs.length) return;
+  function trkSet(i, s, x){
+    var st = BY.trk && BY.trk.steps[i]; if(!st) return;
+    if(s === "run" && st.s !== "run") st.t0 = Date.now();
+    if((s === "ok" || s === "fail") && !st.t1){ st.t1 = Date.now(); if(!st.t0) st.t0 = st.t1; }
+    st.s = s; if(x){ if(x.note != null) st.note = x.note; if(x.link) st.link = x.link; }
+    trkDraw();
+  }
+  function trkTime(st, i){ return st.s === "run" && st.t0 ? bySecs(Date.now() - st.t0) : st.s === "ok" && i < 3 && st.t1 ? bySecs(st.t1 - st.t0) : ""; }
+  function trkDraw(){
+    var el = E("bytrk"), card = bypop && bypop.querySelector(".bycard"), T = BY.trk; if(!el) return;
+    if(card) card.classList.toggle("trk", !!T); el.hidden = !T; if(!T) return;
+    el.innerHTML = T.steps.map(function(st, i){
+      var link = st.link ? '<a href="https://www.mintscan.io/osmosis/tx/' + att(st.link) + '" target=_blank rel=noopener>' + att(st.link.slice(0, 6)) + '\u2026</a>' : '';
+      return '<div class="by-st ' + st.s + '" data-i=' + i + '><i aria-hidden=true></i><b>' + st.l + '</b><span>' + (st.note ? '<u>' + att(st.note) + '</u>' : '') +
+        '<em class=tm>' + trkTime(st, i) + '</em>' + link + '</span></div>';
+    }).join("");
+  }
+  /* the running stage's clock ticks in place; nothing else is redrawn */
+  function trkTick(){
+    var T = BY.trk, el = E("bytrk"); if(!T || T.done || T.failed){ clearInterval(BY_TIMER); return; } if(!el) return;
+    T.steps.forEach(function(st, i){ if(st.s !== "run") return; var tm = el.querySelector('.by-st[data-i="' + i + '"] .tm'); if(tm) tm.textContent = trkTime(st, i);
+      var u = el.querySelector('.by-st[data-i="' + i + '"] u'); if(i === 2 && Date.now() - st.t0 > 180000 && u) u.textContent = "slower than usual"; });
+  }
+  /* the packets the Osmosis transaction sent, by sequence, from its own events */
+  function byPackets(hash){
+    var O = byO();
+    return fetch(O.cfg.api + "/cosmos/tx/v1beta1/txs/" + hash, { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(d){
+      var seq = [];
+      ((d.tx_response && d.tx_response.events) || []).forEach(function(e){ if(e.type !== "send_packet") return; var x = {};
+        (e.attributes || []).forEach(function(at){ x[at.key] = at.value; });
+        if(x.packet_src_channel === O.cfg.channel && x.packet_sequence) seq.push(x.packet_sequence); });
+      return seq;
+    });
+  }
+  /* AtomOne's receipt for each packet: once every one is received, the ATONE is in the wallet; a packet unrelayed when its
+     timeout passes goes back to the Osmosis wallet */
+  function byRelayed(seqs, t0){
+    var api = window.__API || "https://atomone-api.gatadao.com", left = seqs.slice(), O = byO();
+    return new Promise(function(res, rej){
+      var tick = function(){
+        if(!left.length) return res();
+        if(Date.now() - t0 > 21 * 60000) return rej(new Error("The transfer timed out; Osmosis returns it to your Osmosis wallet"));
+        Promise.all(left.map(function(s){ return fetch(api + "/ibc/core/channel/v1/channels/" + O.cfg.home + "/ports/transfer/packet_receipts/" + s, { cache: "no-store" })
+          .then(function(r){ return r.json(); }).then(function(j){ return j && j.received ? s : null; }).catch(function(){ return null; }); }))
+          .then(function(got){ left = left.filter(function(s){ return got.indexOf(s) < 0; }); if(!left.length) res(); else setTimeout(tick, 4000); });
+      };
+      setTimeout(tick, 3000);
+    });
+  }
+  /* no packet found in the events (a node that hides them): the AtomOne balance is the signal instead */
+  function byBalance(amt, before, t0){
+    return new Promise(function(res, rej){
+      var tick = function(){
+        if(Date.now() - t0 > 21 * 60000) return rej(new Error("Not arrived yet; check your AtomOne balance in a few minutes"));
+        window.__TX.balances(window.__ADDR).then(function(b){ if(b.uatone >= before + amt * 0.999) res(); else setTimeout(tick, 5000); }).catch(function(){ setTimeout(tick, 5000); });
+      };
+      setTimeout(tick, 5000);
+    });
+  }
+  function byRun(msgs, amt, kind){
+    var O = byO(), go = E("bysign"); if(!O || !BY.key || !msgs.length) return;
     BY.busy = true; if(go){ go.disabled = true; go.classList.add("busy"); }
-    var n = window.__notify(), before = (window.__BAL && window.__BAL.uatone) || 0;
-    byFeeFor(msgs).then(function(f){ return O.send(BY.key, msgs, "", f, function(s){ if(st) st.textContent = s === "signing" ? "Sign on Osmosis in your wallet" : s === "broadcasting" ? "Sending to Osmosis…" : s === "pending" ? "Waiting for Osmosis to confirm…" : ""; }); })
-    .then(function(){ n.ok(); BY.done = { amt: amt, arrived: false }; if(st) st.textContent = ""; byArrive(amt, before); return byLoad(); })
-    .catch(function(e){ n.fail(e && e.message || String(e)); if(st) st.textContent = ""; })
+    var n = window.__notify(), before = (window.__BAL && window.__BAL.uatone) || 0, cur = 0;
+    trkStart(kind); trkSet(0, "run", { note: kind === "buy" ? "reading the pool" : "approve in your wallet" }); byState();
+    /* a buy re-reads the chain right before signing, so the amount guaranteed is the pool's now, not a minute ago */
+    (kind === "buy" ? byChainQuote(BY.q.u, byTok()).then(function(q){ BY.q = q; msgs = byMsgs(); amt = q.target; trkSet(0, "run", { note: "approve in your wallet" }); return msgs; }) : Promise.resolve(msgs))
+    .then(function(m){ return byFeeFor(m); }).then(function(f){ return O.send(BY.key, msgs, "", f, function(s, x){
+        if(s === "broadcasting"){ trkSet(0, "ok", { note: "" }); trkSet(1, "run"); cur = 1; }
+        if(s === "pending" && x) trkSet(1, "run", { link: x }); }); })
+    .then(function(r){ trkSet(1, "ok", { link: r.hash }); trkSet(2, "run"); cur = 2; byLoad();
+      return byPackets(r.hash).catch(function(){ return []; }); })
+    .then(function(seqs){ var t0 = Date.now(); return seqs.length ? byRelayed(seqs, t0) : byBalance(amt, before, t0); })
+    .then(function(){ trkSet(2, "ok"); trkSet(3, "ok", { note: fmt(amt) + " ATONE" }); BY.trk.done = true; BY.done = { amt: amt, arrived: true }; n.ok();
+      if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); }); })
+    .catch(function(e){ var m = e && e.message || String(e);
+      if(BY.trk){ trkSet(cur, "fail", { note: /reject|denied|cancel/i.test(m) ? "declined in the wallet" : m.replace(/^.*desc = /, "").slice(0, 90) }); BY.trk.failed = true; }
+      n.fail(m); })
     .then(function(){ BY.busy = false; if(go) go.classList.remove("busy"); byState(); });
   }
-  function byHome(){ var O = byO(); if(!O) return; byRun(byHomeMsgs(), byHave(O.cfg.atone)); }
+  function byHome(){ var O = byO(); if(!O) return; byRun(byHomeMsgs(), byHave(O.cfg.atone), "home"); }
   window.__buy = function(){
     if(!bypop || !window.__ADDR || !window.__TX || window.__TX.CHAIN !== "atomone-1") return;
+    if(BY.trk && !BY.trk.done && !BY.trk.failed){ byState(); POP.open(bypop); return; }   /* a buy on its way: show its progress */
     var a = E("byamt"); if(a) a.value = "";
     var s = E("bytok"); if(s && !s.options.length) s.innerHTML = BY_TOK.map(function(t){ return '<option value="' + t.d + '">' + t.s + '</option>'; }).join("");
-    BY.q = null; BY.done = null; BY.err = ""; BY.fee = null; E("byfee").textContent = ""; E("bystep").textContent = "";
+    BY.q = null; BY.done = null; BY.trk = null; BY.err = ""; BY.fee = null; E("byfee").textContent = ""; E("bystep").textContent = "";
     byState(); POP.open(bypop);
     var kp = window.keplr;
     if(!kp){ BY.err = "Buying here signs on Osmosis, and this wallet cannot. Buy on Osmosis's own app, then send it to this address."; byState(); return; }
@@ -3305,7 +3389,10 @@ rememberGridH();
   var byamtEl = E("byamt"); if(byamtEl) byamtEl.addEventListener("input", byQuoteSoon);
   var bytokEl = E("bytok"); if(bytokEl) bytokEl.addEventListener("change", function(){ E("byamt").value = ""; BY.q = null; byState(); });
   var bymax = E("bymax"); if(bymax) bymax.addEventListener("click", function(){ if(!(byMax() > 0)) return; E("byamt").value = exact(byMax()); byQuoteSoon(); });
-  var bysign = E("bysign"); if(bysign) bysign.addEventListener("click", function(){ if(BY.q && BY.q.target) byRun(byMsgs(), BY.q.target); });
+  var bysign = E("bysign"); if(bysign) bysign.addEventListener("click", function(){
+    var T = BY.trk;
+    if(T && (T.done || T.failed)){ var again = T.done; BY.trk = null; BY.done = null; if(again){ E("byamt").value = ""; BY.q = null; } byState(); if(!again) byQuoteSoon(); return; }
+    if(BY.q && BY.q.target) byRun(byMsgs(), BY.q.target, "buy"); });
 
   /* ── Autopilot: a StakeAuthorization REDELEGATE grant to GATA's keeper address, with
      an allow-list, a cap and an expiry the reader sets; the keeper (a separate signer,

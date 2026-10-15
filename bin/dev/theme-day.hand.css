@@ -519,3 +519,9 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .sp-out .r b,html[data-theme=light]:not([data-mono]) .sp-out .y span i,html[data-theme=light]:not([data-mono]) .sp-own button,html[data-theme=light]:not([data-mono]) .spcard .txsum{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .by-out em i,html[data-theme=light]:not([data-mono]) .by-more button,html[data-theme=light]:not([data-mono]) .by-more a,html[data-theme=light]:not([data-mono]) .bycard .txsum,html[data-theme=light]:not([data-mono]) .by-out.done b{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .by-path svg{stroke:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .by-st i{background:var(--surface)}
+  html[data-theme=light]:not([data-mono]) .by-st.run i{border-color:var(--accent);border-right-color:transparent}
+  html[data-theme=light]:not([data-mono]) .by-st.ok i{border-color:var(--accent);background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .by-st.ok i::after{border-color:var(--surface)}
+  html[data-theme=light]:not([data-mono]) .by-st.ok:not(:last-child)::before{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .by-st span a{color:var(--accent)}

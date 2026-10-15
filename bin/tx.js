@@ -279,12 +279,13 @@ function waitFor(hash, tries){
   });
 }
 /* ── Osmosis (operator, 2026-10-15: "buy ... direct from the Osmosis ATONE pool"): one transaction on Osmosis that
-   buys an EXACT amount of ATONE (and, for a wallet short of it, a little PHOTON for AtomOne's fees) and sends it
-   home over IBC in the same signature, so nothing is left behind on Osmosis. Exact-out is what makes the send
-   exact: the swap delivers the amount the transfer then moves. The swap's routes come from Osmosis's own router
-   (sqs), which lists each route's pools from the output back; the chain takes them input first, so each is
-   reversed. Fees in OSMO, or in USDC when the wallet holds no OSMO (Osmosis takes both). ── */
-var OSMO = { api: "https://lcd.osmosis.zone", chain: "osmosis-1", channel: "channel-94814",
+   spends the amount typed on ATONE (and, for a wallet short of it, a little PHOTON for AtomOne's fees) and sends a
+   guaranteed amount home over IBC in the same signature. Exact-in, with the chain as the quote: a simulation reads
+   each swap's output, the swap must give at least 99.7% of it, and exactly that much goes home; what is above it
+   stays on Osmosis and rides home with the next transfer. (Exact-out was tried and dropped: the router's exact-out
+   quotes ran 3 to 9% short of the chain's, and some pools blow up an exact-out.) Routes from Osmosis's router
+   (sqs). Fees in OSMO, or in USDC when the wallet holds no OSMO (Osmosis takes both). ── */
+var OSMO = { api: "https://lcd.osmosis.zone", chain: "osmosis-1", channel: "channel-94814", home: "channel-2",
              atone: "ibc/BC26A7A805ECD6822719472BCB7842A48EF09DF206182F8F259B2593EB5D23FB",
              photon: "ibc/D6E02C5AE8A37FC2E3AB1FC8AC168878ADB870549383DFFEA9FD020C234520A7",
              usdc: "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4" };
@@ -342,6 +343,13 @@ function osmoSimulate(msgs, memo, pubKey, sequence){
   return osmoCall("POST", "/cosmos/tx/v1beta1/simulate", { tx_bytes: b64(raw) })
     .then(function(d){ return parseInt((d.gas_info || {}).gas_used || "0", 10); });
 }
+/* the chain as the quote: a simulation answers each swap's exact output (msg_responses, one per message); a router's
+   quote can be off by a percent on some routes, the chain is not (2026-10-15, simulated) */
+function osmoProbe(msgs, memo, pubKey, sequence){
+  var raw = txRaw(osmoBody(msgs, memo), authInfo(pubKey, sequence, { amount: [], gas: 0 }, 1), []);
+  return osmoCall("POST", "/cosmos/tx/v1beta1/simulate", { tx_bytes: b64(raw) })
+    .then(function(d){ return ((d.result || {}).msg_responses || []).map(function(r){ return parseInt(r.token_out_amount || "0", 10); }); });
+}
 /* Osmosis's fee market: the base fee in uosmo per gas; a fee in another accepted token is that, at the token's price */
 function osmoFee(gasUsed, payDenom, usdPerOsmo, usdPerPay){
   return osmoCall("GET", "/osmosis/txfees/v1beta1/cur_eip_base_fee").then(function(d){
@@ -382,7 +390,7 @@ function osmoWait(hash, tries){
 }
 
 var TX = { body: body, authInfo: authInfo, txRaw: txRaw, b64: b64, unb64: unb64, account: account, balances: balances,
-           osmo: { cfg: OSMO, msgBytes: osmoMsgBytes, body: osmoBody, account: osmoAccount, balances: osmoBalances, simulate: osmoSimulate, fee: osmoFee, send: osmoSend },
+           osmo: { cfg: OSMO, msgBytes: osmoMsgBytes, body: osmoBody, account: osmoAccount, balances: osmoBalances, simulate: osmoSimulate, probe: osmoProbe, fee: osmoFee, send: osmoSend },
            simulate: simulate, gasPrices: gasPrices, feeFor: feeFor, mintRate: mintRate, mintFeeOpt: mintFeeOpt, signDoc: signDoc, send: sendRedelegations, sendDirect: sendDirect, waitFor: waitFor, CHAIN: CHAIN,
            msgBytes: msgBytes };
 if(typeof module !== "undefined" && module.exports) module.exports = TX; else { root.__TX = TX; gasPrices(); }   /* read once at load, for the fee previews */

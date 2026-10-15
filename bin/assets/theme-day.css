@@ -454,6 +454,15 @@
   html[data-theme=light]:not([data-mono]) .by-tok option{background:var(--surface-2);color:var(--ink)}
   html[data-theme=light]:not([data-mono]) .by-out{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .by-path svg{fill:none}
+  html[data-theme=light]:not([data-mono]) .by-trk{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .by-st i{background:var(--surface)}
+  html[data-theme=light]:not([data-mono]) .by-st.run i{border-right-color:transparent}
+  html[data-theme=light]:not([data-mono]) .by-st.ok i::after{border-color:var(--surface)}
+  html[data-theme=light]:not([data-mono]) .by-st.fail i{border-color:var(--danger-bar);background:var(--danger-bar)}
+  html[data-theme=light]:not([data-mono]) .by-st.fail b{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .by-st span u{text-decoration:none}
+  html[data-theme=light]:not([data-mono]) .by-st.fail span u{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .by-st span a{text-decoration:none}
   html[data-theme=light]:not([data-mono]) .by-more button,html[data-theme=light]:not([data-mono]) .by-more a{background:none;text-decoration:none}
   html[data-theme=light]:not([data-mono]) .by-more svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .you-r i .you-mint,html[data-theme=light]:not([data-mono]) .mv-yk .you-mint{border-color:var(--sv-teal,var(--accent));background:transparent;color:var(--sv-teal,var(--accent))}
@@ -1722,4 +1731,10 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .sp-out .r b,html[data-theme=light]:not([data-mono]) .sp-out .y span i,html[data-theme=light]:not([data-mono]) .sp-own button,html[data-theme=light]:not([data-mono]) .spcard .txsum{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .by-out em i,html[data-theme=light]:not([data-mono]) .by-more button,html[data-theme=light]:not([data-mono]) .by-more a,html[data-theme=light]:not([data-mono]) .bycard .txsum,html[data-theme=light]:not([data-mono]) .by-out.done b{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .by-path svg{stroke:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .by-st i{background:var(--surface)}
+  html[data-theme=light]:not([data-mono]) .by-st.run i{border-color:var(--accent);border-right-color:transparent}
+  html[data-theme=light]:not([data-mono]) .by-st.ok i{border-color:var(--accent);background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .by-st.ok i::after{border-color:var(--surface)}
+  html[data-theme=light]:not([data-mono]) .by-st.ok:not(:last-child)::before{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .by-st span a{color:var(--accent)}
 

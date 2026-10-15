@@ -2772,6 +2772,28 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .by-path svg{width:14px;height:14px;fill:none;stroke:var(--wcyan);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .bycard .txbtns{padding-bottom:6px}
 .bycard .txfee{overflow-wrap:anywhere}
+/* the live progress, Skip's way (operator, 2026-10-15): it takes the quote's and the path's place, at their height, so the
+   card keeps its shape; a ring turns on the stage under way, a tick marks one done, the line between them fills */
+.bycard.trk .by-out,.bycard.trk .by-path{display:none}
+.by-trk{margin:12px 20px 0;height:132px;box-sizing:border-box;padding:6px 14px;border:1px solid var(--wbd);border-radius:8px;display:grid;grid-template-rows:repeat(4,1fr);background:linear-gradient(180deg,#10101f,#0b0b18)}
+.by-trk[hidden]{display:none}
+.by-st{position:relative;display:grid;grid-template-columns:16px minmax(0,1fr) auto;align-items:center;gap:10px;min-width:0}
+.by-st i{width:14px;height:14px;box-sizing:border-box;border:2px solid var(--wbd2);border-radius:50%;position:relative;z-index:1;background:#0b0b18}
+.by-st:not(:last-child)::before{content:"";position:absolute;left:7px;top:calc(50% + 8px);height:calc(100% - 16px);width:2px;background:var(--wbd);border-radius:1px}
+.by-st.ok:not(:last-child)::before{background:var(--wcyan)}
+.by-st.run i{border-color:var(--wcyan);border-right-color:transparent;animation:bySpin .8s linear infinite}
+.by-st.ok i{border-color:var(--wcyan);background:var(--wcyan)}
+.by-st.ok i::after{content:"";position:absolute;left:3px;top:1px;width:3px;height:6px;border:solid #0b0b18;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.by-st.fail i{border-color:#ff6b6b;background:#ff6b6b}
+.by-st b{font-size:12px;font-weight:500;color:var(--wf);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.by-st.run b,.by-st.ok b{color:var(--wt)}.by-st.fail b{color:#ff8a8a}
+.by-st span{display:flex;align-items:center;gap:8px;font-family:var(--wmono);font-size:9.5px;letter-spacing:.03em;color:var(--wf);white-space:nowrap;min-width:0}
+.by-st span u{text-decoration:none;overflow:hidden;text-overflow:ellipsis;max-width:190px;color:var(--ws)}
+.by-st.fail span u{color:#ff8a8a;white-space:normal;max-width:220px;line-height:1.3}
+.by-st span em{font-style:normal;font-variant-numeric:tabular-nums}
+.by-st span a{color:var(--wcyan);text-decoration:none}.by-st span a:hover{text-decoration:underline}
+@keyframes bySpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.by-st.run i{animation:none;border-right-color:var(--wcyan);opacity:.7}}
 .by-more{padding:0 22px 16px;display:flex;flex-direction:column;align-items:flex-end;gap:2px;min-height:20px}
 .by-more button,.by-more a{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:3px 0;font-family:var(--wmono);font-size:9.5px;letter-spacing:.06em;color:var(--wcyan);cursor:pointer;text-decoration:none}
 .by-more button[disabled]{opacity:.5;cursor:default}
@@ -7293,6 +7315,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   </div>
   <div class=by-out id=byout aria-live=polite></div>
   <div class=by-path id=bypath></div>
+  <div class=by-trk id=bytrk hidden></div>
   <div class=txfee id=byfee></div>
   <div class=txstep id=bystep></div>
   <div class=txbtns><button class="wk-btn wk-go" id=bysign type=button disabled>Buy</button></div>
