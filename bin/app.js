@@ -1973,42 +1973,25 @@ rememberGridH();
   window.__rateAfterNew = function(t, c, x, added){ var m = model(), S = window.__S(); if(added > 0 && S > 0) m.a = m.a * S / (S + added); return rateAfter(m, t, c, x); };
 
   /* ── StakePilot (operator, 2026-10-15: "stakepilot should do same as autopilot, same rules ... leaving last 3 vals
-     and keep shelf rule"): new ATONE poured by Autopilot's own rule, the shelf rise (keeper.py fill, ported line for
-     line and checked against it at 10 to 1,000,000 ATONE). The smallest validator, leaving out the last 3 of the set,
+     and keep shelf rule"): new ATONE poured by Autopilot's own rule, the shelf rise (shelfFill below, keeper.py fill
+     line for line; checked against it at 10 to 1,000,000 ATONE). The smallest validator, leaving out the last 3 of the set,
      rises first, to 300 ATONE under the validator above it; then the two rise together, each 300 ATONE under the one
      above, and the shelf takes the next validator up as it reaches it. Nobody passes the validator above, so no rank
      changes; the largest fifth never take stake; any validator of the active set may. As the amount grows the shelf
      rises, and the plan follows it as it is typed. ── */
-  var SHELF_EDGE = 3, SHELF_GAP = 1e6, SHELF_STEP = 3e8, SHELF_MIN = 1e6;
-  function shelf(stakes, amount){
-    var n = stakes.length, TOP = Math.floor(n / 5), add = {}, left = Math.floor(amount), s = stakes.map(function(x){ return Math.floor(x); });
-    var i = n - 1 - SHELF_EDGE;
-    while(i >= TOP && left >= SHELF_GAP){
-      var b0 = i;
-      while(i - 1 >= TOP) i--;                       /* every validator may take stake: one segment, up to the fifth */
-      var k0 = i; i--;
-      var cost = function(k, L){ var c = 0; for(var j = k; j <= b0; j++){ var x = L - (j - k) * SHELF_STEP - s[j]; if(x > 0) c += x; } return c; };
-      var k = b0, lmax;
-      for(;;){ lmax = s[k - 1] - SHELF_STEP; if(cost(k, lmax) >= left || k === k0) break; k--; }
-      var hi = lmax, lo = Math.min(s[k], hi);
-      if(cost(k, hi) <= left) lo = hi;
-      else while(lo < hi){ var mid = Math.floor((lo + hi + 1) / 2); if(cost(k, mid) <= left) lo = mid; else hi = mid - 1; }
-      for(var j = k; j <= b0; j++){ var x = lo - (j - k) * SHELF_STEP - s[j]; if(x > 0){ add[j] = x; left -= x; } }
-    }
-    var out = {}; for(var q in add) if(add[q] >= SHELF_MIN) out[q] = add[q];
-    return out;
-  }
   function pilotPlan(u){
     var V = window.__VALS(), n = V.length, S = window.__S();
     if(!(u > 0) || !n || !(S > 0)) return null;
     var m = model(); m.a = m.a * S / (S + u);
-    var add = shelf(V.map(function(v){ return v[1]; }), u), legs = [], placed = 0, j;
-    for(j in add){ var v = V[+j]; legs.push({ id: v[3], m: v[0], rank: +j + 1, t: v[1], c: v[2], x: add[j] }); placed += add[j]; }
+    if(!window.__shelfFill) return null;
+    var at = {}; V.forEach(function(v, q){ at[v[3]] = q; });
+    var add = window.__shelfFill(V, V.map(function(v){ return v[1]; }), u, function(){ return true; }), legs = [], placed = 0, op;
+    for(op in add){ var q = at[op], v = V[q]; legs.push({ id: v[3], m: v[0], rank: q + 1, t: v[1], c: v[2], x: add[op] }); placed += add[op]; }
     if(!legs.length) return null;
     /* what the shelf leaves (dust under 1 ATONE, the last part of a step) goes on its top leg: that one sits 300 ATONE
        under the validator above it, so a little more passes nobody */
     legs.sort(function(p, q){ return p.rank - q.rank; });
-    var rest = u - placed; if(rest > 0 && rest < SHELF_STEP){ legs[0].x += rest; placed += rest; }
+    var rest = u - placed; if(rest > 0 && rest < 3e8){ legs[0].x += rest; placed += rest; }
     var earned = 0; legs.forEach(function(q){ q.after = rateAfter(m, q.t, q.c, q.x); earned += q.x * q.after; });
     legs.sort(function(p, q){ return q.x - p.x; });
     var big = V[0];
@@ -3817,6 +3800,7 @@ rememberGridH();
     Object.keys(add).forEach(function(op){ if(add[op] < 1e6) delete add[op]; });
     return add;
   }
+  window.__shelfFill = shelfFill;
   window.__planRank = function(pos){
     if(!pos || !pos.rows.length || !(pos.total > 0)) return null;
     /* stake in its 21-day cooldown stays where it is; the free stake is hunted, all of it at once */
