@@ -1196,7 +1196,7 @@
       '<div class=txbtns><button class="wk-btn wk-go" id=grgo type=button data-act=grsend disabled>' + (me ? 'Save' : 'Register') + '</button></div></div>';
     if(P) P.open(pop);
     grCheck();
-    var first = E("gr-moniker"); if(first) setTimeout(function(){ first.focus(); }, 60);
+    var first = E("gr-moniker"); if(first) setTimeout(function(){ window.__kbFocus(first); }, 60);
   }
   function grClose(){ var p = E("grpop"); if(p && window.__POP) window.__POP.close(p); }
   /* a governor's card, as a validator's: who it is, what it holds, and the chain's rules for governors */

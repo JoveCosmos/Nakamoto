@@ -2707,13 +2707,13 @@ rememberGridH();
     if(!unpop || !window.__POS) return;
     var a = E("unamt"); if(a) a.value = "";
     var go = E("unsign"); if(go){ go.disabled = true; go.textContent = "Unstake"; }
-    unRows(); unState(); window.__openCard(unpop); if(a) a.focus();
+    unRows(); unState(); window.__openCard(unpop); window.__kbFocus(a);
   });
   window.__unstakeFrom = function(id){
     if(!unpop || !window.__POS) return;
     UNSEL = {}; UNSEL[id] = 1; var a = E("unamt"); if(a) a.value = "";
     var go = E("unsign"); if(go){ go.disabled = true; go.textContent = "Unstake"; }
-    unRows(); unState(); window.__openCard(unpop); if(a) a.focus();
+    unRows(); unState(); window.__openCard(unpop); window.__kbFocus(a);
   };
   var unamtEl = E("unamt"); if(unamtEl) unamtEl.addEventListener("input", unState);
   var unmax = E("unmax"); if(unmax) unmax.addEventListener("click", function(){ var r = unRow(); if(!r) return; E("unamt").value = exact(r.x); unState(); });
@@ -2853,7 +2853,7 @@ rememberGridH();
     if(!mtpop || !window.__ADDR) return;
     var a = E("mtamt"); if(a) a.value = pre > 0 ? exact(pre) : "";
     var go = E("mtsign"); if(go){ go.disabled = true; go.textContent = "Mint"; }
-    MT.rate = 0; mtState(); POP.open(mtpop); if(a) a.focus();
+    MT.rate = 0; mtState(); POP.open(mtpop); window.__kbFocus(a);
     if(window.__TX) window.__TX.mintRate().then(function(r){ MT.rate = r; mtState(); }).catch(function(){ MT.rate = -1; mtState(); });
   };
   if(mtpop) mtpop.__onclose = function(){ mtFeeSoon(null, false); };
@@ -3014,7 +3014,7 @@ rememberGridH();
     if(!stpop || !window.__POS) return;
     STSEL = {}; var a = E("stamt"); if(a) a.value = "";
     var go = E("stsign"); if(go){ go.disabled = true; go.textContent = "Stake"; }
-    stRows(); stState(); window.__openCard(stpop); if(a) a.focus();
+    stRows(); stState(); window.__openCard(stpop); window.__kbFocus(a);
   });
   var stamtEl = E("stamt"); if(stamtEl) stamtEl.addEventListener("input", function(){ stRows(); stState(); });
   var stmax = E("stmax"); if(stmax) stmax.addEventListener("click", function(){ if(!(stBal() > 0)) return; E("stamt").value = exact(stBal()); stRows(); stState(); });
@@ -3111,7 +3111,7 @@ rememberGridH();
     if(!sppop || !window.__ADDR) return;
     var a = E("spamt"); if(a) a.value = "";
     SP.key = ""; var go = E("spsign"); if(go){ go.disabled = true; go.classList.remove("busy"); }
-    spSyncRange(0); spState(); POP.open(sppop); if(a) a.focus();
+    spSyncRange(0); spState(); POP.open(sppop); window.__kbFocus(a);
   };
   window.__pilotRedo = function(){ if(sppop && sppop.classList.contains("on")) spState(); };
   if(sppop) sppop.__onclose = function(){ feeSoon("sp"); };
@@ -3382,7 +3382,7 @@ rememberGridH();
       /* pay with what the wallet holds most of, by value */
       var best = BY_TOK.map(function(t){ return [t.d, byHave(t.d) * ((BY.px && BY.px[t.d]) || (t.d === BY_TOK[0].d ? 1 : 0))]; }).sort(function(x, y){ return y[1] - x[1]; })[0];
       if(s && best && best[1] > 0) s.value = best[0];
-      byState(); if(a) a.focus();
+      byState(); window.__kbFocus(a);
     }).catch(function(e){ BY.err = e && e.message || "Osmosis could not be reached"; byState(); });
   };
   if(bypop) bypop.__onclose = function(){ clearTimeout(BY.t); BY.qn++; };

@@ -245,6 +245,15 @@ z-index:50;}
 @media(max-width:620px){
   .pop.on:not(#z){padding:52px 12px 44px;box-sizing:border-box;align-items:center}
   .pop:not(#z)>.card:not(#z){max-height:100%!important}
+  /* the height of the screen without a keyboard (--fvh, boot.js): a keyboard covers the card, it does not squeeze it */
+  .pop.on:not(#z){bottom:auto;height:var(--fvh,100%)}
+  /* a transaction card on a short screen (operator, 2026-10-16: "even buttons are cut from view"): its header, field,
+     notes and buttons keep their size and its list gives way - a box that does not scroll cannot shrink below its
+     content, a scrolling one can; if even that is not enough, the card scrolls rather than cutting its buttons off */
+  .pop .card.txcard:not(#z){display:flex;flex-direction:column;overflow-y:auto}
+  .pop .card.txcard:not(#z)>*{flex:0 1 auto}
+  .pop .card.txcard:not(#z)>:is(.stlist,.unpick,.txlist){min-height:96px}
+  .stcard .stlist:not(#z):not(#y){flex:1 1 auto;max-height:none}
 }
 .pop .card{max-width:470px;width:100%;
 padding:26px 28px 0;position:relative;

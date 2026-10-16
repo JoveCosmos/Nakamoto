@@ -72,7 +72,11 @@ try{(function(){
     var a = document.activeElement; if(!a) return false; if(a.isContentEditable || a.tagName === "TEXTAREA") return true;
     return a.tagName === "INPUT" && !/^(button|checkbox|radio|range|submit|reset|file|color|image|hidden)$/i.test(a.type || "text");
   }
-  add.call(window, "resize", function(){ KB = innerWidth === W && editing(); if(!KB) W = innerWidth; });
+  /* --fvh: the screen's height without a keyboard. Popups take their height from it, so a keyboard covers a card instead of
+     squeezing it (operator, 2026-10-16: "the keyboard opens with them contracting them ... should open over them") */
+  function fvh(){ document.documentElement.style.setProperty("--fvh", innerHeight + "px"); }
+  fvh();
+  add.call(window, "resize", function(){ KB = innerWidth === W && editing(); if(!KB){ W = innerWidth; fvh(); } });
   window.__kbd = function(){ return KB; };
   window.addEventListener = function(type, fn, opt){
     if(type !== "resize" || typeof fn !== "function") return add.call(window, type, fn, opt);
@@ -85,3 +89,10 @@ try{(function(){
    honour the cap, is left alone */
 try{ if(/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)){
   var vpm = document.querySelector("meta[name=viewport]"); if(vpm && !/maximum-scale/.test(vpm.content)) vpm.content += ",maximum-scale=1"; } }catch(e){}
+
+/* A field focuses itself when its card opens only where there is no on-screen keyboard: on a touch screen the keyboard
+   opens when the reader taps the field, not over a card they have only just opened (operator, 2026-10-16) */
+window.__kbFocus = function(el){
+  if(!el) return;
+  try{ if(window.matchMedia && matchMedia("(pointer:coarse)").matches) return; el.focus(); }catch(e){}
+};
