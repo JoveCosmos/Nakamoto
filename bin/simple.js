@@ -2067,8 +2067,9 @@
       var part = !full && H.length >= 10;
       var rvk = R && R.revoked ? "Autopilot revoked " + actDay(R.revoked * 1000) + ". " : "";
       return { sum: rvk + (H.length ? (part ? "Latest " : "") + H.length + (H.length === 1 ? " move, " : " moves, ") + fmt(mv) + " ATONE moved, " + g1(gn) + (part ? "" : since(H)) : "No moves yet"),
-        tiles: H.length ? [[String(H.length), part ? "latest moves" : (H.length === 1 ? "move" : "moves")], [wn(mv), "ATONE moved"],
-          ["+" + Math.round(gn).toLocaleString("en-US"), "ATONE a year"]].concat(part ? [] : [[first(H), "since"]]) : null,
+        /* a third entry is the phone's wording, where the wide one would wrap (operator, 2026-10-16) */
+        tiles: H.length ? [[String(H.length), part ? "latest moves" : (H.length === 1 ? "move" : "moves")], [wn(mv), "ATONE moved", "Moved"],
+          ["+" + Math.round(gn).toLocaleString("en-US"), "ATONE a year", "A year"]].concat(part ? [] : [[first(H), "since"]]) : null,
         rows: H.map(function(x){ return actRow(actWhen(x.at * 1000), esc(actName(x.src)) + " &rarr; " + esc(actName(x.dst)), "", x.txhash, fmt(x.uatone) + " ATONE"); }) }; });
     if(k === "restake") return rep().then(function(R){
       var L = ((R && R.activity && R.activity.restakes) || []).filter(function(x){ return x.staked > 0; }), tot = 0; L.forEach(function(x){ tot += x.staked; });
@@ -2077,7 +2078,7 @@
           var o = actAcct(t, r, a); rows.push(o.row); });
         return { sum: rows.length ? "Latest " + rows.length + (rows.length === 1 ? " restake" : " restakes") : "No restakes in the latest claims", rows: rows }; });
       return { sum: L.length ? L.length + (L.length === 1 ? " restake, " : " restakes, ") + fmt(tot) + " ATONE of rewards staked back" + since(L) : "No restakes yet",
-        tiles: L.length ? [[String(L.length), L.length === 1 ? "restake" : "restakes"], [wn(tot), "ATONE staked back"], [first(L), "since"]] : null,
+        tiles: L.length ? [[String(L.length), L.length === 1 ? "restake" : "restakes"], [wn(tot), "ATONE staked back", "ATONE restaked"], [first(L), "since"]] : null,
         rows: L.map(function(x){ var nt = (x.targets || []).length; return actRow(actWhen(x.at * 1000), "Rewards staked back",
           x.target ? "onto " + esc(actName(x.target)) + (nt > 1 ? " and " + (nt - 1) + " more" : "") : "", x.txhash, fmt(x.staked) + " ATONE"); }) }; });
     /* Account: the address as an explorer shows it - what it signed, what it received, and what was done on its behalf */
@@ -2098,9 +2099,8 @@
         : rows.length >= ACT_N ? "Latest " + ACT_N + " transactions on this address"
         : bad ? "Latest " + rows.length + " transactions on this address"
         : rows.length + (rows.length === 1 ? " transaction" : " transactions") + (hfd ? " since " + hfd : " on this address");
-      var nIn = rows.filter(function(o){ return !o.failed && /^(Receive|IBC receive)$/.test(o.kind); }).length, nOut = rows.filter(function(o){ return !o.failed && /^(Send|IBC transfer)/.test(o.kind); }).length;
-      return { sum: sum, rows: rows.map(function(o){ return o.row; }),
-        tiles: rows.length ? [[String(rows.length), rows.length >= ACT_N || bad ? "latest transactions" : hfd ? "transactions since " + hfd : "transactions"], [String(nOut), "sent"], [String(nIn), "received"]] : null }; })
+      /* no boxes on Account, the sentence says it (operator, 2026-10-16: "remove boxes from account in activity") */
+      return { sum: sum, rows: rows.map(function(o){ return o.row; }) }; })
       .catch(function(){ return { sum: "Could not read the chain. Try again in a moment.", rows: [] }; });
   }
   function actShow(){
@@ -2109,7 +2109,8 @@
     var c = ACT.cache[k];
     if(!c){ if(sm) sm.textContent = "Reading\u2026"; if(el) el.innerHTML = '<div class=act-empty>Reading\u2026</div>';
       actLoad(k).then(function(r){ ACT.cache[k] = r; if(ACT.k === k) actShow(); }); return; }
-    if(sm){ if(c.tiles) sm.innerHTML = '<div class=act-tiles>' + c.tiles.map(function(t){ return '<span class=act-tile><b>' + esc(t[0]) + '</b><em>' + esc(t[1]) + '</em></span>'; }).join("") + '</div>';
+    var lab = function(t){ return t[2] ? '<span class=tl-w>' + esc(t[1]) + '</span><span class=tl-p>' + esc(t[2]) + '</span>' : esc(t[1]); };
+    if(sm){ if(c.tiles) sm.innerHTML = '<div class=act-tiles>' + c.tiles.map(function(t){ return '<span class=act-tile><b>' + esc(t[0]) + '</b><em>' + lab(t) + '</em></span>'; }).join("") + '</div>';
       else sm.textContent = c.sum; }
     if(el) el.innerHTML = c.rows.length ? c.rows.join("") : '<div class=act-empty>Nothing yet</div>';
   }
