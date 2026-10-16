@@ -468,6 +468,7 @@
   html[data-theme=light]:not([data-mono]) .you-r i .you-mint,html[data-theme=light]:not([data-mono]) .mv-yk .you-mint{border-color:var(--sv-teal,var(--accent));background:transparent;color:var(--sv-teal,var(--accent))}
   html[data-theme=light]:not([data-mono]) .you-r i .you-mint:hover,html[data-theme=light]:not([data-mono]) .mv-yk .you-mint:hover{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .you-r i .you-mint:focus-visible,html[data-theme=light]:not([data-mono]) .mv-yk .you-mint:focus-visible{outline-color:var(--sv-teal,var(--accent))}
+  html[data-theme=light]:not([data-mono]) .mv-yk .you-mint.you-out:hover{background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) .pop .card.stcard::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .stcard .stlist thead th{color:var(--muted);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .stcard .stlist td{border-bottom-color:var(--line-soft)}

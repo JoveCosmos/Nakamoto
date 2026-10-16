@@ -2815,8 +2815,18 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
   color:var(--sv-teal,#2bc8bd);font:500 10px var(--wmono);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
 .you-r i .you-mint:hover,.mv-yk .you-mint:hover{background:rgba(43,200,189,.10)}
 .you-r i .you-mint:focus-visible,.mv-yk .you-mint:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offset:2px}
-.mv-yk .you-mint{position:absolute;right:10px;bottom:9px}
-.mv-yk .you-mint~b{padding-right:50px}
+.mv-yk .yk-act{position:absolute;right:10px;bottom:9px;display:flex;gap:5px}
+.mv-yk .yk-act~b{padding-right:58px}   /* until fitBoxes measures the actions */
+/* a figure too long to sit beside its actions (fitBoxes): they step down under it, at the box's right edge */
+.mv-yk.wrap .yk-act{position:static;order:3;align-self:flex-end;margin-top:6px}
+.mv-yk.wrap .yk-act~b{padding-right:0}
+/* Unstake takes stake out: amber, as Pro's own Unstake */
+.mv-yk .you-mint.you-out:not(#z){border-color:var(--sv-amber);color:var(--sv-amber)}
+.mv-yk .you-mint.you-out:hover{background:rgba(255,176,46,.10)}
+.mv-yk .you-mint.you-out:focus-visible:not(#z){outline-color:var(--sv-amber)}
+/* phones and tablets: Pro's Stake, Unstake and Claim live in the balance boxes they act on (operator, 2026-10-16); the
+   buttons stay in the page, hidden, as the boxes' and the tabs' way into the same cards */
+@media(max-width:1099px){#p-dele #wbody #wk-mine .wk-t1 :is(#stbtn,#unbtn,#clbtn){display:none}}
 .pop .card.stcard::before{background:linear-gradient(90deg,transparent,var(--wgreen),transparent)}
 .stcard .txsum{color:var(--wgreen)}
 
@@ -3798,13 +3808,16 @@ border-color:rgba(46,224,106,.3)}
   .sv-screen{justify-content:flex-start}
   .sv-cards,.sv-cards.four{grid-template-columns:minmax(0,1fr)}
   
-  /* a phone: the lockup keeps its whole tagline; the greeting takes the line under it */
-  .brandbar .sv-brand{flex-wrap:wrap;row-gap:6px}
+  /* a phone: the bar is the wallet's name with its Activity on the other side, nothing more (operator, 2026-10-16:
+     "remove decentralize and earn more. remove welcome"); with no wallet it has nothing to say and goes */
+  .w#calc>.brandbar .sv-brand{flex:1 1 100%;flex-wrap:wrap;row-gap:6px}
+  .brandbar .sv-brand .sv-bw{display:none}
+  html[data-sec=dashboard]:not([data-wallet]) .w#calc>.brandbar{display:none}
   .welc{flex:1 1 100%;margin-left:0;padding-left:0;border-left:0}
   .welc:not([hidden]){display:flex;align-items:center;gap:10px}
-  .welc-t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .welc-act{margin-left:auto;flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;font-family:var(--wmono);font-size:9.5px;line-height:1;letter-spacing:.14em;
-    text-transform:uppercase;padding:6px 10px;border-radius:999px;border:1px solid var(--wamber);background:rgba(255,176,46,.14);color:var(--wamber);cursor:pointer}
+  .welc-t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:700;color:var(--wt)}
+  .welc-act{margin-left:auto;flex:0 0 auto;display:inline-flex;align-items:center;gap:3px;height:22px;font-family:var(--wmono);font-size:8.5px;line-height:1;letter-spacing:.1em;
+    text-transform:uppercase;padding:0 8px;border-radius:999px;border:1px solid var(--wamber);background:rgba(255,176,46,.14);color:var(--wamber);cursor:pointer}
   .welc-act:focus-visible{outline:2px solid var(--wamber);outline-offset:2px}
   
   .sv-chips{grid-template-columns:minmax(0,1fr)}
@@ -6105,6 +6118,11 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-r b{font-family:var(--wmono);font-size:13.5px;font-weight:500;text-align:right;color:var(--wt);font-variant-numeric:tabular-nums}
 .mv-r i{font-style:normal;font-family:var(--wmono);font-size:11.5px;text-align:right}
 .mv-r .a{color:var(--sv-amber)}.mv-r .g{color:var(--sv-teal)}
+/* a row opens its validator's card (operator, 2026-10-16) */
+.mv-r[data-v]{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.mv-r[data-v]:active{background:var(--wh)}
+.mv-r[data-v]:focus-visible{outline:2px solid var(--sv-teal);outline-offset:-2px;border-radius:4px}
+@media(hover:hover){.mv-r[data-v]:hover span{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--wf)}}
 .mv-more{display:flex;align-items:center;gap:6px;width:100%;margin:0;padding:7px 0 3px;border:0;border-top:1px solid var(--wbd);background:none;
   font:inherit;font-size:12px;color:var(--ws);text-align:left;cursor:pointer}
 .mv-more svg{width:13px;height:13px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s ease}

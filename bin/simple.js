@@ -331,27 +331,44 @@
     return proRd && window.__srcFree ? window.__srcFree() : pos.free;
   }
   function balBoxes(){
-    var pos = window.__POS, bal = window.__BAL, mine = pos && pos.rows.length, mv = movable(pos);
+    var pos = window.__POS, bal = window.__BAL, mine = pos && pos.rows.length, mv = movable(pos), a = window.__ADDR;
     var yk = function(k, v, st, x){ return '<div class=mv-yk>' + (x || '') + '<em>' + k + '</em><b' + (st || '') + '>' + v + '</b></div>'; };
+    /* a box's actions sit together in its lower corner, level with the figure; fitBoxes keeps the figure clear of them */
+    var acts = function(h){ return h ? '<span class=yk-act>' + h + '</span>' : ''; };
+    var act = function(k, label, tip, cls){ return '<button type=button class="you-mint' + (cls || '') + '" data-act=' + k + ' title="' + tip + '">' + label + '</button>'; };
+    /* Pro: its three actions in the boxes they act on, as Mint sits in PHOTON's (operator, 2026-10-16): Stake in ATONE
+       available, Unstake in ATONE staked, Claim in ATONE rewards, each shown when Pro's own button would be */
+    var pro = root.getAttribute("data-sv") === "dashboard/self" && a && pos, rb = window.__REWBY || {};
+    var claim = pro && pos.rows.some(function(r){ return (rb[r.id] || 0) >= 1; });
     return '<div class="mv-yg mv-bal">' +
       /* the order (operator, 2026-10-02): what is in the wallet, what is staked, then what it earns */
-      yk("ATONE available", bal ? fmt(bal.uatone) : '-', '', window.__ADDR && bal && BUY() ? '<button type=button class="you-mint you-buy" data-act=buy title="Buy ATONE on Osmosis">Buy</button>' : '') +
+      yk("ATONE available", bal ? fmt(bal.uatone) : '-', '', acts((a && bal && BUY() ? act("buy", "Buy", "Buy ATONE on Osmosis", " you-buy") : '') +
+        (pro ? act("prostake", "Stake", "Stake liquid ATONE") : ''))) +
       /* Mint in the PHOTON box's lower corner, level with the figure: the wallet column that carries it on wide
          screens is not shown under 1100px (operator, 2026-10-13: every feature live, phones too) */
-      yk("PHOTON available", bal ? fmt(bal.uphoton) : '-', '', window.__ADDR && bal ? '<button type=button class=you-mint data-act=mint title="Mint PHOTON from ATONE">Mint</button>' : '') +
-      yk("ATONE staked", pos ? fmt(pos.total) : '-') +
+      yk("PHOTON available", bal ? fmt(bal.uphoton) : '-', '', acts(a && bal ? act("mint", "Mint", "Mint PHOTON from ATONE") : '')) +
+      yk("ATONE staked", pos ? fmt(pos.total) : '-', '', acts(pro && pos.rows.length ? act("unstake", "Unstake", "Unstake from a validator", " you-out") : '')) +
       yk("Movable stake", mv != null ? fmt(mv) : '-') +
-      yk("ATONE rewards", window.__REW != null ? fmt(window.__REW) : '-') +
+      yk("ATONE rewards", window.__REW != null ? fmt(window.__REW) : '-', '', acts(claim ? act("claim", "Claim", "Claim your staking rewards") : '')) +
       yk("Your APR", mine ? pct(pos.rate) : '-', mine ? ' style="color:' + heat(pos.rate).ink + '"' : '', rsx(pos, mine, 1)) + '</div>';
   }
-  /* a figure never overflows its box: the type steps down until it fits (phones and tablets) */
+  /* a figure never overflows its box: the type steps down until it fits (phones and tablets). Beside a box's actions
+     the figure keeps clear of them, as wide as they are, giving up at most two pixels of type (15px); a figure still
+     too long for that (a large balance, a narrow phone) keeps its size on the box's whole width and the actions step
+     down under it (operator, 2026-10-16: "mind adjustment
+     when bigger atone values inside box") */
   function fitBoxes(el){
     if(!el) return;
     Array.prototype.forEach.call(el.querySelectorAll(".mv-bal .mv-yk>b"), function(x){
-      x.style.fontSize = "";
+      var box = x.parentElement, ac = box.querySelector(".yk-act");
+      box.classList.remove("wrap"); x.style.fontSize = ""; x.style.paddingRight = "";
       if(!x.clientWidth) return;
-      var fs = parseFloat(getComputedStyle(x).fontSize);
-      while(x.scrollWidth > x.clientWidth + 1 && fs > 10){ fs -= 0.5; x.style.fontSize = fs + "px"; }
+      var over = function(){ var rg = document.createRange(), cs = getComputedStyle(x); rg.selectNodeContents(x);
+        return rg.getBoundingClientRect().width > x.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) + 0.5; };
+      var fit = function(min){ var fs = parseFloat(getComputedStyle(x).fontSize); while(over() && fs > min){ fs -= 0.5; x.style.fontSize = fs + "px"; } };
+      if(ac){ x.style.paddingRight = (ac.offsetWidth + 8) + "px"; fit(15); if(!over()) return;
+        box.classList.add("wrap"); x.style.paddingRight = ""; x.style.fontSize = ""; }
+      fit(10);
     });
   }
   window.addEventListener("resize", function(){ fitBoxes(E("mv-stage")); fitBoxes(E("sd-mstrip")); });
@@ -1711,7 +1728,7 @@
   var WAS = null;
   function drawHead(){
     var a = window.__ADDR, ac = E("svacct"), cn = E("svconn"), w = window.__WALLET;
-    var wl = E("svwelc"), name = w && w.label && w.label !== "My wallet" && w.label !== w.name ? w.label : "";
+    var wl = E("svwelc"), wn = (w && String(w.label || "").trim()) || "Your wallet";
     if(a){ ac.hidden = false; if(cn) cn.hidden = true;
            /* the pill: the connected wallet's mark, its address as the box allows, copy, disconnect */
            var im = ac.querySelector(".wpl"), src = "assets/wallet-" + String((w && w.name) || "keplr").toLowerCase() + ".svg";
@@ -1719,10 +1736,11 @@
            var pa = ac.querySelector(".wpa"); if(pa) pa.textContent = a.slice(0, 7) + "\u2026" + a.slice(-4);
            ac.title = ((w && w.label) || (w && w.name) || "Wallet") + ", " + a; }
     else { ac.hidden = true; if(cn) cn.hidden = false; }
-    /* phones: the wallet's Activity sits on the welcome line, the wide screen's beside the wallet's name (operator,
-       2026-10-16: "no activity button in phone") */
+    /* phones: the line under the bar is the wallet's own name, its Activity on the other side, nothing more (operator,
+       2026-10-16: "only wallet name and activity button on other side", no tagline, no welcome); the wide screen's
+       Activity sits beside the wallet's name */
     if(wl){ wl.hidden = !a;
-      var wh = a ? '<span class=welc-t>Welcome' + (name ? ', <b>' + esc(name) + '</b>' : '') + '</span><button type=button class=welc-act data-act=activity>Activity <span aria-hidden=true>&rarr;</span></button>' : '';
+      var wh = a ? '<span class=welc-t title="' + esc(wn) + '">' + esc(wn) + '</span><button type=button class=welc-act data-act=activity>Activity <span aria-hidden=true>&rarr;</span></button>' : '';
       if(wl.__h !== wh){ wl.__h = wh; wl.innerHTML = wh; }
       if(!wl.__act){ wl.__act = true; wl.addEventListener("click", function(ev){ if(ev.target.closest && ev.target.closest(".welc-act")) actOpen(); }); } }
     /* a redraw every block must not shut a menu the reader just opened: only a
@@ -2160,7 +2178,8 @@
     var rest = list.length - lim, open = rest > 0 && !!MVOPEN[key];
     var CH = '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 9l6 6 6-6"/></svg>';
     return '<div class="mv-rows' + (open ? ' open' : '') + '" data-k="' + key + '">' + list.map(function(r, i){
-      return '<div class="mv-r' + (i >= lim ? ' mv-x' : '') + '"><u class=' + cls + '>' + r.rank + '</u><span title="' + esc(r.name) + '">' + esc(r.name) + '</span><b>' + r.amt + '</b><i class=' + cls + '>' + r.apr + '</i></div>';
+      /* a row opens its validator's card, whichever list it is in (operator, 2026-10-16) */
+      return '<div class="mv-r' + (i >= lim ? ' mv-x' : '') + '"' + (r.id ? ' data-v="' + esc(r.id) + '" role=button tabindex=0' : '') + '><u class=' + cls + '>' + r.rank + '</u><span title="' + esc(r.name) + '">' + esc(r.name) + '</span><b>' + r.amt + '</b><i class=' + cls + '>' + r.apr + '</i></div>';
     }).join("") + '</div>' +
       (rest > 0 ? '<button type=button class=mv-more data-act=mvmore data-k="' + key + '" data-closed="' + esc('and ' + rest + ' more ' + more) + '" aria-expanded=' + open + '><span>' + (open ? 'Show fewer' : 'and ' + rest + ' more ' + more) + '</span>' + CH + '</button>' : '');
   }
@@ -2266,7 +2285,7 @@
     var nowOn = function(){
       /* dust a redelegation leaves behind (under 0.1 ATONE) is not a position */
       var rows = pos.rows.filter(function(r){ return r.x >= 1e5; }).sort(function(x, y){ return y.x - x.x; });
-      return '<div class=mv-box><em>Now on</em>' + mvRows(rows.map(function(r){ return { rank: r.inactive ? 'out' : rk(r.id), name: r.m, amt: fmt(r.x), apr: r.inactive ? '0%' : pct(r.rate) }; }), 'g', 'validators', 'now') + '</div>';
+      return '<div class=mv-box><em>Now on</em>' + mvRows(rows.map(function(r){ return { id: r.id, rank: r.inactive ? 'out' : rk(r.id), name: r.m, amt: fmt(r.x), apr: r.inactive ? '0%' : pct(r.rate) }; }), 'g', 'validators', 'now') + '</div>';
     };
     var you = '';
     if(a){
@@ -2302,8 +2321,8 @@
         var fr = {}, to = {}, moved = 0;
         plan.msgs.forEach(function(m){ fr[m.from] = (fr[m.from] || 0) + m.amt; to[m.to] = (to[m.to] || 0) + m.amt; moved += m.amt; });
         var src = {}, dst = {};
-        var fL = Object.keys(fr).sort(function(x, y){ return fr[y] - fr[x]; }).map(function(id){ src[id] = 1; return { rank: rk(id), name: nm(id), amt: fmt(fr[id]), apr: pct(rate(id)) }; });
-        var tL = Object.keys(to).sort(function(x, y){ return to[y] - to[x]; }).map(function(id){ dst[id] = 1; return { rank: rk(id), name: nm(id), amt: '+' + fmt(to[id]), apr: pct(rate(id, to[id])) }; });
+        var fL = Object.keys(fr).sort(function(x, y){ return fr[y] - fr[x]; }).map(function(id){ src[id] = 1; return { id: id, rank: rk(id), name: nm(id), amt: fmt(fr[id]), apr: pct(rate(id)) }; });
+        var tL = Object.keys(to).sort(function(x, y){ return to[y] - to[x]; }).map(function(id){ dst[id] = 1; return { id: id, rank: rk(id), name: nm(id), amt: '+' + fmt(to[id]), apr: pct(rate(id, to[id])) }; });
         var lock = pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is under redelegate lock until ' + day(pos.until) + '</div>' : '';
         h = top('Best today', auto ? '' : 'Ready, 1 approval', 'ok', auto ? ACTIVE : btn('opt', direct ? 'Activate Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE')) +
           '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.mnow != null ? plan.mnow : plan.now) + '</i> to <i class=g>' + pct(plan.mafter != null ? plan.mafter : plan.after) + '</i> APR</span>' + lock + '</div>' +   /* the moved stake's own APR (operator, 2026-10-01) */
@@ -2413,6 +2432,9 @@
     if(act === "buy"){ if(BUY() && window.__buy) window.__buy(); return; }
     if(act === "activity"){ actOpen(); return; }
     if(act === "claim"){ if(window.__claim) window.__claim(); return; }
+    /* Pro's Stake and Unstake in its balance boxes (phones and tablets): the cards its own buttons open */
+    if(act === "prostake"){ var psb = E("stbtn"); if(psb) psb.click(); return; }
+    if(act === "unstake"){ var pub = E("unbtn"); if(pub) pub.click(); return; }
     if(act === "vote"){ ev.stopPropagation(); voteSend(t, +t.dataset.pid, +t.dataset.opt); return; }
     if(act === "gfollow"){ govSend(t, { type: "atomone/v1/MsgDelegateGovernor", value: { delegator_address: window.__ADDR, governor_address: t.dataset.g } }); return; }
     if(act === "greg"){ govForm(); return; }
