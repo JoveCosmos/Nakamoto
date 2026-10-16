@@ -54,7 +54,27 @@
   /* write a box only when its markup changed: a block tick that changes nothing touches no
      DOM, and the row or chip the keyboard is on keeps its focus */
   var LASTH = {};
-  function put(id, h){ if(RAIL[id]) h = rail(h); var el = E(id); if(!el || LASTH[id] === h) return el; LASTH[id] = h; el.innerHTML = h; fitFigs(el); return el; }
+  function put(id, h){ if(RAIL[id]) h = rail(h); var el = E(id); if(!el || LASTH[id] === h) return el; LASTH[id] = h;
+    var sc = scrolls(el); el.innerHTML = h; fitFigs(el); unscroll(el, sc); return el; }
+  /* a live redraw must not throw a reader back to the top of a list they scrolled (operator, 2026-10-16: "the list
+     views when scrolling auto reset to top on their own"): every scrolled box in the panel is found again after the
+     redraw by its id, its data-k, or else its place in the panel, and set back where it was */
+  function skey(root, x){
+    if(x.id) return "#" + x.id;
+    if(x.getAttribute("data-k")) return "k:" + x.className.split(" ")[0] + ":" + x.getAttribute("data-k");
+    var path = []; for(var n = x; n && n !== root; n = n.parentElement){ var i = 0, q = n; while((q = q.previousElementSibling)) i++; path.unshift(i); }
+    return "p:" + path.join("/");
+  }
+  function sfind(root, k){
+    if(k.charAt(0) === "#") return root.querySelector(k);
+    if(k.slice(0, 2) === "k:"){ var f = k.split(":"); return root.querySelector("." + f[1] + '[data-k="' + f.slice(2).join(":") + '"]'); }
+    var n = root; k.slice(2).split("/").forEach(function(i){ n = n && n.children[+i]; }); return n || null;
+  }
+  function scrolls(root){
+    var out = []; Array.prototype.forEach.call(root.querySelectorAll("*"), function(x){ if(x.scrollTop > 0 || x.scrollLeft > 0) out.push([skey(root, x), x.scrollTop, x.scrollLeft]); });
+    return out;
+  }
+  function unscroll(root, sc){ sc.forEach(function(k){ var x = sfind(root, k[0]); if(x){ x.scrollTop = k[1]; x.scrollLeft = k[2]; } }); }
   /* governance figures on phones (operator, 2026-10-02: "your governor boxes values overflow if big"): a figure wider
      than its box steps its size down until it fits (12px at the least, then the ellipsis); wider screens keep the
      stylesheet's size. Run on every draw, on resize and when the view changes (a hidden box measures nothing) */
@@ -1699,7 +1719,12 @@
            var pa = ac.querySelector(".wpa"); if(pa) pa.textContent = a.slice(0, 7) + "\u2026" + a.slice(-4);
            ac.title = ((w && w.label) || (w && w.name) || "Wallet") + ", " + a; }
     else { ac.hidden = true; if(cn) cn.hidden = false; }
-    if(wl){ wl.hidden = !a; wl.innerHTML = a ? "Welcome" + (name ? ", <b>" + esc(name) + "</b>" : "") : ""; }
+    /* phones: the wallet's Activity sits on the welcome line, the wide screen's beside the wallet's name (operator,
+       2026-10-16: "no activity button in phone") */
+    if(wl){ wl.hidden = !a;
+      var wh = a ? '<span class=welc-t>Welcome' + (name ? ', <b>' + esc(name) + '</b>' : '') + '</span><button type=button class=welc-act data-act=activity>Activity <span aria-hidden=true>&rarr;</span></button>' : '';
+      if(wl.__h !== wh){ wl.__h = wh; wl.innerHTML = wh; }
+      if(!wl.__act){ wl.__act = true; wl.addEventListener("click", function(ev){ if(ev.target.closest && ev.target.closest(".welc-act")) actOpen(); }); } }
     /* a redraw every block must not shut a menu the reader just opened: only a
        change of state - connected, or no longer - closes it */
     if(WAS !== !!a){ WAS = !!a; closeMenu(); }
@@ -2134,10 +2159,10 @@
     var lim = mvLim();
     var rest = list.length - lim, open = rest > 0 && !!MVOPEN[key];
     var CH = '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 9l6 6 6-6"/></svg>';
-    return '<div class="mv-rows' + (open ? ' open' : '') + '">' + list.map(function(r, i){
+    return '<div class="mv-rows' + (open ? ' open' : '') + '" data-k="' + key + '">' + list.map(function(r, i){
       return '<div class="mv-r' + (i >= lim ? ' mv-x' : '') + '"><u class=' + cls + '>' + r.rank + '</u><span title="' + esc(r.name) + '">' + esc(r.name) + '</span><b>' + r.amt + '</b><i class=' + cls + '>' + r.apr + '</i></div>';
     }).join("") + '</div>' +
-      (rest > 0 ? '<button type=button class=mv-more data-act=mvmore data-k="' + key + '" aria-expanded=' + open + '><span>' + (open ? 'Show fewer' : 'and ' + rest + ' more ' + more) + '</span>' + CH + '</button>' : '');
+      (rest > 0 ? '<button type=button class=mv-more data-act=mvmore data-k="' + key + '" data-closed="' + esc('and ' + rest + ' more ' + more) + '" aria-expanded=' + open + '><span>' + (open ? 'Show fewer' : 'and ' + rest + ' more ' + more) + '</span>' + CH + '</button>' : '');
   }
   function mvLim(){ return 4; }
   /* an opened list keeps the closed list's height and scrolls in it */
@@ -2162,9 +2187,30 @@
     hlFit(el); fitBoxes(el);
     var lim = mvLim();
     Array.prototype.forEach.call(el.querySelectorAll(".mv-rows.open"), function(r){
-      var h = 0; Array.prototype.slice.call(r.children, 0, lim).forEach(function(c){ h += c.offsetHeight; });
+      var h = 0, top = r.scrollTop; Array.prototype.slice.call(r.children, 0, lim).forEach(function(c){ h += c.offsetHeight; });
       if(h) r.style.maxHeight = h + "px";
+      r.scrollTop = top; mvEnd(r);
     });
+  }
+  /* the list's foot fades while there is more below it; at the end it does not */
+  function mvEnd(r){ r.classList.toggle("end", r.scrollTop + r.clientHeight >= r.scrollHeight - 2); }
+  /* "and N more" opens the list in place, in the four rows' height, so nothing under it moves (operator, 2026-09-30).
+     It used to redraw the whole stage, and the click showed no change at all (operator, 2026-10-16: "user cant know
+     that now list is scrollable"): now only the list and its button change, the list glides up one row as it opens,
+     and its foot fades while there is more below */
+  function mvToggle(btn){
+    var k = btn.dataset.k, rows = btn.previousElementSibling;
+    if(!rows || !rows.classList.contains("mv-rows")){ MVOPEN[k] = !MVOPEN[k]; drawMove(); return; }
+    var open = !MVOPEN[k], lim = mvLim(); MVOPEN[k] = open;
+    rows.classList.toggle("open", open); rows.style.maxHeight = ""; rows.scrollTop = 0;
+    btn.setAttribute("aria-expanded", open);
+    var sp = btn.querySelector("span"); if(sp) sp.textContent = open ? "Show fewer" : (btn.dataset.closed || "");
+    if(!open) return;
+    var h = 0; Array.prototype.slice.call(rows.children, 0, lim).forEach(function(c){ h += c.offsetHeight; });
+    if(h) rows.style.maxHeight = h + "px";
+    mvEnd(rows);
+    var step = rows.children[lim] ? rows.children[lim].offsetHeight : 0, still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if(step) requestAnimationFrame(function(){ rows.scrollTo({ top: step, behavior: still ? "auto" : "smooth" }); });
   }
   function mvSet(src, dst){
     /* the set, largest first: the wallet's validators lit (where the stake is, or comes from and goes to); no window
@@ -2358,7 +2404,7 @@
     if(act === "youauto"){ youAuto(); return; }
     if(act === "connect"){ var cb = E("svconn"); if(cb) cb.click(); return; }
     if(act === "faucet"){ faucetGo(t.dataset.t); return; }
-    if(act === "mvmore"){ MVOPEN[t.dataset.k] = !MVOPEN[t.dataset.k]; drawMove(); return; }
+    if(act === "mvmore"){ mvToggle(t); return; }
     if(act === "restakesw"){ rsOpen(); return; }
     if(act === "wtalerts"){ if(t.getAttribute("aria-disabled") !== "true") wtOpen(); return; }
     /* Stake goes to StakePilot (operator, 2026-10-15); its "choose validators myself" link opens the manual list */
@@ -2405,6 +2451,8 @@
     ev.preventDefault(); window.__vshow(t.dataset.v);
   }
   sv.addEventListener("click", onClick);
+  /* an open list's foot fade follows its scroll (scroll does not bubble: caught on the way down) */
+  var mvs = E("mv-stage"); if(mvs) mvs.addEventListener("scroll", function(ev){ var t = ev.target; if(t && t.classList && t.classList.contains("mv-rows")) mvEnd(t); }, true);
   /* the one screen's two columns: YOU shares the dashboard's actions (claim, restake); its Autopilot
      switch opens the setup when off and the Autopilot view when on. A PATH routes like a header tab. */
   var youEl = E("you"), pathsEl = E("paths");

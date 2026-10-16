@@ -1,6 +1,6 @@
 <!doctype html><html lang=en{{STAGE}}><head><meta charset=utf-8>
 <base href="{{BASE}}">
-<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=viewport content="width=device-width,initial-scale=1,interactive-widget=resizes-visual">
 <title>AtomOne Nakamoto Bonus</title>
 <link rel=icon href="assets/favicon.ico" sizes="any"><link rel=icon type="image/png" sizes="32x32" href="assets/favicon-32.png"><link rel=icon type="image/png" sizes="192x192" href="assets/favicon-192.png"><link rel=apple-touch-icon href="assets/apple-touch-icon.png"><meta name=theme-color content="#06060c">
 <script id=shellcfg type=application/json>{{SHELL_CFG}}</script>
@@ -3090,6 +3090,15 @@ transition:filter .15s,transform .12s}
 #wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-ago{display:inline;}
 #wk-plan>.wk-ph .wk-ib{order:3;margin-left:8px}
 @media(max-width:700px){#wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-ago{display:none}}
+/* phones: Redelegate, its lock tag and refresh share one row (operator, 2026-10-16: they broke onto a second row).
+   An empty selection count holds no room; while validators are picked, the tag drops its date for the count */
+@media(max-width:700px){
+  #wk-plan>.wk-ph .wk-seln:empty{display:none}
+  #wk-plan>.wk-ph:has(.wk-seln:not(:empty)) .wk-lockn b:last-of-type{display:none}
+  #wk-plan>.wk-ph h3{flex:0 0 auto}
+  #wk-plan>.wk-ph .wk-lockn{flex:0 1 auto;min-width:0;overflow:hidden}
+  #wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-ib{margin-left:auto}
+}
 /* a row that would pay less is not greyed: it reads like every other row, and only its
    "there" rate turns red to say so */
 #dpicks tbody tr.lt td,#dpicks tbody tr.lt td.nm .nmw>span,#dpicks tbody tr.lt.on td{color:inherit}
@@ -3783,6 +3792,11 @@ border-color:rgba(46,224,106,.3)}
   /* a phone: the lockup keeps its whole tagline; the greeting takes the line under it */
   .brandbar .sv-brand{flex-wrap:wrap;row-gap:6px}
   .welc{flex:1 1 100%;margin-left:0;padding-left:0;border-left:0}
+  .welc:not([hidden]){display:flex;align-items:center;gap:10px}
+  .welc-t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .welc-act{margin-left:auto;flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;font-family:var(--wmono);font-size:9.5px;line-height:1;letter-spacing:.14em;
+    text-transform:uppercase;padding:6px 10px;border-radius:999px;border:1px solid var(--wamber);background:rgba(255,176,46,.14);color:var(--wamber);cursor:pointer}
+  .welc-act:focus-visible{outline:2px solid var(--wamber);outline-offset:2px}
   
   .sv-chips{grid-template-columns:minmax(0,1fr)}
 }
@@ -6092,6 +6106,8 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-rows .mv-x{display:none}
 .mv-rows.open .mv-x{display:grid}
 .mv-rows.open{max-height:210px;overflow-y:auto;scrollbar-width:thin;overscroll-behavior:contain}
+/* an open list says it scrolls: its foot fades while there is more below (operator, 2026-10-16) */
+.mv-rows.open:not(.end){-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent)}
 @media(prefers-reduced-motion:reduce){.mv-more svg{transition:none}}
 .mv-arr{display:flex;justify-content:center}
 .mv-arr svg{width:40px;height:18px;fill:none;stroke:var(--sv-teal);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -6741,7 +6757,7 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
   #mv-stage .mv-top .mv-chip:not(#z){flex:0 0 auto;margin-left:6px;font-size:8.5px;letter-spacing:.06em;padding:4px 8px;white-space:nowrap}
   /* the headline figure and the line under it: one row each, whatever the amount; simple.js steps the size down to
      fit (hlFit), starting smaller than the desktop's 40px (operator: "too big") */
-  #mv-stage .mv-hl>b:not(#z){font-size:30px;white-space:nowrap;overflow:hidden}
+  #mv-stage .mv-hl>b:not(#z){font-size:30px;white-space:nowrap;overflow:hidden;padding-bottom:.18em;margin-bottom:-.18em}   /* the clip reaches the descenders: "Earning" kept a cut-off g (operator, 2026-10-16) */
   #mv-stage .mv-hl>span:not(.mv-lock):not(#z){font-size:13.5px;white-space:nowrap;overflow:hidden}
   /* Stake more never leaves the line (2026-10-15): the words step down in size first (hlFit), then end in an
      ellipsis, the link stays whole; a phone drops the words marked mv-wide (Autopilot's every 12 hours, which its

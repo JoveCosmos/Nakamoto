@@ -626,6 +626,9 @@
   html[data-theme=light]:not([data-mono]) .sv-btn.pri{background:var(--amber-bar);border-color:var(--amber-bar);color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) .sv-btn.pri:hover:not(:disabled){background:var(--amber-bar);border-color:var(--amber-bar);color:#FFFFFF}
   html[data-theme=light]:not([data-mono]) #sv-optp.hero{background:var(--accent-soft),var(--wh);border-color:var(--accent-soft)}
+  @media(max-width:620px){
+    html[data-theme=light]:not([data-mono]) .welc-act{background:var(--warn-bg)}
+  }
   html[data-theme=light]:not([data-mono]) #sv,html[data-theme=light]:not([data-mono]) #sd-mstrip{--sv-amber:var(--warn);--sv-green:var(--accent);--sv-violet:var(--accent);--sv-teal:var(--accent);--sv-pho:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sv-screen{background:var(--surface-2);border-color:var(--line)}
   html[data-theme=light]:not([data-mono]) .sv-screen>.sv-panel,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card:first-child,html[data-theme=light]:not([data-mono]) .sv-screen .sv-card+.sv-card{background:var(--surface-2);box-shadow:none}

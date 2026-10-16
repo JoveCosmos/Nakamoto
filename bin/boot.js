@@ -58,3 +58,30 @@ try{(function(){
    dashboard sits where the calculator sits before the calculator has been laid out */
 try{ var cb = (localStorage.getItem("th_calcbox") || "").split("/");
   if(cb.length === 3 && +cb[2] === innerWidth && +cb[1] > 100){ document.documentElement.style.setProperty("--calc-top", cb[0] + "px"); document.documentElement.style.setProperty("--calc-h", cb[1] + "px"); } }catch(e){}
+
+/* The keyboard is not a new screen (operator, 2026-10-16: "when input field is clicked, the keyboard opens, which
+   shuffles the page ... the layout, app elements, all should be stable, rooted"). Every layout measure here listens
+   to resize - the frame, the map, the fits - and an on-screen keyboard that shrinks the window (Android's in-app
+   browsers, Keplr's among them) fired them all mid-typing. On a touch screen, a resize that keeps the width while a
+   field has the focus is the keyboard opening or closing: no listener sees it, so the page keeps the layout it had.
+   The decision is made once per resize, by the first listener, before any other runs. */
+try{(function(){
+  if(!(window.matchMedia && matchMedia("(pointer:coarse)").matches)) return;
+  var W = innerWidth, KB = false, add = window.addEventListener;
+  function editing(){
+    var a = document.activeElement; if(!a) return false; if(a.isContentEditable || a.tagName === "TEXTAREA") return true;
+    return a.tagName === "INPUT" && !/^(button|checkbox|radio|range|submit|reset|file|color|image|hidden)$/i.test(a.type || "text");
+  }
+  add.call(window, "resize", function(){ KB = innerWidth === W && editing(); if(!KB) W = innerWidth; });
+  window.__kbd = function(){ return KB; };
+  window.addEventListener = function(type, fn, opt){
+    if(type !== "resize" || typeof fn !== "function") return add.call(window, type, fn, opt);
+    return add.call(window, type, function(e){ if(KB) return; return fn.call(this, e); }, opt);
+  };
+})();}catch(e){}
+
+/* iPhones and iPads zoom the whole page into any field set under 16px and leave it zoomed: the page "shuffles". Their
+   pinch zoom ignores maximum-scale, so this only stops the automatic zoom; Android, which does not auto-zoom and does
+   honour the cap, is left alone */
+try{ if(/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)){
+  var vpm = document.querySelector("meta[name=viewport]"); if(vpm && !/maximum-scale/.test(vpm.content)) vpm.content += ",maximum-scale=1"; } }catch(e){}
