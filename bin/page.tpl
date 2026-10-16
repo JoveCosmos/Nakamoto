@@ -2827,6 +2827,17 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 /* phones and tablets: Pro's Stake, Unstake and Claim live in the balance boxes they act on (operator, 2026-10-16); the
    buttons stay in the page, hidden, as the boxes' and the tabs' way into the same cards */
 @media(max-width:1099px){#p-dele #wbody #wk-mine .wk-t1 :is(#stbtn,#unbtn,#clbtn){display:none}}
+/* phones: every balance box centres its title and figure, and what sat in its corner (the actions, the restake mark)
+   takes a third row of its own, centred, at the box's foot (operator, 2026-10-16: "use 3rd row for buttons. center
+   align, also amounts and titles"); the figure has the box's whole width */
+@media(max-width:620px){
+  .mv-bal .mv-yk:not(#z){align-items:center;text-align:center}
+  .mv-bal .mv-yk>:is(em,b):not(#z){align-self:stretch;text-align:center}
+  .mv-bal .mv-yk>em:not(#z){text-indent:.14em}   /* the letter-spacing after the last letter, balanced */
+  .mv-bal .mv-yk>:is(.yk-act,.you-rsx):not(#z){position:static;order:3;align-self:center;margin-top:auto;padding-top:8px}
+  .mv-bal .mv-yk>:is(.yk-act,.you-rsx)~b:not(#z){padding-right:0}
+  .mv-bal .mv-yk>.you-rsx:not(#z){flex-direction:row;align-items:baseline;gap:5px}
+}
 .pop .card.stcard::before{background:linear-gradient(90deg,transparent,var(--wgreen),transparent)}
 .stcard .txsum{color:var(--wgreen)}
 

@@ -362,6 +362,8 @@
     Array.prototype.forEach.call(el.querySelectorAll(".mv-bal .mv-yk>b"), function(x){
       var box = x.parentElement, ac = box.querySelector(".yk-act");
       box.classList.remove("wrap"); x.style.fontSize = ""; x.style.paddingRight = "";
+      /* phones give the actions a row of their own (the CSS): only actions beside the figure need room kept */
+      if(ac && getComputedStyle(ac).position !== "absolute") ac = null;
       if(!x.clientWidth) return;
       var over = function(){ var rg = document.createRange(), cs = getComputedStyle(x); rg.selectNodeContents(x);
         return rg.getBoundingClientRect().width > x.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) + 0.5; };
