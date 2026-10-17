@@ -106,10 +106,11 @@ const bal = async (a, dn) => +(((await chain("/cosmos/bank/v1beta1/balances/" + 
     E.type('stamt', '1'); await E.sleep(300); E.click('#stlist tbody input[data-id]'); await E.wait(function(){ var b = document.getElementById('stsign'); return b && !b.disabled; }, 30000, 'Stake enabled');
     E.click('#stsign')`, async (d, s) => ({ check: s.msgs.length === 1 && s.msgs[0] === "MsgDelegate" && d.tx.body.messages[0].amount.amount === "1000000" ? "ok" : "FAILED" }));
 
-  // 3 Stake with Ask Pilot
+  // 3 Stake card -> Ask Pilot -> StakePilot (one Pilot since 2026-10-17): the typed amount rides along, StakePilot signs
   await run("stake-askpilot", `E.click('#stbtn'); await E.wait(function(){ return E.vis('#stamt'); }, 15000, 'Stake card');
-    E.click('#stask'); E.type('stamt', '2'); await E.wait(function(){ var b = document.getElementById('stsign'); return b && !b.disabled; }, 30000, 'Stake enabled');
-    E.click('#stsign')`, async (d, s) => {
+    E.type('stamt', '2'); E.click('#stask'); await E.wait(function(){ return E.vis('#spamt') && document.getElementById('spamt').value; }, 15000, 'StakePilot with the amount');
+    await E.wait(function(){ var b = document.getElementById('spsign'); return b && !b.disabled; }, 30000, 'StakePilot sign enabled');
+    E.click('#spsign')`, async (d, s) => {
     const tot = d.tx.body.messages.reduce((t, m) => t + +m.amount.amount, 0);
     return { legs: s.msgs.length, check: tot === 2e6 && s.msgs.every(m => m === "MsgDelegate") ? "ok" : "FAILED total " + tot };
   });

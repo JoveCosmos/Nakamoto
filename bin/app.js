@@ -2990,7 +2990,7 @@ rememberGridH();
 
   /* ── stake: liquid ATONE onto validators the reader ticks, split equally, one
      MsgDelegate each - the same list as Redelegate, priced at the share that lands ── */
-  var stpop = E("stpop"), STSEL = {}, ST_PILOT = false;
+  var stpop = E("stpop"), STSEL = {};
   function stCands(){
     return window.__candidates({ except: {}, cleanRecord: CLEAN }).map(function(v){ v.rate0 = window.__rateAfter(v.t, v.c, 0); return v; })
       .sort(function(a, b){ return a.rank - b.rank; });
@@ -2998,16 +2998,6 @@ rememberGridH();
   function stAmount(){ var a = E("stamt"), n = window.__amountIn(a.value); return isFinite(n) && n > 0 ? Math.round(n * 1e6) : 0; }
   function stBal(){ var b = window.__BAL; return b && b.uatone > 0 ? b.uatone : 0; }
   function stPlan(){
-    /* Ask Pilot: the move for the amount typed, by Autopilot's own rule (pilotPlan, the shelf rise); everything that reads
-       the plan (the list, the summary, the fee, what Stake signs, Pro's outcome) follows it unchanged */
-    if(ST_PILOT){
-      var pu = stAmount(), pl = pu > 0 && window.__pilotPlan ? window.__pilotPlan(pu) : null;
-      var prow = pl ? pl.legs.slice().sort(function(a, b){ return a.rank - b.rank; }).map(function(l){ return { id: l.id, m: l.m, x: l.x, after: l.after, rank: l.rank, t: l.t }; }) : [];
-      var prest = 0, ppos = window.__POS, psh = {}; prow.forEach(function(r){ psh[r.id] = r.x; });
-      if(prow.length && ppos) ppos.rows.forEach(function(row){ var v = (window.__VALS() || []).filter(function(q){ return q[3] === row.id; })[0];
-        if(!v || row.inactive) return; prest += row.x * (window.__rateAfterNew(v[1], v[2], psh[row.id] || 0, pu) - row.rate); });
-      return { u: pu, n: prow.length, share: prow.length ? 1 : 0, rate: pl ? pl.rate : 0, rows: prow, rest: prest, pilot: pl };
-    }
     var u = stAmount(), ids = Object.keys(STSEL), n = ids.length, share = n ? Math.floor(u / n) : 0, earned = 0, rows = [];
     if(u > 0 && n) stCands().forEach(function(v){ if(!STSEL[v.id]) return; var aft = window.__rateAfterNew(v.t, v.c, share, u); earned += share * aft; rows.push({ id: v.id, m: v.m, x: share, after: aft }); });
     /* an inactive validator ticked in the closing row: its share earns nothing while it is out */
@@ -3024,16 +3014,9 @@ rememberGridH();
       if(!v || row.inactive) return; rest += row.x * (window.__rateAfterNew(v[1], v[2], sh[row.id] || 0, u) - row.rate); });
     return { u: u, n: n, share: share, rate: u > 0 && n ? earned / (share * n) : 0, rows: rows, rest: rest };
   }
-  /* the validators of Pilot's move as Stake list rows (rank order), with the records the list shows */
-  function stPilotCands(P){
-    var all = {}; window.__candidates({}).forEach(function(v){ all[v.id] = v; });
-    return P.rows.map(function(r){ var v = all[r.id] || { id: r.id, m: r.m, t: r.t, rank: r.rank, jail: null, up: null }; v.rate0 = r.after; return v; });
-  }
   function stRows(){
     var el = E("stlist"); if(!el) return;
     var P = stPlan(), by = {}; P.rows.forEach(function(r){ by[r.id] = r; });
-    /* Ask Pilot with no amount yet: what it does, in the list's own box */
-    if(ST_PILOT && !(P.u > 0)){ el.innerHTML = '<div class=st-pe><b>Pilot picks for you</b><span>Type an amount: Pilot spreads it where it earns the most.</span></div>'; return; }
     /* Redelegate's very table (operator, 2026-09-30: "same to same ... each and every pixel"): its columns, widths,
        titles and cells - rank, the name with what this stake adds, the validator's stake, its record, and APR now → there */
     var pos = window.__POS, now = pos && pos.rows.length ? pos.rate : 0, MEAN = window.__S() / window.__VALS().length;
@@ -3044,20 +3027,19 @@ rememberGridH();
     var lw = el.clientWidth || 0;
     if(wide && lw && lw < 30 + 36 + 64 + 70 + 72 + 64 + 50 + 104 + 170) wide = false;
     if(!ph && lw && lw < 30 + 36 + 64 + 72 + 50 + 104 + 170) ph = true;
-    /* Pilot's move is this same table holding only the validators Pilot stakes on, ticked by Pilot and locked */
-    var cands = ST_PILOT ? stPilotCands(P) : stCands(), allOn = !ST_PILOT && cands.length && cands.every(function(o){ return STSEL[o.id]; });
+    var cands = stCands(), allOn = cands.length && cands.every(function(o){ return STSEL[o.id]; });
     /* docked in Pro the cells are 11 px with 7 px sides: a 52 px stake column cut "924.5k" to "924..." */
     var dk = !!(el.closest && el.closest("#prolist"));
     var h = '<table' + (ph ? ' class=cmp' : '') + '><colgroup>' + (ph ? '<col style="width:26px"><col style="width:30px"><col><col style="width:' + (dk ? 60 : 52) + 'px"><col style="width:58px">'
             : '<col style="width:30px"><col style="width:36px"><col><col style="width:64px">' + (wide ? '<col style="width:70px">' : '') + '<col style="width:72px">' + (wide ? '<col style="width:64px">' : '') + '<col style="width:50px"><col style="width:104px">') + '</colgroup>' +
-            '<thead><tr><th class=ck>' + (ST_PILOT ? '' : '<input type=checkbox class=pro-all aria-label="Tick every validator"' + (allOn ? ' checked' : '') + '>') + '</th><th class=c>rank</th><th class=l>validator</th>' +
+            '<thead><tr><th class=ck><input type=checkbox class=pro-all aria-label="Tick every validator"' + (allOn ? ' checked' : '') + '></th><th class=c>rank</th><th class=l>validator</th>' +
             '<th title="the validator\'s stake; green below the average size, where the bonus pays">stake</th>' + (wide ? '<th title="blocks signed over every block on record">signed</th>' : '') + (ph ? '' : '<th>90<span class=lc>d</span> uptime</th>') + (wide ? '<th title="blocks proposed">proposed</th>' : '') + (ph ? '' : '<th>jailed</th>') +
             '<th>APR</th></tr></thead><tbody>';
     cands.forEach(function(o){
-      var on = ST_PILOT || !!STSEL[o.id], m = by[o.id], there = m ? m.after : o.rate0;
+      var on = !!STSEL[o.id], m = by[o.id], there = m ? m.after : o.rate0;
       var d = (window.__VDBY && window.__VDBY[o.id]) || {}, u90 = d.d90 != null ? +d.d90 : (o.up != null ? +o.up : null);
       var vp = o.t / window.__S() * 100, lu = d.life_up != null ? +d.life_up : null, pr = d.prop != null ? +d.prop : null;
-      h += '<tr class="' + (on ? 'on' : '') + '"><td class=ck><input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + (ST_PILOT ? ' disabled tabindex=-1 title="Pilot\'s pick"' : '') + '></td>' +
+      h += '<tr class="' + (on ? 'on' : '') + '"><td class=ck><input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + '></td>' +
            '<td class="c rk">' + o.rank + '</td><td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span>' +
            (m && m.x > 0 ? '<em class="gtag add" title="what this stake adds">+' + fmt(m.x) + '</em>' : '') + '</div></td>' +
            '<td class="stk" title="' + big(o.t) + ' ATONE, ' + vp.toFixed(vp < 1 ? 2 : 1) + '% of all stake; ' + (o.t < MEAN ? 'below the average size: the bonus pays here' : 'above the average size') + '">' + big(o.t) + '</td>' +
@@ -3067,15 +3049,6 @@ rememberGridH();
            (ph ? '' : o.jail == null ? '<td class=dim>N/A</td>' : '<td class="' + (!o.jail ? 'ok' : o.jail > 1 ? 'bad' : 'warn') + '">' + (o.jail ? o.jail : 'Never') + '</td>') +
            '<td class=r2><b>' + pct(there) + '</b></td></tr>';     /* the validator's APR with this stake on it: nothing to compare */
     });
-    if(ST_PILOT){
-      /* Autopilot moves nothing under 1 ATONE (keeper GAP), and neither does Pilot */
-      var pl = P.pilot;
-      /* no place: the words alone in the list's box, as the empty field's prompt; no table of titles over nothing */
-      if(!P.rows.length){ el.innerHTML = '<div class=st-pe><span>' + (P.u < 1e6 ? 'Pilot stakes 1 ATONE or more' : 'Pilot has no place for this amount right now') + '.</span></div>'; return; }
-      /* the move itself, no caption over it (operator, 2026-10-17); a part the shelf cannot place is said under the table */
-      var ptop = el.scrollTop; el.innerHTML = h + '</tbody></table>' + (pl && pl.left >= 1e6 ? '<div class=st-pcap>' + fmt(pl.left) + ' ATONE stays in your wallet: Pilot places no more today.</div>' : '');
-      el.scrollTop = ptop; return;
-    }
     h += ijRows("st", (h.match(/<col[ >]/g) || []).length, STSEL);
     var top = el.scrollTop; el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
     ijWire(el, stRows);
@@ -3141,14 +3114,13 @@ rememberGridH();
     if(mx) mx.textContent = exact(bal, 2);
     var over = P.u > bal, ok = P.u > 0 && P.n > 0 && !over && P.share > 0;
     if(fld) fld.classList.toggle("bad", !!over);
-    if(hint){ hint.className = "unhint" + (over ? " bad" : ""); hint.textContent = over || ST_PILOT ? "" : (P.u > 0 && !P.n ? "Select a validator" : ""); }   /* over the balance: the box turns red, no words */
+    if(hint){ hint.className = "unhint" + (over ? " bad" : ""); hint.textContent = over ? "" : (P.u > 0 && !P.n ? "Select a validator" : ""); }   /* over the balance: the box turns red, no words */
     if(go) go.disabled = !ok || !window.__WALLET;
     var sb = E("stbell"); if(sb) sb.disabled = !P.n;
-    var sn = E("stseln"); if(sn) sn.innerHTML = P.n && !ST_PILOT ? "<b>" + P.n + "</b>selected" : "";
+    var sn = E("stseln"); if(sn) sn.innerHTML = P.n ? "<b>" + P.n + "</b>selected" : "";
     /* the blended rate rides in the summary's second line */
-    /* Pilot's move states what the shelf places (any part it cannot place stays in the wallet and is not signed) */
     /* a phone keeps the amount and the rate: the count is in the list and beside the field */
-    if(sm) sm.innerHTML = ok ? fmt(P.pilot ? P.pilot.staked : P.u) + " ATONE<br><span class=kps-w>to " + P.n + " validator" + (P.n === 1 ? "" : "s") + " </span>at " + pct(P.rate) : "";
+    if(sm) sm.innerHTML = ok ? fmt(P.u) + " ATONE<br><span class=kps-w>to " + P.n + " validator" + (P.n === 1 ? "" : "s") + " </span>at " + pct(P.rate) : "";
     if(lk) lk.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
       '<span>Staked ATONE earns from the next block; locked; unbonding takes <b>21 days</b>.</span>';
     E("stfee").textContent = ""; var st = E("ststep"); st.textContent = ""; st.className = "txstep";
@@ -3158,20 +3130,20 @@ rememberGridH();
   var stbtn = E("stbtn");
   if(stbtn) stbtn.addEventListener("click", function(){
     if(!stpop || !window.__POS) return;
-    STSEL = {}; ST_PILOT = false; stAskSync(); var a = E("stamt"); if(a) a.value = "";
+    STSEL = {}; var a = E("stamt"); if(a) a.value = "";
     var go = E("stsign"); if(go){ go.disabled = true; go.textContent = "Stake"; }
     stRows(); stState(); window.__openCard(stpop); window.__kbFocus(a);
   });
-  /* Ask Pilot toggles the list between the reader's own picks and Pilot's move; the ticks are kept for the way back */
+  /* Ask Pilot and StakePilot are one thing (operator, 2026-10-17: "merge them"): the button opens StakePilot's card with
+     the amount typed so far, and its "Choose validators myself" comes back here with it */
   var stask = E("stask");
-  function stAskSync(){ if(stask) stask.setAttribute("aria-pressed", ST_PILOT ? "true" : "false"); }
-  if(stask) stask.addEventListener("click", function(){ ST_PILOT = !ST_PILOT; stAskSync(); var el = E("stlist"); if(el) el.scrollTop = 0; stRows(); stState(); });
+  if(stask) stask.addEventListener("click", function(){ var u = stAmount(); window.__closeCard(stpop); if(window.__pilot) window.__pilot(u); });
   var stamtEl = E("stamt"); if(stamtEl) stamtEl.addEventListener("input", function(){ stRows(); stState(); });
   var stmax = E("stmax"); if(stmax) stmax.addEventListener("click", function(){ if(!(stBal() > 0)) return; E("stamt").value = exact(stBal()); stRows(); stState(); });
-  /* Ask Pilot leaves nothing behind (operator, 2026-10-17, as the Redelegate grant once carried over): closed, docked
-     away, the view left (undock calls this) or the wallet gone, the card drops Pilot's mode, the ticks and the amount;
-     a card opened on top (Alerts, a validator) only hides it and keeps them */
-  function stReset(){ ST_PILOT = false; STSEL = {}; stAskSync(); var a = E("stamt"); if(a) a.value = "";
+  /* the card leaves nothing behind (operator, 2026-10-17, as the Redelegate grant once carried over): closed, docked
+     away, the view left (undock calls this) or the wallet gone, it drops the ticks, the amount, the list and the
+     summary; a card opened on top (Alerts, a validator) only hides it and keeps them */
+  function stReset(){ STSEL = {}; var a = E("stamt"); if(a) a.value = "";
     var l = E("stlist"); if(l) l.innerHTML = ""; var sm = E("stsum"); if(sm) sm.innerHTML = ""; }   /* the next open draws them fresh */
   /* a wallet gone: the card itself closes (docked or not, and with anything opened on top of it) */
   window.__stReset = function(){ if(window.__closeCard) window.__closeCard(stpop); stReset(); };
@@ -3264,18 +3236,20 @@ rememberGridH();
     var st = E("spstep"); if(st){ st.textContent = ""; st.className = "txstep"; }
     feeSoon("sp", E("spfee"), ok ? spMsgs : null);
   }
-  window.__pilot = function(){
+  window.__pilot = function(u0){
     if(!sppop || !window.__ADDR) return;
-    var a = E("spamt"); if(a) a.value = "";
+    var a = E("spamt"); if(a) a.value = u0 > 0 ? exact(u0) : "";
     SP.key = ""; var go = E("spsign"); if(go){ go.disabled = true; go.classList.remove("busy"); }
-    spSyncRange(0); spState(); POP.open(sppop); window.__kbFocus(a);
+    spSyncRange(u0 > 0 ? u0 : 0); spState(); POP.open(sppop); window.__kbFocus(a);
   };
   window.__pilotRedo = function(){ if(sppop && sppop.classList.contains("on")) spState(); };
-  if(sppop) sppop.__onclose = function(){ feeSoon("sp"); };
+  /* closed, it keeps no amount and no plan (the next open starts clean) */
+  if(sppop) sppop.__onclose = function(){ feeSoon("sp"); SP.plan = null; SP.key = ""; var a = E("spamt"); if(a) a.value = ""; spSyncRange(0); spState(); };
   var spamtEl = E("spamt"); if(spamtEl) spamtEl.addEventListener("input", function(){ spSyncRange(spAmount()); spState(); });
   var sprng = E("sprng"); if(sprng) sprng.addEventListener("input", function(){ var u = spSlid(); E("spamt").value = u > 0 ? exact(u) : ""; spFill(); spState(); });
   var spmax = E("spmax"); if(spmax) spmax.addEventListener("click", function(){ if(!(spMax() > 0)) return; E("spamt").value = exact(spMax()); spSyncRange(spMax()); spState(); });
-  var spown = E("spown"); if(spown) spown.addEventListener("click", function(){ POP.close(sppop); var sb = E("stbtn"); if(sb) setTimeout(function(){ sb.click(); }, 0); });
+  var spown = E("spown"); if(spown) spown.addEventListener("click", function(){ var u = spAmount(); POP.close(sppop); var sb = E("stbtn");
+    if(sb) setTimeout(function(){ sb.click(); var a = E("stamt"); if(a && u > 0){ a.value = exact(u); a.dispatchEvent(new Event("input")); } }, 0); });
   var spsign = E("spsign");
   if(spsign) spsign.addEventListener("click", function(){
     var msgs = spMsgs(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
@@ -4000,7 +3974,7 @@ rememberGridH();
     return out;
   }
   var txbell = E("txbell"); if(txbell) txbell.addEventListener("click", function(){ if(window.__alertMany) window.__alertMany(alertList(MSGS.map(function(m){ return m.to; }))); });
-  var stbell = E("stbell"); if(stbell) stbell.addEventListener("click", function(){ if(window.__alertMany) window.__alertMany(alertList(ST_PILOT ? stPlan().rows.map(function(r){ return r.id; }) : Object.keys(STSEL))); });
+  var stbell = E("stbell"); if(stbell) stbell.addEventListener("click", function(){ if(window.__alertMany) window.__alertMany(alertList(Object.keys(STSEL))); });
   if(!window.__BOT){ if(txbell) txbell.hidden = true; if(stbell) stbell.hidden = true; }
 
   /* The simple view's one question: what would the best placement of everything
