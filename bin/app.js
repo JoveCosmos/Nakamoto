@@ -1453,7 +1453,7 @@ rememberGridH();
       box.querySelector("b").textContent = (c.goal * 100).toFixed(0) + "%";
       /* the wide words, then the phone's one line */
       var lo = (c.imin * 100).toFixed(0) + "%", two = function(w, p){ return '<span class=kps-w>' + w + '</span><span class=kps-p>' + p + '</span>'; };
-      box.querySelector("small").innerHTML = need > 0 ? two("past it, inflation reverses toward " + lo + " minimum", "past it, falls to " + lo)
+      box.querySelector("small").innerHTML = need > 0 ? two("past it, inflation reverses toward " + lo + " minimum", "past it, falls toward " + lo)
         : atLo ? two("inflation holds at its " + lo + " minimum", "holds at " + lo + " minimum") : two("inflation falls toward " + lo + " minimum", "falls toward " + lo);
       if(mv){ mv.hidden = false;
         mv.innerHTML = need > 0
