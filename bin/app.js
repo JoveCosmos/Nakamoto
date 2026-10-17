@@ -3324,6 +3324,8 @@ rememberGridH();
   window.__spIds = function(){ return SP.plan ? SP.plan.legs.map(function(q){ return q.id; }) : []; };
   /* live figures re-plan the view wherever it is shown: a popup, or Pro's panes */
   window.__pilotRedo = function(){ if(sppop && sppop.classList.contains("on")) spState(); };
+  /* the chain moves while it is open: each live read re-plans it, so the figures and the pour stay the chain's own */
+  window.addEventListener("thermo:live", function(){ window.__pilotRedo(); });
   /* a wallet gone: the Pilot view closes as the Stake card does */
   window.__spReset = function(){ if(sppop && window.__closeCard) window.__closeCard(sppop); };
   /* closed, it keeps no amount and no plan (the next open starts clean) */
