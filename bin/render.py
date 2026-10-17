@@ -394,6 +394,29 @@ for _pg in (() if TESTNET else ("admin",)):          # the faucet page is gone: 
     _ah = _bare_html(open(os.path.join(os.path.dirname(__file__), _pg + ".html")).read()).replace('src="%s.js"' % _pg, 'src="%s.js?v=%s"' % (_pg, hashlib.sha256(_ajs).hexdigest()[:10]))
     for _fn, _body in ((_pg + ".js", _ajs), (_pg + ".html", _ah.encode())):
         _t = os.path.join(OUT, "." + _fn + ".tmp"); open(_t, "wb").write(_body); os.chmod(_t, 0o640); os.replace(_t, os.path.join(OUT, _fn))
+# the tools (2026-10-17): /tools (index), /tools/revoke, /tools/send - small pages reached by direct link, never from the
+# app; one shared sheet and script, a page and script each, all content-hashed, built for BOTH networks under OUT/tools/
+# (the page's payload names the network, as the app's does for tx.js)
+_td, _to = os.path.join(os.path.dirname(__file__), "tools"), os.path.join(OUT, "tools")
+os.makedirs(_to, exist_ok=True)
+_tv = {}
+for _fn in ("tools.js", "index.js", "revoke.js", "send.js"):
+    _chk = subprocess.run(["/usr/bin/node", "--check", os.path.join(_td, _fn)], capture_output=True, text=True)
+    if _chk.returncode != 0:
+        sys.exit("atomone-app: FATAL tools/%s does not parse:\n%s" % (_fn, _chk.stderr.strip()[-600:]))
+    _b = _served_js(os.path.join(_td, _fn)); _tv[_fn] = hashlib.sha256(_b).hexdigest()[:10]
+    _t = os.path.join(_to, "." + _fn + ".tmp"); open(_t, "wb").write(_b); os.chmod(_t, 0o640); os.replace(_t, os.path.join(_to, _fn))
+_css = _bare_css(open(os.path.join(_td, "tools.css")).read()).encode(); _tv["tools.css"] = hashlib.sha256(_css).hexdigest()[:10]
+_t = os.path.join(_to, ".tools.css.tmp"); open(_t, "wb").write(_css); os.chmod(_t, 0o640); os.replace(_t, os.path.join(_to, "tools.css"))
+_txv = hashlib.sha256(open(os.path.join(OUT, "tx.js"), "rb").read()).hexdigest()[:10]
+_netjson = json.dumps({"net": NETCFG}).replace("<", "\\u003c")
+for _pg in ("index", "revoke", "send"):
+    _h = _bare_html(open(os.path.join(_td, _pg + ".html")).read())
+    _h = (_h.replace("{{BASE}}", NETCFG["base"]).replace("{{NETJSON}}", _netjson).replace("{{NETNAME}}", NETCFG["name"])
+            .replace("{{ON_MAIN}}", "" if TESTNET else "on").replace("{{ON_TEST}}", "on" if TESTNET else "")
+            .replace('tools/tools.css"', 'tools/tools.css?v=%s"' % _tv["tools.css"]).replace('tools/tools.js"', 'tools/tools.js?v=%s"' % _tv["tools.js"])
+            .replace('tools/%s.js"' % _pg, 'tools/%s.js?v=%s"' % (_pg, _tv[_pg + ".js"])).replace('src="%stx.js"' % NETCFG["base"], 'src="%stx.js?v=%s"' % (NETCFG["base"], _txv)))
+    _t = os.path.join(_to, "." + _pg + ".html.tmp"); open(_t, "w").write(_h); os.chmod(_t, 0o640); os.replace(_t, os.path.join(_to, _pg + ".html"))
 # Brand marks: AtomOne and PHOTON are the official chain-registry SVGs, GATA is the
 # same mark the snapshot pages use. Published from bin/ like everything else.
 # the Constitution view's text: the official file, converted once per render into a fragment the
