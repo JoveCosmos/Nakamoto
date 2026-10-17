@@ -4409,6 +4409,18 @@ background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.01))}
   .sv-rd::before{right:auto;left:10px;top:auto;bottom:0;width:auto;right:10px;height:2px;border-radius:2px 2px 0 0}
   .sv-rd small{white-space:normal}
 }
+/* phones: a rail's three readouts on one row, compact (operator, 2026-10-17: "3 boxes could be in one row"); a label
+   and a figure step their type down to fit their third (simple.js railFit), the line under them takes two lines */
+@media(max-width:620px){
+  .sv-rail:not(#z){grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  .sv-rd:not(#z){padding:6px 4px 8px;gap:2px}
+  .sv-rd::before{left:8px;right:8px}
+  .sv-rd>em:not(#z){align-self:stretch;font-size:7.5px;letter-spacing:.08em;overflow:hidden;text-align:center}
+  .sv-rd>b:not(#z){align-self:stretch;font-size:15px;overflow:hidden;text-align:center}
+  /* the line under a figure wraps to two lines and always keeps two, so a reading that arrives moves nothing */
+  .sv-rd>small:not(#z){align-self:stretch;font-size:9px;line-height:1.2;min-height:2.4em;white-space:normal;text-align:center;
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+}
 /* the span cards: centred, the figure over a strip of the set */
 .sv-span{align-items:center;text-align:center;gap:6px}
 #sv-netcards .sv-span .sv-k{display:flex;align-items:center;gap:10px;width:100%;justify-content:center}

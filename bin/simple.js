@@ -688,7 +688,7 @@
   /* every figure on Network is a readout hanging from its panel's lit top edge: the label, the
      value, a line under it, centred, in its own colour (--rc) */
   function st(label, value, meta, sw){
-    return '<span class=sv-rd' + (sw ? ' style="--rc:' + sw + '"' : '') + '><em>' + label + '</em><b>' + value + '</b>' + (meta ? '<small>' + meta + '</small>' : '') + '</span>';
+    return '<span class=sv-rd' + (sw ? ' style="--rc:' + sw + '"' : '') + '><em>' + label + '</em><b>' + value + '</b><small>' + (meta || '') + '</small></span>';   /* the line is always there: a reading that arrives with one moves nothing */
   }
   var DAYN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   function big(u){ var a = u / 1e6; return a >= 1e6 ? (a / 1e6).toFixed(1) + "M" : a >= 1e3 ? (a / 1e3).toFixed(1) + "k" : a.toFixed(1); }
@@ -2389,7 +2389,20 @@
     else if(s === "daos") drawDaos();
     else if(s === "cons") drawCons();
     else drawNet();
+    railFit();
   }
+  /* phones: every Network rail's three readouts sit on one row; a figure steps its type down until it fits its third
+     (operator, 2026-10-17: "3 boxes could be in one row ... adjust sizes and fix in one row") */
+  function railFit(){
+    if(!(window.matchMedia && matchMedia("(max-width:620px)").matches)) return;
+    Array.prototype.forEach.call(document.querySelectorAll(".sv-rail .sv-rd>b, .sv-rail .sv-rd>em"), function(x){
+      if(!x.clientWidth) return;
+      x.style.fontSize = "";
+      var fs = parseFloat(getComputedStyle(x).fontSize), min = x.tagName === "EM" ? 6 : 10;
+      while(x.scrollWidth > x.clientWidth + 1 && fs > min){ fs -= 0.25; x.style.fontSize = fs + "px"; }
+    });
+  }
+  window.addEventListener("resize", railFit);
   function schedule(){
     if(pending) return;
     pending = true; requestAnimationFrame(function(){ pending = false; render(); });
