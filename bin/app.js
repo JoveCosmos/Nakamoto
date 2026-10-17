@@ -3193,12 +3193,21 @@ rememberGridH();
      figures roll to their new values, the validators it lands on are chips, and the set is drawn on a canvas with the
      stake pouring into them - the shelf rising as the amount grows. The drawing runs only while the view is shown ── */
   var SPV = { a: null, y: null, raf: 0 }, REDUCED = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* a figure is never cut (a phone, a large amount): its type steps down until the value it rolls to fits its box */
+  function spFit(b, text){
+    b.style.fontSize = ""; if(!b.clientWidth) return;
+    var keep = b.textContent; b.textContent = text;
+    var fs = parseFloat(getComputedStyle(b).fontSize);
+    while(b.scrollWidth > b.clientWidth + 0.5 && fs > 14){ fs -= 1; b.style.fontSize = fs + "px"; }
+    b.textContent = keep;
+  }
   function spHero(P){
     var el = E("spout"), A = E("spapr"), Y = E("spyr"); if(!el || !A || !Y) return;
     el.classList.toggle("idle", !P);
     cancelAnimationFrame(SPV.raf);
-    if(!P){ SPV.a = SPV.y = null; A.textContent = "-"; Y.textContent = "-"; return; }
+    if(!P){ SPV.a = SPV.y = null; A.textContent = "-"; Y.textContent = "-"; A.style.fontSize = Y.style.fontSize = ""; return; }
     var a1 = P.rate, y1 = P.earned, a0 = SPV.a == null ? a1 : SPV.a, y0 = SPV.y == null ? 0 : SPV.y, t0 = performance.now(), D = REDUCED ? 0 : 340;
+    spFit(A, pct(Math.max(a0, a1))); spFit(Y, "+" + fmt(Math.max(y0, y1)));
     (function roll(n){
       var k = D ? Math.min(1, (n - t0) / D) : 1, e = 1 - Math.pow(1 - k, 3);
       SPV.a = a0 + (a1 - a0) * e; SPV.y = y0 + (y1 - y0) * e;
@@ -3333,6 +3342,9 @@ rememberGridH();
   window.__spIds = function(){ return SP.plan ? SP.plan.legs.map(function(q){ return q.id; }) : []; };
   /* live figures re-plan the view wherever it is shown: a popup, or Pro's panes */
   window.__pilotRedo = function(){ if(sppop && sppop.classList.contains("on")) spState(); };
+  /* a turned phone or a resized window fits the figures again */
+  window.addEventListener("resize", function(){ if(sppop && sppop.classList.contains("on") && SP.plan){ var A = E("spapr"), Y = E("spyr");
+    if(A && Y){ spFit(A, A.textContent); spFit(Y, Y.textContent); } } });
   /* the chain moves while it is open: each live read re-plans it, so the figures and the pour stay the chain's own */
   window.addEventListener("thermo:live", function(){ window.__pilotRedo(); });
   /* a wallet gone: the Pilot view closes as the Stake card does */
@@ -4638,7 +4650,7 @@ rememberGridH();
     var one = L.map(function(x){ return '<span class="ht-i' + (x[1] ? ' ' + x[1] : '') + '"><i class=ht-ic>' + IC[x[0]] + '</i>' +
       x[2].map(function(p){ return '<' + p[0] + '>' + p[1] + '</' + p[0] + '>'; }).join("") + '</span>'; }).join(sep) + sep;
     /* the set twice: the run slides one set's width and starts again where it began, with no seam */
-    el.innerHTML = '<span class=ht-live><i></i>Live</span><div class=ht-win><div class=ht-run><div class=ht-set>' + one + '</div><div class=ht-set aria-hidden=true>' + one + '</div></div></div>';
+    el.innerHTML = '<div class=ht-win><div class=ht-run><div class=ht-set>' + one + '</div><div class=ht-set aria-hidden=true>' + one + '</div></div></div>';
     el.hidden = false;
     var set = el.querySelector(".ht-set"), w = set ? set.getBoundingClientRect().width : 0;
     el.style.setProperty("--ht-dur", Math.max(24, w / 36).toFixed(1) + "s");     /* about 36 px a second, however long */

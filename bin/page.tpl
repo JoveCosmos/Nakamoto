@@ -2605,7 +2605,7 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .uncard .unfield:focus-within{border-color:#b9b0ff;box-shadow:0 0 0 3px rgba(185,176,255,.13)}
 .uncard .unfield.bad,.uncard .unfield.bad:focus-within{border-color:var(--wburn)!important;background:rgba(255,77,31,.1)!important;box-shadow:0 0 0 3px rgba(255,77,31,.2)!important}
 .uncard .unfield.bad input{color:#ff8a6a!important}
-.uncard .unfield input.wk-amt2{flex:1 1 auto;min-width:0;height:100%;padding:0 10px;margin:0;border:0;background:transparent;color:#fff8dc;font-family:var(--wmono);font-size:12.5px;outline:none;box-shadow:none;-webkit-appearance:none;appearance:none}
+.uncard .unfield input.wk-amt2{flex:1 1 auto;min-width:0;width:0;height:100%;padding:0 10px;margin:0;border:0;background:transparent;color:#fff8dc;font-family:var(--wmono);font-size:12.5px;outline:none;box-shadow:none;-webkit-appearance:none;appearance:none}
 .uncard .unfield input.wk-amt2:focus,.uncard .unfield input.wk-amt2:focus-visible{box-shadow:none;outline:none}
 .uncard .unfield input.wk-amt2::placeholder{font-family:var(--wmono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);opacity:.8}
 .uncard .unfield .wk-max{height:22px;padding:0 8px;border-radius:4px;border:1px solid var(--wbd2);background:#13132a;color:var(--wf);font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;gap:5px;flex:0 0 auto}
@@ -2732,7 +2732,7 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 /* ── the Pilot view (operator, 2026-10-17: "make it a feature worth feeling in real time ... avoid texts"): a big slider,
    two figures that roll to their new values, the set drawn live with the stake pouring into the validators it lands
    on, those validators as chips. The stage takes what the frame leaves ── */
-.pop .card.spcard:not(#z)>.sp-view:not(#y){flex:1 1 auto;min-height:0}   /* above the phone rule that stops a card's parts growing */
+.pop .card.spcard:not(#z)>.sp-view:not(#y){flex:1 1 auto;min-height:auto}   /* above the phone rule that stops a card's parts growing; never squeezed below its parts */
 .sp-view{display:flex;flex-direction:column;gap:14px;padding:16px 20px 0}
 .sp-rngw{padding:0}
 .sp-rngw>.sp-rng{display:block;width:100%;max-width:none;min-width:0;flex:none;margin:0;height:30px;cursor:pointer;background:none;-webkit-appearance:none;appearance:none}
@@ -2752,7 +2752,8 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .sp-stage{--sp-bar:#2a2a4e;--sp-hot:#2bc8bd;--sp-hot2:#b9b0ff;--sp-dot:#e6fffb;position:relative;flex:1 1 auto;min-height:150px;border:1px solid var(--wbd);border-radius:14px;
   background:radial-gradient(120% 90% at 85% 0%,rgba(43,200,189,.08),transparent 60%),linear-gradient(180deg,#0e0e1f,#0a0a16);overflow:hidden}
 .sp-stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.sp-chips{display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;height:64px;overflow:hidden}
+.sp-chips{flex:0 0 auto;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;height:64px;overflow:hidden}
+.sp-rngw,.sp-hero{flex:0 0 auto}
 .sp-chip{display:inline-flex;align-items:center;gap:7px;height:29px;max-width:100%;padding:0 11px 0 5px;border:1px solid var(--wbd2);border-radius:999px;background:rgba(255,255,255,.02);font-size:12px;color:var(--ws);animation:spIn .28s ease both}
 .sp-chip .wk-lg{width:19px;height:19px;margin:0;flex:0 0 auto}.sp-chip .wk-lgx{line-height:19px;font-size:8px}
 .sp-chip span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -2766,6 +2767,10 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .sp-pho button:hover{background:rgba(255,176,46,.12)}
 .sp-pho svg{width:13px;height:13px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 @media(max-width:620px){.sp-view{gap:10px;padding-top:12px}.sp-hero b{font-size:31px}.sp-hero>div{padding:11px 13px 10px}.sp-stage{min-height:110px}}
+/* a short phone (an SE, a landscape turn): a size tighter, chips on one row, so the card fits without scrolling */
+@media(max-width:620px) and (max-height:700px){.sp-view{gap:8px;padding-top:10px}.sp-hero b{font-size:26px}.sp-hero>div{padding:9px 12px 8px}.sp-hero em{margin-top:5px}
+  .sp-stage{min-height:72px}.sp-chips{height:29px}}
+@media(max-width:620px) and (max-height:600px){.sp-view{gap:6px}.sp-hero>div{padding:7px 11px 6px}.spcard .txbtns:not(#z){padding:10px 20px 12px;margin-top:6px}}
 @media (prefers-reduced-motion:reduce){.sp-chip{animation:none}}
 /* Buy ATONE (operator, 2026-10-15): one signature on Osmosis buys an exact amount of ATONE from its pool and
    sends it home; the token to pay with beside the amount; what arrives, the path it takes; one shape throughout */
@@ -5938,9 +5943,6 @@ color:#7c7aa3;text-decoration:none;white-space:nowrap;transition:color .15s,back
 @media(min-width:800px) and (max-width:1179px){.folder:has(>.hdr-tick:not([hidden])){height:auto;padding-bottom:6px}
   .folder>.hdr-tick:not([hidden]){grid-column:1/-1;grid-row:2}}
 @media(max-width:799px){.folder>.hdr-tick:not([hidden]){grid-column:1/-1;grid-row:3;height:28px;margin:2px 0}}
-.ht-live{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#2ee06a}
-.ht-live i{width:7px;height:7px;border-radius:50%;background:#2ee06a;animation:htlive 2s ease-out infinite}
-@keyframes htlive{0%{box-shadow:0 0 0 0 rgba(46,224,106,.55)}70%{box-shadow:0 0 0 7px rgba(46,224,106,0)}100%{box-shadow:0 0 0 0 rgba(46,224,106,0)}}
 .ht-win{flex:1 1 auto;min-width:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent)}
 .ht-run{display:flex;width:max-content;animation:htmarq var(--ht-dur,40s) linear infinite}
 .hdr-tick:hover .ht-run{animation-play-state:paused}
@@ -5957,8 +5959,8 @@ color:#7c7aa3;text-decoration:none;white-space:nowrap;transition:color .15s,back
 .ht-i.g b{color:#2ee06a}
 .ht-i span{font-size:12px;color:var(--ink2)}
 .ht-sep{flex:0 0 auto;width:1px;height:14px;margin:0 22px;background:var(--edge2)}
-@media(max-width:799px){.ht-live{font-size:8px;letter-spacing:.14em;gap:6px}.ht-ic{width:18px;height:18px}.ht-i{gap:6px}.ht-i b{font-size:12px}.ht-i span{font-size:11px}.ht-sep{margin:0 16px}}
-@media(prefers-reduced-motion:reduce){.ht-run{animation:none}.ht-live i{animation:none}}
+@media(max-width:799px){.ht-ic{width:18px;height:18px}.ht-i{gap:6px}.ht-i b{font-size:12px}.ht-i span{font-size:11px}.ht-sep{margin:0 16px}}
+@media(prefers-reduced-motion:reduce){.ht-run{animation:none}}
 .brandwrap>.brand{grid-area:auto}
 /* the live height under the wordmark, at its right end (as before 2026-09-27); on testnet it moves left
    and says so */
@@ -7115,7 +7117,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
     </div>
     </div>
     {{SHELL_L1}}
-    <div class=hdr-tick id=hdrtick role=marquee aria-label="Autopilot and Restake so far"><span class=ht-live><i></i>Live</span></div>
+    <div class=hdr-tick id=hdrtick role=marquee aria-label="Autopilot and Restake so far"></div>
   </header>
   <div class=one id=one>
   <aside class=you id=you aria-label="Your wallet"></aside>
