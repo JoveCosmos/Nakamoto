@@ -7140,7 +7140,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
     </div>
     </div>
     {{SHELL_L1}}
-    <div class=hdr-tick id=hdrtick hidden role=marquee aria-label="Autopilot and Restake so far"></div>
+    <div class=hdr-tick id=hdrtick role=marquee aria-label="Autopilot and Restake so far"><span class=ht-live><i></i>Live</span></div>
   </header>
   <div class=one id=one>
   <aside class=you id=you aria-label="Your wallet"></aside>

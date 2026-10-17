@@ -4532,12 +4532,15 @@ rememberGridH();
 
 /* ── the header's live strip (operator, 2026-10-17): a market-bar ticker of what Autopilot and Restake have done, from
    pilot/_status.json (never a wallet count), and later partners' news, as CoinGecko's top bar. It runs left on its own,
-   stops while a pointer rests on it, and stands still with reduced motion. DEV ONLY until the operator turns it on:
-   TICK_HOSTS lists the hosts it shows on; anywhere else it stays hidden and fetches nothing. ── */
+   stops while a pointer rests on it, and stands still with reduced motion. ON in production since 2026-10-17 (operator:
+   "do it"); TICK_HOSTS lists the hosts it shows on, anywhere else it hides and fetches nothing. Its row is in the page
+   from the first paint (the Live badge), so on phones and tablets, where it is a row of its own, nothing moves when
+   the figures arrive. ── */
 (function(){
-  var TICK_HOSTS = /^(dev-atomone\.gatahub\.zone|127\.0\.0\.1|localhost)$/;
+  var TICK_HOSTS = /^(atomone\.gatahub\.zone|dev-atomone\.gatahub\.zone|127\.0\.0\.1|localhost)$/;
   var el = document.getElementById("hdrtick");
-  if(!el || !TICK_HOSTS || !TICK_HOSTS.test(location.hostname)) return;
+  if(!el) return;
+  if(!TICK_HOSTS.test(location.hostname)){ el.hidden = true; return; }
   var nf = function(n){ return Math.round(n).toLocaleString("en-US"); };
   var I = function(d){ return '<svg viewBox="0 0 24 24" aria-hidden=true>' + d + '</svg>'; };
   var IC = {
