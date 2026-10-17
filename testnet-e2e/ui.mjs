@@ -54,7 +54,16 @@ const LOG = [];
 // ── Chrome over the DevTools protocol ──
 const DP = 9500 + Math.floor(Math.random() * 400), dir = fs.mkdtempSync(path.join(os.tmpdir(), "ui-e2e-"));
 const chrome = spawn("google-chrome", ["--headless=new", "--disable-gpu", "--no-sandbox", "--hide-scrollbars", "--remote-debugging-port=" + DP,
-  "--user-data-dir=" + dir, "--window-size=1440,900", "about:blank"], { stdio: "ignore" });
+  "--user-data-dir=" + dir, "--window-size=1440,900", "about:blank"], { stdio: "ignore", detached: true });
+/* the browser and its profile go on EVERY exit (quit, stop, a crash): Chrome runs in its own process group and the whole
+   group is killed - killing only the launcher left 65 profiles (up to 185 MB each) in /tmp, as phone.js once did */
+let gone = false;
+function teardown() { if (gone) return; gone = true;
+  try { process.kill(-chrome.pid, "SIGKILL"); } catch { try { chrome.kill("SIGKILL"); } catch {} }
+  try { fs.rmSync(dir, { recursive: true, force: true }); } catch {} }
+process.on("exit", teardown);
+for (const sig of ["SIGINT", "SIGTERM", "SIGHUP"]) process.on(sig, () => { teardown(); process.exit(130); });
+process.on("uncaughtException", e => { console.error(e); teardown(); process.exit(1); });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let tgt; for (let i = 0; i < 50 && !tgt; i++) { await sleep(200); try { tgt = (await (await fetch(`http://127.0.0.1:${DP}/json`)).json()).find(t => t.type === "page"); } catch {} }
 const ws = new WebSocket(tgt.webSocketDebuggerUrl); await new Promise(r => ws.onopen = r);
@@ -162,7 +171,7 @@ http.createServer(async (req, res) => {
       const r = await cdp("Page.captureScreenshot", { format: "png" }); fs.writeFileSync(q("path"), Buffer.from(r.data, "base64")); return send(200, { ok: true }); }
     if (u.pathname === "/dialog") { DIALOG = q("accept") !== "0"; return send(200, { accept: DIALOG }); }
     if (u.pathname === "/log") return send(200, LOG.slice(-60));
-    if (u.pathname === "/quit") { send(200, { bye: true }); chrome.kill(); fs.rmSync(dir, { recursive: true, force: true }); setTimeout(() => process.exit(0), 200); return; }
+    if (u.pathname === "/quit") { send(200, { bye: true }); setTimeout(() => process.exit(0), 200); return; }   // exit runs teardown
     send(404, { error: "unknown" });
   } catch (e) { send(500, { error: e.message }); }
 }).listen(PORT, "127.0.0.1");
