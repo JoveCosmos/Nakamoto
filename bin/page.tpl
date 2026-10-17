@@ -5901,6 +5901,24 @@ color:#7c7aa3;text-decoration:none;white-space:nowrap;transition:color .15s,back
 .netsw .ns{display:none}
 @media(max-width:620px){.netsw a{padding:0 7px;font-size:9px;letter-spacing:.08em}.netsw .nl{display:none}.netsw .ns{display:inline}}
 .brandwrap{grid-area:brand;justify-self:start;display:flex;align-items:center;min-width:0}
+/* ── the header's news strip (app.js; dev only until the operator turns it on in production): the free middle of the
+   top bar, from 900px wide, one line that slides to the next; it starts clear of the block height under the wordmark ── */
+.hdr-tick{display:none}
+@media(min-width:900px){
+  .hdr-tick:not([hidden]){display:flex;align-items:center;flex:0 1 520px;min-width:0;height:30px;margin-left:72px;padding:0 14px 0 5px;
+    border:1px solid var(--edge2);border-radius:999px;background:linear-gradient(90deg,rgba(43,200,189,.10),rgba(43,200,189,.02) 55%,transparent);overflow:hidden}
+}
+.ht-win{flex:1 1 auto;min-width:0;height:30px;overflow:hidden}
+.ht-track{display:flex;flex-direction:column;transition:transform .55s cubic-bezier(.3,.7,.2,1)}
+.ht-i{display:flex;align-items:center;gap:9px;height:30px;min-width:0;white-space:nowrap}
+.ht-tag{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;height:20px;padding:0 9px 0 8px;border-radius:999px;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase}
+.ht-tag::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor;animation:htpulse 2.4s ease-in-out infinite}
+.ht-tag.a{color:#2bc8bd;background:rgba(43,200,189,.13)}
+.ht-tag.r{color:#2ee06a;background:rgba(46,224,106,.12)}
+.ht-i b{flex:0 0 auto;font-size:13px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.ht-tx{flex:0 1 auto;min-width:0;font-size:12px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis}
+@keyframes htpulse{50%{opacity:.35;box-shadow:none}}
+@media(prefers-reduced-motion:reduce){.ht-track{transition:none}.ht-tag::before{animation:none}}
 .brandwrap>.brand{grid-area:auto}
 /* the live height under the wordmark, at its right end (as before 2026-09-27); on testnet it moves left
    and says so */
@@ -7032,7 +7050,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <header class=folder>
     <div class=brandwrap>
     <a class=brand href="./" data-route="intro" title="AtomOne"><img class=mark src="assets/atomone.svg" alt=""><span class=bw><span class=wordmark>AtomOne</span><span class=bheight id=dlive title="the chain's height, live"><i></i><b>{{HEIGHT}}</b><span class=btag>Autopilot</span></span></span></a>
-    </div>
+    <div class=hdr-tick id=hdrtick hidden aria-label="AtomOne news"></div></div>
     <div class=hdr-r>
     <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
     <div class=netsw id=netsw role=group aria-label=Network><a id=netmain href="./" aria-label=Mainnet><span class=nl>Mainnet</span><span class=ns aria-hidden=true>Main</span></a><a id=nettest href="testnet/" aria-label=Testnet><span class=nl>Testnet</span><span class=ns aria-hidden=true>Test</span></a></div>

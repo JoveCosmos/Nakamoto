@@ -4435,3 +4435,43 @@ rememberGridH();
   }
   window.addEventListener("keplr_keystorechange", function(){ if(window.__ADDR) connect(true); });
 })();
+
+/* ── the header's news strip (operator, 2026-10-17): the empty middle of the top bar carries a slow feed of our own
+   numbers today (Autopilot and Restake, never a wallet count) and, later, partners' news, as CoinGecko's top bar does.
+   One item at a time slides up every few seconds; hovering holds it; reduced motion swaps without moving.
+   DEV ONLY until the operator turns it on in production: TICK_HOSTS lists the hosts it shows on (add
+   atomone.gatahub.zone to go live). Elsewhere the strip stays hidden and nothing is fetched. ── */
+(function(){
+  var TICK_HOSTS = /^(dev-atomone\.gatahub\.zone|127\.0\.0\.1|localhost)$/;
+  var el = document.getElementById("hdrtick");
+  if(!el || !TICK_HOSTS.test(location.hostname)) return;
+  var nf = function(n){ return Math.round(n).toLocaleString("en-US"); };
+  function items(s){
+    var i = s && s.impact, L = []; if(!i) return L;
+    if(i.moved_uatone > 0) L.push(["a", "Autopilot", nf(i.moved_uatone / 1e6) + " ATONE", "moved to a better APR, hands-free"]);
+    if(i.gain_atone_year > 0) L.push(["a", "Autopilot", "+" + nf(i.gain_atone_year) + " ATONE", "a year added for its stakers, while they sleep"]);
+    if(i.validators > 0) L.push(["a", "Autopilot", nf(i.validators) + " validators", "share the stake it moved"]);
+    if(i.restaked_uatone > 0) L.push(["r", "Restake", nf(i.restaked_uatone / 1e6) + " ATONE", "of rewards put back to work"]);
+    if(i.restakes > 0) L.push(["r", "Restake", nf(i.restakes) + " restakes", "so far, twice a day"]);
+    return L;
+  }
+  var n = 0, at = 0, hold = false, track = null, H = 30;
+  function draw(L){
+    if(!L.length){ el.hidden = true; n = 0; return; }
+    var row = function(x){ return '<div class=ht-i><span class="ht-tag ' + x[0] + '">' + x[1] + '</span><b>' + x[2] + '</b><span class=ht-tx>' + x[3] + '</span></div>'; };
+    /* the first item again at the end, so the loop closes without a jump back */
+    var key = JSON.stringify(L); if(el.__key === key) return; el.__key = key;
+    el.innerHTML = '<div class=ht-win><div class=ht-track>' + L.map(row).join("") + row(L[0]) + '</div></div>';
+    track = el.querySelector(".ht-track"); n = L.length; at = 0; el.hidden = false;
+  }
+  function step(){
+    if(hold || n < 2 || !track || document.hidden) return;
+    at++; track.style.transition = ""; track.style.transform = "translateY(" + (-H * at) + "px)";
+    if(at === n) setTimeout(function(){ track.style.transition = "none"; track.style.transform = "translateY(0)"; at = 0; }, 600);
+  }
+  el.addEventListener("mouseenter", function(){ hold = true; });
+  el.addEventListener("mouseleave", function(){ hold = false; });
+  function load(){ fetch("pilot/_status.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(s){ draw(items(s)); }).catch(function(){}); }
+  load(); setInterval(load, 10 * 60 * 1000); setInterval(step, 4500);
+})();
