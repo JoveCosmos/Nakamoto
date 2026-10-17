@@ -995,6 +995,29 @@
      validator's tokens per share), and the governor the connected wallet follows ════ */
   var GV = { at: 0, busy: false, list: null, err: null, mine: {}, bonded: 0 };
   function gapi(p){ return fetch((window.__API || "https://atomone-api.gatadao.com") + p, { cache: "no-store" }).then(function(r){ return r.json(); }); }
+  /* a read whose "nothing there" the REST API answers with an error status (a wallet that follows no governor, a
+     proposal it has not voted on) asks the node's ABCI query instead, through this site: that answers 200 every time,
+     with the chain's own code and words in the body, so an ordinary "none" is never a failed request in the browser.
+     The request and the answer are protobuf: pbStr/pbNum write a field, pbRead lists an answer's fields by number */
+  function pbVar(n){ var o = []; while(n > 127){ o.push(n % 128 + 128); n = Math.floor(n / 128); } o.push(n); return o; }
+  function pbStr(f, s){ var u = Array.from(new TextEncoder().encode(s)); return [f * 8 + 2].concat(pbVar(u.length), u); }
+  function pbNum(f, n){ return [f * 8].concat(pbVar(n)); }
+  function pbRead(b){
+    var o = {}, i = 0, vr = function(){ var x = 0, m = 1, c; do { c = b[i++]; x += (c & 127) * m; m *= 128; } while(c & 128 && i < b.length); return x; };
+    while(i < b.length){ var t = vr(), f = Math.floor(t / 8), w = t % 8, v;
+      if(w === 0) v = vr(); else if(w === 2){ var n = vr(); v = b.subarray(i, i + n); i += n; } else if(w === 1){ i += 8; continue; } else if(w === 5){ i += 4; continue; } else break;
+      (o[f] = o[f] || []).push(v); }
+    return o;
+  }
+  function pbText(b){ return b ? new TextDecoder().decode(b) : ""; }
+  function abciQ(path, bytes){
+    var hex = bytes.map(function(x){ return (x < 16 ? "0" : "") + x.toString(16); }).join("");
+    return fetch('rpc/abci_query?path="' + path + '"&data=0x' + hex, { cache: "no-store" })
+      .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function(j){ var q = j && j.result && j.result.response; if(!q) throw new Error("no answer");
+        var raw = atob(q.value || ""), v = new Uint8Array(raw.length); for(var i = 0; i < raw.length; i++) v[i] = raw.charCodeAt(i);
+        return { code: +q.code || 0, log: String(q.log || ""), value: v }; });
+  }
   function loadGovs(){
     if(GV.busy || (GV.list && Date.now() - GV.at < 300000)) return;
     GV.busy = true;
@@ -1025,7 +1048,9 @@
     var a = window.__ADDR; if(!a) return undefined;
     var c = GV.mine[a];
     if(c === undefined){ GV.mine[a] = null;
-      gapi("/atomone/gov/v1/delegations/" + a).then(function(d){ GV.mine[a] = d.governor_address || ""; }).catch(function(){ GV.mine[a] = ""; })
+      /* QueryGovernanceDelegationRequest{delegator_address(1)} -> {governor_address(1)}; none is the chain's NotFound */
+      abciQ("/atomone.gov.v1.Query/GovernanceDelegation", pbStr(1, a))
+        .then(function(q){ GV.mine[a] = q.code ? "" : pbText((pbRead(q.value)[1] || [])[0]); }).catch(function(){ GV.mine[a] = ""; })
         .then(function(){ if(screen() === "govs") render(); }); }
     return GV.mine[a];
   }
@@ -1375,18 +1400,19 @@
      the wallet as MsgVote, broadcast through our node at the chain's own gas price. The vote read from the chain is cached
      per wallet and proposal until the wallet votes again. A wallet that follows a governor is told the governor votes for
      it unless it votes itself (the chain gives the wallet's own vote precedence) ── */
-  var VOPT = { VOTE_OPTION_YES: "yes", VOTE_OPTION_ABSTAIN: "abstain", VOTE_OPTION_NO: "no" }, VNUM = { yes: 1, abstain: 2, no: 3 };
+  var VOPT = { VOTE_OPTION_YES: "yes", VOTE_OPTION_ABSTAIN: "abstain", VOTE_OPTION_NO: "no" }, VNUM = { yes: 1, abstain: 2, no: 3 }, VONUM = { 1: "yes", 2: "abstain", 3: "no" };
   function myVote(pid){ return window.__ADDR ? acctVote(window.__ADDR, pid) : ""; }
   function acctVote(a, pid){
     if(!a) return "";
     var k = a + ":" + pid, c = GP.votes[k];
     if(c === undefined){ GP.votes[k] = null;
-      /* "not voted" is CONFIRMED only by the chain's own answer for a missing vote ("voter ... not found for proposal",
-         a 400 on AtomOne); any other failure leaves it unknown (operator, 2026-10-12: "only when really confirmed") */
-      gapi("/atomone/gov/v1/proposals/" + pid + "/votes/" + a)
-        .then(function(d){ var o = d.vote && d.vote.options && d.vote.options[0];
-          if(o){ GP.votes[k] = VOPT[o.option] || ""; GP.vknown[k] = true; }
-          else { GP.votes[k] = ""; GP.vknown[k] = /not found for proposal/.test(String(d.message || "")); } })
+      /* "not voted" is CONFIRMED only by the chain's own answer for a missing vote ("voter ... not found for proposal");
+         any other failure leaves it unknown (operator, 2026-10-12: "only when really confirmed").
+         QueryVoteRequest{proposal_id(1), voter(2)} -> {vote(1): Vote{options(4): [{option(1), weight(2)}]}} */
+      abciQ("/atomone.gov.v1.Query/Vote", pbNum(1, +pid).concat(pbStr(2, a)))
+        .then(function(q){ var v = !q.code && (pbRead(q.value)[1] || [])[0], o = v && (pbRead(v)[4] || [])[0];
+          if(o){ GP.votes[k] = VONUM[(pbRead(o)[1] || [0])[0]] || ""; GP.vknown[k] = true; }
+          else { GP.votes[k] = ""; GP.vknown[k] = /not found for proposal/.test(q.log); } })
         .catch(function(){ GP.votes[k] = ""; GP.vknown[k] = false; })
         .then(function(){ if(screen() === "props") drawProps(); }); }
     return c;
@@ -1403,10 +1429,11 @@
        only since 2026-08-21, before every past proposal); the node's recent transactions then add anything newer */
     var BK = { y: "yes", n: "no", a: "abstain" };
     /* the bake's own coverage window, read once: "Not voted" is only claimed inside it (audit 2026-10-13) */
+    /* the bake is mainnet's (testnet has none to read: asking would only be a failed request per wallet) */
     if(GP.vmeta === undefined){ GP.vmeta = null;
-      fetch("votes/_meta.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; })
+      if(!TN()) fetch("votes/_meta.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; })
         .then(function(m){ GP.vmeta = m || null; }).catch(function(){}); }
-    var base = fetch("votes/" + a.charAt(6) + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; })
+    var base = (TN() ? Promise.resolve(null) : fetch("votes/" + a.charAt(6) + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }))
       .then(function(d){ if(!d) return; baked = true; var m = d[a] || {}; Object.keys(m).forEach(function(k){ map[+k] = BK[m[k]] || (m[k] ? "voted" : null); }); })   /* an option the bake did not recognise is still A VOTE, never "not voted" (audit 2026-10-13) */
       .catch(function(){});
     /* the node's recent votes FOR this account (2026-10-12): searched by the vote event's own voter, which is the
@@ -2054,7 +2081,7 @@
   }
   function actLoad(k){
     var a = window.__ADDR; if(!a) return Promise.resolve({ sum: "Connect a wallet", rows: [] });
-    var rep = function(){ return fetch("pilot/" + a + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }); };
+    var rep = function(){ return fetch("pilot/" + a + ".json", { cache: "no-store" }).then(function(r){ return r.status === 200 ? r.json() : null; }).catch(function(){ return null; }); };   /* 204: no report for this wallet */
     var g1 = function(v){ return "+" + (+v).toLocaleString("en-US", { maximumFractionDigits: v >= 100 ? 0 : 2 }) + " ATONE a year"; };
     var since = function(L){ return L.length ? ", since " + actDay(L[L.length - 1].at * 1000) : ""; };
     /* the top line as figures (operator, 2026-10-12: "beautify"): whole ATONE once it is in the thousands */

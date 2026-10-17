@@ -2713,8 +2713,7 @@ rememberGridH();
        earlier opening of the card (another plan) is dropped */
     var tok = ++TXS;
     if(window.__TX && window.__WALLET){
-      window.__TX.account(window.__ADDR).then(function(acc){
-        return window.__TX.simulate(msgs, "", window.__WALLET.pubKey, acc.sequence); })
+      txGas({ address: window.__ADDR, pubKey: window.__WALLET.pubKey }, msgs)
       .then(function(g){ if(tok !== TXS) return; var f = window.__TX.feeFor(g, msgs.length); fee.textContent = "fee ≈ " + (parseInt(f.amount[0].amount, 10) / 1e6).toFixed(3) + " PHOTON, gas " + f.gas.toLocaleString(); })
       .catch(function(e){ if(tok !== TXS) return; fee.textContent = "the chain could not price it: " + String(e && e.message || e); });
     }
@@ -2741,6 +2740,14 @@ rememberGridH();
      keystroke; an answer for terms that have changed since is dropped. get() returns the
      messages; without it any estimate still in flight is dropped */
   var FEEQ = {};
+  /* the gas a preview shows, from the node's own simulation. A wallet holding nothing can pay no fee, so its preview is
+     the standard estimate without asking: a never-funded address has no account on chain, and that lookup would be a
+     failed request in the browser */
+  function txGas(w, msgs){
+    var b = window.__BAL;
+    if(b && !b.uatone && !b.uphoton) return Promise.resolve(0);
+    return window.__TX.account(w.address).then(function(acc){ return window.__TX.simulate(msgs, "", w.pubKey, acc.sequence); });
+  }
   function feeSoon(key, el, get){
     var q = FEEQ[key] || (FEEQ[key] = { n: 0, t: 0 }), n = ++q.n, w = window.__WALLET;
     clearTimeout(q.t);
@@ -2748,7 +2755,7 @@ rememberGridH();
     el.textContent = "fee: estimating\u2026";
     q.t = setTimeout(function(){
       var msgs = get(); if(!msgs || !msgs.length || n !== q.n) return;
-      window.__TX.account(w.address).then(function(acc){ return window.__TX.simulate(msgs, "", w.pubKey, acc.sequence); }).catch(function(){ return 0; })
+      txGas(w, msgs).catch(function(){ return 0; })
         .then(function(g){ if(n !== q.n) return; var f = window.__TX.feeFor(g, msgs.length);
           el.textContent = "fee \u2248 " + (parseInt(f.amount[0].amount, 10) / 1e6).toFixed(3) + " PHOTON, gas " + f.gas.toLocaleString(); });
     }, 350);
@@ -2952,7 +2959,7 @@ rememberGridH();
     el.textContent = "fee: estimating\u2026";
     MT.t = setTimeout(function(){
       var msgs = mtMsgs(); if(!msgs.length || n !== MT.q) return;
-      window.__TX.account(w.address).then(function(acc){ return window.__TX.simulate(msgs, "", w.pubKey, acc.sequence); }).catch(function(){ return 0; })
+      txGas(w, msgs).catch(function(){ return 0; })
         .then(function(g){ if(n !== MT.q) return; var f = window.__TX.feeFor(g, 1, window.__TX.mintFeeOpt(MT.rate));
           el.textContent = "fee \u2248 " + (parseInt(f.amount[0].amount, 10) / 1e6).toFixed(6) + " ATONE, gas " + f.gas.toLocaleString(); });
     }, 350);
@@ -3722,7 +3729,8 @@ rememberGridH();
      and ignored: GATA's validator is one validator like any other in this app */
   function atReport(){
     if(!window.__ADDR) return Promise.resolve(null);
-    return fetch("pilot/" + window.__ADDR + ".json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+    /* a wallet with no report is a 204 (nothing here), not a 404 the browser would print as a failed request */
+    return fetch("pilot/" + window.__ADDR + ".json", { cache: "no-store" }).then(function(r){ return r.status === 200 ? r.json() : null; }).catch(function(){ return null; });
   }
   /* no strategies: one fixed rule for Autopilot's own picks (never jailed, 95%+ uptime, the smaller validators) */
   function atPreset(){ return "below"; }

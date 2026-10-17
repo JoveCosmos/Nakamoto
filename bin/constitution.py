@@ -103,6 +103,6 @@ def fragment(md, meta):
            % (html.escape(meta["url"]), html.escape(meta["repo"]), html.escape(meta["commit"][:7]), html.escape(meta["date"])))
     return ('<nav class=cn-toc aria-label="Contents"><em>Contents</em>' + "".join(nav) + '</nav>'
             '<div class=cn-art tabindex=0><div class=cn-in>'
-            '<select class=cn-sel aria-label="Go to a part">' + opts + '</select>'
+            '<select class=cn-sel name=cn-part aria-label="Go to a part">' + opts + '</select>'
             '<header class=cn-hd><h1>The AtomOne Constitution</h1><p>' + src + '</p></header>'
             + body + '</div></div>')

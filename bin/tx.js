@@ -260,11 +260,13 @@ function sendDirect(wallet, msgs, memo, onStep, opt){
     return waitFor(tr.txhash);
   });
 }
+/* asked as a search by hash: until the block lands the answer is an empty list, where the lookup by hash answers
+   404 and the browser prints every one of those waits as a failed request */
 function waitFor(hash, tries){
   tries = tries || 0;
   return new Promise(function(res){ setTimeout(res, 3000); }).then(function(){
-    return call("GET", "/cosmos/tx/v1beta1/txs/" + hash).then(function(d){
-      var tr = d.tx_response || {};
+    return call("GET", "/cosmos/tx/v1beta1/txs?query=" + encodeURIComponent("tx.hash='" + hash + "'")).then(function(d){
+      var tr = (d.tx_responses || [])[0] || {};
       if(tr.height && tr.height !== "0"){
         /* in a block but failed there: that is the answer, not a reason to keep asking */
         if(tr.code && tr.code !== 0){ var bad = new Error("failed in block " + tr.height + ": " + (tr.raw_log || tr.code)); bad.final = true; throw bad; }
