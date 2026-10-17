@@ -17,6 +17,30 @@ document.addEventListener("click", function(ev){ var b = ev.target.closest && ev
   window.dispatchEvent(new Event("tools:theme")); });
 /* ── REST ── */
 function get(p){ return fetch(API + p, { cache: "no-store" }).then(function(r){ return r.json(); }); }
+/* ── a chain query the REST API answers with an error status for "none" (a wallet that follows no governor) goes to
+   the node's ABCI query through this site (rpc/abci_query, as the app does): always 200, the chain's code in the body ── */
+function pbVar(n){ var o = []; while(n > 127){ o.push(n % 128 + 128); n = Math.floor(n / 128); } o.push(n); return o; }
+function pbStr(f, str){ var u = Array.from(new TextEncoder().encode(str)); return [f * 8 + 2].concat(pbVar(u.length), u); }
+function pbRead(b){
+  var o = {}, i = 0, vr = function(){ var x = 0, m = 1, c; do { c = b[i++]; x += (c & 127) * m; m *= 128; } while(c & 128 && i < b.length); return x; };
+  while(i < b.length){ var t = vr(), f = Math.floor(t / 8), w = t % 8, v;
+    if(w === 0) v = vr(); else if(w === 2){ var n = vr(); v = b.subarray(i, i + n); i += n; } else if(w === 1){ i += 8; continue; } else if(w === 5){ i += 4; continue; } else break;
+    (o[f] = o[f] || []).push(v); }
+  return o;
+}
+function abciQ(path, bytes){
+  var hex = bytes.map(function(x){ return (x < 16 ? "0" : "") + x.toString(16); }).join("");
+  return fetch(BASE + 'rpc/abci_query?path="' + path + '"&data=0x' + hex, { cache: "no-store" })
+    .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then(function(j){ var q = j && j.result && j.result.response; if(!q) throw new Error("no answer");
+      var raw = atob(q.value || ""), v = new Uint8Array(raw.length); for(var i = 0; i < raw.length; i++) v[i] = raw.charCodeAt(i);
+      return { code: +q.code || 0, log: String(q.log || ""), value: v }; });
+}
+/* the governor this wallet follows (x/gov GovernanceDelegation), or null */
+function govOf(addr){
+  return abciQ("/atomone.gov.v1.Query/GovernanceDelegation", pbStr(1, addr))
+    .then(function(q){ if(q.code) return null; var v = (pbRead(q.value)[1] || [])[0]; return v ? new TextDecoder().decode(v) : null; }).catch(function(){ return null; });
+}
 /* ── bech32: an address is checked before it is used ── */
 var CH = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
 function pm(v){ var g = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3], c = 1;
@@ -29,13 +53,15 @@ function conv(a, hrp){ var p = a.lastIndexOf("1"), d = []; for(var i = p + 1; i 
   var c = pm(hrpx(hrp).concat(d, [0, 0, 0, 0, 0, 0])) ^ 1, o = hrp + "1"; for(i = 0; i < d.length; i++) o += CH[d[i]];
   for(i = 0; i < 6; i++) o += CH[(c >> (5 * (5 - i))) & 31]; return o; }
 /* ── names: validators (and their operator accounts) from the app's data, our own grantee from its status ── */
-var NAMES = {}, OURS = null, namesReady = Promise.all([
+var NAMES = {}, GOVS = {}, OURS = null, namesReady = Promise.all([
+  get("/atomone/gov/v1/governors?pagination.limit=500").then(function(d){ (d.governors || []).forEach(function(g){ var m = ((g.description || {}).moniker || "").trim(); if(m) GOVS[g.governor_address] = m; }); }).catch(function(){}),
   fetch(BASE + "data.json", { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(d){
     (d.validators || []).concat(d.inactive || []).forEach(function(v){ if(!v.op) return; NAMES[v.op] = v.m; NAMES[conv(v.op, "atone")] = v.m; }); }).catch(function(){}),
   fetch(BASE + "pilot/_status.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; }).then(function(s){ OURS = s && s.grantee || null; }).catch(function(){})
 ]);
 function nameOf(a){ if(OURS && a === OURS) return { n: "Nakamoto", kind: "ours" }; if(NAMES[a]) return { n: NAMES[a], kind: "validator" }; return { n: a.slice(0, 10) + "…" + a.slice(-6), kind: "unknown" }; }
 function short(a){ return a.slice(0, 10) + "…" + a.slice(-6); }
+function govName(a){ return GOVS[a] || short(a); }
 /* ── the wallet ── */
 function unwrapA(r){ if(r && r.status === "success") return r.data; var m = (r && r.message) || "Adena refused"; throw new Error(/reject/i.test(m) ? "Request rejected" : m); }
 function providers(){
@@ -99,6 +125,6 @@ function stage(cv, draw){
 }
 function tok(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
 window.T = { NET: NET, BASE: BASE, CHAIN: CHAIN, E: E, esc: esc, get: get, bechOk: bechOk, conv: conv, names: namesReady, nameOf: nameOf, short: short,
-  wallet: function(){ return W; }, onWallet: function(f){ onWallet.push(f); }, connect: connect, drawGate: drawGate, sign: sign, feePreview: feePreview,
+  govOf: govOf, govName: govName, wallet: function(){ return W; }, onWallet: function(f){ onWallet.push(f); }, connect: connect, drawGate: drawGate, sign: sign, feePreview: feePreview,
   fmtP: fmtP, fmtA: fmtA, stage: stage, tok: tok, ours: function(){ return OURS; } };
 })();

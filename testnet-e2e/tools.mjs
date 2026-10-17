@@ -2,6 +2,7 @@
 // through its own buttons with a stand-in wallet kind, every transaction read back from the chain.
 //   node tools.mjs <wallet-name> <keplr|ledger|adena|adena-ledger> revoke            revoke every grant the wallet gave
 //   node tools.mjs <wallet-name> <kind> send <denom> <addr:amount,addr:amount,...>    one batch send
+//   node tools.mjs <wallet-name> <kind> gov                                           unfollow the governor through the scanner (the wallet must follow one)
 // Needs ui.mjs running with the wallet loaded. Prints PASS/FAIL lines and a SUMMARY.
 const [NAME, KIND, WHAT, ...REST] = process.argv.slice(2);
 const UI = "http://127.0.0.1:9412", BASE = "http://127.0.0.1:8089/testnet/", API = "https://atomone-testnet-api.gatadao.com";
@@ -25,8 +26,24 @@ const HELP = `window.__e2e = { wait: function(pred, ms, what){ var t0 = Date.now
   if(v) return res(v); if(Date.now() - t0 > (ms || 20000)) return rej(new Error("timeout: " + (what || pred))); setTimeout(tick, 250); })(); }); },
   set: function(el, v){ el.value = v; el.dispatchEvent(new Event("input", { bubbles: true })); } }; "ok"`;
 (async () => {
-  const c = await open(WHAT === "revoke" ? "revoke" : "send"); console.log("connected", JSON.stringify(c)); await ev(HELP);
-  if (WHAT === "revoke") {
+  const c = await open(WHAT === "send" ? "send" : "revoke"); console.log("connected", JSON.stringify(c)); await ev(HELP);
+  if (WHAT === "gov") {
+    const g0 = await chain("/atomone/gov/v1/delegations/" + c.addr);
+    const before = g0.governor_address || null;
+    await ev(`window.__e2e.wait(function(){ return document.getElementById("stgtag").textContent !== "scanning"; }, 30000, "scan")`);
+    const row = await ev(`(function(){ var r = [].slice.call(document.querySelectorAll('#rows .row')).find(function(x){ return /^Governor: /.test(x.querySelector('.who b').textContent); });
+      return r ? { name: r.querySelector('.who b').textContent, addr: r.querySelector('.who small').textContent, ticked: r.querySelector('input').checked } : null; })()`);
+    note("gov:listed", !!row && !!before && row.addr === before && row.ticked === false, { shown: row, onchain: before });
+    if (!row || !before) return done();
+    await ev(`document.getElementById("selnone").click(); (function(){ var r = [].slice.call(document.querySelectorAll('#rows .row')).find(function(x){ return /^Governor: /.test(x.querySelector('.who b').textContent); }); r.querySelector('input').click(); })(); "ok"`);
+    const sel = await ev(`+document.getElementById("hs").textContent`);
+    await ev(`window.__e2e.wait(function(){ return /PHOTON/.test(document.getElementById("fee").textContent); }, 30000, "fee")`);
+    await ev(`document.getElementById("go").click(); "ok"`);
+    const link = await ev(`window.__e2e.wait(function(){ return document.getElementById("done").hidden ? null : document.getElementById("donelink").href; }, 180000, "done")`);
+    const hash = link.split("/").pop(), d = await txOf(hash); const s = d ? summary(d) : {};
+    const after = await chain("/atomone/gov/v1/delegations/" + c.addr);
+    note("gov:unfollow", !!d && s.code === 0 && s.mode === "LEGACY_AMINO_JSON" && s.msgs.join() === "MsgUndelegateGovernor" && !after.governor_address && sel === 1, { hash: hash.slice(0, 10), ...s, selected: sel, after: after.governor_address || null });
+  } else if (WHAT === "revoke") {
     const before = (await chain("/cosmos/authz/v1beta1/grants/granter/" + c.addr)).grants || [];
     const n = await ev(`window.__e2e.wait(function(){ var n = +document.getElementById("hn").textContent; return document.getElementById("stgtag").textContent !== "scanning" ? n + 1 : 0; }, 30000, "scan").then(function(n){ return n - 1; })`);
     note("revoke:scan", n === before.length, { shown: n, onchain: before.length });
