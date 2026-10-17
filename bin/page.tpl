@@ -6856,6 +6856,8 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 @media(max-width:700px){
   #mv-stage .mv-top:not(#z){flex-wrap:wrap;row-gap:10px}
   #mv-stage .mv-top>.mv-tgo:not(#z),#mv-stage .mv-top>.mv-ton:not(#z),#mv-stage .mv-top>.mv-tdis:not(#z){flex:1 1 100%;margin-left:0}
+  /* no Autopilot countdown in Your move on a phone (operator, 2026-10-17); the Autopilot box above says it is on */
+  #mv-stage .mv-top>.mv-ton:not(#z):not(#y){display:none}
   #mv-stage .mv-top .sv-btn.go.mv-go.mv-tgo:not(#z):not(#y):not(#x){width:100%}
   /* the status chip stays in the title row, smaller, next to its caption; the caption gives way first (2026-10-02) */
   #mv-stage .mv-top>em:not(#z){flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9px;letter-spacing:.12em}
