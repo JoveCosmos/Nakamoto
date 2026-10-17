@@ -1451,8 +1451,10 @@ rememberGridH();
       var tgt = c.goal * c.supply, need = tgt - c.bonded, now = c.bonded / c.supply * 100, atHi = c.infl >= c.imax - 1e-6, atLo = c.infl <= c.imin + 1e-6;
       /* past the goal the chain's mint rule turns inflation around, toward its minimum */
       box.querySelector("b").textContent = (c.goal * 100).toFixed(0) + "%";
-      box.querySelector("small").textContent = need > 0 ? "past it, inflation reverses toward " + (c.imin * 100).toFixed(0) + "% minimum"
-        : atLo ? "inflation holds at its " + (c.imin * 100).toFixed(0) + "% minimum" : "inflation falls toward " + (c.imin * 100).toFixed(0) + "% minimum";
+      /* the wide words, then the phone's one line */
+      var lo = (c.imin * 100).toFixed(0) + "%", two = function(w, p){ return '<span class=kps-w>' + w + '</span><span class=kps-p>' + p + '</span>'; };
+      box.querySelector("small").innerHTML = need > 0 ? two("past it, inflation reverses toward " + lo + " minimum", "past it, falls to " + lo)
+        : atLo ? two("inflation holds at its " + lo + " minimum", "holds at " + lo + " minimum") : two("inflation falls toward " + lo + " minimum", "falls toward " + lo);
       if(mv){ mv.hidden = false;
         mv.innerHTML = need > 0
           ? "To go from <b>" + now.toFixed(1) + "%</b> to <b>" + (c.goal * 100).toFixed(0) + "%</b> staked, <b class=or>" + whole(need) + " ATONE</b> more would have to be staked." +
@@ -1466,13 +1468,14 @@ rememberGridH();
      value inside popup boxes is incomplete") */
   function kpFit(){
     if(!(window.matchMedia && matchMedia("(max-width:560px)").matches)) return;
-    [].forEach.call(document.querySelectorAll(".pop.on .kp .kp-f>b, .pop.on .kp .kp-hv>b"), function(x){
+    [].forEach.call(document.querySelectorAll(".pop.on .kp .kp-f>b, .pop.on .kp .kp-hv>b, .pop.on .kp .kp-g:not(.kp-g3) .kp-f>small"), function(x){
       x.style.fontSize = ""; if(!x.clientWidth) return;
       /* the words' own width to the fraction of a pixel: a figure a hair too wide used to end in an ellipsis */
       var over = function(){ var rg = document.createRange(); rg.selectNodeContents(x.firstChild && x.firstChild.nodeType === 1 && x.childNodes.length === 1 ? x.firstChild : x);
         return rg.getBoundingClientRect().width > x.clientWidth + 0.25; };
       var fs = parseFloat(getComputedStyle(x).fontSize);
-      while(over() && fs > 12){ fs -= 0.5; x.style.fontSize = fs + "px"; }
+      var min = x.tagName === "SMALL" ? 9.5 : 12;
+      while(over() && fs > min){ fs -= 0.5; x.style.fontSize = fs + "px"; }
     });
   }
   window.addEventListener("resize", kpFit);

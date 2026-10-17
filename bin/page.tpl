@@ -3293,7 +3293,12 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
   .kp-g3 .kp-f:not(#z){padding:9px 9px 10px}
   .kp-g3 .kp-f>em:not(#z){min-height:2.5em;line-height:1.25}
   .kp-g3 .kp-f>b:not(#z){font-size:18px}
+  /* a two-column box's line under its figure is one line on a phone (operator, 2026-10-17: "should not exceed 1 row"):
+     the phone's shorter words, and kpFit steps the type down if a narrow phone still needs it */
+  .kp .kp-g:not(.kp-g3) .kp-f>small:not(#z){white-space:nowrap;overflow:hidden}
+  .kps-w:not(#z){display:none}.kps-p:not(#z){display:inline}
 }
+.kps-p{display:none}
 
 /* ── Self, 2026-09-27: no balance boxes; the three lists hold ten rows and scroll past them; the columns
    sit at the bottom of the frame and the room above carries one Autopilot row (sa-) ── */
@@ -7411,11 +7416,11 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
     <div class=kp-big><b class=am><span data-kp=BONDED>{{BONDED}}</span></b><em>ATONE staked, <strong><span data-kp=BONDED_PCT>{{BONDED_PCT}}</span>%</strong> of <span data-kp=SUPPLY>{{SUPPLY}}</span></em>
       <span class=kp-bar><i style="width:{{BONDED_PCT}}%"></i></span></div>
     <div class=kp-g>
-      <div class=kp-f><em>Inflation</em><b><span data-kp=INFL>{{INFL}}</span>%</b><small>a year, at the real block pace</small></div>
+      <div class=kp-f><em>Inflation</em><b><span data-kp=INFL>{{INFL}}</span>%</b><small><span class=kps-w>a year, at the real block pace</span><span class=kps-p>a year, real pace</span></small></div>
       <div class=kp-f><em>Minted</em><b><span data-kp=MINTED>{{MINTED}}</span></b><small>ATONE a year</small></div>
-      <div class=kp-f><em>Reward pool</em><b><span data-kp=POOL>{{POOL}}</span></b><small>ATONE a year, to stakers</small></div>
-      <div class=kp-f><em>Community pool</em><b><span data-kp=CTAKE>{{CTAKE}}</span></b><small>ATONE a year, <span data-kp=TAX>{{TAX}}</span>% tax</small></div>
-      <div class=kp-f><em>Delegators</em><b>{{DELEG}}</b><small>staking with <span data-kp=N>{{N}}</span> validators</small></div>
+      <div class=kp-f><em>Reward pool</em><b><span data-kp=POOL>{{POOL}}</span></b><small><span class=kps-w>ATONE a year, to stakers</span><span class=kps-p>a year, to stakers</span></small></div>
+      <div class=kp-f><em>Community pool</em><b><span data-kp=CTAKE>{{CTAKE}}</span></b><small><span class=kps-w>ATONE a year, </span><span class=kps-p>a year, </span><span data-kp=TAX>{{TAX}}</span>% tax</small></div>
+      <div class=kp-f><em>Delegators</em><b>{{DELEG}}</b><small><span class=kps-w>staking </span>with <span data-kp=N>{{N}}</span> validators</small></div>
       <div class=kp-f id=kpgoal><em>Staking goal</em><b>-</b><small>&nbsp;</small></div>
     </div>
     <p class=kp-move id=kpgoalmv hidden></p>
@@ -7443,7 +7448,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
     </div>
     <div class=kp-g>
       <div class=kp-f><em>Reward pool</em><b><span data-kp=POOL>{{POOL}}</span></b><small>ATONE a year</small></div>
-      <div class=kp-f><em>Validators</em><b><span data-kp=N>{{N}}</span></b><small>share the bonus equally</small></div>
+      <div class=kp-f><em>Validators</em><b><span data-kp=N>{{N}}</span></b><small><span class=kps-w>share the bonus equally</span><span class=kps-p>share it equally</span></small></div>
     </div>
     <ul class="bul kp-notes">
       <li>At <b><span data-kp=ETA>{{ETA}}</span></b>, <b><span data-kp=ETA_PCT>{{ETA_PCT}}</span>%</b> of all rewards are split equally between the <span data-kp=N>{{N}}</span> validators.</li>
