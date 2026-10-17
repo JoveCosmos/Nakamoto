@@ -1,7 +1,7 @@
 /* console.js - the app as an engineer sees it in DevTools: every console message, uncaught error, failed or
    4xx/5xx request and Chrome "Issue" (the Issues tab) while the page loads and walks every route.
      node --experimental-websocket dev/console.js [--url URL] [--size 1440x900] [--phone] [--wallet] [--addr ATONE1...]
-                                                 [--wait MS] [--settle MS] [--verbose] [--clicks] [routes...]
+                                                 [--wait MS] [--settle MS] [--verbose] [--clicks] [--page /admin] [routes...]
    --phone emulates a touch phone at --size (default 390x844). --verbose adds Chrome's verbose lines (violations).
    --clicks then opens what a reader opens on each route - every action button, validator row and card - one at a
    time, and closes it again (never a sign, send or faucet button). The stand-in wallet carries the address's real
@@ -11,7 +11,7 @@
 const { spawn } = require("child_process"), fs = require("fs"), path = require("path"), os = require("os");
 const A = process.argv.slice(2), opt = k => { const i = A.indexOf(k); if(i < 0) return null; const v = A[i + 1]; A.splice(i, 2); return v; };
 const flag = k => { const i = A.indexOf(k); if(i < 0) return false; A.splice(i, 1); return true; };
-const URL0 = opt("--url") || "http://127.0.0.1:8089", PHONE = flag("--phone");
+const URL0 = opt("--url") || "http://127.0.0.1:8089", PAGE = opt("--page") || "/", PHONE = flag("--phone");
 const SIZE = (opt("--size") || (PHONE ? "390x844" : "1440x900")).split("x").map(Number);
 const WAIT = +(opt("--wait") || 2500), SETTLE = +(opt("--settle") || 8000), VERBOSE = flag("--verbose"), CLICKS = flag("--clicks");
 const ADDR0 = opt("--addr"), ADDR = ADDR0 || "atone14y3usgepvcxxs6jkjqwhuyjy6eyhu7rkvpg2a7", WALLET = flag("--wallet") || !!ADDR0;
@@ -117,7 +117,7 @@ async function clickAll(r, send){
     await send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 }); }
   else await send("Emulation.setDeviceMetricsOverride", { width: SIZE[0], height: SIZE[1], deviceScaleFactor: 1, mobile: false });
   if(WALLET) await send("Page.addScriptToEvaluateOnNewDocument", { source: mock(await pubKey()) });
-  await send("Page.navigate", { url: URL0 + "/" }); await sleep(SETTLE);
+  await send("Page.navigate", { url: URL0 + PAGE }); await sleep(SETTLE);
   for(const r of ROUTES){ where.route = r;
     /* as a reader's click (userGesture): a history entry added without one is marked skippable by Chrome */
     try{ await send("Runtime.evaluate", { expression: `window.__shellGo && window.__shellGo(${JSON.stringify(r)})`, userGesture: true }); }catch(e){ add("tool", "error", "route " + r + ": " + e.message); }

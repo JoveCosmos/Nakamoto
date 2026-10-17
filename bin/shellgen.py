@@ -204,6 +204,7 @@ def build(cfg, tpl):
            + (f"{show_ver}{{display:inline-flex}}\n{show_grp}{{display:flex}}\n"
               f"{lit_ver}{{background:var(--l2-on);color:var(--l2-on-ink);font-weight:500}}\n" if show_ver else ""))
 
-    blob = json.dumps(cfg, separators=(",", ":"), ensure_ascii=False)
+    # the page's copy is the configuration alone: "about" is this file's documentation, and nothing reads it
+    blob = json.dumps({k: v for k, v in cfg.items() if k != "about"}, separators=(",", ":"), ensure_ascii=False)
     blob = blob.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     return {"SHELL_CFG": blob, "SHELL_L1": "".join(l1), "SHELL_L2": "".join(l2), "SHELL_CSS": css}

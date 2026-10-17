@@ -324,11 +324,65 @@ for _js in ("app.js", "boot.js", "tx.js", "simple.js", "shell.js"):
                           capture_output=True, text=True)
     if _chk.returncode != 0:
         sys.exit("atomone-app: FATAL %s does not parse:\n%s" % (_js, _chk.stderr.strip()[-600:]))
+# What the site serves is the program, not this repository's working notes (dates, decisions, who asked): a script
+# goes out through strip.js (its comments cut, the copy proven the same syntax tree, else the script as written), a
+# sheet and the page without their comments (2026-10-17: "someone technical inspects the site ... clean image").
+def _served_js(path):
+    tmp = os.path.join(OUT, "." + os.path.basename(path) + ".bare.tmp")
+    r = subprocess.run(["/usr/bin/node", "--expose-internals", os.path.join(os.path.dirname(__file__), "strip.js"), path, tmp],
+                       capture_output=True, text=True)
+    try:
+        if r.returncode == 0:
+            return open(tmp, "rb").read()
+        print("atomone-app: note: %s served with its comments (%s)" % (os.path.basename(path), (r.stderr.strip() or "strip.js failed")[-200:]))
+        return open(path, "rb").read()
+    finally:
+        try: os.remove(tmp)
+        except OSError: pass
+def _bare_css(css):
+    """the sheet without its comments: quoted strings are kept whole; a comment alone on its line(s) goes with the line,
+    one at a line's end with the spaces before it, one between two tokens leaves a space. Checked: the same rules once
+    whitespace is folded, and no comment left; else the sheet goes out as written"""
+    cuts, i, n = [], 0, len(css)
+    while i < n:
+        c = css[i]
+        if c in "\"'":
+            j = i + 1
+            while j < n and css[j] != c and css[j] != "\n":
+                j += 2 if css[j] == "\\" else 1
+            i = j + 1; continue
+        if css.startswith("/*", i):
+            j = css.find("*/", i + 2); j = n if j < 0 else j + 2
+            cuts.append((i, j)); i = j; continue
+        i += 1
+    out, at = [], 0
+    for a, b in cuts:
+        ps = a
+        while ps > at and css[ps - 1] in " \t": ps -= 1
+        qe = b
+        while qe < n and css[qe] in " \t": qe += 1
+        line_start, line_end = ps == 0 or css[ps - 1] == "\n", qe == n or css[qe] in "\r\n"
+        out.append(css[at:ps])
+        if line_start and line_end: at = qe + (2 if css[qe:qe + 2] == "\r\n" else 1)
+        elif line_end: at = qe
+        else: out.append(" "); at = qe
+    out.append(css[at:]); bare = "".join(out)
+    fold = lambda x: re.sub(r"\s+", " ", x).strip()
+    if "/*" in bare or fold(re.sub(r"/\*.*?\*/", " ", css, flags=re.S)) != fold(bare):
+        print("atomone-app: note: a sheet served with its comments (its bare copy did not check)")
+        return css
+    return bare
+def _bare_html(doc):
+    """a page without its comments: each <style> through _bare_css, and the markup's <!-- --> notes (one alone on its
+    line goes with the line; the pattern never runs past a note's own end)"""
+    doc = re.sub(r"(<style[^>]*>)(.*?)(</style>)", lambda m: m.group(1) + _bare_css(m.group(2)) + m.group(3), doc, flags=re.S)
+    doc = re.sub(r"(?m)^[ \t]*<!--(?:(?!-->).)*-->[ \t]*\n", "", doc, flags=re.S)
+    return re.sub(r"<!--(?:(?!-->).)*-->", "", doc, flags=re.S)
 for _js in ("app.js", "boot.js", "tx.js", "simple.js", "shell.js"):
-    shutil.copyfile(os.path.join(os.path.dirname(__file__), _js),
-                    os.path.join(OUT, "." + _js + ".tmp"))
-    os.chmod(os.path.join(OUT, "." + _js + ".tmp"), 0o640)
-    os.replace(os.path.join(OUT, "." + _js + ".tmp"), os.path.join(OUT, _js))
+    _t = os.path.join(OUT, "." + _js + ".tmp")
+    open(_t, "wb").write(_served_js(os.path.join(os.path.dirname(__file__), _js)))
+    os.chmod(_t, 0o640)
+    os.replace(_t, os.path.join(OUT, _js))
 # the operator console and the testnet faucet: each its own page and script (versioned by content), shared as a
 # direct link (/admin, /faucet), never linked from the app. Built once, at the site root: the console switches
 # networks itself and the faucet is testnet-only, so the testnet tree gets no copies.
@@ -336,8 +390,8 @@ for _pg in (() if TESTNET else ("admin",)):          # the faucet page is gone: 
     _chk = subprocess.run(["/usr/bin/node", "--check", os.path.join(os.path.dirname(__file__), _pg + ".js")], capture_output=True, text=True)
     if _chk.returncode != 0:
         sys.exit("atomone-app: FATAL %s.js does not parse:\n%s" % (_pg, _chk.stderr.strip()[-600:]))
-    _ajs = open(os.path.join(os.path.dirname(__file__), _pg + ".js"), "rb").read()
-    _ah = open(os.path.join(os.path.dirname(__file__), _pg + ".html")).read().replace('src="%s.js"' % _pg, 'src="%s.js?v=%s"' % (_pg, hashlib.sha256(_ajs).hexdigest()[:10]))
+    _ajs = _served_js(os.path.join(os.path.dirname(__file__), _pg + ".js"))
+    _ah = _bare_html(open(os.path.join(os.path.dirname(__file__), _pg + ".html")).read()).replace('src="%s.js"' % _pg, 'src="%s.js?v=%s"' % (_pg, hashlib.sha256(_ajs).hexdigest()[:10]))
     for _fn, _body in ((_pg + ".js", _ajs), (_pg + ".html", _ah.encode())):
         _t = os.path.join(OUT, "." + _fn + ".tmp"); open(_t, "wb").write(_body); os.chmod(_t, 0o640); os.replace(_t, os.path.join(OUT, _fn))
 # Brand marks: AtomOne and PHOTON are the official chain-registry SVGs, GATA is the
@@ -360,7 +414,8 @@ for fn in os.listdir(src_a):
             shutil.copyfile(os.path.join(sp, f2), t); os.replace(t, os.path.join(dd, f2))
         continue
     t = os.path.join(dst_a, "." + fn + ".tmp")
-    shutil.copyfile(sp, t)
+    if fn.endswith(".css"): open(t, "w").write(_bare_css(open(sp).read()))   # the day sheet, as the page's own
+    else: shutil.copyfile(sp, t)
     os.replace(t, os.path.join(dst_a, fn))
 # the tab icon is the GATA mark (the same file the GATA app serves); browsers and
 # bookmark tools also ask for /favicon.ico at the root, so it lives there too
@@ -413,6 +468,11 @@ for _js in ("app.js", "boot.js", "tx.js", "simple.js", "shell.js"):
     page = page.replace(f'src="{_js}"', f'src="{_js}?v={_h}"')
 if TESTNET:
     page = page.replace("N/A%", "N/A")      # a template's "%" after a figure that is not there
+page = _bare_html(page)
+# the site's crawler rules, at its root only: every page may be read; the per-wallet Autopilot reports are not pages
+if not TESTNET:
+    _t = os.path.join(OUT, ".robots.txt.tmp")
+    open(_t, "w").write("User-agent: *\nDisallow: /pilot/\nDisallow: /testnet/pilot/\n"); os.chmod(_t, 0o640); os.replace(_t, os.path.join(OUT, "robots.txt"))
 # the day sheet the same way: a versioned URL can be cached for good (nginx says so for any
 # ?v=), and a new sheet is a new URL
 _day = os.path.join(OUT, "assets", "theme-day.css")

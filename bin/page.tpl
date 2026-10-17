@@ -6,6 +6,9 @@
 <script id=shellcfg type=application/json>{{SHELL_CFG}}</script>
 <script src="boot.js"></script>
 <meta name=description content="AtomOne's Nakamoto Bonus, live: what it pays, what would reverse it, and ten million blocks of evidence.">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Nakamoto"><meta property="og:title" content="AtomOne Nakamoto Bonus">
+<meta property="og:description" content="AtomOne's Nakamoto Bonus, live: what it pays, what would reverse it, and ten million blocks of evidence.">
+<meta property="og:image" content="https://atomone.gatahub.zone/assets/favicon-192.png"><meta name=twitter:card content=summary>
 <style>
 :root{
 color-scheme:dark;
