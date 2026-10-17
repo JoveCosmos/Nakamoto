@@ -43,7 +43,7 @@
     /* a balance box (phones, tablets) says it shorter: the box's own label already reads Your APR (2026-10-15) */
     var add = '+' + pct(Math.pow(1 + r / 730, 730) - 1 - r);
     /* the wallet's APR block (operator, 2026-10-17): "restake" on the line of "on N validators", the addition over it */
-    if(box === "line") return '<span class=you-rsl><span>restake</span><span>' + add + ' APR</span></span>';
+    if(box === "line") return '<span class=you-rsl><span>restake</span><span>' + add + '</span></span>';   /* no "APR" (operator, 2026-10-17) */
     return '<span class=you-rsx><span>' + add + (box ? '' : ' APR') + '</span><span>restake</span></span>';
   }
   function pp(x){ return (x >= 0 ? "+" : "−") + Math.abs(x * 100).toFixed(1) + "%"; }

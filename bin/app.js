@@ -162,7 +162,7 @@ window.__dd = function(sel, cls){
 var DOCK = null;
 var DOCK_PARTS = {
   /* hdr: into the pane's title row, where Redelegate keeps its amount field; list: the pane's body; out: Outcome */
-  stpop: { mode: "stake",   title: "Stake",         hdr: [".sttop", "#stask"], list: ["#stlist"],  out: ["#stsum", "#stlock", "#stfee", "#ststep", ".txbtns"] },
+  stpop: { mode: "stake",   title: "Stake",         hdr: [".sttop"], list: ["#stlist"],  out: ["#stsum", "#stlock", "#stfee", "#ststep", ".txbtns"] },
   unpop: { mode: "unstake", title: "Unstake",       hdr: [".unamt"], list: ["#unpick"],  out: ["#unsum", "#unlock", "#unfee", "#unstep", ".txbtns"] },
   clpop: { mode: "claim",   title: "Claim",         hdr: [],         list: ["#clpick"],  out: ["#clsum", "#clfee", "#clstep", ".txbtns"] }
 };
@@ -3168,7 +3168,14 @@ rememberGridH();
   if(stask) stask.addEventListener("click", function(){ ST_PILOT = !ST_PILOT; stAskSync(); var el = E("stlist"); if(el) el.scrollTop = 0; stRows(); stState(); });
   var stamtEl = E("stamt"); if(stamtEl) stamtEl.addEventListener("input", function(){ stRows(); stState(); });
   var stmax = E("stmax"); if(stmax) stmax.addEventListener("click", function(){ if(!(stBal() > 0)) return; E("stamt").value = exact(stBal()); stRows(); stState(); });
-  if(stpop) stpop.__onclose = function(){ feeSoon("st"); };
+  /* Ask Pilot leaves nothing behind (operator, 2026-10-17, as the Redelegate grant once carried over): closed, docked
+     away, the view left (undock calls this) or the wallet gone, the card drops Pilot's mode, the ticks and the amount;
+     a card opened on top (Alerts, a validator) only hides it and keeps them */
+  function stReset(){ ST_PILOT = false; STSEL = {}; stAskSync(); var a = E("stamt"); if(a) a.value = "";
+    var l = E("stlist"); if(l) l.innerHTML = ""; var sm = E("stsum"); if(sm) sm.innerHTML = ""; }   /* the next open draws them fresh */
+  /* a wallet gone: the card itself closes (docked or not, and with anything opened on top of it) */
+  window.__stReset = function(){ if(window.__closeCard) window.__closeCard(stpop); stReset(); };
+  if(stpop) stpop.__onclose = function(){ feeSoon("st"); stReset(); };
   var stsign = E("stsign");
   if(stsign) stsign.addEventListener("click", function(){
     var msgs = stMsgs(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
@@ -4356,6 +4363,7 @@ rememberGridH();
     busy(false);
     var wn = E("wname"); if(wn) wn.textContent = "Wallet";
     if(window.__atDoor) window.__atDoor();          /* no wallet: nothing of the last one's grant stays */
+    if(window.__stReset) window.__stReset();        /* nor of a Stake card's Pilot move */
     if(window.__redraw) window.__redraw();
     if(window.__planDraw) window.__planDraw();
   }

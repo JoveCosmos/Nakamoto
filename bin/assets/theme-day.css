@@ -449,11 +449,8 @@
   html[data-theme=light]:not([data-mono]) .sp-own svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .pop .card.bycard::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .by-tok option{background:var(--surface-2);color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .st-ask{border-color:var(--accent);background:transparent;color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .st-ask svg:not(#z){fill:none;stroke:currentColor}
-  html[data-theme=light]:not([data-mono]) .st-ask>span:not(#z){color:inherit}
-  html[data-theme=light]:not([data-mono]) .st-ask:hover{background:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .st-ask[aria-pressed=true]{background:var(--accent);color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .stcard .wk-btn.wk-go.st-ask{background:var(--line-strong);border-color:var(--accent);color:#FFFFFF;box-shadow:none}
   html[data-theme=light]:not([data-mono]) .st-ask:focus-visible{outline-color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .wk-txh .txsum .kps-w:not(#z){color:inherit}
   html[data-theme=light]:not([data-mono]) .dd-trig.by-dd{background:transparent}
@@ -1173,6 +1170,7 @@
     html[data-theme=light]:not([data-mono]) #you .wk-tbl2 thead:not(#z),html[data-theme=light]:not([data-mono]) #you .wk-tbl2 thead tr:not(#z){background:none;box-shadow:none}
     html[data-theme=light]:not([data-mono]) #one .pro-dock:not(#z){background:none;box-shadow:none}
     html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go:disabled:not(#z){background:transparent}
+    html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go.st-ask:not(#z):not(#y){border-color:var(--accent);background:var(--accent);color:#FFFFFF}
     html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go:not(#z):not(#y),html[data-theme=light]:not([data-mono]) #one #p-dele #wk-mv #dgo:not(#z):not(#y){box-shadow:none}
     html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go:disabled:not(#z):not(#y),html[data-theme=light]:not([data-mono]) #one #p-dele #wk-mv #dgo:disabled:not(#z):not(#y){background:transparent}
   }
@@ -1764,4 +1762,10 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .by-st.ok i::after{border-color:var(--surface)}
   html[data-theme=light]:not([data-mono]) .by-st.ok:not(:last-child)::before{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .by-st span a{color:var(--accent)}
+
+  /* Ask Pilot by day (operator, 2026-10-17: Stake's own button in another colour): Autopilot's violet, inked for paper;
+     the shadow turned night's lavender into the line colour, which read as a dead button */
+  html[data-theme=light]:not([data-mono]) .stcard .wk-btn.wk-go.st-ask:not(#z){background:#4B3F8F;border-color:#4B3F8F;color:#FFFFFF;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .stcard .wk-btn.wk-go.st-ask:hover:not(#z){background:#3B3172;border-color:#3B3172;filter:none}
+  html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go.st-ask:not(#z):not(#y):not(#x){border-color:#4B3F8F;background:#4B3F8F;color:#FFFFFF}
 

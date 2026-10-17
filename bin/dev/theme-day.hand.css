@@ -527,3 +527,9 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .by-st.ok i::after{border-color:var(--surface)}
   html[data-theme=light]:not([data-mono]) .by-st.ok:not(:last-child)::before{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .by-st span a{color:var(--accent)}
+
+  /* Ask Pilot by day (operator, 2026-10-17: Stake's own button in another colour): Autopilot's violet, inked for paper;
+     the shadow turned night's lavender into the line colour, which read as a dead button */
+  html[data-theme=light]:not([data-mono]) .stcard .wk-btn.wk-go.st-ask:not(#z){background:#4B3F8F;border-color:#4B3F8F;color:#FFFFFF;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .stcard .wk-btn.wk-go.st-ask:hover:not(#z){background:#3B3172;border-color:#3B3172;filter:none}
+  html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go.st-ask:not(#z):not(#y):not(#x){border-color:#4B3F8F;background:#4B3F8F;color:#FFFFFF}
