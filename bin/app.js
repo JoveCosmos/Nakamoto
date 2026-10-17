@@ -4535,23 +4535,25 @@ rememberGridH();
     pilot: I('<path d="M12 3l7 18-7-4.5L5 21z"/>'),
     up: I('<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>'),
     spread: I('<circle cx="6" cy="7" r="2.5"/><circle cx="18" cy="7" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.5 7h7M7.3 9.3l3.4 6.4M16.7 9.3l-3.4 6.4"/>'),
-    re: I('<path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v5h-5"/>'),
-    clock: I('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>')
+    re: I('<path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v5h-5"/>')
   };
+  /* each item: icon, tone, then its parts in reading order - em a label, b a figure, span plain words (operator,
+     2026-10-17: "Autopilot 563,637 ATONE moved", "+109,795 ATONE more a year, hands-free", Restake as ONE item) */
   function items(s){
     var i = s && s.impact, L = []; if(!i) return L;
-    if(i.moved_uatone > 0) L.push(["pilot", "", "Autopilot", nf(i.moved_uatone / 1e6) + " ATONE", "moved to a better APR"]);
-    if(i.gain_atone_year > 0) L.push(["up", "g", "Earned on top", "+" + nf(i.gain_atone_year) + " ATONE", "a year, hands-free"]);
-    if(i.validators > 0) L.push(["spread", "", "Spread", nf(i.validators) + " validators", "share the stake it moved"]);
-    if(i.restaked_uatone > 0) L.push(["re", "g", "Restaked", nf(i.restaked_uatone / 1e6) + " ATONE", "of rewards put back to work"]);
-    if(i.restakes > 0) L.push(["clock", "", "Restakes", nf(i.restakes), "so far, twice a day"]);
+    if(i.moved_uatone > 0) L.push(["pilot", "", [["em", "Autopilot"], ["b", nf(i.moved_uatone / 1e6) + " ATONE"], ["span", "moved"]]]);
+    if(i.gain_atone_year > 0) L.push(["up", "g", [["b", "+" + nf(i.gain_atone_year) + " ATONE more"], ["span", "a year, hands-free"]]]);
+    if(i.validators > 0) L.push(["spread", "", [["em", "Spread"], ["b", nf(i.validators) + " validators"], ["span", "share the stake it moved"]]]);
+    if(i.restakes > 0 || i.restaked_uatone > 0) L.push(["re", "g", [].concat(i.restakes > 0 ? [["b", nf(i.restakes)]] : [], [["em", "Restake"]],
+      i.restaked_uatone > 0 ? [["b", nf(i.restaked_uatone / 1e6) + " ATONE"]] : [])]);
     return L;
   }
   function draw(L){
     if(!L.length){ el.hidden = true; return; }
     var key = JSON.stringify(L); if(el.__key === key) return; el.__key = key;
     var sep = '<i class=ht-sep aria-hidden=true></i>';
-    var one = L.map(function(x){ return '<span class="ht-i' + (x[1] ? ' ' + x[1] : '') + '"><i class=ht-ic>' + IC[x[0]] + '</i><em>' + x[2] + '</em><b>' + x[3] + '</b><span>' + x[4] + '</span></span>'; }).join(sep) + sep;
+    var one = L.map(function(x){ return '<span class="ht-i' + (x[1] ? ' ' + x[1] : '') + '"><i class=ht-ic>' + IC[x[0]] + '</i>' +
+      x[2].map(function(p){ return '<' + p[0] + '>' + p[1] + '</' + p[0] + '>'; }).join("") + '</span>'; }).join(sep) + sep;
     /* the set twice: the run slides one set's width and starts again where it began, with no seam */
     el.innerHTML = '<span class=ht-live><i></i>Live</span><div class=ht-win><div class=ht-run><div class=ht-set>' + one + '</div><div class=ht-set aria-hidden=true>' + one + '</div></div></div>';
     el.hidden = false;

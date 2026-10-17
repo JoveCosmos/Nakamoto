@@ -5958,7 +5958,9 @@ color:#7c7aa3;text-decoration:none;white-space:nowrap;transition:color .15s,back
    controls (48px); narrower: a full-width row under the bar. One fixed height, so it moves nothing (2026-10-17) ── */
 .hdr-tick{display:none}
 .hdr-tick:not([hidden]){display:flex;align-items:center;gap:12px;min-width:0;height:32px}
-@media(min-width:1180px){.folder>.hdr-tick:not([hidden]){grid-column:1/-1;grid-row:1;justify-self:center;width:min(760px,calc(100% - 834px))}}
+/* between the brand and the controls (operator, 2026-10-17: "move the ticker to left, increase its length"): from 48 px
+   after the brand's counter line to 40 px before the theme button, at most 1000 px */
+@media(min-width:1180px){.folder>.hdr-tick:not([hidden]){grid-column:1/-1;grid-row:1;justify-self:start;margin-left:222px;width:min(1000px,calc(100% - 631px))}}
 @media(min-width:800px) and (max-width:1179px){.folder:has(>.hdr-tick:not([hidden])){height:auto;padding-bottom:6px}
   .folder>.hdr-tick:not([hidden]){grid-column:1/-1;grid-row:2}}
 @media(max-width:799px){.folder>.hdr-tick:not([hidden]){grid-column:1/-1;grid-row:3;height:28px;margin:2px 0}}
@@ -5970,7 +5972,9 @@ color:#7c7aa3;text-decoration:none;white-space:nowrap;transition:color .15s,back
 .hdr-tick:hover .ht-run{animation-play-state:paused}
 @keyframes htmarq{to{transform:translateX(-50%)}}
 .ht-set{flex:0 0 auto;display:flex;align-items:center}
-.ht-i{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+/* the label, the figure and the words of an item share one baseline; the icon sits centred on the line */
+.ht-i{display:inline-flex;align-items:baseline;gap:8px;white-space:nowrap}
+.ht-i>.ht-ic{align-self:center}
 .ht-ic{flex:0 0 auto;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:rgba(43,200,189,.14);color:#2bc8bd;box-shadow:inset 0 0 0 1px rgba(43,200,189,.28)}
 .ht-i.g .ht-ic{background:rgba(46,224,106,.12);color:#2ee06a;box-shadow:inset 0 0 0 1px rgba(46,224,106,.26)}
 .ht-ic svg:not(#z){display:block;width:11px;height:11px;margin:0;max-height:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
