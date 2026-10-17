@@ -83,7 +83,17 @@ var POP = (function(){
   document.addEventListener("click", function(ev){
     var t = ev.target;
     if(t && t.classList && t.classList.contains("pop") && t === top()) close(t); });
-  return { open: open, close: close, closeAll: closeAll, top: top };
+  /* a view switch inside one screen (Ask Pilot and Back, operator 2026-10-17): b takes a's place in the stack with no
+     entrance and the backdrop kept; a goes as a closed card does (its __onclose runs) */
+  function swap(a, b){
+    var i = -1;
+    for(var k = st.length - 1; k >= 0; k--) if(st[k].el === a){ i = k; break; }
+    if(i < 0){ open(b); return; }
+    st.splice(i + 1); st[i].el = b;
+    a.classList.remove("on"); if(a.__onclose) a.__onclose();
+    b.classList.add("on", "back"); R.classList.add("popon"); focusIn(b);
+  }
+  return { open: open, close: close, closeAll: closeAll, top: top, swap: swap };
 })();
 window.__POP = POP;
 
@@ -163,6 +173,8 @@ var DOCK = null;
 var DOCK_PARTS = {
   /* hdr: into the pane's title row, where Redelegate keeps its amount field; list: the pane's body; out: Outcome */
   stpop: { mode: "stake",   title: "Stake",         hdr: [".sttop"], list: ["#stlist"],  out: ["#stsum", "#stlock", "#stfee", "#ststep", ".txbtns"] },
+  /* StakePilot is the Stake screen's other view (Ask Pilot): the same tab, its view in the same panes */
+  sppop: { mode: "stake",   title: "StakePilot",    hdr: [".unamt"], list: [".sp-rngw", "#spout", "#splegs", "#spbc", "#sppho"], out: ["#spsum", "#spfee", "#spstep", ".txbtns"] },
   unpop: { mode: "unstake", title: "Unstake",       hdr: [".unamt"], list: ["#unpick"],  out: ["#unsum", "#unlock", "#unfee", "#unstep", ".txbtns"] },
   clpop: { mode: "claim",   title: "Claim",         hdr: [],         list: ["#clpick"],  out: ["#clsum", "#clfee", "#clstep", ".txbtns"] }
 };
@@ -203,6 +215,9 @@ function dock(pop){
   proTabs(); if(window.__proBrk) window.__proBrk();
 }
 window.__openCard = function(pop){ if(!pop) return; if(proWide()) dock(pop); else POP.open(pop); };
+/* one screen, two views: the Stake card and StakePilot switch in place, in Pro's panes when docked, else in the same
+   popup frame with no second entrance */
+window.__viewSwap = function(from, to){ if(DOCK && DOCK.pop === from){ dock(to); return; } POP.swap(from, to); };
 window.__closeCard = function(pop){ if(DOCK && DOCK.pop === pop) undock(); else POP.close(pop); };
 window.__undock = undock;
 window.__undockIfNarrow = function(){ if(DOCK && !proWide()) undock(); };
@@ -3076,7 +3091,7 @@ rememberGridH();
     var rows = [], head = [], tot = 0, fig = ["", ""], fig0 = null;
     var pc = function(x){ return (x * 100).toFixed(1) + "%"; };
     if(mode === "stake"){
-      var P = stPlan(); head = ["Validator", "Stake", "APR", "ATONE/yr"];
+      var P = DOCK && DOCK.pop && DOCK.pop.id === "sppop" && window.__spBrk ? window.__spBrk() : stPlan(); head = ["Validator", "Stake", "APR", "ATONE/yr"];
       P.rows.forEach(function(r){ tot += r.x; rows.push([logo(r.id, r.m) + '<span>' + att(r.m) + '</span>', fmt(r.x), r.after ? pc(r.after) : '0%', '+' + fmt(r.x * r.after)]); });
       fig = ["ATONE/year", P.rows.length ? (tot * P.rate + P.rest >= 0 ? '+' : '\u2212') + fmt(Math.abs(tot * P.rate + P.rest)) : '-'];
     } else if(mode === "unstake"){
@@ -3134,10 +3149,18 @@ rememberGridH();
     var go = E("stsign"); if(go){ go.disabled = true; go.textContent = "Stake"; }
     stRows(); stState(); window.__openCard(stpop); window.__kbFocus(a);
   });
-  /* Ask Pilot and StakePilot are one thing (operator, 2026-10-17: "merge them"): the button opens StakePilot's card with
-     the amount typed so far, and its "Choose validators myself" comes back here with it */
+  /* Ask Pilot and StakePilot are one thing (operator, 2026-10-17): the button switches this screen to StakePilot's view in
+     place, with the amount typed so far; its Back, in the same place, switches back here with StakePilot's amount */
   var stask = E("stask");
-  if(stask) stask.addEventListener("click", function(){ var u = stAmount(); window.__closeCard(stpop); if(window.__pilot) window.__pilot(u); });
+  if(stask) stask.addEventListener("click", function(){ var u = stAmount(); if(window.__pilotView) window.__pilotView(u); });
+  window.__stakeView = function(u){
+    if(!stpop || !window.__POS) return;
+    STSEL = {}; var a = E("stamt"); if(a) a.value = u > 0 ? exact(u) : "";
+    var go = E("stsign"); if(go){ go.disabled = true; go.textContent = "Stake"; }
+    var sp = E("sppop"), here = sp && ((DOCK && DOCK.pop === sp) || sp.classList.contains("on"));
+    if(here) window.__viewSwap(sp, stpop); else window.__openCard(stpop);
+    stRows(); stState(); window.__kbFocus(a);
+  };
   var stamtEl = E("stamt"); if(stamtEl) stamtEl.addEventListener("input", function(){ stRows(); stState(); });
   var stmax = E("stmax"); if(stmax) stmax.addEventListener("click", function(){ if(!(stBal() > 0)) return; E("stamt").value = exact(stBal()); stRows(); stState(); });
   /* the card leaves nothing behind (operator, 2026-10-17, as the Redelegate grant once carried over): closed, docked
@@ -3232,24 +3255,44 @@ rememberGridH();
     var pm = E("sppm"); if(pm) pm.addEventListener("click", function(){ if(window.__mint) window.__mint(100000); });
     var ok = !!P && P.legs.length > 0 && !need;
     var sm = E("spsum"); if(sm) sm.innerHTML = P ? fmt(P.staked) + " ATONE<br>to " + P.legs.length + " validator" + (P.legs.length === 1 ? "" : "s") + " at " + pct(P.rate) : "";
-    var go = E("spsign"); if(go){ go.disabled = !ok || !window.__WALLET; if(!go.classList.contains("busy")) go.textContent = P ? "Stake " + fmt(P.staked) + " ATONE" : "Stake"; }
+    /* "Stake", as on the Stake card: the amount is in the summary above, and a label that grew with it moved Back */
+    var go = E("spsign"); if(go){ go.disabled = !ok || !window.__WALLET; if(!go.classList.contains("busy")) go.textContent = "Stake"; }
+    var sb = E("spbell"); if(sb) sb.disabled = !(P && P.legs.length);
     var st = E("spstep"); if(st){ st.textContent = ""; st.className = "txstep"; }
     feeSoon("sp", E("spfee"), ok ? spMsgs : null);
+    if(DOCK && DOCK.pop === sppop && window.__proBrk) window.__proBrk();
   }
-  window.__pilot = function(u0){
-    if(!sppop || !window.__ADDR) return;
+  function spPrep(u0){
     var a = E("spamt"); if(a) a.value = u0 > 0 ? exact(u0) : "";
     SP.key = ""; var go = E("spsign"); if(go){ go.disabled = true; go.classList.remove("busy"); }
-    spSyncRange(u0 > 0 ? u0 : 0); spState(); POP.open(sppop); window.__kbFocus(a);
+    spSyncRange(u0 > 0 ? u0 : 0);
+  }
+  /* straight in (testnet's Stake buttons): the Stake screen opened on its Pilot view */
+  window.__pilot = function(u0){
+    if(!sppop || !window.__ADDR) return;
+    spPrep(u0); window.__openCard(sppop); spState(); window.__kbFocus(E("spamt"));
   };
+  /* Ask Pilot: the Pilot view in place of the Stake card's */
+  window.__pilotView = function(u0){
+    if(!sppop || !window.__ADDR) return;
+    spPrep(u0); window.__viewSwap(stpop, sppop); spState(); window.__kbFocus(E("spamt"));
+  };
+  /* Pro's Outcome while StakePilot is docked: its move, and what the stake already there earns after it lands */
+  window.__spBrk = function(){
+    var P = SP.plan, u = P ? P.staked : 0, rows = P ? P.legs.map(function(q){ return { id: q.id, m: q.m, x: q.x, after: q.after }; }) : [];
+    var rest = 0, pos = window.__POS, sh = {}; rows.forEach(function(r){ sh[r.id] = r.x; });
+    if(u > 0 && pos) pos.rows.forEach(function(row){ var v = (window.__VALS() || []).filter(function(q){ return q[3] === row.id; })[0];
+      if(!v || row.inactive) return; rest += row.x * (window.__rateAfterNew(v[1], v[2], sh[row.id] || 0, u) - row.rate); });
+    return { rows: rows, rate: P ? P.rate : 0, rest: rest };
+  };
+  window.__spIds = function(){ return SP.plan ? SP.plan.legs.map(function(q){ return q.id; }) : []; };
   window.__pilotRedo = function(){ if(sppop && sppop.classList.contains("on")) spState(); };
   /* closed, it keeps no amount and no plan (the next open starts clean) */
   if(sppop) sppop.__onclose = function(){ feeSoon("sp"); SP.plan = null; SP.key = ""; var a = E("spamt"); if(a) a.value = ""; spSyncRange(0); spState(); };
   var spamtEl = E("spamt"); if(spamtEl) spamtEl.addEventListener("input", function(){ spSyncRange(spAmount()); spState(); });
   var sprng = E("sprng"); if(sprng) sprng.addEventListener("input", function(){ var u = spSlid(); E("spamt").value = u > 0 ? exact(u) : ""; spFill(); spState(); });
   var spmax = E("spmax"); if(spmax) spmax.addEventListener("click", function(){ if(!(spMax() > 0)) return; E("spamt").value = exact(spMax()); spSyncRange(spMax()); spState(); });
-  var spown = E("spown"); if(spown) spown.addEventListener("click", function(){ var u = spAmount(); POP.close(sppop); var sb = E("stbtn");
-    if(sb) setTimeout(function(){ sb.click(); var a = E("stamt"); if(a && u > 0){ a.value = exact(u); a.dispatchEvent(new Event("input")); } }, 0); });
+  var spback = E("spback"); if(spback) spback.addEventListener("click", function(){ var u = spAmount(); if(window.__stakeView) window.__stakeView(u); });
   var spsign = E("spsign");
   if(spsign) spsign.addEventListener("click", function(){
     var msgs = spMsgs(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
@@ -3975,7 +4018,8 @@ rememberGridH();
   }
   var txbell = E("txbell"); if(txbell) txbell.addEventListener("click", function(){ if(window.__alertMany) window.__alertMany(alertList(MSGS.map(function(m){ return m.to; }))); });
   var stbell = E("stbell"); if(stbell) stbell.addEventListener("click", function(){ if(window.__alertMany) window.__alertMany(alertList(Object.keys(STSEL))); });
-  if(!window.__BOT){ if(txbell) txbell.hidden = true; if(stbell) stbell.hidden = true; }
+  var spbell = E("spbell"); if(spbell) spbell.addEventListener("click", function(){ if(window.__alertMany && window.__spIds) window.__alertMany(alertList(window.__spIds())); });
+  if(!window.__BOT){ if(txbell) txbell.hidden = true; if(stbell) stbell.hidden = true; if(spbell) spbell.hidden = true; }
 
   /* The simple view's one question: what would the best placement of everything
      that can move be worth? Answered by the same machinery the pane uses - the

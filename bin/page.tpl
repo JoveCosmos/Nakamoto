@@ -258,7 +258,7 @@ z-index:50;}
   .pop .card.txcard:not(#z)>:is(.txfee,.txstep){flex-shrink:0}
   /* a title row with a button (Stake's Ask Pilot) holds the summary's worst case, three lines, so it never grows */
   /* one size whatever the list holds (Ask Pilot's few rows, the whole set): the card always fills the screen */
-  .pop .card.stcard:not(#z){height:100%}
+  .pop .card:is(.stcard,.spcard):not(#z){height:100%}
 }
 .pop .card{max-width:470px;width:100%;
 padding:26px 28px 0;position:relative;
@@ -2674,7 +2674,7 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .txbtns .wk-bell{margin-right:auto;display:inline-flex;align-items:center;gap:6px;color:var(--wamber);border-color:rgba(255,176,46,.35);background:transparent}
 .txbtns .wk-bell:hover{border-color:var(--wamber);color:#ffd58a}
 .txbtns .wk-bell:disabled{opacity:.4;cursor:default}
-#txpop .txbtns .wk-bell svg,#stpop .txbtns .wk-bell svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin:0;max-height:none}
+#txpop .txbtns .wk-bell svg,#stpop .txbtns .wk-bell svg,#sppop .txbtns .wk-bell svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin:0;max-height:none}
 .acard .amany{display:flex;flex-wrap:wrap;gap:5px;padding:0 24px 2px}
 .acard .amany[hidden]{display:none}
 .acard .amany span{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px 0 4px;border:1px solid var(--edge2,#34345c);border-radius:5px;background:#0b0b16;font-size:11px;color:var(--ink,#e6e4f0);white-space:nowrap}
@@ -2720,7 +2720,13 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .mtcard .unamt>.unfield{flex:1 1 auto}
 /* StakePilot (operator, 2026-10-15): the amount, typed or slid; the rate it earns and where it lands, re-planned
    as it changes; one shape whatever the amount (the boxes keep their heights, nothing below them moves) */
-.pop .card.spcard{width:min(440px,94vw);max-width:440px}
+/* StakePilot's frame is the Stake card's (operator, 2026-10-17: a view switch, not a second popup): the same width and
+   height, its fee and buttons at the foot where the Stake card has them */
+.pop .card.spcard{width:min(520px,94vw);max-width:520px}
+.pop .card:is(.stcard,.spcard){height:92vh;height:92svh;max-height:92vh;max-height:92svh;display:flex;flex-direction:column}
+.pop .card.spcard>.txfee{margin-top:auto}
+/* the Stake card's list takes what the frame leaves (both views end on the same foot) */
+.pop .card.stcard>.stlist{flex:1 1 0;min-height:100px;max-height:none;height:auto}
 .pop .card.spcard::before{content:"";position:absolute;left:24px;right:24px;top:0;height:1px;opacity:.9;background:linear-gradient(90deg,transparent,var(--wcyan),transparent)}
 .spcard .txsum{color:var(--wcyan)}
 .spcard .unamt>.unfield{flex:1 1 auto}
@@ -2764,11 +2770,6 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .sp-pho span{flex:1 1 auto;font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.45;color:var(--ws)}
 .sp-pho button{flex:0 0 auto;font-family:var(--wmono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:6px 10px;border-radius:5px;border:1px solid var(--wamber);background:transparent;color:var(--wamber);cursor:pointer}
 .sp-pho button:hover{background:rgba(255,176,46,.12)}
-.spcard .txbtns{padding-bottom:6px}
-.sp-own{padding:0 22px 16px;display:flex;justify-content:flex-end}
-.sp-own button{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:4px 0;font-family:var(--wmono);font-size:9.5px;letter-spacing:.08em;color:var(--wcyan);cursor:pointer}
-.sp-own svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
-.sp-own button:hover svg{transform:translateX(2px)}
 @media (prefers-reduced-motion:reduce){.sp-legs.new .sp-leg{animation:none}}
 /* Buy ATONE (operator, 2026-10-15): one signature on Osmosis buys an exact amount of ATONE from its pool and
    sends it home; the token to pay with beside the amount; what arrives, the path it takes; one shape throughout */
@@ -2780,10 +2781,15 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 @media (max-width:480px){.bycard .wk-max b{display:none}.by-tok{padding-right:18px}}
 .by-tok{flex:0 0 auto;margin:0 6px 0 2px;padding:4px 20px 4px 8px;border:1px solid var(--wbd2);border-radius:5px;color:var(--wt);font-family:var(--wmono);font-size:10px;letter-spacing:.08em;cursor:pointer;-webkit-appearance:none;appearance:none;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238f8db4' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 7px center/8px 5px}
 .by-tok option{background:#0f0f1c;color:#e6e4f0}
-/* Stake's Ask Pilot (operator, 2026-10-17): Stake's own button, just before it, in Autopilot's lavender; it opens
-   StakePilot (one Pilot, merged the same day) with the amount typed so far */
+/* Ask Pilot (operator, 2026-10-17): Stake's own button, just before it, in Autopilot's lavender. It switches the screen to
+   StakePilot's view in place (the card, or Pro's panes), where the same button in the same place reads Back. Both carry
+   both sides in one cell, so the button keeps one width and nothing beside it moves */
+.wk-btn.wk-go.st-ask{display:inline-grid;grid-template-areas:"x";place-items:center}
+.st-ask>span{grid-area:x;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.st-ask>.st-a2,.st-ask[aria-pressed=true]>.st-a1{visibility:hidden}
+.st-ask[aria-pressed=true]>.st-a2{visibility:visible}
 .st-ask svg:not(#z){display:block;width:11px;height:11px;margin:0;max-height:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.stcard .wk-btn.wk-go.st-ask{background:linear-gradient(180deg,#c9c2ff,#9d93f0);border:1px solid #b9b0ff;color:#1b1440;box-shadow:0 10px 24px -12px rgba(185,176,255,.8),inset 0 1px 0 rgba(255,255,255,.3)}
+.txcard .wk-btn.wk-go.st-ask{background:linear-gradient(180deg,#c9c2ff,#9d93f0);border:1px solid #b9b0ff;color:#1b1440;box-shadow:0 10px 24px -12px rgba(185,176,255,.8),inset 0 1px 0 rgba(255,255,255,.3)}
 .st-ask:focus-visible{outline:2px solid #b9b0ff;outline-offset:2px}
 /* three buttons on a narrow phone (Alerts, Ask Pilot, Stake did not fit 360 px): Alerts keeps its bell, its word is
    still read out by a screen reader */
@@ -6727,7 +6733,7 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
     font:600 15px var(--wsans);letter-spacing:0;text-transform:none}
   #one #proout .txbtns .wk-btn.wk-go:disabled:not(#z){border-color:var(--wbd2);background:transparent;color:var(--wf)}
   #one #proout .txbtns .wk-bell{display:none!important}
-  #one #proout .txbtns .wk-btn.wk-go.st-ask:not(#z):not(#y){flex:0 0 auto;width:auto;margin:0;padding:0 20px;border-color:#b9b0ff;background:#b9b0ff;color:#1b1440}
+  #one #proout .txbtns .wk-btn.wk-go.st-ask:not(#z):not(#y){display:inline-grid;flex:0 0 auto;width:auto;margin:0;padding:0 20px;border-color:#b9b0ff;background:#b9b0ff;color:#1b1440}   /* #wk-mv's buttons are inline-flex: the two sides would sit side by side */
   /* every action's button is Redelegate's: full width, the same height, radius, type and fill */
   #one #proout .txbtns .wk-btn.wk-go:not(#z):not(#y),#one #p-dele #wk-mv #dgo:not(#z):not(#y){width:100%;flex:1 1 auto;height:46px;margin:0;padding:0 20px;border-radius:12px;
     border:1px solid var(--wcyan);background:var(--wcyan);color:var(--wc);font:600 15px var(--wsans);letter-spacing:0;text-transform:none;box-shadow:none}
@@ -7565,8 +7571,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <div class=sp-pho id=sppho></div>
   <div class=txfee id=spfee></div>
   <div class=txstep id=spstep></div>
-  <div class=txbtns><button class="wk-btn wk-go" id=spsign type=button disabled>Stake</button></div>
-  <div class=sp-own><button type=button id=spown>Choose validators myself<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></div>
+  <div class=txbtns><button class="wk-btn wk-bell" id=spbell type=button title="Alerts for these validators" disabled><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>Alerts</button><button class="wk-btn wk-go st-ask" id=spback type=button aria-pressed=true title="Back to choosing validators"><span class=st-a1>Ask Pilot<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></span><span class=st-a2><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12H5M11 6l-6 6 6 6"/></svg>Back</span></button><button class="wk-btn wk-go" id=spsign type=button disabled>Stake</button></div>
 </div></div>
 
 <div class=pop id=stpop><div class="card txcard uncard stcard">
@@ -7580,7 +7585,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <div class=txlock id=stlock></div>
   <div class=txfee id=stfee></div>
   <div class=txstep id=ststep></div>
-  <div class=txbtns><button class="wk-btn wk-bell" id=stbell type=button title="Alerts for these validators"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>Alerts</button><button class="wk-btn wk-go st-ask" id=stask type=button title="StakePilot: where this amount earns the most">Ask Pilot<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button><button class="wk-btn wk-go" id=stsign type=button disabled>Stake</button></div>
+  <div class=txbtns><button class="wk-btn wk-bell" id=stbell type=button title="Alerts for these validators"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>Alerts</button><button class="wk-btn wk-go st-ask" id=stask type=button aria-pressed=false title="StakePilot: where this amount earns the most"><span class=st-a1>Ask Pilot<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></span><span class=st-a2><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12H5M11 6l-6 6 6 6"/></svg>Back</span></button><button class="wk-btn wk-go" id=stsign type=button disabled>Stake</button></div>
 </div></div>
 
 <div class=pop id=atpop><div class="card txcard uncard atcard" role=dialog aria-modal=true aria-labelledby=atttl data-v=setup>
