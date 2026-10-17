@@ -4448,17 +4448,19 @@ rememberGridH();
   var nf = function(n){ return Math.round(n).toLocaleString("en-US"); };
   function items(s){
     var i = s && s.impact, L = []; if(!i) return L;
-    if(i.moved_uatone > 0) L.push(["a", "Autopilot", nf(i.moved_uatone / 1e6) + " ATONE", "moved to a better APR, hands-free"]);
-    if(i.gain_atone_year > 0) L.push(["a", "Autopilot", "+" + nf(i.gain_atone_year) + " ATONE", "a year added for its stakers, while they sleep"]);
-    if(i.validators > 0) L.push(["a", "Autopilot", nf(i.validators) + " validators", "share the stake it moved"]);
-    if(i.restaked_uatone > 0) L.push(["r", "Restake", nf(i.restaked_uatone / 1e6) + " ATONE", "of rewards put back to work"]);
-    if(i.restakes > 0) L.push(["r", "Restake", nf(i.restakes) + " restakes", "so far, twice a day"]);
+    /* the wide line, then the phone's shorter one */
+    if(i.moved_uatone > 0) L.push(["a", "Autopilot", nf(i.moved_uatone / 1e6) + " ATONE", "moved to a better APR, hands-free", "moved to a better APR"]);
+    if(i.gain_atone_year > 0) L.push(["a", "Autopilot", "+" + nf(i.gain_atone_year) + " ATONE", "a year added for its stakers, while they sleep", "a year added for stakers"]);
+    if(i.validators > 0) L.push(["a", "Autopilot", nf(i.validators) + " validators", "share the stake it moved", "share the stake it moved"]);
+    if(i.restaked_uatone > 0) L.push(["r", "Restake", nf(i.restaked_uatone / 1e6) + " ATONE", "of rewards put back to work", "of rewards put back to work"]);
+    if(i.restakes > 0) L.push(["r", "Restake", nf(i.restakes) + " restakes", "so far, twice a day", "so far, twice a day"]);
     return L;
   }
-  var n = 0, at = 0, hold = false, track = null, H = 30;
+  var n = 0, at = 0, hold = false, track = null;
+  var H = function(){ return track && track.firstElementChild ? track.firstElementChild.offsetHeight : 30; };   /* 30 px wide, 28 on a phone */
   function draw(L){
     if(!L.length){ el.hidden = true; n = 0; return; }
-    var row = function(x){ return '<div class=ht-i><span class="ht-tag ' + x[0] + '">' + x[1] + '</span><b>' + x[2] + '</b><span class=ht-tx>' + x[3] + '</span></div>'; };
+    var row = function(x){ return '<div class=ht-i><span class="ht-tag ' + x[0] + '">' + x[1] + '</span><b>' + x[2] + '</b><span class=ht-tx><span class=ht-l>' + x[3] + '</span><span class=ht-s>' + x[4] + '</span></span></div>'; };
     /* the first item again at the end, so the loop closes without a jump back */
     var key = JSON.stringify(L); if(el.__key === key) return; el.__key = key;
     el.innerHTML = '<div class=ht-win><div class=ht-track>' + L.map(row).join("") + row(L[0]) + '</div></div>';
@@ -4466,7 +4468,7 @@ rememberGridH();
   }
   function step(){
     if(hold || n < 2 || !track || document.hidden) return;
-    at++; track.style.transition = ""; track.style.transform = "translateY(" + (-H * at) + "px)";
+    at++; track.style.transition = ""; track.style.transform = "translateY(" + (-H() * at) + "px)";
     if(at === n) setTimeout(function(){ track.style.transition = "none"; track.style.transform = "translateY(0)"; at = 0; }, 600);
   }
   el.addEventListener("mouseenter", function(){ hold = true; });

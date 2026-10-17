@@ -1080,6 +1080,9 @@
   html[data-theme=light]:not([data-mono]) .ht-tag::before{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .ht-tag.a{color:var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .ht-tag.r{color:var(--accent);background:var(--accent-soft)}
+  @media(max-width:620px){
+    html[data-theme=light]:not([data-mono]) .folder .hdr-tick:not([hidden]){background:transparent}
+  }
   html[data-theme=light]:not([data-mono]) .bheight{color:var(--muted)}
   html[data-theme=light]:not([data-mono]) .bheight i{box-shadow:none}
   html[data-theme=light]:not([data-mono]) .btag{color:var(--accent)}

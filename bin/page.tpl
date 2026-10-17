@@ -5917,6 +5917,19 @@ color:#7c7aa3;text-decoration:none;white-space:nowrap;transition:color .15s,back
 .ht-tag.r{color:#2ee06a;background:rgba(46,224,106,.12)}
 .ht-i b{flex:0 0 auto;font-size:13px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 .ht-tx{flex:0 1 auto;min-width:0;font-size:12px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis}
+.ht-s{display:none}
+/* phones: the top bar has no free middle, so the strip takes a third row across it, smaller, with the shorter lines */
+@media(max-width:620px){
+  .folder:not(#z){grid-template-areas:"brand right" "nav nav" "tick tick"}
+  .folder>.brandwrap:not(#z){display:contents}
+  .folder>.brandwrap>.brand{grid-area:brand;justify-self:start}
+  .folder .hdr-tick:not([hidden]){grid-area:tick;display:flex;align-items:center;min-width:0;height:28px;margin:2px 0 4px;padding:0 10px 0 4px;
+    border:1px solid var(--edge2);border-radius:999px;background:linear-gradient(90deg,rgba(43,200,189,.10),rgba(43,200,189,.02) 55%,transparent);overflow:hidden}
+  .hdr-tick .ht-win{height:28px}.hdr-tick .ht-i{height:28px;gap:7px}
+  .hdr-tick .ht-tag{height:18px;padding:0 7px 0 6px;font-size:8px;letter-spacing:.1em;gap:5px}
+  .hdr-tick .ht-i b{font-size:12px}.hdr-tick .ht-tx{font-size:11px}
+  .hdr-tick .ht-l{display:none}.hdr-tick .ht-s{display:inline}
+}
 @keyframes htpulse{50%{opacity:.35;box-shadow:none}}
 @media(prefers-reduced-motion:reduce){.ht-track{transition:none}.ht-tag::before{animation:none}}
 .brandwrap>.brand{grid-area:auto}
