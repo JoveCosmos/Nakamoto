@@ -20,6 +20,8 @@ a:hover{text-decoration:underline}
 .bar{display:flex;align-items:center;gap:12px;min-height:44px}
 .bar .mark{display:flex;align-items:center;gap:10px;color:var(--wt)}
 .bar .mark img{width:30px;height:30px;border-radius:8px}
+/* the mark is white on transparent: a dark tile behind it in day mode, as the app's own "powered by" has */
+html[data-theme=light] .bar .mark img{background:#1b1a22;padding:3px;box-sizing:border-box}
 .bar .mark b{font-size:17px;font-weight:600;letter-spacing:-.01em}
 .bar .mark small{display:block;font-family:var(--wmono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--wf)}
 .bar .sp{flex:1}
