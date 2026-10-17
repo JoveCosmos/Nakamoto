@@ -3069,11 +3069,12 @@ rememberGridH();
     });
     if(ST_PILOT){
       /* Autopilot moves nothing under 1 ATONE (keeper GAP), and neither does Pilot */
-      var pl = P.pilot, cap = !P.rows.length ? (P.u < 1e6 ? 'Pilot stakes 1 ATONE or more' : 'Pilot has no place for this amount right now') : 'Pilot\'s move: the smallest rise first, nobody passes the one above' +
-        (pl && pl.left >= 1e6 ? '; ' + fmt(pl.left) + ' ATONE stays in your wallet' : '');
+      var pl = P.pilot;
       /* no place: the words alone in the list's box, as the empty field's prompt; no table of titles over nothing */
-      if(!P.rows.length){ el.innerHTML = '<div class=st-pe><span>' + cap + '.</span></div>'; return; }
-      var ptop = el.scrollTop; el.innerHTML = '<div class=st-pcap>' + cap + '</div>' + h + '</tbody></table>'; el.scrollTop = ptop; return;
+      if(!P.rows.length){ el.innerHTML = '<div class=st-pe><span>' + (P.u < 1e6 ? 'Pilot stakes 1 ATONE or more' : 'Pilot has no place for this amount right now') + '.</span></div>'; return; }
+      /* the move itself, no caption over it (operator, 2026-10-17); a part the shelf cannot place is said under the table */
+      var ptop = el.scrollTop; el.innerHTML = h + '</tbody></table>' + (pl && pl.left >= 1e6 ? '<div class=st-pcap>' + fmt(pl.left) + ' ATONE stays in your wallet: Pilot places no more today.</div>' : '');
+      el.scrollTop = ptop; return;
     }
     h += ijRows("st", (h.match(/<col[ >]/g) || []).length, STSEL);
     var top = el.scrollTop; el.innerHTML = h + '</tbody></table>'; el.scrollTop = top;
