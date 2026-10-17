@@ -2848,7 +2848,7 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
     text-transform:uppercase;color:var(--ws);white-space:nowrap;flex:0 1 auto;min-width:0;overflow:hidden}
   #wk-mine .wk-t1 .wk-lockm b{font-size:10px;font-weight:400;letter-spacing:0;color:#ffd58a}
   #wk-mine .wk-t1 .wk-lockm .w{display:none}
-  #wk-mine .wk-t1 .wk-lockm svg{width:10px;height:10px;flex:0 0 auto;fill:none;stroke:var(--wamber);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  #wk-mine .wk-t1 .wk-lockm svg{width:10px;height:10px;margin:0;max-height:none;flex:0 0 auto;fill:none;stroke:var(--wamber);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   /* Refresh holds Redelegate's top right corner whatever else the title row carries (operator, 2026-10-17: "shouldn't
      move around"); the row keeps its width clear of it and the amount field takes that width back */
   #wk-plan>.wk-ph:not(#z){position:relative;padding-right:26px}
