@@ -598,7 +598,9 @@ var drawTrend = (function(){
   var box = E("trend") ? E("trend").getBoundingClientRect() : null;
   var T=D.weekly, W=box && box.width > 40 ? Math.round(box.width) : (sm?460:900),
       H=box && box.height > 40 ? Math.round(box.height) : 300,
-      PL=sm?44:64, PR=sm?16:28, PT=sm?20:26, PB=sm?34:46;
+      PL=sm?34:64, PR=sm?6:28, PT=sm?20:26, PB=sm?34:46;
+  /* phones: the axis figures start at the title's left edge and the plot runs to the boxes' right edge, as Projection's */
+  var YLX=sm?0:PL-11, YLA=sm?"start":"end";
   if(!T || T.length<2){ E("trend").innerHTML=""; return; }
   var vs=T.map(function(x){return x.top10;});
   var lo=Math.floor(Math.min.apply(null,vs))-1, hi=Math.ceil(Math.max.apply(null,vs))+1;
@@ -608,7 +610,7 @@ var drawTrend = (function(){
   T.forEach(function(x,i){ if(bi<0 && x.wk>=0) bi=i; });
   var step=Math.max(1,Math.ceil((hi-lo)/6));
   for(var g=lo+1;g<hi;g+=step) s+='<line x1="'+PL+'" y1="'+Y(g)+'" x2="'+(W-PR)+'" y2="'+Y(g)+
-    '" stroke="#232342"/><text x="'+(PL-11)+'" y="'+(Y(g)+4)+'" text-anchor="end" font-size="11.5" fill="#6f6d94">'+g+'%</text>';
+    '" stroke="#232342"/><text x="'+YLX+'" y="'+(Y(g)+4)+'" text-anchor="'+YLA+'" font-size="11.5" fill="#6f6d94">'+g+'%</text>';
   var bx = bi>0 ? X(bi-0.5) : null;
   if(bx!==null){ s+='<rect x="'+bx+'" y="'+PT+'" width="'+(W-PR-bx)+'" height="'+(H-PT-PB)+'" fill="#ff4d1f12"/>'+
     '<line x1="'+bx+'" y1="'+PT+'" x2="'+bx+'" y2="'+(H-PB)+'" stroke="#ff4d1f" stroke-width="2"/>'+
@@ -619,13 +621,18 @@ var drawTrend = (function(){
   /* every week is a point, but a label every week would be a smear - one in four,
      always including the first week of the bonus */
   var lab=Math.ceil(T.length/9);
+  /* drawn at the box's real size, where nine dates can crowd: a date keeps 52px from the last one and from the bonus's
+     start (which always shows), and the dates at the ends anchor inward so neither is clipped */
+  var lastLX=-99, bX=bi>=0?X(bi):-999;
+  var dlab=function(x,i){ var lx=X(i), a="middle";
+    if(i!==bi && (lx-lastLX<52 || Math.abs(lx-bX)<52)) return ""; lastLX=lx;
+    if(lx>W-PR-24){ lx=W-PR; a="end"; } else if(lx<PL+20){ a="start"; }
+    return '<text x="'+lx.toFixed(1)+'" y="'+(H-PB+23)+'" text-anchor="'+a+'" font-size="10.5" fill="#6f6d94">'+x.date+'</text>'; };
   T.forEach(function(x,i){ var on=bi>=0&&i>=bi;
     s+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(x.top10).toFixed(1)+'" r="'+(on?4.6:3.4)+
       '" fill="'+(on?"#ff4d1f":"#fff8dc")+'" stroke="#06060c" stroke-width="1.2"><title>'+
       x.date+", "+x.top10+"%, nakamoto "+x.nakamoto+'</title></circle>';
-    if(i===bi || (i-bi)%lab===0)
-      s+='<text x="'+X(i).toFixed(1)+'" y="'+(H-PB+23)+'" text-anchor="middle" font-size="10.5" fill="#6f6d94">'+
-      x.date+'</text>'; });
+    if(i===bi || (i-bi)%lab===0) s+=dlab(x,i); });
   s+='<text x="'+PL+'" y="'+(PT+17)+'" font-size="12.5" fill="#a5a3c4">'+
     (sm?"10 LARGEST VALS":"10 LARGEST VALIDATORS")+'</text>';
   E("trend").setAttribute("viewBox","0 0 "+W+" "+H);
@@ -634,6 +641,9 @@ var drawTrend = (function(){
 });
 drawTrend();
 (function(){ var t; window.addEventListener("resize", function(){ clearTimeout(t); t = setTimeout(drawTrend, 180); }); })();
+/* and when its box first takes a width: drawn at load while the Trend view is hidden, a phone kept the fallback frame */
+if(window.ResizeObserver && E("trend")){ (function(){ var tw = 0; new ResizeObserver(function(en){ var w = Math.round(en[0].contentRect.width);
+  if(w > 40 && w !== tw){ tw = w; drawTrend(); } }).observe(E("trend")); })(); }
 
 /* pivot */
 /* the arithmetic pane and its plot() were retired; simple() below draws the
@@ -1068,51 +1078,68 @@ rememberGridH();
 (function(){
   var SC = D.schedule, ES = D.eta_stats;
   if(!SC || !SC.length) return;
-  var sm = window.innerWidth < 620;
-  /* the same frame as the Effect graph beside it (PL/PR/PT/PB and the label offsets), so the two line up */
-  var W=sm?460:900, H=300, PL=sm?44:64, PR=sm?16:28, PT=sm?20:26, PB=sm?34:46;
-  /* a week whose eta is not known (the rule could not be replayed onto the live value:
-     testnet, or a history this page cannot reproduce) has eta null - no point, no line */
-  var lo=0, hi=Math.max(ES.cap*0.22, Math.max.apply(null,SC.filter(function(r){return r.eta!=null;}).map(function(r){return r.eta;}))*1.9);
-  var X=function(i){return PL+i/(SC.length-1)*(W-PL-PR);};
-  var Y=function(v){return PT+(1-(v-lo)/(hi-lo))*(H-PT-PB);};
-  var nowI=0; SC.forEach(function(r,i){ if(r.now) nowI=i; });
-  var s="";
-  for(var g=0;g<=4;g++){ var v=hi*g/4;
-    s+='<line x1="'+PL+'" y1="'+Y(v)+'" x2="'+(W-PR)+'" y2="'+Y(v)+'" stroke="#232342"/>'+
-       '<text x="'+(PL-11)+'" y="'+(Y(v)+4)+'" text-anchor="end" font-size="11.5" fill="#6f6d94">'+v.toFixed(2)+'</text>'; }
-  s+='<line x1="'+PL+'" y1="'+Y(ES.floor)+'" x2="'+(W-PR)+'" y2="'+Y(ES.floor)+
-     '" stroke="#6f66c8" stroke-width="1.5" stroke-dasharray="4 4"/>'+
-     '<text x="'+(W-PR)+'" y="'+(Y(ES.floor)-7)+'" text-anchor="end" font-size="11" fill="#6f66c8">FLOOR '+ES.floor.toFixed(2)+'</text>';
-  /* past solid, future dashed - projections must not look like history */
-  var dp="",df="";
-  SC.forEach(function(r,i){
-    if(r.eta==null) return;
-    var pt=X(i).toFixed(1)+" "+Y(r.eta).toFixed(1);
-    if(i<=nowI) dp+=(dp?"L":"M")+pt;
-    if(i>=nowI) df+=(df?"L":"M")+pt; });
-  if(SC.some(function(r){ return r.eta==null; }))
-    s+='<text x="'+((PL+X(nowI))/2).toFixed(1)+'" y="'+(Y(ES.floor)-40)+'" text-anchor="middle" font-size="12" fill="#8f8db4">past weeks N/A</text>';
-  s+='<path d="'+df+'" fill="none" stroke="#6f6d94" stroke-width="2" stroke-dasharray="5 4"/>';
-  s+='<path d="'+dp+'" fill="none" stroke="#ffb02e" stroke-width="3"/>';
-  s+='<line x1="'+X(nowI)+'" y1="'+PT+'" x2="'+X(nowI)+'" y2="'+(H-PB)+'" stroke="#ff4d1f" stroke-width="1.5"/>';
-  s+='<text x="'+(X(nowI)+10)+'" y="'+(PT+17)+'" font-size="12.5" fill="#ff4d1f">TODAY</text>';
-  /* where eta is heading, on the graph under TODAY (operator, 2026-10-02: it was a sentence above the chart) - the
-     same three states render.py's STEPLINE had; it flips to the line's left when the right side has no room */
-  var Ru = D.rule || {}, st = ES.rising ? "rising" : (ES.weeks_to_floor || 0) > 0 ? "falling" : "held at the floor";
-  var lab = "\u03b7 " + st + " now" + (Ru.ratio != null ? " (c = " + Ru.ratio.toFixed(2) + "\u00d7)" : ""), lw = lab.length * 6.6;
-  var lx = X(nowI) + 10 + lw > W - PR ? X(nowI) - 10 : X(nowI) + 10;
-  s+='<text x="'+lx+'" y="'+(PT+34)+'" font-size="12" fill="#ff4d1f"'+(lx < X(nowI) ? ' text-anchor="end"' : '')+'>'+lab+'</text>';
-  SC.forEach(function(r,i){
-    if(r.eta==null){ if(i%2===0) s+='<text x="'+X(i).toFixed(1)+'" y="'+(H-PB+23)+'" text-anchor="middle" font-size="10.5" fill="#6f6d94">'+r.date.split(" ")[0]+'</text>'; return; }
-    s+='<circle class="etapt" data-i="'+i+'" cx="'+X(i).toFixed(1)+'" cy="'+Y(r.eta).toFixed(1)+
-       '" r="'+(r.now?6:4)+'" fill="'+(r.now?"#ff4d1f":i<nowI?"#ffb02e":"#6f6d94")+
-       '" stroke="#06060c" stroke-width="1.5" style="cursor:pointer"><title>week '+r.week+
-       ", "+r.date+", η "+r.eta.toFixed(2)+'</title></circle>';
-    if(i%2===0) s+='<text x="'+X(i).toFixed(1)+'" y="'+(H-PB+23)+
-       '" text-anchor="middle" font-size="10.5" fill="#6f6d94">'+r.date.split(" ")[0]+'</text>'; });
-  E("etacurve").setAttribute("viewBox","0 0 "+W+" "+H);
-  E("etacurve").innerHTML=s;
+  /* drawn whenever its box takes a new width: at load the Trend view is hidden, so a phone's first draw had no box to
+     take its size from and fell back to a scaled frame */
+  function drawEta(){
+    var sm = window.innerWidth < 620, ebw = E("etacurve") ? Math.round(E("etacurve").getBoundingClientRect().width) : 0;
+    /* the same frame as the Effect graph beside it (PL/PR/PT/PB and the label offsets), so the two line up. Phones: drawn
+       at the box's own size, as the Effect graph is, so its type reads at the page's size; the axis figures start at the
+       title's left edge and the plot runs to the boxes' right edge (operator, 2026-10-17: "not scaled as per projection
+       title and boxes below") */
+    var px = sm && ebw > 200;
+    var W=px?ebw:(sm?460:900), H=px?Math.round(Math.max(200, ebw*0.6)):300, PL=sm?34:64, PR=sm?6:28, PT=sm?20:26, PB=sm?34:46;
+    var YLX=sm?0:PL-11, YLA=sm?"start":"end";
+    /* a week whose eta is not known (the rule could not be replayed onto the live value:
+       testnet, or a history this page cannot reproduce) has eta null - no point, no line */
+    var lo=0, hi=Math.max(ES.cap*0.22, Math.max.apply(null,SC.filter(function(r){return r.eta!=null;}).map(function(r){return r.eta;}))*1.9);
+    var X=function(i){return PL+i/(SC.length-1)*(W-PL-PR);};
+    var Y=function(v){return PT+(1-(v-lo)/(hi-lo))*(H-PT-PB);};
+    var nowI=0; SC.forEach(function(r,i){ if(r.now) nowI=i; });
+    var s="";
+    for(var g=0;g<=4;g++){ var v=hi*g/4;
+      s+='<line x1="'+PL+'" y1="'+Y(v)+'" x2="'+(W-PR)+'" y2="'+Y(v)+'" stroke="#232342"/>'+
+         '<text x="'+YLX+'" y="'+(Y(v)+4)+'" text-anchor="'+YLA+'" font-size="11.5" fill="#6f6d94">'+v.toFixed(2)+'</text>'; }
+    s+='<line x1="'+PL+'" y1="'+Y(ES.floor)+'" x2="'+(W-PR)+'" y2="'+Y(ES.floor)+
+       '" stroke="#6f66c8" stroke-width="1.5" stroke-dasharray="4 4"/>'+
+       '<text x="'+(W-PR)+'" y="'+(Y(ES.floor)-7)+'" text-anchor="end" font-size="11" fill="#6f66c8">FLOOR '+ES.floor.toFixed(2)+'</text>';
+    /* past solid, future dashed - projections must not look like history */
+    var dp="",df="";
+    SC.forEach(function(r,i){
+      if(r.eta==null) return;
+      var pt=X(i).toFixed(1)+" "+Y(r.eta).toFixed(1);
+      if(i<=nowI) dp+=(dp?"L":"M")+pt;
+      if(i>=nowI) df+=(df?"L":"M")+pt; });
+    if(SC.some(function(r){ return r.eta==null; }))
+      s+='<text x="'+((PL+X(nowI))/2).toFixed(1)+'" y="'+(Y(ES.floor)-40)+'" text-anchor="middle" font-size="12" fill="#8f8db4">past weeks N/A</text>';
+    s+='<path d="'+df+'" fill="none" stroke="#6f6d94" stroke-width="2" stroke-dasharray="5 4"/>';
+    s+='<path d="'+dp+'" fill="none" stroke="#ffb02e" stroke-width="3"/>';
+    s+='<line x1="'+X(nowI)+'" y1="'+PT+'" x2="'+X(nowI)+'" y2="'+(H-PB)+'" stroke="#ff4d1f" stroke-width="1.5"/>';
+    s+='<text x="'+(X(nowI)+10)+'" y="'+(PT+17)+'" font-size="12.5" fill="#ff4d1f">TODAY</text>';
+    /* where eta is heading, on the graph under TODAY (operator, 2026-10-02: it was a sentence above the chart) - the
+       same three states render.py's STEPLINE had; it flips to the line's left when the right side has no room */
+    var Ru = D.rule || {}, st = ES.rising ? "rising" : (ES.weeks_to_floor || 0) > 0 ? "falling" : "held at the floor";
+    var lab = "\u03b7 " + st + " now" + (Ru.ratio != null ? " (c = " + Ru.ratio.toFixed(2) + "\u00d7)" : ""), lw = lab.length * 6.6;
+    var lx = X(nowI) + 10 + lw > W - PR ? X(nowI) - 10 : X(nowI) + 10;
+    s+='<text x="'+lx+'" y="'+(PT+34)+'" font-size="12" fill="#ff4d1f"'+(lx < X(nowI) ? ' text-anchor="end"' : '')+'>'+lab+'</text>';
+    /* the axis under it: every other week on wide screens; phones name each month once, never two closer than 30px */
+    var lastM = "", lastX = -99;
+    var xlab = function(r, i){ var m = r.date.split(" ")[0], x = X(i);
+      if(sm){ if(m === lastM || x - lastX < 30) return ""; lastM = m; lastX = x; }
+      else if(i%2!==0) return "";
+      return '<text x="'+x.toFixed(1)+'" y="'+(H-PB+23)+'" text-anchor="middle" font-size="10.5" fill="#6f6d94">'+m+'</text>'; };
+    SC.forEach(function(r,i){
+      if(r.eta==null){ s+=xlab(r, i); return; }
+      s+='<circle class="etapt" data-i="'+i+'" cx="'+X(i).toFixed(1)+'" cy="'+Y(r.eta).toFixed(1)+
+         '" r="'+(r.now?6:4)+'" fill="'+(r.now?"#ff4d1f":i<nowI?"#ffb02e":"#6f6d94")+
+         '" stroke="#06060c" stroke-width="1.5" style="cursor:pointer"><title>week '+r.week+
+         ", "+r.date+", η "+r.eta.toFixed(2)+'</title></circle>';
+      s+=xlab(r, i); });
+    E("etacurve").setAttribute("viewBox","0 0 "+W+" "+H);
+    E("etacurve").innerHTML=s;
+  }
+  drawEta();
+  if(window.ResizeObserver && E("etacurve")){ var etaW = 0; new ResizeObserver(function(en){ var w = Math.round(en[0].contentRect.width);
+    if(w > 40 && w !== etaW){ etaW = w; drawEta(); } }).observe(E("etacurve")); }
 
   /* popup */
   var pop=E("pop"), R=D.set.reward_pool, N=D.set.n;
@@ -1136,8 +1163,8 @@ rememberGridH();
     tr.addEventListener("keydown", function(ev){
       if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); show(i); } });
   });
-  Array.prototype.forEach.call(document.querySelectorAll(".etapt"), function(c){
-    c.addEventListener("click", function(){ show(+c.dataset.i); }); });
+  /* the points are redrawn with the chart, so a tap is caught on the chart itself */
+  E("etacurve").addEventListener("click", function(ev){ var c = ev.target.closest ? ev.target.closest(".etapt") : null; if(c) show(+c.dataset.i); });
 
   /* history popup holds the full table; rows inside it open the per-week card.
      The weeks box inside the coefficient card opens it too - as a child, so
