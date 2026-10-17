@@ -4552,7 +4552,7 @@ rememberGridH();
     /* three items (operator, 2026-10-17): Autopilot and Restake as count, name, amount; the counts are runs that landed a
        transaction (the keeper's impact: txs = distinct move transactions, restakes = restake transactions), so a run
        that found nothing to do never counts */
-    if(i.moved_uatone > 0) L.push(["pilot", "", [].concat(i.txs > 0 ? [["b", nf(i.txs)]] : [], [["em", "Autopilot"], ["b", nf(i.moved_uatone / 1e6) + " ATONE"], ["span", "moved"]])]);
+    if(i.moved_uatone > 0) L.push(["pilot", "", [].concat(i.txs > 0 ? [["b", nf(i.txs)]] : [], [["em", "Autopilot moves"], ["b", nf(i.moved_uatone / 1e6) + " ATONE"]])]);
     if(i.gain_atone_year > 0) L.push(["up", "g", [["b", "+" + nf(i.gain_atone_year) + " ATONE more"], ["span", "a year, hands-free"]]]);
     if(i.restakes > 0 || i.restaked_uatone > 0) L.push(["re", "g", [].concat(i.restakes > 0 ? [["b", nf(i.restakes)]] : [], [["em", "Restake"]],
       i.restaked_uatone > 0 ? [["b", nf(i.restaked_uatone / 1e6) + " ATONE"]] : [])]);
