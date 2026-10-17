@@ -7025,7 +7025,8 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
 }
 @media(min-width:1100px) and (max-height:680px){
   #mv-stage .mv-days small{display:none}
-  #mv-stage .mv-hl>span:not(.mv-sline){display:none}
+  /* except the line naming the 10,000 ATONE the three cards are for: without it their "ATONE a year" has no amount */
+  #mv-stage .mv-hl>span:not(.mv-sline):not(.mv-ref){display:none}
   /* the sentence gives way, Stake more stays (2026-10-15) */
   #mv-stage .mv-hl>span.mv-sline .mv-tx{display:none}
   #mv-stage .mv-hl>span.mv-sline .mv-stk:not(#z){margin-left:0}
@@ -7048,6 +7049,13 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   .mv-box{padding:9px 12px 5px}
   #mv-stage .mv-act .sd-go,#mv-stage .mv-go{height:42px}
   .mv-days{padding:10px 14px;gap:6px}
+}
+/* a very short window (a 1366x768 laptop's browser, 513 px of page): the wallet column a step tighter again, so its
+   switches stay inside it */
+@media(min-width:1100px) and (max-height:560px){
+  #you{gap:9px}
+  .you-r{min-height:28px}
+  .you-apr b{font-size:28px}
 }
 @media(max-width:1099px){
   /* the paths: a bar at the foot, five doors, the open one lit; the page keeps room for it */

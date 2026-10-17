@@ -2334,7 +2334,7 @@
     if(!a){
       /* disconnected: the corner holds Activate Autopilot, greyed; on hover it says why (operator, 2026-09-30) */
       h = top('', '', '', '<span class=mv-tdis data-tip="Connect a wallet"><button class="sv-btn go mv-go mv-tgo" type=button disabled aria-disabled=true tabindex=-1>Activate Autopilot</button></span>') +
-        (hi ? '<div class=mv-hl><b>About ' + pct(hi) + ' APR</b><span>with Autopilot, for 10,000 ATONE</span></div>' : '') + cmp() + mvSet({}, {});
+        (hi ? '<div class=mv-hl><b>About ' + pct(hi) + ' APR</b><span class=mv-ref>with Autopilot, for 10,000 ATONE</span></div>' : '') + cmp() + mvSet({}, {});
     } else if(!pos){
       h = top('') + '<div class=mv-hl><b>Reading your stake…</b></div>';
     } else if(!pos.rows.length){
@@ -2344,7 +2344,7 @@
         '<div class=mv-hl><b>' + (none ? 'Get ATONE to start earning' : 'Stake to start earning') + '</b>' +
         /* the cards below are each 10,000 ATONE's year, so the line names the amount as the disconnected one does
            (operator, 2026-10-17: "10k atone reference is no where like it is on disconnected state") */
-        (none ? '<span>Bought from the Osmosis pool, home in one signature</span>' : hi ? '<span>About ' + pct(hi) + ' APR with Autopilot, for 10,000 ATONE</span>' : '') + '</div>' + cmp() + mvSet({}, {});
+        (none ? '<span>Bought from the Osmosis pool, home in one signature</span>' : hi ? '<span class=mv-ref>About ' + pct(hi) + ' APR with Autopilot, for 10,000 ATONE</span>' : '') + '</div>' + cmp() + mvSet({}, {});
     } else {
       var plan = planNow(pos), offer = plan && plan.after != null && plan.msgs && plan.msgs.length;
       var direct = !!(window.__canGrant && window.__canGrant());
