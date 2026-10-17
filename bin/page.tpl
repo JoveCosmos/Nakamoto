@@ -2613,8 +2613,12 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 /* phones: the amount box takes the row and its caption ("of 2,426.167977 on PRO Delegators") wraps under it, cut
    at the card's edge, instead of running off the side (operator, 2026-10-02) */
 @media(max-width:620px){.uncard .unamt:not(#z){flex-wrap:wrap;row-gap:6px}.uncard .unamt>.unfield:not(#z){flex:1 1 100%;width:auto;max-width:none}
-  .uncard .unamt>.unhint:not(#z),.uncard .unamt>.wk-seln:not(#z){flex:1 1 100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .uncard .unamt>.unhint:empty:not(#z),.uncard .unamt>.wk-seln:empty:not(#z){display:none}}
+  /* the selection count and the hint share one row under the amount, always there, so neither moves what is under it
+     as it fills (operator, 2026-10-17: "select validator msg under input field appears and changes ui") */
+  .uncard .unamt>.wk-seln:not(#z){flex:0 0 auto;min-width:0;max-width:50%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .uncard .unamt>.unhint:not(#z){flex:1 1 0;min-width:0;min-height:13px;line-height:13px;align-self:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  /* Mint's rate note is two lines on a phone while it is read and one when it is known: two lines kept */
+  .mtcard .mtout span:not(#z){min-height:2.6em}}
 .uncard .txlock{padding-top:12px}
 .uncard .wk-btn.wk-go{background:linear-gradient(180deg,#ffc453,#e69a17);border:1px solid #ffb02e;color:#1d1200;box-shadow:0 10px 24px -12px rgba(255,176,46,.7),inset 0 1px 0 rgba(255,255,255,.3)}
 .uncard .wk-btn.wk-go:hover{filter:brightness(1.06)}
@@ -2625,10 +2629,20 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 /* the two ends the same 360px, Redelegate the room between; the wallet's table and boxes
    sized for 336px inside */
 
-/* the cards keep their height: the fee line and the step line have their room before
-   they are filled, so nothing below them moves */
-#txpop .txfee,#unpop .txfee,#clpop .txfee,#stpop .txfee{height:23px;min-height:23px;line-height:13px;overflow:hidden;white-space:nowrap}
-#txpop .txstep,#unpop .txstep,#clpop .txstep,#stpop .txstep{min-height:20px}
+/* EVERY transaction card keeps its shape, set here once for every .txcard, never card by card (operator, 2026-10-17:
+   "keep these practices as rules for our app, app wide"): a line whose words come and go has its room before it is
+   filled, so nothing under it moves and the centred card never jumps.
+   - the fee line: one line, always there
+   - the step line ("Waiting for your wallet", "Broadcasting"): it shows in the fee line's place and covers it while it
+     has words; a refusal is read whole, so an error may grow
+   - the hint and the selection count under the amount: one row, always there (the phone rule above) */
+.txcard .txfee{height:23px;min-height:23px;line-height:13px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;box-sizing:content-box}
+.txcard .txfee+.txstep:not(#z){display:block;margin-top:-33px;height:23px;min-height:0;padding-top:10px;line-height:13px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;box-sizing:content-box}
+.txcard .txfee+.txstep:empty:not(#z){visibility:hidden}
+.txcard .txfee:has(+.txstep:not(:empty)){visibility:hidden}
+.txcard .txfee+.txstep.err:not(#z){height:auto;min-height:23px;white-space:pre-wrap}
+.txcard .txstep:empty{display:block;visibility:hidden}
+.bycard .txfee:not(#z){height:auto;min-height:26px;white-space:normal}   /* Osmosis's refusals run long: two lines kept */
 @media(max-width:900px){
   .wk-two{align-content:start;grid-auto-rows:max-content}
   #wk-mine,#wk-plan,#wk-mv{height:auto;max-height:none;overflow:hidden}
