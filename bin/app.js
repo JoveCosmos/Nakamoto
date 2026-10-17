@@ -3286,7 +3286,10 @@ rememberGridH();
     return { rows: rows, rate: P ? P.rate : 0, rest: rest };
   };
   window.__spIds = function(){ return SP.plan ? SP.plan.legs.map(function(q){ return q.id; }) : []; };
-  window.__pilotRedo = function(){ if(sppop && sppop.classList.contains("on")) spState(); };
+  /* live figures re-plan the view wherever it is shown: a popup, or Pro's panes */
+  window.__pilotRedo = function(){ if(sppop && (sppop.classList.contains("on") || (DOCK && DOCK.pop === sppop))) spState(); };
+  /* a wallet gone: the Pilot view closes as the Stake card does */
+  window.__spReset = function(){ if(sppop && window.__closeCard) window.__closeCard(sppop); };
   /* closed, it keeps no amount and no plan (the next open starts clean) */
   if(sppop) sppop.__onclose = function(){ feeSoon("sp"); SP.plan = null; SP.key = ""; var a = E("spamt"); if(a) a.value = ""; spSyncRange(0); spState(); };
   var spamtEl = E("spamt"); if(spamtEl) spamtEl.addEventListener("input", function(){ spSyncRange(spAmount()); spState(); });
@@ -3300,7 +3303,7 @@ rememberGridH();
     var n = window.__notify();
     window.__TX.send(window.__WALLET, msgs, "", function(){})
     .then(function(){
-      n.ok(); POP.close(sppop);
+      n.ok(); window.__closeCard(sppop);   /* docked in Pro too: the view goes, nothing of the move stays */
       if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); });
     })
     .catch(function(e){ n.fail(e && e.message || String(e)); })
@@ -4381,7 +4384,8 @@ rememberGridH();
     busy(false);
     var wn = E("wname"); if(wn) wn.textContent = "Wallet";
     if(window.__atDoor) window.__atDoor();          /* no wallet: nothing of the last one's grant stays */
-    if(window.__stReset) window.__stReset();        /* nor of a Stake card's Pilot move */
+    if(window.__stReset) window.__stReset();        /* nor of a Stake card's picks */
+    if(window.__spReset) window.__spReset();        /* nor of a Pilot move */
     if(window.__redraw) window.__redraw();
     if(window.__planDraw) window.__planDraw();
   }
