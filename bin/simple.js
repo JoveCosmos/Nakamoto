@@ -2342,7 +2342,9 @@
       var none = BUY() && !(window.__BAL && window.__BAL.uatone >= 1e6);
       h = top('', 'Nothing staked', 'q', none ? btn('buy', 'Buy ATONE') : btn('stake', 'Stake ATONE')) +
         '<div class=mv-hl><b>' + (none ? 'Get ATONE to start earning' : 'Stake to start earning') + '</b>' +
-        (none ? '<span>Bought from the Osmosis pool, home in one signature</span>' : hi ? '<span>About ' + pct(hi) + ' APR with Autopilot</span>' : '') + '</div>' + cmp() + mvSet({}, {});
+        /* the cards below are each 10,000 ATONE's year, so the line names the amount as the disconnected one does
+           (operator, 2026-10-17: "10k atone reference is no where like it is on disconnected state") */
+        (none ? '<span>Bought from the Osmosis pool, home in one signature</span>' : hi ? '<span>About ' + pct(hi) + ' APR with Autopilot, for 10,000 ATONE</span>' : '') + '</div>' + cmp() + mvSet({}, {});
     } else {
       var plan = planNow(pos), offer = plan && plan.after != null && plan.msgs && plan.msgs.length;
       var direct = !!(window.__canGrant && window.__canGrant());
