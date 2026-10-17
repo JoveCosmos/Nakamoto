@@ -72,6 +72,11 @@ function msgBytes(m){
      same address (the chain makes the signer the to_address); amino name as the chain registers it */
   if(m.type === "atomone/photon/v1/MsgMintPhoton")
     return any("/atomone.photon.v1.MsgMintPhoton", cat(strField(1, m.value.to_address), bytesField(2, coin(m.value.amount))));
+  /* a bank send: MsgSend{from_address(1), to_address(2), amount repeated Coin(3)} (the tools pages, 2026-10-17) */
+  if(m.type === "cosmos-sdk/MsgSend"){
+    var cs = []; (m.value.amount || []).forEach(function(c){ cs = cs.concat(bytesField(3, coin(c))); });
+    return any("/cosmos.bank.v1beta1.MsgSend", cat(strField(1, m.value.from_address), strField(2, m.value.to_address), cs));
+  }
   /* ── authz: a grant of restricted staking authority, its revocation, and execution ── */
   if(m.type === "cosmos-sdk/MsgGrant")
     return any("/cosmos.authz.v1beta1.MsgGrant", cat(
