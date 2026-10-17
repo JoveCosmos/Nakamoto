@@ -14,6 +14,9 @@
 //   node e2e.mjs grant-any              Autopilot REDELEGATE with no validator list (any validator)
 //   node e2e.mjs revoke                 revoke all three
 //   node e2e.mjs login <url>            sign in to the admin API as the testnet operator (needs its credential), print cookie
+//   node e2e.mjs keyfile <path>         a new throwaway wallet: words to <path> (0600, never printed), address printed
+//   node e2e.mjs send <to> <uatone> <uphoton>   from the test wallet (funds the throwaway wallets of the wallet-path runs)
+//   node e2e.mjs propose <title>        a text proposal from the test wallet with the full 10 ATONE deposit (voting tests)
 import fs from "node:fs";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Secp256k1HdWallet as AminoWallet } from "@cosmjs/amino";
@@ -82,5 +85,27 @@ if (cmd === "login") {
     body: JSON.stringify({ address: acc.address, pubkey: s.signature.pub_key.value, signature: s.signature.signature, text: ch.text }) });
   const ck = (r.headers.get("set-cookie") || "").split(";")[0];
   console.log(r.status, JSON.stringify(await r.json())); fs.writeFileSync(new URL("./admin.cookie", import.meta.url).pathname, ck, { mode: 0o600 }); process.exit(r.ok ? 0 : 1);
+}
+if (cmd === "keyfile") {
+  if (!a[0] || fs.existsSync(a[0])) throw new Error("give a new file path");
+  const w = await DirectSecp256k1HdWallet.generate(24, { prefix: "atone" }); fs.writeFileSync(a[0], w.mnemonic, { mode: 0o600 });
+  console.log((await w.getAccounts())[0].address); process.exit(0);
+}
+if (cmd === "send") {
+  const { c, me } = await cl(testWords());
+  done(await c.sendTokens(me, a[0], [{ denom: "uatone", amount: String(a[1]) }, { denom: "uphoton", amount: String(a[2]) }].filter(x => +x.amount > 0), "auto", ""));
+}
+if (cmd === "propose") {
+  // AtomOne's gov v1 MsgSubmitProposal has the fields of the SDK's gov v1 message (messages 1 .. summary 6) under its own type URL
+  const { MsgSubmitProposal } = await import("cosmjs-types/cosmos/gov/v1/tx");
+  const { Registry } = await import("@cosmjs/proto-signing"), { defaultRegistryTypes } = await import("@cosmjs/stargate");
+  const w = await DirectSecp256k1HdWallet.fromMnemonic(testWords(), { prefix: "atone" }); const [acc] = await w.getAccounts();
+  const c = await SigningStargateClient.connectWithSigner(RPC, w, { gasPrice: GasPrice.fromString("0.03uphoton"),
+    registry: new Registry([...defaultRegistryTypes, ["/atomone.gov.v1.MsgSubmitProposal", MsgSubmitProposal]]) });
+  if (await c.getChainId() !== CHAIN) throw new Error("not testnet");
+  const title = a.join(" ") || "Vote test from the AtomOne app";
+  done(await c.signAndBroadcast(acc.address, [{ typeUrl: "/atomone.gov.v1.MsgSubmitProposal", value: MsgSubmitProposal.fromPartial({ messages: [],
+    initialDeposit: [{ denom: "uatone", amount: "10000000" }], proposer: acc.address, metadata: "testnet vote test, AtomOne app", title,   // a text proposal needs metadata
+    summary: "A testnet text proposal for testing votes from the AtomOne app. It changes nothing." }) }], "auto", ""));
 }
 console.log("unknown command"); process.exit(2);
