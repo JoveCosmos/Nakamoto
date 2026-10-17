@@ -3230,7 +3230,7 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
 .kp .kp-h .disc .kg{width:62%;height:62%}
 .kp .kp-h h2{margin:0;font-size:18px;font-weight:700;letter-spacing:-.01em;line-height:1.2;color:var(--ink)}
 .kp .kp-h p{margin:3px 0 0;font-size:12.5px;line-height:1.45;color:var(--ink2);text-wrap:pretty}
-.kp .backq{flex:0 0 auto;align-self:center}
+.kp .backq:not(#z){flex:0 0 auto;align-self:center;position:static;transform:none;margin:0}   /* a step in the header's row, before the disc: the old absolute place landed on the disc and the title */
 .kp .kp-b{display:flex;flex-direction:column;gap:12px;padding:16px 22px 20px}
 .kp em{font-style:normal;font-size:11.5px;line-height:1.3;color:var(--ink2)}
 .kp small{font-size:11.5px;line-height:1.3;color:var(--ink2)}
@@ -3277,6 +3277,23 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
 .kp-bar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#ffb02e,#8fe8e0)}
 @media(max-width:560px){.kp .kp-h{padding:14px 16px 12px}.kp .kp-b{padding:14px 16px 16px}.kp-hv b{font-size:24px}.kp-eq{flex-wrap:wrap}
 .kp-eq .kp-res{flex-basis:100%;padding:10px 0 0;border-left:0;border-top:1px solid var(--edge2)}.kp-g3{grid-template-columns:1fr 1fr}.kp-rule{grid-template-columns:1fr 1fr}.kp-rgo{grid-column:1/-1;text-align:right}}
+/* phones: the cards' figures are whole, stepping their type down to fit (app.js kpFit), never cut with an ellipsis; and
+   the Concentration card in order (operator, 2026-10-17: "empty spaces, boxes unordered"): the two thirds with the
+   division between them on one row, the result under them as "= 6.69x", the three facts side by side on one row,
+   their labels given two lines so the figures line up */
+@media(max-width:560px){
+  .kp .kp-f>b:not(#z),.kp .kp-hv>b:not(#z){white-space:nowrap;overflow:hidden;text-overflow:clip}
+  .kp .kp-go:not(#z){display:block;margin:3px 0 0}
+  .kp-eq:not(#z){display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);column-gap:10px;row-gap:10px;align-items:start}
+  .kp-eq>i:not(#z){align-self:center}
+  .kp-eq>i:nth-of-type(2):not(#z){display:none}
+  .kp-eq .kp-res:not(#z){grid-column:1/-1}
+  .kp-eq .kp-res b:not(#z)::before{content:"= ";font-weight:400;color:var(--ink3)}
+  .kp-g3:not(#z){grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .kp-g3 .kp-f:not(#z){padding:9px 9px 10px}
+  .kp-g3 .kp-f>em:not(#z){min-height:2.5em;line-height:1.25}
+  .kp-g3 .kp-f>b:not(#z){font-size:18px}
+}
 
 /* ── Self, 2026-09-27: no balance boxes; the three lists hold ten rows and scroll past them; the columns
    sit at the bottom of the frame and the room above carries one Autopilot row (sa-) ── */

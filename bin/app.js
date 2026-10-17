@@ -1461,7 +1461,21 @@ rememberGridH();
             " Inflation " + (atLo ? "holds at its <b>" + (c.imin * 100).toFixed(0) + "%</b> minimum." : "falls toward <b>" + (c.imin * 100).toFixed(0) + "%</b>."); }
     }
   }
-  function kpLive(fetchToo){ kpFill(); if(fetchToo) kpChain().then(kpFill); }
+  function kpLive(fetchToo){ kpFill(); kpFit(); if(fetchToo) kpChain().then(function(){ kpFill(); kpFit(); }); }
+  /* phones: a card's figure steps its type down until it fits its box, never an ellipsis (operator, 2026-10-17: "the atone
+     value inside popup boxes is incomplete") */
+  function kpFit(){
+    if(!(window.matchMedia && matchMedia("(max-width:560px)").matches)) return;
+    [].forEach.call(document.querySelectorAll(".pop.on .kp .kp-f>b, .pop.on .kp .kp-hv>b"), function(x){
+      x.style.fontSize = ""; if(!x.clientWidth) return;
+      /* the words' own width to the fraction of a pixel: a figure a hair too wide used to end in an ellipsis */
+      var over = function(){ var rg = document.createRange(); rg.selectNodeContents(x.firstChild && x.firstChild.nodeType === 1 && x.childNodes.length === 1 ? x.firstChild : x);
+        return rg.getBoundingClientRect().width > x.clientWidth + 0.25; };
+      var fs = parseFloat(getComputedStyle(x).fontSize);
+      while(over() && fs > 12){ fs -= 0.5; x.style.fontSize = fs + "px"; }
+    });
+  }
+  window.addEventListener("resize", kpFit);
   /* while a card is open: the set's figures follow every block, the chain's every minute */
   window.addEventListener("thermo:live", function(){ if(kpOpen()) kpLive(Date.now() - KPL.at > 60000); });
   /* the C card explains what steers eta; opened from the page it stands alone,
