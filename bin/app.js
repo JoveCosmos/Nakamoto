@@ -3071,6 +3071,8 @@ rememberGridH();
       /* Autopilot moves nothing under 1 ATONE (keeper GAP), and neither does Pilot */
       var pl = P.pilot, cap = !P.rows.length ? (P.u < 1e6 ? 'Pilot stakes 1 ATONE or more' : 'Pilot has no place for this amount right now') : 'Pilot\'s move: the smallest rise first, nobody passes the one above' +
         (pl && pl.left >= 1e6 ? '; ' + fmt(pl.left) + ' ATONE stays in your wallet' : '');
+      /* no place: the words alone in the list's box, as the empty field's prompt; no table of titles over nothing */
+      if(!P.rows.length){ el.innerHTML = '<div class=st-pe><span>' + cap + '.</span></div>'; return; }
       var ptop = el.scrollTop; el.innerHTML = '<div class=st-pcap>' + cap + '</div>' + h + '</tbody></table>'; el.scrollTop = ptop; return;
     }
     h += ijRows("st", (h.match(/<col[ >]/g) || []).length, STSEL);
@@ -3517,7 +3519,9 @@ rememberGridH();
     var s = E("bytok"); if(s && !s.options.length) s.innerHTML = BY_TOK.map(function(t){ return '<option value="' + t.d + '">' + t.s + '</option>'; }).join("");
     BY.q = null; BY.done = null; BY.trk = null; BY.err = ""; BY.fee = null; E("byfee").textContent = ""; E("bystep").textContent = "";
     byState(); POP.open(bypop);
-    var kp = window.keplr;
+    /* the CONNECTED wallet signs on Osmosis, or nothing does: with Adena connected and Keplr also installed, the swap was
+       signed by Keplr's key, spending another wallet's Osmosis funds (2026-10-17) */
+    var kp = window.__WALLET && window.__WALLET.name === "Keplr" ? window.keplr : null;
     if(!kp){ BY.err = "Buying here signs on Osmosis, and this wallet cannot. Buy on Osmosis's own app, then send it to this address."; byState(); return; }
     kp.enable("osmosis-1").then(function(){ return kp.getKey("osmosis-1"); }).then(function(k){
       if(k.isNanoLedger) throw new Error("A Ledger signs Osmosis swaps in Osmosis's own app; buy there, then send it to this address.");
@@ -4510,6 +4514,11 @@ rememberGridH();
     setTimeout(wait, 200);
   }
   window.addEventListener("keplr_keystorechange", function(){ if(window.__ADDR) connect(true); });
+  /* Adena tells of an account switch through its own On() (2026-10-17: the page went on signing as the account it had
+     connected, which Adena refuses or the chain rejects); Keplr's keystore event above does the same for Keplr */
+  var adenaOn = function(){ try{ if(window.adena && typeof window.adena.On === "function")
+    window.adena.On("changedAccount", function(){ if(window.__ADDR && window.__WALLET && window.__WALLET.name === "Adena") connect(true); }); }catch(e){} };
+  if(window.adena) adenaOn(); else window.addEventListener("load", adenaOn);
 })();
 
 /* ── the header's live strip (operator, 2026-10-17): a market-bar ticker of what Autopilot and Restake have done, from
