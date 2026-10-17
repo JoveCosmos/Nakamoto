@@ -2287,7 +2287,9 @@
     var btn = function(a, label){ return '<button class="sv-btn go mv-go mv-tgo" type=button data-act=' + a + '>' + label + '</button>'; };
     /* Autopilot on: the corner counts down to its next run, 00:00 or 12:00 UTC (operator, 2026-10-01); the digits are
        filled by apTick() so the stage's HTML stays the same between draws */
-    var ACTIVE = '<b class="mv-on mv-ton">Autopilot <span class=mv-cd>--:--:--</span></b>';
+    /* Autopilot on: no countdown and no label in Your move's title row (operator, 2026-10-17: "no need when active once");
+       the slot stays empty, as the phone's has been since the morning */
+    var ACTIVE = '';
     /* the set chart in every state (operator, 2026-09-30): where this wallet's stake sits, lit on the set */
     var mineIds = function(){ var o = {}; (pos && pos.rows || []).forEach(function(r){ if(r.x >= 1e5 && !r.inactive) o[r.id] = 1; }); return o; };
     var nowOn = function(){
