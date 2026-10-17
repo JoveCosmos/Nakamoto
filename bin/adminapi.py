@@ -13,7 +13,7 @@ session is an HMAC-signed cookie (12 hours, HttpOnly, Secure, SameSite=Strict, p
     GET  /admin-api/challenge               -> {text}           a message to sign, valid 5 min
     POST /admin-api/login {address, pubkey, signature, text}    -> sets the session cookie
     POST /admin-api/logout
-    GET  /admin-api/me                       -> {address}
+    GET  /admin-api/me                       -> {address, nets}; {address: null} when signed out
     GET  /admin-api/overview?net=mainnet|testnet               -> grants ledger, keeper status,
                                                                   validator incidents, events
     POST /admin-api/decide {net, granter, action, note?}      -> the operator's decision on a delegator:
@@ -295,8 +295,10 @@ class H(BaseHTTPRequestHandler):
             if full: return self.reply(503, {"error": "busy, try again in a few minutes"})
             return self.reply(200, {"text": text})
         a = self.who()
+        # signed out is an answer here, not a failure: the console asks on every open, and a 401 was a red line in the
+        # browser's console each time (2026-10-17). Every other route still refuses without a session
+        if path == "/admin-api/me": return self.reply(200, {"address": a, "nets": nets_of(a)} if a else {"address": None})
         if not a: return self.reply(401, {"error": "sign in"})
-        if path == "/admin-api/me": return self.reply(200, {"address": a, "nets": nets_of(a)})
         if path == "/admin-api/overview":
             net = (q.get("net") or ["mainnet"])[0]
             if net not in WEB: return self.reply(400, {"error": "net"})

@@ -39,6 +39,7 @@
   E("out").addEventListener("click", function(){ api("logout", {}).then(function(){ location.reload(); }); });
   function start(){
     api("me").then(function(m){
+      if(!m.address){ E("gate").hidden = false; E("app").hidden = true; return; }   /* signed out: the sign-in */
       E("gate").hidden = true; E("app").hidden = false; E("out").hidden = false; E("who").hidden = false;
       E("who").textContent = short(m.address);
       var nets = m.nets || ["mainnet"];
