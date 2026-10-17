@@ -5901,37 +5901,34 @@ color:#7c7aa3;text-decoration:none;white-space:nowrap;transition:color .15s,back
 .netsw .ns{display:none}
 @media(max-width:620px){.netsw a{padding:0 7px;font-size:9px;letter-spacing:.08em}.netsw .nl{display:none}.netsw .ns{display:inline}}
 .brandwrap{grid-area:brand;justify-self:start;display:flex;align-items:center;min-width:0}
-/* ── the header's news strip (app.js; dev only until the operator turns it on in production): the free middle of the
-   top bar, from 900px wide, one line that slides to the next; it starts clear of the block height under the wordmark ── */
+/* ── the header's live strip (app.js, dev only until the operator turns it on): a market-bar ticker of what Autopilot and
+   Restake have done. Wide screens: centred in the bar's free middle, clear of the mark (240px at 1366) and of the
+   controls (48px); narrower: a full-width row under the bar. One fixed height, so it moves nothing (2026-10-17) ── */
 .hdr-tick{display:none}
-@media(min-width:900px){
-  .hdr-tick:not([hidden]){display:flex;align-items:center;flex:0 1 520px;min-width:0;height:30px;margin-left:72px;padding:0 14px 0 5px;
-    border:1px solid var(--edge2);border-radius:999px;background:linear-gradient(90deg,rgba(43,200,189,.10),rgba(43,200,189,.02) 55%,transparent);overflow:hidden}
-}
-.ht-win{flex:1 1 auto;min-width:0;height:30px;overflow:hidden}
-.ht-track{display:flex;flex-direction:column;transition:transform .55s cubic-bezier(.3,.7,.2,1)}
-.ht-i{display:flex;align-items:center;gap:9px;height:30px;min-width:0;white-space:nowrap}
-.ht-tag{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;height:20px;padding:0 9px 0 8px;border-radius:999px;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase}
-.ht-tag::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor;animation:htpulse 2.4s ease-in-out infinite}
-.ht-tag.a{color:#2bc8bd;background:rgba(43,200,189,.13)}
-.ht-tag.r{color:#2ee06a;background:rgba(46,224,106,.12)}
-.ht-i b{flex:0 0 auto;font-size:13px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.ht-tx{flex:0 1 auto;min-width:0;font-size:12px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis}
-.ht-s{display:none}
-/* phones: the top bar has no free middle, so the strip takes a third row across it, smaller, with the shorter lines */
-@media(max-width:620px){
-  .folder:not(#z){grid-template-areas:"brand right" "nav nav" "tick tick"}
-  .folder>.brandwrap:not(#z){display:contents}
-  .folder>.brandwrap>.brand{grid-area:brand;justify-self:start}
-  .folder .hdr-tick:not([hidden]){grid-area:tick;display:flex;align-items:center;min-width:0;height:28px;margin:2px 0 4px;padding:0 10px 0 4px;
-    border:1px solid var(--edge2);border-radius:999px;background:linear-gradient(90deg,rgba(43,200,189,.10),rgba(43,200,189,.02) 55%,transparent);overflow:hidden}
-  .hdr-tick .ht-win{height:28px}.hdr-tick .ht-i{height:28px;gap:7px}
-  .hdr-tick .ht-tag{height:18px;padding:0 7px 0 6px;font-size:8px;letter-spacing:.1em;gap:5px}
-  .hdr-tick .ht-i b{font-size:12px}.hdr-tick .ht-tx{font-size:11px}
-  .hdr-tick .ht-l{display:none}.hdr-tick .ht-s{display:inline}
-}
-@keyframes htpulse{50%{opacity:.35;box-shadow:none}}
-@media(prefers-reduced-motion:reduce){.ht-track{transition:none}.ht-tag::before{animation:none}}
+.hdr-tick:not([hidden]){display:flex;align-items:center;gap:12px;min-width:0;height:32px}
+@media(min-width:1180px){.folder>.hdr-tick:not([hidden]){grid-column:1/-1;grid-row:1;justify-self:center;width:min(760px,calc(100% - 834px))}}
+@media(min-width:800px) and (max-width:1179px){.folder:has(>.hdr-tick:not([hidden])){height:auto;padding-bottom:6px}
+  .folder>.hdr-tick:not([hidden]){grid-column:1/-1;grid-row:2}}
+@media(max-width:799px){.folder>.hdr-tick:not([hidden]){grid-column:1/-1;grid-row:3;height:28px;margin:2px 0}}
+.ht-live{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#2ee06a}
+.ht-live i{width:7px;height:7px;border-radius:50%;background:#2ee06a;animation:htlive 2s ease-out infinite}
+@keyframes htlive{0%{box-shadow:0 0 0 0 rgba(46,224,106,.55)}70%{box-shadow:0 0 0 7px rgba(46,224,106,0)}100%{box-shadow:0 0 0 0 rgba(46,224,106,0)}}
+.ht-win{flex:1 1 auto;min-width:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent)}
+.ht-run{display:flex;width:max-content;animation:htmarq var(--ht-dur,40s) linear infinite}
+.hdr-tick:hover .ht-run{animation-play-state:paused}
+@keyframes htmarq{to{transform:translateX(-50%)}}
+.ht-set{flex:0 0 auto;display:flex;align-items:center}
+.ht-i{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.ht-ic{flex:0 0 auto;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:rgba(43,200,189,.14);color:#2bc8bd;box-shadow:inset 0 0 0 1px rgba(43,200,189,.28)}
+.ht-i.g .ht-ic{background:rgba(46,224,106,.12);color:#2ee06a;box-shadow:inset 0 0 0 1px rgba(46,224,106,.26)}
+.ht-ic svg:not(#z){display:block;width:11px;height:11px;margin:0;max-height:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.ht-i em{font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
+.ht-i b{font-size:13px;font-weight:700;letter-spacing:-.01em;color:var(--ink);font-variant-numeric:tabular-nums}
+.ht-i.g b{color:#2ee06a}
+.ht-i span{font-size:12px;color:var(--ink2)}
+.ht-sep{flex:0 0 auto;width:1px;height:14px;margin:0 22px;background:var(--edge2)}
+@media(max-width:799px){.ht-live{font-size:8px;letter-spacing:.14em;gap:6px}.ht-ic{width:18px;height:18px}.ht-i{gap:6px}.ht-i b{font-size:12px}.ht-i span{font-size:11px}.ht-sep{margin:0 16px}}
+@media(prefers-reduced-motion:reduce){.ht-run{animation:none}.ht-live i{animation:none}}
 .brandwrap>.brand{grid-area:auto}
 /* the live height under the wordmark, at its right end (as before 2026-09-27); on testnet it moves left
    and says so */
@@ -7063,7 +7060,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <header class=folder>
     <div class=brandwrap>
     <a class=brand href="./" data-route="intro" title="AtomOne"><img class=mark src="assets/atomone.svg" alt=""><span class=bw><span class=wordmark>AtomOne</span><span class=bheight id=dlive title="the chain's height, live"><i></i><b>{{HEIGHT}}</b><span class=btag>Autopilot</span></span></span></a>
-    <div class=hdr-tick id=hdrtick hidden aria-label="AtomOne news"></div></div>
+    </div>
     <div class=hdr-r>
     <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
     <div class=netsw id=netsw role=group aria-label=Network><a id=netmain href="./" aria-label=Mainnet><span class=nl>Mainnet</span><span class=ns aria-hidden=true>Main</span></a><a id=nettest href="testnet/" aria-label=Testnet><span class=nl>Testnet</span><span class=ns aria-hidden=true>Test</span></a></div>
@@ -7078,6 +7075,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
     </div>
     </div>
     {{SHELL_L1}}
+    <div class=hdr-tick id=hdrtick hidden role=marquee aria-label="Autopilot and Restake so far"></div>
   </header>
   <div class=one id=one>
   <aside class=you id=you aria-label="Your wallet"></aside>

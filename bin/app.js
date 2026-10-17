@@ -4436,47 +4436,44 @@ rememberGridH();
   window.addEventListener("keplr_keystorechange", function(){ if(window.__ADDR) connect(true); });
 })();
 
-/* ── the header's news strip (operator, 2026-10-17): the empty middle of the top bar carries a slow feed of our own
-   numbers today (Autopilot and Restake, never a wallet count) and, later, partners' news, as CoinGecko's top bar does.
-   One item at a time slides up every few seconds; hovering holds it; reduced motion swaps without moving.
-   DEV ONLY until the operator turns it on in production: TICK_HOSTS lists the hosts it shows on (add
-   atomone.gatahub.zone to go live). Elsewhere the strip stays hidden and nothing is fetched. ── */
+/* ── the header's live strip (operator, 2026-10-17): a market-bar ticker of what Autopilot and Restake have done, from
+   pilot/_status.json (never a wallet count), and later partners' news, as CoinGecko's top bar. It runs left on its own,
+   stops while a pointer rests on it, and stands still with reduced motion. DEV ONLY until the operator turns it on:
+   TICK_HOSTS lists the hosts it shows on; anywhere else it stays hidden and fetches nothing. ── */
 (function(){
-  /* HIDDEN EVERYWHERE, dev too (operator, 2026-10-17: "not good. keep it hidden. too basic and needs placement in web
-     better. too close to logo and atomone text"): null shows it nowhere; the dev hosts were
-     /^(dev-atomone\.gatahub\.zone|127\.0\.0\.1|localhost)$/ */
-  var TICK_HOSTS = null;
+  var TICK_HOSTS = /^(dev-atomone\.gatahub\.zone|127\.0\.0\.1|localhost)$/;
   var el = document.getElementById("hdrtick");
   if(!el || !TICK_HOSTS || !TICK_HOSTS.test(location.hostname)) return;
   var nf = function(n){ return Math.round(n).toLocaleString("en-US"); };
+  var I = function(d){ return '<svg viewBox="0 0 24 24" aria-hidden=true>' + d + '</svg>'; };
+  var IC = {
+    pilot: I('<path d="M12 3l7 18-7-4.5L5 21z"/>'),
+    up: I('<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>'),
+    spread: I('<circle cx="6" cy="7" r="2.5"/><circle cx="18" cy="7" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.5 7h7M7.3 9.3l3.4 6.4M16.7 9.3l-3.4 6.4"/>'),
+    re: I('<path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v5h-5"/>'),
+    clock: I('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>')
+  };
   function items(s){
     var i = s && s.impact, L = []; if(!i) return L;
-    /* the wide line, then the phone's shorter one */
-    if(i.moved_uatone > 0) L.push(["a", "Autopilot", nf(i.moved_uatone / 1e6) + " ATONE", "moved to a better APR, hands-free", "moved to a better APR"]);
-    if(i.gain_atone_year > 0) L.push(["a", "Autopilot", "+" + nf(i.gain_atone_year) + " ATONE", "a year added for its stakers, while they sleep", "a year added for stakers"]);
-    if(i.validators > 0) L.push(["a", "Autopilot", nf(i.validators) + " validators", "share the stake it moved", "share the stake it moved"]);
-    if(i.restaked_uatone > 0) L.push(["r", "Restake", nf(i.restaked_uatone / 1e6) + " ATONE", "of rewards put back to work", "of rewards put back to work"]);
-    if(i.restakes > 0) L.push(["r", "Restake", nf(i.restakes) + " restakes", "so far, twice a day", "so far, twice a day"]);
+    if(i.moved_uatone > 0) L.push(["pilot", "", "Autopilot", nf(i.moved_uatone / 1e6) + " ATONE", "moved to a better APR"]);
+    if(i.gain_atone_year > 0) L.push(["up", "g", "Earned on top", "+" + nf(i.gain_atone_year) + " ATONE", "a year, hands-free"]);
+    if(i.validators > 0) L.push(["spread", "", "Spread", nf(i.validators) + " validators", "share the stake it moved"]);
+    if(i.restaked_uatone > 0) L.push(["re", "g", "Restaked", nf(i.restaked_uatone / 1e6) + " ATONE", "of rewards put back to work"]);
+    if(i.restakes > 0) L.push(["clock", "", "Restakes", nf(i.restakes), "so far, twice a day"]);
     return L;
   }
-  var n = 0, at = 0, hold = false, track = null;
-  var H = function(){ return track && track.firstElementChild ? track.firstElementChild.offsetHeight : 30; };   /* 30 px wide, 28 on a phone */
   function draw(L){
-    if(!L.length){ el.hidden = true; n = 0; return; }
-    var row = function(x){ return '<div class=ht-i><span class="ht-tag ' + x[0] + '">' + x[1] + '</span><b>' + x[2] + '</b><span class=ht-tx><span class=ht-l>' + x[3] + '</span><span class=ht-s>' + x[4] + '</span></span></div>'; };
-    /* the first item again at the end, so the loop closes without a jump back */
+    if(!L.length){ el.hidden = true; return; }
     var key = JSON.stringify(L); if(el.__key === key) return; el.__key = key;
-    el.innerHTML = '<div class=ht-win><div class=ht-track>' + L.map(row).join("") + row(L[0]) + '</div></div>';
-    track = el.querySelector(".ht-track"); n = L.length; at = 0; el.hidden = false;
+    var sep = '<i class=ht-sep aria-hidden=true></i>';
+    var one = L.map(function(x){ return '<span class="ht-i' + (x[1] ? ' ' + x[1] : '') + '"><i class=ht-ic>' + IC[x[0]] + '</i><em>' + x[2] + '</em><b>' + x[3] + '</b><span>' + x[4] + '</span></span>'; }).join(sep) + sep;
+    /* the set twice: the run slides one set's width and starts again where it began, with no seam */
+    el.innerHTML = '<span class=ht-live><i></i>Live</span><div class=ht-win><div class=ht-run><div class=ht-set>' + one + '</div><div class=ht-set aria-hidden=true>' + one + '</div></div></div>';
+    el.hidden = false;
+    var set = el.querySelector(".ht-set"), w = set ? set.getBoundingClientRect().width : 0;
+    el.style.setProperty("--ht-dur", Math.max(24, w / 36).toFixed(1) + "s");     /* about 36 px a second, however long */
   }
-  function step(){
-    if(hold || n < 2 || !track || document.hidden) return;
-    at++; track.style.transition = ""; track.style.transform = "translateY(" + (-H() * at) + "px)";
-    if(at === n) setTimeout(function(){ track.style.transition = "none"; track.style.transform = "translateY(0)"; at = 0; }, 600);
-  }
-  el.addEventListener("mouseenter", function(){ hold = true; });
-  el.addEventListener("mouseleave", function(){ hold = false; });
   function load(){ fetch("pilot/_status.json", { cache: "no-store" }).then(function(r){ return r.ok ? r.json() : null; })
     .then(function(s){ draw(items(s)); }).catch(function(){}); }
-  load(); setInterval(load, 10 * 60 * 1000); setInterval(step, 4500);
+  load(); setInterval(load, 10 * 60 * 1000);
 })();
