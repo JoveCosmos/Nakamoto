@@ -3278,27 +3278,26 @@ background:linear-gradient(180deg,#46f585,#22c65e);border:1px solid #3cf07a;box-
 @media(max-width:560px){.kp .kp-h{padding:14px 16px 12px}.kp .kp-b{padding:14px 16px 16px}.kp-hv b{font-size:24px}.kp-eq{flex-wrap:wrap}
 .kp-eq .kp-res{flex-basis:100%;padding:10px 0 0;border-left:0;border-top:1px solid var(--edge2)}.kp-g3{grid-template-columns:1fr 1fr}.kp-rule{grid-template-columns:1fr 1fr}.kp-rgo{grid-column:1/-1;text-align:right}}
 /* phones: the cards' figures are whole, stepping their type down to fit (app.js kpFit), never cut with an ellipsis; and
-   the Concentration card in order (operator, 2026-10-17: "empty spaces, boxes unordered"): the two thirds with the
-   division between them on one row, the result under them as "= 6.69x", the three facts side by side on one row,
-   their labels given two lines so the figures line up */
+   the Concentration card in order (operator, 2026-10-17): the two thirds with the division between them, under the line
+   the result with the reversal beside it (the "<" reads against the figure next to it, as on the wide screens), then
+   the two other facts side by side; every line in every box one row, in the phone's shorter words */
 @media(max-width:560px){
   .kp .kp-f>b:not(#z),.kp .kp-hv>b:not(#z){white-space:nowrap;overflow:hidden;text-overflow:clip}
   .kp .kp-go:not(#z){display:block;margin:3px 0 0}
   .kp-eq:not(#z){display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);column-gap:10px;row-gap:10px;align-items:start}
   .kp-eq>i:not(#z){align-self:center}
   .kp-eq>i:nth-of-type(2):not(#z){display:none}
-  .kp-eq .kp-res:not(#z){grid-column:1/-1}
-  .kp-eq .kp-res b:not(#z)::before{content:"= ";font-weight:400;color:var(--ink3)}
-  .kp-g3:not(#z){grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-  .kp-g3 .kp-f:not(#z){padding:9px 9px 10px}
-  .kp-g3 .kp-f>em:not(#z){min-height:2.5em;line-height:1.25}
-  .kp-g3 .kp-f>b:not(#z){font-size:18px}
+  .kp-eq .kp-res:not(#z){grid-column:1/3}
+  .kp-eq .kp-rev:not(#z){display:flex;grid-column:3;padding:10px 0 0;border-top:1px solid var(--edge2)}
+  .kp-g3:not(#z){grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kp-g3 .kp-revf:not(#z){display:none}
+  .kp .kp-f>:is(em,small):not(#z){white-space:nowrap;overflow:hidden}
   /* a two-column box's line under its figure is one line on a phone (operator, 2026-10-17: "should not exceed 1 row"):
      the phone's shorter words, and kpFit steps the type down if a narrow phone still needs it */
-  .kp .kp-g:not(.kp-g3) .kp-f>small:not(#z){white-space:nowrap;overflow:hidden}
   .kps-w:not(#z){display:none}.kps-p:not(#z){display:inline}
 }
 .kps-p{display:none}
+.kp-rev{display:none}
 
 /* ── Self, 2026-09-27: no balance boxes; the three lists hold ten rows and scroll past them; the columns
    sit at the bottom of the frame and the room above carries one Autopilot row (sa-) ── */
@@ -7400,11 +7399,12 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
       <div class=kp-hv><em>Smallest third</em><b><span data-kp=LOW>{{LOW}}</span></b><small>average of <span data-kp=GROUP_LO>{{GROUP_LO}}</span></small></div>
       <i aria-hidden=true>=</i>
       <div class="kp-hv kp-res"><em>Concentration</em><b class=or><span data-kp=RATIO>{{RATIO}}</span>&times;</b><small>times as large</small></div>
+      <div class="kp-hv kp-rev"><em><span class=lc>&eta;</span> reverses when</em><b><span data-kp=REV_WHEN>{{REV_WHEN}}</span></b></div>
     </div>
     <div class="kp-g kp-g3">
-      <div class=kp-f><em><span class=lc>&eta;</span> reverses when</em><b><span data-kp=REV_WHEN>{{REV_WHEN}}</span></b></div>
-      <div class=kp-f><em>Could halt the chain</em><b><span class=haltn>{{NK}}</span></b><small>validators together</small></div>
-      <div class=kp-f><em>Validators</em><b><span data-kp=N>{{N}}</span></b><small>in the active set</small></div>
+      <div class="kp-f kp-revf"><em><span class=lc>&eta;</span> reverses when</em><b><span data-kp=REV_WHEN>{{REV_WHEN}}</span></b></div>
+      <div class=kp-f><em>Could halt <span class=kps-w>the </span>chain</em><b><span class=haltn>{{NK}}</span></b><small>validators<span class=kps-w> together</span></small></div>
+      <div class=kp-f><em>Validators</em><b><span data-kp=N>{{N}}</span></b><small>in <span class=kps-w>the </span>active set</small></div>
     </div>
     <p class=kp-move>To go from <b><span data-kp=RATIO>{{RATIO}}</span>&times;</b> to <b><span data-kp=THRESH>{{THRESH}}</span>&times;</b>, <b class=or><span data-kp=MOVE>{{MOVE}}</span> ATONE</b> would have to move from the <span class=kp-lw><span data-kp=MOVE_FROM>{{MOVE_FROM}}</span></span> third of validators to the <span class=kp-lw><span data-kp=MOVE_TO>{{MOVE_TO}}</span></span> third.</p>
   </div>

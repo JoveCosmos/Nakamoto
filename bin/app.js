@@ -1468,13 +1468,13 @@ rememberGridH();
      value inside popup boxes is incomplete") */
   function kpFit(){
     if(!(window.matchMedia && matchMedia("(max-width:560px)").matches)) return;
-    [].forEach.call(document.querySelectorAll(".pop.on .kp .kp-f>b, .pop.on .kp .kp-hv>b, .pop.on .kp .kp-g:not(.kp-g3) .kp-f>small"), function(x){
+    [].forEach.call(document.querySelectorAll(".pop.on .kp .kp-f>b, .pop.on .kp .kp-hv>b, .pop.on .kp .kp-f>small, .pop.on .kp .kp-f>em"), function(x){
       x.style.fontSize = ""; if(!x.clientWidth) return;
       /* the words' own width to the fraction of a pixel: a figure a hair too wide used to end in an ellipsis */
       var over = function(){ var rg = document.createRange(); rg.selectNodeContents(x.firstChild && x.firstChild.nodeType === 1 && x.childNodes.length === 1 ? x.firstChild : x);
         return rg.getBoundingClientRect().width > x.clientWidth + 0.25; };
       var fs = parseFloat(getComputedStyle(x).fontSize);
-      var min = x.tagName === "SMALL" ? 9.5 : 12;
+      var min = x.tagName === "SMALL" || x.tagName === "EM" ? 9.5 : 12;
       while(over() && fs > min){ fs -= 0.5; x.style.fontSize = fs + "px"; }
     });
   }
