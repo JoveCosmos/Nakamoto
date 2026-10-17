@@ -3033,7 +3033,7 @@ rememberGridH();
     var el = E("stlist"); if(!el) return;
     var P = stPlan(), by = {}; P.rows.forEach(function(r){ by[r.id] = r; });
     /* Ask Pilot with no amount yet: what it does, in the list's own box */
-    if(ST_PILOT && !(P.u > 0)){ el.innerHTML = '<div class=st-pe><b>Pilot picks for you</b><span>Type an amount: Pilot spreads it where it earns the most, by Autopilot\'s own rule.</span></div>'; return; }
+    if(ST_PILOT && !(P.u > 0)){ el.innerHTML = '<div class=st-pe><b>Pilot picks for you</b><span>Type an amount: Pilot spreads it where it earns the most.</span></div>'; return; }
     /* Redelegate's very table (operator, 2026-09-30: "same to same ... each and every pixel"): its columns, widths,
        titles and cells - rank, the name with what this stake adds, the validator's stake, its record, and APR now → there */
     var pos = window.__POS, now = pos && pos.rows.length ? pos.rate : 0, MEAN = window.__S() / window.__VALS().length;

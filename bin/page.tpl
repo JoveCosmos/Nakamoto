@@ -7580,7 +7580,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
 </div></div>
 
 <div class=pop id=stpop><div class="card txcard uncard stcard">
-  <header class=wk-txh><div><b>Stake</b><span>{{CHAIN_ID}}</span></div><button class=st-ask id=stask type=button aria-pressed=false title="Pilot spreads the amount where it earns the most, by Autopilot's rule"><span class=st-a1>Ask Pilot</span><span class=st-a2>My picks</span><svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button><span class=txsum id=stsum></span></header>
+  <header class=wk-txh><div><b>Stake</b><span>{{CHAIN_ID}}</span></div><button class=st-ask id=stask type=button aria-pressed=false title="Pilot spreads the amount where it earns the most"><span class=st-a1>Ask Pilot</span><span class=st-a2>My picks</span><svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button><span class=txsum id=stsum></span></header>
   <div class="unamt sttop">
     <div class="wk-field unfield"><input class=wk-amt2 id=stamt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to stake"><button class=wk-max id=stmax type=button title="Every liquid ATONE">max <b id=stmaxv>-</b></button></div>
     <span class=wk-seln id=stseln aria-live=polite></span>
