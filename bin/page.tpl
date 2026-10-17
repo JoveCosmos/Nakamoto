@@ -5,10 +5,11 @@
 <link rel=icon href="assets/favicon.ico" sizes="any"><link rel=icon type="image/png" sizes="32x32" href="assets/favicon-32.png"><link rel=icon type="image/png" sizes="192x192" href="assets/favicon-192.png"><link rel=apple-touch-icon href="assets/apple-touch-icon.png"><meta name=theme-color content="#06060c">
 <script id=shellcfg type=application/json>{{SHELL_CFG}}</script>
 <script src="boot.js"></script>
-<meta name=description content="AtomOne's Nakamoto Bonus, live: what it pays, what would reverse it, and ten million blocks of evidence.">
+<meta name=description content="Chain that rewards decentralization. Nakamoto finds your best move, StakePilot places it in one step, Autopilot keeps it at the best APR.">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Nakamoto"><meta property="og:title" content="AtomOne Nakamoto Bonus">
-<meta property="og:description" content="AtomOne's Nakamoto Bonus, live: what it pays, what would reverse it, and ten million blocks of evidence.">
-<meta property="og:image" content="https://atomone.gatahub.zone/assets/favicon-192.png"><meta name=twitter:card content=summary>
+<meta property="og:description" content="Chain that rewards decentralization. Nakamoto finds your best move, StakePilot places it in one step, Autopilot keeps it at the best APR.">
+<meta property="og:image" content="https://atomone.gatahub.zone/assets/og-card.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The same stake. A higher APR. The Nakamoto app for AtomOne."><meta name=twitter:card content=summary_large_image>
 <style>
 :root{
 color-scheme:dark;
