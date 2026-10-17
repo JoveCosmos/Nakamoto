@@ -256,8 +256,7 @@ z-index:50;}
   .stcard .stlist:not(#z):not(#y){flex:1 1 0;max-height:none;height:auto}
   /* a fee line and the step that shares its slot keep their size in every card (a long list squeezed the step 33 -> 13 px) */
   .pop .card.txcard:not(#z)>:is(.txfee,.txstep){flex-shrink:0}
-  /* a title row with a button (Stake's Ask Pilot) holds the summary's worst case, three lines, so it never grows */
-  /* one size whatever the list holds (Ask Pilot's few rows, the whole set): the card always fills the screen */
+  /* one size whatever the card holds: the Stake card and StakePilot always fill the screen */
   .pop .card:is(.stcard,.spcard):not(#z){height:100%}
 }
 .pop .card{max-width:470px;width:100%;
@@ -2720,9 +2719,9 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .mtcard .unamt>.unfield{flex:1 1 auto}
 /* StakePilot (operator, 2026-10-15): the amount, typed or slid; the rate it earns and where it lands, re-planned
    as it changes; one shape whatever the amount (the boxes keep their heights, nothing below them moves) */
-/* StakePilot's frame is the Stake card's (operator, 2026-10-17: a view switch, not a second popup): the same width and
-   height, its fee and buttons at the foot where the Stake card has them */
-.pop .card.spcard{width:min(520px,94vw);max-width:520px}
+/* StakePilot's frame (operator, 2026-10-17: "bigger popup wide"): wide on a desktop, the screen's height, its fee and
+   buttons at the foot; the Stake card (Pro's manual stake) keeps the same height */
+.pop .card.spcard{width:min(960px,94vw);max-width:960px}
 .pop .card:is(.stcard,.spcard){height:92vh;height:92svh;max-height:92vh;max-height:92svh;display:flex;flex-direction:column}
 .pop .card.spcard>.txfee{margin-top:auto}
 /* the Stake card's list takes what the frame leaves (both views end on the same foot) */
@@ -2730,47 +2729,44 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .pop .card.spcard::before{content:"";position:absolute;left:24px;right:24px;top:0;height:1px;opacity:.9;background:linear-gradient(90deg,transparent,var(--wcyan),transparent)}
 .spcard .txsum{color:var(--wcyan)}
 .spcard .unamt>.unfield{flex:1 1 auto}
-.sp-rngw{padding:12px 20px 0}
-.sp-rng{display:block;width:100%;margin:0;height:18px;cursor:pointer;background:none;-webkit-appearance:none;appearance:none}
-.sp-rng::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--wcyan) var(--sp-f,0%),#2a2a4a var(--sp-f,0%))}
-.sp-rng::-moz-range-track{height:4px;border-radius:2px;background:#2a2a4a}
-.sp-rng::-moz-range-progress{height:4px;border-radius:2px;background:var(--wcyan)}
-.sp-rng::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;background:var(--wcyan);border:3px solid #0b0b18;box-shadow:0 0 0 1px var(--wcyan)}
-.sp-rng::-moz-range-thumb{width:10px;height:10px;border-radius:50%;background:var(--wcyan);border:3px solid #0b0b18;box-shadow:0 0 0 1px var(--wcyan)}
-.sp-rng:focus-visible{outline:none}.sp-rng:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 1px var(--wcyan),0 0 0 5px rgba(43,200,189,.25)}
-.sp-out{margin:12px 20px 0;padding:0 16px;height:78px;box-sizing:border-box;border:1px solid var(--wbd);border-radius:8px;display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:18px;align-items:center;background:linear-gradient(180deg,#10101f,#0b0b18)}
-.sp-out .r{display:flex;flex-direction:column;align-items:flex-start}
-.sp-out .r b{font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1;color:var(--wcyan);font-variant-numeric:tabular-nums}
-.sp-out .r em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);margin-top:6px}
-.sp-out .y{display:flex;flex-direction:column;gap:5px;min-width:0}
-.sp-out .y b{font-size:15px;font-weight:600;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sp-out .y span{font-family:var(--wmono);font-size:9.5px;letter-spacing:.03em;line-height:1.35;color:var(--ws)}
-.sp-out .y span i{font-style:normal;color:var(--wcyan)}
-.sp-out.idle{grid-template-columns:minmax(0,1fr)}
-.sp-out.idle span{font-family:var(--wmono);font-size:10px;letter-spacing:.04em;line-height:1.5;color:var(--wf);text-align:center}
-.sp-legs{margin:8px 20px 0;height:92px;display:grid;grid-auto-rows:28px;gap:4px;align-content:start}
-.sp-leg{display:grid;grid-template-columns:18px minmax(0,1fr) auto;align-items:center;gap:9px;padding:0 10px;border:1px solid var(--wbd);border-radius:6px;font-size:12px;min-width:0}
-.sp-leg .wk-lg{width:18px;height:18px;margin:0}.sp-leg .wk-lgx{line-height:18px;font-size:8px}
-.sp-leg span{color:var(--ws);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sp-leg b{font-weight:600;color:var(--wt);font-variant-numeric:tabular-nums;white-space:nowrap}
-.sp-leg b i{font-style:normal;font-family:var(--wmono);font-size:8.5px;letter-spacing:.08em;color:var(--wf);font-weight:400}
-.sp-leg.more{grid-template-columns:minmax(0,1fr) auto;border-style:dashed}
-.sp-legs.new .sp-leg{animation:spIn .26s ease both}
-.sp-legs.new .sp-leg:nth-child(2){animation-delay:.04s}.sp-legs.new .sp-leg:nth-child(3){animation-delay:.08s}
-@keyframes spIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
-.sp-bc{position:relative;margin:10px 20px 0;padding-bottom:14px;height:44px;display:flex;align-items:flex-end;gap:1px}
-.sp-bc i{flex:1 1 0;min-width:1px;border-radius:1px 1px 0 0;background:#24244a;transition:background .2s}
-.sp-bc i.on{background:var(--wcyan)}
-.sp-ax{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between}
-.sp-ax em{font-style:normal;font-family:var(--wmono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--wf)}
-.sp-pho{margin:10px 20px 0}
+/* ── the Pilot view (operator, 2026-10-17: "make it a feature worth feeling in real time ... avoid texts"): a big slider,
+   two figures that roll to their new values, the set drawn live with the stake pouring into the validators it lands
+   on, those validators as chips. The stage takes what the frame leaves ── */
+.pop .card.spcard:not(#z)>.sp-view:not(#y){flex:1 1 auto;min-height:0}   /* above the phone rule that stops a card's parts growing */
+.sp-view{display:flex;flex-direction:column;gap:14px;padding:16px 20px 0}
+.sp-rngw{padding:0}
+.sp-rngw>.sp-rng{display:block;width:100%;max-width:none;min-width:0;flex:none;margin:0;height:30px;cursor:pointer;background:none;-webkit-appearance:none;appearance:none}
+.sp-rngw>.sp-rng::-webkit-slider-runnable-track{height:10px;border-radius:5px;background:linear-gradient(90deg,#2bc8bd 0,#b9b0ff var(--sp-f,0%),#22223c var(--sp-f,0%));box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
+.sp-rngw>.sp-rng::-moz-range-track{height:10px;border-radius:5px;background:#22223c}
+.sp-rngw>.sp-rng::-moz-range-progress{height:10px;border-radius:5px;background:linear-gradient(90deg,#2bc8bd,#b9b0ff)}
+.sp-rngw>.sp-rng::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;margin-top:-8px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffffff,#d9fffb 55%,#9ff0e8);border:0;box-shadow:0 0 0 4px rgba(43,200,189,.28),0 0 22px rgba(43,200,189,.55)}
+.sp-rngw>.sp-rng::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffffff,#d9fffb 55%,#9ff0e8);border:0;box-shadow:0 0 0 4px rgba(43,200,189,.28),0 0 22px rgba(43,200,189,.55)}
+.sp-rngw>.sp-rng:focus-visible{outline:none}.sp-rngw>.sp-rng:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(43,200,189,.5),0 0 26px rgba(43,200,189,.75)}
+.sp-hero{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.sp-hero>div{min-width:0;padding:14px 18px 12px;border:1px solid var(--wbd);border-radius:14px;background:linear-gradient(180deg,rgba(43,200,189,.07),rgba(43,200,189,0) 70%)}
+.sp-hero>.y{background:linear-gradient(180deg,rgba(185,176,255,.08),rgba(185,176,255,0) 70%)}
+.sp-hero b{display:block;font-size:46px;font-weight:700;letter-spacing:-.025em;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;color:#2bc8bd}
+.sp-hero>.y b{color:#cdc6ff}
+.sp-hero em{display:block;margin-top:8px;font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--wf)}
+.sp-hero.idle b{color:var(--wf);opacity:.55}
+.sp-stage{--sp-bar:#2a2a4e;--sp-hot:#2bc8bd;--sp-hot2:#b9b0ff;--sp-dot:#e6fffb;position:relative;flex:1 1 auto;min-height:150px;border:1px solid var(--wbd);border-radius:14px;
+  background:radial-gradient(120% 90% at 85% 0%,rgba(43,200,189,.08),transparent 60%),linear-gradient(180deg,#0e0e1f,#0a0a16);overflow:hidden}
+.sp-stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.sp-chips{display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;height:64px;overflow:hidden}
+.sp-chip{display:inline-flex;align-items:center;gap:7px;height:29px;max-width:100%;padding:0 11px 0 5px;border:1px solid var(--wbd2);border-radius:999px;background:rgba(255,255,255,.02);font-size:12px;color:var(--ws);animation:spIn .28s ease both}
+.sp-chip .wk-lg{width:19px;height:19px;margin:0;flex:0 0 auto}.sp-chip .wk-lgx{line-height:19px;font-size:8px}
+.sp-chip span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-chip b{font-weight:600;color:#2bc8bd;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sp-chip.more{padding:0 12px;color:var(--wf);border-style:dashed}
+.sp-chip.left{padding:0 12px;color:var(--wamber);border-color:rgba(255,176,46,.4)}
+@keyframes spIn{from{opacity:0;transform:translateY(4px) scale(.98)}to{opacity:1;transform:none}}
 .sp-pho:empty{display:none}
-.sp-pho div{display:flex;align-items:center;gap:9px;padding:9px 12px;border:1px solid rgba(255,176,46,.32);border-radius:6px}
-.sp-pho svg{width:13px;height:13px;flex:0 0 auto;fill:none;stroke:var(--wamber);stroke-width:2;stroke-linecap:round}
-.sp-pho span{flex:1 1 auto;font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.45;color:var(--ws)}
-.sp-pho button{flex:0 0 auto;font-family:var(--wmono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:6px 10px;border-radius:5px;border:1px solid var(--wamber);background:transparent;color:var(--wamber);cursor:pointer}
+.sp-pho button{display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px;border-radius:999px;border:1px solid var(--wamber);background:transparent;color:var(--wamber);
+  font-family:var(--wmono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
 .sp-pho button:hover{background:rgba(255,176,46,.12)}
-@media (prefers-reduced-motion:reduce){.sp-legs.new .sp-leg{animation:none}}
+.sp-pho svg{width:13px;height:13px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+@media(max-width:620px){.sp-view{gap:10px;padding-top:12px}.sp-hero b{font-size:31px}.sp-hero>div{padding:11px 13px 10px}.sp-stage{min-height:110px}}
+@media (prefers-reduced-motion:reduce){.sp-chip{animation:none}}
 /* Buy ATONE (operator, 2026-10-15): one signature on Osmosis buys an exact amount of ATONE from its pool and
    sends it home; the token to pay with beside the amount; what arrives, the path it takes; one shape throughout */
 .pop .card.bycard{width:min(440px,94vw);max-width:440px}
@@ -2781,20 +2777,6 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 @media (max-width:480px){.bycard .wk-max b{display:none}.by-tok{padding-right:18px}}
 .by-tok{flex:0 0 auto;margin:0 6px 0 2px;padding:4px 20px 4px 8px;border:1px solid var(--wbd2);border-radius:5px;color:var(--wt);font-family:var(--wmono);font-size:10px;letter-spacing:.08em;cursor:pointer;-webkit-appearance:none;appearance:none;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238f8db4' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 7px center/8px 5px}
 .by-tok option{background:#0f0f1c;color:#e6e4f0}
-/* Ask Pilot (operator, 2026-10-17): Stake's own button, just before it, in Autopilot's lavender. It switches the screen to
-   StakePilot's view in place (the card, or Pro's panes), where the same button in the same place reads Back. Both carry
-   both sides in one cell, so the button keeps one width and nothing beside it moves */
-.wk-btn.wk-go.st-ask{display:inline-grid;grid-template-areas:"x";place-items:center}
-.st-ask>span{grid-area:x;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
-.st-ask>.st-a2,.st-ask[aria-pressed=true]>.st-a1{visibility:hidden}
-.st-ask[aria-pressed=true]>.st-a2{visibility:visible}
-.st-ask svg:not(#z){display:block;width:11px;height:11px;margin:0;max-height:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.txcard .wk-btn.wk-go.st-ask{background:linear-gradient(180deg,#c9c2ff,#9d93f0);border:1px solid #b9b0ff;color:#1b1440;box-shadow:0 10px 24px -12px rgba(185,176,255,.8),inset 0 1px 0 rgba(255,255,255,.3)}
-.st-ask:focus-visible{outline:2px solid #b9b0ff;outline-offset:2px}
-/* three buttons on a narrow phone (Alerts, Ask Pilot, Stake did not fit 360 px): Alerts keeps its bell, its word is
-   still read out by a screen reader */
-@media(max-width:400px){.txbtns:has(.st-ask) .wk-bell:not(#z){width:38px;padding:0;gap:0;font-size:0;letter-spacing:0}
-  .txbtns:has(.st-ask) .wk-bell svg:not(#z){width:14px;height:14px}}
 /* the wide copy inside a title row's summary is running text, not the row's block caption (.wk-txh span) */
 .wk-txh .txsum .kps-w:not(#z){margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit}
 @media(min-width:561px){.wk-txh .txsum .kps-w:not(#z){display:inline}}
@@ -2922,8 +2904,8 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .stcard .txlock{border-color:rgba(46,224,106,.28);background:rgba(46,224,106,.05)}
 .stcard .txlock span b{color:var(--wgreen)}
 #p-dele .stcard .txlock svg,.stcard .txlock svg{stroke:var(--wgreen)}
-.stcard .wk-btn.wk-go{background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;color:#04150a;box-shadow:0 10px 24px -12px rgba(46,224,106,.75),inset 0 1px 0 rgba(255,255,255,.3)}
-.stcard .wk-btn.wk-go:disabled{background:linear-gradient(180deg,#1d1d36,#15152a);border-color:#2f2f52;color:#66648c;box-shadow:none}
+:is(.stcard,.spcard) .wk-btn.wk-go{background:linear-gradient(180deg,#34e874,#1db85a);border:1px solid #2ee06a;color:#04150a;box-shadow:0 10px 24px -12px rgba(46,224,106,.75),inset 0 1px 0 rgba(255,255,255,.3)}
+:is(.stcard,.spcard) .wk-btn.wk-go:disabled{background:linear-gradient(180deg,#1d1d36,#15152a);border-color:#2f2f52;color:#66648c;box-shadow:none}
 #p-dele #wk-plan>.wk-ph .wk-lockn svg{width:9px;height:9px;margin:0 1px 0 0;max-height:none;fill:none;stroke:var(--wamber);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
 @media(max-width:700px){#wk-plan>.wk-ph .wk-lockn{font-size:6.5px;padding:0 6px}#wk-plan>.wk-ph .wk-lockn .w{display:none}#wk-plan>.wk-ph .wk-lockn b:last-of-type::before{content:"\2192";margin:0 2px;color:var(--wamber)}}
 /* ── every pane has a floor: the list fades out over its last pixels and a hairline
@@ -6733,7 +6715,6 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
     font:600 15px var(--wsans);letter-spacing:0;text-transform:none}
   #one #proout .txbtns .wk-btn.wk-go:disabled:not(#z){border-color:var(--wbd2);background:transparent;color:var(--wf)}
   #one #proout .txbtns .wk-bell{display:none!important}
-  #one #proout .txbtns .wk-btn.wk-go.st-ask:not(#z):not(#y){display:inline-grid;flex:0 0 auto;width:auto;margin:0;padding:0 20px;border-color:#b9b0ff;background:#b9b0ff;color:#1b1440}   /* #wk-mv's buttons are inline-flex: the two sides would sit side by side */
   /* every action's button is Redelegate's: full width, the same height, radius, type and fill */
   #one #proout .txbtns .wk-btn.wk-go:not(#z):not(#y),#one #p-dele #wk-mv #dgo:not(#z):not(#y){width:100%;flex:1 1 auto;height:46px;margin:0;padding:0 20px;border-radius:12px;
     border:1px solid var(--wcyan);background:var(--wcyan);color:var(--wc);font:600 15px var(--wsans);letter-spacing:0;text-transform:none;box-shadow:none}
@@ -7564,14 +7545,16 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
     <div class="wk-field unfield"><input class=wk-amt2 id=spamt type=text inputmode=decimal placeholder="ATONE to stake" autocomplete=off spellcheck=false aria-label="ATONE to stake"><button class=wk-max id=spmax type=button title="Every available ATONE">max <b id=spmaxv>-</b></button></div>
     <span class=unhint id=sphint></span>
   </div>
-  <div class=sp-rngw><input class=sp-rng id=sprng type=range min=0 max=1000 step=1 value=0 aria-label="Slide to choose how much to stake"></div>
-  <div class=sp-out id=spout aria-live=polite></div>
-  <div class=sp-legs id=splegs></div>
-  <div class=sp-bc id=spbc aria-hidden=true></div>
-  <div class=sp-pho id=sppho></div>
+  <div class=sp-view id=spview>
+    <div class=sp-rngw><input class=sp-rng id=sprng type=range min=0 max=1000 step=1 value=0 aria-label="Slide to choose how much to stake"></div>
+    <div class="sp-hero idle" id=spout aria-live=polite><div class=a><b id=spapr>-</b><em>APR</em></div><div class=y><b id=spyr>-</b><em>ATONE a year</em></div></div>
+    <div class=sp-stage id=spstage><canvas id=spcv aria-hidden=true></canvas></div>
+    <div class=sp-chips id=splegs></div>
+    <div class=sp-pho id=sppho></div>
+  </div>
   <div class=txfee id=spfee></div>
   <div class=txstep id=spstep></div>
-  <div class=txbtns><button class="wk-btn wk-bell" id=spbell type=button title="Alerts for these validators" disabled><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>Alerts</button><button class="wk-btn wk-go st-ask" id=spback type=button aria-pressed=true title="Back to choosing validators"><span class=st-a1>Ask Pilot<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></span><span class=st-a2><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12H5M11 6l-6 6 6 6"/></svg>Back</span></button><button class="wk-btn wk-go" id=spsign type=button disabled>Stake</button></div>
+  <div class=txbtns><button class="wk-btn wk-bell" id=spbell type=button title="Alerts for these validators" disabled><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>Alerts</button><button class="wk-btn wk-go" id=spsign type=button disabled>Stake</button></div>
 </div></div>
 
 <div class=pop id=stpop><div class="card txcard uncard stcard">
@@ -7585,7 +7568,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <div class=txlock id=stlock></div>
   <div class=txfee id=stfee></div>
   <div class=txstep id=ststep></div>
-  <div class=txbtns><button class="wk-btn wk-bell" id=stbell type=button title="Alerts for these validators"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>Alerts</button><button class="wk-btn wk-go st-ask" id=stask type=button aria-pressed=false title="StakePilot: where this amount earns the most"><span class=st-a1>Ask Pilot<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></span><span class=st-a2><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12H5M11 6l-6 6 6 6"/></svg>Back</span></button><button class="wk-btn wk-go" id=stsign type=button disabled>Stake</button></div>
+  <div class=txbtns><button class="wk-btn wk-bell" id=stbell type=button title="Alerts for these validators"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>Alerts</button><button class="wk-btn wk-go" id=stsign type=button disabled>Stake</button></div>
 </div></div>
 
 <div class=pop id=atpop><div class="card txcard uncard atcard" role=dialog aria-modal=true aria-labelledby=atttl data-v=setup>

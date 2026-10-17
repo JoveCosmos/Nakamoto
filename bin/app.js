@@ -83,17 +83,7 @@ var POP = (function(){
   document.addEventListener("click", function(ev){
     var t = ev.target;
     if(t && t.classList && t.classList.contains("pop") && t === top()) close(t); });
-  /* a view switch inside one screen (Ask Pilot and Back, operator 2026-10-17): b takes a's place in the stack with no
-     entrance and the backdrop kept; a goes as a closed card does (its __onclose runs) */
-  function swap(a, b){
-    var i = -1;
-    for(var k = st.length - 1; k >= 0; k--) if(st[k].el === a){ i = k; break; }
-    if(i < 0){ open(b); return; }
-    st.splice(i + 1); st[i].el = b;
-    a.classList.remove("on"); if(a.__onclose) a.__onclose();
-    b.classList.add("on", "back"); R.classList.add("popon"); focusIn(b);
-  }
-  return { open: open, close: close, closeAll: closeAll, top: top, swap: swap };
+  return { open: open, close: close, closeAll: closeAll, top: top };
 })();
 window.__POP = POP;
 
@@ -173,8 +163,6 @@ var DOCK = null;
 var DOCK_PARTS = {
   /* hdr: into the pane's title row, where Redelegate keeps its amount field; list: the pane's body; out: Outcome */
   stpop: { mode: "stake",   title: "Stake",         hdr: [".sttop"], list: ["#stlist"],  out: ["#stsum", "#stlock", "#stfee", "#ststep", ".txbtns"] },
-  /* StakePilot is the Stake screen's other view (Ask Pilot): the same tab, its view in the same panes */
-  sppop: { mode: "stake",   title: "StakePilot",    hdr: [".unamt"], list: [".sp-rngw", "#spout", "#splegs", "#spbc", "#sppho"], out: ["#spsum", "#spfee", "#spstep", ".txbtns"] },
   unpop: { mode: "unstake", title: "Unstake",       hdr: [".unamt"], list: ["#unpick"],  out: ["#unsum", "#unlock", "#unfee", "#unstep", ".txbtns"] },
   clpop: { mode: "claim",   title: "Claim",         hdr: [],         list: ["#clpick"],  out: ["#clsum", "#clfee", "#clstep", ".txbtns"] }
 };
@@ -215,9 +203,6 @@ function dock(pop){
   proTabs(); if(window.__proBrk) window.__proBrk();
 }
 window.__openCard = function(pop){ if(!pop) return; if(proWide()) dock(pop); else POP.open(pop); };
-/* one screen, two views: the Stake card and StakePilot switch in place, in Pro's panes when docked, else in the same
-   popup frame with no second entrance */
-window.__viewSwap = function(from, to){ if(DOCK && DOCK.pop === from){ dock(to); return; } POP.swap(from, to); };
 window.__closeCard = function(pop){ if(DOCK && DOCK.pop === pop) undock(); else POP.close(pop); };
 window.__undock = undock;
 window.__undockIfNarrow = function(){ if(DOCK && !proWide()) undock(); };
@@ -3091,7 +3076,7 @@ rememberGridH();
     var rows = [], head = [], tot = 0, fig = ["", ""], fig0 = null;
     var pc = function(x){ return (x * 100).toFixed(1) + "%"; };
     if(mode === "stake"){
-      var P = DOCK && DOCK.pop && DOCK.pop.id === "sppop" && window.__spBrk ? window.__spBrk() : stPlan(); head = ["Validator", "Stake", "APR", "ATONE/yr"];
+      var P = stPlan(); head = ["Validator", "Stake", "APR", "ATONE/yr"];
       P.rows.forEach(function(r){ tot += r.x; rows.push([logo(r.id, r.m) + '<span>' + att(r.m) + '</span>', fmt(r.x), r.after ? pc(r.after) : '0%', '+' + fmt(r.x * r.after)]); });
       fig = ["ATONE/year", P.rows.length ? (tot * P.rate + P.rest >= 0 ? '+' : '\u2212') + fmt(Math.abs(tot * P.rate + P.rest)) : '-'];
     } else if(mode === "unstake"){
@@ -3149,18 +3134,6 @@ rememberGridH();
     var go = E("stsign"); if(go){ go.disabled = true; go.textContent = "Stake"; }
     stRows(); stState(); window.__openCard(stpop); window.__kbFocus(a);
   });
-  /* Ask Pilot and StakePilot are one thing (operator, 2026-10-17): the button switches this screen to StakePilot's view in
-     place, with the amount typed so far; its Back, in the same place, switches back here with StakePilot's amount */
-  var stask = E("stask");
-  if(stask) stask.addEventListener("click", function(){ var u = stAmount(); if(window.__pilotView) window.__pilotView(u); });
-  window.__stakeView = function(u){
-    if(!stpop || !window.__POS) return;
-    STSEL = {}; var a = E("stamt"); if(a) a.value = u > 0 ? exact(u) : "";
-    var go = E("stsign"); if(go){ go.disabled = true; go.textContent = "Stake"; }
-    var sp = E("sppop"), here = sp && ((DOCK && DOCK.pop === sp) || sp.classList.contains("on"));
-    if(here) window.__viewSwap(sp, stpop); else window.__openCard(stpop);
-    stRows(); stState(); window.__kbFocus(a);
-  };
   var stamtEl = E("stamt"); if(stamtEl) stamtEl.addEventListener("input", function(){ stRows(); stState(); });
   var stmax = E("stmax"); if(stmax) stmax.addEventListener("click", function(){ if(!(stBal() > 0)) return; E("stamt").value = exact(stBal()); stRows(); stState(); });
   /* the card leaves nothing behind (operator, 2026-10-17, as the Redelegate grant once carried over): closed, docked
@@ -3207,52 +3180,129 @@ rememberGridH();
   function spSlid(){ var r = E("sprng"), mx = spMax(); if(!r || !(mx > 0)) return 0; var s = +r.value / 1000; return s >= 1 ? mx : Math.min(mx, spNice(s * s * mx)); }
   function spFill(){ var r = E("sprng"); if(r) r.style.setProperty("--sp-f", (+r.value / 10) + "%"); }
   function spSyncRange(u){ var r = E("sprng"), mx = spMax(); if(r) r.value = mx > 0 ? Math.round(Math.sqrt(Math.min(1, u / mx)) * 1000) : 0; spFill(); }
-  function spLegs(P){
+  /* ── the live view (operator, 2026-10-17: "make it a feature worth feeling in real time ... avoid texts"): the two
+     figures roll to their new values, the validators it lands on are chips, and the set is drawn on a canvas with the
+     stake pouring into them - the shelf rising as the amount grows. The drawing runs only while the view is shown ── */
+  var SPV = { a: null, y: null, raf: 0 }, REDUCED = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function spHero(P){
+    var el = E("spout"), A = E("spapr"), Y = E("spyr"); if(!el || !A || !Y) return;
+    el.classList.toggle("idle", !P);
+    cancelAnimationFrame(SPV.raf);
+    if(!P){ SPV.a = SPV.y = null; A.textContent = "-"; Y.textContent = "-"; return; }
+    var a1 = P.rate, y1 = P.earned, a0 = SPV.a == null ? a1 : SPV.a, y0 = SPV.y == null ? 0 : SPV.y, t0 = performance.now(), D = REDUCED ? 0 : 340;
+    (function roll(n){
+      var k = D ? Math.min(1, (n - t0) / D) : 1, e = 1 - Math.pow(1 - k, 3);
+      SPV.a = a0 + (a1 - a0) * e; SPV.y = y0 + (y1 - y0) * e;
+      A.textContent = pct(SPV.a); Y.textContent = "+" + fmt(SPV.y);
+      if(k < 1) SPV.raf = requestAnimationFrame(roll);
+    })(t0);
+  }
+  function spChips(P){
     var el = E("splegs"); if(!el) return;
-    var legs = P ? P.legs : [], key = legs.map(function(q){ return q.id; }).join(",");
-    var show = legs.length > 3 ? legs.slice(0, 2) : legs, more = legs.length - show.length;
-    var rows = show.map(function(q){ return '<div class=sp-leg>' + logo(q.id, q.m) + '<span>' + att(q.m) + '</span><b>' + fmt(q.x) + ' <i>ATONE</i></b></div>'; });
-    if(more > 0){ var rest = legs.slice(2).reduce(function(s, q){ return s + q.x; }, 0);
-      rows.push('<div class="sp-leg more"><span>and ' + more + ' more validators</span><b>' + fmt(rest) + ' <i>ATONE</i></b></div>'); }
-    /* the same validators: the figures change in place; new ones fade in, so sliding never flickers */
-    if(key === SP.key && el.children.length === rows.length){
-      Array.prototype.forEach.call(el.children, function(c, i){ var b = c.querySelector("b"), nb = rows[i].match(/<b>(.*)<\/b>/); if(b && nb && b.innerHTML !== nb[1]) b.innerHTML = nb[1]; });
-    } else { el.innerHTML = rows.join(""); el.classList.remove("new"); void el.offsetWidth; el.classList.add("new"); }
-    SP.key = key;
-  }
-  function spCode(P){
-    var el = E("spbc"); if(!el) return;
-    var V = window.__VALS(), on = {}, hi = V.length ? V[0][1] : 0, i;
-    if(P) P.legs.forEach(function(q){ on[q.id] = 1; });
-    if(el.children.length !== V.length + 1){
-      var h = '';
-      for(i = 0; i < V.length; i++) h += '<i style="height:' + (hi ? 10 + 90 * Math.sqrt(V[i][1] / hi) : 10).toFixed(1) + '%"></i>';
-      el.innerHTML = h + '<span class=sp-ax><em>#1 largest</em><em>smallest #' + V.length + '</em></span>';
+    var legs = P ? P.legs : [], cap = 7, show = legs.length > cap ? legs.slice(0, cap - 1) : legs, more = legs.length - show.length;
+    var left = P && P.left >= 1e6 ? P.left : 0;
+    var key = show.map(function(q){ return q.id; }).join(",") + "|" + more + "|" + (left ? 1 : 0);
+    var chip = function(q){ return '<span class=sp-chip data-id="' + att(q.id) + '">' + logo(q.id, q.m) + '<span>' + att(q.m) + '</span><b>+' + fmt(q.x) + '</b></span>'; };
+    if(key === SP.key){
+      /* the same validators: only the amounts change, in place */
+      show.forEach(function(q, i){ var b = el.children[i] && el.children[i].querySelector("b"); if(b){ var t = "+" + fmt(q.x); if(b.textContent !== t) b.textContent = t; } });
+      var lf = el.querySelector(".left"); if(lf) lf.textContent = fmt(left) + " ATONE stays";
+      return;
     }
-    for(i = 0; i < V.length; i++){ var b = el.children[i]; if(b) b.classList.toggle("on", !!on[V[i][3]]); }
+    SP.key = key;
+    el.innerHTML = show.map(chip).join("") + (more > 0 ? '<span class="sp-chip more">+' + more + '</span>' : '') +
+      (left ? '<span class="sp-chip left">' + fmt(left) + ' ATONE stays</span>' : '');
   }
+  /* the stage: every validator of the set as a bar (largest left), the ones the move lands on lit, and the stake flowing
+     into them as light; bars ease to their new state, so dragging the slider is felt, not redrawn */
+  var STG = { on: false, raf: 0, last: 0, cv: null, ctx: null, w: 0, h: 0, d: 1, n: 0, t: [], k: [], kTo: [], c: [], cTo: [], f: [],
+              legs: [], tot: 0, parts: [], acc: 0, rush: 0, col: null, colAt: 0 };
+  function stgShown(){ var cv = E("spcv"); return !!(cv && cv.offsetParent && cv.clientWidth > 0); }
+  function stgSize(){
+    var cv = STG.cv, r = cv.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1);
+    var w = Math.max(1, Math.round(r.width * d)), h = Math.max(1, Math.round(r.height * d));
+    if(cv.width !== w || cv.height !== h){ cv.width = w; cv.height = h; }
+    STG.w = w; STG.h = h; STG.d = d;
+  }
+  function stgCols(){
+    var cs = getComputedStyle(E("spstage")), g = function(k, x){ var v = cs.getPropertyValue(k).trim(); return v || x; };
+    STG.col = { bar: g("--sp-bar", "#2a2a4e"), hot: g("--sp-hot", "#2bc8bd"), hot2: g("--sp-hot2", "#b9b0ff"), dot: g("--sp-dot", "#e6fffb") }; STG.colAt = performance.now();
+  }
+  function stgSet(P){
+    STG.cv = E("spcv"); if(!STG.cv) return;
+    var V = window.__VALS(), n = V.length, i;
+    if(STG.n !== n){ STG.n = n; STG.k = []; STG.c = []; STG.f = []; for(i = 0; i < n; i++){ STG.k.push(0); STG.c.push(0); STG.f.push(0); } }
+    STG.t = V.map(function(v){ return v[1]; });
+    STG.kTo = []; STG.cTo = []; for(i = 0; i < n; i++){ STG.kTo.push(0); STG.cTo.push(0); }
+    STG.legs = []; STG.tot = 0;
+    if(P && P.legs.length){
+      var at = {}, mx = 0; V.forEach(function(v, q){ at[v[3]] = q; });
+      P.legs.forEach(function(q){ if(q.x > mx) mx = q.x; });
+      P.legs.forEach(function(q){ var j = at[q.id]; if(j == null) return; var s = q.x / mx;
+        STG.kTo[j] = 0.5 + 0.5 * s; STG.cTo[j] = s; STG.legs.push({ i: j, w: q.x }); STG.tot += q.x; });
+      STG.rush = 1;   /* a change sends a wave */
+    }
+    stgStart();
+  }
+  function stgStart(){ if(STG.on || !STG.cv) return; STG.on = true; STG.last = performance.now(); stgCols(); STG.raf = requestAnimationFrame(stgTick); }
+  function stgStop(){ STG.on = false; cancelAnimationFrame(STG.raf); STG.parts = []; }
+  function stgPick(){ var r = Math.random() * STG.tot; for(var j = 0; j < STG.legs.length; j++){ r -= STG.legs[j].w; if(r <= 0) return STG.legs[j].i; } return STG.legs[STG.legs.length - 1].i; }
+  function stgTick(now){
+    if(!STG.on) return;
+    if(!stgShown()){ stgStop(); return; }
+    var dt = Math.min(0.05, (now - STG.last) / 1000), i; STG.last = now;
+    if(now - STG.colAt > 1000) stgCols();
+    stgSize();
+    var ctx = STG.ctx || (STG.ctx = STG.cv.getContext("2d")), W = STG.w, H = STG.h, d = STG.d, n = STG.n, C = STG.col;
+    var ease = REDUCED ? 1 : Math.min(1, dt * 9);
+    for(i = 0; i < n; i++){ STG.k[i] += (STG.kTo[i] - STG.k[i]) * ease; STG.c[i] += (STG.cTo[i] - STG.c[i]) * ease; STG.f[i] *= Math.exp(-dt * 5); }
+    /* geometry: the bars fill the stage, heights on a square-root law of stake (the largest reaches the top) */
+    var padX = 10 * d, padT = 22 * d, padB = 12 * d, gap = n > 60 ? 1 * d : 2 * d;
+    var bw = Math.max(1, (W - 2 * padX - gap * (n - 1)) / n), base = H - padB, top = STG.t.length ? STG.t[0] : 1;
+    var bx = function(j){ return padX + j * (bw + gap); }, bh = function(j){ return Math.max(2 * d, (base - padT) * Math.sqrt(STG.t[j] / top)); };
+    ctx.clearRect(0, 0, W, H);
+    /* bars */
+    for(i = 0; i < n; i++){
+      var x = bx(i), h = bh(i), y = base - h, k = STG.k[i];
+      ctx.globalAlpha = 1; ctx.fillStyle = C.bar; ctx.fillRect(x, y, bw, h);
+      if(k > 0.01){
+        var g = ctx.createLinearGradient(0, y, 0, base); g.addColorStop(0, C.hot2); g.addColorStop(1, C.hot);
+        ctx.globalAlpha = Math.min(1, k); ctx.fillStyle = g; ctx.fillRect(x, y, bw, h);
+        /* the cap: what lands here, lit, its height by the share of the move */
+        var ch = (3 + 16 * STG.c[i]) * d;
+        ctx.globalAlpha = Math.min(1, k * (0.75 + 0.25 * Math.min(1, STG.f[i] + 0.2)));
+        ctx.shadowColor = C.hot; ctx.shadowBlur = (8 + 14 * STG.f[i]) * d; ctx.fillStyle = C.dot; ctx.fillRect(x, y - ch - 2 * d, bw, ch); ctx.shadowBlur = 0;
+      }
+    }
+    /* the pour: light falling into the validators it lands on, more of it where more goes, a wave on each change */
+    if(!REDUCED && STG.legs.length){
+      STG.acc += dt * (18 + 70 * STG.rush); STG.rush *= Math.exp(-dt * 2.2);
+      while(STG.acc >= 1 && STG.parts.length < 260){ STG.acc -= 1; var j = stgPick(), tx = bx(j) + bw / 2;
+        STG.parts.push({ j: j, x0: tx + (Math.random() - 0.5) * 90 * d, y0: -6 * d, t: 0, dur: 0.6 + Math.random() * 0.5, r: (1 + Math.random() * 1.4) * d }); }
+    } else STG.acc = 0;
+    ctx.globalCompositeOperation = "lighter"; ctx.fillStyle = C.dot;
+    for(i = STG.parts.length - 1; i >= 0; i--){
+      var p = STG.parts[i]; p.t += dt / p.dur;
+      if(p.t >= 1 || STG.kTo[p.j] < 0.01){ if(p.t >= 1) STG.f[p.j] = Math.min(1, STG.f[p.j] + 0.35); STG.parts.splice(i, 1); continue; }
+      var e2 = p.t * p.t, tx2 = bx(p.j) + bw / 2, ty = base - bh(p.j) - (3 + 16 * STG.c[p.j]) * d - 2 * d;
+      var px = p.x0 + (tx2 - p.x0) * (1 - Math.pow(1 - p.t, 2)), py = p.y0 + (ty - p.y0) * e2;
+      ctx.globalAlpha = 0.35 + 0.65 * Math.sin(Math.PI * Math.min(1, p.t * 1.1));
+      ctx.beginPath(); ctx.arc(px, py, p.r, 0, 6.2832); ctx.fill();
+    }
+    ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1;
+    STG.raf = requestAnimationFrame(stgTick);
+  }
+  if(window.ResizeObserver && E("spstage")) new ResizeObserver(function(){ if(STG.on) stgSize(); else if(stgShown()) stgStart(); }).observe(E("spstage"));
   function spState(){
     var u = spAmount(), bal = spBal(), mx = spMax(), over = u > mx, P = u > 0 && !over ? window.__pilotPlan(u) : null;
     SP.plan = P;
     var mv = E("spmaxv"); if(mv) mv.textContent = exact(mx, 2);
     var fld = E("spamt") && E("spamt").closest(".unfield"); if(fld) fld.classList.toggle("bad", !!over);
     var hint = E("sphint"); if(hint){ hint.className = "unhint" + (over ? " bad" : ""); hint.textContent = ""; }
-    var out = E("spout");
-    if(out){
-      if(P){ var yr = P.earned, more = (P.rate - P.big) * u;
-        out.className = "sp-out";
-        out.innerHTML = '<div class=r><b>' + pct(P.rate) + '</b><em>APR</em></div><div class=y><b>+' + fmt(yr) + ' ATONE a year</b>' +
-          (P.left >= 1e6 ? '<span>the shelf takes ' + fmt(P.staked) + ' ATONE today; the rest stays in your wallet</span>' :
-           more > 1e6 ? '<span><i>+' + fmt(more) + '</i> a year more than on the largest validator</span>' : '<span>where your stake earns most today</span>') + '</div>';
-      } else { out.className = "sp-out idle";
-        out.innerHTML = '<span>' + (!bal ? 'No ATONE available to stake yet' : over ? 'More than you can stake now' : 'Type an amount or slide: StakePilot finds where it earns most') + '</span>'; }
-    }
-    spLegs(P); spCode(P);
-    /* fees are PHOTON: short of it, a pinch minted from ATONE first */
-    var ph = E("sppho"), need = spPho() < SP_PHO;
-    if(ph) ph.innerHTML = need && bal > SP_KEEP ? '<div><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.5"/></svg>' +
-      '<span>Fees on AtomOne are paid in PHOTON. Mint a little first, from 0.1 ATONE.</span><button type=button id=sppm>Mint PHOTON</button></div>' : '';
-    var pm = E("sppm"); if(pm) pm.addEventListener("click", function(){ if(window.__mint) window.__mint(100000); });
+    spHero(P); spChips(P); stgSet(P);
+    /* fees are PHOTON: short of it, one button mints a pinch from ATONE first */
+    var ph = E("sppho"), need = spPho() < SP_PHO, phH = need && bal > SP_KEEP ? '<button type=button id=sppm><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.5"/></svg>Mint PHOTON for fees</button>' : '';
+    if(ph && ph.innerHTML !== phH){ ph.innerHTML = phH; var pm = E("sppm"); if(pm) pm.addEventListener("click", function(){ if(window.__mint) window.__mint(100000); }); }
     var ok = !!P && P.legs.length > 0 && !need;
     var sm = E("spsum"); if(sm) sm.innerHTML = P ? fmt(P.staked) + " ATONE<br>to " + P.legs.length + " validator" + (P.legs.length === 1 ? "" : "s") + " at " + pct(P.rate) : "";
     /* "Stake", as on the Stake card: the amount is in the summary above, and a label that grew with it moved Back */
@@ -3260,42 +3310,27 @@ rememberGridH();
     var sb = E("spbell"); if(sb) sb.disabled = !(P && P.legs.length);
     var st = E("spstep"); if(st){ st.textContent = ""; st.className = "txstep"; }
     feeSoon("sp", E("spfee"), ok ? spMsgs : null);
-    if(DOCK && DOCK.pop === sppop && window.__proBrk) window.__proBrk();
   }
   function spPrep(u0){
     var a = E("spamt"); if(a) a.value = u0 > 0 ? exact(u0) : "";
     SP.key = ""; var go = E("spsign"); if(go){ go.disabled = true; go.classList.remove("busy"); }
     spSyncRange(u0 > 0 ? u0 : 0);
   }
-  /* straight in (testnet's Stake buttons): the Stake screen opened on its Pilot view */
+  /* StakePilot, the stake flow outside Pro (operator, 2026-10-17): every Stake there opens it */
   window.__pilot = function(u0){
     if(!sppop || !window.__ADDR) return;
-    spPrep(u0); window.__openCard(sppop); spState(); window.__kbFocus(E("spamt"));
-  };
-  /* Ask Pilot: the Pilot view in place of the Stake card's */
-  window.__pilotView = function(u0){
-    if(!sppop || !window.__ADDR) return;
-    spPrep(u0); window.__viewSwap(stpop, sppop); spState(); window.__kbFocus(E("spamt"));
-  };
-  /* Pro's Outcome while StakePilot is docked: its move, and what the stake already there earns after it lands */
-  window.__spBrk = function(){
-    var P = SP.plan, u = P ? P.staked : 0, rows = P ? P.legs.map(function(q){ return { id: q.id, m: q.m, x: q.x, after: q.after }; }) : [];
-    var rest = 0, pos = window.__POS, sh = {}; rows.forEach(function(r){ sh[r.id] = r.x; });
-    if(u > 0 && pos) pos.rows.forEach(function(row){ var v = (window.__VALS() || []).filter(function(q){ return q[3] === row.id; })[0];
-      if(!v || row.inactive) return; rest += row.x * (window.__rateAfterNew(v[1], v[2], sh[row.id] || 0, u) - row.rate); });
-    return { rows: rows, rate: P ? P.rate : 0, rest: rest };
+    spPrep(u0); POP.open(sppop); spState(); window.__kbFocus(E("spamt"));
   };
   window.__spIds = function(){ return SP.plan ? SP.plan.legs.map(function(q){ return q.id; }) : []; };
   /* live figures re-plan the view wherever it is shown: a popup, or Pro's panes */
-  window.__pilotRedo = function(){ if(sppop && (sppop.classList.contains("on") || (DOCK && DOCK.pop === sppop))) spState(); };
+  window.__pilotRedo = function(){ if(sppop && sppop.classList.contains("on")) spState(); };
   /* a wallet gone: the Pilot view closes as the Stake card does */
   window.__spReset = function(){ if(sppop && window.__closeCard) window.__closeCard(sppop); };
   /* closed, it keeps no amount and no plan (the next open starts clean) */
-  if(sppop) sppop.__onclose = function(){ feeSoon("sp"); SP.plan = null; SP.key = ""; var a = E("spamt"); if(a) a.value = ""; spSyncRange(0); spState(); };
+  if(sppop) sppop.__onclose = function(){ feeSoon("sp"); SP.plan = null; SP.key = ""; var a = E("spamt"); if(a) a.value = ""; spSyncRange(0); spState(); stgStop(); };
   var spamtEl = E("spamt"); if(spamtEl) spamtEl.addEventListener("input", function(){ spSyncRange(spAmount()); spState(); });
   var sprng = E("sprng"); if(sprng) sprng.addEventListener("input", function(){ var u = spSlid(); E("spamt").value = u > 0 ? exact(u) : ""; spFill(); spState(); });
   var spmax = E("spmax"); if(spmax) spmax.addEventListener("click", function(){ if(!(spMax() > 0)) return; E("spamt").value = exact(spMax()); spSyncRange(spMax()); spState(); });
-  var spback = E("spback"); if(spback) spback.addEventListener("click", function(){ var u = spAmount(); if(window.__stakeView) window.__stakeView(u); });
   var spsign = E("spsign");
   if(spsign) spsign.addEventListener("click", function(){
     var msgs = spMsgs(); if(!msgs.length || !window.__TX || !window.__WALLET) return;

@@ -2,7 +2,7 @@
 // one wallet kind at a time, every signing path through the page's own buttons; each transaction is then read back
 // from the chain (code, sign mode, messages) and the state it should have changed is checked.
 //   node paths.mjs <wallet-name> <keplr|ledger|adena|adena-ledger> [path,path,...]
-// Paths: stakepilot stake stake-askpilot mint claim redelegate unstake autopilot-on autopilot-off restake-on restake-off
+// Paths: stakepilot stake mint claim redelegate unstake autopilot-on autopilot-off restake-on restake-off
 // governor-follow governor-unfollow vote. Needs: ui.mjs running with the wallet loaded (a throwaway words file from
 // `e2e.mjs keyfile`, funded with `e2e.mjs send`), ~10 ATONE and ~1.5 PHOTON per wallet, and for "vote" a proposal in
 // voting (`e2e.mjs propose`). Claim needs rewards the page has read: run it a minute after staking.
@@ -101,19 +101,10 @@ const bal = async (a, dn) => +(((await chain("/cosmos/bank/v1beta1/balances/" + 
     return { staked: tot / 1e6, check: tot === 2e6 && s.msgs.every(m => m === "MsgDelegate") ? "ok" : "FAILED total " + tot };
   });
 
-  // 2 Stake, picked by hand: one validator ticked
+  // 2 Stake, picked by hand (Pro's manual card): one validator ticked
   await run("stake", `E.click('#stbtn'); await E.wait(function(){ return E.vis('#stamt'); }, 15000, 'Stake card');
     E.type('stamt', '1'); await E.sleep(300); E.click('#stlist tbody input[data-id]'); await E.wait(function(){ var b = document.getElementById('stsign'); return b && !b.disabled; }, 30000, 'Stake enabled');
     E.click('#stsign')`, async (d, s) => ({ check: s.msgs.length === 1 && s.msgs[0] === "MsgDelegate" && d.tx.body.messages[0].amount.amount === "1000000" ? "ok" : "FAILED" }));
-
-  // 3 Stake card -> Ask Pilot -> StakePilot (one Pilot since 2026-10-17): the typed amount rides along, StakePilot signs
-  await run("stake-askpilot", `E.click('#stbtn'); await E.wait(function(){ return E.vis('#stamt'); }, 15000, 'Stake card');
-    E.type('stamt', '2'); E.click('#stask'); await E.wait(function(){ return E.vis('#spamt') && document.getElementById('spamt').value; }, 15000, 'StakePilot with the amount');
-    await E.wait(function(){ var b = document.getElementById('spsign'); return b && !b.disabled; }, 30000, 'StakePilot sign enabled');
-    E.click('#spsign')`, async (d, s) => {
-    const tot = d.tx.body.messages.reduce((t, m) => t + +m.amount.amount, 0);
-    return { legs: s.msgs.length, check: tot === 2e6 && s.msgs.every(m => m === "MsgDelegate") ? "ok" : "FAILED total " + tot };
-  });
 
   // 4 Mint PHOTON (fee in ATONE)
   const ph0 = await bal(A, "uphoton");

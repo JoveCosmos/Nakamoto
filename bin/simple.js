@@ -122,12 +122,11 @@
   /* the testnet page: what only our index knows (history, proposers, jailings, the
      30/90-day and lifetime records) is not known there - it reads N/A, never a zero */
   function TN(){ return ((DD().net || {}).net) === "testnet"; }
-  /* Buy and StakePilot are off on mainnet for now (operator, 2026-10-15: "hide the buy and stakepilot from mainnet"):
-     StakePilot runs on testnet, Buy (the Osmosis pool) only ever runs on mainnet, so it shows nowhere; Stake and
-     Stake more open the manual stake card on mainnet. Set either flag to bring it back */
-  var BUY_MAIN = false, PILOT_MAIN = false;
+  /* Buy is off on mainnet for now (operator, 2026-10-15): Buy (the Osmosis pool) only ever runs on mainnet, so it shows
+     nowhere; set the flag to bring it back. StakePilot is the stake flow on both networks since 2026-10-17 (operator:
+     "stake pilot should be default ... manual already in pro"): every Stake outside Pro opens it, Pro keeps the manual card */
+  var BUY_MAIN = false;
   function BUY(){ return BUY_MAIN && !TN(); }
-  function PILOT(){ return PILOT_MAIN || TN(); }
   var NA = "N/A", NAMSG = '<div class=sv-upwait>N/A on testnet</div>';
   function tag(cls, t, title){ return '<span class="sv-tag ' + cls + '"' + (title ? ' title="' + esc(title) + '"' : '') + '>' + t + '</span>'; }
   /* a span of the set's record: centred, and the set itself as a strip of cells under the figure,
@@ -408,8 +407,6 @@
           '<li style="--sc:' + heat(S.mid).fill + '"><b>See what it earns</b><span>a day, a week, a year, in ATONE</span></li>' +
           '<li style="--sc:#2ee06a"><b>Redelegate</b><span>to the best earning place, in single signature</span></li>' +
         '</ol>';
-    } else if(!pos.rows.length && !PILOT()){
-      h = '<div class=sv-none><h3>No stake on AtomOne</h3><button class="sv-btn go" type=button data-act=stake>Stake ATONE</button></div>';
     } else if(!pos.rows.length){
       /* the way in for a wallet with nothing staked (operator, 2026-10-15: "the app is missing the new user base"): three
          steps, the one to take now lit, and one door under them; on testnet the faucet stands in for buying */
@@ -2452,7 +2449,7 @@
     if(act === "restakesw"){ rsOpen(); return; }
     if(act === "wtalerts"){ if(t.getAttribute("aria-disabled") !== "true") wtOpen(); return; }
     /* Stake goes to StakePilot (operator, 2026-10-15); its "choose validators myself" link opens the manual list */
-    if(act === "stake"){ if(PILOT() && window.__pilot && window.__ADDR){ window.__pilot(); return; } var sb = E("stbtn"); if(sb) sb.click(); return; }
+    if(act === "stake"){ if(window.__pilot && window.__ADDR){ window.__pilot(); return; } var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "mint"){ if(window.__mint) window.__mint(); return; }
     if(act === "buy"){ if(BUY() && window.__buy) window.__buy(); return; }
     if(act === "activity"){ actOpen(); return; }

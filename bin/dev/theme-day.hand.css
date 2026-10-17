@@ -510,15 +510,19 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #dmy thead th.ck input:checked::after{border-color:var(--surface)}
   html[data-theme=light]:not([data-mono]) #dmy tbody tr.on td{background:var(--accent-soft)}
 
-  /* StakePilot (2026-10-15): the set's bars in the ivory line colour, the chosen ones and the slider in the accent */
-  html[data-theme=light]:not([data-mono]) .sp-bc i{background:#DCD7CB}
-  html[data-theme=light]:not([data-mono]) .sp-bc i.on{background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sp-rng::-webkit-slider-runnable-track{background:linear-gradient(90deg,var(--accent) var(--sp-f,0%),#DCD7CB var(--sp-f,0%))}
-  html[data-theme=light]:not([data-mono]) .sp-rng::-moz-range-track{background:#DCD7CB}
-  html[data-theme=light]:not([data-mono]) .sp-rng::-moz-range-progress{background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sp-rng::-webkit-slider-thumb{background:var(--accent);border-color:var(--surface);box-shadow:0 0 0 1px var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sp-rng::-moz-range-thumb{background:var(--accent);border-color:var(--surface);box-shadow:0 0 0 1px var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sp-out .r b,html[data-theme=light]:not([data-mono]) .sp-out .y span i,html[data-theme=light]:not([data-mono]) .sp-own button,html[data-theme=light]:not([data-mono]) .spcard .txsum{color:var(--accent)}
+  /* the Pilot view by day (2026-10-17): ink figures, the slider in the accent, the stage on paper with the accent pour */
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng::-webkit-slider-runnable-track{background:linear-gradient(90deg,var(--accent) 0,#4B3F8F var(--sp-f,0%),#E3DED3 var(--sp-f,0%));box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng::-moz-range-track{background:#E3DED3}
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng::-moz-range-progress{background:linear-gradient(90deg,var(--accent),#4B3F8F)}
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng::-webkit-slider-thumb{background:var(--surface);box-shadow:0 0 0 2px var(--accent),0 4px 14px rgba(14,94,82,.35)}
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng::-moz-range-thumb{background:var(--surface);box-shadow:0 0 0 2px var(--accent),0 4px 14px rgba(14,94,82,.35)}
+  html[data-theme=light]:not([data-mono]) .sp-hero>div{background:var(--surface);border-color:var(--line)}
+  html[data-theme=light]:not([data-mono]) .sp-hero b{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sp-hero>.y b{color:#4B3F8F}
+  html[data-theme=light]:not([data-mono]) .sp-hero.idle b{color:var(--faint)}
+  html[data-theme=light]:not([data-mono]) .sp-stage{--sp-bar:#E0DBCF;--sp-hot:#0E5E52;--sp-hot2:#4B3F8F;--sp-dot:#0E5E52;background:linear-gradient(180deg,#FFFDF8,#F8F6F0);border-color:var(--line)}
+  html[data-theme=light]:not([data-mono]) .sp-chip{background:var(--surface);border-color:var(--line);color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .sp-chip b,html[data-theme=light]:not([data-mono]) .spcard .txsum{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .by-out em i,html[data-theme=light]:not([data-mono]) .by-more button,html[data-theme=light]:not([data-mono]) .by-more a,html[data-theme=light]:not([data-mono]) .bycard .txsum,html[data-theme=light]:not([data-mono]) .by-out.done b{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .by-path svg{stroke:var(--accent)}
   html[data-theme=light]:not([data-mono]) .by-st i{background:var(--surface)}
@@ -528,8 +532,3 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .by-st.ok:not(:last-child)::before{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .by-st span a{color:var(--accent)}
 
-  /* Ask Pilot by day (operator, 2026-10-17: Stake's own button in another colour): Autopilot's violet, inked for paper;
-     the shadow turned night's lavender into the line colour, which read as a dead button */
-  html[data-theme=light]:not([data-mono]) .txcard .wk-btn.wk-go.st-ask:not(#z){background:#4B3F8F;border-color:#4B3F8F;color:#FFFFFF;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .txcard .wk-btn.wk-go.st-ask:hover:not(#z){background:#3B3172;border-color:#3B3172;filter:none}
-  html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go.st-ask:not(#z):not(#y):not(#x){border-color:#4B3F8F;background:#4B3F8F;color:#FFFFFF}

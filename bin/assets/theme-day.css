@@ -433,23 +433,26 @@
   html[data-theme=light]:not([data-mono]) .stcard .txlock{border-color:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) #p-dele .stcard .txlock svg,html[data-theme=light]:not([data-mono]) .stcard .txlock svg{fill:none}
   html[data-theme=light]:not([data-mono]) .pop .card.spcard::before{background:transparent}
-  html[data-theme=light]:not([data-mono]) .sp-rng{background:none}
-  html[data-theme=light]:not([data-mono]) .sp-rng::-webkit-slider-runnable-track{background:var(--wcyan)}
-  html[data-theme=light]:not([data-mono]) .sp-rng::-moz-range-track{background:var(--line)}
-  html[data-theme=light]:not([data-mono]) .sp-rng::-webkit-slider-thumb{border-color:var(--surface);box-shadow:0 0 0 1px var(--wcyan)}
-  html[data-theme=light]:not([data-mono]) .sp-rng::-moz-range-thumb{border-color:var(--surface);box-shadow:0 0 0 1px var(--wcyan)}
-  html[data-theme=light]:not([data-mono]) .sp-rng:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 1px var(--wcyan),0 0 0 5px var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .sp-out{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .sp-bc i{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) .sp-pho div{border-color:var(--amber-bar)}
-  html[data-theme=light]:not([data-mono]) .sp-pho svg{fill:none}
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng{background:none}
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng::-webkit-slider-runnable-track{background:var(--accent);box-shadow:inset 0 0 0 1px var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng::-moz-range-track{background:var(--line-soft)}
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng::-moz-range-progress{background:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng::-webkit-slider-thumb{background:transparent;box-shadow:0 0 0 4px var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng::-moz-range-thumb{background:transparent;box-shadow:0 0 0 4px var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sp-hero>div{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sp-hero>.y{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .sp-hero b{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sp-hero>.y b{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sp-stage{--sp-bar:var(--ink);--sp-hot:var(--accent);--sp-hot2:var(--accent);--sp-dot:var(--accent);background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sp-chip{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .sp-chip b{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sp-chip.left{border-color:var(--amber-bar)}
   html[data-theme=light]:not([data-mono]) .sp-pho button{background:transparent}
   html[data-theme=light]:not([data-mono]) .sp-pho button:hover{background:var(--warn-bg)}
+  html[data-theme=light]:not([data-mono]) .sp-pho svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .pop .card.bycard::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .by-tok option{background:var(--surface-2);color:var(--ink)}
-  html[data-theme=light]:not([data-mono]) .st-ask svg:not(#z){fill:none;stroke:currentColor}
-  html[data-theme=light]:not([data-mono]) .txcard .wk-btn.wk-go.st-ask{background:var(--line-strong);border-color:var(--accent);color:#FFFFFF;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .st-ask:focus-visible{outline-color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .wk-txh .txsum .kps-w:not(#z){color:inherit}
   html[data-theme=light]:not([data-mono]) .dd-trig.by-dd{background:transparent}
   html[data-theme=light]:not([data-mono]) .by-out{background:var(--surface-2)}
@@ -487,8 +490,8 @@
   html[data-theme=light]:not([data-mono]) .stcard .stlist td.ck input:checked::after{border-color:var(--surface)}
   html[data-theme=light]:not([data-mono]) .stcard .unfield:focus-within{box-shadow:0 0 0 3px var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .stcard .txlock{border-color:var(--accent-soft);background:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) .stcard .wk-btn.wk-go{background:var(--accent);border-color:var(--accent);color:#FFFFFF;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .stcard .wk-btn.wk-go:disabled{background:var(--surface-2);border-color:var(--line);color:var(--faint);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) :is(.stcard,.spcard) .wk-btn.wk-go{background:var(--accent);border-color:var(--accent);color:#FFFFFF;box-shadow:none}
+  html[data-theme=light]:not([data-mono]) :is(.stcard,.spcard) .wk-btn.wk-go:disabled{background:var(--surface-2);border-color:var(--line);color:var(--faint);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #p-dele #wk-plan>.wk-ph .wk-lockn svg{fill:none}
   html[data-theme=light]:not([data-mono]) #wk-mine::after,html[data-theme=light]:not([data-mono]) #wk-plan::after,html[data-theme=light]:not([data-mono]) #wk-mv::after{background:transparent}
   html[data-theme=light]:not([data-mono]) #wk-mine .wk-bh h3::before{box-shadow:none}
@@ -1168,7 +1171,6 @@
     html[data-theme=light]:not([data-mono]) #you .wk-tbl2 thead:not(#z),html[data-theme=light]:not([data-mono]) #you .wk-tbl2 thead tr:not(#z){background:none;box-shadow:none}
     html[data-theme=light]:not([data-mono]) #one .pro-dock:not(#z){background:none;box-shadow:none}
     html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go:disabled:not(#z){background:transparent}
-    html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go.st-ask:not(#z):not(#y){border-color:var(--accent);background:var(--accent);color:#FFFFFF}
     html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go:not(#z):not(#y),html[data-theme=light]:not([data-mono]) #one #p-dele #wk-mv #dgo:not(#z):not(#y){box-shadow:none}
     html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go:disabled:not(#z):not(#y),html[data-theme=light]:not([data-mono]) #one #p-dele #wk-mv #dgo:disabled:not(#z):not(#y){background:transparent}
   }
@@ -1743,15 +1745,19 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #dmy thead th.ck input:checked::after{border-color:var(--surface)}
   html[data-theme=light]:not([data-mono]) #dmy tbody tr.on td{background:var(--accent-soft)}
 
-  /* StakePilot (2026-10-15): the set's bars in the ivory line colour, the chosen ones and the slider in the accent */
-  html[data-theme=light]:not([data-mono]) .sp-bc i{background:#DCD7CB}
-  html[data-theme=light]:not([data-mono]) .sp-bc i.on{background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sp-rng::-webkit-slider-runnable-track{background:linear-gradient(90deg,var(--accent) var(--sp-f,0%),#DCD7CB var(--sp-f,0%))}
-  html[data-theme=light]:not([data-mono]) .sp-rng::-moz-range-track{background:#DCD7CB}
-  html[data-theme=light]:not([data-mono]) .sp-rng::-moz-range-progress{background:var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sp-rng::-webkit-slider-thumb{background:var(--accent);border-color:var(--surface);box-shadow:0 0 0 1px var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sp-rng::-moz-range-thumb{background:var(--accent);border-color:var(--surface);box-shadow:0 0 0 1px var(--accent)}
-  html[data-theme=light]:not([data-mono]) .sp-out .r b,html[data-theme=light]:not([data-mono]) .sp-out .y span i,html[data-theme=light]:not([data-mono]) .sp-own button,html[data-theme=light]:not([data-mono]) .spcard .txsum{color:var(--accent)}
+  /* the Pilot view by day (2026-10-17): ink figures, the slider in the accent, the stage on paper with the accent pour */
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng::-webkit-slider-runnable-track{background:linear-gradient(90deg,var(--accent) 0,#4B3F8F var(--sp-f,0%),#E3DED3 var(--sp-f,0%));box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng::-moz-range-track{background:#E3DED3}
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng::-moz-range-progress{background:linear-gradient(90deg,var(--accent),#4B3F8F)}
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng::-webkit-slider-thumb{background:var(--surface);box-shadow:0 0 0 2px var(--accent),0 4px 14px rgba(14,94,82,.35)}
+  html[data-theme=light]:not([data-mono]) .sp-rngw>.sp-rng::-moz-range-thumb{background:var(--surface);box-shadow:0 0 0 2px var(--accent),0 4px 14px rgba(14,94,82,.35)}
+  html[data-theme=light]:not([data-mono]) .sp-hero>div{background:var(--surface);border-color:var(--line)}
+  html[data-theme=light]:not([data-mono]) .sp-hero b{color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .sp-hero>.y b{color:#4B3F8F}
+  html[data-theme=light]:not([data-mono]) .sp-hero.idle b{color:var(--faint)}
+  html[data-theme=light]:not([data-mono]) .sp-stage{--sp-bar:#E0DBCF;--sp-hot:#0E5E52;--sp-hot2:#4B3F8F;--sp-dot:#0E5E52;background:linear-gradient(180deg,#FFFDF8,#F8F6F0);border-color:var(--line)}
+  html[data-theme=light]:not([data-mono]) .sp-chip{background:var(--surface);border-color:var(--line);color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) .sp-chip b,html[data-theme=light]:not([data-mono]) .spcard .txsum{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .by-out em i,html[data-theme=light]:not([data-mono]) .by-more button,html[data-theme=light]:not([data-mono]) .by-more a,html[data-theme=light]:not([data-mono]) .bycard .txsum,html[data-theme=light]:not([data-mono]) .by-out.done b{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .by-path svg{stroke:var(--accent)}
   html[data-theme=light]:not([data-mono]) .by-st i{background:var(--surface)}
@@ -1761,9 +1767,4 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .by-st.ok:not(:last-child)::before{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .by-st span a{color:var(--accent)}
 
-  /* Ask Pilot by day (operator, 2026-10-17: Stake's own button in another colour): Autopilot's violet, inked for paper;
-     the shadow turned night's lavender into the line colour, which read as a dead button */
-  html[data-theme=light]:not([data-mono]) .txcard .wk-btn.wk-go.st-ask:not(#z){background:#4B3F8F;border-color:#4B3F8F;color:#FFFFFF;box-shadow:none}
-  html[data-theme=light]:not([data-mono]) .txcard .wk-btn.wk-go.st-ask:hover:not(#z){background:#3B3172;border-color:#3B3172;filter:none}
-  html[data-theme=light]:not([data-mono]) #one #proout .txbtns .wk-btn.wk-go.st-ask:not(#z):not(#y):not(#x){border-color:#4B3F8F;background:#4B3F8F;color:#FFFFFF}
 
