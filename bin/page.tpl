@@ -2761,6 +2761,9 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 @media (max-width:480px){.bycard .wk-max b{display:none}.by-tok{padding-right:18px}}
 .by-tok{flex:0 0 auto;margin:0 6px 0 2px;padding:4px 20px 4px 8px;border:1px solid var(--wbd2);border-radius:5px;color:var(--wt);font-family:var(--wmono);font-size:10px;letter-spacing:.08em;cursor:pointer;-webkit-appearance:none;appearance:none;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238f8db4' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 7px center/8px 5px}
 .by-tok option{background:#0f0f1c;color:#e6e4f0}
+/* Buy's Pay with, as its select was */
+.dd-trig.by-dd{flex:0 0 auto;align-self:center;gap:6px;margin:0 6px 0 2px;padding:4px 8px;border:1px solid var(--wbd2);border-radius:5px;background:transparent;color:var(--wt);font-family:var(--wmono);font-size:10px;line-height:1.2;letter-spacing:.08em}
+.dd-trig.by-dd>svg[viewBox]:not(#z){width:10px;height:10px}
 .by-out{margin:12px 20px 0;padding:0 16px;height:84px;box-sizing:border-box;border:1px solid var(--wbd);border-radius:8px;display:flex;flex-direction:column;justify-content:center;gap:5px;background:linear-gradient(180deg,#10101f,#0b0b18)}
 .by-out em{font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf);display:flex;justify-content:space-between;gap:10px}
 .by-out em i{font-style:normal;letter-spacing:.06em;text-transform:none;color:var(--wcyan);white-space:nowrap}
@@ -5224,6 +5227,33 @@ scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent}
 .cn-in ul{margin:8px 0;padding-left:22px}.cn-in li{margin:4px 0}.cn-in li::marker{color:var(--wf)}
 .cn-in ul.cn-terms{list-style:none;padding-left:0}.cn-in ul.cn-terms>li{padding:8px 0;border-bottom:1px solid var(--wbd);margin:0}
 .cn-sel{display:none}
+/* ── the app's own dropdown (window.__dd in app.js): the select stays in the page, hidden, as the value's home; its
+   button keeps the select's look and the list opens in the page as the app's menus do (operator, 2026-10-17) ── */
+.dd-native{display:none!important}
+.dd-trig{display:flex;align-items:center;gap:8px;min-width:0;text-align:left;cursor:pointer;font:inherit}
+.dd-trig .dd-v{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dd-trig>svg[viewBox]:not(#z){display:block;flex:0 0 auto;width:12px;height:12px;margin:0;max-height:none;fill:none;stroke:var(--wf);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s ease}
+.dd-trig.open>svg[viewBox]:not(#z){transform:rotate(180deg)}
+.dd-trig:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offset:2px}
+.dd-trig:disabled{cursor:not-allowed;opacity:.55}
+/* the accent is the section's teal where the button has one, the app's teal where it has not (the Buy card) */
+.dd-list{--dd-a:var(--sv-teal,#2bc8bd);position:fixed;z-index:300;overflow-y:auto;overscroll-behavior:contain;padding:5px;border-radius:12px;background:linear-gradient(var(--wsolid),var(--wsolid)),#0b0b16;font-family:var(--wsans);
+  border:1px solid color-mix(in srgb,var(--dd-a) 30%,transparent);box-shadow:0 18px 44px -18px rgba(0,0,0,.85),0 0 24px -14px var(--dd-a)}
+.dd-o{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:0;border-radius:8px;background:transparent;color:var(--wt);
+  font:inherit;font-size:13px;font-weight:500;line-height:1.3;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.dd-o span{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dd-o svg{display:none;flex:0 0 auto;width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.dd-o.hi{background:color-mix(in srgb,var(--dd-a) 12%,transparent)}
+.dd-o[aria-selected=true]{color:var(--dd-a);font-weight:700}
+.dd-o[aria-selected=true] svg{display:block}
+/* the Constitution's parts, indented as its contents */
+.dd-o.dd-l2{font-weight:700}
+.dd-o.dd-l3{padding-left:22px}
+.dd-o.dd-l4{padding-left:34px;font-size:12px;color:var(--wf)}
+.dd-o.dd-l4[aria-selected=true]{color:var(--dd-a)}
+/* the Constitution's part picker, phones and narrow windows, as its select was */
+.cn-dd{display:none}
+@media(max-width:900px){.dd-trig.cn-dd{display:flex;width:100%;margin:0 0 14px;height:34px;padding:0 10px;border-radius:8px;border:1px solid var(--wbd2);background:var(--wi);color:var(--wt);font-size:13px}}
 @media(max-width:900px){.cn-wrap{grid-template-columns:minmax(0,1fr)}.cn-toc{display:none}
 .cn-sel{display:block;width:100%;margin:0 0 14px;height:34px;padding:0 10px;border-radius:8px;border:1px solid var(--wbd2);background:var(--wi);color:var(--wt);font:inherit;font-size:13px}
 .cn-in{padding:18px 16px 48px;font-size:14px}}

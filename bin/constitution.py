@@ -97,7 +97,8 @@ def fragment(md, meta):
         # the class names are written out whole, so a scan for used classes (dev/csslean.py) finds them
         cls = {2: "cn-l2", 3: "cn-l3", 4: "cn-l4"}[lvl]
         nav.append('<a class="%s" href="#%s" data-cn="%s">%s</a>' % (cls, sid, sid, html.escape(short)))
-    opts = "".join('<option value="%s">%s%s</option>' % (sid, " " * (lvl - 2), html.escape(text)) for lvl, sid, text in toc)
+    # each part keeps its level, which the app's list indents as the contents do
+    opts = "".join('<option value="%s" data-lvl="%d">%s</option>' % (sid, lvl, html.escape(re.sub(r"^(Article \d+|Section [\w.]+):\s*", lambda k: k.group(1) + ": ", text))) for lvl, sid, text in toc)
     src = ('The official text, <a href="%s" target=_blank rel="noopener noreferrer">%s</a>, commit <b>%s</b> of %s. Nothing here is edited.'
            % (html.escape(meta["url"]), html.escape(meta["repo"]), html.escape(meta["commit"][:7]), html.escape(meta["date"])))
     return ('<nav class=cn-toc aria-label="Contents"><em>Contents</em>' + "".join(nav) + '</nav>'

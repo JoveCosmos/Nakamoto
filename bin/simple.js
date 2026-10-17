@@ -1684,6 +1684,7 @@
       spy(); }
     links.forEach(function(a){ a.addEventListener("click", function(ev){ ev.preventDefault(); go(a.dataset.cn); }); });
     if(sel) sel.addEventListener("change", function(){ go(sel.value); });
+    if(sel && window.__dd) window.__dd(sel, "cn-dd");      /* the parts open in the app's own list, indented as the contents */
     /* the contents mark the part being read: the last heading above the top third of the column */
     var tick = false;
     function spy(){ tick = false; var cur = 0, top = inner() ? art.getBoundingClientRect().top : 0, line = top + (inner() ? art.clientHeight : innerHeight) / 3;

@@ -87,6 +87,75 @@ var POP = (function(){
 })();
 window.__POP = POP;
 
+/* ── one themed dropdown for the app (operator, 2026-10-17: "upgrade, the gata app has them"): a native <select>'s open
+   list is the system's own and CSS cannot reach it, so it opened as a plain grey list in every theme. The select stays
+   in the page, hidden, as the home of the value: a button stands in for it and the list opens in the page, styled as
+   the app's menus. Picking sets the select's value and fires its change event, and code that sets the value moves the
+   button too, so callers keep their code. Keyboard as a select: Enter, Space or an arrow opens; arrows, Home and End
+   move; Enter or Space picks; Escape or Tab closes. The list follows its button on scroll and opens upward only when
+   there is more room above. The same pattern as the GATA app's Dropdown. */
+window.__dd = function(sel, cls){
+  if(!sel || sel.__dd) return null; sel.__dd = true;
+  var x = function(v){ return String(v).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  var b = document.createElement("button"); b.type = "button"; b.className = "dd-trig" + (cls ? " " + cls : "");
+  b.setAttribute("aria-haspopup", "listbox"); b.setAttribute("aria-expanded", "false");
+  if(sel.getAttribute("aria-label")) b.setAttribute("aria-label", sel.getAttribute("aria-label"));
+  b.innerHTML = '<span class=dd-v></span><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 9l6 6 6-6"/></svg>';
+  sel.classList.add("dd-native"); sel.tabIndex = -1; sel.setAttribute("aria-hidden", "true");
+  sel.parentNode.insertBefore(b, sel.nextSibling);
+  var list = null, hi = -1, P = HTMLSelectElement.prototype;
+  var dv = Object.getOwnPropertyDescriptor(P, "value"), di = Object.getOwnPropertyDescriptor(P, "selectedIndex");
+  function sync(){ var o = sel.options[sel.selectedIndex]; b.querySelector(".dd-v").textContent = o ? o.text.trim() : "-"; b.disabled = sel.disabled; if(sel.disabled) close(); }
+  function paint(){ if(!list) return; var v = sel.value;
+    [].forEach.call(list.children, function(o, i){ o.setAttribute("aria-selected", o.dataset.v === v ? "true" : "false"); o.classList.toggle("hi", i === hi); }); }
+  /* code that sets the value (the Constitution follows the reading) moves the button with it */
+  Object.defineProperty(sel, "value", { configurable: true, get: function(){ return dv.get.call(this); }, set: function(v){ dv.set.call(this, v); sync(); paint(); } });
+  Object.defineProperty(sel, "selectedIndex", { configurable: true, get: function(){ return di.get.call(this); }, set: function(v){ di.set.call(this, v); sync(); paint(); } });
+  new MutationObserver(sync).observe(sel, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["disabled"] });
+  /* the list lives on <body>, outside the themed sections, so it takes their colours from its button */
+  var TOK = ["--wsolid", "--wbd", "--wbd2", "--wt", "--ws", "--wf", "--wh", "--wsans", "--wmono", "--sv-teal"];
+  function place(){ if(!list) return;
+    var r = b.getBoundingClientRect(), below = innerHeight - r.bottom - 12, above = r.top - 12, cap = 320;
+    list.style.minWidth = Math.min(r.width, innerWidth - 16) + "px"; list.style.maxWidth = (innerWidth - 16) + "px";   /* long names end in an ellipsis, never off screen */
+    list.style.left = Math.max(8, Math.min(r.left, innerWidth - 8 - list.offsetWidth)) + "px";
+    if(below < 140 && above > below){ var h = Math.min(cap, above); list.style.maxHeight = h + "px"; list.style.top = Math.max(8, r.top - 5 - Math.min(h, list.scrollHeight)) + "px"; }
+    else { list.style.maxHeight = Math.min(cap, Math.max(below, 140)) + "px"; list.style.top = (r.bottom + 5) + "px"; } }
+  function keep(){ var o = list && list.children[hi]; if(!o) return;
+    if(o.offsetTop < list.scrollTop) list.scrollTop = o.offsetTop - 5;
+    else if(o.offsetTop + o.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = o.offsetTop + o.offsetHeight - list.clientHeight + 5; }
+  function open(){ if(list || sel.disabled || !sel.options.length) return;
+    list = document.createElement("div"); list.className = "dd-list"; list.setAttribute("role", "listbox");
+    var cs = getComputedStyle(b); TOK.forEach(function(n){ var v = cs.getPropertyValue(n); if(v) list.style.setProperty(n, v.trim()); });
+    var CK = '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+    list.innerHTML = [].map.call(sel.options, function(o){ var l = o.getAttribute("data-lvl");
+      return '<button type=button role=option tabindex=-1 class="dd-o' + ({ "2": " dd-l2", "3": " dd-l3", "4": " dd-l4" }[l] || "") + '" data-v="' + x(o.value) + '"><span>' + x(o.text.trim()) + '</span>' + CK + '</button>'; }).join("");
+    document.body.appendChild(list); hi = sel.selectedIndex; paint(); place();
+    var cur = list.children[hi]; if(cur) list.scrollTop = cur.offsetTop - (list.clientHeight - cur.offsetHeight) / 2;
+    b.setAttribute("aria-expanded", "true"); b.classList.add("open");
+    list.addEventListener("click", function(ev){ var o = ev.target.closest(".dd-o"); if(o) pick(o.dataset.v); });
+    list.addEventListener("mousemove", function(ev){ var o = ev.target.closest(".dd-o"), i = o ? [].indexOf.call(list.children, o) : -1; if(i >= 0 && i !== hi){ hi = i; paint(); } });
+    document.addEventListener("pointerdown", outside, true); document.addEventListener("keydown", key, true);
+    window.addEventListener("scroll", follow, true); window.addEventListener("resize", place); }
+  function close(){ if(!list) return; list.remove(); list = null; b.setAttribute("aria-expanded", "false"); b.classList.remove("open");
+    document.removeEventListener("pointerdown", outside, true); document.removeEventListener("keydown", key, true);
+    window.removeEventListener("scroll", follow, true); window.removeEventListener("resize", place); }
+  function follow(ev){ if(list && ev.target !== list) place(); }      /* the page moved: the list moves with its button */
+  function pick(v){ var ch = v !== sel.value; close(); b.focus(); if(ch){ dv.set.call(sel, v); sync(); sel.dispatchEvent(new Event("change", { bubbles: true })); } }
+  function outside(ev){ if(b.contains(ev.target) || (list && list.contains(ev.target))) return; close(); }
+  function key(ev){ if(!list) return; var n = sel.options.length, k = ev.key;
+    if(k === "Tab"){ close(); return; }
+    if(["Escape", "ArrowDown", "ArrowUp", "Home", "End", "Enter", " "].indexOf(k) < 0) return;
+    ev.preventDefault(); ev.stopPropagation();          /* the popup under the list must not see these */
+    if(k === "Escape"){ close(); b.focus(); return; }
+    if(k === "Enter" || k === " "){ var o = list.children[hi]; if(o) pick(o.dataset.v); else close(); return; }
+    hi = k === "Home" ? 0 : k === "End" ? n - 1 : Math.max(0, Math.min(n - 1, (hi < 0 ? sel.selectedIndex : hi) + (k === "ArrowDown" ? 1 : -1)));
+    paint(); keep(); }
+  b.addEventListener("click", function(){ if(list) close(); else open(); });
+  b.addEventListener("keydown", function(ev){ if(!list && ["Enter", " ", "ArrowDown", "ArrowUp"].indexOf(ev.key) >= 0){ ev.preventDefault(); open(); } });
+  sync();
+  return b;
+};
+
 /* Pro on a wide screen (operator, 2026-09-30): Stake, Unstake and Claim open no card - the card's list loads in the
    main pane where Redelegate's is, and its figures and button in Outcome. The very same elements are moved there
    and put back, so every handler, state and fee estimate stays the card's own. The phone keeps the cards. */
@@ -3390,6 +3459,7 @@ rememberGridH();
   if(bypop) bypop.__onclose = function(){ clearTimeout(BY.t); BY.qn++; };
   var byamtEl = E("byamt"); if(byamtEl) byamtEl.addEventListener("input", byQuoteSoon);
   var bytokEl = E("bytok"); if(bytokEl) bytokEl.addEventListener("change", function(){ E("byamt").value = ""; BY.q = null; byState(); });
+  if(bytokEl) window.__dd(bytokEl, "by-dd");                 /* Pay with opens the app's own list */
   var bymax = E("bymax"); if(bymax) bymax.addEventListener("click", function(){ if(!(byMax() > 0)) return; E("byamt").value = exact(byMax()); byQuoteSoon(); });
   var bysign = E("bysign"); if(bysign) bysign.addEventListener("click", function(){
     var T = BY.trk;

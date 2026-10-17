@@ -449,6 +449,7 @@
   html[data-theme=light]:not([data-mono]) .sp-own svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .pop .card.bycard::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .by-tok option{background:var(--surface-2);color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .dd-trig.by-dd{background:transparent}
   html[data-theme=light]:not([data-mono]) .by-out{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .by-path svg{fill:none}
   html[data-theme=light]:not([data-mono]) .by-trk{background:var(--surface-2)}
@@ -946,6 +947,11 @@
   html[data-theme=light]:not([data-mono]) #sv-cons .cn-hd a{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) .cn-toc a{text-decoration:none;border-left-color:transparent}
   html[data-theme=light]:not([data-mono]) .cn-toc a:hover{background:var(--surface-2)}
+  html[data-theme=light]:not([data-mono]) .dd-trig>svg[viewBox]:not(#z){fill:none}
+  html[data-theme=light]:not([data-mono]) .dd-trig:focus-visible{outline-color:var(--sv-teal,var(--accent))}
+  html[data-theme=light]:not([data-mono]) .dd-list{--dd-a:var(--sv-teal,var(--accent));background:var(--wsolid),var(--surface);box-shadow:none}
+  html[data-theme=light]:not([data-mono]) .dd-o{background:transparent}
+  html[data-theme=light]:not([data-mono]) .dd-o svg{fill:none;stroke:currentColor}
   @media(max-width:620px){
     html[data-theme=light]:not([data-mono]) .cn-art{background:transparent}
   }
@@ -1506,6 +1512,8 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .netsw a[aria-current=page]{color:#0b5a53;background:#fff;box-shadow:0 1px 2px rgba(60,50,20,.2),inset 0 0 0 1px rgba(15,122,114,.35)}
   html[data-theme=light]:not([data-mono]) .netsw a#nettest[aria-current=page]{color:#8a5200;background:#fff;box-shadow:0 1px 2px rgba(60,50,20,.2),inset 0 0 0 1px rgba(200,120,0,.4)}
   html[data-theme=light]:not([data-mono]) .se-rss{border-color:rgba(15,122,114,.35);background:linear-gradient(90deg,rgba(15,122,114,.12),rgba(15,122,114,.04));color:var(--ink)}
+  /* the app's dropdown list in day: the day accent, a hairline and a soft lift off the card under it */
+  html[data-theme=light]:not([data-mono]) .dd-list{--dd-a:var(--sv-teal,var(--accent));border-color:var(--wbd2,rgb(227,222,211));box-shadow:0 14px 34px -14px rgba(60,50,20,.35)}
   /* Pro's wallet strip takes the Easy view's day tokens, so the two are identical */
   html[data-theme=light]:not([data-mono]) #sd-mstrip{--sv-amber:var(--warn);--sv-green:var(--accent);--sv-violet:var(--accent);--sv-teal:var(--accent);--sv-pho:#1f6f9a}
   html[data-theme=light]:not([data-mono]) #p-dele #sd-mstrip{background-color:rgb(255,253,248);border-color:rgb(227,222,211)}
