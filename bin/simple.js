@@ -330,24 +330,25 @@
     var proRd = root.getAttribute("data-sv") === "dashboard/self" && !root.getAttribute("data-pro");
     return proRd && window.__srcFree ? window.__srcFree() : pos.free;
   }
-  function balBoxes(){
+  function balBoxes(pro){
     var pos = window.__POS, bal = window.__BAL, mine = pos && pos.rows.length, mv = movable(pos), a = window.__ADDR;
     var yk = function(k, v, st, x){ return '<div class=mv-yk>' + (x || '') + '<em>' + k + '</em><b' + (st || '') + '>' + v + '</b></div>'; };
     /* a box's actions sit together in its lower corner, level with the figure; fitBoxes keeps the figure clear of them */
     var acts = function(h){ return h ? '<span class=yk-act>' + h + '</span>' : ''; };
     var act = function(k, label, tip, cls){ return '<button type=button class="you-mint' + (cls || '') + '" data-act=' + k + ' title="' + tip + '">' + label + '</button>'; };
-    /* Pro: its three actions in the boxes they act on, as Mint sits in PHOTON's (operator, 2026-10-16): Stake in ATONE
-       available, Unstake in ATONE staked, Claim in ATONE rewards, each shown when Pro's own button would be */
-    var pro = root.getAttribute("data-sv") === "dashboard/self" && a && pos, rb = window.__REWBY || {};
-    var claim = pro && pos.rows.some(function(r){ return (rb[r.id] || 0) >= 1; });
+    /* the three actions in the boxes they act on, as Mint sits in PHOTON's: Stake in ATONE available, Unstake in ATONE
+       staked, Claim in ATONE rewards, each shown when Pro's own button would be (operator, 2026-10-16, Pro; 2026-10-17,
+       Move too). Pro's Stake is its own card; Move's is Move's Stake, StakePilot where that is on */
+    var on = a && pos, rb = window.__REWBY || {};
+    var claim = on && pos.rows.some(function(r){ return (rb[r.id] || 0) >= 1; });
     return '<div class="mv-yg mv-bal">' +
       /* the order (operator, 2026-10-02): what is in the wallet, what is staked, then what it earns */
       yk("ATONE available", bal ? fmt(bal.uatone) : '-', '', acts((a && bal && BUY() ? act("buy", "Buy", "Buy ATONE on Osmosis", " you-buy") : '') +
-        (pro ? act("prostake", "Stake", "Stake liquid ATONE") : ''))) +
+        (on ? act(pro ? "prostake" : "stake", "Stake", "Stake liquid ATONE") : ''))) +
       /* Mint in the PHOTON box's lower corner, level with the figure: the wallet column that carries it on wide
          screens is not shown under 1100px (operator, 2026-10-13: every feature live, phones too) */
       yk("PHOTON available", bal ? fmt(bal.uphoton) : '-', '', acts(a && bal ? act("mint", "Mint", "Mint PHOTON from ATONE") : '')) +
-      yk("ATONE staked", pos ? fmt(pos.total) : '-', '', acts(pro && pos.rows.length ? act("unstake", "Unstake", "Unstake from a validator", " you-out") : '')) +
+      yk("ATONE staked", pos ? fmt(pos.total) : '-', '', acts(on && pos.rows.length ? act("unstake", "Unstake", "Unstake from a validator", " you-out") : '')) +
       yk("Movable stake", mv != null ? fmt(mv) : '-') +
       yk("ATONE rewards", window.__REW != null ? fmt(window.__REW) : '-', '', acts(claim ? act("claim", "Claim", "Claim your staking rewards") : '')) +
       yk("Your APR", mine ? pct(pos.rate) : '-', mine ? ' style="color:' + heat(pos.rate).ink + '"' : '', rsx(pos, mine, 1)) + '</div>';
@@ -375,7 +376,7 @@
   }
   window.addEventListener("resize", function(){ fitBoxes(E("mv-stage")); fitBoxes(E("sd-mstrip")); });
   function wstrip(){
-    if(window.matchMedia && matchMedia("(max-width:1099px)").matches) return balBoxes();
+    if(window.matchMedia && matchMedia("(max-width:1099px)").matches) return balBoxes(true);
     var pos = window.__POS, bal = window.__BAL;
     var mine = pos && pos.rows.length, rew = window.__REW || 0, liq = bal ? bal.uatone : 0, stk = pos ? pos.total : 0;
     /* the wallet card, then five boxes - Available, Photon, Staked, APR, Rewards - each figure in its well */
@@ -2192,7 +2193,7 @@
      amount needs (operator, 2026-10-02: "+19,051.6 ATONE a year" broke onto two rows) */
   function hlFit(el){
     var phone = window.matchMedia && matchMedia("(max-width:700px)").matches;
-    Array.prototype.forEach.call(el.querySelectorAll(".mv-hl>b, .mv-hl>span:not(.mv-lock)"), function(x){
+    Array.prototype.forEach.call(el.querySelectorAll(".mv-hl>b, .mv-hl>span:not(.mv-lock), .mv-hl>.mv-lock"), function(x){
       x.style.fontSize = "";
       if(!phone || !x.clientWidth) return;
       /* a line carrying Stake more measures its words, the part that gives way, to the fraction of a pixel (any
@@ -2294,7 +2295,7 @@
     if(a){
       var bal = window.__BAL, mine = pos && pos.rows.length, rs = !!(at && at.restake);
       /* testnet: the faucet, as the wide wallet column has it (operator, 2026-10-02: "no faucet on phone?") */
-      you = '<div class=mv-you>' + balBoxes() + (root.getAttribute("data-net") === "testnet" ? faucetBox(a) : '') +
+      you = '<div class=mv-you>' + balBoxes(false) + (root.getAttribute("data-net") === "testnet" ? faucetBox(a) : '') +
         '<div class=mv-ysw>' + youSwitch("youauto", "Autopilot", auto, "", !mine) + youSwitch("restakesw", "Restake", rs, "", !mine) + '</div></div>';
     }
     var h;

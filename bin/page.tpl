@@ -2543,10 +2543,7 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
    21-day cooldown share the next */
 #wk-mv .wk-ans{row-gap:6px}
 
-#wk-mv .wk-ans .p.gain,#wk-mv .wk-ans .p.lock{flex:1 1 0}
-#wk-mv .wk-ans .p.lock{--c:#ffb02e}
-#wk-mv .wk-ans .p.lock b{color:#ffb02e}
-#p-dele #wk-mv .wk-ans .p.lock svg{max-height:none;fill:none;stroke:#ffb02e;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+#wk-mv .wk-ans .p.gain{flex:1 1 0}
 /* the stake row as three columns: the phrase, the field, the button */
 
 /* stake under cooldown: an amber note at the end of the Redelegate title row */
@@ -2829,14 +2826,34 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 @media(max-width:1099px){#p-dele #wbody #wk-mine .wk-t1 :is(#stbtn,#unbtn,#clbtn){display:none}}
 /* phones: every balance box centres its title and figure, and what sat in its corner (the actions, the restake mark)
    takes a third row of its own, centred, at the box's foot (operator, 2026-10-16: "use 3rd row for buttons. center
-   align, also amounts and titles"); the figure has the box's whole width */
+   align, also amounts and titles"); the figure has the box's whole width. Tight, so the boxes leave the screen to the
+   rest (operator, 2026-10-17: "almost all screen size is taken by boxes") */
 @media(max-width:620px){
-  .mv-bal .mv-yk:not(#z){align-items:center;text-align:center}
+  .mv-bal.mv-yg:not(#z){gap:6px}
+  .mv-bal .mv-yk:not(#z){align-items:center;text-align:center;padding:7px 9px;gap:0}
+  .mv-bal .mv-yk>em:not(#z),.mv-bal .mv-yk>b:not(#z){line-height:1.2}
   .mv-bal .mv-yk>:is(em,b):not(#z){align-self:stretch;text-align:center}
   .mv-bal .mv-yk>em:not(#z){text-indent:.14em}   /* the letter-spacing after the last letter, balanced */
-  .mv-bal .mv-yk>:is(.yk-act,.you-rsx):not(#z){position:static;order:3;align-self:center;margin-top:auto;padding-top:8px}
+  .mv-bal .mv-yk>:is(.yk-act,.you-rsx):not(#z){position:static;order:3;align-self:center;margin-top:auto;padding-top:4px}
   .mv-bal .mv-yk>:is(.yk-act,.you-rsx)~b:not(#z){padding-right:0}
   .mv-bal .mv-yk>.you-rsx:not(#z){flex-direction:row;align-items:baseline;gap:5px}
+}
+/* the lock tag: on phones it sits in Delegations' title row, where the stake is listed, and leaves Redelegate's
+   (operator, 2026-10-17); the wide screens keep it in Redelegate's */
+.wk-lockm,.wk-lockm[hidden]{display:none}
+@media(max-width:700px){
+  #wk-plan>.wk-ph #dlockn:not(#z){display:none}
+  #wk-mine .wk-t1 .wk-lockm:not([hidden]){display:inline-flex;align-items:center;gap:4px;height:22px;margin-left:auto;padding:0 7px;border-radius:5px;
+    border:1px solid rgba(255,176,46,.35);background:rgba(255,176,46,.06);font-family:var(--wmono);font-size:8px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--ws);white-space:nowrap;flex:0 1 auto;min-width:0;overflow:hidden}
+  #wk-mine .wk-t1 .wk-lockm b{font-size:10px;font-weight:400;letter-spacing:0;color:#ffd58a}
+  #wk-mine .wk-t1 .wk-lockm .w{display:none}
+  #wk-mine .wk-t1 .wk-lockm svg{width:10px;height:10px;flex:0 0 auto;fill:none;stroke:var(--wamber);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  /* Refresh holds Redelegate's top right corner whatever else the title row carries (operator, 2026-10-17: "shouldn't
+     move around"); the row keeps its width clear of it and the amount field takes that width back */
+  #wk-plan>.wk-ph:not(#z){position:relative;padding-right:26px}
+  #wk-plan>.wk-ph>.wk-field:not(#z){margin-right:-26px;max-width:none}
+  #wk-plan>.wk-ph #wrefresh:not(#z){position:absolute;top:0;right:0;margin:0}
 }
 .pop .card.stcard::before{background:linear-gradient(90deg,transparent,var(--wgreen),transparent)}
 .stcard .txsum{color:var(--wgreen)}
@@ -2881,9 +2898,8 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 
 /* the three figures as one row of stacked boxes, the balance boxes' shape */
 #wk-mv .wk-ans{flex-wrap:nowrap;gap:6px;margin:4px 0 0}
-#wk-mv .wk-ans .p,#wk-mv .wk-ans .p.rate,#wk-mv .wk-ans .p.gain,#wk-mv .wk-ans .p.lock{flex:1 1 0;min-width:0;height:46px;padding:0 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+#wk-mv .wk-ans .p,#wk-mv .wk-ans .p.rate,#wk-mv .wk-ans .p.gain{flex:1 1 0;min-width:0;height:46px;padding:0 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
 #wk-mv .wk-ans .p.rate{flex:1.25 1 0}
-#wk-mv .wk-ans .p.lock{flex:1.2 1 0}
 #wk-mv .wk-ans .p i{font-size:6.5px;letter-spacing:.14em;white-space:nowrap}
 #wk-mv .wk-ans .p b{font-size:12px;letter-spacing:-.02em;white-space:nowrap}
 #wk-mv .wk-ans .p .arr{font-size:10px;margin:0 1px}
@@ -2893,8 +2909,6 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 #wk-mv .wk-ans .p.rate i:first-child{flex:1 1 100%;text-align:center}
 #wk-mv .wk-ans .p.rate i:first-child::after{content:" \2192  after"}
 #wk-mv .wk-ans .p.rate i:not(:first-child){display:none}
-#p-dele #wk-mv .wk-ans .p.lock svg{width:9px;height:9px;margin:0 2px 0 0}
-#wk-mv .wk-ans .p.lock i{display:inline-flex;align-items:center}
 
 #dpicks td.r2{letter-spacing:-.02em}
 #prolist .wk-tbl2 td.r2{letter-spacing:-.02em}#dpicks td.r2 em{margin:0 2px}
@@ -2998,7 +3012,7 @@ border-color:var(--wbd2);}
    Outcome head carries its three figures as small chips at the right ── */
 
 #wk-mv .wk-mvh .wk-ans{margin:0 0 0 auto;flex:0 1 auto;min-width:0;display:flex;flex-wrap:nowrap;gap:5px;order:0}
-#wk-mv .wk-mvh .wk-ans .p,#wk-mv .wk-mvh .wk-ans .p.rate,#wk-mv .wk-mvh .wk-ans .p.gain,#wk-mv .wk-mvh .wk-ans .p.lock{flex:0 0 auto;height:22px;padding:0 7px;flex-direction:row;flex-flow:row nowrap;align-items:center;gap:4px;min-width:0}
+#wk-mv .wk-mvh .wk-ans .p,#wk-mv .wk-mvh .wk-ans .p.rate,#wk-mv .wk-mvh .wk-ans .p.gain{flex:0 0 auto;height:22px;padding:0 7px;flex-direction:row;flex-flow:row nowrap;align-items:center;gap:4px;min-width:0}
 #wk-mv .wk-mvh .wk-ans .p i{font-size:6.5px;letter-spacing:.12em;display:inline-flex;align-items:center}
 #wk-mv .wk-mvh .wk-ans .p i:first-child{flex:0 0 auto;text-align:left}
 #wk-mv .wk-mvh .wk-ans .p.rate i:first-child::after{content:none}
@@ -3119,15 +3133,11 @@ transition:filter .15s,transform .12s}
 #wk-plan>.wk-ph .wk-ago{order:2;margin-left:auto}
 #wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-ago{display:inline;}
 #wk-plan>.wk-ph .wk-ib{order:3;margin-left:8px}
-@media(max-width:700px){#wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-ago{display:none}}
 /* phones: Redelegate, its lock tag and refresh share one row (operator, 2026-10-16: they broke onto a second row).
    An empty selection count holds no room; while validators are picked, the tag drops its date for the count */
 @media(max-width:700px){
   #wk-plan>.wk-ph .wk-seln:empty{display:none}
-  #wk-plan>.wk-ph:has(.wk-seln:not(:empty)) .wk-lockn b:last-of-type{display:none}
   #wk-plan>.wk-ph h3{flex:0 0 auto}
-  #wk-plan>.wk-ph .wk-lockn{flex:0 1 auto;min-width:0;overflow:hidden}
-  #wk-plan>.wk-ph:has(.wk-lockn:not([hidden])) .wk-ib{margin-left:auto}
 }
 /* a row that would pay less is not greyed: it reads like every other row, and only its
    "there" rate turns red to say so */
@@ -3320,13 +3330,12 @@ border:1px solid color-mix(in srgb,var(--sa-v) 40%,transparent);background:linea
   
   /* the outcome boxes, legible: taller, the labels a real size, the figures larger */
   #wk-mv .wk-ans{margin:6px 0 0}
-  #wk-mv .wk-ans .p,#wk-mv .wk-ans .p.rate,#wk-mv .wk-ans .p.gain,#wk-mv .wk-ans .p.lock{height:56px;gap:7px;padding:0 6px}
+  #wk-mv .wk-ans .p,#wk-mv .wk-ans .p.rate,#wk-mv .wk-ans .p.gain{height:56px;gap:7px;padding:0 6px}
   #wk-mv .wk-ans .p i{font-size:8.5px;letter-spacing:.12em;color:var(--ws)}
   #wk-mv .wk-ans .p b{font-size:14px}
   #wk-mv .wk-ans .p.rate b{font-size:12.5px}
   #wk-mv .wk-ans .p .arr{font-size:12px}
   #wk-mv .wk-ans .p.rate{flex:1.7 1 0;row-gap:7px;column-gap:4px}
-  #p-dele #wk-mv .wk-ans .p.lock svg{width:11px;height:11px;margin:0 3px 0 0}
   /* the amount field alone on its line: a set width on the left, not the whole line */
 
 #wk-plan input.wk-amt2{font-size:16px;padding:0 10px}
@@ -6155,7 +6164,7 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-arr svg{width:40px;height:18px;fill:none;stroke:var(--sv-teal);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .mv-lock{font-size:12.5px;color:var(--sv-amber)}
 .mv-hl>.mv-lock{grid-column:2;white-space:nowrap;text-align:right}
-@media(max-width:700px){.mv-hl>.mv-lock{grid-column:1/-1;white-space:normal;text-align:left}}
+@media(max-width:700px){.mv-hl>.mv-lock{grid-column:1/-1;white-space:nowrap;overflow:hidden;text-align:left}}   /* one row: hlFit steps the type down (operator, 2026-10-17) */
 /* "Stake more" while the stake cools down (operator, 2026-10-04): a text link with an arrow, right after the "Free to
    move again" sentence, in the line's own size */
 #mv-stage .mv-hl .mv-stk{display:inline-flex;align-items:center;gap:.3em;margin:0 0 0 .35em;padding:0;border:0;background:none;cursor:pointer;
@@ -6633,7 +6642,6 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
   /* Redelegate's Outcome: now → after and ATONE/year on one row; the 21 days as the note above the button */
   #one #p-dele #wk-mv .wk-ans:not(#z):not(#y){grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
   #one #p-dele #wk-mv .wk-ans .p.rate:not(#z):not(#y){grid-column:auto}
-  #one #p-dele #wk-mv .wk-ans .p.lock{display:none!important}
   /* every note at Outcome's foot reads as Stake's: one small mono line in a light box */
   #one #wk-mv .rdnote:not(#z),#one #proout .txlock:not(#z):not(#y){display:flex;align-items:center;gap:8px;margin:auto 0 12px;padding:9px 12px;border-radius:8px;
     border:1px solid rgba(255,176,46,.28);background:rgba(255,176,46,.05);width:auto;max-width:none;align-self:stretch}
@@ -6719,7 +6727,6 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
   #one #p-dele #wk-mv>.wk-ans .p b:not(#z){font-size:13px}
   #one #p-dele #wk-mv>.wk-ans .p .arr{margin:0 2px}
   #one #p-dele #wk-mv>.wk-ans .p.rate i:nth-of-type(2){display:none}
-  #one #p-dele #wk-mv>.wk-ans .p.lock{display:none!important}
 }
 /* the title row reads the same in every tab: the count centred on the field's line, Outcome's figures on its title's */
 @media(min-width:1100px){
@@ -7138,7 +7145,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
         <section class=wk-pane id=wk-mine>
           <div id=wk-acct>
           <div class=wk-ap id=wkap hidden><span class=wk-apk>Autopilot</span><span class=wk-aps id=wkaps>Inactive</span><button class=wk-apb id=atbtn type=button title="Let GATA keep this stake where it earns most, inside limits you set">Activate</button></div>
-          <header class="wk-ph wk-t1"><h3>Delegations</h3><span class=wk-pn id=dmyn></span>
+          <header class="wk-ph wk-t1"><h3>Delegations</h3><span class=wk-pn id=dmyn></span><span class=wk-lockm id=dlockm hidden></span>
             <div class=wk-foot id=dstat></div>
             <button class="wk-unb wk-rdb" id=rdbtn type=button title="Move stake between validators">Redelegate</button>
             <button class="wk-unb wk-stb" id=stbtn type=button hidden title="Stake liquid ATONE">Stake</button>

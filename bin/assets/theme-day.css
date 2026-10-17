@@ -397,9 +397,6 @@
   html[data-theme=light]:not([data-mono]) #prolist .wk-tbl2 td.nm .nmw>span.wk-lgx{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves td.amt{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #wk-mv .wk-moves tr:hover td{background:var(--surface-2)}
-  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.lock{--c:var(--warn)}
-  html[data-theme=light]:not([data-mono]) #wk-mv .wk-ans .p.lock b{color:var(--warn)}
-  html[data-theme=light]:not([data-mono]) #p-dele #wk-mv .wk-ans .p.lock svg{fill:none;stroke:var(--warn)}
   html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-lockn{border-color:var(--amber-bar);background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) #wk-plan>.wk-ph .wk-lockn b{color:var(--warn)}
   html[data-theme=light]:not([data-mono]) #txpop .txlockn{border-color:var(--amber-bar);background:var(--warn-bg)}
@@ -469,6 +466,11 @@
   html[data-theme=light]:not([data-mono]) .you-r i .you-mint:hover,html[data-theme=light]:not([data-mono]) .mv-yk .you-mint:hover{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .you-r i .you-mint:focus-visible,html[data-theme=light]:not([data-mono]) .mv-yk .you-mint:focus-visible{outline-color:var(--sv-teal,var(--accent))}
   html[data-theme=light]:not([data-mono]) .mv-yk .you-mint.you-out:hover{background:var(--warn-bg)}
+  @media(max-width:700px){
+    html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-lockm:not([hidden]){border-color:var(--amber-bar);background:var(--warn-bg)}
+    html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-lockm b{color:var(--warn)}
+    html[data-theme=light]:not([data-mono]) #wk-mine .wk-t1 .wk-lockm svg{fill:none}
+  }
   html[data-theme=light]:not([data-mono]) .pop .card.stcard::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .stcard .stlist thead th{color:var(--muted);background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .stcard .stlist td{border-bottom-color:var(--line-soft)}

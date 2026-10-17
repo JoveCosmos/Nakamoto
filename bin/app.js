@@ -2364,9 +2364,9 @@ rememberGridH();
     window.__ANS = { now: now, after: after, gain: gain };
     el.innerHTML =
       '<span class="p rate"><i>now</i><b' + (pos && pos.rows.length ? '' : ' class=dim') + '>' + (pos && pos.rows.length ? pct(now) : '-') + '</b><span class=arr>\u2192</span><i>after</i><b class="aft' + (after == null ? ' dim' : after < now - 0.0005 ? ' neg' : '') + '">' + (after == null ? '-' : pct(after)) + '</b></span>' +
-      '<span class="p gain"><i>ATONE/year</i><b' + (gain > 0.5 ? '' : gain < -0.5 ? ' class=neg' : ' class=dim') + '>' + (gain > 0.5 ? '+' + one(gain) : gain < -0.5 ? '\u2212' + one(-gain) : '-') + '</b></span>' +
-      /* the chain's own rule: what moves cannot move again for 21 days */
-      (!lockTip(pos) ? '' : '<span class="p lock" title="' + lockTip(pos) + '"><i><svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>redelegate</i><b>21 days</b></span>');
+      '<span class="p gain"><i>ATONE/year</i><b' + (gain > 0.5 ? '' : gain < -0.5 ? ' class=neg' : ' class=dim') + '>' + (gain > 0.5 ? '+' + one(gain) : gain < -0.5 ? '\u2212' + one(-gain) : '-') + '</b></span>';
+    /* no redelegate lock box among Outcome's figures (operator, 2026-10-17); the 21 days stay in the Redelegate title
+       row and, on a wide screen, in the note at Outcome's foot */
     /* the same rule as a note at Outcome's foot, above the button (Pro on a wide screen) */
     var rn = E("rdnote"); if(rn){ var sp = rn.querySelector("span"); if(sp) sp.innerHTML = 'Redelegated stake cannot be redelegated again for <b>21 days</b>, until <b>' + (window.__day ? window.__day(Date.now() + 21 * 86400000) : new Date(Date.now() + 21 * 86400000).toLocaleDateString("en-GB", { day: "numeric", month: "short" })) + '</b>'; }
     /* the button lives in the stake row; here it only learns whether it can be pressed */
@@ -2431,8 +2431,10 @@ rememberGridH();
     /* only what needs saying: stake that is held, stake on its way out */
     var h = "";
     /* the cooldown is said once, in the Redelegate title row, where the stake is asked for */
-    var ln = E("dlockn"); if(ln){ ln.hidden = !(pos.locked >= 1e6);
+    var ln = E("dlockn"), lm = E("dlockm"); if(ln){ ln.hidden = !(pos.locked >= 1e6);
       if(pos.locked >= 1e6){ ln.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><b>' + fmt(pos.locked) + '</b><span class=w>ATONE under redelegate cooldown until</span><span class=w2>locked until</span><b>' + window.__dayFull(pos.until) + '</b>'; ln.title = lockTip(pos); } }
+    /* phones show the same tag in Delegations' title row instead (operator, 2026-10-17) */
+    if(ln && lm){ lm.hidden = ln.hidden; if(lm.innerHTML !== ln.innerHTML) lm.innerHTML = ln.innerHTML; lm.title = ln.title || ""; }
     (window.__UNB || []).forEach(function(u){ h += pill("warn", fmt(u.amt) + " unbonding from " + att(u.m) + ", " + window.__day(u.until)); });
     el.innerHTML = h;
     var ub = E("unbtn"); if(ub) ub.hidden = !(pos && pos.rows.length);
