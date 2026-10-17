@@ -469,6 +469,9 @@ for _js in ("app.js", "boot.js", "tx.js", "simple.js", "shell.js"):
 if TESTNET:
     page = page.replace("N/A%", "N/A")      # a template's "%" after a figure that is not there
 page = _bare_html(page)
+# search engines: every mainnet route serves this same page, so they are one page (canonical: the root), and testnet is
+# never a search result (2026-10-17: Google listed /testnet/ and old route snapshots as separate results)
+page = page.replace("<base href=", ('<meta name=robots content="noindex">' if TESTNET else '<link rel=canonical href="https://atomone.gatahub.zone/">') + "\n<base href=", 1)
 # the site's crawler rules, at its root only: every page may be read; the per-wallet Autopilot reports are not pages
 if not TESTNET:
     _t = os.path.join(OUT, ".robots.txt.tmp")
