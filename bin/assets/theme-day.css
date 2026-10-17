@@ -449,6 +449,13 @@
   html[data-theme=light]:not([data-mono]) .sp-own svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .pop .card.bycard::before{background:transparent}
   html[data-theme=light]:not([data-mono]) .by-tok option{background:var(--surface-2);color:var(--ink)}
+  html[data-theme=light]:not([data-mono]) .st-ask{border-color:var(--accent);background:transparent;color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .st-ask svg:not(#z){fill:none;stroke:currentColor}
+  html[data-theme=light]:not([data-mono]) .st-ask>span:not(#z){color:inherit}
+  html[data-theme=light]:not([data-mono]) .st-ask:hover{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .st-ask[aria-pressed=true]{background:var(--accent);color:#FFFFFF}
+  html[data-theme=light]:not([data-mono]) .st-ask:focus-visible{outline-color:var(--accent)}
+  html[data-theme=light]:not([data-mono]) .wk-txh .txsum .kps-w:not(#z){color:inherit}
   html[data-theme=light]:not([data-mono]) .dd-trig.by-dd{background:transparent}
   html[data-theme=light]:not([data-mono]) .by-out{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .by-path svg{fill:none}

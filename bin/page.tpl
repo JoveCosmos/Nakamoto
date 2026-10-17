@@ -253,7 +253,13 @@ z-index:50;}
   .pop .card.txcard:not(#z){display:flex;flex-direction:column;overflow-y:auto}
   .pop .card.txcard:not(#z)>*{flex:0 1 auto}
   .pop .card.txcard:not(#z)>:is(.stlist,.unpick,.txlist){min-height:96px}
-  .stcard .stlist:not(#z):not(#y){flex:1 1 auto;max-height:none}
+  .stcard .stlist:not(#z):not(#y){flex:1 1 0;max-height:none;height:auto}
+  /* a fee line and the step that shares its slot keep their size in every card (a long list squeezed the step 33 -> 13 px) */
+  .pop .card.txcard:not(#z)>:is(.txfee,.txstep){flex-shrink:0}
+  /* a title row with a button (Stake's Ask Pilot) holds the summary's worst case, three lines, so it never grows */
+  .txcard>.wk-txh:has(>.st-ask){box-sizing:content-box;min-height:41.5px}   /* 3 lines of 13.5 px + the span's 1 px top margin */
+  /* one size whatever the list holds (Ask Pilot's few rows, the whole set): the card always fills the screen */
+  .pop .card.stcard:not(#z){height:100%}
 }
 .pop .card{max-width:470px;width:100%;
 padding:26px 28px 0;position:relative;
@@ -2775,6 +2781,31 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 @media (max-width:480px){.bycard .wk-max b{display:none}.by-tok{padding-right:18px}}
 .by-tok{flex:0 0 auto;margin:0 6px 0 2px;padding:4px 20px 4px 8px;border:1px solid var(--wbd2);border-radius:5px;color:var(--wt);font-family:var(--wmono);font-size:10px;letter-spacing:.08em;cursor:pointer;-webkit-appearance:none;appearance:none;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238f8db4' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 7px center/8px 5px}
 .by-tok option{background:#0f0f1c;color:#e6e4f0}
+/* Stake's Ask Pilot (operator, 2026-10-17): a toggle in the title row; on, the list below shows Pilot's move for the
+   amount typed, Autopilot's own rule (the shelf rise), and Stake signs exactly that; the list keeps its box */
+.st-ask{flex:0 0 auto;display:inline-grid;grid-template-columns:auto auto;align-items:center;justify-content:center;column-gap:5px;height:24px;margin:0;padding:0 10px;border:1px solid #2bc8bd;border-radius:999px;
+  background:transparent;color:#2bc8bd;font-family:var(--wmono);font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;cursor:pointer}
+.st-ask svg:not(#z){display:block;width:11px;height:11px;margin:0;max-height:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.st-ask>span:not(#z){display:block;grid-area:1/1;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit;text-align:center}
+.st-ask>svg{grid-area:1/2}
+.st-ask>.st-a2,.st-ask[aria-pressed=true]>.st-a1{visibility:hidden}
+.st-ask[aria-pressed=true]>.st-a2{visibility:visible}
+.st-ask:hover{background:rgba(43,200,189,.10)}
+.st-ask[aria-pressed=true]{background:#2bc8bd;color:#04140f}
+.st-ask[aria-pressed=true] svg{transform:rotate(180deg)}
+.st-ask:focus-visible{outline:2px solid #2bc8bd;outline-offset:2px}
+.stlist:has(>.st-pe){display:flex;flex-direction:column}
+.st-pe{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:0;padding:18px;text-align:center;font-size:12.5px;line-height:1.45;color:var(--ws)}
+.st-pe b{font-size:13px;color:var(--wt)}
+.st-pcap{padding:8px 10px 6px;font-family:var(--wmono);font-size:9px;letter-spacing:.06em;color:var(--wf)}
+.stlist tr.on input[disabled]{opacity:1;cursor:default}
+#one #prohdr .st-ask:not(#z){margin:0}
+/* the title and the button keep their width; the summary takes what is left and wraps inside it */
+.txcard>.wk-txh:has(>.st-ask)>div{flex:0 0 auto}
+.txcard>.wk-txh:has(>.st-ask)>.txsum{flex:1 1 0;min-width:0}
+/* the wide copy inside a title row's summary is running text, not the row's block caption (.wk-txh span) */
+.wk-txh .txsum .kps-w:not(#z){margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit}
+@media(min-width:561px){.wk-txh .txsum .kps-w:not(#z){display:inline}}
 /* Buy's Pay with, as its select was */
 .dd-trig.by-dd{flex:0 0 auto;align-self:center;gap:6px;margin:0 6px 0 2px;padding:4px 8px;border:1px solid var(--wbd2);border-radius:5px;background:transparent;color:var(--wt);font-family:var(--wmono);font-size:10px;line-height:1.2;letter-spacing:.08em}
 .dd-trig.by-dd>svg[viewBox]:not(#z){width:10px;height:10px}
@@ -2875,7 +2906,7 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .pop .card.stcard::before{background:linear-gradient(90deg,transparent,var(--wgreen),transparent)}
 .stcard .txsum{color:var(--wgreen)}
 
-.stcard .stlist{margin:12px 20px 0;max-height:max(100px,calc(92vh - 322px));max-height:max(100px,calc(92svh - 322px));overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;flex:0 0 auto}
+.stcard .stlist{margin:12px 20px 0;max-height:max(100px,calc(92vh - 322px));max-height:max(100px,calc(92svh - 322px));height:max(100px,calc(92vh - 322px));height:max(100px,calc(92svh - 322px));overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--wbd2) transparent;flex:0 0 auto}
 .stcard .stlist table{width:100%;border-collapse:collapse;table-layout:fixed}
 .stcard .stlist thead th{font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:400;color:#c1bfdc;text-align:right;white-space:nowrap;padding:8px 5px 7px;background:linear-gradient(180deg,#151530,#0f0f22);border-top:1px solid var(--wbd2);border-bottom:1px solid var(--wbd2);position:sticky;top:0;z-index:1}
 .stcard .stlist thead th:first-child{border-left:1px solid var(--wbd2);border-radius:5px 0 0 5px}
@@ -6700,7 +6731,7 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
   #one #proout .txbtns .wk-btn.wk-go:disabled:not(#z):not(#y),#one #p-dele #wk-mv #dgo:disabled:not(#z):not(#y){border-color:var(--wbd2);background:transparent;color:var(--wf)}
   #one #p-dele #wk-mv #dgo:not(#z):not(#y){flex:0 0 auto;margin-top:auto}
   /* the card's lists were sized for a card: here they take the pane's height */
-  #one #prolist .unpick:not(#z),#one #prolist .stlist:not(#z){flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto}
+  #one #prolist .unpick:not(#z),#one #prolist .stlist:not(#z){flex:1 1 auto;min-height:0;max-height:none;height:auto;overflow-y:auto}
   #one #proout .txlock:not(#z){display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;font:400 12.5px/1.45 var(--wsans);letter-spacing:0}
   #one #proout .txlock svg:not(#z){flex:0 0 auto;width:15px;height:15px;margin-top:2px}
   #one #proout .txlock:empty,#one #proout .txfee:empty,#one #proout .txstep:empty{display:none}
@@ -7533,7 +7564,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
 </div></div>
 
 <div class=pop id=stpop><div class="card txcard uncard stcard">
-  <header class=wk-txh><div><b>Stake</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=stsum></span></header>
+  <header class=wk-txh><div><b>Stake</b><span>{{CHAIN_ID}}</span></div><button class=st-ask id=stask type=button aria-pressed=false title="Pilot spreads the amount where it earns the most, by Autopilot's rule"><span class=st-a1>Ask Pilot</span><span class=st-a2>My picks</span><svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button><span class=txsum id=stsum></span></header>
   <div class="unamt sttop">
     <div class="wk-field unfield"><input class=wk-amt2 id=stamt type=text inputmode=decimal placeholder="amount" autocomplete=off spellcheck=false aria-label="ATONE to stake"><button class=wk-max id=stmax type=button title="Every liquid ATONE">max <b id=stmaxv>-</b></button></div>
     <span class=wk-seln id=stseln aria-live=polite></span>
