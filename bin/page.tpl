@@ -6175,6 +6175,14 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
    centres under it; the addition is a zero-height box whose line rises out of its top, so the block keeps its height */
 .you-apr small{display:flex;align-items:baseline;justify-content:space-between;gap:10px;min-width:0}
 .you-apr small>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* (operator, 2026-10-17 "push it toward left"): the tag follows the figure, 14 px after it, not the column's edge - the
+   block becomes a grid whose first column is the figure's width, "on N validators" under it, the tag in the next column */
+.you-apr:has(.you-rsl){display:grid;grid-template-columns:auto auto minmax(0,1fr);column-gap:14px;row-gap:3px;align-items:baseline}
+.you-apr:has(.you-rsl)>em{grid-column:1/-1}
+.you-apr:has(.you-rsl)>.you-big{grid-column:1;grid-row:2}
+.you-apr:has(.you-rsl)>small{display:contents}
+.you-apr:has(.you-rsl)>small>span:first-child{grid-column:1;grid-row:3}
+.you-apr:has(.you-rsl) .you-rsl{grid-column:2;grid-row:3}
 .you-rsl{flex:0 0 auto;display:inline-grid;justify-items:center;font-family:var(--wmono);letter-spacing:.03em;color:var(--sv-green);white-space:nowrap;pointer-events:none}
 .you-rsl>span{grid-area:1/1;font-size:8.5px;line-height:1.2;opacity:.85}
 .you-rsl>span+span{display:flex;align-items:flex-end;align-self:start;height:0;margin-top:-1px;font-size:12.5px;font-weight:700;opacity:1}
