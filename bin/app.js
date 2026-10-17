@@ -2308,7 +2308,7 @@ rememberGridH();
       '<thead><tr><th class=ck><input type=checkbox class=pro-all aria-label="Tick every validator"' + (n && n === rows.length ? ' checked' : '') + '></th>' +
       cols.map(function(c){ return '<th' + (c[2] ? ' class=' + c[2] : '') + '>' + c[0] + '</th>'; }).join('') + '</tr></thead><tbody>';
     rows.forEach(function(r){ var on = !!sel[r.id];
-      h += '<tr' + (on ? ' class=on' : '') + '><td class=ck><input type=checkbox data-id="' + att(r.id) + '"' + (on ? ' checked' : '') + '></td>' + cells(r).join('') + '</tr>'; });
+      h += '<tr' + (on ? ' class=on' : '') + '><td class=ck><input type=checkbox data-id="' + att(r.id) + '" aria-label="' + att(r.m || r.id) + '"' + (on ? ' checked' : '') + '></td>' + cells(r).join('') + '</tr>'; });
     el.innerHTML = h + '</tbody></table>';
     var all = el.querySelector(".pro-all"); if(all) all.addEventListener("change", function(){ toggle(rows.map(function(r){ return r.id; }), all.checked); });
     Array.prototype.forEach.call(el.querySelectorAll("tbody input[data-id]"), function(c){
@@ -2435,14 +2435,14 @@ rememberGridH();
       /* what this plan adds sits at the right end of the name cell, against the stake
          column: it grows leftwards into the name's spare room, and no column moves */
       if(ph){
-        h += '<tr class="' + (on ? 'on' : '') + (pos && !o.better ? ' lt' : '') + '"><td class=ck>' + (pos ? '<input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + '>' : '') + '</td>' +
+        h += '<tr class="' + (on ? 'on' : '') + (pos && !o.better ? ' lt' : '') + '"><td class=ck>' + (pos ? '<input type=checkbox data-id="' + att(o.id) + '" aria-label="' + att(o.m || o.id) + '"' + (on ? ' checked' : '') + '>' : '') + '</td>' +
              '<td class="l nm" data-v="' + att(o.id) + '" tabindex=0 title="Open this validator"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span>' +
              (mv != null ? '<em class="gtag add">+' + fmt(mv) + '</em>' : '') + '</div></td>' +
              (tiny ? '' : '<td class=stk>' + big(o.t) + '</td>') +
              (lay ? '<td class=r2><s>' + (pos && pos.rows.length ? pct(now) : '-') + '</s><em>→</em><b>' + pct(there) + '</b></td>' : '<td class=r2><b>' + pct(o.rate0) + '</b></td>') + '</tr>';
         return;
       }
-      h += '<tr class="' + (on ? 'on' : '') + (pos && !o.better ? ' lt' : '') + '"><td class=ck>' + (pos ? '<input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + '>' : '') + '</td>' +
+      h += '<tr class="' + (on ? 'on' : '') + (pos && !o.better ? ' lt' : '') + '"><td class=ck>' + (pos ? '<input type=checkbox data-id="' + att(o.id) + '" aria-label="' + att(o.m || o.id) + '"' + (on ? ' checked' : '') + '>' : '') + '</td>' +
            '<td class="c rk">' + o.rank + '</td><td class="l nm" data-v="' + att(o.id) + '" tabindex=0 title="Open this validator"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span>' +
            (mv != null ? '<em class="gtag add" title="what this plan adds">+' + fmt(mv) + '</em>' : '') + '</div></td>' +
            '<td class="stk" title="' + big(o.t) + ' ATONE, ' + vp.toFixed(vp < 1 ? 2 : 1) + '% of all stake; ' + (o.t < MEAN ? 'below the average size: the bonus pays here' : 'above the average size') + '">' + big(o.t) + '</td>' +
@@ -3055,7 +3055,7 @@ rememberGridH();
       var on = !!STSEL[o.id], m = by[o.id], there = m ? m.after : o.rate0;
       var d = (window.__VDBY && window.__VDBY[o.id]) || {}, u90 = d.d90 != null ? +d.d90 : (o.up != null ? +o.up : null);
       var vp = o.t / window.__S() * 100, lu = d.life_up != null ? +d.life_up : null, pr = d.prop != null ? +d.prop : null;
-      h += '<tr class="' + (on ? 'on' : '') + '"><td class=ck><input type=checkbox data-id="' + att(o.id) + '"' + (on ? ' checked' : '') + '></td>' +
+      h += '<tr class="' + (on ? 'on' : '') + '"><td class=ck><input type=checkbox data-id="' + att(o.id) + '" aria-label="' + att(o.m || o.id) + '"' + (on ? ' checked' : '') + '></td>' +
            '<td class="c rk">' + o.rank + '</td><td class="l nm"><div class=nmw>' + logo(o.id, o.m) + '<span>' + att(o.m) + '</span>' +
            (m && m.x > 0 ? '<em class="gtag add" title="what this stake adds">+' + fmt(m.x) + '</em>' : '') + '</div></td>' +
            '<td class="stk" title="' + big(o.t) + ' ATONE, ' + vp.toFixed(vp < 1 ? 2 : 1) + '% of all stake; ' + (o.t < MEAN ? 'below the average size: the bonus pays here' : 'above the average size') + '">' + big(o.t) + '</td>' +
