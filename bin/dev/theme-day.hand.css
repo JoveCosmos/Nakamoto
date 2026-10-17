@@ -453,7 +453,7 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-cc.g b,html[data-theme=light]:not([data-mono]) #mv-stage .mv-cc.g span{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-chip.warn{background:var(--warn-bg);color:var(--warn-ink)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-chip.q{background:var(--surface-2);color:var(--muted)}
-  html[data-theme=light]:not([data-mono]) #mv-stage .mv-ap,html[data-theme=light]:not([data-mono]) #mv-stage .mv-cyc>div.done{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) #mv-stage .mv-cyc>div.done{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-cyc>div.warn{background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-dc i{background:var(--line)}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-dc i.on{background:var(--warn)}

@@ -2351,7 +2351,7 @@
           '<small>The chain holds redelegated stake for 21 days.</small></div>' + nowOn() +
           (auto ? '<div class=mv-cyc><div class=done><em>' + (hist ? day(hist.at * 1000) : 'Done') + '</em><b>Moved</b></div><div class=warn><em>Until ' + day(t1) + '</em><b>Cooling down</b></div>' +
                   '<div><em>Every 12 hours</em><b>Checked again</b></div><div><em>5 points more</em><b>Moved for you</b></div></div>'
-                : '<div class=mv-ap><span>On ' + day(t1) + ' this stake is free again. <b>Autopilot moves it for you</b> whenever it can earn more (min 5% APR), checking every 12 hours.</span></div>') +
+                : '') +   /* no "free again on ... Autopilot moves it" note (operator, 2026-10-17: redundant); the set below takes the room */
           mvSet({}, mineIds());
       } else {
         h = top('Your stake today', 'At its best', 'ok', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +

@@ -6338,8 +6338,6 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .mv-dc i{height:12px;border-radius:3px;background:var(--wbd)}
 .mv-dc i.on{background:var(--sv-amber)}
 .mv-days small{font-size:12px;color:var(--ws)}
-.mv-ap{margin-top:auto;display:flex;align-items:center;gap:16px;padding:14px 16px;border-radius:12px;background:rgba(43,200,189,.10)}
-.mv-ap>span{flex:1 1 auto;font-size:13.5px;line-height:1.45;color:var(--wt)}
 #mv-stage .mv-ghost{flex:0 0 auto;height:42px;padding:0 18px;border:1px solid var(--sv-teal);background:transparent;color:var(--sv-teal)}
 .mv-cyc{margin-top:auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .mv-cyc>div{display:flex;flex-direction:column;gap:3px;padding:11px 13px;border:1px solid var(--wbd);border-radius:11px}
@@ -6905,8 +6903,6 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
   #mv-stage .mv-sh:not(#z){display:none}
   #mv-stage .mv-hl>b:not(#z){font-size:26px}
   #mv-stage .mv-box .mv-r:not(#z){padding:3px 0}
-  #mv-stage .mv-ap:not(#z){padding:8px 12px}
-  #mv-stage .mv-ap .mv-ghost:not(#z){height:34px}
 }
 /* Your move: the action in the title row's corner, the chip just left of it; the set chart pinned to the foot, its
    bars each opening the validator (operator, 2026-09-30) */
@@ -7084,7 +7080,6 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   .mv-set{flex:0 0 auto;min-height:0}
   .mv-act{flex-direction:column;align-items:stretch;gap:10px}
   #mv-stage .mv-act .sd-go,#mv-stage .mv-go{width:100%}
-  .mv-ap{flex-direction:column;align-items:stretch}
   .mv-cyc{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-height:680px){.you-fct:not(#z){margin-top:0}.you-fct em{display:none}.you-fb{flex-direction:row;gap:6px}.you-fq:not(#z){height:26px;font-size:10px;padding:0 6px}.you-hf:not(#z){margin-top:8px;gap:6px}.you-sw:not(#z){padding:7px 12px}}
