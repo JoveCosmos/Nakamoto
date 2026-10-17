@@ -41,7 +41,10 @@
     /* two lines in the block's upper corner (operator, 2026-10-08): the addition, then a live dot and the word */
     /* (operator, 2026-10-13) no dot; the addition reads "+3% APR", upright and larger, "restake" small under it */
     /* a balance box (phones, tablets) says it shorter: the box's own label already reads Your APR (2026-10-15) */
-    return '<span class=you-rsx><span>+' + pct(Math.pow(1 + r / 730, 730) - 1 - r) + (box ? '' : ' APR') + '</span><span>restake</span></span>';
+    var add = '+' + pct(Math.pow(1 + r / 730, 730) - 1 - r);
+    /* the wallet's APR block (operator, 2026-10-17): "restake" on the line of "on N validators", the addition over it */
+    if(box === "line") return '<span class=you-rsl><span>restake</span><span>' + add + ' APR</span></span>';
+    return '<span class=you-rsx><span>' + add + (box ? '' : ' APR') + '</span><span>restake</span></span>';
   }
   function pp(x){ return (x >= 0 ? "+" : "−") + Math.abs(x * 100).toFixed(1) + "%"; }
   function hueOf(n){ var h = 0, s = String(n || "?"); for(var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return h; }
@@ -1933,8 +1936,8 @@
     var wname = (window.__WALLET && String(window.__WALLET.label || "").trim()) || "Your wallet";
     var row = function(k, v, u, extra){ return '<div class=you-r><span>' + k + '</span>' + (extra || '') + '<b>' + v + '</b><i>' + u + '</i></div>'; };
     var h = '<div class=you-h><h3 title="' + esc(wname) + '">' + esc(wname) + '</h3>' + wmeta() + '</div>';
-    h += '<div class=you-apr><em>Your APR</em><span class=you-big><b' + (mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '>' + (mine ? pct(pos.rate) : '-') + '</b>' + rsx(pos, mine) + '</span>' +
-      '<small>' + (!a ? 'connect a wallet to see yours' : !pos ? 'reading…' : mine ? 'on ' + onNow(pos) + ' validator' + (onNow(pos) === 1 ? '' : 's') : 'Nothing staked') + '</small></div>';
+    h += '<div class=you-apr><em>Your APR</em><span class=you-big><b' + (mine ? ' style="color:' + heat(pos.rate).ink + '"' : '') + '>' + (mine ? pct(pos.rate) : '-') + '</b></span>' +
+      '<small><span>' + (!a ? 'connect a wallet to see yours' : !pos ? 'reading…' : mine ? 'on ' + onNow(pos) + ' validator' + (onNow(pos) === 1 ? '' : 's') : 'Nothing staked') + '</span>' + rsx(pos, mine, "line") + '</small></div>';
     /* Pro on Redelegate: what can move now, the ticked delegations' free stake when any are ticked (operator, 2026-09-30) */
     var proRd = root.getAttribute("data-sv") === "dashboard/self" && matchMedia("(min-width:1100px)").matches && !root.getAttribute("data-pro");
     h += '<div class=you-bal>' +

@@ -6168,12 +6168,16 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 /* Restake's addition in the APR block's upper corner, two lines: "+11.7% APR", then a blinking dot and "restake" (operator,
    2026-10-08). Inside the block's own padding box, so it never touches the section's border */
 .you-apr,.mv-yk{position:relative}
-.you-big{display:inline-flex;align-self:flex-start}   /* not positioned: the tag anchors to the APR block, so it can sit at the column's right */
-/* the restake tag at the RIGHT of the wallet's APR row, level with the figure (operator, 2026-10-13: "push
-   restake to right"): "+3% APR" with "restake" centred under it, no dot */
-.you-big .you-rsx{left:auto;right:0;margin-left:0;top:3px;bottom:auto;align-items:center;gap:1px}
-.you-big .you-rsx span:first-child{font-size:12.5px;font-weight:700}
-.you-big .you-rsx span+span{font-size:8.5px}
+.you-big{display:inline-flex;align-self:flex-start}
+/* the restake addition at the right of the wallet's APR block (operator, 2026-10-13 "push restake to right"; 2026-10-17
+   "restake text aligned with 'on 25 vals', the apr and percent follow"): "restake" sits on the baseline of "on N
+   validators", "+3% APR" centred over it. Both share one grid cell, so the tag is as wide as the addition and "restake"
+   centres under it; the addition is a zero-height box whose line rises out of its top, so the block keeps its height */
+.you-apr small{display:flex;align-items:baseline;justify-content:space-between;gap:10px;min-width:0}
+.you-apr small>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.you-rsl{flex:0 0 auto;display:inline-grid;justify-items:center;font-family:var(--wmono);letter-spacing:.03em;color:var(--sv-green);white-space:nowrap;pointer-events:none}
+.you-rsl>span{grid-area:1/1;font-size:8.5px;line-height:1.2;opacity:.85}
+.you-rsl>span+span{display:flex;align-items:flex-end;align-self:start;height:0;margin-top:-1px;font-size:12.5px;font-weight:700;opacity:1}
 .you-rsx{position:absolute;top:0;right:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-family:var(--wmono);font-size:11px;line-height:1.2;font-style:normal;letter-spacing:.03em;color:var(--sv-green);white-space:nowrap;font-weight:500;pointer-events:none}
 .you-rsx span{display:inline-flex;align-items:center;gap:5px}
 .you-rsx span+span{font-size:9.5px;opacity:.85}
