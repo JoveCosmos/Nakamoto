@@ -4442,9 +4442,12 @@ rememberGridH();
    DEV ONLY until the operator turns it on in production: TICK_HOSTS lists the hosts it shows on (add
    atomone.gatahub.zone to go live). Elsewhere the strip stays hidden and nothing is fetched. ── */
 (function(){
-  var TICK_HOSTS = /^(dev-atomone\.gatahub\.zone|127\.0\.0\.1|localhost)$/;
+  /* HIDDEN EVERYWHERE, dev too (operator, 2026-10-17: "not good. keep it hidden. too basic and needs placement in web
+     better. too close to logo and atomone text"): null shows it nowhere; the dev hosts were
+     /^(dev-atomone\.gatahub\.zone|127\.0\.0\.1|localhost)$/ */
+  var TICK_HOSTS = null;
   var el = document.getElementById("hdrtick");
-  if(!el || !TICK_HOSTS.test(location.hostname)) return;
+  if(!el || !TICK_HOSTS || !TICK_HOSTS.test(location.hostname)) return;
   var nf = function(n){ return Math.round(n).toLocaleString("en-US"); };
   function items(s){
     var i = s && s.impact, L = []; if(!i) return L;
