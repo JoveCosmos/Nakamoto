@@ -279,17 +279,20 @@ def announce(L, ev):
     """the two grant events of this step as sentences, Autopilot and Restake never in one message (operator, 2026-10-09:
     an admin watch, no explanations), with the service's total as it stands after it. More than BURST of one service
     in one poll: one message for that service listing every address (red team 2026-10-01: a flood is one message)"""
-    want = [e for e in ev if e[1].startswith("New Autopilot grant") or e[1].startswith("Restake enabled")]
+    # and an Autopilot grant the delegator revoked (operator, 2026-10-18: "alerts discord when Autopilot is revoked")
+    want = [e for e in ev if e[1].startswith(("New Autopilot grant", "Restake enabled", "Autopilot grant revoked"))]
     if not want: return
     T = totals(L)
     for svc, name, prefix, did in (("autopilot", "Autopilot", "New Autopilot grant", "granted Autopilot"),
-                                   ("restake", "Restake", "Restake enabled", "turned on Restake")):
+                                   ("restake", "Restake", "Restake enabled", "turned on Restake"),
+                                   ("autopilot", "Autopilot", "Autopilot grant revoked", "revoked Autopilot")):
         grs = [e[3].get("Delegator") for e in want if e[1].startswith(prefix)]
         if not grs: continue
         tot = "%s now has %d wallets and {:,.1f} ATONE staked.".format(T[svc][1] / 1e6) % (name, T[svc][0])
         if len(grs) <= BURST:
             for gr in grs:
-                disc("ok", "New Autopilot grant" if svc == "autopilot" else "Restake turned on",
+                disc("warn" if prefix.endswith("revoked") else "ok",
+                     "Autopilot revoked" if prefix.endswith("revoked") else "New Autopilot grant" if svc == "autopilot" else "Restake turned on",
                      "`%s` %s with {:,.2f} ATONE staked.\n%s".format(staked(gr) / 1e6) % (gr, did, tot), None)
             continue
         text, n = "%d wallets %s in one check:\n" % (len(grs), did), 0
@@ -298,7 +301,8 @@ def announce(L, ev):
             if len(text) + len(ln) + 120 > 3800: break
             text += ln; n += 1
         if n < len(grs): text += "and %d more (the admin console lists them all)\n" % (len(grs) - n)
-        disc("ok", "%d new %s" % (len(grs), "Autopilot grants" if svc == "autopilot" else "Restake wallets"), text + tot, None)
+        disc("warn" if prefix.endswith("revoked") else "ok",
+             "%d Autopilot revokes" % len(grs) if prefix.endswith("revoked") else "%d new %s" % (len(grs), "Autopilot grants" if svc == "autopilot" else "Restake wallets"), text + tot, None)
 
 def milestones(L, c):
     """20 / 50 / 100 users and 200k / 500k / 1M ATONE, per service, each announced once (a row in `milestone`). The very
