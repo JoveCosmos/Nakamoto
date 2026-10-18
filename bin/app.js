@@ -3275,7 +3275,7 @@ rememberGridH();
   function stgTick(now){
     if(!STG.on) return;
     if(!stgShown()){ stgStop(); return; }
-    var dt = Math.min(0.05, (now - STG.last) / 1000), i; STG.last = now;
+    var dt = Math.max(0, Math.min(0.05, (now - STG.last) / 1000)), i; STG.last = now;   /* a first frame can be stamped before stgStart's clock read: never a negative step */
     if(now - STG.colAt > 1000) stgCols();
     stgSize();
     var ctx = STG.ctx || (STG.ctx = STG.cv.getContext("2d")), W = STG.w, H = STG.h, d = STG.d, n = STG.n, C = STG.col;
