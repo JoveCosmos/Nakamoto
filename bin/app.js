@@ -3216,7 +3216,7 @@ rememberGridH();
     var a1 = P.rate, y1 = P.earned, a0 = SPV.a == null ? a1 : SPV.a, y0 = SPV.y == null ? 0 : SPV.y, t0 = performance.now(), D = REDUCED ? 0 : 340;
     spFit(A, pct(Math.max(a0, a1))); spFit(Y, "+" + fmt(Math.max(y0, y1)));
     (function roll(n){
-      var k = D ? Math.min(1, (n - t0) / D) : 1, e = 1 - Math.pow(1 - k, 3);
+      var k = D ? Math.max(0, Math.min(1, (performance.now() - t0) / D)) : 1, e = 1 - Math.pow(1 - k, 3);   /* the clock, not the frame's timestamp: that one can precede t0 (or lag), and the ease then ran backwards ("+-2,134.8", 2026-10-18) */
       SPV.a = a0 + (a1 - a0) * e; SPV.y = y0 + (y1 - y0) * e;
       A.textContent = pct(SPV.a); Y.textContent = "+" + fmt(SPV.y);
       if(k < 1) SPV.raf = requestAnimationFrame(roll);

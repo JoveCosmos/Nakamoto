@@ -2771,6 +2771,11 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
 .sp-pho button:hover{background:rgba(255,176,46,.12)}
 .sp-pho svg{width:13px;height:13px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 @media(max-width:620px){.sp-view{gap:10px;padding-top:12px}.sp-hero b{font-size:31px}.sp-hero>div{padding:11px 13px 10px}.sp-stage{min-height:110px}}
+/* a laptop window (2026-10-18: "no stake button or alert button visible in stake pilot in normal laptop screen"): on a
+   short desktop window the stage gives way first, then the figures, so Alerts and Stake always sit inside the card */
+@media(min-width:621px) and (max-height:820px){.sp-view{gap:10px;padding-top:12px}.sp-hero b{font-size:36px}.sp-hero>div{padding:11px 15px 10px}.sp-stage{min-height:84px}}
+@media(min-width:621px) and (max-height:700px){.sp-view{gap:8px;padding-top:10px}.sp-hero b{font-size:29px}.sp-hero>div{padding:9px 13px 8px}.sp-hero em{margin-top:5px}
+  .sp-stage{min-height:60px}.sp-chips{height:29px}.spcard .txbtns:not(#z){padding-top:10px;padding-bottom:12px}}
 /* a short phone (an SE, a landscape turn): a size tighter, chips on one row, so the card fits without scrolling */
 @media(max-width:620px) and (max-height:700px){.sp-view{gap:8px;padding-top:10px}.sp-hero b{font-size:26px}.sp-hero>div{padding:9px 12px 8px}.sp-hero em{margin-top:5px}
   .sp-stage{min-height:72px}.sp-chips{height:29px}}
