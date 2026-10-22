@@ -1083,7 +1083,10 @@ def auto_apply(c, g, p, pid, dry, out):
     # to a single move: nothing was broadcast, so nothing can be sent twice
     per = MAX_MOVES_TX
     def over_gas(res):
-        return "max gas exceeded" in json.dumps(res.get("error") or "").lower() or "dynamicfee state: gas" in json.dumps(res.get("error") or "")
+        # the chain's block window, and the signer's own per-transaction ceiling (atone12hjdyj, 2026-10-22: 21 moves
+        # were 110.3M for the chain, then 10 moves 73.3M for the signer's 30M ceiling, at 7.3M a move)
+        e = json.dumps(res.get("error") or "").lower()
+        return "max gas exceeded" in e or "dynamicfee state: gas" in e or "more than the ceiling" in e
     if moves_today(c, gr) + len(moves) > MAX_MOVES_DAY:
         r = {"error": "daily move limit (%d) reached" % MAX_MOVES_DAY}
     else:
