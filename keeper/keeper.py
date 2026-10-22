@@ -57,6 +57,13 @@ MAX_MOVES_DAY = 60            # per wallet in any 24 hours (operator, 2026-10-01
 MAX_MOVES_TX = 60             # per transaction (operator, 2026-10-01: one transaction, ~20M gas of the block's 100M); the signer's MAX_MOVES
 RS_EDGE = 3                   # restake: the last 3 of the set are left out of the highest-APR pick (the signer's RS_EDGE)
 MIN_MOVE = 1_000_000          # no move under 1 ATONE: dust uses a pair entry and a move slot for nothing
+# A move off a validator that has been slashed makes the chain replay the delegation's reward history: CoreStake
+# (2,219 delegators, one slash) prices at 5.2M a move against the usual 300k, measured 2026-10-22, and a 21-move plan
+# was refused by the chain (110M over its 100M block) and by the signer (73M over its 30M a transaction). Above this a
+# move is not worth our PHOTON - unless it is a RESCUE, stake on a validator that left the active set and earns
+# nothing, where the fee buys the delegator their stake back and the wallet would otherwise sit idle for good.
+MAX_GAS_PER_MOVE = int(os.environ.get("KEEPER_MAX_GAS_PER_MOVE", str(1_500_000)))
+GAS_SEEN = {}                 # validator -> (gas a move, the ceiling that refused it), learned from a refusal
 FRESH_S = 3600                # the collector's record older than this, or a chain head older than HEAD_S: no tick
 HEAD_S = 180
 # (red team 2026-10-01) fee griefing: a grant that ends between our read and the block fails at delivery and the
@@ -903,7 +910,7 @@ SETTLE_WORDS = ("redelegation", "transitive", "too many", "max entries", "no del
                 "not enough delegation", "insufficient delegation", "invalid shares", "shares amount", "too few tokens",
                 "truncates to zero", "validator does not exist", "no validator", "same validator", "authorization not found",
                 "authorization expired", "failed to get grant", "insufficient amount", "more than", "exceeds",
-                "daily move limit", "bad move", "bad granter")
+                "daily move limit", "bad move", "bad granter", "gas a move")
 RETRY_WORDS = ("fee", "gas", "sequence", "mempool", "tx already in", "timeout", "timed out", "network", "connect", "refused",
                "reset", "unreachable", "econn", "socket", "rpc", "fetch failed", "http 5", "insufficient funds", "unauthorized")
 RETRY_CODES = {5, 11, 13, 19, 20, 32}    # the sdk codespace: fee payer short, out of gas, fee too low, in cache, mempool full, sequence
@@ -1053,6 +1060,18 @@ def beat():
     except Exception as e:
         log("beat failed: %s" % e)
 
+# a wallet whose ordinary move prices over the cap: the operator hears once a day, with the validator behind it, and
+# the wallet is left alone until its plan changes (a rescue never lands here)
+def gas_capped(c, gr, src, permove):
+    key = "gascap:" + time.strftime("%Y-%m-%d", time.gmtime())
+    if c.execute("SELECT 1 FROM alert_sent WHERE granter=? AND k=?", (gr, key)).fetchone(): return
+    c.execute("INSERT OR REPLACE INTO alert_sent VALUES(?, ?, ?)", (gr, key, int(time.time()))); c.commit()
+    name = _names().get(src, (src[-10:], None))[0]
+    alert("warn", "Autopilot move too expensive: " + short(gr),
+          "A move off %s prices at %s gas, over the %s cap, so nothing was sent. The stake still earns where it is; "
+          "a validator that left the active set would be moved anyway." % (name, "{:,}".format(permove), "{:,}".format(MAX_GAS_PER_MOVE)),
+          {"Delegator": gr, "Validator": name})
+
 def plan_fields(gr, p):
     f = {"Delegator": gr}
     if p and p.get("moves"):
@@ -1063,7 +1082,7 @@ def plan_fields(gr, p):
         f["Moves"] = "none: the stake already sits well"
     return f
 
-def auto_apply(c, g, p, pid, dry, out):
+def auto_apply(c, g, p, pid, dry, out, vals=None):
     """carry out a plan in the run that made it (no operator step since 2026-09-30), then announce it"""
     gr, now = g["granter"], int(time.time())
     f = plan_fields(gr, p)
@@ -1081,22 +1100,44 @@ def auto_apply(c, g, p, pid, dry, out):
     # signed. A wallet with many unmatured redelegations prices far above the usual 300k a move and can sit stuck on
     # every run (atone12hjdyj, 21 moves, 110.3M, three runs 2026-10-22). The part is then halved and tried again, down
     # to a single move: nothing was broadcast, so nothing can be sent twice
+    # Gas: the chain refuses a transaction whose gas would carry the block past its 100M maximum (x/dynamicfee
+    # state.Update), and the signer refuses one over its own ceiling. Both refusals come before anything is signed, so
+    # the part is halved and tried again, down to a single move. A validator that has been slashed costs many times the
+    # usual 300k a move (CoreStake, 5.2M, 2026-10-22): past MAX_GAS_PER_MOVE an ordinary move is left for the operator,
+    # while a RESCUE (the source left the active set, so the stake earns nothing) goes ahead at any price and finishes
+    # itself over the runs that follow
     per = MAX_MOVES_TX
+    GASRE = re.compile(r"gas (\d+)(?: is more than the ceiling |\D{0,12}> max )(\d+)")
     def over_gas(res):
-        # the chain's block window, and the signer's own per-transaction ceiling (atone12hjdyj, 2026-10-22: 21 moves
-        # were 110.3M for the chain, then 10 moves 73.3M for the signer's 30M ceiling, at 7.3M a move)
         e = json.dumps(res.get("error") or "").lower()
         return "max gas exceeded" in e or "dynamicfee state: gas" in e or "more than the ceiling" in e
+    def gas_of(res, n):
+        m = GASRE.search(json.dumps(res.get("error") or ""))
+        return (int(m.group(1)) // max(1, n), int(m.group(2))) if m else (0, 0)
+    def rescue(part):
+        # the source is not in the active set: that stake earns nothing until it moves
+        return bool(vals) and any(e["src"] not in vals for e in part)
+    def fits(src, want):
+        seen = GAS_SEEN.get(src)
+        return max(1, min(want, seen[1] // seen[0])) if seen and seen[0] > 0 else want
     if moves_today(c, gr) + len(moves) > MAX_MOVES_DAY:
         r = {"error": "daily move limit (%d) reached" % MAX_MOVES_DAY}
     else:
         k = 0
         while k < len(moves):
+            per = fits(moves[k]["src"], per)          # what this validator's moves were last known to cost
             part = moves[k:k + per]
             r = execute(gr, part)
-            while over_gas(r) and len(part) > 1:
-                per = max(1, len(part) // 2)
-                log("granter=%s gas over the block's limit at %d moves, trying %d" % (gr, len(part), per))
+            while over_gas(r):
+                permove, ceiling = gas_of(r, len(part))
+                if permove: GAS_SEEN[part[0]["src"]] = (permove, ceiling)
+                if permove > MAX_GAS_PER_MOVE and not rescue(part):
+                    r = {"error": "%s gas a move, over the %s cap: left for the operator" % ("{:,}".format(permove), "{:,}".format(MAX_GAS_PER_MOVE))}
+                    gas_capped(c, gr, part[0]["src"], permove)
+                    break
+                if len(part) <= 1: break
+                per = max(1, min(len(part) // 2, fits(part[0]["src"], len(part) - 1)))
+                log("granter=%s %s gas a move: %d moves refused, trying %d%s" % (gr, "{:,}".format(permove) if permove else "?", len(part), per, ", rescue" if rescue(part) else ""))
                 part = moves[k:k + per]
                 r = execute(gr, part)
             if not ("txhash" in r and "error" not in r): moves = moves[k:]; break
@@ -1328,7 +1369,7 @@ def once(c, only=None, live=None, force=False):
             # no approval (operator, 2026-09-30): a plan is carried out in the run that makes it. Disable (the console's
             # stop) stops everything for a delegator
             if due and p and p["moves"] and gr not in adm["paused"]:
-                auto_apply(c, g, p, pid, dry, rep)
+                auto_apply(c, g, p, pid, dry, rep, work)
             elif due and p is not None and not p["moves"]:
                 c.execute("DELETE FROM retry WHERE granter=?", (gr,)); c.commit()     # nothing left to move: nothing to retry
             # the history after this run's move, so a move made now is in the report now (a grant it used up gets no later run)
