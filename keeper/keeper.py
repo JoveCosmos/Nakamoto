@@ -1076,18 +1076,33 @@ def auto_apply(c, g, p, pid, dry, out):
     # in parts of at most MAX_MOVES_TX, one transaction each, in order; a part that fails stops the rest, and what
     # landed before it stays recorded (the retry plans again from the chain)
     moves, sent, r = p["moves"], [], {}
+    # the chain's own gas window: the dynamicfee post-handler refuses a transaction whose gas would carry the block past
+    # its maximum (x/dynamicfee state.Update, "gas N > max 100000000"), and the simulation fails before anything is
+    # signed. A wallet with many unmatured redelegations prices far above the usual 300k a move and can sit stuck on
+    # every run (atone12hjdyj, 21 moves, 110.3M, three runs 2026-10-22). The part is then halved and tried again, down
+    # to a single move: nothing was broadcast, so nothing can be sent twice
+    per = MAX_MOVES_TX
+    def over_gas(res):
+        return "max gas exceeded" in json.dumps(res.get("error") or "").lower() or "dynamicfee state: gas" in json.dumps(res.get("error") or "")
     if moves_today(c, gr) + len(moves) > MAX_MOVES_DAY:
         r = {"error": "daily move limit (%d) reached" % MAX_MOVES_DAY}
     else:
-        for k in range(0, len(moves), MAX_MOVES_TX):
-            part = moves[k:k + MAX_MOVES_TX]
+        k = 0
+        while k < len(moves):
+            part = moves[k:k + per]
             r = execute(gr, part)
+            while over_gas(r) and len(part) > 1:
+                per = max(1, len(part) // 2)
+                log("granter=%s gas over the block's limit at %d moves, trying %d" % (gr, len(part), per))
+                part = moves[k:k + per]
+                r = execute(gr, part)
             if not ("txhash" in r and "error" not in r): moves = moves[k:]; break
             record_moves(c, gr, part, r.get("txhash"), now); c.commit()
             RUN["ap_wallets"].add(gr); RUN["ap_moves"] += len(part); RUN["ap_txs"].append(r.get("txhash"))
             RUN["txinfo"][r.get("txhash")] = {"at": now, "granter": gr, "msgs": len(part), "uatone": sum(int(e["amount"]) for e in part)}
             RUN["ap_uatone"] += sum(int(e["amount"]) for e in part); RUN["ap_gain"] += sum(float(e.get("gain", 0)) for e in part)
             sent.append(r.get("txhash"))
+            k += len(part)
         else:
             moves = []
     ok = not moves
@@ -1096,7 +1111,7 @@ def auto_apply(c, g, p, pid, dry, out):
     if not ok:
         # (red team 2026-10-01) every broadcast counts: a failed one (a code != 0, a 502 with its txhash, one sent and not
         # yet seen) is in the wallet's day and its fee in the wallet's budget; a grant or stake gone holds it 24 hours
-        record_failed(c, gr, "autopilot", h, min(len(moves), MAX_MOVES_TX))
+        record_failed(c, gr, "autopilot", h, min(len(moves), per))
         held = hold_if(c, gr, r.get("error"))
     c.execute("INSERT INTO applied VALUES(?,?,?,?,?,?,?,?,?)", (now, gr, pid, "auto", ",".join(sent) or None, 0, 1 if ok else 0,
               None if ok else ("%s: %s" % ("settled" if kind == "settle" else "will retry", json.dumps(r.get("error"))))[:300], 0))
