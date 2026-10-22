@@ -1036,6 +1036,23 @@ def report(granter, obj):
     tmp = os.path.join(REPORTS, granter + ".json.tmp")
     json.dump(obj, open(tmp, "w")); os.replace(tmp, os.path.join(REPORTS, granter + ".json"))
 
+# A slot run walks every wallet and takes about six minutes at 96 Autopilot and 72 Restake grants, while _status.json
+# was written only at its end: the app's own check calls the keeper "stale" after five minutes and paged the operator
+# (2026-10-18, 2026-10-22). The run now stamps the file as it goes, at most once a minute, so "ticking" means alive;
+# a run that truly hangs still goes stale and still pages.
+_BEAT = [0.0]
+def beat():
+    now = time.time()
+    if now - _BEAT[0] < 60: return
+    _BEAT[0] = now
+    p = os.path.join(REPORTS, "_status.json")
+    try:
+        obj = json.load(open(p)) if os.path.exists(p) else {}
+        obj["checked"] = int(now); obj["busy"] = True
+        tmp = p + ".tmp"; json.dump(obj, open(tmp, "w")); os.replace(tmp, p)
+    except Exception as e:
+        log("beat failed: %s" % e)
+
 def plan_fields(gr, p):
     f = {"Delegator": gr}
     if p and p.get("moves"):
@@ -1234,6 +1251,7 @@ def once(c, only=None, live=None, force=False):
     adm = admin()
     for g in gs:
         gr = g["granter"]
+        beat()
         try:
             # no strategies: one fixed rule for every Autopilot (the report still names it "moderate")
             name = "moderate"
@@ -1317,6 +1335,7 @@ def once(c, only=None, live=None, force=False):
     # usual checks (withdraw address, other services, the cap, the dry switch, Disable). No admin step.
     for granter in rgs:
         if only and granter != only: continue
+        beat()
         try:
             if granter in adm["paused"]: continue
             # (red team 2026-10-01) the same holds as Autopilot, with the end of Restake's own two grants; not marked as
