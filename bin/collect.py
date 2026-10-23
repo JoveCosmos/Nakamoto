@@ -437,10 +437,17 @@ json.dump(vsets, open(_tmp, "w")); os.replace(_tmp, VSETS)
 srows = sql(f"""SELECT cons_addr, kind, count(*)::int,
                        max(height), to_char(max(time),'YYYY-MM-DD'), coalesce(sum(burned),0)::text
                 FROM slash_event WHERE chain_id='{CHAIN}' GROUP BY cons_addr, kind;""")
+# jailings of the last 90 days as well: Restake will not stake a wallet's rewards on a validator jailed three times
+# ever or twice in 90 days (operator, 2026-10-23), and the app shows the count on the validator's card
+jrows = sql(f"""SELECT cons_addr, count(*)::int FROM slash_event
+                WHERE chain_id='{CHAIN}' AND kind='jailed' AND time > now() - interval '90 days'
+                GROUP BY cons_addr;""")
+j90 = {ca: int(n) for ca, n in jrows}
 hist = {}
 for ca, kind, n, h, t, burned in srows:
     e = hist.setdefault(ca, {"jailed": 0, "slashed": 0, "last": None, "burned": 0})
     e["jailed" if kind == "jailed" else "slashed"] = int(n)
+    e["jailed90"] = j90.get(ca, 0)
     if e["last"] is None or t > e["last"]: e["last"] = t; e["last_height"] = int(h)
     e["burned"] += int(burned or 0)
 
@@ -910,7 +917,7 @@ out = {
       missed=sinfo.get(v["cons"], {}).get("missed", 0),
       tomb=sinfo.get(v["cons"], {}).get("tomb", False),
       prop=prop.get(v["chex"], 0), prop_pct=round(prop.get(v["chex"], 0)/ptot*100, 3),
-      jail=hist.get(v["cons"], {}).get("jailed", 0),
+      jail=hist.get(v["cons"], {}).get("jailed", 0), jail90=hist.get(v["cons"], {}).get("jailed90", 0),
       slash=hist.get(v["cons"], {}).get("slashed", 0),
       last_slash=hist.get(v["cons"], {}).get("last"),
       burned=hist.get(v["cons"], {}).get("burned", 0),
@@ -955,7 +962,7 @@ out["hist_from"] = status["sync_info"].get("earliest_block_time")
 # testnet: what only our index knows is not known - None, which the page shows as N/A
 if TESTNET:
     for v in out["validators"]:
-        for k in ("prop", "prop_pct", "jail", "last_slash", "burned", "bars", "d30", "d90", "joined",
+        for k in ("prop", "prop_pct", "jail", "jail90", "last_slash", "burned", "bars", "d30", "d90", "joined",
                   "life_up", "life_n", "life_missed", "earn_avg", "earn_hi", "earn_lo"):
             if k in v: v[k] = None
 

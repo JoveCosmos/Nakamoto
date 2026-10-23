@@ -510,6 +510,28 @@ def gas_price():
     try: return float(get("/cosmos/dynamicfee/v1/gas_price/uphoton")["price"]["amount"]) * 2
     except Exception: return 0.25
 
+# ── validators Restake will not stake new rewards on (operator, 2026-10-23): jailed three times or more ever, or
+# twice or more in the last 90 days. Rewards are staked for the delegator every 12 hours with no one watching, so a
+# validator that keeps going down would quietly take them; Autopilot's own moves and the app's StakePilot are NOT
+# filtered, the reader chooses there. The counts come from the published build (collect.py reads them from our index),
+# re-read when the file changes, so a validator returns on its own once it is 90 days clean ────────────────────────
+JAIL_EVER, JAIL_90 = 3, 2
+_SKIP = {"at": 0.0, "mtime": 0, "ops": set()}
+def restake_skip():
+    """the operator addresses Restake leaves alone, from the build's own validator list"""
+    path = os.path.join(os.path.dirname(REPORTS.rstrip("/")), "data.json")
+    try:
+        st = os.stat(path)
+        if st.st_mtime == _SKIP["mtime"]: return _SKIP["ops"]
+        d = json.load(open(path))
+        _SKIP["ops"] = {v["op"] for v in d.get("validators", [])
+                        if (v.get("jail") or 0) >= JAIL_EVER or (v.get("jail90") or 0) >= JAIL_90}
+        _SKIP["mtime"] = st.st_mtime
+        log("restake skips %d validator(s) for jailings" % len(_SKIP["ops"]))
+    except Exception as e:
+        log("restake skip list unreadable, nobody skipped: %s" % e)   # a missing build never blocks a restake
+    return _SKIP["ops"]
+
 def plan_restake(c, granter, rg, vals, m):  # noqa: C901
     """what a restake would do now: claim the wallet's rewards (largest first) and stake them all on the best
     validator of the DELEGATE allow-list. Only grants to our own address count: any other authz grant the
@@ -546,7 +568,8 @@ def plan_restake(c, granter, rg, vals, m):  # noqa: C901
     # past that, fewer rewards are claimed now and the rest at the next run
     allow, deny = set(rg["stake"]["allow"] or []), set(rg["stake"].get("deny") or [])
     ranked = sorted(vals.values(), key=lambda v: -v["t"])
-    def ok(v): return (not allow or v["op"] in allow) and v["op"] not in deny
+    skip = restake_skip()
+    def ok(v): return (not allow or v["op"] in allow) and v["op"] not in deny and v["op"] not in skip
     def room(amount):
         """(2026-10-09) Autopilot's pours leave the shelf a staircase 1 ATONE a step (20 validators wide that day): rising
         from its bottom lifts every step, more legs than RS_LEGS, and every restake was skipped. Then the rewards go where
