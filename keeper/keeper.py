@@ -516,21 +516,25 @@ def gas_price():
 # filtered, the reader chooses there. The counts come from the published build (collect.py reads them from our index),
 # re-read when the file changes, so a validator returns on its own once it is 90 days clean ────────────────────────
 JAIL_EVER, JAIL_90 = 3, 2
-_SKIP = {"at": 0.0, "mtime": 0, "ops": set()}
-def restake_skip():
-    """the operator addresses Restake leaves alone, from the build's own validator list"""
+_SKIP = {"mtime": 0, "restake": set(), "all": set()}
+def _skips():
+    """from the build: the validators the operator's list excludes from every strategy ("nostake"), and the ones
+    Restake alone leaves alone (the jailings above). A build that cannot be read excludes nobody"""
     path = os.path.join(os.path.dirname(REPORTS.rstrip("/")), "data.json")
     try:
         st = os.stat(path)
-        if st.st_mtime == _SKIP["mtime"]: return _SKIP["ops"]
+        if st.st_mtime == _SKIP["mtime"]: return _SKIP
         d = json.load(open(path))
-        _SKIP["ops"] = {v["op"] for v in d.get("validators", [])
-                        if (v.get("jail") or 0) >= JAIL_EVER or (v.get("jail90") or 0) >= JAIL_90}
+        _SKIP["all"] = set(d.get("nostake") or [])
+        _SKIP["restake"] = _SKIP["all"] | {v["op"] for v in d.get("validators", [])
+                                           if (v.get("jail") or 0) >= JAIL_EVER or (v.get("jail90") or 0) >= JAIL_90}
         _SKIP["mtime"] = st.st_mtime
-        log("restake skips %d validator(s) for jailings" % len(_SKIP["ops"]))
+        log("skips: %d everywhere, %d more for Restake" % (len(_SKIP["all"]), len(_SKIP["restake"]) - len(_SKIP["all"])))
     except Exception as e:
-        log("restake skip list unreadable, nobody skipped: %s" % e)   # a missing build never blocks a restake
-    return _SKIP["ops"]
+        log("skip list unreadable, nobody skipped: %s" % e)
+    return _SKIP
+def restake_skip(): return _skips()["restake"]
+def strategy_skip(): return _skips()["all"]
 
 def plan_restake(c, granter, rg, vals, m):  # noqa: C901
     """what a restake would do now: claim the wallet's rewards (largest first) and stake them all on the best
@@ -817,7 +821,8 @@ def plan(g, rows, reds, vals, m, room=None):
     rate_src = {x["op"]: x["rate"] for x in src}
     # any validator of the active set may take stake (operator, 2026-09-30): no uptime test, and a tombstoned validator
     # never returns to the set, so there is none to exclude; an older grant's validator list still binds
-    def listed(v): return (g["allow"] is None or v["op"] in g["allow"]) and v["op"] not in g["deny"]
+    skip_all = strategy_skip()
+    def listed(v): return (g["allow"] is None or v["op"] in g["allow"]) and v["op"] not in g["deny"] and v["op"] not in skip_all
     used = pairs_used(reds)
     def dst_rates(ms):
         mv_ = {}

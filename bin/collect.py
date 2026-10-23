@@ -433,6 +433,13 @@ for _i, _w in enumerate(_done):
 _tmp = VSETS + ".tmp"
 json.dump(vsets, open(_tmp, "w")); os.replace(_tmp, VSETS)
 
+# Validators the app's own strategies never stake ON (operator's list; a wallet's existing stake there is untouched
+# and may still be moved off). Add an operator address here and the next build carries it to Autopilot, StakePilot
+# and Restake alike.
+NO_STAKE = [
+    "atonevaloper1gpqlu4ml3hqkfqf3vyrvj8040c6jdrt0l8eg34",   # StakeLab.zone (2026-10-23)
+]
+
 # ── per-validator history from our index ─────────────────────────────────────
 srows = sql(f"""SELECT cons_addr, kind, count(*)::int,
                        max(height), to_char(max(time),'YYYY-MM-DD'), coalesce(sum(burned),0)::text
@@ -828,6 +835,7 @@ except Exception as e:
     print(f"atomone-app: economics skipped ({e})", file=sys.stderr)
 
 out = {
+  "nostake": NO_STAKE,
   "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
   "chain": CHAIN, "height": head,
   "eta": {"now": coef, "step": float(nb["step"]), "min": float(nb["minimum_coefficient"]),

@@ -2109,14 +2109,14 @@ rememberGridH();
     var m = model(); m.a = m.a * S / (S + u);
     if(!window.__shelfFill) return null;
     var at = {}; V.forEach(function(v, q){ at[v[3]] = q; });
-    var add = window.__shelfFill(V, V.map(function(v){ return v[1]; }), u, function(){ return true; }), legs = [], placed = 0, op;
+    var add = window.__shelfFill(V, V.map(function(v){ return v[1]; }), u, function(q){ return !noStake(V[q][3]); }), legs = [], placed = 0, op;
     for(op in add){ var q = at[op], v = V[q]; legs.push({ id: v[3], m: v[0], rank: q + 1, t: v[1], c: v[2], x: add[op] }); placed += add[op]; }
     /* no room on the shelf at all (operator, 2026-10-17: "stakepilot not working in testnet"): a set levelled flat, as
        testnet's is (ranks 7-43 within 4 ATONE, the one above the zone among them), leaves no validator 300 ATONE under the
        one above, so the rule has no answer. Then the stake goes to the smallest validators the rule may use, in equal
        parts, at most 5 and at least 1 ATONE each; where the shelf has room (mainnet) it is never used */
     if(!legs.length && u >= 1e6 && window.__shelfZone){
-      var zone = window.__shelfZone(n), k = Math.min(5, zone.length, Math.floor(u / 1e6)), each = k ? Math.floor(u / k) : 0;
+      var zone = window.__shelfZone(n).filter(function(q){ return !noStake(V[q][3]); }), k = Math.min(5, zone.length, Math.floor(u / 1e6)), each = k ? Math.floor(u / k) : 0;
       for(var z = 0; z < k; z++){ var vz = V[zone[z]]; legs.push({ id: vz[3], m: vz[0], rank: zone[z] + 1, t: vz[1], c: vz[2], x: z === 0 ? u - each * (k - 1) : each }); }
       placed = legs.length ? u : 0;
     }
@@ -4146,6 +4146,10 @@ rememberGridH();
     return add;
   }
   window.__shelfFill = shelfFill;
+  /* validators the build's own list keeps out of a strategy's destinations: stake already there is left alone and may
+     still be moved off, they simply take nothing new */
+  function noStake(id){ var L = (window.__D && window.__D.nostake) || []; return L.indexOf(id) >= 0; }
+  window.__noStake = noStake;
   /* the ranks the shelf may pour into (0-based, smallest first): the last EDGE left out, never the largest fifth */
   window.__shelfZone = function(n){ var o = []; for(var i = n - 1 - EDGE; i >= topN(n); i--) o.push(i); return o; };
   window.__planRank = function(pos){
