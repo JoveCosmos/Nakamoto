@@ -2770,7 +2770,9 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
   font-family:var(--wmono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
 .sp-pho button:hover{background:rgba(255,176,46,.12)}
 .sp-pho svg{width:13px;height:13px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
-@media(max-width:620px){.sp-view{gap:10px;padding-top:12px}.sp-hero b{font-size:31px}.sp-hero>div{padding:11px 13px 10px}.sp-stage{min-height:110px}}
+@media(max-width:620px){.sp-view{gap:10px;padding-top:12px}.sp-hero b{font-size:31px}.sp-hero>div{padding:11px 13px 10px}.sp-stage{min-height:110px}
+  /* two chips a row on a phone (2026-10-25: "on phone only one val appears"): a long name gives way, the amount never */
+  .sp-chips{gap:5px}.sp-chip{gap:5px;padding:0 9px 0 4px}.sp-chip span{max-width:72px}}
 /* a laptop window (2026-10-18: "no stake button or alert button visible in stake pilot in normal laptop screen"): on a
    short desktop window the stage gives way first, then the figures, so Alerts and Stake always sit inside the card */
 @media(min-width:621px) and (max-height:820px){.sp-view{gap:10px;padding-top:12px}.sp-hero b{font-size:36px}.sp-hero>div{padding:11px 15px 10px}.sp-stage{min-height:84px}}

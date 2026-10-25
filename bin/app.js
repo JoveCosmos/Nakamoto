@@ -3235,11 +3235,28 @@ rememberGridH();
       /* the same validators: only the amounts change, in place */
       show.forEach(function(q, i){ var b = el.children[i] && el.children[i].querySelector("b"); if(b){ var t = "+" + fmt(q.x); if(b.textContent !== t) b.textContent = t; } });
       var lf = el.querySelector(".left"); if(lf) lf.textContent = fmt(left) + " ATONE stays";
+      if(spOver(el)){ SP.key = null; spChips(P); }   /* a wider amount pushed a chip out: lay them out again */
       return;
     }
     SP.key = key;
     el.innerHTML = show.map(chip).join("") + (more > 0 ? '<span class="sp-chip more">+' + more + '</span>' : '') +
       (left ? '<span class="sp-chip left">' + fmt(left) + ' ATONE stays</span>' : '');
+    /* the strip has a fixed height (nothing below it moves) and clips: a validator that does not fit is counted into the
+       "+N" chip instead of vanishing, so a phone never shows one validator of three with no sign of the rest */
+    var cut = 0, mv, vs;
+    while(spOver(el) && (vs = el.querySelectorAll(".sp-chip[data-id]")).length > 1){
+      vs[vs.length - 1].remove(); cut++;
+      mv = el.querySelector(".sp-chip.more");
+      if(!mv){ mv = document.createElement("span"); mv.className = "sp-chip more"; var lv = el.querySelectorAll(".sp-chip[data-id]"); lv[lv.length - 1].after(mv); }
+      mv.textContent = "+" + (more + cut);
+    }
+  }
+  /* by layout position, not the painted box: the chips arrive with a short slide, and mid-slide they paint lower than
+     they sit, which read as overflow and cut chips that fit */
+  function spOver(el){
+    var c = el.lastElementChild; if(!c || !el.clientHeight) return false;
+    var top = c.offsetParent === el ? c.offsetTop : c.offsetTop - el.offsetTop;
+    return top + c.offsetHeight > el.clientHeight + 1;
   }
   /* the stage: every validator of the set as a bar (largest left), the ones the move lands on lit, and the stake flowing
      into them as light; bars ease to their new state, so dragging the slider is felt, not redrawn */
