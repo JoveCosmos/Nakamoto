@@ -400,7 +400,7 @@ for _pg in (() if TESTNET else ("admin",)):          # the faucet page is gone: 
 _td, _to = os.path.join(os.path.dirname(__file__), "tools"), os.path.join(OUT, "tools")
 os.makedirs(_to, exist_ok=True)
 _tv = {}
-for _fn in ("tools.js", "index.js", "revoke.js", "send.js"):
+for _fn in ("tools.js", "index.js", "revoke.js", "send.js", "gather.js"):
     _chk = subprocess.run(["/usr/bin/node", "--check", os.path.join(_td, _fn)], capture_output=True, text=True)
     if _chk.returncode != 0:
         sys.exit("atomone-app: FATAL tools/%s does not parse:\n%s" % (_fn, _chk.stderr.strip()[-600:]))
@@ -410,7 +410,7 @@ _css = _bare_css(open(os.path.join(_td, "tools.css")).read()).encode(); _tv["too
 _t = os.path.join(_to, ".tools.css.tmp"); open(_t, "wb").write(_css); os.chmod(_t, 0o640); os.replace(_t, os.path.join(_to, "tools.css"))
 _txv = hashlib.sha256(open(os.path.join(OUT, "tx.js"), "rb").read()).hexdigest()[:10]
 _netjson = json.dumps({"net": NETCFG}).replace("<", "\\u003c")
-for _pg in ("index", "revoke", "send"):
+for _pg in ("index", "revoke", "send", "gather"):
     _h = _bare_html(open(os.path.join(_td, _pg + ".html")).read())
     _h = (_h.replace("{{BASE}}", NETCFG["base"]).replace("{{NETJSON}}", _netjson).replace("{{NETNAME}}", NETCFG["name"])
             .replace("{{ON_MAIN}}", "" if TESTNET else "on").replace("{{ON_TEST}}", "on" if TESTNET else "")

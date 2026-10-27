@@ -135,3 +135,11 @@ textarea.paste{width:100%;min-height:92px;padding:10px 12px;border:1px solid var
   .foot{gap:10px} .foot .btn{flex:1 1 100%}
 }
 @media(max-width:360px){.hero{grid-template-columns:repeat(3,minmax(0,1fr))} .hero b{font-size:21px;min-height:21px} .hero em{font-size:7.5px;letter-spacing:.08em}}
+
+/* gather: what the move does, said before signing */
+.notes{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.notes:empty{display:none}
+.notes p{margin:0;padding:10px 12px;border:1px solid var(--wbd);border-radius:10px;font-size:13px;line-height:1.5;color:var(--ws)}
+.notes p b{color:var(--wt);font-weight:600;font-variant-numeric:tabular-nums}
+.notes p.w{border-color:var(--amber);background:linear-gradient(180deg,rgba(255,176,46,.08),transparent)}
+.notes p a{color:var(--teal)}
