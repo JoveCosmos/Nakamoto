@@ -6236,6 +6236,10 @@ html[data-svs=over] #one #sv-over{display:flex;flex-direction:column;padding:0;b
 .you-fct>em small{margin-left:6px;font-size:9px;letter-spacing:.06em;text-transform:none;color:var(--wf);opacity:.8}
 .you-fb{display:flex;flex-direction:column;gap:8px}
 .you-fw{position:relative;display:flex}
+/* phones: the two requests side by side, each half the row (operator, 2026-10-27: "faucet buttons are on the left,
+   right side is empty"); the short-screen rule below made them a row without letting them grow */
+@media(max-width:620px){.you-fb:not(#z){flex-direction:row;gap:8px}.you-fb>.you-fw,.you-fb>.you-fq{flex:1 1 0;min-width:0}}
+@media(max-height:680px){.you-fb>.you-fw,.you-fb>.you-fq{flex:1 1 0;min-width:0}}
 @media(max-height:680px){.you-fct:not(#z){margin-top:0}.you-fct em{display:none}.you-fb{flex-direction:row;gap:6px}.you-fq:not(#z){height:26px;font-size:10px;padding:0 6px}.you-hf:not(#z){margin-top:8px;gap:6px}.you-sw:not(#z){padding:7px 12px}}
 .you-fq{flex:1 1 auto;min-width:0;height:34px;padding:0 12px;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-sizing:border-box;border:1px solid var(--sv-teal,#2bc8bd);border-radius:9px;background:transparent;color:var(--sv-teal,#2bc8bd);
   font:600 11.5px var(--wsans);cursor:pointer;white-space:nowrap}
