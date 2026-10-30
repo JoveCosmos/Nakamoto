@@ -588,20 +588,19 @@ window.__mapMode = function(m){
 window.addEventListener("pageshow", function(ev){ if(ev.persisted) window.__mapMode("color"); });
 
 /* trend */
-var drawTrend = (function(){
+/* The Effect chart, drawn into any svg at that svg's own pixel size: the Trend panel's box, or the popup that opens it big
+   (2026-10-30: the popup copied the panel's drawing into a fixed 900x300 frame, so it sat small in one corner of an empty
+   card). Its frame, type, strokes and dots match Projection's beside it exactly; the marker's tag sits right of its line,
+   as TODAY does (BONUS ON sat left of it and ran into the series name). */
+function drawTrendTo(el, W, H, sm){
   /* Weekly on both sides of the bonus. Months could not resolve eight weeks of
      bonus - two points is one interval - and a measure that changes scale at the
      very line it is meant to test proves nothing. */
-  /* the viewBox takes the BOX's own shape (audit 2026-10-13: a fixed 900x300 letterboxed into the tall
-     Trend panel drew the whole chart at ~44% with 6px axis text), as the bonus Graph does; redrawn on resize */
-  var sm = window.innerWidth < 620;
-  var box = E("trend") ? E("trend").getBoundingClientRect() : null;
-  var T=D.weekly, W=box && box.width > 40 ? Math.round(box.width) : (sm?460:900),
-      H=box && box.height > 40 ? Math.round(box.height) : 300,
-      PL=sm?34:64, PR=sm?6:28, PT=sm?20:26, PB=sm?34:46;
+  var T=D.weekly, PL=sm?34:64, PR=sm?6:28, PT=sm?20:26, PB=sm?34:46;
   /* phones: the axis figures start at the title's left edge and the plot runs to the boxes' right edge, as Projection's */
   var YLX=sm?0:PL-11, YLA=sm?"start":"end";
-  if(!T || T.length<2){ E("trend").innerHTML=""; return; }
+  if(!el) return;
+  if(!T || T.length<2){ el.innerHTML=""; return; }
   var vs=T.map(function(x){return x.top10;});
   var lo=Math.floor(Math.min.apply(null,vs))-1, hi=Math.ceil(Math.max.apply(null,vs))+1;
   var X=function(i){return PL+i/(T.length-1)*(W-PL-PR);};
@@ -613,11 +612,10 @@ var drawTrend = (function(){
     '" stroke="#232342"/><text x="'+YLX+'" y="'+(Y(g)+4)+'" text-anchor="'+YLA+'" font-size="11.5" fill="#6f6d94">'+g+'%</text>';
   var bx = bi>0 ? X(bi-0.5) : null;
   if(bx!==null){ s+='<rect x="'+bx+'" y="'+PT+'" width="'+(W-PR-bx)+'" height="'+(H-PT-PB)+'" fill="#ff4d1f12"/>'+
-    '<line x1="'+bx+'" y1="'+PT+'" x2="'+bx+'" y2="'+(H-PB)+'" stroke="#ff4d1f" stroke-width="2"/>'+
-    /* phones: the left label owns the top-left corner, so the tag moves inside the shaded span */
-    '<text x="'+(sm?bx+8:bx-10)+'" y="'+(PT+17)+'" font-size="12.5" fill="#ff4d1f" text-anchor="'+(sm?'start':'end')+'">BONUS ON</text>'; }
+    '<line x1="'+bx+'" y1="'+PT+'" x2="'+bx+'" y2="'+(H-PB)+'" stroke="#ff4d1f" stroke-width="1.5"/>'+
+    '<text x="'+(bx+10)+'" y="'+(PT+17)+'" font-size="12.5" fill="#ff4d1f">BONUS ON</text>'; }
   T.forEach(function(x,i){ d+=(i?"L":"M")+X(i).toFixed(1)+" "+Y(x.top10).toFixed(1); });
-  s+='<path d="'+d+'" fill="none" stroke="#fff8dc" stroke-width="2.4"/>';
+  s+='<path d="'+d+'" fill="none" stroke="#fff8dc" stroke-width="3"/>';
   /* every week is a point, but a label every week would be a smear - one in four,
      always including the first week of the bonus */
   var lab=Math.ceil(T.length/9);
@@ -628,22 +626,31 @@ var drawTrend = (function(){
     if(i!==bi && (lx-lastLX<52 || Math.abs(lx-bX)<52)) return ""; lastLX=lx;
     if(lx>W-PR-24){ lx=W-PR; a="end"; } else if(lx<PL+20){ a="start"; }
     return '<text x="'+lx.toFixed(1)+'" y="'+(H-PB+23)+'" text-anchor="'+a+'" font-size="10.5" fill="#6f6d94">'+x.date+'</text>'; };
-  T.forEach(function(x,i){ var on=bi>=0&&i>=bi;
-    s+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(x.top10).toFixed(1)+'" r="'+(on?4.6:3.4)+
-      '" fill="'+(on?"#ff4d1f":"#fff8dc")+'" stroke="#06060c" stroke-width="1.2"><title>'+
+  /* dots as Projection's: 4, the latest 6 (Projection's TODAY), outlined 1.5 */
+  T.forEach(function(x,i){ var on=bi>=0&&i>=bi, last=i===T.length-1;
+    s+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(x.top10).toFixed(1)+'" r="'+(last?6:4)+
+      '" fill="'+(on?"#ff4d1f":"#fff8dc")+'" stroke="#06060c" stroke-width="1.5"><title>'+
       x.date+", "+x.top10+"%, nakamoto "+x.nakamoto+'</title></circle>';
     if(i===bi || (i-bi)%lab===0) s+=dlab(x,i); });
   s+='<text x="'+PL+'" y="'+(PT+17)+'" font-size="12.5" fill="#a5a3c4">'+
     (sm?"10 LARGEST VALS":"10 LARGEST VALIDATORS")+'</text>';
-  E("trend").setAttribute("viewBox","0 0 "+W+" "+H);
-  E("trend").setAttribute("preserveAspectRatio","none");
-  E("trend").innerHTML=s;
-});
+  el.setAttribute("viewBox","0 0 "+W+" "+H);
+  el.setAttribute("preserveAspectRatio","none");
+  el.innerHTML=s;
+}
+/* the Trend panel's copy: the viewBox takes the BOX's own shape (audit 2026-10-13: a fixed 900x300 letterboxed into the
+   tall Trend panel drew the whole chart at ~44% with 6px axis text), as the bonus Graph does; redrawn on resize */
+window.__drawTrendTo = drawTrendTo;   // the popup's chart (its code lives in another scope)
+var drawTrend = function(){
+  // the layout size (clientWidth/Height): a view switching in is scaled by its animation, which getBoundingClientRect reports
+  var sm = window.innerWidth < 620, t = E("trend"), box = t ? { width: t.clientWidth, height: t.clientHeight } : null;
+  drawTrendTo(E("trend"), box && box.width > 40 ? Math.round(box.width) : (sm?460:900), box && box.height > 40 ? Math.round(box.height) : 300, sm);
+};
 drawTrend();
 (function(){ var t; window.addEventListener("resize", function(){ clearTimeout(t); t = setTimeout(drawTrend, 180); }); })();
 /* and when its box first takes a width: drawn at load while the Trend view is hidden, a phone kept the fallback frame */
-if(window.ResizeObserver && E("trend")){ (function(){ var tw = 0; new ResizeObserver(function(en){ var w = Math.round(en[0].contentRect.width);
-  if(w > 40 && w !== tw){ tw = w; drawTrend(); } }).observe(E("trend")); })(); }
+if(window.ResizeObserver && E("trend")){ (function(){ var tk = ""; new ResizeObserver(function(en){ var w = Math.round(en[0].contentRect.width), h = Math.round(en[0].contentRect.height);
+  if(w > 40 && w + "x" + h !== tk){ tk = w + "x" + h; drawTrend(); } }).observe(E("trend")); })(); }
 
 /* pivot */
 /* the arithmetic pane and its plot() were retired; simple() below draws the
@@ -1081,13 +1088,16 @@ rememberGridH();
   /* drawn whenever its box takes a new width: at load the Trend view is hidden, so a phone's first draw had no box to
      take its size from and fell back to a scaled frame */
   function drawEta(){
-    var sm = window.innerWidth < 620, ebw = E("etacurve") ? Math.round(E("etacurve").getBoundingClientRect().width) : 0;
+    var sm = window.innerWidth < 620, ebw = E("etacurve") ? E("etacurve").clientWidth : 0;   // layout size, as the Effect graph
     /* the same frame as the Effect graph beside it (PL/PR/PT/PB and the label offsets), so the two line up. Phones: drawn
        at the box's own size, as the Effect graph is, so its type reads at the page's size; the axis figures start at the
        title's left edge and the plot runs to the boxes' right edge (operator, 2026-10-17: "not scaled as per projection
        title and boxes below") */
     var px = sm && ebw > 200;
-    var W=px?ebw:(sm?460:900), H=px?Math.round(Math.max(200, ebw*0.6)):300, PL=sm?34:64, PR=sm?6:28, PT=sm?20:26, PB=sm?34:46;
+    /* wide screens: drawn at its box's own size too (2026-10-30: it still took a fixed 900x300 frame, letterboxed to ~44%
+       with 5px type beside the true-size Effect graph) - the same pixels, frame, type and marks as Effect */
+    var ebh = E("etacurve") ? E("etacurve").clientHeight : 0, wide = ebw > 200 && ebh > 80;   // any width: the box's own height when it has one
+    var W=px||wide?ebw:(sm?460:900), H=wide?ebh:px?Math.round(Math.max(200, ebw*0.6)):300, PL=sm?34:64, PR=sm?6:28, PT=sm?20:26, PB=sm?34:46;
     var YLX=sm?0:PL-11, YLA=sm?"start":"end";
     /* a week whose eta is not known (the rule could not be replayed onto the live value:
        testnet, or a history this page cannot reproduce) has eta null - no point, no line */
@@ -1135,11 +1145,12 @@ rememberGridH();
          ", "+r.date+", η "+r.eta.toFixed(2)+'</title></circle>';
       s+=xlab(r, i); });
     E("etacurve").setAttribute("viewBox","0 0 "+W+" "+H);
+    if(wide) E("etacurve").setAttribute("preserveAspectRatio","none"); else E("etacurve").removeAttribute("preserveAspectRatio");
     E("etacurve").innerHTML=s;
   }
   drawEta();
-  if(window.ResizeObserver && E("etacurve")){ var etaW = 0; new ResizeObserver(function(en){ var w = Math.round(en[0].contentRect.width);
-    if(w > 40 && w !== etaW){ etaW = w; drawEta(); } }).observe(E("etacurve")); }
+  if(window.ResizeObserver && E("etacurve")){ var etaK = ""; new ResizeObserver(function(en){ var w = Math.round(en[0].contentRect.width), h = Math.round(en[0].contentRect.height);
+    if(w > 40 && w + "x" + h !== etaK){ etaK = w + "x" + h; drawEta(); } }).observe(E("etacurve")); }
 
   /* popup */
   var pop=E("pop"), R=D.set.reward_pool, N=D.set.n;
@@ -1804,7 +1815,13 @@ rememberGridH();
     vb[1] = Math.min(Math.max(vb[1], 0), V0[3] - vb[3]);
   }
   function reset(){ vb = V0.slice(); apply(); }
-  function open(){ big.innerHTML = src.innerHTML; reset(); POP.open(pop); }
+  /* drawn fresh at the popup's own size (2026-10-30: it copied the panel's drawing, made for the panel's box, into a fixed
+     900x300 frame - the chart sat at panel size in one corner of an empty card); zoom works in that frame */
+  function open(){ POP.open(pop); requestAnimationFrame(function(){
+    var h = Math.round(Math.min(window.innerHeight * .58, 420)); big.style.height = h + "px";
+    // the layout width (an svg has no offsetWidth, and the pop-in animation scales its on-screen box while it opens)
+    var card = big.parentElement, cs = getComputedStyle(card), w = Math.round(card.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)) || 900;
+    window.__drawTrendTo(big, w, h, window.innerWidth < 620); V0 = [0, 0, w, h]; reset(); }); }
 
   src.addEventListener("click", open);
   src.addEventListener("keydown", function(ev){
@@ -2498,6 +2515,28 @@ rememberGridH();
     var go = E("dgo"); if(go) go.disabled = !(pos && window.__WALLET && MSGS.length);
   }
 
+  /* phones: the lock tag stays on the Delegations title row whatever the amount - its text scales down (never below
+     5.5 px) until it fits the room the title leaves, instead of wrapping to a second row (operator, 2026-10-30) */
+  function fitLockM(){
+    var el = E("dlockm"); if(!el) return; el.style.fontSize = el.style.padding = el.style.letterSpacing = "";
+    var row = el.parentElement, h3 = row && row.querySelector("h3");
+    if(el.hidden || !el.offsetParent || !h3) return;
+    // room = the row's content width less the title and one gap, with 1 px to spare (flex lines break on fractions);
+    // need = the tag's whole box at its natural width, borders included
+    var cs = getComputedStyle(row), avail = row.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
+      - h3.getBoundingClientRect().width - (parseFloat(cs.columnGap) || 0) - 1;
+    var need = function(){ return el.scrollWidth + (el.offsetWidth - el.clientWidth); };
+    if(need() > avail){ el.style.padding = "0 4px"; el.style.letterSpacing = "0"; }   // first the tag's own spacing, then the type
+    var size = parseFloat(getComputedStyle(el).fontSize);
+    for(var i = 0; i < 6 && need() > avail && size > 5.5; i++){
+      size = Math.max(5.5, Math.floor(size * Math.min(.98, avail / need()) * 4) / 4); el.style.fontSize = size + "px"; }
+  }
+  window.__fitLockM = fitLockM;   // probes call it after changing the amount
+  /* refit whenever the row or the title changes size (a web font arriving widens the title after the first fit) */
+  (function(){ var go = function(){ var r = E("dlockm"); r = r && r.parentElement; if(!r) return;
+      if(window.ResizeObserver){ var ro = new ResizeObserver(function(){ requestAnimationFrame(fitLockM); }); ro.observe(r); var h = r.querySelector("h3"); if(h) ro.observe(h); }
+      if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ requestAnimationFrame(fitLockM); }); };
+    if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go(); })();
   /* the lock says what of this wallet is locked, and until when; nothing locked, no lock at all (operator, 2026-09-30) */
   function lockTip(pos){ return pos && pos.locked >= 1e6 ? fmt(pos.locked) + ' ATONE locked until ' + window.__dayFull(pos.until) : ''; }
   var MSGS = [];
@@ -2560,6 +2599,7 @@ rememberGridH();
       if(pos.locked >= 1e6){ ln.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden=true><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><b>' + fmt(pos.locked) + '</b><span class=w>ATONE under redelegate cooldown until</span><span class=w2>locked until</span><b>' + window.__dayFull(pos.until) + '</b>'; ln.title = lockTip(pos); } }
     /* phones show the same tag in Delegations' title row instead (operator, 2026-10-17) */
     if(ln && lm){ lm.hidden = ln.hidden; if(lm.innerHTML !== ln.innerHTML) lm.innerHTML = ln.innerHTML; lm.title = ln.title || ""; }
+    fitLockM();
     (window.__UNB || []).forEach(function(u){ h += pill("warn", fmt(u.amt) + " unbonding from " + att(u.m) + ", " + window.__day(u.until)); });
     el.innerHTML = h;
     var ub = E("unbtn"); if(ub) ub.hidden = !(pos && pos.rows.length);

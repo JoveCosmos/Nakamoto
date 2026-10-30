@@ -2884,9 +2884,10 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
   #wk-mine .wk-t1 .wk-lockm:not([hidden]){display:inline-flex;align-items:center;gap:4px;height:22px;margin-left:auto;padding:0 7px;border-radius:5px;
     border:1px solid rgba(255,176,46,.35);background:rgba(255,176,46,.06);font-family:var(--wmono);font-size:8px;letter-spacing:.06em;
     text-transform:uppercase;color:var(--ws);white-space:nowrap;flex:0 1 auto;min-width:0;overflow:hidden}
-  #wk-mine .wk-t1 .wk-lockm b{font-size:10px;font-weight:400;letter-spacing:0;color:#ffd58a}
+  /* sizes in em: app.js scales the tag's font-size down until it fits beside the title (a long amount, a narrow phone) */
+  #wk-mine .wk-t1 .wk-lockm b{font-size:1.25em;font-weight:400;letter-spacing:0;color:#ffd58a}
   #wk-mine .wk-t1 .wk-lockm .w{display:none}
-  #wk-mine .wk-t1 .wk-lockm svg{width:10px;height:10px;margin:0;max-height:none;flex:0 0 auto;fill:none;stroke:var(--wamber);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  #wk-mine .wk-t1 .wk-lockm svg{width:1.25em;height:1.25em;margin:0;max-height:none;flex:0 0 auto;fill:none;stroke:var(--wamber);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   /* Refresh holds Redelegate's top right corner whatever else the title row carries (operator, 2026-10-17: "shouldn't
      move around"); the row keeps its width clear of it and the amount field takes that width back */
   #wk-plan>.wk-ph:not(#z){position:relative;padding-right:26px}
