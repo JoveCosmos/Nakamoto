@@ -43,6 +43,8 @@ import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { SigningStargateClient, GasPrice, QueryClient, calculateFee, setupAuthzExtension, setupDistributionExtension, setupStakingExtension } from "@cosmjs/stargate";
 import { MsgBeginRedelegate, MsgDelegate } from "cosmjs-types/cosmos/staking/v1beta1/tx";
 import { MsgWithdrawDelegatorReward } from "cosmjs-types/cosmos/distribution/v1beta1/tx";
+import { MsgExec } from "cosmjs-types/cosmos/authz/v1beta1/tx";
+import { TxBody } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 
 const PREFIX = "atone", CHAIN_ID = process.env.CHAIN_ID || "atomone-1";   // testnet: atomone-testnet-1
 const GAS = process.env.ATOMONE_GAS_PRICE || "0.25uphoton";   // only when the chain's own price cannot be read
@@ -97,7 +99,7 @@ async function getClient() {
     clientPromise = (async () => {
       const wallet = await DirectSecp256k1HdWallet.fromMnemonic(MNEMONIC, { prefix: PREFIX });
       const [account] = await wallet.getAccounts();
-      const client = await connectFirst(RPCS, rpc => SigningStargateClient.connectWithSigner(rpc, wallet, { gasPrice: GasPrice.fromString(GAS) }));
+      const client = await connectFirst(RPCS, rpc => SigningStargateClient.connectWithSigner(rpc, guarded(wallet), { gasPrice: GasPrice.fromString(GAS) }));
       const id = await client.getChainId();
       if (id !== CHAIN_ID) throw new Error("wrong chain " + id);
       const query = QueryClient.withExtensions(client.forceGetCometClient(), setupAuthzExtension, setupDistributionExtension, setupStakingExtension);
@@ -217,6 +219,43 @@ function memoOf(memo, fallback) {
   if (memo === undefined || memo === null || memo === "") return { memo: fallback };
   if (typeof memo !== "string" || memo.length > 64 || /[\u0000-\u001f\u007f-\u009f]/.test(memo)) return { error: "bad memo" };
   return { memo };
+}
+// what this key will sign, whatever a request - or a later edit of this file - asks (2026-10-29, after Binance's
+// largest hot wallet was emptied by one message its own key signed). The wallet is wrapped: right before each
+// signature the transaction is decoded and refused unless it is exactly ONE MsgExec with this account as grantee,
+// holding only redelegations, delegations and reward claims in uatone, all for ONE delegator who is not this account,
+// and no extension options. A send, a grant, a vote, anything for this account's own funds: no signature exists.
+const EXEC_URL = "/cosmos.authz.v1beta1.MsgExec";
+function signPolicy(bodyBytes, signer) {
+  const body = TxBody.decode(bodyBytes);
+  if (body.extensionOptions.length || body.nonCriticalExtensionOptions.length) return "extension options are not signed";
+  if (body.messages.length !== 1 || body.messages[0].typeUrl !== EXEC_URL) return "only one MsgExec is signed, got " + body.messages.map(m => m.typeUrl).join(", ");
+  const ex = MsgExec.decode(body.messages[0].value);
+  if (ex.grantee !== signer) return "an exec for another grantee";
+  if (!ex.msgs.length) return "an empty exec";
+  let who = null;
+  for (const m of ex.msgs) {
+    let d, coin = null;
+    if (m.typeUrl === REDEL_URL) { const v = MsgBeginRedelegate.decode(m.value); d = v.delegatorAddress; coin = v.amount; }
+    else if (m.typeUrl === DELEG_URL) { const v = MsgDelegate.decode(m.value); d = v.delegatorAddress; coin = v.amount; }
+    else if (m.typeUrl === WDRAW_URL) d = MsgWithdrawDelegatorReward.decode(m.value).delegatorAddress;
+    else return "message type " + m.typeUrl;
+    if (coin && coin.denom !== "uatone") return "a stake in " + coin.denom;
+    if (d === signer) return "a message for this account's own funds";
+    if (who && d !== who) return "messages for more than one delegator";
+    who = d;
+  }
+  return null;
+}
+function guarded(wallet) {
+  return {
+    getAccounts: () => wallet.getAccounts(),
+    async signDirect(address, doc) {
+      const why = signPolicy(doc.bodyBytes, address);
+      if (why) { console.error("autopilot-signer: REFUSED TO SIGN: " + why); throw new Error("signing policy: " + why); }
+      return wallet.signDirect(address, doc);
+    },
+  };
 }
 // ---- end policy ----
 
