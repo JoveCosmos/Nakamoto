@@ -4568,7 +4568,9 @@ rememberGridH();
       })
       .then(function(d){
         live();
-        window.__DELS = d.delegation_responses || [];
+        /* dust stays out of every list, record and count (operator, 2026-10-31): a delegation under 0.01 ATONE is a leftover
+           of a move (a fraction of a micro-ATONE on a once-slashed validator cannot be removed by anyone) */
+        window.__DELS = (d.delegation_responses || []).filter(function(x){ return +((x.balance || {}).amount || 0) >= 1e4; });
         /* Stake that ARRIVED by redelegation cannot leave again until its entry
            matures - the chain rejects it outright (ErrTransitiveRedelegation),
            not as a soft cooldown. 21 days. A plan built on locked stake is a plan

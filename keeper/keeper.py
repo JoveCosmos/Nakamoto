@@ -800,6 +800,21 @@ def ranks_kept(ranked, moves):
     shelf = max(v["t"] + d.get(v["op"], 0) for v in ranked if v["op"] in dsts)
     return all(v["t"] + d[v["op"]] >= shelf + GAP for v in ranked if v["op"] in srcs)
 
+def absorb_dust(moves, rows):
+    """(operator, 2026-10-31: Autopilot left dust delegations of a few micro-ATONE showing as 0 in every list) a source never
+    keeps free stake under 1 ATONE: that last remainder rides on the source's largest move, so no dust delegation is left
+    behind. Stake in its 21-day lock stays (the delegation lives on anyway). A fraction of ONE micro-ATONE on a validator
+    that was once slashed can still remain: the chain moves whole micro-ATONE only, and nobody can remove that kind."""
+    free = {r["op"]: int(r["x"]) - int(r["locked"]) for r in rows}
+    locked = {r["op"]: int(r["locked"]) for r in rows}
+    sent = {}
+    for x in moves: sent[x["src"]] = sent.get(x["src"], 0) + x["amount"]
+    for op, amt in sent.items():
+        rest = free.get(op, 0) - amt
+        if 0 < rest < MIN_MOVE and locked.get(op, 0) == 0:
+            big = max((x for x in moves if x["src"] == op), key=lambda x: x["amount"]); big["amount"] += rest
+    return moves
+
 def plan(g, rows, reds, vals, m, room=None):
     room = MAX_MOVES_DAY if room is None else room
     for r in rows:
@@ -887,6 +902,7 @@ def plan(g, rows, reds, vals, m, room=None):
     # a source's last piece under 1 ATONE is no move: the shelf it leaves short by less than the 1 ATONE gap keeps its order
     moves = [x for x in moves if x["amount"] >= MIN_MOVE]
     if not moves: return None
+    moves = absorb_dust(moves, rows)   # before the rank check: a remainder that would change a rank still refuses the plan
     if not ranks_kept(ranked, moves):
         log("plan refused: it would change a rank (%s)" % g.get("granter", "?")); return None
     rate_dst = dst_rates(moves)

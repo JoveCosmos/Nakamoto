@@ -22,6 +22,8 @@ function load(){
     T.get("/cosmos/authz/v1beta1/grants/granter/" + a + "?pagination.limit=200").catch(function(){ return {}; })
   ]).then(function(r){
     if(!T.wallet() || T.wallet().address !== a) return;
+    /* dust (under 0.01 ATONE, a leftover of a move) is not listed, as in the app (2026-10-31) */
+    if(r[0] && r[0].delegation_responses) r[0].delegation_responses = r[0].delegation_responses.filter(function(x){ return +((x.balance || {}).amount || 0) >= 1e4; });
     APR = {}; ((r[3] && r[3].validators) || []).forEach(function(v){ if(v.op) APR[v.op] = v.net; });
     /* Autopilot is on when this wallet granted our account the right to delegate or redelegate for it */
     var ours = T.ours(); PILOT = !!ours && ((r[4] && r[4].grants) || []).some(function(g){
