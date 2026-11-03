@@ -241,3 +241,15 @@ html.embed .hero>div b:not(#z){min-height:0;display:block}
 /* + recipient at the row's right end, over the rows' remove buttons (operator, 2026-11-03) */
 html.embed #add:not(#z){margin-left:auto;order:9}
 html.embed .hero>div b:not(#z):not(#y){letter-spacing:0}
+/* Gather's notes inside the app (operator, 2026-11-03: too big): two quiet lines, a small marker, the figures carrying them */
+html.embed .notes:not(#z){gap:5px;margin-top:0}
+html.embed .notes p:not(#z){position:relative;padding:6px 10px 6px 24px;border-radius:8px;font-size:11.5px;line-height:1.4;color:var(--wf);background:var(--wi)}
+html.embed .notes p:not(#z)::before{content:"";position:absolute;left:10px;top:11px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+html.embed .notes p.w:not(#z)::before{background:var(--amber)}
+html.embed .notes p b:not(#z){font-size:11.5px}
+html.embed .sel:not(#z){font-size:10.5px;letter-spacing:.06em}html.embed .sel #selnote:not(#z){font-size:11px}
+/* a scrolling list keeps room for its rows' focus border (operator, 2026-11-03: the green edge was cut left and top) */
+html.embed #tool>.side>.rows:not(#z){padding:3px}
+/* the fee line is one text line centred on the button (operator, 2026-11-03): a flex column split "fee ≈", the PHOTON span and ", gas" into stacked rows */
+.foot>.fee:not(#z){display:block;align-self:center;min-height:0;line-height:18px}
+.foot>.fee:not(#z) span{white-space:normal}

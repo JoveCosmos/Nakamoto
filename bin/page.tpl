@@ -5742,6 +5742,7 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .tlbal{display:inline-flex;align-items:baseline;gap:10px;font-size:12.5px;white-space:nowrap}
 .tlbal b{font-weight:600;color:var(--ink)}.tlbal em{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.06em;color:var(--ink3);margin-left:4px}
 @media(max-width:700px){.tlwho b,.tlbal{display:none!important}}
+@media(max-width:700px){#tlpop .wk-txh>div:has(.tltag:not([hidden])) .tlwho{display:none!important}}   /* a phone header with a note drops the address */
 .tlcard #tlttl{white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
 .tlcard #tlttl svg{width:18px;height:18px;flex:0 0 auto;fill:none;stroke:var(--wcyan);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .tltag .tlt-s{display:none}
@@ -7056,7 +7057,7 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 #mv-stage .mv-top>em:not(#z){flex:0 1 auto;min-width:0}
 #mv-stage .mv-top .mv-chip{margin-left:0}
 #mv-stage .mv-top>.mv-tgo,#mv-stage .mv-top>.mv-ton:not(#z):not(#y),#mv-stage .mv-top>.mv-tdis{margin-left:auto}
-#mv-stage .sv-btn.go.mv-go.mv-tgo:not(#z):not(#y){height:38px;min-width:0;padding:0 18px;font-size:14px;flex:0 0 auto}
+#mv-stage .sv-btn.go.mv-go.mv-tgo:not(#z):not(#y){height:30px;min-width:0;padding:0 12px;font-size:13px;flex:0 0 auto}   /* Stake more's size (operator, 2026-11-03) */
 #mv-stage .mv-top .mv-ton:not(#z){font-size:14px;margin-left:10px}
 /* Autopilot on, wide screens: Stake more is in the corner, so the sentence's link would say it twice */
 @media(min-width:701px){#mv-stage:has(.mv-top>.mv-smore) .mv-stk{display:none}}
@@ -7085,7 +7086,8 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 /* a phone: the action takes its own full row under the title, never off the edge (2026-09-30) */
 @media(max-width:700px){
   #mv-stage .mv-top:not(#z){flex-wrap:wrap;row-gap:10px}
-  #mv-stage .mv-top>.mv-tgo:not(#z),#mv-stage .mv-top>.mv-ton:not(#z),#mv-stage .mv-top>.mv-tdis:not(#z){flex:1 1 100%;margin-left:0}
+  #mv-stage .mv-top>.mv-ton:not(#z),#mv-stage .mv-top>.mv-tdis:not(#z){flex:1 1 100%;margin-left:0}
+  #mv-stage .mv-top>.mv-tgo:not(#z){flex:0 0 auto;margin-left:auto}
   /* no Autopilot countdown in Your move on a phone (operator, 2026-10-17); the Autopilot box above says it is on */
   #mv-stage .mv-top>.mv-ton:not(#z):not(#y){display:none}
   #mv-stage .mv-top>.mv-more:not(#z):not(#y){display:none}
