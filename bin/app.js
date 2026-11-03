@@ -2393,9 +2393,10 @@ rememberGridH();
          (movable.length ? '<input type=checkbox class=src-all aria-label="Tick every delegation that can move"' + (movable.length && movable.every(function(r){ return SRCSEL[r.id]; }) ? ' checked' : '') + '>' : '') +
          '</th><th class=c>rank</th><th class=l>validator</th><th>ATONE</th><th>APR</th><th>rewards</th></tr></thead><tbody>';
     /* unstakings first, rows of the same list (operator, 2026-11-03): the end date beside the name, Cancel where the APR is */
+    var unh = '';   /* drawn after the delegations (operator, 2026-11-03: active ones on top) */
     (window.__UNB || []).forEach(function(u, i){
       var d = new Date(u.until), dd = d.getUTCDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getUTCMonth()] + ' ' + String(d.getUTCFullYear()).slice(2);
-      h += '<tr class=unst title="unstaking until ' + window.__day(u.until) + '"><td class=ck></td><td class="c rk">' + (rankOf(V, u.op) || '-') + '</td><td class="l nm"><div class=nmw>' + logo(u.op, u.m) + '<span>' + att(u.m) + '</span><em class=unsd>' + dd + '</em></div></td>' +
+      unh += '<tr class=unst title="unstaking until ' + window.__day(u.until) + '"><td class=ck></td><td class="c rk">' + (rankOf(V, u.op) || '-') + '</td><td class="l nm"><div class=nmw>' + logo(u.op, u.m) + '<span>' + att(u.m) + '</span><em class=unsd>' + dd + '</em></div></td>' +
            '<td class=amt>' + fmt(u.amt) + '</td><td><button type=button class=unbx data-u="' + i + '" aria-label="Cancel unstaking">Cancel</button></td><td class=rw></td></tr>'; });
     for(k = 0; k < slice.length; k++){
       var rw = slice[k], rk = rankOf(V, rw.id);
@@ -2406,7 +2407,7 @@ rememberGridH();
            /* out of the set, the APR cell names why: Jailed (red) or Inactive */
            '<td' + (rw.inactive ? ' class=st' : '') + '>' + (rw.inactive ? (((window.__INACT || {})[rw.id] || {}).jailed ? '<span class=dmj>Jailed</span>' : '<span class=dmi>Inactive</span>') : pct(rw.rate)) + '</td><td class=rw>' + (RB[rw.id] != null ? fmt(RB[rw.id]) : '-') + '</td></tr>';
     }
-    return h + '</tbody></table>';
+    return h + unh + '</tbody></table>';
   }
 
   /* ── the list: every validator that would earn more, a page at a time; a

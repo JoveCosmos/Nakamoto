@@ -2329,7 +2329,7 @@
       var d2 = function(t){ var x = new Date(t); return x.getUTCDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][x.getUTCMonth()] + ' ' + String(x.getUTCFullYear()).slice(2); };
       /* where the APR stands: its Cancel, the same card as Pro's row (operator, 2026-11-03) */
       var un = (window.__UNB || []).map(function(u, k){ return { id: u.op, rank: rk(u.op) || 'out', name: u.m, sub: '<b class=mv-unw>unstaking </b>' + d2(u.until), amt: fmt(u.amt), apr: '<button type=button class=mv-uc data-act=unbone data-u="' + k + '">Cancel</button>' }; });
-      return '<div class=mv-box><em>Now on</em>' + mvRows(rows.map(function(r){ return { id: r.id, rank: r.inactive ? 'out' : rk(r.id), name: r.m, amt: fmt(r.x), apr: r.inactive ? '0%' : pct(r.rate) }; }).concat(un), 'g', 'validators', 'now') + '</div>';
+      return '<div class=mv-box><div class=mv-nh><em>Now on</em>' + unbLine(true) + '</div>' + mvRows(rows.map(function(r){ return { id: r.id, rank: r.inactive ? 'out' : rk(r.id), name: r.m, amt: fmt(r.x), apr: r.inactive ? '0%' : pct(r.rate) }; }).concat(un), 'g', 'validators', 'now') + '</div>';
     };
     var you = '';
     if(a){
@@ -2341,7 +2341,7 @@
     var h;
     if(!a){
       /* disconnected: the corner holds Activate Autopilot, greyed; on hover it says why (operator, 2026-09-30) */
-      h = top('', '', '', '<span class=mv-tdis data-tip="Connect a wallet"><button class="sv-btn go mv-go mv-tgo" type=button disabled aria-disabled=true tabindex=-1>Activate Autopilot</button></span>') +
+      h = top('', '', '', '') +   /* no Activate Autopilot without a wallet (operator, 2026-11-03) */
         (hi ? '<div class=mv-hl><b>About ' + pct(hi) + ' APR</b><span class=mv-ref>with Autopilot, for 10,000 ATONE</span></div>' : '') + cmp() + mvSet({}, {});
     } else if(!pos){
       h = top('') + '<div class=mv-hl><b>Reading your stake…</b></div>';
@@ -2371,7 +2371,7 @@
         var tL = Object.keys(to).sort(function(x, y){ return to[y] - to[x]; }).map(function(id){ dst[id] = 1; return { id: id, rank: rk(id), name: nm(id), amt: '+' + fmt(to[id]), apr: pct(rate(id, to[id])) }; });
         var lock = pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is under redelegate lock until ' + day(pos.until) + '</div>' : '';
         h = top('Best today', auto ? '' : 'Ready, 1 approval', 'ok', auto ? ACTIVE : btn('opt', direct ? 'Activate Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE')) +
-          '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.mnow != null ? plan.mnow : plan.now) + '</i> to <i class=g>' + pct(plan.mafter != null ? plan.mafter : plan.after) + '</i> APR</span>' + lock + unbLine() + '</div>' +   /* the moved stake's own APR (operator, 2026-10-01) */
+          '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.mnow != null ? plan.mnow : plan.now) + '</i> to <i class=g>' + pct(plan.mafter != null ? plan.mafter : plan.after) + '</i> APR</span>' + lock + '</div>' +   /* the moved stake's own APR (operator, 2026-10-01) */
           '<div class=mv-flow><div class=mv-box><em>From, ' + fL.length + ' validator' + (fL.length === 1 ? '' : 's') + '</em>' + mvRows(fL, 'a', 'validators', 'from') + '</div>' +
           '<div class=mv-arr aria-hidden=true><svg viewBox="0 0 44 20"><path d="M2 10h38M32 3l8 7-8 7"/></svg></div>' +
           '<div class=mv-box><em>To, ' + tL.length + ' validator' + (tL.length === 1 ? '' : 's') + '</em>' + mvRows(tL, 'g', 'validators', 'to') + '</div></div>' +
@@ -2383,7 +2383,7 @@
         /* no Day k of 21 chip (operator, 2026-10-15: "too redundant"): the 21-day strip below already counts it */
         h = top(auto ? 'Moved. Autopilot is active' : 'Moved. Cooling down', '', '', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
           /* the one move open while the stake cools down: staking what sits in the wallet (operator, 2026-10-04) */
-          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b>' + line('Free to move again on <b>' + day(t1) + '</b>.') + unbLine() + '</div>' +
+          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b>' + line('Free to move again on <b>' + day(t1) + '</b>.') + '</div>' +
           /* the 21-day line sits beside the title, and the cycle boxes are gone (operator, 2026-11-03): the room goes to Now on */
           '<div class=mv-days><div class=mv-dh><span>Cooling down<small class=mv-dn>The chain holds redelegated stake for 21 days.</small></span><span>' + day(t0) + ' to ' + day(t1) + '</span></div><div class=mv-dc>' + cells + '</div></div>' + nowOn() +
           mvSet({}, mineIds());
@@ -2391,7 +2391,7 @@
         h = top('Your stake today', 'At its best', 'ok', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
           '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b>' + line('No move earns 3 APR points more today.' + (auto ? '<span class=mv-wide> Autopilot checks again every 12 hours.</span>' : '')) +
           /* the same lock note as the offer's, in the same place (operator, 2026-10-01) */
-          (pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is under redelegate lock until ' + day(pos.until) + '</div>' : '') + unbLine() + '</div>' +
+          (pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is under redelegate lock until ' + day(pos.until) + '</div>' : '') + '</div>' +
           nowOn() + mvSet({}, mineIds());
       }
     }
@@ -2401,10 +2401,11 @@
   }
   /* under the state's sentence, in every state (operator, 2026-11-03): what is unstaking, in one line that never wraps,
      and Cancel - the same card as the rows above Pro's list, every entry ticked */
-  function unbLine(){
+  function unbLine(inBox){
     var U = window.__UNB || []; if(!U.length) return '';
     var t = 0, e = 0; U.forEach(function(u){ t += u.amt; e = Math.max(e, u.until); });
     var d = window.__dayFull ? window.__dayFull(e) : '';
+    if(inBox) return '<span class=mv-nu><span class=mv-nut><b>' + fmt(t) + ' ATONE</b> unstaking <b>' + d + '</b></span><button type=button class=mv-nc data-act=unbcancel>Cancel<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></span>';
     return '<span class="mv-sline mv-unb"><span class=mv-tx><b>' + fmt(t) + ' ATONE</b> unstaking <b>' + d + '</b>.</span> <button type=button class=mv-stk data-act=unbcancel>Cancel<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></span>';
   }
   /* the time left to Autopilot's next run, h:mm:ss, in every countdown on the page */

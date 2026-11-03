@@ -2280,6 +2280,9 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 
 .wk-max{border-color:var(--wbd2)}
 .wk-tbl2 td.ck input{border-color:#5a5a88;}
+/* the ticks in Pro's lists read clearly on the dark ground (operator, 2026-11-03) */
+.wk-tbl2 :is(td,th).ck input:not(:disabled):not(#z){border:1.5px solid #8f8fc8;background:rgba(255,255,255,.06)}
+.wk-tbl2 :is(td,th).ck input:disabled:not(#z){border:1px dashed #4a4a72;background:transparent}
 .wk-tbl2 td .sb{display:none}
 /* the account is the disconnect: mark, name and address, the leave glyph */
 
@@ -5689,7 +5692,7 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 /* unstaking rows in the delegations list (2026-11-03): the same row, the date small in amber, a small Cancel */
 #dmy tr.unst td{color:var(--ink)}
 #dmy tr.unst .nmw{display:flex;align-items:center;gap:6px;min-width:0}
-#dmy tr.unst .nmw>span{flex:1 1 auto;min-width:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#dmy tr.unst .nmw>span:not(.wk-lg){flex:1 1 auto;min-width:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #dmy tr.unst em.unsd{flex:0 1 auto;min-width:0;overflow:hidden;font-style:normal;font-size:10px;color:var(--wamber);white-space:nowrap}
 #dmy .unbx{font:inherit;font-size:10px;font-weight:600;line-height:1;padding:2px 6px;border:1px solid rgba(255,107,107,.55);border-radius:5px;background:rgba(255,107,107,.08);color:#ff6b6b;cursor:pointer;white-space:nowrap}
 #dmy .unbx:hover{background:rgba(255,107,107,.18)}#dmy .unbx:focus-visible{outline:2px solid #ff6b6b;outline-offset:1px}
@@ -7012,7 +7015,18 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 #mv-stage .mv-top>.sv-btn.mv-smore:not(#z):not(#y){margin-left:auto;align-self:center;display:inline-flex;align-items:center;gap:6px;width:auto;min-width:0;height:30px;padding:0 12px;font-size:13px;flex:0 0 auto}
 #mv-stage .mv-top:has(>.mv-smore):not(#z){flex-wrap:nowrap}
 #mv-stage .mv-top:has(>.mv-smore)>em:not(#z){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#mv-stage .mv-top>.mv-smore svg{width:13px;height:13px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+/* (2026-11-03) phones keep only the inline Stake more, not the title-row button */
+@media(max-width:700px){#mv-stage .mv-top>.sv-btn.mv-smore:not(#z):not(#y):not(#x){display:none}}
+/* Now on's title row carries the unstaking summary, one line, Cancel whole */
+.mv-nh{display:flex;align-items:baseline;gap:12px;min-width:0}
+.mv-nh>em{flex:0 0 auto;font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+.mv-nu{flex:1 1 auto;min-width:0;display:flex;align-items:baseline;justify-content:flex-end;gap:8px;font-size:12px;color:var(--wf);white-space:nowrap}
+.mv-nu .mv-nut{min-width:0;overflow:hidden;text-overflow:ellipsis}.mv-nu b{color:var(--ink);font-weight:600}
+.mv-nu .mv-nc{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:none;font:inherit;font-weight:600;color:var(--sv-teal,#2bc8bd);cursor:pointer}
+.mv-nu .mv-nc:hover{text-decoration:underline;text-underline-offset:3px}.mv-nu .mv-nc:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offset:2px}
+.mv-nu .mv-nc svg{width:12px;height:12px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:700px){.mv-nu{font-size:11px;gap:6px}}
+#mv-stage .mv-top>.mv-smore svg{width:13px;height:13px;flex:0 0 auto;display:block;position:relative;top:.5px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 #mv-stage .mv-cd{font-family:var(--wmono);font-variant-numeric:tabular-nums;letter-spacing:.02em}
 #mv-stage .mv-set:not(#z):not(#y):not(#x){margin-top:auto}
 #mv-stage .mv-bars i{cursor:pointer}
