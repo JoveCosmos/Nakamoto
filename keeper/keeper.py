@@ -1341,12 +1341,18 @@ def once(c, only=None, live=None, force=False):
     global PREV_ACTIVE
     left = PREV_ACTIVE - set(vals) if PREV_ACTIVE else set()
     PREV_ACTIVE = set(vals)
+    # ...and moved off it in this same tick (operator, 2026-11-03): a jailed or dropped validator does not wait for the
+    # 12-hour slot. Only the stake on it that is free to move goes; locked stake waits for its lock as before
+    evac = set()
     if left:
+        log("left the active set: %s" % ", ".join(sorted(left)))
         for g in gs:
             try:
                 rows_, reds_ = position(g["granter"], vals)
-                if any(r["op"] in left for r in rows_): inactive_alert(c, g["granter"], rows_, reds_, vals)
+                if any(r["op"] in left for r in rows_):
+                    inactive_alert(c, g["granter"], rows_, reds_, vals); evac.add(g["granter"])
             except Exception as e: log("inactive check failed for %s: %s" % (short(g["granter"]), e))
+        if evac: log("moving off at once: %d Autopilot wallets" % len(evac))
     led = ledger()                                    # once per tick (red team 2026-10-01)
     gs.sort(key=lambda g: granted_at(g["granter"], c, led))
     try: rgs = restake_grants()
@@ -1364,7 +1370,7 @@ def once(c, only=None, live=None, force=False):
             last = c.execute("SELECT max(at) FROM run_g WHERE granter=?", (gr,)).fetchone()[0] or 0
             # the grant as it stands: a re-grant (Change, a new validator list, expiry or a higher cap) is planned at once,
             # not at the next slot, so the console never shows a plan made for the grant it replaced
-            due = force or not last or last < slot0() or grant_changed(g, prev)
+            due = force or not last or last < slot0() or grant_changed(g, prev) or gr in evac
             # a move that failed for a fee, network or RPC reason is tried again at its time; one that was sent but not
             # seen is looked up by hash first, and if it landed that is the move - nothing is planned over it
             rt = c.execute("SELECT due, tries, txhash, moves, since FROM retry WHERE granter=?", (gr,)).fetchone()
