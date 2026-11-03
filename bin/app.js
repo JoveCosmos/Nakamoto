@@ -2378,7 +2378,7 @@ rememberGridH();
         (54 + (q % 3) * 12) + '%"></b></td><td class=amt><b></b></td><td><b></b></td><td class=rw><b></b></td></tr>';
       return sk + '</tbody></table>';
     }
-    if(!pos.rows.length){ if(pn) pn.textContent = ""; pager(E("dmypg"), 0, 0, LPS, "l"); return empty("No stake on AtomOne"); }
+    if(!pos.rows.length && !(window.__UNB || []).length){ if(pn) pn.textContent = ""; pager(E("dmypg"), 0, 0, LPS, "l"); return empty("No stake on AtomOne"); }
     var rows = pos.rows.slice().sort(function(a, b){ return b.x - a.x; }), h = "", k;
     var nsel = 0; rows.forEach(function(r){ if(SRCSEL[r.id] && r.x - r.locked >= 1e5) nsel++; });
     /* "N selected" is Redelegate's: in Stake, Unstake and Claim the ticks are not there (proTabs() redoes this on a switch) */
@@ -2392,6 +2392,11 @@ rememberGridH();
     h += '<table><colgroup><col style="width:28px"><col style="width:30px"><col><col style="width:80px"><col style="width:58px"><col style="width:56px"></colgroup><thead><tr><th class=ck>' +
          (movable.length ? '<input type=checkbox class=src-all aria-label="Tick every delegation that can move"' + (movable.length && movable.every(function(r){ return SRCSEL[r.id]; }) ? ' checked' : '') + '>' : '') +
          '</th><th class=c>rank</th><th class=l>validator</th><th>ATONE</th><th>APR</th><th>rewards</th></tr></thead><tbody>';
+    /* unstakings first, rows of the same list (operator, 2026-11-03): the end date beside the name, Cancel where the APR is */
+    (window.__UNB || []).forEach(function(u, i){
+      var d = new Date(u.until), dd = d.getUTCDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getUTCMonth()] + ' ' + String(d.getUTCFullYear()).slice(2);
+      h += '<tr class=unst title="unstaking until ' + window.__day(u.until) + '"><td class=ck></td><td class="c rk">' + (rankOf(V, u.op) || '-') + '</td><td class="l nm"><div class=nmw>' + logo(u.op, u.m) + '<span>' + att(u.m) + '</span><em class=unsd>' + dd + '</em></div></td>' +
+           '<td class=amt>' + fmt(u.amt) + '</td><td><button type=button class=unbx data-u="' + i + '" aria-label="Cancel unstaking">Cancel</button></td><td class=rw></td></tr>'; });
     for(k = 0; k < slice.length; k++){
       var rw = slice[k], rk = rankOf(V, rw.id);
       var canSrc = rw.x - rw.locked >= 1e5, onSrc = canSrc && !!SRCSEL[rw.id];
@@ -2603,7 +2608,7 @@ rememberGridH();
     fitLockM();
     /* unstakings: their own rows above the list, each with a cancel (operator, 2026-11-03), not pills in the title row */
     var ul = E("dunb"), U = window.__UNB || [];
-    if(ul){ ul.hidden = !U.length;
+    if(ul){ ul.hidden = true; U = [];
       ul.innerHTML = U.map(function(u, i){ return '<div class=unbr><span class=unbt><b>' + fmt(u.amt) + ' ATONE</b> ' + window.__day(u.until) + ', <i>' + att(u.m) + '</i></span>' +
         '<button type=button class=unbx data-u="' + i + '" aria-label="Cancel unstaking" title="Cancel unstaking"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 6l12 12M18 6L6 18"/></svg>Cancel</button></div>'; }).join(""); }
     el.innerHTML = h;
@@ -2676,6 +2681,7 @@ rememberGridH();
     var tr = ev.target.closest ? ev.target.closest("tr.vrow[data-v]") : null;
     if(tr && window.__vshow){ ev.preventDefault(); window.__vshow(tr.getAttribute("data-v")); }
   });
+  if(dmy) dmy.addEventListener("click", function(ev){ var b = ev.target.closest && ev.target.closest(".unbx"); if(b){ ev.stopPropagation(); window.__cancelUnb(+b.dataset.u); } }, true);
   if(dmy){ dmy.addEventListener("click", rowCard); dmy.addEventListener("keydown", rowCard);
     dmy.addEventListener("change", function(ev){
       var c = ev.target, pos = window.__POS; if(!c || c.type !== "checkbox" || !pos) return;

@@ -1046,6 +1046,9 @@
   html[data-theme=light]:not([data-mono]) .wk-unbl .unbx:hover{background:var(--danger-bg)}
   html[data-theme=light]:not([data-mono]) .wk-unbl .unbx:focus-visible{outline-color:var(--danger-bar)}
   html[data-theme=light]:not([data-mono]) .wk-unbl .unbx svg{fill:none;stroke:currentColor}
+  html[data-theme=light]:not([data-mono]) #dmy .unbx{border-color:var(--danger-bar);background:var(--danger-bg);color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) #dmy .unbx:hover{background:var(--danger-bg)}
+  html[data-theme=light]:not([data-mono]) #dmy .unbx:focus-visible{outline-color:var(--danger-bar)}
   html[data-theme=light]:not([data-mono]) .tlbtn{background:transparent}
   html[data-theme=light]:not([data-mono]) .tlbtn svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .tlmenu{background:var(--bg,var(--surface));box-shadow:none}

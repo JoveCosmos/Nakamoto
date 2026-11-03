@@ -5686,6 +5686,13 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .wk-unbl .unbx:hover{background:rgba(255,107,107,.18)}.wk-unbl .unbx:focus-visible{outline:2px solid #ff6b6b;outline-offset:1px}
 .wk-unbl .unbx svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}
 #wk-mine #wk-acct>#dmy:not(#z){flex:1 1 auto;min-height:60px;overflow-y:auto;scrollbar-width:thin}
+/* unstaking rows in the delegations list (2026-11-03): the same row, the date small in amber, a small Cancel */
+#dmy tr.unst td{color:var(--ink)}
+#dmy tr.unst .nmw{display:flex;align-items:center;gap:6px;min-width:0}
+#dmy tr.unst .nmw>span{flex:1 1 auto;min-width:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#dmy tr.unst em.unsd{flex:0 1 auto;min-width:0;overflow:hidden;font-style:normal;font-size:10px;color:var(--wamber);white-space:nowrap}
+#dmy .unbx{font:inherit;font-size:10px;font-weight:600;line-height:1;padding:2px 6px;border:1px solid rgba(255,107,107,.55);border-radius:5px;background:rgba(255,107,107,.08);color:#ff6b6b;cursor:pointer;white-space:nowrap}
+#dmy .unbx:hover{background:rgba(255,107,107,.18)}#dmy .unbx:focus-visible{outline:2px solid #ff6b6b;outline-offset:1px}
 .cucard .unrow.off{opacity:.45;cursor:not-allowed}.cucard .unrow small{display:block;font-size:10px;color:var(--wf)}
 .cucard .cunote{margin:10px 16px 0;white-space:normal}
 /* Your move's unstaking line (2026-11-03): one row at every width, the words give way (ellipsis), Cancel stays whole */
