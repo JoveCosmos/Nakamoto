@@ -2616,7 +2616,8 @@ rememberGridH();
     var ub = E("unbtn"); if(ub) ub.hidden = !(pos && pos.rows.length);
     var sb = E("stbtn"); if(sb) sb.hidden = !pos;
     /* Claim: only while some validator holds rewards to take; it opens the claim card */
-    var cb = E("clbtn"); if(cb){ var rb = window.__REWBY || {}, any = pos.rows.some(function(r){ return (rb[r.id] || 0) >= 1; }); cb.hidden = !any; }
+    /* Claim opens whenever there is stake, rewards or not; its sign button waits for something to claim (operator, 2026-11-03) */
+    var cb = E("clbtn"); if(cb) cb.hidden = !pos.rows.length;
   }
 
   /* rows a page: what the pane has room for, measured, never fewer than four */
@@ -3018,18 +3019,18 @@ rememberGridH();
   function clRows(){
     var pos = window.__POS, by = window.__REWBY || {}; if(!pos) return [];
     return pos.rows.map(function(r){ return { id: r.id, m: r.m, op: r.op, x: by[r.id] || 0 }; })
-      .filter(function(r){ return r.x >= 1; }).sort(function(a, b){ return b.x - a.x; });
+      .sort(function(a, b){ return b.x - a.x; });   /* every delegation, its rewards 0 or more */
   }
   function clMsgs(){
     var VD = window.__VDBY || {}, out = [];
-    clRows().forEach(function(r){ if(!CLSEL[r.id]) return; var d = VD[r.id], op = (d && d.op) || r.op; if(!op) return;
+    clRows().forEach(function(r){ if(!CLSEL[r.id] || r.x < 1) return; var d = VD[r.id], op = (d && d.op) || r.op; if(!op) return;
       out.push({ type: "cosmos-sdk/MsgWithdrawDelegationReward", value: { delegator_address: window.__ADDR, validator_address: op } }); });
     return out;
   }
   window.__clMsgs = clMsgs;
   function clDraw(){
     var el = E("clpick"), rows = clRows(); if(!el) return;
-    var n = 0, tot = 0, all = 0; rows.forEach(function(r){ all += r.x; if(CLSEL[r.id]){ n++; tot += r.x; } });
+    var n = 0, tot = 0, all = 0; rows.forEach(function(r){ all += r.x; if(CLSEL[r.id] && r.x >= 1){ n++; tot += r.x; } });
     var every = rows.length > 1 ? '<label class="unrow all' + (n === rows.length ? ' on' : '') + '"><input type=checkbox value="*"' + (n === rows.length ? ' checked' : '') + '>' +
       '<span class="wk-lg wk-lgx">\u2211</span><b>All validators</b><i>' + exact(all, 6) + '<em>ATONE</em></i></label>' : '';
     if(DOCK && DOCK.pop === clpop){
@@ -3038,7 +3039,7 @@ rememberGridH();
         function(r){ return ['<td class="c rk">' + (rk[r.id] || '-') + '</td>', '<td class="l nm"><div class=nmw>' + logo(r.id, r.m) + '<span>' + att(r.m) + '</span></div></td>',
                              '<td>' + exact(r.x, 6) + '</td>']; },
         CLSEL, function(ids, on){ ids.forEach(function(id){ if(on) CLSEL[id] = 1; else delete CLSEL[id]; }); clDraw(); });
-      var sm0 = E("clsum"), go0 = E("clsign"), n0 = 0, tot0 = 0; rows.forEach(function(r){ if(CLSEL[r.id]){ n0++; tot0 += r.x; } });
+      var sm0 = E("clsum"), go0 = E("clsign"), n0 = 0, tot0 = 0; rows.forEach(function(r){ if(CLSEL[r.id] && r.x >= 1){ n0++; tot0 += r.x; } });
       if(sm0) sm0.innerHTML = n0 ? exact(tot0, 6) + " ATONE<br>from " + n0 + " validator" + (n0 === 1 ? "" : "s") : "";
       if(go0) go0.disabled = !n0 || !window.__WALLET;
       var ph = E("prohdr"); if(ph) ph.innerHTML = n0 ? '<span class=wk-seln><b>' + n0 + '</b>selected</span>' : '';
@@ -3066,7 +3067,7 @@ rememberGridH();
   window.__claim = function(){
     if(!clpop || !window.__POS) return;
     var rows = clRows(); if(!rows.length) return;
-    CLSEL = {}; rows.forEach(function(r){ CLSEL[r.id] = 1; });
+    CLSEL = {}; rows.forEach(function(r){ if(r.x >= 1) CLSEL[r.id] = 1; });
     var go = E("clsign"); if(go) go.textContent = "Claim";
     E("clfee").textContent = "";
     clDraw(); window.__openCard(clpop);
