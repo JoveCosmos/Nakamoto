@@ -12,8 +12,8 @@
   html[data-theme=light]:not([data-mono]) .folder{background:rgba(244,241,234,.93);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);box-shadow:none}
   html[data-theme=light]:not([data-mono]) .wordmark{font-family:var(--day-display);color:var(--ink)}
 
-  html[data-theme=light]:not([data-mono]) .thbtn{border-color:var(--line-strong);background:var(--surface);color:var(--muted)}
-  html[data-theme=light]:not([data-mono]) .thbtn:hover{color:var(--ink);background:#ECE8DF}
+  html[data-theme=light]:not([data-mono]) :is(.thbtn,.tlbtn){border-color:var(--line-strong);background:var(--surface);color:var(--muted)}
+  html[data-theme=light]:not([data-mono]) :is(.thbtn,.tlbtn):hover{color:var(--ink);background:#ECE8DF}
   html[data-theme=light]:not([data-mono]) .tsfx{color:var(--accent)!important}
   html[data-theme=light]:not([data-mono]) .bt,html[data-theme=light]:not([data-mono]) .btx{font-family:var(--day-display);color:var(--ink)}
 

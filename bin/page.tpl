@@ -5695,9 +5695,9 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 /* tools: the header button beside day/night, its menu, and the full-screen card */
 .tlw{position:relative;display:inline-flex}
 .tlw{margin-left:auto}
-.tlbtn{height:36px;display:inline-flex;align-items:center;gap:7px;padding:0 13px;border-radius:10px;border:1px solid var(--edge2);background:transparent;color:var(--ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
-.tlbtn:hover{border-color:var(--wcyan)}.tlbtn:focus-visible{outline:2px solid var(--wcyan);outline-offset:2px}
-.tlbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tlbtn{height:32px;display:inline-flex;align-items:center;gap:7px;padding:0 11px;border-radius:8px;border:1px solid var(--edge2);background:transparent;color:var(--ink2);font:inherit;font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap;flex:0 0 auto;transition:color .2s,border-color .2s}
+.tlbtn:hover{color:var(--ink);border-color:var(--ink3)}.tlbtn:focus-visible{outline:2px solid var(--acc,var(--hot));outline-offset:2px}
+.tlbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin:0;display:block}
 .hdr-r .thbtn:not(#z){margin-left:0}
 @media(max-width:620px){.tlbtn{height:32px;width:32px;padding:0;justify-content:center}.tlbtn span{display:none}}
 .tlmenu{position:absolute;top:calc(100% + 6px);right:0;z-index:60;min-width:240px;display:flex;flex-direction:column;padding:6px;border-radius:12px;border:1px solid var(--edge2);background:var(--bg,#0b0b16);box-shadow:0 12px 32px rgba(0,0,0,.35)}
