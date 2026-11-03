@@ -5751,6 +5751,17 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .mv-r button.mv-uc:hover{background:rgba(255,107,107,.18)}.mv-r button.mv-uc:focus-visible{outline:2px solid #ff6b6b;outline-offset:1px}
 .mv-dh{display:flex;gap:10px}.mv-dh>span:first-child{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mv-dh>span:last-child{flex:0 0 auto;white-space:nowrap}
 .mv-dh small.mv-dn{margin-left:10px;font-size:10.5px;color:var(--ink3);font-weight:400}
+/* phones, the economics cards (operator, 2026-11-03): the title with its tag (and PHOTON's 1 billion max after it) on
+   one row, the price, change and market cap on the next, the legend last, right above its graph */
+@media(max-width:700px){
+  :is(#sv-ecoa,#sv-ecop) .sv-ph:not(#z){display:flex;flex-wrap:wrap;align-items:center;column-gap:8px;row-gap:6px;height:auto;max-height:none}
+  :is(#sv-ecoa,#sv-ecop) .sv-ph>h3:not(#z){order:1;margin:0}
+  :is(#sv-ecoa,#sv-ecop) .sv-ph>.sv-trole:not(#z){order:2;margin:0;align-self:center}
+  :is(#sv-ecoa,#sv-ecop) .sv-ph>.sv-tmax:not(#z){order:3;margin:0}
+  :is(#sv-ecoa,#sv-ecop) .sv-ph>.sv-tp:not(#z){order:4;flex:1 1 100%;margin:0}
+  :is(#sv-ecoa,#sv-ecop) .sv-ph>.sv-gkey:not(#z){order:5;flex:1 1 100%;margin:0}
+  :is(#sv-ecoa,#sv-ecop) .sv-ph>:not(h3):not(.sv-trole):not(.sv-tmax):not(.sv-tp):not(.sv-gkey){order:9}
+}
 .pop .atjail{margin:10px 0 12px;padding:9px 12px;border-radius:9px;border:1px solid rgba(91,179,232,.22);background:rgba(91,179,232,.05)}
 .pop .atjail:hover{background:rgba(91,179,232,.09)}
 .pop .atjail span{font-size:12px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

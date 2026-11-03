@@ -184,3 +184,7 @@ html.embed .hero>div em:not(#z){font-size:10px;margin:0;white-space:nowrap}
 @media(max-width:760px){html.embed .wrap>#tool:not([hidden]){flex-direction:column;gap:10px}
   html.embed #tool>.left{flex:0 0 auto}html.embed #tool>.left>.stage{flex:0 0 150px!important;min-height:120px;height:150px!important}
   html.embed #tool>.side{flex:1 1 auto;min-height:0}}
+/* the Auth Scanner's figures as plain text, no boxes (operator, 2026-11-03) */
+html.embed .hero.plain:not(#z){gap:14px}
+html.embed .hero.plain>div:not(#z){padding:0;border:0;background:none;box-shadow:none}
+html.embed .hero.plain>div b:not(#z){font-size:16px}
