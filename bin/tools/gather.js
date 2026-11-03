@@ -93,7 +93,7 @@ function notes(p){
     }
     h += '<p>Moved stake is held on GATA HUB for <b>21 days</b>, until <b>' + day(Date.now() + 21 * 864e5) + '</b>: it keeps earning, but cannot be moved to another validator before then. You can still unstake it.</p>';
   }
-  if(PILOT) h += '<p class=w><b>Autopilot is on for this wallet.</b> It will spread this stake across validators again at its next run. Turn Autopilot off in <a href="' + T.BASE + '">Nakamoto</a> first to keep everything on GATA HUB.</p>';
+  if(PILOT) h += '<p class=w><b>Autopilot is active for this wallet.</b> It will redelegate again after 21 day cooldown.</p>';
   E("notes").innerHTML = h;
 }
 /* the fee: each transaction simulated at the chain's price, summed */
