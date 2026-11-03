@@ -230,6 +230,26 @@ def grants():
         if not key: break
     return out
 
+# ── the reader's choice on jailed validators (operator, 2026-11-03): Autopilot leaves out the validators Restake leaves
+# out (jailed three times ever, or twice in 90 days) unless the grant's own transaction says "all validators" in its
+# memo - the box the reader unticked. Read from the chain, once per grant (a re-grant has a new expiry) ──────────────
+ALL_VALS = "all validators"
+_MEMO = {}
+def all_vals(granter, exp):
+    k = (granter, exp)
+    if k in _MEMO: return _MEMO[k]
+    q = ("/cosmos/tx/v1beta1/txs?query=" + urllib.parse.quote("message.sender='%s' AND message.action='/cosmos.authz.v1beta1.MsgGrant'" % granter)
+         + "&order_by=ORDER_BY_DESC&limit=5")
+    try:
+        for t in get(q).get("tx_responses") or []:
+            ms = t.get("tx", {}).get("body", {}).get("messages", [])
+            if any((x.get("grant") or {}).get("authorization", {}).get("authorization_type") == "AUTHORIZATION_TYPE_REDELEGATE" for x in ms):
+                _MEMO[k] = ALL_VALS in (t["tx"]["body"].get("memo") or "").lower(); return _MEMO[k]
+        _MEMO[k] = False
+    except Exception as e:
+        log("grant memo unreadable for %s, jailed validators left out: %s" % (short(granter), e)); return False
+    return _MEMO[k]
+
 def grant_sig(g):
     """the grant's identity for "changed": its validator list and expiry. Not the cap: the chain lowers max_tokens on
     every move, so a capped grant would look new every tick (audit 2026-09-30)"""
@@ -837,6 +857,7 @@ def plan(g, rows, reds, vals, m, room=None):
     # any validator of the active set may take stake (operator, 2026-09-30): no uptime test, and a tombstoned validator
     # never returns to the set, so there is none to exclude; an older grant's validator list still binds
     skip_all = strategy_skip()
+    if not all_vals(g["granter"], g["exp"]): skip_all = skip_all | restake_skip()       # jailed often: left out by default
     def listed(v): return (g["allow"] is None or v["op"] in g["allow"]) and v["op"] not in g["deny"] and v["op"] not in skip_all
     used = pairs_used(reds)
     def dst_rates(ms):

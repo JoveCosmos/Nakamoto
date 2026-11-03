@@ -2770,7 +2770,7 @@ rememberGridH();
     var msgs = TXSNAP || txAll(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
     txsign.disabled = true; txsign.classList.add("busy");
     var n = window.__notify(), ap = TXAP;
-    (ap ? window.__TX.sendDirect(window.__WALLET, msgs, "GATA AtomOne Autopilot", function(){}) : window.__TX.send(window.__WALLET, msgs, "", function(){}))
+    (ap ? window.__TX.sendDirect(window.__WALLET, msgs, window.__atMemo ? window.__atMemo() : "GATA AtomOne Autopilot", function(){}) : window.__TX.send(window.__WALLET, msgs, "", function(){}))
     .then(function(){
       n.ok(); POP.close(txpop); TXAP = false;
       if(ap && window.__atReload) window.__atReload();
@@ -3779,7 +3779,7 @@ rememberGridH();
           var ms = ((rs[i].tx || {}).body || {}).messages || [];
           for(var k = 0; k < ms.length; k++){ var m = ms[k], a = m.grant && m.grant.authorization || {};
             if(m["@type"] === "/cosmos.authz.v1beta1.MsgGrant" && m.grantee === AT.addr && a.authorization_type === "AUTHORIZATION_TYPE_REDELEGATE")
-              return Date.parse(rs[i].timestamp) || null; } }
+              { AT_ALL_G = /all validators/i.test(((rs[i].tx || {}).body || {}).memo || ""); return Date.parse(rs[i].timestamp) || null; } } }
         return null; })
       .catch(function(){ return null; });
   }
@@ -3840,7 +3840,15 @@ rememberGridH();
   function atScope(){ return atOps(atPick() === "selected" ? atSelIds() : atAutoIds()); }
   /* the memo the keeper reads: the strategy word, then the flags */
   /* the memo on the reader's grant: a plain label, nothing reads it */
-  function atMemo(){ return "GATA AtomOne Autopilot"; }
+  /* jailed validators: left out unless the reader unticks the box; the choice travels in the grant's memo, which the
+     keeper reads (operator, 2026-11-03). A standing grant shows its own choice, changeable only through Change */
+  var AT_ALL = false, AT_ALL_G = false;
+  function atMemo(){ return "GATA AtomOne Autopilot" + (AT_ALL ? ", all validators" : ""); }
+  window.__atMemo = atMemo;
+  function atJail(ro){ var b = E("atjail"), w = E("atjailw"), t = E("atjaili"); if(!b) return;
+    b.checked = !AT_ALL; b.disabled = !!ro; w.classList.toggle("all", AT_ALL); w.classList.toggle("ro", !!ro);
+    t.textContent = AT_ALL ? "All validators, none excluded" : "Recommended, avoids unreliable validators"; }
+  (function(){ var b = E("atjail"); if(b) b.addEventListener("change", function(){ AT_ALL = !b.checked; atJail(false); }); })();
   function atMonths(){ return AT.days >= 365 ? "12 months" : AT.days >= 180 ? "6 months" : "3 months"; }
   function atCap(){ var a = E("atcap"), n = window.__amountIn(a.value); return isFinite(n) && n > 0 ? Math.round(n * 1e6) : 0; }
   function atMsgs(){
@@ -3967,7 +3975,9 @@ rememberGridH();
         (AT_EDIT ? '<br><span class=g>Changing it:</span> the terms below replace these when you sign.' : '');
     }
     E("atform").hidden = view;
-    E("atrevoke").hidden = !view; E("atedit").hidden = true;   /* nothing to change: no cap, no list */
+    E("atrevoke").hidden = !view; E("atedit").hidden = !view;   /* Change: the jailed-validators choice */
+    if(g && !AT_EDIT) AT_ALL = AT_ALL_G;
+    atJail(g && !AT_EDIT);
     var go = E("atgrant"); go.hidden = view; go.textContent = g ? "Update" : "Activate";
     /* no Cancel or Close: a tap outside, or Escape, closes the card. Back stays - it leaves a
        change of a standing grant without closing */

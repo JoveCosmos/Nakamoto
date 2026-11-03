@@ -5675,6 +5675,14 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 #atpop .atrsh{margin-left:10px;font-size:11px;color:var(--ws);align-self:center}
 #atpop .atrow:has(#atrsk){flex-direction:row;flex-wrap:wrap;align-items:center}
 #atpop .atrow:has(#atrsk) .atlab{flex:0 0 100%}
+/* the jailed-validators choice in Autopilot: the app's checkbox row (.aopt) in the card's own box; the hint is one
+   line that never wraps, so ticking it changes words and colour, never the card's height */
+#atpop .atjail{margin:10px 0 12px;padding:9px 12px;border-radius:9px;border:1px solid rgba(91,179,232,.22);background:rgba(91,179,232,.05)}
+#atpop .atjail:hover{background:rgba(91,179,232,.09)}
+#atpop .atjail span{font-size:12px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#atpop .atjail i{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:1.3em;line-height:1.3em}
+#atpop .atjail.all i{color:var(--wamber)}
+#atpop .atjail.ro{cursor:default}#atpop .atjail.ro:hover{background:rgba(91,179,232,.05)}
 #atpop .atnote:not(#z){margin-top:14px;padding:10px 12px;font-size:12px;border-radius:9px}
 /* the list: taller rows, the name and the APR larger */
 #atpop .atrt b:not(#z){font-size:15px;font-weight:700}
@@ -7615,6 +7623,8 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
       </div>
       <ul class=bn id=atwhat><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="8"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></i><span class=bn-t><b>Keeps your stake in the active set</b><small><b id=atidlen>Stake</b> sits idle on inactive validators today</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 17l5-5 4 4 7-8"/><path d="M15 8h5v5"/></svg></i><span class=bn-t><b>Keeps your APR at its best</b><small>moves only for 5 APR points or more</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Redelegates, nothing else</b><small>GATA funds your pilot, no fees for you</small></span></li></ul>
       <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Runs every <b>12 hours</b>, you can revoke anytime.</span></div>
+      <!-- jailed validators (operator, 2026-11-03): ticked by default; the line under it is one fixed row whatever it says -->
+      <label class="aopt atjail" id=atjailw><input type=checkbox id=atjail checked><span>Exclude validators jailed 3x, or 2x in 90 days<i id=atjaili>Recommended, avoids unreliable validators</i></span></label>
     </section>
     <section class=atR id=atR aria-label="Select your validators">
       <div class=atrs><input class=atfind id=atfind type=search placeholder="Find by name or operator key" aria-label="Find a validator" autocomplete=off spellcheck=false><span class=wk-seln id=atcount aria-live=polite></span></div>
