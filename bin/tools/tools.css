@@ -224,3 +224,5 @@ html.embed .hero:not(.plain)>div:not(#z){flex:1 1 0;justify-content:center;text-
 .fllist{overflow-y:auto;padding:8px 12px 12px;display:flex;flex-direction:column;gap:6px}
 .flr{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border:1px solid var(--wbd);border-radius:9px}
 .flr b{font-size:13px}.flr small{font-family:var(--wmono);font-size:10.5px;color:var(--wf);overflow-wrap:anywhere}
+/* inside the app on a wide card the header carries the balance (2026-11-03) */
+@media(min-width:701px){html.embed #bal{display:none}}

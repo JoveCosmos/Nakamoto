@@ -5725,6 +5725,22 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 #tlpop .sd-wch i.net{color:var(--wcyan);border-color:currentColor}#tlpop .sd-wch i.net.tn{color:var(--wamber)}
 .tltag{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10.5px;line-height:1.2;padding:3px 8px;border-radius:999px;border:1px solid var(--wamber);color:var(--wamber);background:rgba(255,176,46,.08)}
 .tlcard .wk-txh>div{min-width:0}
+/* the tool card's header: its own sizes, not the transaction cards' title and chain-id rules */
+#tlpop .wk-txh #tlttl:not(#z){font-size:15px;font-weight:600;color:var(--wt)}
+#tlpop .wk-txh #tlttl>span:not(#z){display:inline;font:inherit;color:inherit;letter-spacing:inherit;text-transform:none;margin:0}
+#tlpop .wk-txh :is(.tlwho,.tlbal) :is(b,span,em):not(#z){display:inline;margin:0;text-transform:none}
+#tlpop .wk-txh .tlwho b:not(#z),#tlpop .wk-txh .tlbal b:not(#z){font-size:13px;font-weight:600;letter-spacing:0;color:var(--wt)}
+#tlpop .wk-txh .tlwho span:not(#z){font-family:var(--wmono);font-size:11px;font-weight:400;letter-spacing:.02em;color:var(--wf)}
+#tlpop .wk-txh .tlbal em:not(#z){font-family:var(--wmono);font-size:10px;font-weight:400;letter-spacing:.06em;color:var(--wf);margin-left:4px}
+#tlpop .wk-txh .tlbal>span:not(#z){display:inline-flex;align-items:baseline}
+#tlpop .wk-txh :is(.tlwho,.tlbal):not(#z):not(#y){display:inline-flex;align-items:baseline;gap:8px;margin:0 0 0 4px;font-size:inherit}
+#tlpop .wk-txh .tlbal:not(#z):not(#y){gap:14px;padding-left:12px;border-left:1px solid var(--wbd)}
+#tlpop .wk-txh .tlbal[hidden]:not(#z):not(#y){display:none}
+.tlwho{display:inline-flex;align-items:baseline;gap:8px;min-width:0;font-size:12.5px;white-space:nowrap}
+.tlwho b{font-weight:600;color:var(--ink)}.tlwho span{font-family:var(--wmono);font-size:11px;color:var(--ink3)}
+.tlbal{display:inline-flex;align-items:baseline;gap:10px;font-size:12.5px;white-space:nowrap}
+.tlbal b{font-weight:600;color:var(--ink)}.tlbal em{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.06em;color:var(--ink3);margin-left:4px}
+@media(max-width:700px){.tlwho b,.tlbal{display:none!important}}
 .tlcard #tlttl{white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
 .tlcard #tlttl svg{width:18px;height:18px;flex:0 0 auto;fill:none;stroke:var(--wcyan);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .tltag .tlt-s{display:none}
@@ -7667,7 +7683,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
 </div></div>
 
 <div class=pop id=tlpop><div class="card txcard uncard spcard tlcard" role=dialog aria-modal=true aria-labelledby=tlttl>
-  <header class=wk-txh><div><b id=tlttl>Tools</b><span class=sd-wch><i class=net id=tlnet></i></span><span class=tltag id=tltag hidden></span></div></header>
+  <header class=wk-txh><div><b id=tlttl>Tools</b><span class=sd-wch><i class=net id=tlnet></i></span><span class=tlwho id=tlwho></span><span class=tlbal id=tlbal hidden></span><span class=tltag id=tltag hidden></span></div></header>
   <div class=tlgate id=tlgate hidden><h2>Connect a wallet</h2><div class=tlws id=tlws></div></div>
   <iframe class=tlfr id=tlfr title="Tool" hidden></iframe>
 </div></div>

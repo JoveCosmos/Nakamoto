@@ -2944,7 +2944,16 @@ rememberGridH();
         : '<span>' + (/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) ? "Open this page inside the Keplr app" : "Install Keplr or Adena") + '</span>';
     }
     E("tlws").addEventListener("click", function(ev){ var t = ev.target.closest && ev.target.closest("[data-tlw]"); if(t && window.__wconnect) window.__wconnect(t.dataset.tlw); });
+    /* the header names the wallet, after the network; Fee Saver also shows the balance there (operator, 2026-11-03) */
+    function who(){
+      var W = window.__WALLET, a = window.__ADDR, wh = E("tlwho"), bl = E("tlbal");
+      wh.innerHTML = a ? '<b>' + att((W && W.label) || (W && W.name) || "Wallet") + '</b><span>' + a.slice(0, 10) + '\u2026' + a.slice(-6) + '</span>' : '';
+      var B = window.__BAL, f = function(u){ return (u / 1e6).toLocaleString("en-US", { maximumFractionDigits: 2 }); };
+      bl.hidden = !(TOOL === "send" && a && B);
+      if(!bl.hidden) bl.innerHTML = '<span><b>' + f(B.uatone || 0) + '</b><em>ATONE</em></span><span><b>' + f(B.uphoton || 0) + '</b><em>PHOTON</em></span>';
+    }
     function show(){
+      who();
       if(!window.__ADDR){ fr.hidden = true; g.hidden = false; gate(); return; }
       g.hidden = true; fr.hidden = false;
       var u = BASEH + "tools/" + TOOL + "?embed=1"; if(fr.getAttribute("src") !== u) fr.setAttribute("src", u);
