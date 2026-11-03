@@ -124,6 +124,24 @@ function stage(cv, draw){
     redraw: function(){ if(!on) return; var r = size(); ctx.clearRect(0, 0, r.width, r.height); draw(ctx, r.width, r.height, 0); if(reduced) return; cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); } };
 }
 function tok(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+/* ── inside the app (operator, 2026-11-03): the app opens a tool full screen in a frame with ?embed=1. The page then
+   carries no bar of its own and uses the app's wallet (the same object: address, pubKey, signAmino(doc)) and theme ── */
+var EMB = /[?&]embed=1(&|$)/.test(location.search) && window.parent !== window;
+if(EMB){
+  document.documentElement.classList.add("embed");
+  var P = window.parent;
+  var sync = function(){
+    try{
+      var th = P.document.documentElement.getAttribute("data-theme");
+      if(th && document.documentElement.getAttribute("data-theme") !== th){ document.documentElement.setAttribute("data-theme", th); window.dispatchEvent(new Event("tools:theme")); }
+      var pw = P.__WALLET || null;
+      if((pw && pw.address) !== (W && W.address)){ W = pw && pw.address ? pw : null; window.__ADDR = W ? W.address : null; window.__WALLET = W;
+        drawWallet(); onWallet.forEach(function(f){ f(W); }); }
+    }catch(e){}
+  };
+  /* after every tool script has registered for the wallet: a sync before then would set it with no one told */
+  window.addEventListener("load", function(){ sync(); setInterval(sync, 700); });
+}
 window.T = { NET: NET, BASE: BASE, CHAIN: CHAIN, E: E, esc: esc, get: get, bechOk: bechOk, conv: conv, names: namesReady, nameOf: nameOf, short: short,
   govOf: govOf, govName: govName, wallet: function(){ return W; }, onWallet: function(f){ onWallet.push(f); }, connect: connect, drawGate: drawGate, sign: sign, feePreview: feePreview,
   fmtP: fmtP, fmtA: fmtA, stage: stage, tok: tok, ours: function(){ return OURS; } };

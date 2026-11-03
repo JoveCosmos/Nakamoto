@@ -2212,7 +2212,7 @@
     var CH = '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 9l6 6 6-6"/></svg>';
     return '<div class="mv-rows' + (open ? ' open' : '') + '" data-k="' + key + '">' + list.map(function(r, i){
       /* a row opens its validator's card, whichever list it is in (operator, 2026-10-16) */
-      return '<div class="mv-r' + (i >= lim ? ' mv-x' : '') + '"' + (r.id ? ' data-v="' + esc(r.id) + '" role=button tabindex=0' : '') + '><u class=' + cls + '>' + r.rank + '</u><span title="' + esc(r.name) + '">' + esc(r.name) + '</span><b>' + r.amt + '</b><i class=' + cls + '>' + r.apr + '</i></div>';
+      return '<div class="mv-r' + (i >= lim ? ' mv-x' : '') + '"' + (r.id ? ' data-v="' + esc(r.id) + '" role=button tabindex=0' : '') + '><u class=' + (r.c || cls) + '>' + r.rank + '</u><span title="' + esc(r.name) + '">' + esc(r.name) + (r.sub ? '<i class=mv-un>' + r.sub + '</i>' : '') + '</span><b>' + r.amt + '</b><i class=' + (r.c || cls) + '>' + r.apr + '</i></div>';
     }).join("") + '</div>' +
       (rest > 0 ? '<button type=button class=mv-more data-act=mvmore data-k="' + key + '" data-closed="' + esc('and ' + rest + ' more ' + more) + '" aria-expanded=' + open + '><span>' + (open ? 'Show fewer' : 'and ' + rest + ' more ' + more) + '</span>' + CH + '</button>' : '');
   }
@@ -2322,7 +2322,11 @@
     var nowOn = function(){
       /* dust a redelegation leaves behind (under 0.1 ATONE) is not a position */
       var rows = pos.rows.filter(function(r){ return r.x >= 1e5; }).sort(function(x, y){ return y.x - x.x; });
-      return '<div class=mv-box><em>Now on</em>' + mvRows(rows.map(function(r){ return { id: r.id, rank: r.inactive ? 'out' : rk(r.id), name: r.m, amt: fmt(r.x), apr: r.inactive ? '0%' : pct(r.rate) }; }), 'g', 'validators', 'now') + '</div>';
+      /* unstakings too, tagged, their end date where the APR is (operator, 2026-11-03) */
+      var d2 = function(t){ var x = new Date(t); return x.getUTCDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][x.getUTCMonth()] + ' ' + String(x.getUTCFullYear()).slice(2); };
+      /* where the APR stands: its Cancel, the same card as Pro's row (operator, 2026-11-03) */
+      var un = (window.__UNB || []).map(function(u, k){ return { id: u.op, rank: rk(u.op) || 'out', name: u.m, sub: '<b class=mv-unw>unstaking </b>' + d2(u.until), amt: fmt(u.amt), apr: '<button type=button class=mv-uc data-act=unbone data-u="' + k + '">Cancel</button>' }; });
+      return '<div class=mv-box><em>Now on</em>' + mvRows(rows.map(function(r){ return { id: r.id, rank: r.inactive ? 'out' : rk(r.id), name: r.m, amt: fmt(r.x), apr: r.inactive ? '0%' : pct(r.rate) }; }).concat(un), 'g', 'validators', 'now') + '</div>';
     };
     var you = '';
     if(a){
@@ -2377,11 +2381,8 @@
         h = top(auto ? 'Moved. Autopilot is active' : 'Moved. Cooling down', '', '', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
           /* the one move open while the stake cools down: staking what sits in the wallet (operator, 2026-10-04) */
           '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b>' + line('Free to move again on <b>' + day(t1) + '</b>.') + unbLine() + '</div>' +
-          '<div class=mv-days><div class=mv-dh><span>Cooling down</span><span>' + day(t0) + ' to ' + day(t1) + '</span></div><div class=mv-dc>' + cells + '</div>' +
-          '<small>The chain holds redelegated stake for 21 days.</small></div>' + nowOn() +
-          (auto ? '<div class=mv-cyc><div class=done><em>' + (hist ? day(hist.at * 1000) : 'Done') + '</em><b>Moved</b></div><div class=warn><em>Until ' + day(t1) + '</em><b>Cooling down</b></div>' +
-                  '<div><em>Every 12 hours</em><b>Checked again</b></div><div><em>3 points more</em><b>Moved for you</b></div></div>'
-                : '') +   /* no "free again on ... Autopilot moves it" note (operator, 2026-10-17: redundant); the set below takes the room */
+          /* the 21-day line sits beside the title, and the cycle boxes are gone (operator, 2026-11-03): the room goes to Now on */
+          '<div class=mv-days><div class=mv-dh><span>Cooling down<small class=mv-dn>The chain holds redelegated stake for 21 days.</small></span><span>' + day(t0) + ' to ' + day(t1) + '</span></div><div class=mv-dc>' + cells + '</div></div>' + nowOn() +
           mvSet({}, mineIds());
       } else {
         h = top('Your stake today', 'At its best', 'ok', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
@@ -2488,6 +2489,7 @@
     if(act === "wtalerts"){ if(t.getAttribute("aria-disabled") !== "true") wtOpen(); return; }
     /* Stake goes to StakePilot (operator, 2026-10-15); its "choose validators myself" link opens the manual list */
     if(act === "unbcancel"){ if(window.__cancelUnb) window.__cancelUnb(null); return; }
+    if(act === "unbone"){ if(window.__cancelUnb) window.__cancelUnb(+t.dataset.u); return; }
     if(act === "stake"){ if(window.__pilot && window.__ADDR){ window.__pilot(); return; } var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "mint"){ if(window.__mint) window.__mint(); return; }
     if(act === "buy"){ if(BUY() && window.__buy) window.__buy(); return; }

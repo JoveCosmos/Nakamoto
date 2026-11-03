@@ -2605,7 +2605,7 @@ rememberGridH();
     var ul = E("dunb"), U = window.__UNB || [];
     if(ul){ ul.hidden = !U.length;
       ul.innerHTML = U.map(function(u, i){ return '<div class=unbr><span class=unbt><b>' + fmt(u.amt) + ' ATONE</b> ' + window.__day(u.until) + ', <i>' + att(u.m) + '</i></span>' +
-        '<button type=button class=unbx data-u="' + i + '" aria-label="Cancel unstaking" title="Cancel unstaking"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>'; }).join(""); }
+        '<button type=button class=unbx data-u="' + i + '" aria-label="Cancel unstaking" title="Cancel unstaking"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 6l12 12M18 6L6 18"/></svg>Cancel</button></div>'; }).join(""); }
     el.innerHTML = h;
     var ub = E("unbtn"); if(ub) ub.hidden = !(pos && pos.rows.length);
     var sb = E("stbtn"); if(sb) sb.hidden = !pos;
@@ -2915,6 +2915,40 @@ rememberGridH();
   /* ── claim: the rewards waiting on each validator, one MsgWithdrawDelegatorReward per
      validator ticked - all of them to begin with. Claimed ATONE lands as available and earns
      nothing until it is staked again ── */
+  /* ── tools (operator, 2026-11-03): a menu beside day/night; a tool opens full screen in a card that names it and
+     the network, with the app's wallet, or the connect choice when none is connected ── */
+  (function(){
+    var b = E("tlbtn"), m = E("tlmenu"), pop = E("tlpop"), fr = E("tlfr"), g = E("tlgate"); if(!b || !m || !pop) return;
+    var TOOL = null, TIMER = 0, NAMES = { revoke: "Revoke Scanner", send: "Fee Saver", gather: "Gather to GATA HUB" };
+    var BASEH = (document.querySelector("base") || { getAttribute: function(){ return "/"; } }).getAttribute("href") || "/";
+    var test = /testnet/.test(BASEH);
+    function menu(on){ m.hidden = !on; b.setAttribute("aria-expanded", on ? "true" : "false"); if(on){ var f = m.querySelector("button"); if(f) f.focus(); } }
+    b.addEventListener("click", function(ev){ ev.stopPropagation(); menu(m.hidden); });
+    document.addEventListener("click", function(ev){ if(!m.hidden && !(ev.target.closest && ev.target.closest(".tlw"))) menu(false); });
+    document.addEventListener("keydown", function(ev){ if(ev.key === "Escape" && !m.hidden){ menu(false); b.focus(); } });
+    m.addEventListener("click", function(ev){ var t = ev.target.closest && ev.target.closest("[data-tool]"); if(!t) return; menu(false); open(t.dataset.tool); });
+    function gate(){
+      var ws = []; if(window.keplr) ws.push("Keplr"); if(window.adena && window.adena.cosmos) ws.push("Adena");
+      E("tlws").innerHTML = ws.length ? ws.map(function(n){ return '<button class="sv-btn go" type=button data-tlw="' + n + '">' + n + '</button>'; }).join("")
+        : '<span>' + (/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) ? "Open this page inside the Keplr app" : "Install Keplr or Adena") + '</span>';
+    }
+    E("tlws").addEventListener("click", function(ev){ var t = ev.target.closest && ev.target.closest("[data-tlw]"); if(t && window.__wconnect) window.__wconnect(t.dataset.tlw); });
+    function show(){
+      if(!window.__ADDR){ fr.hidden = true; g.hidden = false; gate(); return; }
+      g.hidden = true; fr.hidden = false;
+      var u = BASEH + "tools/" + TOOL + "?embed=1"; if(fr.getAttribute("src") !== u) fr.setAttribute("src", u);
+    }
+    function open(t){
+      TOOL = t; E("tlttl").textContent = NAMES[t] || "Tools";
+      var n = E("tlnet"); n.textContent = test ? "Testnet" : "Mainnet"; n.classList.toggle("tn", test);
+      fr.removeAttribute("src"); show(); POP.open(pop);
+      clearInterval(TIMER); TIMER = setInterval(function(){ if(pop.classList.contains("on")) show(); }, 600);
+    }
+    window.__tool = open;
+    pop.__onclose = function(){ clearInterval(TIMER); fr.removeAttribute("src"); TOOL = null; };
+    E("tlx").addEventListener("click", function(){ POP.close(pop); });
+  })();
+
   /* ── cancel unstaking (operator, 2026-11-03): any unstaking entry can be cancelled before it ends; the stake goes back
      to its validator. The chain refuses a jailed validator, so those rows cannot be ticked ── */
   var cupop = E("cupop"), CUSEL = {};

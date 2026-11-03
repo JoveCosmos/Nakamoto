@@ -1551,7 +1551,7 @@ html[data-tab=dele] .flipbox,html[data-tab=empty] .flipbox,html[data-tab=connect
    top edge), Inter at 600-800, solid gradient buttons, tinted tag pills, inset
    tracks. Every class here is prefixed wk- or scoped under #p-dele, so nothing
    the calculator names can reach in - and nothing here reaches out. */
-#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard,#sppop .txcard,#bypop .txcard{
+#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard,#sppop .txcard,#tlpop .txcard,#bypop .txcard{
   --wsolid:rgba(14,24,38,.97);
   
   --wblue:#3B9EFF;--wcyan:#62D9FF;--wgreen:#36D399;--wamber:#FFB155;--wburn:#FF7A45;--wgold:#F5C66B;
@@ -1807,7 +1807,7 @@ html[data-tab=dele] .calclab,html[data-tab=empty] .calclab,html[data-tab=connect
 :root{--void:#06060c;--edge:#232342;--edge2:#34345c;--ink:#e6e4f0;--ink2:#a5a3c4;--ink3:#6f6d94;--faint:#3a3a54;
 --hot:#ffb02e;--burn:#ff4d1f;--cold:#6f66c8;--lit:#fff8dc;--card:#0b0b16;--card2:#111124;--inset:#0a0a14;
 --blue:#6f66c8;--cyan:#2bc8bd;--green:#2ee06a;--amber:#ffb02e}
-#sv,.hdr-r,.brandbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard,#sppop .txcard,#bypop .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
+#sv,.hdr-r,.brandbar,#p-dele,#p-intro,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard,#sppop .txcard,#tlpop .txcard,#bypop .txcard{--wc:#09090f;--wh:#0f0f1c;--wbd:#232342;--wbd2:#34345c;--wi:#0a0a14;--wchip:#0b0b16;--wsolid:rgba(11,11,22,.97);
 --wt:#e6e4f0;--ws:#a5a3c4;--wf:#6f6d94;--wblue:#6f66c8;--wcyan:#2bc8bd;--wgreen:#2ee06a;--wamber:#ffb02e;--wburn:#ff4d1f;--wgold:#ffb02e;
 --wsans:"Helvetica Neue",Helvetica,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--wmono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
 body{background:var(--void);background-image:radial-gradient(130% 62% at 50% 0%,#16162e 0%,#0a0a16 42%,var(--void) 74%)}
@@ -2268,7 +2268,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 
 /* the wallet, lifted out of the dark: lighter grounds, brighter hairlines and
    type, so the figures read without leaning in */
-#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard,#sppop .txcard,#bypop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
+#sv,.hdr-r,.brandbar,#p-dele,#txpop .txcard,#unpop .txcard,#clpop .txcard,#stpop .txcard,#atpop .txcard,#grpop .txcard,#mtpop .txcard,#sppop .txcard,#tlpop .txcard,#bypop .txcard{--wc:#0e0e1d;--wh:#16162a;--wbd:#2a2a4a;--wbd2:#3e3e66;--wi:#0b0b19;--wchip:#12122200;--wt:#f0eef8;--ws:#c1bfdc;--wf:#8f8db4}
 
 .wk-pane{background:linear-gradient(180deg,#10101f,#0d0d1b)}
 .wk-tbl2 td{border-bottom-color:#22223c}
@@ -5678,19 +5678,49 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 /* the jailed-validators choice in Autopilot: the app's checkbox row (.aopt) in the card's own box; the hint is one
    line that never wraps, so ticking it changes words and colour, never the card's height */
 /* unstakings above the delegations list: one row each, never wrapping (the name gives way), a cancel at its end */
-.wk-unbl{display:flex;flex-direction:column;gap:4px;margin:6px 0 8px}
-.wk-unbl .unbr{display:flex;align-items:center;gap:8px;min-width:0;height:28px;padding:0 4px 0 10px;border-radius:6px;border:1px solid rgba(255,177,85,.28);background:rgba(255,177,85,.06);font-size:11.5px;color:var(--ink)}
+.wk-unbl{display:flex;flex-direction:column;gap:4px;margin:6px 0 8px;flex:0 0 auto;max-height:100px;overflow-y:auto;scrollbar-width:thin}
+.wk-unbl .unbr{display:flex;align-items:center;gap:8px;min-width:0;min-height:30px;padding:0 4px 0 10px;border-radius:6px;border:1px solid var(--wbd);background:transparent;font-size:11.5px;color:var(--ink)}
 .wk-unbl .unbt{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wk-unbl .unbt b{color:var(--wamber);font-weight:600}.wk-unbl .unbt i{font-style:normal}
-.wk-unbl .unbx{flex:0 0 auto;width:24px;height:24px;display:grid;place-items:center;border:0;border-radius:5px;background:transparent;color:#ff6b6b;cursor:pointer}
-.wk-unbl .unbx:hover{background:rgba(255,107,107,.12)}.wk-unbl .unbx:focus-visible{outline:2px solid #ff6b6b;outline-offset:1px}
-.wk-unbl .unbx svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.wk-unbl .unbx{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border:1px solid rgba(255,107,107,.55);border-radius:6px;background:rgba(255,107,107,.08);color:#ff6b6b;font:inherit;font-size:10.5px;font-weight:600;cursor:pointer}
+.wk-unbl .unbx:hover{background:rgba(255,107,107,.18)}.wk-unbl .unbx:focus-visible{outline:2px solid #ff6b6b;outline-offset:1px}
+.wk-unbl .unbx svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}
+#wk-mine #wk-acct>#dmy:not(#z){flex:1 1 auto;min-height:60px;overflow-y:auto;scrollbar-width:thin}
 .cucard .unrow.off{opacity:.45;cursor:not-allowed}.cucard .unrow small{display:block;font-size:10px;color:var(--wf)}
 .cucard .cunote{margin:10px 16px 0;white-space:normal}
 /* Your move's unstaking line (2026-11-03): one row at every width, the words give way (ellipsis), Cancel stays whole */
 #mv-stage .mv-hl>span.mv-unb{display:flex;align-items:baseline;white-space:nowrap;min-width:0;overflow:hidden;grid-column:1/-1}
 #mv-stage .mv-hl>span.mv-unb .mv-tx{min-width:0;overflow:hidden;text-overflow:ellipsis}
 #mv-stage .mv-hl>span.mv-unb .mv-stk{flex:0 0 auto}
+/* tools: the header button beside day/night, its menu, and the full-screen card */
+.tlw{position:relative;display:inline-flex}
+.thbtn.tlbtn:not(#z){margin-left:6px}
+.thbtn.tlbtn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tlmenu{position:absolute;top:calc(100% + 6px);right:0;z-index:60;min-width:240px;display:flex;flex-direction:column;padding:6px;border-radius:12px;border:1px solid var(--edge2);background:var(--bg,#0b0b16);box-shadow:0 12px 32px rgba(0,0,0,.35)}
+.tlmenu[hidden]{display:none}
+.tlmenu button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:9px 11px;border:0;border-radius:8px;background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.tlmenu button:hover,.tlmenu button:focus-visible{background:rgba(127,127,127,.12);outline:none}
+.tlmenu b{font-size:13px;font-weight:600}.tlmenu small{font-size:11px;color:var(--ink3)}
+.tlcard .wk-txh{display:flex;align-items:center;justify-content:space-between}
+.tlcard .wk-txh>div{display:flex;align-items:center;gap:10px}
+#tlpop .sd-wch i.net{color:var(--wcyan);border-color:currentColor}#tlpop .sd-wch i.net.tn{color:var(--wamber)}
+.tlx{width:32px;height:32px;display:grid;place-items:center;border:1px solid var(--wbd2);border-radius:9px;background:transparent;color:var(--ink);cursor:pointer}
+.tlx svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.pop .card.tlcard{display:flex;flex-direction:column}
+.tlfr{flex:1 1 auto;width:100%;height:100%;min-height:70vh;border:0;background:transparent}
+@media(max-width:700px){.tlfr{min-height:0}.pop .card.spcard.tlcard:not(#z)>.tlfr{flex:1 1 auto}}
+.tlgate{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px}
+.tlgate h2{margin:0;font-size:20px;color:var(--ink);font-weight:600}
+.pop .card.spcard.tlcard:not(#z){width:min(1180px,96vw);max-width:1180px}
+@media(max-width:700px){.pop .card.spcard.tlcard:not(#z){width:100vw;max-width:100vw;height:100svh;max-height:100svh;border-radius:0}}.tlws{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+/* Now on's unstaking tag, and the 21-day line beside Cooling down (2026-11-03) */
+.mv-r span i.mv-un{font-style:normal;font-weight:400;margin-left:8px;color:var(--wamber)}
+.mv-r span i.mv-un b.mv-unw{font-weight:inherit}
+@media(max-width:700px){.mv-r span i.mv-un{font-size:11px;margin-left:6px}.mv-r span i.mv-un b.mv-unw{display:none}}
+.mv-r button.mv-uc{font:inherit;font-size:11px;font-weight:600;line-height:1;padding:3px 7px;border:1px solid rgba(255,107,107,.55);border-radius:6px;background:rgba(255,107,107,.08);color:#ff6b6b;cursor:pointer;white-space:nowrap}
+.mv-r button.mv-uc:hover{background:rgba(255,107,107,.18)}.mv-r button.mv-uc:focus-visible{outline:2px solid #ff6b6b;outline-offset:1px}
+.mv-dh{display:flex;gap:10px}.mv-dh>span:first-child{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mv-dh>span:last-child{flex:0 0 auto;white-space:nowrap}
+.mv-dh small.mv-dn{margin-left:10px;font-size:10.5px;color:var(--ink3);font-weight:400}
 .pop .atjail{margin:10px 0 12px;padding:9px 12px;border-radius:9px;border:1px solid rgba(91,179,232,.22);background:rgba(91,179,232,.05)}
 .pop .atjail:hover{background:rgba(91,179,232,.09)}
 .pop .atjail span{font-size:12px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -7152,6 +7182,13 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
     </div>
     <div class=hdr-r>
     <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
+    <!-- tools (operator, 2026-11-03): next to day/night, a menu, each tool full screen in the app -->
+    <div class=tlw><button class="thbtn tlbtn" id=tlbtn type=button aria-haspopup=menu aria-expanded=false aria-label="Tools" title="Tools"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></button>
+      <div class=tlmenu id=tlmenu role=menu hidden>
+        <button type=button role=menuitem data-tool=revoke><b>Revoke Scanner</b><small>who can act for your wallet</small></button>
+        <button type=button role=menuitem data-tool=send><b>Fee Saver</b><small>send at the chain's price</small></button>
+        <button type=button role=menuitem data-tool=gather><b>Gather to GATA HUB</b><small>all your stake in one place</small></button>
+      </div></div>
     <div class=netsw id=netsw role=group aria-label=Network><a id=netmain href="./" aria-label=Mainnet><span class=nl>Mainnet</span><span class=ns aria-hidden=true>Main</span></a><a id=nettest href="testnet/" aria-label=Testnet><span class=nl>Testnet</span><span class=ns aria-hidden=true>Test</span></a></div>
     <div class=sv-who>
       <button class="sv-btn sml pri" id=svconn type=button aria-haspopup=true aria-expanded=false>Connect wallet</button>
@@ -7555,6 +7592,13 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <div class=txfee id=clfee></div>
   <div class=txstep id=clstep></div>
   <div class=txbtns><button class="wk-btn wk-go" id=clsign type=button disabled>Claim</button></div>
+</div></div>
+
+<div class=pop id=tlpop><div class="card txcard uncard spcard tlcard" role=dialog aria-modal=true aria-labelledby=tlttl>
+  <header class=wk-txh><div><b id=tlttl>Tools</b><span class=sd-wch><i class=net id=tlnet></i></span></div>
+    <button class=tlx id=tlx type=button aria-label="Close" title="Close"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
+  <div class=tlgate id=tlgate hidden><h2>Connect a wallet</h2><div class=tlws id=tlws></div></div>
+  <iframe class=tlfr id=tlfr title="Tool" hidden></iframe>
 </div></div>
 
 <div class=pop id=cupop><div class="card txcard uncard cucard" role=dialog aria-modal=true aria-labelledby=cuttl>

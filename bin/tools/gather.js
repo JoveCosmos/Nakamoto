@@ -40,7 +40,10 @@ function load(){
     ((r[0] && r[0].delegation_responses) || []).forEach(function(d){
       var v = d.delegation.validator_address, x = parseInt(d.balance.amount, 10); if(!(x >= 1)) return;
       if(v === GATA){ HELD += x; return; }
-      var locked = Math.min(x, lockOn[v] || 0), free = x - locked, full = (toGata[v] || 0) >= MAXENT;
+      /* the chain refuses ANY redelegation out of a validator that still holds an unmatured redelegation in for this
+         wallet (ErrTransitiveRedelegation), not just the amount that arrived: the whole delegation is held (as the app's
+         Pro holds it); found by the testnet run 2026-11-03 */
+      var locked = lockOn[v] ? x : 0, free = x - locked, full = (toGata[v] || 0) >= MAXENT;
       ROWS.push({ v: v, n: T.nameOf(v).n, x: x, free: full ? 0 : free, locked: full ? x : locked,
                   till: full ? toGataTill[v] : lockTill[v], why: full ? "max" : (locked ? "lock" : "") });
     });

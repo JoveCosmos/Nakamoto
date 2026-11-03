@@ -143,3 +143,8 @@ textarea.paste{width:100%;min-height:92px;padding:10px 12px;border:1px solid var
 .notes p b{color:var(--wt);font-weight:600;font-variant-numeric:tabular-nums}
 .notes p.w{border-color:var(--amber);background:linear-gradient(180deg,rgba(255,176,46,.08),transparent)}
 .notes p a{color:var(--teal)}
+
+/* inside the app (?embed=1): the app's card carries the name, the network and close; the page is only the tool */
+html.embed .bar{display:none}
+html.embed body{background:transparent}
+html.embed .wrap{padding-top:8px}
