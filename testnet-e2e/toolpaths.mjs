@@ -78,7 +78,7 @@ if (!ONLY || /revoke/.test(ONLY)) {
   await run("revoke", `await wait(function(){ return Dc.querySelectorAll('#rows input[type=checkbox]').length >= ${Math.max(1, g0)}; }, 40000, 'grant rows');
     Dc.getElementById('selall').click(); await wait(function(){ return !Dc.getElementById('go').disabled; }, 30000, 'Revoke enabled'); Dc.getElementById('go').click();`,
     async (d, s) => { const g = ((await chain("/cosmos/authz/v1beta1/grants/granter/" + A)).grants || []).length;
-      return { grants: g0 + " -> " + g, check: g0 > 0 && g === 0 && s.msgs.every(m => m === "MsgRevoke") ? "ok" : "FAILED" }; });
+      return { grants: g0 + " -> " + g, check: g0 > 0 && g === 0 && s.msgs.every(m => m === "MsgRevoke" || m === "MsgUndelegateGovernor") ? "ok" : "FAILED" }; });
 }
 if (!ONLY || /gather/.test(ONLY)) {
   await open("gather");

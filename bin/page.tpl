@@ -7036,13 +7036,13 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 @media(max-width:700px){#mv-stage .mv-top>.sv-btn.mv-smore:not(#z):not(#y):not(#x){display:none}}
 /* Now on's title row carries the unstaking summary, one line, Cancel whole */
 .mv-nh{display:flex;align-items:baseline;gap:12px;min-width:0}
-.mv-nh>em{flex:0 0 auto;font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
-.mv-nu{flex:1 1 auto;min-width:0;display:flex;align-items:baseline;justify-content:flex-end;gap:8px;font-size:12px;color:var(--wf);white-space:nowrap}
-.mv-nu .mv-nut{min-width:0;overflow:hidden;text-overflow:ellipsis}.mv-nu b{color:var(--ink);font-weight:600}
+.mv-nh>em{flex:0 0 auto;font-style:normal;font-family:var(--wmono);font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
+.mv-nu{flex:1 1 auto;min-width:0;display:flex;align-items:baseline;justify-content:flex-end;gap:8px;font-size:11px;color:var(--wf);white-space:nowrap}
+.mv-nu .mv-nut{min-width:0;overflow:hidden;text-overflow:ellipsis}.mv-nu b{color:var(--ink2,var(--ink));font-weight:600}
 .mv-nu .mv-nc{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:none;font:inherit;font-weight:600;color:var(--sv-teal,#2bc8bd);cursor:pointer}
 .mv-nu .mv-nc:hover{text-decoration:underline;text-underline-offset:3px}.mv-nu .mv-nc:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offset:2px}
 .mv-nu .mv-nc svg{width:12px;height:12px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-@media(max-width:700px){.mv-nu{font-size:11px;gap:6px}}
+@media(max-width:700px){.mv-nu{font-size:10px;gap:6px}.mv-nu .mv-nc:not(#z){display:none}}
 #mv-stage .mv-top>.mv-smore svg{width:13px;height:13px;flex:0 0 auto;display:block;position:relative;top:.5px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 #mv-stage .mv-cd{font-family:var(--wmono);font-variant-numeric:tabular-nums;letter-spacing:.02em}
 #mv-stage .mv-set:not(#z):not(#y):not(#x){margin-top:auto}

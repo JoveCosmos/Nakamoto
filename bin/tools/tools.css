@@ -188,3 +188,10 @@ html.embed .hero>div em:not(#z){font-size:10px;margin:0;white-space:nowrap}
 html.embed .hero.plain:not(#z){gap:14px}
 html.embed .hero.plain>div:not(#z){padding:0;border:0;background:none;box-shadow:none}
 html.embed .hero.plain>div b:not(#z){font-size:16px}
+/* list headings and selection buttons (operator, 2026-11-03): a heading on the left, real buttons on the right */
+.sel .lh{font-family:var(--wmono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--wt);font-weight:600}
+.sel #selnote{margin-left:10px;color:var(--wf)}
+.lnk.chip{height:26px;padding:0 11px;border:1px solid var(--wbd2);border-radius:7px;background:var(--wi);color:var(--wt);font-weight:600;cursor:pointer}
+.lnk.chip:hover:not(:disabled){border-color:var(--teal);color:var(--teal)}
+.lnk.chip:disabled{opacity:.45;cursor:default}
+.lnk.chip+.lnk.chip{margin-left:6px}
