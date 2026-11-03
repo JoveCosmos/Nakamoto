@@ -4552,6 +4552,7 @@ rememberGridH();
       .then(function(k){
         live();
         window.__ADDR = k.bech32Address;
+        if(window.__hit) window.__hit("wallet", w.name);   /* the wallet's kind only, never the address */
         /* what the signing step needs: the wallet, the address, the public key */
         /* label: the account's own name as the wallet reports it (what the reader
            called it in Keplr/Adena); name: the provider, kept for the mark */

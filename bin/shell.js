@@ -176,6 +176,15 @@
   }
 
   /* ── one move: section and view in, everything else follows ── */
+  /* ── visits: each page view and each wallet connect is counted on our own server, nothing else: no address, no
+     cookie, no outside tracker. The id is a random one this browser keeps, so a return visit counts once ── */
+  var VID = null, LASTHIT = null;
+  try{ VID = localStorage.getItem("th_vid"); if(!VID){ VID = Math.random().toString(36).slice(2, 12); localStorage.setItem("th_vid", VID); } }catch(e){}
+  function hit(ev, p){
+    try{ fetch(BASE + "hit?e=" + ev + "&p=" + encodeURIComponent(p || "") + "&v=" + (VID || "-"), { keepalive: true, credentials: "omit", cache: "no-store" }).catch(function(){}); }catch(e){}
+  }
+  window.__hit = hit;
+
   function go(s, v, how){
     var prevS = cur.s, prevV = cur.v, tab, e;
     if(s) v = shown(s, v);
@@ -202,6 +211,7 @@
     if(how === "push" && here !== h) history.pushState(null, "", h);
     else if(here !== h) history.replaceState(null, "", h);          /* replace, or a pop that arrived by an old #/ link */
     if(s){ remember(s, v); if(s.switch && v.group) GLAST[s.id + "/" + v.group] = v; }
+    if(h !== LASTHIT){ LASTHIT = h; hit("view", s ? s.route + "/" + v.route : "intro"); }
     if(prevS !== s || prevV !== v) toTop(s, v);
   }
   /* the group switch (Staking | Governance): a group opens on the view last open in it this
