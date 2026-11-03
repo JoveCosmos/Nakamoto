@@ -38,6 +38,8 @@ const HELP = `window.__e2e = {
 
 async function connect() {
   await post("/use?name=" + NAME); await post("/kind?k=" + KIND);
+  // E2E_PHONE=1: the whole run in a 390x844 touch phone
+  await post(process.env.E2E_PHONE ? "/size?w=390&h=844" : "/size?w=0");
   await post("/go?url=" + encodeURIComponent(PAGE) + "&wait=6000");
   const wn = /adena/.test(KIND) ? "Adena" : "Keplr";
   const r = await ev(`new Promise(function(res){ window.__wconnect && window.__wconnect(${JSON.stringify(wn)}); var t0 = Date.now();
@@ -135,12 +137,31 @@ const bal = async (a, dn) => +(((await chain("/cosmos/bank/v1beta1/balances/" + 
     return { unbonding: u.length, check: s.msgs[0] === "MsgUndelegate" && u.length ? "ok" : "FAILED" };
   });
 
+  // 7b Cancel unstaking (2026-11-03): the first unstaking row's cancel in Pro, then the card's button
+  const unb = async () => ((await chain("/cosmos/staking/v1beta1/delegators/" + A + "/unbonding_delegations")).unbonding_responses || []).reduce((n, u) => n + (u.entries || []).length, 0);
+  const unb0 = await unb();
+  await run("cancel-unstake", `await E.wait(function(){ return document.querySelector('#dunb .unbx'); }, 20000, 'unstaking rows');
+    document.querySelector('#dunb .unbx').click(); await E.wait(function(){ var b = document.getElementById('cusign'); return b && !b.disabled && E.vis('#cusign'); }, 30000, 'Cancel enabled');
+    E.click('#cusign')`,
+    async (d, s) => { const n = await unb(); return { entries: unb0 + " -> " + n, check: s.msgs.every(m => m === "MsgCancelUnbondingDelegation") && n === unb0 - 1 ? "ok" : "FAILED" }; }, "dashboard/self");
+  // 7c the same from Your move's summary line: every entry at once
+  const unb1 = await unb();
+  await run("cancel-all", `await E.wait(function(){ return document.querySelector('[data-act=unbcancel]'); }, 20000, 'summary line');
+    document.querySelector('[data-act=unbcancel]').click(); await E.wait(function(){ var b = document.getElementById('cusign'); return b && !b.disabled && E.vis('#cusign'); }, 30000, 'Cancel enabled');
+    E.click('#cusign')`,
+    async (d, s) => { const n = await unb(); return { entries: unb1 + " -> " + n, msgs: s.msgs.length, check: s.msgs.length >= 1 && s.msgs.every(m => m === "MsgCancelUnbondingDelegation") && n === 0 ? "ok" : "FAILED" }; }, "dashboard/wallet");
+
   // 8 Autopilot on, then off (revoke)
   const grants = async () => ((await chain("/cosmos/authz/v1beta1/grants/granter/" + A)).grants || []).map(g => (g.authorization["@type"] || "").split(".").pop() + ":" + (g.authorization.authorization_type || g.authorization.msg || ""));
   await run("autopilot-on", `E.click('[data-act=youauto]'); await E.wait(function(){ return E.vis('#atgrant'); }, 15000, 'Autopilot card');
     await E.wait(function(){ var b = document.getElementById('atgrant'); return b && !b.disabled; }, 30000, 'Activate enabled'); E.click('#atgrant');
     await E.sleep(1500); if(E.vis('#txsign')){ await E.wait(function(){ return !document.getElementById('txsign').disabled; }, 30000, 'Outcome sign'); E.click('#txsign'); }`,
     async (d, s) => { const g = await grants(); return { grants: g, memo: s.memo, check: s.msgs.includes("MsgGrant") && g.some(x => /REDELEGATE/.test(x)) && !/all validators/i.test(s.memo) ? "ok" : "FAILED" }; });
+
+  await run("autopilot-off", `E.click('[data-act=youauto]'); await E.wait(function(){ return E.vis('#atrevoke') && !document.getElementById('atrevoke').hidden; }, 15000, 'Revoke button');
+    E.click('#atrevoke')`,
+    async (d, s) => { const g = await grants(); return { grants: g, check: s.msgs[0] === "MsgRevoke" && !g.some(x => /REDELEGATE/.test(x)) ? "ok" : "FAILED" }; });
+
   // 8b Autopilot on with the jailed-validators box unticked: the grant's memo carries "all validators" (2026-11-03)
   await run("autopilot-all-on", `E.click('[data-act=youauto]'); await E.wait(function(){ return E.vis('#atgrant'); }, 15000, 'Autopilot card');
     var bx = document.getElementById('atjail'); if(!bx || !bx.checked || bx.disabled) throw new Error('box not ticked and enabled');
@@ -149,24 +170,27 @@ const bal = async (a, dn) => +(((await chain("/cosmos/bank/v1beta1/balances/" + 
     await E.wait(function(){ var b = document.getElementById('atgrant'); return b && !b.disabled; }, 30000, 'Activate enabled'); E.click('#atgrant');
     await E.sleep(1500); if(E.vis('#txsign')){ await E.wait(function(){ return !document.getElementById('txsign').disabled; }, 30000, 'Outcome sign'); E.click('#txsign'); }`,
     async (d, s) => { const g = await grants(); return { grants: g, memo: s.memo, check: s.msgs.includes("MsgGrant") && g.some(x => /REDELEGATE/.test(x)) && /all validators/i.test(s.memo) ? "ok" : "FAILED" }; });
-  await run("autopilot-off", `E.click('[data-act=youauto]'); await E.wait(function(){ return E.vis('#atrevoke') && !document.getElementById('atrevoke').hidden; }, 15000, 'Revoke button');
+  await run("autopilot-off2", `E.click('[data-act=youauto]'); await E.wait(function(){ return E.vis('#atrevoke') && !document.getElementById('atrevoke').hidden; }, 15000, 'Revoke button');
     E.click('#atrevoke')`,
     async (d, s) => { const g = await grants(); return { grants: g, check: s.msgs[0] === "MsgRevoke" && !g.some(x => /REDELEGATE/.test(x)) ? "ok" : "FAILED" }; });
-
   // 9 Restake on, then off
   await run("restake-on", `E.click('[data-act=restakesw]'); await E.wait(function(){ return E.vis('#rsgo'); }, 15000, 'Restake card');
     await E.wait(function(){ var b = document.getElementById('rsgo'); return b && !b.disabled; }, 30000, 'Restake enabled'); E.click('#rsgo')`,
     async (d, s) => { const g = await grants(); return { grants: g, memo: s.memo, check: g.some(x => /DELEGATE$/.test(x)) && g.some(x => /WithdrawDelegatorReward/.test(x)) && !/all validators/i.test(s.memo) ? "ok" : "FAILED" }; });
+
+  await run("restake-off", `E.click('[data-act=restakesw]'); await E.sleep(2500);
+    var b = E.vis('#rsgo'); if(b){ await E.wait(function(){ return !b.disabled; }, 30000, 'Restake off enabled'); E.click(b); }`,
+    async (d, s) => { const g = await grants(); return { grants: g, check: s.msgs.every(m => m === "MsgRevoke") && !g.length ? "ok" : "FAILED" }; });
+
   // 9b Restake on with the jailed-validators box unticked (2026-11-03)
   await run("restake-all-on", `E.click('[data-act=restakesw]'); await E.wait(function(){ return E.vis('#rsgo'); }, 15000, 'Restake card');
     var bx = document.getElementById('rsjail'); if(!bx || !bx.checked || bx.disabled) throw new Error('box not ticked and enabled');
     E.click('#rsjail'); await E.sleep(300); if(bx.checked) throw new Error('box did not untick');
     await E.wait(function(){ var b = document.getElementById('rsgo'); return b && !b.disabled; }, 30000, 'Restake enabled'); E.click('#rsgo')`,
     async (d, s) => { const g = await grants(); return { grants: g, memo: s.memo, check: g.some(x => /DELEGATE$/.test(x)) && /all validators/i.test(s.memo) ? "ok" : "FAILED" }; });
-  await run("restake-off", `E.click('[data-act=restakesw]'); await E.sleep(2500);
+  await run("restake-off2", `E.click('[data-act=restakesw]'); await E.sleep(2500);
     var b = E.vis('#rsgo'); if(b){ await E.wait(function(){ return !b.disabled; }, 30000, 'Restake off enabled'); E.click(b); }`,
     async (d, s) => { const g = await grants(); return { grants: g, check: s.msgs.every(m => m === "MsgRevoke") && !g.length ? "ok" : "FAILED" }; });
-
   // 10 a governor: follow the first active one, then stop following
   await run("governor-follow", `document.querySelector('tr.gvt-r[data-gv]').click(); await E.wait(function(){ return E.vis('[data-act=gfollow]'); }, 15000, 'Follow button');
     E.click(E.vis('[data-act=gfollow]'))`,

@@ -163,6 +163,11 @@ http.createServer(async (req, res) => {
       await cdp("Runtime.evaluate", { expression: "window.dispatchEvent(new Event('keplr_keystorechange'))" }); return send(200, { use: cur, address: W[cur].acc.address }); }
     if (u.pathname === "/kind") { if (!KINDS.includes(q("k"))) return send(400, { error: "kind is one of " + KINDS.join(", ") });
       KIND = q("k"); await install(); return send(200, { kind: KIND, note: "takes effect on the next /go" }); }
+    // the whole run at one size (phones: 390x844, touch, mobile metrics) until /size?w=0 clears it
+    if (u.pathname === "/size") { const w = +(q("w") || 0), h = +(q("h") || 844);
+      if (!w) { await cdp("Emulation.clearDeviceMetricsOverride", {}); await cdp("Emulation.setTouchEmulationEnabled", { enabled: false }); return send(200, { size: "default" }); }
+      await cdp("Emulation.setDeviceMetricsOverride", { width: w, height: h, deviceScaleFactor: 1, mobile: w < 600 });
+      await cdp("Emulation.setTouchEmulationEnabled", { enabled: w < 600, maxTouchPoints: 5 }); return send(200, { size: w + "x" + h }); }
     if (u.pathname === "/go") { await cdp("Page.navigate", { url: q("url") }); await sleep(+(q("wait") || 4000)); return send(200, { ok: true }); }
     if (u.pathname === "/eval") { const r = await cdp("Runtime.evaluate", { expression: await body(req), awaitPromise: true, returnByValue: true });
       return send(200, r.exceptionDetails ? { error: r.exceptionDetails.exception?.description || r.exceptionDetails.text } : { value: r.result.value }); }

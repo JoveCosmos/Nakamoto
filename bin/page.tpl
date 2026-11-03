@@ -5677,6 +5677,20 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 #atpop .atrow:has(#atrsk) .atlab{flex:0 0 100%}
 /* the jailed-validators choice in Autopilot: the app's checkbox row (.aopt) in the card's own box; the hint is one
    line that never wraps, so ticking it changes words and colour, never the card's height */
+/* unstakings above the delegations list: one row each, never wrapping (the name gives way), a cancel at its end */
+.wk-unbl{display:flex;flex-direction:column;gap:4px;margin:6px 0 8px}
+.wk-unbl .unbr{display:flex;align-items:center;gap:8px;min-width:0;height:28px;padding:0 4px 0 10px;border-radius:6px;border:1px solid rgba(255,177,85,.28);background:rgba(255,177,85,.06);font-size:11.5px;color:var(--ink)}
+.wk-unbl .unbt{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wk-unbl .unbt b{color:var(--wamber);font-weight:600}.wk-unbl .unbt i{font-style:normal}
+.wk-unbl .unbx{flex:0 0 auto;width:24px;height:24px;display:grid;place-items:center;border:0;border-radius:5px;background:transparent;color:#ff6b6b;cursor:pointer}
+.wk-unbl .unbx:hover{background:rgba(255,107,107,.12)}.wk-unbl .unbx:focus-visible{outline:2px solid #ff6b6b;outline-offset:1px}
+.wk-unbl .unbx svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.cucard .unrow.off{opacity:.45;cursor:not-allowed}.cucard .unrow small{display:block;font-size:10px;color:var(--wf)}
+.cucard .cunote{margin:10px 16px 0;white-space:normal}
+/* Your move's unstaking line (2026-11-03): one row at every width, the words give way (ellipsis), Cancel stays whole */
+#mv-stage .mv-hl>span.mv-unb{display:flex;align-items:baseline;white-space:nowrap;min-width:0;overflow:hidden;grid-column:1/-1}
+#mv-stage .mv-hl>span.mv-unb .mv-tx{min-width:0;overflow:hidden;text-overflow:ellipsis}
+#mv-stage .mv-hl>span.mv-unb .mv-stk{flex:0 0 auto}
 .pop .atjail{margin:10px 0 12px;padding:9px 12px;border-radius:9px;border:1px solid rgba(91,179,232,.22);background:rgba(91,179,232,.05)}
 .pop .atjail:hover{background:rgba(91,179,232,.09)}
 .pop .atjail span{font-size:12px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -7054,6 +7068,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   /* the sentence gives way, Stake more stays (2026-10-15) */
   #mv-stage .mv-hl>span.mv-sline .mv-tx{display:none}
   #mv-stage .mv-hl>span.mv-sline .mv-stk:not(#z){margin-left:0}
+  #mv-stage .mv-hl>span.mv-unb .mv-tx:not(#z){display:block}
   #mv-stage .mv-set:not(#z){min-height:48px}
 }
 /* a short screen (a laptop at 600-780px): everything a size tighter, the switches without their line */
@@ -7312,6 +7327,8 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
             <button class="wk-unb wk-stb" id=stbtn type=button hidden title="Stake liquid ATONE">Stake</button>
             <button class=wk-unb id=unbtn type=button hidden title="Unstake from a validator">Unstake</button>
             <button class="wk-unb wk-clb" id=clbtn type=button hidden title="Claim your staking rewards">Claim</button></header>
+          <!-- unstakings, one row each with its own cancel (operator, 2026-11-03) -->
+          <div class=wk-unbl id=dunb hidden></div>
           <div class=wk-tbl2 id=dmy></div>
           <footer class=wk-pf><nav class=wk-pg id=dmypg></nav></footer>
           </div>
@@ -7538,6 +7555,15 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <div class=txfee id=clfee></div>
   <div class=txstep id=clstep></div>
   <div class=txbtns><button class="wk-btn wk-go" id=clsign type=button disabled>Claim</button></div>
+</div></div>
+
+<div class=pop id=cupop><div class="card txcard uncard cucard" role=dialog aria-modal=true aria-labelledby=cuttl>
+  <header class=wk-txh><div><b id=cuttl>Cancel unstaking</b><span>{{CHAIN_ID}}</span></div><span class=txsum id=cusum></span></header>
+  <div class=unpick id=cupick></div>
+  <div class="atnote cunote"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>The stake goes back to its validator and earns again from the next block. You can cancel any time before the unstaking ends.</span></div>
+  <div class=txfee id=cufee></div>
+  <div class=txstep id=custep></div>
+  <div class=txbtns><button class="wk-btn wk-go" id=cusign type=button disabled>Cancel unstaking</button></div>
 </div></div>
 
 <div class=pop id=mtpop><div class="card txcard uncard mtcard" role=dialog aria-modal=true aria-labelledby=mtttl>

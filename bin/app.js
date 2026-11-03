@@ -2601,7 +2601,11 @@ rememberGridH();
     /* phones show the same tag in Delegations' title row instead (operator, 2026-10-17) */
     if(ln && lm){ lm.hidden = ln.hidden; if(lm.innerHTML !== ln.innerHTML) lm.innerHTML = ln.innerHTML; lm.title = ln.title || ""; }
     fitLockM();
-    (window.__UNB || []).forEach(function(u){ h += pill("warn", fmt(u.amt) + " unbonding from " + att(u.m) + ", " + window.__day(u.until)); });
+    /* unstakings: their own rows above the list, each with a cancel (operator, 2026-11-03), not pills in the title row */
+    var ul = E("dunb"), U = window.__UNB || [];
+    if(ul){ ul.hidden = !U.length;
+      ul.innerHTML = U.map(function(u, i){ return '<div class=unbr><span class=unbt><b>' + fmt(u.amt) + ' ATONE</b> ' + window.__day(u.until) + ', <i>' + att(u.m) + '</i></span>' +
+        '<button type=button class=unbx data-u="' + i + '" aria-label="Cancel unstaking" title="Cancel unstaking"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>'; }).join(""); }
     el.innerHTML = h;
     var ub = E("unbtn"); if(ub) ub.hidden = !(pos && pos.rows.length);
     var sb = E("stbtn"); if(sb) sb.hidden = !pos;
@@ -2911,6 +2915,48 @@ rememberGridH();
   /* ── claim: the rewards waiting on each validator, one MsgWithdrawDelegatorReward per
      validator ticked - all of them to begin with. Claimed ATONE lands as available and earns
      nothing until it is staked again ── */
+  /* ── cancel unstaking (operator, 2026-11-03): any unstaking entry can be cancelled before it ends; the stake goes back
+     to its validator. The chain refuses a jailed validator, so those rows cannot be ticked ── */
+  var cupop = E("cupop"), CUSEL = {};
+  function cuKey(u){ return u.op + "@" + u.h + "@" + u.amt; }
+  function cuJailed(u){ var x = (window.__INACT || {})[u.op]; return !!(x && x.jailed); }
+  function cuMsgs(){
+    return (window.__UNB || []).filter(function(u){ return CUSEL[cuKey(u)] && !cuJailed(u); }).map(function(u){
+      return { type: "cosmos-sdk/MsgCancelUnbondingDelegation", value: { delegator_address: window.__ADDR, validator_address: u.op,
+               amount: { denom: "uatone", amount: String(u.amt) }, creation_height: u.h } }; });
+  }
+  function cuDraw(){
+    var el = E("cupick"), U = window.__UNB || []; if(!el) return;
+    var n = 0, tot = 0; U.forEach(function(u){ if(CUSEL[cuKey(u)] && !cuJailed(u)){ n++; tot += u.amt; } });
+    el.innerHTML = U.map(function(u){ var k = cuKey(u), j = cuJailed(u), on = !!CUSEL[k] && !j;
+      return '<label class="unrow' + (on ? ' on' : '') + (j ? ' off' : '') + '"><input type=checkbox value="' + att(k) + '"' + (on ? ' checked' : '') + (j ? ' disabled' : '') + '>' +
+             logo(u.op, u.m) + '<b>' + att(u.m) + (j ? '<small>validator jailed</small>' : '<small>' + window.__day(u.until) + '</small>') + '</b><i>' + exact(u.amt, 6) + '<em>ATONE</em></i></label>'; }).join("");
+    Array.prototype.forEach.call(el.querySelectorAll("input"), function(c){
+      c.addEventListener("change", function(){ if(c.checked) CUSEL[c.value] = 1; else delete CUSEL[c.value]; cuDraw(); }); });
+    var sm = E("cusum"); if(sm) sm.innerHTML = n ? exact(tot, 6) + " ATONE<br>from " + n + " unstaking" + (n === 1 ? "" : "s") : "";
+    var go = E("cusign"); if(go) go.disabled = !n || !window.__WALLET;
+    var st = E("custep"); st.textContent = ""; st.className = "txstep";
+    feeSoon("cu", E("cufee"), n ? cuMsgs : null);
+  }
+  /* opens on one entry (a row's cancel) or every one (Your move's summary) */
+  window.__cancelUnb = function(i){
+    var U = window.__UNB || []; if(!cupop || !U.length) return;
+    CUSEL = {}; U.forEach(function(u, k){ if(i == null || k === i) CUSEL[cuKey(u)] = 1; });
+    E("cufee").textContent = ""; cuDraw(); POP.open(cupop);
+  };
+  if(cupop) cupop.__onclose = function(){ feeSoon("cu"); };
+  var dunb = E("dunb"); if(dunb) dunb.addEventListener("click", function(ev){ var b = ev.target.closest && ev.target.closest(".unbx"); if(b) window.__cancelUnb(+b.dataset.u); });
+  var cusign = E("cusign");
+  if(cusign) cusign.addEventListener("click", function(){
+    var msgs = cuMsgs(); if(!msgs.length || !window.__TX || !window.__WALLET) return;
+    cusign.disabled = true; cusign.classList.add("busy");
+    var n = window.__notify();
+    window.__TX.send(window.__WALLET, msgs, "", function(){})
+    .then(function(){ n.ok(); POP.close(cupop); if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); if(window.__redraw) window.__redraw(); }); })
+    .catch(function(e){ n.fail(e && e.message || String(e)); })
+    .then(function(){ cusign.disabled = false; cusign.classList.remove("busy"); });
+  });
+
   var clpop = E("clpop"), CLSEL = {};
   function clRows(){
     var pos = window.__POS, by = window.__REWBY || {}; if(!pos) return [];
@@ -4241,7 +4287,8 @@ rememberGridH();
   window.__shelfFill = shelfFill;
   /* keeper.py ap_edge(): Autopilot pours down to the last slot, less one for every validator that left the set within
      the unbonding period and holds more than that slot - it would push the last one out on its return (2026-11-03) */
-  function apEdge(s){ var b = (window.__D && window.__D.returning) || [], e = 0, k;
+  function apEdge(s){ if(window.__PLAN_MAX) return 0;   /* an example for no wallet or no stake: the best case, all 100 (operator, 2026-11-03) */
+    var b = (window.__D && window.__D.returning) || [], e = 0, k;
     for(k = 0; k < b.length; k++) if(e < s.length && b[k] > s[s.length - 1 - e]) e++;
     return e; }
   window.__apEdge = apEdge;
@@ -4260,6 +4307,8 @@ rememberGridH();
   /* the ranks the shelf may pour into (0-based, smallest first): the last EDGE left out, never the largest fifth */
   window.__shelfZone = function(n){ var o = [], s = window.__VALS().map(function(v){ return v[1]; }).sort(function(a, b){ return b - a; });
     for(var i = n - 1 - apEdge(s); i >= topN(n); i--) o.push(i); return o; };
+  /* the best case, for a reader with no wallet or no stake: every validator, every slot */
+  window.__planMax = function(f){ window.__PLAN_MAX = true; try{ return f(); } finally { window.__PLAN_MAX = false; } };
   window.__planRank = function(pos){
     if(!pos || !pos.rows.length || !(pos.total > 0)) return null;
     /* stake in its 21-day cooldown stays where it is; the free stake is hunted, all of it at once */
@@ -4271,7 +4320,7 @@ rememberGridH();
     /* sources in the keeper's order: the most free stake first */
     /* all the free stake may go: the floor (never below the shelf) is set in the rounds, once the shelf is known */
     /* keeper.py: stake on a validator the wallet excludes (box ticked) moves first, from any rank, with no gain test */
-    var jskL = (window.__D && window.__D.jailskip) || [], allV = window.__atAll && window.__atAll(), forced = {};
+    var jskL = (window.__D && window.__D.jailskip) || [], allV = window.__PLAN_MAX || (window.__atAll && window.__atAll()), forced = {};
     if(!allV) jskL.forEach(function(id){ forced[id] = 1; });
     var src = pos.rows.filter(function(r){ return r.x - r.locked > 0 && (!bset[r.id] || forced[r.id]); }).sort(function(a, b){ return ((forced[a.id] ? 0 : 1) - (forced[b.id] ? 0 : 1)) || ((b.x - b.locked) - (a.x - a.locked)); }).map(function(r){
       return { id: r.id, give: Math.floor(r.x - r.locked), rate: r.inactive ? 0 : r.rate };
@@ -4309,7 +4358,7 @@ rememberGridH();
       var Vn = V.map(function(v, q){ return [v, q]; }).sort(function(a, b){
         var d = (b[0][1] - (gone[b[0][3]] || 0)) - (a[0][1] - (gone[a[0][3]] || 0)); return d || a[1] - b[1]; }).map(function(x){ return x[0]; });
       var s = Vn.map(function(v){ return v[1] - (gone[v[3]] || 0); });
-      var jsk = (window.__D && window.__D.jailskip) || [], all = window.__atAll && window.__atAll();
+      var jsk = (window.__D && window.__D.jailskip) || [], all = window.__PLAN_MAX || (window.__atAll && window.__atAll());
       var ok = function(j){ return !fixed[Vn[j][3]] && !gone[Vn[j][3]] && (all || jsk.indexOf(Vn[j][3]) < 0); };     /* any validator of the active set (operator, 2026-09-30), less the jailed-often unless unticked (2026-11-03) */
       var r = movesFor(src, budget, Vn, s, ok);
       while(r.out.length > MAXMOVES && budget > 1e6){ budget = Math.floor(budget * 0.85); r = movesFor(src, budget, Vn, s, ok); }
@@ -4643,8 +4692,9 @@ rememberGridH();
         window.__UNB = [];
         (ub.unbonding_responses || []).forEach(function(u){
           (u.entries || []).forEach(function(e){
-            window.__UNB.push({ m: by[u.validator_address] || u.validator_address.slice(-6),
-                                amt: parseInt(e.balance, 10), until: new Date(e.completion_time).getTime() }); }); });
+            window.__UNB.push({ m: by[u.validator_address] || u.validator_address.slice(-6), op: u.validator_address,
+                                h: String(e.creation_height), amt: parseInt(e.balance, 10), until: new Date(e.completion_time).getTime() }); }); });
+        window.__UNB.sort(function(a, b){ return a.until - b.until; });
         return get("/cosmos/distribution/v1beta1/delegators/" + window.__ADDR + "/rewards").catch(function(){ return {}; });
       })
       .then(function(rw){

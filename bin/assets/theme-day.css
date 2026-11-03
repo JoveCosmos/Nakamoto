@@ -1041,6 +1041,11 @@
   html[data-theme=light]:not([data-mono]) #atpop .atidle{border-color:var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #atpop .atidle b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #atpop .atidle b.n{color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .wk-unbl .unbr{border-color:var(--warn-bg);background:var(--warn-bg)}
+  html[data-theme=light]:not([data-mono]) .wk-unbl .unbx{background:transparent;color:var(--danger)}
+  html[data-theme=light]:not([data-mono]) .wk-unbl .unbx:hover{background:var(--danger-bg)}
+  html[data-theme=light]:not([data-mono]) .wk-unbl .unbx:focus-visible{outline-color:var(--danger-bar)}
+  html[data-theme=light]:not([data-mono]) .wk-unbl .unbx svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .pop .atjail{border-color:var(--accent-soft);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .pop .atjail:hover{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .pop .atjail.ro:hover{background:var(--accent-soft)}

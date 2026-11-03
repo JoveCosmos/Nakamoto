@@ -471,7 +471,7 @@
           /* no wallet: 10,000 ATONE at the best APR it can get, as Move your stake would place it - the optimiser
              picks up to ten validators of the live set, the stake splits equally across them, and each one's rate
              is read after its share lands on it; the APR is their average */
-          var X = 1e10, bp = window.__planWith ? window.__planWith(X, { maxVals: 10 }) : null, k = bp && bp.moves ? bp.moves.length : 0, r = 0;
+          var X = 1e10, bp = window.__planWith ? window.__planMax(function(){ return window.__planWith(X, { maxVals: 10 }); }) : null, k = bp && bp.moves ? bp.moves.length : 0, r = 0;
           if(k && window.__rateAfter) bp.moves.forEach(function(q){ r += window.__rateAfter(q.t, q.c, X / k) / k; });
           if(!(r > 0)) r = S.hi;
           return '<div class=sv-ph><h3>What 10,000 ATONE earns</h3>' + (r > 0 ? tag("a", pct(r) + " APR", "the best APR 10,000 ATONE can get today" +
@@ -2289,11 +2289,11 @@
     var lo = 0, hi = 0, big = V.slice().sort(function(x, y){ return y[1] - x[1]; })[0];
     if(big && window.__planRank && window.__VDBY && window.__VDBY[big[3]]){
       lo = rate(big[3]);
-      var sp = window.__planRank({ rows: [{ id: big[3], op: window.__VDBY[big[3]].op, x: 1e10, rate: lo, locked: 0, inactive: false }], total: 1e10, locked: 0 });
+      var sp = window.__planMax(function(){ return window.__planRank({ rows: [{ id: big[3], op: window.__VDBY[big[3]].op, x: 1e10, rate: lo, locked: 0, inactive: false }], total: 1e10, locked: 0 }); });
       /* no move clears 3 points (testnet today): the figure is still where the rule puts stake, the first validator
          it fills (rank n-3), so the stage never stands empty */
       hi = sp ? sp.after : 0;
-      if(!hi && V.length > 3){ var fv = V.slice().sort(function(x, y){ return y[1] - x[1]; })[V.length - 4]; hi = rate(fv[3], 1e10); }
+      if(!hi && V.length){ var fv = V.slice().sort(function(x, y){ return y[1] - x[1]; })[V.length - 1]; hi = rate(fv[3], 1e10); }
     }
     /* what 10,000 ATONE earns in a year: on the largest validator, by the rule (Autopilot), on the smallest - each APR
        as it would be with the 10,000 on it (operator, 2026-09-30: "show smallest as well", no plain sentence) */
@@ -2345,7 +2345,7 @@
         '<div class=mv-hl><b>' + (none ? 'Get ATONE to start earning' : 'Stake to start earning') + '</b>' +
         /* the cards below are each 10,000 ATONE's year, so the line names the amount as the disconnected one does
            (operator, 2026-10-17: "10k atone reference is no where like it is on disconnected state") */
-        (none ? '<span>Bought from the Osmosis pool, home in one signature</span>' : hi ? '<span class=mv-ref>About ' + pct(hi) + ' APR with Autopilot, for 10,000 ATONE</span>' : '') + '</div>' + cmp() + mvSet({}, {});
+        (none ? '<span>Bought from the Osmosis pool, home in one signature</span>' : hi ? '<span class=mv-ref>About ' + pct(hi) + ' APR with Autopilot, for 10,000 ATONE</span>' : '') + unbLine() + '</div>' + cmp() + mvSet({}, {});
     } else {
       var plan = planNow(pos), offer = plan && plan.after != null && plan.msgs && plan.msgs.length;
       var direct = !!(window.__canGrant && window.__canGrant());
@@ -2364,7 +2364,7 @@
         var tL = Object.keys(to).sort(function(x, y){ return to[y] - to[x]; }).map(function(id){ dst[id] = 1; return { id: id, rank: rk(id), name: nm(id), amt: '+' + fmt(to[id]), apr: pct(rate(id, to[id])) }; });
         var lock = pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is under redelegate lock until ' + day(pos.until) + '</div>' : '';
         h = top('Best today', auto ? '' : 'Ready, 1 approval', 'ok', auto ? ACTIVE : btn('opt', direct ? 'Activate Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE')) +
-          '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.mnow != null ? plan.mnow : plan.now) + '</i> to <i class=g>' + pct(plan.mafter != null ? plan.mafter : plan.after) + '</i> APR</span>' + lock + '</div>' +   /* the moved stake's own APR (operator, 2026-10-01) */
+          '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.mnow != null ? plan.mnow : plan.now) + '</i> to <i class=g>' + pct(plan.mafter != null ? plan.mafter : plan.after) + '</i> APR</span>' + lock + unbLine() + '</div>' +   /* the moved stake's own APR (operator, 2026-10-01) */
           '<div class=mv-flow><div class=mv-box><em>From, ' + fL.length + ' validator' + (fL.length === 1 ? '' : 's') + '</em>' + mvRows(fL, 'a', 'validators', 'from') + '</div>' +
           '<div class=mv-arr aria-hidden=true><svg viewBox="0 0 44 20"><path d="M2 10h38M32 3l8 7-8 7"/></svg></div>' +
           '<div class=mv-box><em>To, ' + tL.length + ' validator' + (tL.length === 1 ? '' : 's') + '</em>' + mvRows(tL, 'g', 'validators', 'to') + '</div></div>' +
@@ -2376,7 +2376,7 @@
         /* no Day k of 21 chip (operator, 2026-10-15: "too redundant"): the 21-day strip below already counts it */
         h = top(auto ? 'Moved. Autopilot is active' : 'Moved. Cooling down', '', '', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
           /* the one move open while the stake cools down: staking what sits in the wallet (operator, 2026-10-04) */
-          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b>' + line('Free to move again on <b>' + day(t1) + '</b>.') + '</div>' +
+          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b>' + line('Free to move again on <b>' + day(t1) + '</b>.') + unbLine() + '</div>' +
           '<div class=mv-days><div class=mv-dh><span>Cooling down</span><span>' + day(t0) + ' to ' + day(t1) + '</span></div><div class=mv-dc>' + cells + '</div>' +
           '<small>The chain holds redelegated stake for 21 days.</small></div>' + nowOn() +
           (auto ? '<div class=mv-cyc><div class=done><em>' + (hist ? day(hist.at * 1000) : 'Done') + '</em><b>Moved</b></div><div class=warn><em>Until ' + day(t1) + '</em><b>Cooling down</b></div>' +
@@ -2387,13 +2387,21 @@
         h = top('Your stake today', 'At its best', 'ok', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
           '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b>' + line('No move earns 3 APR points more today.' + (auto ? '<span class=mv-wide> Autopilot checks again every 12 hours.</span>' : '')) +
           /* the same lock note as the offer's, in the same place (operator, 2026-10-01) */
-          (pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is under redelegate lock until ' + day(pos.until) + '</div>' : '') + '</div>' +
+          (pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is under redelegate lock until ' + day(pos.until) + '</div>' : '') + unbLine() + '</div>' +
           nowOn() + mvSet({}, mineIds());
       }
     }
     put("mv-stage", you + h);
     mvFit();
     apTick();
+  }
+  /* under the state's sentence, in every state (operator, 2026-11-03): what is unstaking, in one line that never wraps,
+     and Cancel - the same card as the rows above Pro's list, every entry ticked */
+  function unbLine(){
+    var U = window.__UNB || []; if(!U.length) return '';
+    var t = 0, e = 0; U.forEach(function(u){ t += u.amt; e = Math.max(e, u.until); });
+    var d = window.__dayFull ? window.__dayFull(e) : '';
+    return '<span class="mv-sline mv-unb"><span class=mv-tx>' + fmt(t) + ' ATONE unstaking ' + d + '.</span> <button type=button class=mv-stk data-act=unbcancel>Cancel<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></span>';
   }
   /* the time left to Autopilot's next run, h:mm:ss, in every countdown on the page */
   function apTick(){
@@ -2479,6 +2487,7 @@
     if(act === "restakesw"){ rsOpen(); return; }
     if(act === "wtalerts"){ if(t.getAttribute("aria-disabled") !== "true") wtOpen(); return; }
     /* Stake goes to StakePilot (operator, 2026-10-15); its "choose validators myself" link opens the manual list */
+    if(act === "unbcancel"){ if(window.__cancelUnb) window.__cancelUnb(null); return; }
     if(act === "stake"){ if(window.__pilot && window.__ADDR){ window.__pilot(); return; } var sb = E("stbtn"); if(sb) sb.click(); return; }
     if(act === "mint"){ if(window.__mint) window.__mint(); return; }
     if(act === "buy"){ if(BUY() && window.__buy) window.__buy(); return; }

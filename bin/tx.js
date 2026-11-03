@@ -38,6 +38,12 @@ function msgBytes(m){
     return any("/cosmos.staking.v1beta1.MsgDelegate", cat(
       strField(1, m.value.delegator_address), strField(2, m.value.validator_address),
       bytesField(3, coin(m.value.amount))));
+  /* cancelling an unstaking: MsgCancelUnbondingDelegation{delegator_address(1), validator_address(2), amount(3),
+     creation_height(4)} - the entry is named by the height it began at */
+  if(m.type === "cosmos-sdk/MsgCancelUnbondingDelegation")
+    return any("/cosmos.staking.v1beta1.MsgCancelUnbondingDelegation", cat(
+      strField(1, m.value.delegator_address), strField(2, m.value.validator_address),
+      bytesField(3, coin(m.value.amount)), uintField(4, BigInt(m.value.creation_height))));
   if(m.type === "cosmos-sdk/MsgUndelegate")
     return any("/cosmos.staking.v1beta1.MsgUndelegate", cat(
       strField(1, m.value.delegator_address), strField(2, m.value.validator_address),
