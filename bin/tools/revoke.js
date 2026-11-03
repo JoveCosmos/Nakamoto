@@ -135,6 +135,8 @@ stg = T.stage(E("cv"), function(c, w, h, t){
     /* the cut mark on a ticked line */
     if(on && !gone){ var s2 = 6; c.strokeStyle = red; c.lineWidth = 2.2; c.lineCap = "round";
       c.beginPath(); c.moveTo(mx - s2, my - s2); c.lineTo(mx + s2, my + s2); c.moveTo(mx + s2, my - s2); c.lineTo(mx - s2, my + s2); c.stroke(); c.lineCap = "butt"; }
+    /* many grants (over 8): a dot each, the names are in the list beside (2026-11-03: pills would overlap) */
+    if(n > 8){ c.fillStyle = cc; c.beginPath(); c.arc(px, py, on ? 6 : 4.5, 0, 7); c.fill(); c.globalAlpha = 1; return; }
     /* the pill: name (phones: the kind alone), kept inside the picture */
     var lab = phone ? x.g.kind : (x.g.name.length > 20 ? x.g.name.slice(0, 19) + "…" : x.g.name), sub = phone ? "" : x.g.kind;
     c.font = "600 11px " + mono; var tw = Math.max(c.measureText(lab).width, sub ? (c.font = "10px " + mono, c.measureText(sub).width) : 0);
