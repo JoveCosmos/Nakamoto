@@ -2281,7 +2281,7 @@ font-family:var(--wmono);font-size:9px;letter-spacing:.04em;line-height:1.6;colo
 .wk-max{border-color:var(--wbd2)}
 .wk-tbl2 td.ck input{border-color:#5a5a88;}
 /* the ticks in Pro's lists read clearly on the dark ground (operator, 2026-11-03) */
-.wk-tbl2 :is(td,th).ck input:not(:disabled):not(#z){border:1.5px solid #8f8fc8;background:rgba(255,255,255,.06)}
+.wk-tbl2 :is(td,th).ck input:not(:disabled):not(:checked):not(#z){border:1.5px solid #8f8fc8;background:rgba(255,255,255,.06)}   /* ticked keeps its own fill */
 .wk-tbl2 :is(td,th).ck input:disabled:not(#z){border:1px dashed #4a4a72;background:transparent}
 .wk-tbl2 td .sb{display:none}
 /* the account is the disconnect: mark, name and address, the leave glyph */
