@@ -900,6 +900,11 @@ out = {
   "delegators": delegators,
   "coverage": coverage,
   "inactive": INACT,
+  # Autopilot's two guards, for the page's preview (the keeper reads the chain itself): validators jailed 3 times ever or
+  # twice in 90 days (left out unless the reader unticks the box), and the stakes of the validators that left the set
+  # within the unbonding period and can come back (one bottom slot kept free for each) - operator, 2026-11-03
+  "jailskip": [v["op"] for v in V if hist.get(v["cons"], {}).get("jailed", 0) >= 3 or hist.get(v["cons"], {}).get("jailed90", 0) >= 2],
+  "returning": sorted([v["t"] for v in INACT if v["st"] == "unbonding"], reverse=True),
   "validators": [dict(
       m=v["m"], t=v["t"], c=v["c"], op=v["op"], web=v["web"], det=v["det"], vid=VIDS[v["op"]],
       apr=apr(v["t"], coef), net=apr(v["t"], coef)*(1-v["c"]),

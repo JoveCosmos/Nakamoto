@@ -131,10 +131,19 @@ function rankSet(validators) {
     .map(v => ({ op: v.operatorAddress, tokens: BigInt(v.tokens), jailed: !!v.jailed }));
   return out.sort((a, b) => (a.tokens > b.tokens ? -1 : a.tokens < b.tokens ? 1 : 0));
 }
-// a move's destination: bonded, not jailed, 0-based index from top(n) to n-1-EDGE (ranks 21 to n-3 of 100)
-function checkMoves(ranked, moves) {
+// keeper.py ap_edge() (operator, 2026-11-03): Autopilot may use every slot down to the last, less one for each validator
+// that left the set within the unbonding period and holds more than that slot (it would push the last one out on its
+// return). back: those validators' stakes, largest first; unreadable = the old fixed EDGE (fail closed)
+function apEdge(ranked, back) {
+  if (!back) return EDGE;
+  let e = 0;
+  for (const t of back) if (e < ranked.length && t > ranked[ranked.length - 1 - e].tokens) e++;
+  return e;
+}
+// a move's destination: bonded, not jailed, 0-based index from top(n) to n-1-apEdge (ranks 21 to 100 less the guard)
+function checkMoves(ranked, moves, back) {
   const n = ranked.length, idx = new Map(ranked.map((v, i) => [v.op, i]));
-  const lo = top(n), hi = n - 1 - EDGE;
+  const lo = top(n), hi = n - 1 - apEdge(ranked, back);
   for (const m of moves) {
     const i = idx.get(m.dst);
     if (i === undefined) return "destination " + m.dst + " is not bonded";
@@ -272,6 +281,18 @@ async function bondedSet(query) {
   } while (key && key.length);
   const ranked = rankSet(all);
   if (!ranked.length) throw new Error("bonded set is empty");
+  // the validators that can come back: left the set within the unbonding period (jailed or dropped)
+  let back = null;
+  try {
+    const un = []; let k2, p2 = 0;
+    do {
+      const r = await query.staking.validators("BOND_STATUS_UNBONDING", k2);
+      un.push(...(r.validators || [])); k2 = r.pagination?.nextKey;
+      if (++p2 > 50) throw new Error("unbonding set: too many pages");
+    } while (k2 && k2.length);
+    back = un.map(v => BigInt(v.tokens)).sort((a, b) => (a > b ? -1 : a < b ? 1 : 0));
+  } catch (e) { console.error("unbonding set unreadable, last " + EDGE + " slots refused:", e.message); }
+  ranked.back = back;
   setCache = { at: Date.now(), ranked };
   return ranked;
 }
@@ -377,7 +398,7 @@ const server = http.createServer(async (req, res) => {
       if (capHeld(capLog, granter, Date.now()) + moves.length > MAX_MOVES_DAY) return { code: 400, err: "daily move limit (" + MAX_MOVES_DAY + ") reached" };
       const gp = grantProblem(await grantsFor(query, granter, sender, [REDEL_URL]), [REDEL_URL], Date.now());
       if (gp) return { code: 409, err: gp };
-      const bad = checkMoves(await bondedSet(query), moves);
+      const rk = await bondedSet(query), bad = checkMoves(rk, moves, rk.back);
       if (bad) return { code: 400, err: bad };
       for (const [src, amt] of sumBySrc(moves)) {
         const has = await delegated(query, granter, src);

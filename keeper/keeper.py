@@ -768,17 +768,39 @@ def pairs_used(reds):
 def top(n): return n // 5
 def bottom(n): return (n * 34 + 50) // 100
 EDGE = 3            # the last 3 are left out (operator, 2026-09-30)
+# Autopilot pours down to the last slot of the set (operator, 2026-11-03: "all 100 qualify except jailed ones"), less one
+# slot for every validator that left the set within the unbonding period (jailed or dropped, status UNBONDING) and holds
+# more than that slot: when it unjails it takes a place in the set and pushes the last one out, and stake Autopilot had
+# just put there would sit outside the set, locked for 21 days. Read from the chain every tick, so a jailing seen this
+# tick already counts. A tombstoned validator never returns but is counted for its 21 days anyway (the safe side)
+AP_EDGE = 0
+RETURNING = []      # stakes (uatone) of the validators that can come back, refreshed by once()
+def returning():
+    out, key = [], None
+    while True:
+        d = get("/cosmos/staking/v1beta1/validators?status=BOND_STATUS_UNBONDING&pagination.limit=200"
+                + ("&pagination.key=%s" % urllib.parse.quote(key, safe="") if key else ""))
+        out += [int(v["tokens"]) for v in d.get("validators", [])]
+        key = d.get("pagination", {}).get("next_key")
+        if not key: return sorted(out, reverse=True)
+def ap_edge(s, back=None):
+    """s: the set's stakes, largest first. One slot more at the bottom for each returning validator that would rank above it"""
+    back = RETURNING if back is None else back
+    e = AP_EDGE
+    for t in back:
+        if e < len(s) and t > s[len(s) - 1 - e]: e += 1
+    return e
 GAP = 1_000_000     # 1 ATONE between neighbours: a tie would let the chain's tie-break swap the two
 STEP = 300_000_000  # Autopilot fills each validator to 300 ATONE under the one above (operator, 2026-10-09; was 1 ATONE):
                     # the room left is where Restake stakes, as a 1-ATONE staircase had none (no restake ran 10-09 12:00)
 
-def fill(ranked, stake, amount, ok, min_leg=MIN_MOVE, step=STEP):
+def fill(ranked, stake, amount, ok, min_leg=MIN_MOVE, step=STEP, edge=EDGE):
     """the shelf rise: answers {op: added}. ranked is largest first; stake(op) the stake as it stands; ok(v) whether v
     may take any. A validator that may not (a source, a refused pair, a grant's list) is a fixed step: the shelf below
     it rises to `step` under it, then the pour carries on above it. Autopilot pours with STEP, Restake with GAP"""
     n = len(ranked); add = {}; left = int(amount); TOP = top(n)
     s = [int(stake(v["op"])) for v in ranked]
-    i = n - 1 - EDGE
+    i = n - 1 - edge
     while i >= TOP and left >= GAP:
         if not ok(ranked[i]): i -= 1; continue
         b0 = i                                         # the segment: b0 up to the first fixed step (or TOP)
@@ -865,7 +887,7 @@ def plan(g, rows, reds, vals, m, room=None):
         for x in ms: mv_[x["dst"]] = mv_.get(x["dst"], 0) + x["amount"]
         return {op: rate_after(m, vals[op]["t"], vals[op]["c"], a) for op, a in mv_.items()}
     def moves_for(srcs, amount, ok, rk):
-        add = fill(rk, stake, amount, ok)
+        add = fill(rk, stake, amount, ok, edge=ap_edge([int(stake(v["op"])) for v in rk]))
         at = {v["op"]: i for i, v in enumerate(rk)}
         # sources fill destinations in turn, smallest validator first: at most S + D - 1 moves
         out, short, si, left = [], set(), 0, [dict(x) for x in srcs]
@@ -1346,6 +1368,9 @@ def once(c, only=None, live=None, force=False):
     # the set as the chain has it now (not the 15-minute collect): anything already executed is simply there
     # no silent fallback to the collector's stakes: a tick without the live set does nothing
     vals = live_vals(vals)
+    global RETURNING
+    try: RETURNING = returning()
+    except Exception as e: RETURNING = [10**18] * EDGE; log("returning validators unreadable, last %d slots left out: %s" % (EDGE, e))
     # first come, first served (operator, 2026-09-29): grants are planned in the order they were made, and each
     # move carried out this tick is counted as placed before the next grant is planned - the first grantee gets the
     # top strategy, the next one the next best

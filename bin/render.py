@@ -223,6 +223,7 @@ payload = json.dumps({"generated": D["generated"], "thresh": th["threshold"],
                       # (not jailed) validator can be staked to or redelegated to from the lists; id = operator
                       # since 2026-10-01, the sixth field stays for the page's existing reads
                       "inactive": [[v["m"], v["t"], v["c"], v["op"], 1 if v["jailed"] else 0, v["op"]] for v in D.get("inactive") or []],
+                      "jailskip": D.get("jailskip") or [], "returning": D.get("returning") or [],
                       "eta": e, "set": s,
                       # the Network tabs: 24h proposers, 7 days of hourly activity, the economics
                       # history, and where the chain's record starts

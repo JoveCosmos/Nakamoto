@@ -917,6 +917,7 @@ function applyData(d){
   VALS.length = 0; Array.prototype.push.apply(VALS, next);
   VALS.sort(function(a, b){ return b[1] - a[1]; });
   D.set = d.set; D.eta = d.eta || D.eta; D.vdetail = d.validators; D.generated = d.generated || D.generated;
+  if(d.jailskip) D.jailskip = d.jailskip; if(d.returning) D.returning = d.returning;
   if(!LIVE_AT){ S = d.set.bonded; R = d.set.reward_pool; }     /* a live tick outranks the build */
   N = VALS.length; MEAN = S / N; BASE = R / S; maxT = VALS[0][1];
   LIVE_C = ratioOf(VALS.map(function(v){ return v[1]; }));
@@ -3845,6 +3846,7 @@ rememberGridH();
   var AT_ALL = false, AT_ALL_G = false;
   function atMemo(){ return "GATA AtomOne Autopilot" + (AT_ALL ? ", all validators" : ""); }
   window.__atMemo = atMemo;
+  window.__atAll = function(){ return AT_ALL; };
   function atJail(ro){ var b = E("atjail"), w = E("atjailw"), t = E("atjaili"); if(!b) return;
     b.checked = !AT_ALL; b.disabled = !!ro; w.classList.toggle("all", AT_ALL); w.classList.toggle("ro", !!ro);
     t.textContent = AT_ALL ? "All validators, none excluded" : "Recommended, avoids unreliable validators"; }
@@ -4198,7 +4200,7 @@ rememberGridH();
      a fixed step: the shelf below it rises to STEP (300 ATONE, the room Restake stakes into) under it, then the pour
      carries on above it */
   function shelfFill(V, s, amount, ok){
-    var n = V.length, add = {}, left = Math.floor(amount), i = n - 1 - EDGE, j, TOP = topN(n);
+    var n = V.length, add = {}, left = Math.floor(amount), i = n - 1 - apEdge(s), j, TOP = topN(n);
     while(i >= TOP && left >= GAP){
       if(!ok(i)){ i--; continue; }
       var b0 = i;
@@ -4216,12 +4218,19 @@ rememberGridH();
     return add;
   }
   window.__shelfFill = shelfFill;
+  /* keeper.py ap_edge(): Autopilot pours down to the last slot, less one for every validator that left the set within
+     the unbonding period and holds more than that slot - it would push the last one out on its return (2026-11-03) */
+  function apEdge(s){ var b = (window.__D && window.__D.returning) || [], e = 0, k;
+    for(k = 0; k < b.length; k++) if(e < s.length && b[k] > s[s.length - 1 - e]) e++;
+    return e; }
+  window.__apEdge = apEdge;
   /* validators the build's own list keeps out of a strategy's destinations: stake already there is left alone and may
      still be moved off, they simply take nothing new */
   function noStake(id){ var L = (window.__D && window.__D.nostake) || []; return L.indexOf(id) >= 0; }
   window.__noStake = noStake;
   /* the ranks the shelf may pour into (0-based, smallest first): the last EDGE left out, never the largest fifth */
-  window.__shelfZone = function(n){ var o = []; for(var i = n - 1 - EDGE; i >= topN(n); i--) o.push(i); return o; };
+  window.__shelfZone = function(n){ var o = [], s = window.__VALS().map(function(v){ return v[1]; }).sort(function(a, b){ return b - a; });
+    for(var i = n - 1 - apEdge(s); i >= topN(n); i--) o.push(i); return o; };
   window.__planRank = function(pos){
     if(!pos || !pos.rows.length || !(pos.total > 0)) return null;
     /* stake in its 21-day cooldown stays where it is; the free stake is hunted, all of it at once */
@@ -4268,7 +4277,8 @@ rememberGridH();
       var Vn = V.map(function(v, q){ return [v, q]; }).sort(function(a, b){
         var d = (b[0][1] - (gone[b[0][3]] || 0)) - (a[0][1] - (gone[a[0][3]] || 0)); return d || a[1] - b[1]; }).map(function(x){ return x[0]; });
       var s = Vn.map(function(v){ return v[1] - (gone[v[3]] || 0); });
-      var ok = function(j){ return !fixed[Vn[j][3]] && !gone[Vn[j][3]]; };     /* any validator of the active set (operator, 2026-09-30) */
+      var jsk = (window.__D && window.__D.jailskip) || [], all = window.__atAll && window.__atAll();
+      var ok = function(j){ return !fixed[Vn[j][3]] && !gone[Vn[j][3]] && (all || jsk.indexOf(Vn[j][3]) < 0); };     /* any validator of the active set (operator, 2026-09-30), less the jailed-often unless unticked (2026-11-03) */
       var r = movesFor(src, budget, Vn, s, ok);
       while(r.out.length > MAXMOVES && budget > 1e6){ budget = Math.floor(budget * 0.85); r = movesFor(src, budget, Vn, s, ok); }
       out = r.out;
