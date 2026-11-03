@@ -211,3 +211,5 @@ html.embed .hero:not(.plain)>div:not(#z){flex:1 1 0;justify-content:center;text-
 .bal .bf b{font-size:13px;color:var(--wt)}.bal .bf.on{border-color:var(--teal)}.bal .bf.on b{color:var(--teal)}
 .bal .bo{font-size:11px;color:var(--amber)}
 @media(max-width:600px){html.embed .hero:not(.plain)>div em:not(#z){white-space:normal;font-size:8.5px;line-height:1.25;letter-spacing:.06em}html.embed .hero:not(.plain)>div:not(#z){padding:7px 4px}}
+@media(max-width:600px) and (max-height:860px){html.embed #tool>.left>.stage:not(#z){flex:0 0 110px!important;height:110px!important;min-height:96px}html.embed .wrap>#tool:not([hidden]){gap:8px}html.embed #tool>.side{gap:8px}}
+@media(max-width:600px) and (max-height:760px){html.embed #tool>.left>.stage:not(#z){flex:0 0 84px!important;height:84px!important;min-height:80px}}

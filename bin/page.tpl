@@ -7047,10 +7047,9 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 @media(max-width:700px){#mv-stage .mv-top>.sv-btn.mv-smore:not(#z):not(#y):not(#x){display:none}}
 /* Now on's title row carries the unstaking summary, one line, Cancel whole */
 /* the same columns as an unstaking row, so the summary stands over the rows' dates (operator, 2026-11-03) */
-.mv-nh{display:grid;grid-template-columns:44px minmax(0,calc(50% - 104px)) 1fr auto 56px;column-gap:8px;align-items:baseline;min-width:0}
-@media(max-width:700px){.mv-nh{grid-template-columns:44px minmax(0,calc(50% - 76px)) 1fr auto 56px}}
-.mv-nh>em{grid-column:1/3;font-style:normal;font-family:var(--wmono);font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
-.mv-nu{grid-column:3/6;justify-self:start;min-width:0;max-width:100%;display:flex;align-items:baseline;gap:8px;font-size:11px;color:var(--wf);white-space:nowrap;overflow:hidden}
+.mv-nh{display:flex;align-items:baseline;gap:12px;min-width:0}   /* the summary right beside the title (operator, 2026-11-03) */
+.mv-nh>em{flex:0 0 auto;font-style:normal;font-family:var(--wmono);font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+.mv-nu{flex:0 1 auto;min-width:0;max-width:100%;display:flex;align-items:baseline;gap:8px;font-size:11px;color:var(--wf);white-space:nowrap;overflow:hidden}
 .mv-nu .mv-nut{min-width:0;overflow:hidden;text-overflow:ellipsis}.mv-nu b{color:var(--ink2,var(--ink));font-weight:600}
 .mv-nu .mv-nc{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:none;font:inherit;font-weight:600;color:var(--sv-teal,#2bc8bd);cursor:pointer}
 .mv-nu .mv-nc:hover{text-decoration:underline;text-underline-offset:3px}.mv-nu .mv-nc:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offset:2px}
