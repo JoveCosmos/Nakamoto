@@ -229,3 +229,15 @@ html.embed .hero:not(.plain)>div:not(#z){flex:1 1 0;justify-content:center;text-
 .perr{border:1px solid var(--red);border-radius:9px;background:rgba(255,90,60,.06);padding:6px 10px;max-height:96px;overflow-y:auto;font-size:12px;color:var(--wt)}
 .perr ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:3px}.perr b{color:var(--red);margin-right:6px}
 .empty.gem{display:flex;flex-direction:column;align-items:center;gap:4px;padding:18px 12px;text-align:center}.empty.gem b{font-size:14px;color:var(--wt);text-transform:none;letter-spacing:0}.empty.gem span{font-size:12px;color:var(--wf);text-transform:none;letter-spacing:0}
+/* Fee Saver rows (operator, 2026-11-03): a whole address shows (no scrolling inside the field); phones give it its own line */
+.srow input[data-k=a]{font-size:11px;letter-spacing:-.01em;padding:0 9px}
+html.embed .memo{flex:1 1 100%!important;width:100%}
+@media(max-width:600px){.srow:not(#z){grid-template-columns:minmax(0,1fr) 34px;grid-template-areas:"a rm" "x x";row-gap:6px}
+  .srow input[data-k=a]{grid-area:a;font-size:10.5px;padding:0 7px}.srow input[data-k=x]{grid-area:x}.srow .rm{grid-area:rm}}
+/* (2026-11-03) the compact figures: no leftover minimum height, so each value sits in the middle of its box */
+html.embed .hero>div b:not(#z){min-height:0;display:block}
+@media(max-width:600px){.srow:not(#z):not(#y){grid-template-areas:"a a" "x rm"}.srow input[data-k=a]:not(#z){font-size:10px;padding:0 7px;letter-spacing:-.02em}}
+@media(max-width:375px){.srow input[data-k=a]:not(#z){font-size:9.2px;padding:0 6px}}
+/* + recipient at the row's right end, over the rows' remove buttons (operator, 2026-11-03) */
+html.embed #add:not(#z){margin-left:auto;order:9}
+html.embed .hero>div b:not(#z):not(#y){letter-spacing:0}

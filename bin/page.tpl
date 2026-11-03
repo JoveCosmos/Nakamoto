@@ -5598,6 +5598,7 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .atcard .atfoot .txbtns{grid-area:b;justify-content:center;}
 .atfoot .atfs{grid-area:f;padding:0 20px}
 .atfs{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
+.atfs>.txstep:empty,.atfs>.txfee:empty{display:none}   /* an empty status line takes no room: the fee sits centred on the button (2026-11-03) */
 .atcard .atfoot .txfee,.atcard .atfoot .txstep{padding:0;min-height:0}
 .atcard .atfoot .txfee{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .atcard .atfoot .txfee:empty,.atcard .atfoot .txstep:empty{display:none}
@@ -5790,12 +5791,15 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
   :is(#sv-ecoa,#sv-ecop) .sv-ph:not(#z):not(#y){flex-wrap:wrap}
   .sv-tp.sv-tp2 b{font-size:13px}
 }
-.pop .atjail{margin:10px 0 12px;padding:9px 12px;border-radius:9px;border:1px solid rgba(91,179,232,.22);background:rgba(91,179,232,.05)}
-.pop .atjail:hover{background:rgba(91,179,232,.09)}
-.pop .atjail span{font-size:12px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pop .atjail i{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:1.3em;line-height:1.3em}
-.pop .atjail.all i{color:var(--wamber)}
-.pop .atjail.ro{cursor:default}.pop .atjail.ro:hover{background:rgba(91,179,232,.05)}
+.pop .atjail:not(#z){display:flex;align-items:center;gap:8px;margin:8px 0 12px;padding:7px 12px;border-radius:9px;border:1px solid rgba(91,179,232,.28);background:rgba(91,179,232,.06);font-size:12px;cursor:pointer}
+.pop .atjail:not(#z) input{margin:0;flex:0 0 auto}
+.pop .atjail:not(#z)>span{flex:1 1 auto;min-width:0;display:flex;align-items:baseline;gap:8px;font-size:12px;line-height:1.3;white-space:nowrap;overflow:hidden}
+.pop .atjail:not(#z)>span>i{flex:0 0 auto;display:inline;margin:0;height:auto;font-style:normal;font-size:11px;color:var(--wf)}
+.pop .atjail.all:not(#z)>span>i{color:var(--wamber)}
+.pop .atjail:hover{background:rgba(91,179,232,.1)}
+.pop .atjail.ro{cursor:default}.pop .atjail.ro:hover{background:rgba(91,179,232,.06)}
+.pop .atjail b{font-weight:400;min-width:0;overflow:hidden;text-overflow:ellipsis}.pop .atjail b.js{display:none}
+@media(max-width:520px){.pop .atjail b.jl{display:none}.pop .atjail b.js{display:inline}.pop .atjail:not(#z)>span{font-size:11.5px;gap:6px}.pop .atjail:not(#z)>span>i{font-size:10.5px}}
 #atpop .atnote:not(#z){margin-top:14px;padding:10px 12px;font-size:12px;border-radius:9px}
 /* the list: taller rows, the name and the APR larger */
 #atpop .atrt b:not(#z){font-size:15px;font-weight:700}
@@ -7781,7 +7785,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
       <ul class=bn id=atwhat><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="8"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></i><span class=bn-t><b>Keeps your stake in the active set</b><small><b id=atidlen>Stake</b> sits idle on inactive validators today</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 17l5-5 4 4 7-8"/><path d="M15 8h5v5"/></svg></i><span class=bn-t><b>Keeps your APR at its best</b><small>moves only for 3 APR points or more</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Redelegates, nothing else</b><small>GATA funds your pilot, no fees for you</small></span></li></ul>
       <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Runs every <b>12 hours</b>, you can revoke anytime.</span></div>
       <!-- jailed validators (operator, 2026-11-03): ticked by default, changeable only while inactive; the line under it is one fixed row -->
-      <label class="aopt atjail" id=atjailw><input type=checkbox id=atjail checked><span>Exclude validators jailed 3x, or 2x in 90 days<i id=atjaili>Recommended</i></span></label>
+      <label class="aopt atjail" id=atjailw><input type=checkbox id=atjail checked><span><b class=jl>Exclude validators jailed 3x, or 2x in 90 days</b><b class=js>Exclude jailed 3x, or 2x in 90d</b><i id=atjaili>Recommended</i></span></label>
     </section>
     <section class=atR id=atR aria-label="Select your validators">
       <div class=atrs><input class=atfind id=atfind type=search placeholder="Find by name or operator key" aria-label="Find a validator" autocomplete=off spellcheck=false><span class=wk-seln id=atcount aria-live=polite></span></div>
@@ -7799,7 +7803,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
   <div class=rsbody>
     <ul class=bn><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></i><span class=bn-t><b>Compounds your rewards</b><small><b id=rsadd>your rewards</b> more a year</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 20V10M10 20V6M15 20v-8M20 20V4"/></svg></i><span class=bn-t><b>Into the best-paying validators</b><small>not back onto the same one</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Claims and stakes, nothing else</b><small>GATA funds your restake, no fees for you</small></span></li></ul>
     <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Runs every <b>12 hours</b>, minimum 1 ATONE, you can revoke anytime.</span></div>
-    <label class="aopt atjail" id=rsjailw><input type=checkbox id=rsjail checked><span>Exclude validators jailed 3x, or 2x in 90 days<i id=rsjaili>Recommended</i></span></label>
+    <label class="aopt atjail" id=rsjailw><input type=checkbox id=rsjail checked><span><b class=jl>Exclude validators jailed 3x, or 2x in 90 days</b><b class=js>Exclude jailed 3x, or 2x in 90d</b><i id=rsjaili>Recommended</i></span></label>
   </div>
   <div class=rsfoot><div class=atfs><div class=txfee id=rsfee></div></div><button class="wk-btn wk-go" id=rsgo type=button>Activate</button></div>
 </div></div>

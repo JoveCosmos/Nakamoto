@@ -88,7 +88,7 @@ function notes(p){
     yAfter = yNow; p.forEach(function(r){ yAfter += r.free * ((APR[GATA] || 0) - (APR[r.v] || 0)); });
     if(all > 0 && APR[GATA] != null){
       var a0 = yNow / all * 100, a1 = yAfter / all * 100, d = (yAfter - yNow) / 1e6;
-      E("hg").textContent = (d < -0.05 ? "-" : "+") + T.fmtA(Math.abs(d) * 1e6, 1);
+      E("hg").textContent = (d < -0.05 ? "\u2212" : "+") + T.fmtA(Math.abs(d) * 1e6, 1);   /* a real minus, spaced (2026-11-03) */
       h += '<p' + (d < 0 ? ' class=w' : '') + '>Your staking APR goes from <b>' + a0.toFixed(1) + '%</b> to <b>' + a1.toFixed(1) + '%</b>, ' +
         (d < 0 ? '<b>' + T.fmtA(-d * 1e6, 1) + ' ATONE a year less</b>' : '<b>' + T.fmtA(d * 1e6, 1) + ' ATONE a year more</b>') + '.</p>';
     }

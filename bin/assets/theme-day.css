@@ -1070,7 +1070,7 @@
   html[data-theme=light]:not([data-mono]) .mv-r button.mv-uc{border-color:var(--danger-bar);background:var(--danger-bg);color:var(--danger)}
   html[data-theme=light]:not([data-mono]) .mv-r button.mv-uc:hover{background:var(--danger-bg)}
   html[data-theme=light]:not([data-mono]) .mv-r button.mv-uc:focus-visible{outline-color:var(--danger-bar)}
-  html[data-theme=light]:not([data-mono]) .pop .atjail{border-color:var(--accent-soft);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .pop .atjail:not(#z){border-color:var(--accent-soft);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .pop .atjail:hover{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .pop .atjail.ro:hover{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .ap-first{border-color:var(--accent);background:var(--accent-soft)}
