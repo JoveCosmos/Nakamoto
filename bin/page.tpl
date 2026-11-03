@@ -5715,9 +5715,10 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 #tlpop .sd-wch i.net{color:var(--wcyan);border-color:currentColor}#tlpop .sd-wch i.net.tn{color:var(--wamber)}
 .tlx{width:32px;height:32px;display:grid;place-items:center;border:1px solid var(--wbd2);border-radius:9px;background:transparent;color:var(--ink);cursor:pointer}
 .tlx svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
-.pop .card.tlcard{display:flex;flex-direction:column}
-.tlfr{flex:1 1 auto;width:100%;height:100%;min-height:70vh;border:0;background:transparent}
-@media(max-width:700px){.tlfr{min-height:0}.pop .card.spcard.tlcard:not(#z)>.tlfr{flex:1 1 auto}}
+#tlpop .card.tlcard:not(#z):not(#y){display:flex;flex-direction:column}
+#tlpop .card.tlcard>.tlfr:not(#z){flex:1 1 0;min-height:0;height:auto}
+.tlfr{flex:1 1 0;width:100%;height:auto;min-height:0;border:0;background:transparent}   /* the room under the card's header, no more */
+
 .tlgate{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px}
 .tlgate h2{margin:0;font-size:20px;color:var(--ink);font-weight:600}
 .pop .card.spcard.tlcard:not(#z){width:min(1180px,96vw);max-width:1180px}

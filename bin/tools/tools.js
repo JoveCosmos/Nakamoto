@@ -118,7 +118,7 @@ function fmtA(u, d){ return (u / 1e6).toLocaleString("en-US", { maximumFractionD
 function stage(cv, draw){
   var ctx = cv.getContext("2d"), on = false, raf = 0, t0 = 0, reduced = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   function size(){ var r = cv.getBoundingClientRect(), p = Math.min(2, window.devicePixelRatio || 1); cv.width = Math.max(1, Math.round(r.width * p)); cv.height = Math.max(1, Math.round(r.height * p)); ctx.setTransform(p, 0, 0, p, 0, 0); return r; }
-  function tick(ts){ if(!on) return; if(!t0) t0 = ts; var r = cv.getBoundingClientRect(); if(Math.round(r.width * (window.devicePixelRatio || 1)) !== cv.width) size();
+  function tick(ts){ if(!on) return; if(!t0) t0 = ts; var r = cv.getBoundingClientRect(), p = Math.min(2, window.devicePixelRatio || 1); if(Math.round(r.width * p) !== cv.width || Math.round(r.height * p) !== cv.height) size();   /* height too: inside the app the picture's height follows the card (2026-11-03) */
     ctx.clearRect(0, 0, r.width, r.height); draw(ctx, r.width, r.height, (ts - t0) / 1000); if(reduced) return; raf = requestAnimationFrame(tick); }
   return { start: function(){ if(on) return; on = true; t0 = 0; size(); raf = requestAnimationFrame(tick); }, stop: function(){ on = false; cancelAnimationFrame(raf); },
     redraw: function(){ if(!on) return; var r = size(); ctx.clearRect(0, 0, r.width, r.height); draw(ctx, r.width, r.height, 0); if(reduced) return; cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); } };
