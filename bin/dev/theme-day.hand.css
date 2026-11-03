@@ -532,3 +532,7 @@ radial-gradient(130% 100% at 0% 0%,rgba(196,186,255,.38),transparent 58%),linear
   html[data-theme=light]:not([data-mono]) .by-st.ok:not(:last-child)::before{background:var(--accent)}
   html[data-theme=light]:not([data-mono]) .by-st span a{color:var(--accent)}
 
+/* the Tools menu (2026-11-03): its own day surface, and a hover that reads clearly */
+html[data-theme=light]:not([data-mono]) .tlmenu{background:var(--surface);border-color:var(--line-strong);box-shadow:0 12px 32px rgba(40,30,10,.14)}
+html[data-theme=light]:not([data-mono]) .tlmenu button:hover,html[data-theme=light]:not([data-mono]) .tlmenu button:focus-visible{background:#E7E1D4}
+html[data-theme=light]:not([data-mono]) .tlmenu b{color:var(--ink)}
