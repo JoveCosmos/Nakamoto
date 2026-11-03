@@ -143,7 +143,12 @@ if(EMB){
     }catch(e){}
   };
   /* after every tool script has registered for the wallet: a sync before then would set it with no one told */
-  window.addEventListener("load", function(){ sync(); setInterval(sync, 700); });
+  /* two sides inside the app (operator, 2026-11-03): the picture (and its legend) on one, everything else on the other */
+  var split = function(){ var tl = E("tool"); if(!tl || tl.querySelector(":scope>.side")) return;
+    var left = document.createElement("div"), side = document.createElement("div"); left.className = "left"; side.className = "side";
+    Array.prototype.slice.call(tl.children).forEach(function(c){ (c.classList.contains("stage") || c.classList.contains("legend") ? left : side).appendChild(c); });
+    tl.appendChild(left); tl.appendChild(side); };
+  window.addEventListener("load", function(){ split(); sync(); setInterval(sync, 700); });
 }
 window.T = { why: why, NET: NET, BASE: BASE, CHAIN: CHAIN, E: E, esc: esc, get: get, bechOk: bechOk, conv: conv, names: namesReady, nameOf: nameOf, short: short,
   govOf: govOf, govName: govName, wallet: function(){ return W; }, onWallet: function(f){ onWallet.push(f); }, connect: connect, drawGate: drawGate, sign: sign, feePreview: feePreview,

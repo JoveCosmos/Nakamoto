@@ -71,11 +71,11 @@ function msgs(list){ var me = T.wallet().address; return list.map(function(r){
 function chunks(m){ var o = []; for(var i = 0; i < m.length; i += CHUNK) o.push(m.slice(i, i + CHUNK)); return o; }
 function state(){
   var p = picked(), tot = p.reduce(function(s, r){ return s + r.free; }, 0), n = p.length, k = chunks(p).length;
-  E("hv").textContent = n; E("ha").textContent = T.fmtA(tot, 1); E("hg").textContent = T.fmtA(HELD, 1);
+  E("hv").textContent = n; E("ha").textContent = T.fmtA(tot, 1); E("hg").textContent = "-";   /* the year's change, set by notes() */
   E("hero").classList.toggle("idle", !n);
   var held = ROWS.filter(function(r){ return r.locked >= 1; }).length;
   E("selnote").textContent = ROWS.length ? n + " of " + ROWS.length + " selected" + (held ? ", " + held + " partly held by the chain" : "") : "";
-  E("stgtag").textContent = n ? "to GATA HUB" : (HELD ? "on GATA HUB" : "nothing to gather");
+  E("stgtag").textContent = n ? "into GATA HUB" : "nothing to gather";
   E("go").disabled = !n || BUSY; E("go").textContent = !n ? "Gather" : k > 1 ? "Gather, " + k + " signatures" : "Gather";
   PK = p.map(function(r){ return r.free; }); notes(p); fee(n ? p : null);
 }
@@ -88,6 +88,7 @@ function notes(p){
     yAfter = yNow; p.forEach(function(r){ yAfter += r.free * ((APR[GATA] || 0) - (APR[r.v] || 0)); });
     if(all > 0 && APR[GATA] != null){
       var a0 = yNow / all * 100, a1 = yAfter / all * 100, d = (yAfter - yNow) / 1e6;
+      E("hg").textContent = (d < -0.05 ? "-" : "+") + T.fmtA(Math.abs(d) * 1e6, 1);
       h += '<p' + (d < 0 ? ' class=w' : '') + '>Your staking APR goes from <b>' + a0.toFixed(1) + '%</b> to <b>' + a1.toFixed(1) + '%</b>, ' +
         (d < 0 ? '<b>' + T.fmtA(-d * 1e6, 1) + ' ATONE a year less</b>' : '<b>' + T.fmtA(d * 1e6, 1) + ' ATONE a year more</b>') + '.</p>';
     }
@@ -139,15 +140,22 @@ E("go").addEventListener("click", function(){
 });
 E("again").addEventListener("click", function(){ E("done").hidden = true; E("tool").hidden = false; stg.start(); load(); });
 /* the picture: each source on the left, its stake flowing into one validator on the right */
+function bz(a, b, c2, d, t){ var u = 1 - t; return u * u * u * a + 3 * u * u * t * b + 3 * u * t * t * c2 + t * t * t * d; }
+/* the picture fits its panel (2026-11-03): a tall one flows top to bottom, your validators above, into GATA HUB below */
 stg = T.stage(E("cv"), function(c, w, h, t){
-  var teal = T.tok("--teal"), vio = T.tok("--violet2"), bar = T.tok("--bar"), dot = T.tok("--dot"), x1 = w * .84, y1 = h / 2, n = PK.length, max = Math.max.apply(null, PK.concat([1]));
+  var teal = T.tok("--teal"), vio = T.tok("--violet2"), bar = T.tok("--bar"), dot = T.tok("--dot"), n = PK.length, max = Math.max.apply(null, PK.concat([1]));
+  var tall = h > w * .9, x1 = tall ? w / 2 : w * .84, y1 = tall ? h * .8 : h / 2;
   if(!n){ for(var k = 0; k < 3; k++){ var rr = (t * 40 + k * 30) % 90; c.globalAlpha = 1 - rr / 90; c.strokeStyle = teal; c.beginPath(); c.arc(x1, y1, 8 + rr, 0, 7); c.stroke(); } c.globalAlpha = 1; }
-  for(var i = 0; i < n; i++){ var x0 = w * .16, y0 = n === 1 ? h / 2 : h * (.24 + .64 * i / (n - 1)), r = 3 + 5 * Math.sqrt(PK[i] / max);
-    c.strokeStyle = bar; c.lineWidth = 1; c.beginPath(); c.moveTo(x0, y0); c.bezierCurveTo(w * .5, y0, w * .5, y1, x1, y1); c.stroke();
-    var q = (t * .45 + i * .37) % 1, px = x0 + (x1 - x0) * q, py = y0 + (y1 - y0) * (3 * q * q - 2 * q * q * q);
-    c.fillStyle = i % 2 ? vio : teal; c.beginPath(); c.arc(px, py, r, 0, 7); c.fill();
+  for(var i = 0; i < n; i++){
+    var f = n === 1 ? .5 : .12 + .76 * i / (n - 1), x0 = tall ? w * f : w * .16, y0 = tall ? h * .16 : h * f, r = 3 + 5 * Math.sqrt(PK[i] / max);
+    var ax = tall ? x0 : w * .5, ay = tall ? h * .5 : y0, bx = tall ? x1 : w * .5, by = tall ? h * .5 : y1;
+    c.strokeStyle = bar; c.lineWidth = 1; c.beginPath(); c.moveTo(x0, y0); c.bezierCurveTo(ax, ay, bx, by, x1, y1); c.stroke();
+    var q = (t * .45 + i * .37) % 1;
+    c.fillStyle = i % 2 ? vio : teal; c.beginPath(); c.arc(bz(x0, ax, bx, x1, q), bz(y0, ay, by, y1, q), r, 0, 7); c.fill();
     c.fillStyle = bar; c.beginPath(); c.arc(x0, y0, 5, 0, 7); c.fill(); }
-  c.fillStyle = dot; c.beginPath(); c.arc(x1, y1, 9, 0, 7); c.fill(); c.strokeStyle = teal; c.lineWidth = 2; c.beginPath(); c.arc(x1, y1, 14, 0, 7); c.stroke();
+  c.fillStyle = dot; c.beginPath(); c.arc(x1, y1, 10, 0, 7); c.fill(); c.strokeStyle = teal; c.lineWidth = 2; c.beginPath(); c.arc(x1, y1, 16, 0, 7); c.stroke();
+  c.fillStyle = teal; c.font = "600 11px " + (T.tok("--wmono") || "monospace"); c.textAlign = "center"; c.textBaseline = "top";
+  if(tall) c.fillText("GATA HUB", x1, Math.min(h - 16, y1 + 24)); else { c.textBaseline = "bottom"; c.fillText("GATA HUB", x1, y1 - 22); }
 });
 window.addEventListener("tools:theme", function(){ stg.redraw(); });
 T.drawGate(E("gatebox"));

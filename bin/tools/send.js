@@ -62,13 +62,19 @@ E("go").addEventListener("click", function(){
 E("again").addEventListener("click", function(){ E("done").hidden = true; E("tool").hidden = false; ROWS = [{ a: "", x: "" }]; E("paste").value = ""; drawRows(); stg.start(); state(); });
 function balances(){ var w = T.wallet(); if(!w) return; window.__TX.balances(w.address).then(function(b){ if(T.wallet() && T.wallet().address === w.address){ BAL = b; state(); } }).catch(function(){}); }
 /* the picture: the wallet on the left, a packet flowing to each recipient, sized by amount */
+function bz(a, b, c2, d, t){ var u = 1 - t; return u * u * u * a + 3 * u * u * t * b + 3 * u * t * t * c2 + t * t * t * d; }
+/* the picture fits its panel (2026-11-03): a tall one flows top to bottom, you above, the recipients below */
 stg = T.stage(E("cv"), function(c, w, h, t){
-  var teal = T.tok("--teal"), vio = T.tok("--violet2"), bar = T.tok("--bar"), dot = T.tok("--dot"), x0 = w * .16, y0 = h / 2, n = PK.length, max = Math.max.apply(null, PK.concat([1]));
-  if(!n){ for(var k = 0; k < 3; k++){ var rr = (t * 40 + k * 30) % 90; c.globalAlpha = 1 - rr / 90; c.strokeStyle = teal; c.beginPath(); c.arc(x0, y0, 8 + rr, 0, 7); c.stroke(); } c.globalAlpha = 1; }
-  for(var i = 0; i < n; i++){ var x1 = w * .84, y1 = n === 1 ? h / 2 : h * (.14 + .72 * i / (n - 1)), r = 3 + 5 * Math.sqrt(PK[i] / max);
-    c.strokeStyle = bar; c.lineWidth = 1; c.beginPath(); c.moveTo(x0, y0); c.bezierCurveTo(w * .5, y0, w * .5, y1, x1, y1); c.stroke();
-    var p = (t * .45 + i * .37) % 1, px = x0 + (x1 - x0) * p, py = y0 + (y1 - y0) * (3 * p * p - 2 * p * p * p);
-    c.fillStyle = i % 2 ? vio : teal; c.beginPath(); c.arc(px, py, r, 0, 7); c.fill();
+  var teal = T.tok("--teal"), vio = T.tok("--violet2"), bar = T.tok("--bar"), dot = T.tok("--dot"), n = PK.length, max = Math.max.apply(null, PK.concat([1]));
+  var tall = h > w * .9, x0 = tall ? w / 2 : w * .16, y0 = tall ? h * .14 : h / 2;
+  if(!n){ var cx = w / 2, cy = h / 2; for(var k = 0; k < 3; k++){ var rr = (t * 40 + k * 30) % 90; c.globalAlpha = 1 - rr / 90; c.strokeStyle = teal; c.beginPath(); c.arc(cx, cy, 8 + rr, 0, 7); c.stroke(); } c.globalAlpha = 1;
+    c.fillStyle = dot; c.beginPath(); c.arc(cx, cy, 7, 0, 7); c.fill(); c.strokeStyle = teal; c.lineWidth = 2; c.beginPath(); c.arc(cx, cy, 11, 0, 7); c.stroke(); return; }
+  for(var i = 0; i < n; i++){
+    var f = n === 1 ? .5 : .12 + .76 * i / (n - 1), x1 = tall ? w * f : w * .84, y1 = tall ? h * .86 : h * f, r = 3 + 5 * Math.sqrt(PK[i] / max);
+    var ax = tall ? x0 : w * .5, ay = tall ? h * .5 : y0, bx = tall ? x1 : w * .5, by = tall ? h * .5 : y1;
+    c.strokeStyle = bar; c.lineWidth = 1; c.beginPath(); c.moveTo(x0, y0); c.bezierCurveTo(ax, ay, bx, by, x1, y1); c.stroke();
+    var p = (t * .45 + i * .37) % 1;
+    c.fillStyle = i % 2 ? vio : teal; c.beginPath(); c.arc(bz(x0, ax, bx, x1, p), bz(y0, ay, by, y1, p), r, 0, 7); c.fill();
     c.fillStyle = bar; c.beginPath(); c.arc(x1, y1, 5, 0, 7); c.fill(); }
   c.fillStyle = dot; c.beginPath(); c.arc(x0, y0, 7, 0, 7); c.fill(); c.strokeStyle = teal; c.lineWidth = 2; c.beginPath(); c.arc(x0, y0, 11, 0, 7); c.stroke();
 });
