@@ -2819,12 +2819,16 @@ rememberGridH();
     var pos = window.__POS, el = E("unpick"); if(!el || !pos) return;
     /* dust a redelegation leaves behind (under 0.1 ATONE) is not a position to unstake from */
     var rows = pos.rows.filter(function(r){ return r.x >= 1e5; }).sort(function(a, b){ return b.x - a.x; });
+    /* the chain allows 7 unstakings at once per validator: one that holds 7 is shown, not offered (operator, 2026-11-03) */
+    var pend = {}; (window.__UNB || []).forEach(function(u){ pend[u.op] = (pend[u.op] || 0) + 1; });
+    var full = function(r){ return (pend[r.op] || pend[r.id] || 0) >= 7; };
+    rows.forEach(function(r){ if(full(r)) delete UNSEL[r.id]; });
     Object.keys(UNSEL).forEach(function(id){ if(!rows.some(function(r){ return r.id === id; })) delete UNSEL[id]; });
-    if(!Object.keys(UNSEL).length && rows.length) UNSEL[rows[0].id] = 1;
+    if(!Object.keys(UNSEL).length){ var f0 = rows.filter(function(r){ return !full(r); })[0]; if(f0) UNSEL[f0.id] = 1; }
     var n = 0; rows.forEach(function(r){ if(UNSEL[r.id]) n++; });
     var head = DOCK && DOCK.pop === unpop ? '<div class=unhead><span>Validator</span><span class=h-st>Status</span><span class=h-x>ATONE</span></div>' : '';
     /* each validator's standing, so stake sitting idle on an inactive or jailed one is plain to see */
-    var status = function(r){ var ia = (window.__INACT || {})[r.id], out = r.inactive || !!ia || !(window.__VDBY || {})[r.id];
+    var status = function(r){ if(full(r)) return '<u class="vst o">7 unstaking</u>'; var ia = (window.__INACT || {})[r.id], out = r.inactive || !!ia || !(window.__VDBY || {})[r.id];
       return out ? (ia && ia.jailed ? '<u class="vst j">Jailed</u>' : '<u class="vst o">Inactive</u>') : '<u class="vst a">Active</u>'; };
     /* the first row selects every validator at once */
     var all = rows.length > 1 ? '<label class="unrow all' + (n === rows.length ? ' on' : '') + '"><input type=checkbox value="*"' + (n === rows.length ? ' checked' : '') + '>' +
@@ -2834,16 +2838,16 @@ rememberGridH();
       proTable(el, rows, [["rank", 36, "c"], ["validator", null, "l"], ["status", 84, "l"], ["ATONE", 96, ""]],
         function(r){ return ['<td class="c rk">' + (rk[r.id] || '-') + '</td>', '<td class="l nm"><div class=nmw>' + logo(r.id, r.m) + '<span>' + att(r.m) + '</span></div></td>',
                              '<td class=l>' + status(r) + '</td>', '<td>' + fmt(r.x) + '</td>']; },
-        UNSEL, function(ids, on){ ids.forEach(function(id){ if(on) UNSEL[id] = 1; else delete UNSEL[id]; }); unRows(); unState(); });
+        UNSEL, function(ids, on){ ids.forEach(function(id){ var r = rows.filter(function(x){ return x.id === id; })[0]; if(on && !(r && full(r))) UNSEL[id] = 1; else delete UNSEL[id]; }); unRows(); unState(); });
       return;
     }
     el.className = "unpick";
     el.innerHTML = head + all + rows.map(function(r){ var on = !!UNSEL[r.id];
-      return '<label class="unrow' + (on ? ' on' : '') + '"><input type=checkbox value="' + att(r.id) + '"' + (on ? ' checked' : '') + '>' +
+      var fu = full(r); return '<label class="unrow' + (on ? ' on' : '') + (fu ? ' off' : '') + '"><input type=checkbox value="' + att(r.id) + '"' + (on ? ' checked' : '') + (fu ? ' disabled' : '') + '>' +
              logo(r.id, r.m) + '<b>' + att(r.m) + '</b>' + status(r) + '<i>' + fmt(r.x) + '<em>ATONE</em></i></label>'; }).join("");
     Array.prototype.forEach.call(el.querySelectorAll("input"), function(c){
       c.addEventListener("change", function(){
-        if(c.value === "*") rows.forEach(function(r){ if(c.checked) UNSEL[r.id] = 1; else delete UNSEL[r.id]; });
+        if(c.value === "*") rows.forEach(function(r){ if(c.checked && !full(r)) UNSEL[r.id] = 1; else delete UNSEL[r.id]; });
         else if(c.checked) UNSEL[c.value] = 1; else delete UNSEL[c.value];
         unRows(); unState(); }); });
   }
@@ -2919,7 +2923,7 @@ rememberGridH();
      the network, with the app's wallet, or the connect choice when none is connected ── */
   (function(){
     var b = E("tlbtn"), m = E("tlmenu"), pop = E("tlpop"), fr = E("tlfr"), g = E("tlgate"); if(!b || !m || !pop) return;
-    var TOOL = null, TIMER = 0, NAMES = { revoke: "Auth Scanner", send: "Fee Saver", gather: "Gather to GATA HUB" };
+    var TOOL = null, TIMER = 0, NAMES = { revoke: "Auth Scanner", send: "Fee Saver", gather: "Gather spread stake" };
     var BASEH = (document.querySelector("base") || { getAttribute: function(){ return "/"; } }).getAttribute("href") || "/";
     var test = /testnet/.test(BASEH);
     function menu(on){ m.hidden = !on; b.setAttribute("aria-expanded", on ? "true" : "false"); if(on){ var f = m.querySelector("button"); if(f) f.focus(); } }
@@ -4321,7 +4325,7 @@ rememberGridH();
   window.__shelfFill = shelfFill;
   /* keeper.py ap_edge(): Autopilot pours down to the last slot, less one for every validator that left the set within
      the unbonding period and holds more than that slot - it would push the last one out on its return (2026-11-03) */
-  function apEdge(s){ if(window.__PLAN_MAX) return 0;   /* an example for no wallet or no stake: the best case, all 100 (operator, 2026-11-03) */
+  function apEdge(s){   /* the example for no wallet or no stake keeps this guard too (operator, 2026-11-03: best case with the return guard) */
     var b = (window.__D && window.__D.returning) || [], e = 0, k;
     for(k = 0; k < b.length; k++) if(e < s.length && b[k] > s[s.length - 1 - e]) e++;
     return e; }

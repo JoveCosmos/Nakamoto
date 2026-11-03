@@ -7191,7 +7191,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
       <div class=tlmenu id=tlmenu role=menu hidden>
         <button type=button role=menuitem data-tool=revoke><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6z"/><circle cx="11.5" cy="11" r="2.6"/><path d="M13.4 12.9l2.1 2.1"/></svg><span><b>Auth Scanner</b><small>who can act for your wallet</small></span></button>
         <button type=button role=menuitem data-tool=send><svg viewBox="0 0 24 24" aria-hidden=true><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/></svg><span><b>Fee Saver</b><small>multi send at chain's price</small></span></button>
-        <button type=button role=menuitem data-tool=gather><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="5" cy="6" r="1.8"/><circle cx="5" cy="18" r="1.8"/><circle cx="19" cy="12" r="2.4"/><path d="M6.6 6.9l9.8 4.2M6.6 17.1l9.8-4.2M7 12h9.6"/></svg><span><b>Gather to GATA HUB</b><small>gather spread stake</small></span></button>
+        <button type=button role=menuitem data-tool=gather><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="5" cy="6" r="1.8"/><circle cx="5" cy="18" r="1.8"/><circle cx="19" cy="12" r="2.4"/><path d="M6.6 6.9l9.8 4.2M6.6 17.1l9.8-4.2M7 12h9.6"/></svg><span><b>Gather spread stake</b><small>all your stake in one place</small></span></button>
       </div></div>
     <div class=netsw id=netsw role=group aria-label=Network><a id=netmain href="./" aria-label=Mainnet><span class=nl>Mainnet</span><span class=ns aria-hidden=true>Main</span></a><a id=nettest href="testnet/" aria-label=Testnet><span class=nl>Testnet</span><span class=ns aria-hidden=true>Test</span></a></div>
     <div class=sv-who>
