@@ -2175,14 +2175,6 @@
     var sm = E("rssum"); if(sm) sm.innerHTML = on ? '<i class="you-tag on">Active</i>' : '<i class=you-tag>Inactive</i>';
     var b = E("rsgo"); if(b){ b.textContent = on ? "Revoke" : "Activate"; b.className = "wk-btn " + (on ? "wk-danger" : "wk-go"); }
     if(window.__rsJail) window.__rsJail(on);
-    /* another service already compounds this wallet: activating cancels its claim-and-stake grants in the same
-       approval, and the card says so BEFORE the wallet lists the revokes (audit 2026-10-13) */
-    var oh = E("rsoth"); if(oh){ oh.hidden = true;
-      if(!on && window.__rsOthers) window.__rsOthers().then(function(gs){
-        if(!gs.length || !E("rspop").classList.contains("on")) return;
-        var t = E("rsothn"); if(t) t.textContent = "Activating also turns off " + (gs.length === 1 ? "another restake service" : gs.length + " other restake services") +
-          " this wallet has authorized (" + gs.map(function(g){ return g.slice(0, 10) + "\u2026"; }).join(", ") + "): one service claims and stakes, not two.";
-        oh.hidden = false; }); }
     if(window.__rsFee) window.__rsFee();
     POP.open(el);
   }

@@ -7643,7 +7643,6 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
     <ul class=bn><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></i><span class=bn-t><b>Compounds your rewards</b><small><b id=rsadd>your rewards</b> more a year</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M5 20V10M10 20V6M15 20v-8M20 20V4"/></svg></i><span class=bn-t><b>Into the best-paying validators</b><small>not back onto the same one</small></span></li><li><i class=bn-ic><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></i><span class=bn-t><b>Claims and stakes, nothing else</b><small>GATA funds your restake, no fees for you</small></span></li></ul>
     <div class=atnote><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Runs every <b>12 hours</b>, minimum 1 ATONE, you can revoke anytime.</span></div>
     <label class="aopt atjail" id=rsjailw><input type=checkbox id=rsjail checked><span>Exclude validators jailed 3x, or 2x in 90 days<i id=rsjaili>Recommended</i></span></label>
-    <div class="atnote rswarn" id=rsoth hidden><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.5"/></svg><span id=rsothn></span></div>
   </div>
   <div class=rsfoot><div class=atfs><div class=txfee id=rsfee></div></div><button class="wk-btn wk-go" id=rsgo type=button>Activate</button></div>
 </div></div>
