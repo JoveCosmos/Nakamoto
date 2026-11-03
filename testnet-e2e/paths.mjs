@@ -138,8 +138,17 @@ const bal = async (a, dn) => +(((await chain("/cosmos/bank/v1beta1/balances/" + 
   // 8 Autopilot on, then off (revoke)
   const grants = async () => ((await chain("/cosmos/authz/v1beta1/grants/granter/" + A)).grants || []).map(g => (g.authorization["@type"] || "").split(".").pop() + ":" + (g.authorization.authorization_type || g.authorization.msg || ""));
   await run("autopilot-on", `E.click('[data-act=youauto]'); await E.wait(function(){ return E.vis('#atgrant'); }, 15000, 'Autopilot card');
-    await E.wait(function(){ var b = document.getElementById('atgrant'); return b && !b.disabled; }, 30000, 'Activate enabled'); E.click('#atgrant')`,
-    async (d, s) => { const g = await grants(); return { grants: g, check: s.msgs[0] === "MsgGrant" && g.some(x => /REDELEGATE/.test(x)) ? "ok" : "FAILED" }; });
+    await E.wait(function(){ var b = document.getElementById('atgrant'); return b && !b.disabled; }, 30000, 'Activate enabled'); E.click('#atgrant');
+    await E.sleep(1500); if(E.vis('#txsign')){ await E.wait(function(){ return !document.getElementById('txsign').disabled; }, 30000, 'Outcome sign'); E.click('#txsign'); }`,
+    async (d, s) => { const g = await grants(); return { grants: g, memo: s.memo, check: s.msgs.includes("MsgGrant") && g.some(x => /REDELEGATE/.test(x)) && !/all validators/i.test(s.memo) ? "ok" : "FAILED" }; });
+  // 8b Autopilot on with the jailed-validators box unticked: the grant's memo carries "all validators" (2026-11-03)
+  await run("autopilot-all-on", `E.click('[data-act=youauto]'); await E.wait(function(){ return E.vis('#atgrant'); }, 15000, 'Autopilot card');
+    var bx = document.getElementById('atjail'); if(!bx || !bx.checked || bx.disabled) throw new Error('box not ticked and enabled');
+    E.click('#atjail'); await E.sleep(300); if(bx.checked) throw new Error('box did not untick');
+    if(!/none excluded/.test(document.getElementById('atjaili').textContent)) throw new Error('hint did not change');
+    await E.wait(function(){ var b = document.getElementById('atgrant'); return b && !b.disabled; }, 30000, 'Activate enabled'); E.click('#atgrant');
+    await E.sleep(1500); if(E.vis('#txsign')){ await E.wait(function(){ return !document.getElementById('txsign').disabled; }, 30000, 'Outcome sign'); E.click('#txsign'); }`,
+    async (d, s) => { const g = await grants(); return { grants: g, memo: s.memo, check: s.msgs.includes("MsgGrant") && g.some(x => /REDELEGATE/.test(x)) && /all validators/i.test(s.memo) ? "ok" : "FAILED" }; });
   await run("autopilot-off", `E.click('[data-act=youauto]'); await E.wait(function(){ return E.vis('#atrevoke') && !document.getElementById('atrevoke').hidden; }, 15000, 'Revoke button');
     E.click('#atrevoke')`,
     async (d, s) => { const g = await grants(); return { grants: g, check: s.msgs[0] === "MsgRevoke" && !g.some(x => /REDELEGATE/.test(x)) ? "ok" : "FAILED" }; });

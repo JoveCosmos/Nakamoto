@@ -193,7 +193,7 @@ def step(L, allg, now=None):
                      "status": "new", "grant": g, "cap0": g.get("cap"), "warned": [], "paused": (e or {}).get("paused", False),
                      "history": ((e or {}).get("history") or [])[-20:] + [{"at": now, "what": "granted"}]}
             if not first:
-                ev.append(("info", "New Autopilot grant: " + short(gr), "Autopilot runs every 12 hours with no approval step: the first move, if one earns 5 APR points more, is made on its next run.", {
+                ev.append(("info", "New Autopilot grant: " + short(gr), "Autopilot runs every 12 hours with no approval step: the first move, if one earns 3 APR points more, is made on its next run.", {
                     "Delegator": gr, "Cap": cap(g), "Validators": str(allow_n(g)) if allow_n(g) else "any, the rule picks",
                     "Restake": "on" if gr in on else "off"}))
             continue

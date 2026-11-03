@@ -4192,7 +4192,7 @@ rememberGridH();
      the largest fifth never take stake. A source may give all the free stake and fall in rank, never below the top of
      the shelf (operator, 2026-10-01); stake on the smallest 34% never moves out; at most MAXMOVES moves (move less rather than cut); nothing while
      any of the wallet's stake is cooling down. Answers null or { now, after, gain, moves, msgs:[{from,to,amt}] }. */
-  var EDGE = 3, GAP = 1e6, STEP = 300e6, MAXMOVES = 60, MIN_LIFT = 0.05;   /* keeper.py EDGE, GAP, STEP, MAX_MOVES_DAY */
+  var EDGE = 3, GAP = 1e6, STEP = 300e6, MAXMOVES = 60, MIN_LIFT = 0.03;   /* keeper.py EDGE, GAP, STEP, MAX_MOVES_DAY */
   /* keeper.py top(n) and bottom(n): the largest fifth never take stake, the smallest 34% never give (20 and 34 of 100) */
   function topN(n){ return Math.floor(n / 5); }
   function bottomN(n){ return Math.floor((n * 34 + 50) / 100); }
@@ -4241,7 +4241,10 @@ rememberGridH();
     var now = pos.rows.reduce(function(s, r){ return s + r.x * (r.inactive ? 0 : r.rate); }, 0) / pos.total;
     /* sources in the keeper's order: the most free stake first */
     /* all the free stake may go: the floor (never below the shelf) is set in the rounds, once the shelf is known */
-    var src = pos.rows.filter(function(r){ return r.x - r.locked > 0 && !bset[r.id]; }).sort(function(a, b){ return (b.x - b.locked) - (a.x - a.locked); }).map(function(r){
+    /* keeper.py: stake on a validator the wallet excludes (box ticked) moves first, from any rank, with no gain test */
+    var jskL = (window.__D && window.__D.jailskip) || [], allV = window.__atAll && window.__atAll(), forced = {};
+    if(!allV) jskL.forEach(function(id){ forced[id] = 1; });
+    var src = pos.rows.filter(function(r){ return r.x - r.locked > 0 && (!bset[r.id] || forced[r.id]); }).sort(function(a, b){ return ((forced[a.id] ? 0 : 1) - (forced[b.id] ? 0 : 1)) || ((b.x - b.locked) - (a.x - a.locked)); }).map(function(r){
       return { id: r.id, give: Math.floor(r.x - r.locked), rate: r.inactive ? 0 : r.rate };
     }).filter(function(x){ return x.give >= 1e6; });
     if(!src.length) return null;
@@ -4267,7 +4270,7 @@ rememberGridH();
       return { out: out, short: Object.keys(short) };
     }
     /* settled in rounds, as the keeper: a destination a full pair would leave short, or one too poor for even the
-       best-placed source, becomes a fixed step; a source the shelf cannot lift by more than 5 points stays put */
+       best-placed source, becomes a fixed step; a source the shelf cannot lift by more than 3 points stays put */
     var fixed = {}, out = [], done = false;
     for(var round = 0, rmax = 4 * n + 4 * src.length + 10; round < rmax && src.length; round++){
       var budget = src.reduce(function(s, x){ return s + x.give; }, 0), gone = {};
@@ -4291,11 +4294,12 @@ rememberGridH();
       var low = src.filter(function(x){ return at[x.id] != null && V[at[x.id]][1] - (sent[x.id] || 0) < shelf + GAP; });
       if(low.length){ low.forEach(function(x){ x.give = Math.max(0, Math.floor(V[at[x.id]][1] - shelf - GAP)); });
         src = src.filter(function(x){ return x.give >= 1e6; }); continue; }
-      var rd = dstRates(out).rd, best = Math.min.apply(null, out.map(function(m){ return rs[m.from]; }));
-      var weak = Object.keys(rd).filter(function(d){ return rd[d] - best <= MIN_LIFT; });
+      var fr = out.filter(function(m){ return !forced[m.from]; }).map(function(m){ return rs[m.from]; });
+      var rd = dstRates(out).rd, best = fr.length ? Math.min.apply(null, fr) : null;
+      var weak = best === null ? [] : Object.keys(rd).filter(function(d){ return rd[d] - best <= MIN_LIFT; });
       if(weak.length){ weak.forEach(function(d){ fixed[d] = 1; }); continue; }
       var floor = Math.min.apply(null, Object.keys(rd).map(function(d){ return rd[d]; }));
-      var high = src.filter(function(x){ return rs[x.id] >= floor - MIN_LIFT; });
+      var high = src.filter(function(x){ return !forced[x.id] && rs[x.id] >= floor - MIN_LIFT; });
       if(high.length){ var top = high.reduce(function(a, b){ return rs[b.id] > rs[a.id] ? b : a; });
         src = src.filter(function(x){ return x !== top; }); continue; }
       done = true; break;
@@ -4313,8 +4317,8 @@ rememberGridH();
       if(moved[r.id]) gainU += r.x * (rd[r.id] - r.rate);
       else if(sentU[r.id]) gainU += (r.x - sentU[r.id]) * (window.__rateAfter(v[1], v[2], -sentU[r.id]) - r.rate); });
     var after = now + gainU / pos.total, gain = gainU / 1e6, movedU = out.reduce(function(s, m){ return s + m.amt; }, 0), lift = gainU / movedU;
-    /* only a move whose true gain is worth more than 5 APR points on the stake that moves (operator, 2026-09-30 / 10-08) */
-    if(gain < 1 || !(lift > MIN_LIFT)) return null;
+    /* only a move whose true gain is worth more than 3 APR points on the stake that moves (operator, 2026-09-30 / 10-08) */
+    if(!out.some(function(m){ return forced[m.from]; }) && (gain < 1 || !(lift > MIN_LIFT))) return null;
     /* the moved stake alone (operator, 2026-10-01): what it earns where it sits and where it lands - the numbers
        "The same N ATONE, from a to b" and the sign card speak of */
     var mnow = out.reduce(function(s, m){ return s + m.amt * rs[m.from]; }, 0) / movedU;

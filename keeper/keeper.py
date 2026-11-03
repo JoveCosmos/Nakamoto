@@ -46,12 +46,12 @@ SECRET = _secret()
 GRANTEE = os.environ.get("KEEPER_GRANTEE", "").strip()
 DRY = os.environ.get("KEEPER_DRY", "1") != "0"
 # the operator's rule, fixed here and not in the env (the env files still carried 0.005 and 6 hours from the old
-# gated keeper, which would have moved stake for half a point): a move every 12 hours, only for more than 5 APR points
+# gated keeper, which would have moved stake for half a point): a move every 12 hours, only for more than 3 APR points (5 until 2026-11-03)
 EVERY = 12 * 3600
 # the 12-hour cycles are pinned to the clock (operator, 2026-09-30): Autopilot and Restake both run at 00:00 and 12:00 UTC.
 # A wallet is due once per slot; a new or changed grant is still planned at once, and retries keep their own waits
 def slot0(t=None): return int((time.time() if t is None else t) // EVERY) * EVERY
-MIN_GAIN_APR = 0.05
+MIN_GAIN_APR = 0.03          # 3 APR points on the stake that moves (operator, 2026-11-03; was 5)
 MIN_GAIN_ATONE = 1.0          # and pay at least this per year
 MAX_MOVES_DAY = 60            # per wallet in any 24 hours (operator, 2026-10-01: a large wallet finishes in one run); the signer's MAX_MOVES_DAY
 MAX_MOVES_TX = 60             # per transaction (operator, 2026-10-01: one transaction, ~20M gas of the block's 100M); the signer's MAX_MOVES
@@ -232,7 +232,8 @@ def grants():
 
 # ── the reader's choice on jailed validators (operator, 2026-11-03): Autopilot leaves out the validators Restake leaves
 # out (jailed three times ever, or twice in 90 days) unless the grant's own transaction says "all validators" in its
-# memo - the box the reader unticked. Read from the chain, once per grant (a re-grant has a new expiry) ──────────────
+# memo - the box the reader unticked. Read from the chain once per tick: an Autopilot grant has no expiry, so a change
+# (Change, Update) leaves nothing else to tell it apart - the cache is cleared at the start of every tick ──────────────
 ALL_VALS = "all validators"
 _MEMO = {}
 def all_vals(granter, exp):
@@ -893,9 +894,13 @@ def plan(g, rows, reds, vals, m, room=None):
     ranked = sorted(vals.values(), key=lambda v: -v["t"]); n = len(ranked)
     if not n: return None
     bset = {v["op"] for v in ranked[max(0, n - bottom(n)):]}
+    # stake on a validator the wallet excludes (jailed 3x ever or 2x in 90 days, box ticked) moves first, from any rank,
+    # and needs no APR gain: the reader asked for it off them (operator, 2026-11-03). Stake already there was put there
+    # by the reader; the exclusion is its own, so nothing else is forced
+    forced = set() if all_vals(g["granter"], g["exp"]) else (restake_skip() - strategy_skip())
     src = []
     # all the free stake may go: the floor (never below the shelf) is set in the rounds below, once the shelf is known
-    for r in sorted((r for r in rows if r["free"] > 0 and r["op"] not in bset), key=lambda r: -r["free"]):
+    for r in sorted((r for r in rows if r["free"] > 0 and (r["op"] not in bset or r["op"] in forced)), key=lambda r: (r["op"] not in forced, -r["free"])):
         if r["free"] >= MIN_MOVE: src.append({"op": r["op"], "give": int(r["free"]), "rate": r["rate"]})
     if not src: return None
     rate_src = {x["op"]: x["rate"] for x in src}
@@ -927,7 +932,7 @@ def plan(g, rows, reds, vals, m, room=None):
     # its share for even the best-placed source, becomes a fixed step; a source that would end below the shelf's top
     # gives less (its floor: 1 ATONE over the shelf); a source the shelf cannot lift by more than MIN_GAIN_APR stays
     # where it is. Each round only adds a step, lowers a give or drops a source, so it ends, and every move left on
-    # its own earns more than 5 APR points (audit 2026-09-30) on a shelf with no hole in it
+    # its own earns more than 3 APR points (audit 2026-09-30) on a shelf with no hole in it
     fixed = set(); moves = []
     for _ in range(4 * n + 4 * len(src) + 10):
         if not src: return None
@@ -955,11 +960,12 @@ def plan(g, rows, reds, vals, m, room=None):
             for x in low: x["give"] = max(0, int(vals[x["op"]]["t"] - shelf - GAP))
             src = [x for x in src if x["give"] >= MIN_MOVE]; continue
         rate_dst = dst_rates(moves)
-        best = min(rate_src[x["src"]] for x in moves)
-        weak = {op for op, r in rate_dst.items() if r - best <= MIN_GAIN_APR}
+        free_ = [rate_src[x["src"]] for x in moves if x["src"] not in forced]
+        best = min(free_) if free_ else None
+        weak = {op for op, r in rate_dst.items() if best is not None and r - best <= MIN_GAIN_APR}
         if weak: fixed |= weak; continue
         floor = min(rate_dst.values())
-        high = [x for x in src if rate_src[x["op"]] >= floor - MIN_GAIN_APR]
+        high = [x for x in src if x["op"] not in forced and rate_src[x["op"]] >= floor - MIN_GAIN_APR]
         if high:
             top = max(high, key=lambda x: rate_src[x["op"]])
             src = [x for x in src if x is not top]; continue
@@ -992,8 +998,8 @@ def plan(g, rows, reds, vals, m, room=None):
     after = now + gain * 1e6 / total
     moved_u = sum(mv["amount"] for mv in moves)
     lift = gain * 1e6 / moved_u
-    # only a move whose true gain is worth more than MIN_GAIN_APR (5 APR points) on the stake that moves: otherwise the wallet is at its best
-    if gain < MIN_GAIN_ATONE or lift <= MIN_GAIN_APR: return None
+    # only a move whose true gain is worth more than MIN_GAIN_APR (3 APR points) on the stake that moves: otherwise the wallet is at its best
+    if not any(mv["src"] in forced for mv in moves) and (gain < MIN_GAIN_ATONE or lift <= MIN_GAIN_APR): return None
     return {"moves": moves, "now": now, "after": after, "total": total, "gain": gain, "lift": lift}
 
 # ── execution ──────────────────────────────────────────────────────────────
@@ -1392,6 +1398,7 @@ def once(c, only=None, live=None, force=False):
     # no silent fallback to the collector's stakes: a tick without the live set does nothing
     vals = live_vals(vals)
     global RETURNING
+    _MEMO.clear()
     try: RETURNING = returning()
     except Exception as e: RETURNING = [10**18] * EDGE; log("returning validators unreadable, last %d slots left out: %s" % (EDGE, e))
     # first come, first served (operator, 2026-09-29): grants are planned in the order they were made, and each

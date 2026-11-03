@@ -2289,7 +2289,7 @@
     if(big && window.__planRank && window.__VDBY && window.__VDBY[big[3]]){
       lo = rate(big[3]);
       var sp = window.__planRank({ rows: [{ id: big[3], op: window.__VDBY[big[3]].op, x: 1e10, rate: lo, locked: 0, inactive: false }], total: 1e10, locked: 0 });
-      /* no move clears 5 points (testnet today): the figure is still where the rule puts stake, the first validator
+      /* no move clears 3 points (testnet today): the figure is still where the rule puts stake, the first validator
          it fills (rank n-3), so the stage never stands empty */
       hi = sp ? sp.after : 0;
       if(!hi && V.length > 3){ var fv = V.slice().sort(function(x, y){ return y[1] - x[1]; })[V.length - 4]; hi = rate(fv[3], 1e10); }
@@ -2379,12 +2379,12 @@
           '<div class=mv-days><div class=mv-dh><span>Cooling down</span><span>' + day(t0) + ' to ' + day(t1) + '</span></div><div class=mv-dc>' + cells + '</div>' +
           '<small>The chain holds redelegated stake for 21 days.</small></div>' + nowOn() +
           (auto ? '<div class=mv-cyc><div class=done><em>' + (hist ? day(hist.at * 1000) : 'Done') + '</em><b>Moved</b></div><div class=warn><em>Until ' + day(t1) + '</em><b>Cooling down</b></div>' +
-                  '<div><em>Every 12 hours</em><b>Checked again</b></div><div><em>5 points more</em><b>Moved for you</b></div></div>'
+                  '<div><em>Every 12 hours</em><b>Checked again</b></div><div><em>3 points more</em><b>Moved for you</b></div></div>'
                 : '') +   /* no "free again on ... Autopilot moves it" note (operator, 2026-10-17: redundant); the set below takes the room */
           mvSet({}, mineIds());
       } else {
         h = top('Your stake today', 'At its best', 'ok', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
-          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b>' + line('No move earns 5 APR points more today.' + (auto ? '<span class=mv-wide> Autopilot checks again every 12 hours.</span>' : '')) +
+          '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b>' + line('No move earns 3 APR points more today.' + (auto ? '<span class=mv-wide> Autopilot checks again every 12 hours.</span>' : '')) +
           /* the same lock note as the offer's, in the same place (operator, 2026-10-01) */
           (pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is under redelegate lock until ' + day(pos.until) + '</div>' : '') + '</div>' +
           nowOn() + mvSet({}, mineIds());
