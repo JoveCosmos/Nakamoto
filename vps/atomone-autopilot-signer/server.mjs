@@ -40,7 +40,8 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
-import { SigningStargateClient, GasPrice, QueryClient, calculateFee, setupAuthzExtension, setupDistributionExtension, setupStakingExtension } from "@cosmjs/stargate";
+import { SigningStargateClient, GasPrice, QueryClient, calculateFee, setupAuthzExtension, setupDistributionExtension, setupSlashingExtension, setupStakingExtension } from "@cosmjs/stargate";
+import { fromBech32, toHex } from "@cosmjs/encoding";
 import { MsgBeginRedelegate, MsgDelegate } from "cosmjs-types/cosmos/staking/v1beta1/tx";
 import { MsgWithdrawDelegatorReward } from "cosmjs-types/cosmos/distribution/v1beta1/tx";
 import { MsgExec } from "cosmjs-types/cosmos/authz/v1beta1/tx";
@@ -102,7 +103,7 @@ async function getClient() {
       const client = await connectFirst(RPCS, rpc => SigningStargateClient.connectWithSigner(rpc, guarded(wallet), { gasPrice: GasPrice.fromString(GAS) }));
       const id = await client.getChainId();
       if (id !== CHAIN_ID) throw new Error("wrong chain " + id);
-      const query = QueryClient.withExtensions(client.forceGetCometClient(), setupAuthzExtension, setupDistributionExtension, setupStakingExtension);
+      const query = QueryClient.withExtensions(client.forceGetCometClient(), setupAuthzExtension, setupDistributionExtension, setupSlashingExtension, setupStakingExtension);
       return { client, sender: account.address, query };
     })().catch(e => { clientPromise = null; throw e; });
   }
@@ -268,6 +269,11 @@ function guarded(wallet) {
 }
 // ---- end policy ----
 
+// a validator's consensus address as hex: sha256 of its ed25519 key, first 20 bytes (the Any holds PubKey{key})
+function consHex(v) {
+  const val = v.consensusPubkey?.value; if (!val || val[0] !== 0x0a) return "";
+  return crypto.createHash("sha256").update(Buffer.from(val.slice(2, 2 + val[1]))).digest("hex").slice(0, 40);
+}
 // the bonded set from this signer's own RPC, read at most once a minute (and again after every tx it signs)
 const SET_TTL_MS = 60_000;
 let setCache = { at: 0, ranked: null };
@@ -290,7 +296,17 @@ async function bondedSet(query) {
       un.push(...(r.validators || [])); k2 = r.pagination?.nextKey;
       if (++p2 > 50) throw new Error("unbonding set: too many pages");
     } while (k2 && k2.length);
-    back = un.map(v => BigInt(v.tokens)).sort((a, b) => (a > b ? -1 : a < b ? 1 : 0));
+    // a tombstoned validator never returns (operator, 2026-11-03); signing infos unreadable = all count (the safe side)
+    let tomb = new Set();
+    try {
+      let k3, p3 = 0;
+      do {
+        const r = await query.slashing.signingInfos(k3);
+        for (const i of r.info || []) if (i.tombstoned) tomb.add(toHex(fromBech32(i.address).data));
+        k3 = r.pagination?.nextKey; if (++p3 > 50) throw new Error("signing infos: too many pages");
+      } while (k3 && k3.length);
+    } catch (e) { tomb = new Set(); console.error("signing infos unreadable, tombstoned counted as returning:", e.message); }
+    back = un.filter(v => !tomb.has(consHex(v))).map(v => BigInt(v.tokens)).sort((a, b) => (a > b ? -1 : a < b ? 1 : 0));
   } catch (e) { console.error("unbonding set unreadable, last " + EDGE + " slots refused:", e.message); }
   ranked.back = back;
   setCache = { at: Date.now(), ranked };

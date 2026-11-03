@@ -21,7 +21,7 @@ Report per granter: /srv/atomone-app/web/keeper/<granter>.json (the page shows i
 Testnet: the same code under atomone-app-keeper-testnet with KEEPER_DATA/STATE/REPORTS/ADMIN
 and ATOMONE_API pointed at testnet. Mainnet reads the box's own node (127.0.0.1:3999) unless ATOMONE_API says otherwise.
 """
-import calendar, hashlib, json, os, re, sqlite3, sys, time, urllib.request, urllib.error, urllib.parse
+import base64, calendar, hashlib, json, os, re, sqlite3, sys, time, urllib.request, urllib.error, urllib.parse
 
 # Discord, through the app's one sender (bin/notify.py; the webhook comes from the unit's alerts env)
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "bin"))
@@ -775,12 +775,35 @@ EDGE = 3            # the last 3 are left out (operator, 2026-09-30)
 # tick already counts. A tombstoned validator never returns but is counted for its 21 days anyway (the safe side)
 AP_EDGE = 0
 RETURNING = []      # stakes (uatone) of the validators that can come back, refreshed by once()
+_B32 = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
+def _b32bytes(addr):
+    """the 20 bytes behind a bech32 address (consensus addresses in signing infos)"""
+    acc, bits, out = 0, 0, []
+    for ch in addr[addr.rindex("1") + 1:-6]:
+        acc = (acc << 5) | _B32.index(ch); bits += 5
+        if bits >= 8: bits -= 8; out.append((acc >> bits) & 0xff)
+    return bytes(out)
+def _tombstoned():
+    """consensus addresses (raw 20 bytes) the chain has tombstoned: they never return (operator, 2026-11-03)"""
+    out, key = set(), None
+    while True:
+        d = get("/cosmos/slashing/v1beta1/signing_infos?pagination.limit=500" + ("&pagination.key=%s" % urllib.parse.quote(key, safe="") if key else ""))
+        out |= {_b32bytes(e["address"]) for e in d.get("info", []) if e.get("tombstoned")}
+        key = d.get("pagination", {}).get("next_key")
+        if not key: return out
 def returning():
+    """the stakes of the validators that can come back: left the set within the unbonding period, not tombstoned. If the
+    tombstone list cannot be read, every such validator counts (the safe side)"""
+    try: tomb = _tombstoned()
+    except Exception as e: tomb = set(); log("signing infos unreadable, tombstoned validators counted as returning: %s" % e)
     out, key = [], None
     while True:
         d = get("/cosmos/staking/v1beta1/validators?status=BOND_STATUS_UNBONDING&pagination.limit=200"
                 + ("&pagination.key=%s" % urllib.parse.quote(key, safe="") if key else ""))
-        out += [int(v["tokens"]) for v in d.get("validators", [])]
+        for v in d.get("validators", []):
+            try: cons = hashlib.sha256(base64.b64decode(v["consensus_pubkey"]["key"])).digest()[:20]
+            except Exception: cons = None
+            if cons not in tomb: out.append(int(v["tokens"]))
         key = d.get("pagination", {}).get("next_key")
         if not key: return sorted(out, reverse=True)
 def ap_edge(s, back=None):
