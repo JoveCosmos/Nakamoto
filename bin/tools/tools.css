@@ -195,3 +195,10 @@ html.embed .hero.plain>div b:not(#z){font-size:16px}
 .lnk.chip:hover:not(:disabled){border-color:var(--teal);color:var(--teal)}
 .lnk.chip:disabled{opacity:.45;cursor:default}
 .lnk.chip+.lnk.chip{margin-left:6px}
+/* Auth Scanner (operator, 2026-11-03): no figures row, no select buttons; headings that read as headings; the live count
+   beside them; the fee centred on the button */
+.hero.gone,#selall,#selnone{display:none!important}
+.sel .lh{display:inline-flex;align-items:center;gap:8px;font-family:var(--wsans);font-size:13px;font-weight:700;letter-spacing:.01em;text-transform:none;color:var(--wt)}
+.sel .lh::before{content:"";width:3px;height:14px;border-radius:2px;background:var(--teal)}
+.sel #selnote{margin-left:12px;font-size:12px;color:var(--wf)}.sel #selnote b{color:var(--red);font-size:14px;margin-right:3px}
+.foot{align-items:center}.foot .fee{display:flex;flex-direction:column;justify-content:center;align-self:center}

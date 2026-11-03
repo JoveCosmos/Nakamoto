@@ -57,7 +57,8 @@ function rows(){
 function hero(){
   var n = G.length, s = G.filter(function(g){ return SEL[g.i]; }).length, u = G.filter(function(g){ return g.who === "unknown"; }).length;
   E("hn").textContent = n; E("hs").textContent = s; E("hu").textContent = u;
-  E("selnote").textContent = s > PAGE ? Math.ceil(s / PAGE) + " signatures (" + PAGE + " each)" : s ? "one signature" : " ";
+  /* the live count where the selection buttons were (operator, 2026-11-03) */
+  E("selnote").innerHTML = '<b>' + s + '</b> selected' + (s > PAGE ? ', ' + Math.ceil(s / PAGE) + ' signatures' : '');
   E("go").disabled = !s || BUSY; E("go").textContent = s ? "Revoke " + s : "Revoke";
   E("selall").disabled = !n || s === n; E("selnone").disabled = !s;
   fee();
