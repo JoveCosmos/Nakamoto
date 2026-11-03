@@ -3765,12 +3765,32 @@ rememberGridH();
     return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/authz/v1beta1/grants?granter=" + who + "&grantee=" + AT.addr + "&pagination.limit=50", { cache: "no-store" })
       .then(function(r){ return r.json(); })
       .then(function(d){ var all = d.grants || [], g = null; all.forEach(function(x){ if(grantType(x) === REDEL) g = x; });
-        return Promise.resolve(g ? grantedAt(who) : null).then(function(since){ return { who: who, grant: g, grants: all, since: since }; }); })
+        return Promise.all([g ? grantedAt(who) : null, grantMemos(who)]).then(function(x){ return { who: who, grant: g, grants: all, since: x[0] }; }); })
       .catch(function(){ return { who: who, grant: null, grants: [] }; });
   }
   /* when the standing grant was made: the chain keeps only its expiry, so the date is the
      latest MsgGrant this wallet signed to the keeper for redelegation (tx search); null if
      the search fails */
+  /* the jailed-validators choice each standing grant was made with: the memo of the latest MsgGrant to our grantee for
+     redelegation (Autopilot) and for delegation (Restake); "all validators" = the box was unticked (2026-11-03) */
+  var RS_ALL = false, RS_ALL_G = false;
+  function grantMemos(who){
+    var q = encodeURIComponent("message.action='/cosmos.authz.v1beta1.MsgGrant' AND message.sender='" + who + "'");
+    return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/tx/v1beta1/txs?query=" + q + "&order_by=ORDER_BY_DESC&pagination.limit=20", { cache: "no-store" })
+      .then(function(r){ return r.json(); })
+      .then(function(d){ var rs = d.tx_responses || [], seenA = false, seenR = false;
+        rs.forEach(function(t){ var b = (t.tx || {}).body || {}, all = /all validators/i.test(b.memo || "");
+          (b.messages || []).forEach(function(m){ var a = m.grant && m.grant.authorization || {};
+            if(m["@type"] !== "/cosmos.authz.v1beta1.MsgGrant" || m.grantee !== AT.addr) return;
+            if(a.authorization_type === "AUTHORIZATION_TYPE_REDELEGATE" && !seenA){ seenA = true; AT_ALL_G = all; }
+            if(a.authorization_type === "AUTHORIZATION_TYPE_DELEGATE" && !seenR){ seenR = true; RS_ALL_G = all; } }); }); })
+      .catch(function(){});
+  }
+  window.__rsJail = function(on){ var b = E("rsjail"), w = E("rsjailw"), t = E("rsjaili"); if(!b) return;
+    if(on) RS_ALL = RS_ALL_G;
+    b.checked = !RS_ALL; b.disabled = !!on; w.classList.toggle("all", RS_ALL); w.classList.toggle("ro", !!on);
+    t.textContent = RS_ALL ? "All validators, none excluded" : "Recommended"; };
+  (function(){ var b = E("rsjail"); if(b) b.addEventListener("change", function(){ RS_ALL = !b.checked; window.__rsJail(false); }); })();
   function grantedAt(who){
     var q = encodeURIComponent("message.action='/cosmos.authz.v1beta1.MsgGrant' AND message.sender='" + who + "'");
     return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/tx/v1beta1/txs?query=" + q + "&order_by=ORDER_BY_DESC&pagination.limit=20", { cache: "no-store" })
@@ -3780,7 +3800,7 @@ rememberGridH();
           var ms = ((rs[i].tx || {}).body || {}).messages || [];
           for(var k = 0; k < ms.length; k++){ var m = ms[k], a = m.grant && m.grant.authorization || {};
             if(m["@type"] === "/cosmos.authz.v1beta1.MsgGrant" && m.grantee === AT.addr && a.authorization_type === "AUTHORIZATION_TYPE_REDELEGATE")
-              { AT_ALL_G = /all validators/i.test(((rs[i].tx || {}).body || {}).memo || ""); return Date.parse(rs[i].timestamp) || null; } } }
+              return Date.parse(rs[i].timestamp) || null; } }
         return null; })
       .catch(function(){ return null; });
   }
@@ -3849,7 +3869,7 @@ rememberGridH();
   window.__atAll = function(){ return AT_ALL; };
   function atJail(ro){ var b = E("atjail"), w = E("atjailw"), t = E("atjaili"); if(!b) return;
     b.checked = !AT_ALL; b.disabled = !!ro; w.classList.toggle("all", AT_ALL); w.classList.toggle("ro", !!ro);
-    t.textContent = AT_ALL ? "All validators, none excluded" : "Recommended, avoids unreliable validators"; }
+    t.textContent = AT_ALL ? "All validators, none excluded" : "Recommended"; }
   (function(){ var b = E("atjail"); if(b) b.addEventListener("change", function(){ AT_ALL = !b.checked; atJail(false); }); })();
   function atMonths(){ return AT.days >= 365 ? "12 months" : AT.days >= 180 ? "6 months" : "3 months"; }
   function atCap(){ var a = E("atcap"), n = window.__amountIn(a.value); return isFinite(n) && n > 0 ? Math.round(n * 1e6) : 0; }
@@ -3977,9 +3997,9 @@ rememberGridH();
         (AT_EDIT ? '<br><span class=g>Changing it:</span> the terms below replace these when you sign.' : '');
     }
     E("atform").hidden = view;
-    E("atrevoke").hidden = !view; E("atedit").hidden = !view;   /* Change: the jailed-validators choice */
-    if(g && !AT_EDIT) AT_ALL = AT_ALL_G;
-    atJail(g && !AT_EDIT);
+    E("atrevoke").hidden = !view; E("atedit").hidden = true;   /* nothing to change: the box is set at activation, revoke to change it */
+    if(g) AT_ALL = AT_ALL_G;
+    atJail(!!g);
     var go = E("atgrant"); go.hidden = view; go.textContent = g ? "Update" : "Activate";
     /* no Cancel or Close: a tap outside, or Escape, closes the card. Back stays - it leaves a
        change of a standing grant without closing */
@@ -4121,7 +4141,7 @@ rememberGridH();
       var on = rsOn(), msgs = rsMsgs(!on);
       if(!msgs.length) throw new Error(on ? "Nothing to disable" : "Stake with a validator first");
       return (on ? Promise.resolve([]) : otherRestake()).then(function(rv){
-        return window.__TX.sendDirect(window.__WALLET, msgs.concat(rv), on ? "" : "GATA AtomOne Restake", function(){}); });
+        return window.__TX.sendDirect(window.__WALLET, msgs.concat(rv), on ? "" : "GATA AtomOne Restake" + (RS_ALL ? ", all validators" : ""), function(){}); });
     })
       .then(function(){ n.ok(); done = true; return atGrant().then(function(r){ if(atKeep(r)){ draw(); if(window.__redraw) window.__redraw(); } }); })
       .catch(function(e){ n.fail(e && e.message || String(e)); })

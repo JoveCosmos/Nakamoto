@@ -156,7 +156,13 @@ const bal = async (a, dn) => +(((await chain("/cosmos/bank/v1beta1/balances/" + 
   // 9 Restake on, then off
   await run("restake-on", `E.click('[data-act=restakesw]'); await E.wait(function(){ return E.vis('#rsgo'); }, 15000, 'Restake card');
     await E.wait(function(){ var b = document.getElementById('rsgo'); return b && !b.disabled; }, 30000, 'Restake enabled'); E.click('#rsgo')`,
-    async (d, s) => { const g = await grants(); return { grants: g, check: g.some(x => /DELEGATE$/.test(x)) && g.some(x => /WithdrawDelegatorReward/.test(x)) ? "ok" : "FAILED" }; });
+    async (d, s) => { const g = await grants(); return { grants: g, memo: s.memo, check: g.some(x => /DELEGATE$/.test(x)) && g.some(x => /WithdrawDelegatorReward/.test(x)) && !/all validators/i.test(s.memo) ? "ok" : "FAILED" }; });
+  // 9b Restake on with the jailed-validators box unticked (2026-11-03)
+  await run("restake-all-on", `E.click('[data-act=restakesw]'); await E.wait(function(){ return E.vis('#rsgo'); }, 15000, 'Restake card');
+    var bx = document.getElementById('rsjail'); if(!bx || !bx.checked || bx.disabled) throw new Error('box not ticked and enabled');
+    E.click('#rsjail'); await E.sleep(300); if(bx.checked) throw new Error('box did not untick');
+    await E.wait(function(){ var b = document.getElementById('rsgo'); return b && !b.disabled; }, 30000, 'Restake enabled'); E.click('#rsgo')`,
+    async (d, s) => { const g = await grants(); return { grants: g, memo: s.memo, check: g.some(x => /DELEGATE$/.test(x)) && /all validators/i.test(s.memo) ? "ok" : "FAILED" }; });
   await run("restake-off", `E.click('[data-act=restakesw]'); await E.sleep(2500);
     var b = E.vis('#rsgo'); if(b){ await E.wait(function(){ return !b.disabled; }, 30000, 'Restake off enabled'); E.click(b); }`,
     async (d, s) => { const g = await grants(); return { grants: g, check: s.msgs.every(m => m === "MsgRevoke") && !g.length ? "ok" : "FAILED" }; });

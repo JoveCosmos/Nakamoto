@@ -236,15 +236,16 @@ def grants():
 # (Change, Update) leaves nothing else to tell it apart - the cache is cleared at the start of every tick ──────────────
 ALL_VALS = "all validators"
 _MEMO = {}
-def all_vals(granter, exp):
-    k = (granter, exp)
+def all_vals(granter, exp, kind="AUTHORIZATION_TYPE_REDELEGATE"):
+    """True when the reader unticked the box: the latest grant of this kind (REDELEGATE Autopilot, DELEGATE Restake)"""
+    k = (granter, exp, kind)
     if k in _MEMO: return _MEMO[k]
     q = ("/cosmos/tx/v1beta1/txs?query=" + urllib.parse.quote("message.sender='%s' AND message.action='/cosmos.authz.v1beta1.MsgGrant'" % granter)
          + "&order_by=ORDER_BY_DESC&limit=5")
     try:
         for t in get(q).get("tx_responses") or []:
             ms = t.get("tx", {}).get("body", {}).get("messages", [])
-            if any((x.get("grant") or {}).get("authorization", {}).get("authorization_type") == "AUTHORIZATION_TYPE_REDELEGATE" for x in ms):
+            if any((x.get("grant") or {}).get("authorization", {}).get("authorization_type") == kind and x.get("grantee") == GRANTEE for x in ms):
                 _MEMO[k] = ALL_VALS in (t["tx"]["body"].get("memo") or "").lower(); return _MEMO[k]
         _MEMO[k] = False
     except Exception as e:
@@ -593,7 +594,7 @@ def plan_restake(c, granter, rg, vals, m):  # noqa: C901
     # past that, fewer rewards are claimed now and the rest at the next run
     allow, deny = set(rg["stake"]["allow"] or []), set(rg["stake"].get("deny") or [])
     ranked = sorted(vals.values(), key=lambda v: -v["t"])
-    skip = restake_skip()
+    skip = strategy_skip() if all_vals(granter, None, "AUTHORIZATION_TYPE_DELEGATE") else restake_skip()   # the Restake box (2026-11-03)
     def ok(v): return (not allow or v["op"] in allow) and v["op"] not in deny and v["op"] not in skip
     def room(amount):
         """(2026-10-09) Autopilot's pours leave the shelf a staircase 1 ATONE a step (20 validators wide that day): rising

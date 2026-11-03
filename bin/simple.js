@@ -2174,6 +2174,7 @@
     var ad = E("rsadd"); if(ad) ad.textContent = add > 0 ? "+" + fmt(pos.total * add) + " ATONE" : "Your rewards";
     var sm = E("rssum"); if(sm) sm.innerHTML = on ? '<i class="you-tag on">Active</i>' : '<i class=you-tag>Inactive</i>';
     var b = E("rsgo"); if(b){ b.textContent = on ? "Revoke" : "Activate"; b.className = "wk-btn " + (on ? "wk-danger" : "wk-go"); }
+    if(window.__rsJail) window.__rsJail(on);
     /* another service already compounds this wallet: activating cancels its claim-and-stake grants in the same
        approval, and the card says so BEFORE the wallet lists the revokes (audit 2026-10-13) */
     var oh = E("rsoth"); if(oh){ oh.hidden = true;

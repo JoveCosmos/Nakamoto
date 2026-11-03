@@ -1041,9 +1041,9 @@
   html[data-theme=light]:not([data-mono]) #atpop .atidle{border-color:var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) #atpop .atidle b{color:var(--ink)}
   html[data-theme=light]:not([data-mono]) #atpop .atidle b.n{color:var(--danger)}
-  html[data-theme=light]:not([data-mono]) #atpop .atjail{border-color:var(--accent-soft);background:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) #atpop .atjail:hover{background:var(--accent-soft)}
-  html[data-theme=light]:not([data-mono]) #atpop .atjail.ro:hover{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .pop .atjail{border-color:var(--accent-soft);background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .pop .atjail:hover{background:var(--accent-soft)}
+  html[data-theme=light]:not([data-mono]) .pop .atjail.ro:hover{background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .ap-first{border-color:var(--accent);background:var(--accent-soft)}
   html[data-theme=light]:not([data-mono]) .ap-first b{color:var(--accent)}
   html[data-theme=light]:not([data-mono]) .sd-ida .sd-wch i.st.rs{color:var(--ink);border-color:var(--surface-2);background:var(--surface-2)}
