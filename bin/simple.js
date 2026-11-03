@@ -912,8 +912,20 @@
     if(days >= 150){
       var every = days > 1100 ? 6 : 3, ticks = [], seen = {};
       pts.forEach(function(p, i){ var m = +p.d.slice(5, 7), key = p.d.slice(0, 7); if(i && (m - 1) % every === 0 && !seen[key]){ seen[key] = 1; ticks.push(i); } });
-      gx = '<div class="sv-gx sv-gxt">' + ticks.map(function(i){ return '<span style="left:' + (i / (n - 1) * 100).toFixed(2) + '%">' + dl(pts[i].d) + '</span>'; }).join("") + '</div>';
-    } else gx = '<div class=sv-gx><span>' + dl(pts[0].d) + '</span><span>' + dl(pts[Math.floor(n / 2)].d) + '</span><span>' + dl(pts[n - 1].d) + '</span></div>';
+      /* never two labels closer than a sixth of the width: they would run into each other (2026-11-03) */
+      var kept = [], lastF = -99; ticks.forEach(function(i){ var f = i / (n - 1) * 100; if(f - lastF >= 22){ kept.push(i); lastF = f; } }); ticks = kept;
+      gx = '<div class="sv-gx sv-gxt">' + ticks.map(function(i){ var f = i / (n - 1) * 100, an = f < 8 ? ' class=gxl' : f > 92 ? ' class=gxr' : '';
+        var sh = dl(pts[i].d).replace(/ (\d\d)(\d\d)$/, " $2");   /* phones: "Oct 24" */
+        return '<span' + an + ' style="left:' + f.toFixed(2) + '%"><b class=gxf>' + dl(pts[i].d) + '</b><b class=gxs>' + sh + '</b></span>'; }).join("") + '</div>';
+    } else {
+      /* (operator, 2026-11-03: the dates overflowed and sat where their dates are not) each month's first reading, labelled
+         with its own date at its own place on the line; a label near an edge is anchored inside */
+      var mt = [], sm = {};
+      var lf = -99; pts.forEach(function(p, i){ var key = p.d.slice(0, 7), f = i / (n - 1) * 100; if(i && !sm[key]){ sm[key] = 1; if(f - lf >= 22){ mt.push(i); lf = f; } } });
+      var dm = function(s){ return new Date(s + "T00:00:00Z").toLocaleDateString("en", { day: "numeric", month: "short", timeZone: "UTC" }); };
+      gx = '<div class="sv-gx sv-gxt">' + mt.map(function(i){ var f = i / (n - 1) * 100, an = f < 8 ? ' class=gxl' : f > 92 ? ' class=gxr' : '';
+        return '<span' + an + ' style="left:' + f.toFixed(2) + '%">' + dm(pts[i].d) + '</span>'; }).join("") + '</div>';
+    }
     /* the latest reading of each line, marked at the right end with its value */
     var ends = lines.map(function(l){ var v = pts[n - 1][l.k], y = (1 - (v - lo) / (hi - lo)) * 100;
       return '<i class="' + l.cls + '" style="top:' + y.toFixed(2) + '%"></i><em class="' + l.cls + '" style="top:' + y.toFixed(2) + '%">' + (fmtV || fmtY)(v) + '</em>'; }).join("");
@@ -968,9 +980,9 @@
     /* the price rides in the title row: the figure in the token's colour, its day in green or red,
        the market cap quiet beside it; then what the token is for (sv-trole) */
     var tp = function(k, p, col){ p = p || {}; var d = p.change_24h, sup = last ? last[k] / 1e6 : null, cap = p.usd != null && sup ? p.usd * sup : null;
-      return '<span class=sv-tp><b style="color:' + col + '">' + usd(p.usd) + '</b>' +
-        (d == null ? '' : '<i class=' + (d >= 0 ? "up" : "dn") + '>' + (d >= 0 ? "+" : "\u2212") + Math.abs(d).toFixed(1) + '% 24h</i>') +
-        (cap ? '<small>market cap <u>$' + (cap >= 1e9 ? (cap / 1e9).toFixed(2) + "B" : (cap / 1e6).toFixed(1) + "M") + '</u></small>' : '') + '</span>'; };
+      /* price and market cap only, one size, two colours (operator, 2026-11-03: no 24h change) */
+      return '<span class="sv-tp sv-tp2"><b style="color:' + col + '">' + usd(p.usd) + '</b>' +
+        (cap ? '<b class=sv-mcap>market cap $' + (cap >= 1e9 ? (cap / 1e9).toFixed(2) + "B" : (cap / 1e6).toFixed(1) + "M") + '</b>' : '') + '</span>'; };
     if(!hist.length){ put("sv-ecoa", '<div class=sv-ph><h3>ATONE supply and stake</h3></div><div class=sv-upwait>Reading the chain…</div>'); put("sv-ecop", '<div class=sv-ph><h3>PHOTON supply</h3></div><div class=sv-upwait>Reading the chain…</div>'); return; }
     /* each supply's bottom line is its change over the last 30 days, exactly: the value on the day 30 days before the
        latest reading, interpolated by date between the two readings around it (the history is daily since 2026-09-26
@@ -2407,7 +2419,7 @@
     var U = window.__UNB || []; if(!U.length) return '';
     var t = 0, e = 0; U.forEach(function(u){ t += u.amt; e = Math.max(e, u.until); });
     var d = window.__dayFull ? window.__dayFull(e) : '';
-    if(inBox) return '<span class=mv-nu><span class=mv-nut><b>' + fmt(t) + ' ATONE</b> unstaking <b>' + d + '</b></span><button type=button class=mv-nc data-act=unbcancel>Cancel<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></span>';
+    if(inBox) return '<span class=mv-nu><span class=mv-nut><b>' + fmt(t) + ' ATONE</b> unstaking <b>' + d + '</b></span></span>';
     return '<span class="mv-sline mv-unb"><span class=mv-tx><b>' + fmt(t) + ' ATONE</b> unstaking <b>' + d + '</b>.</span> <button type=button class=mv-stk data-act=unbcancel>Cancel<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></span>';
   }
   /* the time left to Autopilot's next run, h:mm:ss, in every countdown on the page */

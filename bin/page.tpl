@@ -5762,6 +5762,17 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
   :is(#sv-ecoa,#sv-ecop) .sv-ph>.sv-gkey:not(#z){order:5;flex:1 1 100%;margin:0}
   :is(#sv-ecoa,#sv-ecop) .sv-ph>:not(h3):not(.sv-trole):not(.sv-tmax):not(.sv-tp):not(.sv-gkey){order:9}
 }
+.sv-gxt span b{font-weight:inherit}.sv-gxt span b.gxs{display:none}
+@media(max-width:700px){.sv-gxt span b.gxf{display:none}.sv-gxt span b.gxs{display:inline}}
+.sv-gxt span.gxl{transform:none}.sv-gxt span.gxl::before{left:0}
+.sv-gxt span.gxr{transform:translateX(-100%)}.sv-gxt span.gxr::before{left:auto;right:0}
+.sv-tp.sv-tp2{display:inline-flex;align-items:baseline;gap:10px}
+.sv-tp.sv-tp2 b{font-size:15px;font-weight:600}.sv-tp.sv-tp2 b.sv-mcap{color:var(--wt)}
+@media(max-width:700px){
+  :is(#sv-ecoa,#sv-ecop) .sv-ph .sv-trole:not(#z):not(#y){font-size:8px;height:18px;padding:0 6px;letter-spacing:.06em;white-space:nowrap;max-width:calc(100% - 90px);overflow:hidden;text-overflow:ellipsis}
+  :is(#sv-ecoa,#sv-ecop) .sv-ph:not(#z):not(#y){flex-wrap:wrap}
+  .sv-tp.sv-tp2 b{font-size:13px}
+}
 .pop .atjail{margin:10px 0 12px;padding:9px 12px;border-radius:9px;border:1px solid rgba(91,179,232,.22);background:rgba(91,179,232,.05)}
 .pop .atjail:hover{background:rgba(91,179,232,.09)}
 .pop .atjail span{font-size:12px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -6214,7 +6225,7 @@ html[data-tab=connect] .l2host{display:none}
   #sv-govcards{grid-template-columns:minmax(0,1fr)}
   .sv-gkey{white-space:normal;flex-wrap:wrap;row-gap:4px}
   /* a date axis at quarters is eight labels; the phone shows every other one (half-years) */
-  .sv-gxt span:nth-child(even){display:none}
+  /* (2026-11-03) spacing is decided in simple.js now: no label is hidden by position */
   /* Picks: the column is the screen's width, not the table's; the tables lay out fixed - rank, the
      name taking what is left (cut with an ellipsis), the figures in narrow columns */
   .duotab{grid-template-columns:minmax(0,1fr)}
@@ -7035,9 +7046,11 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 /* (2026-11-03) phones keep only the inline Stake more, not the title-row button */
 @media(max-width:700px){#mv-stage .mv-top>.sv-btn.mv-smore:not(#z):not(#y):not(#x){display:none}}
 /* Now on's title row carries the unstaking summary, one line, Cancel whole */
-.mv-nh{display:flex;align-items:baseline;gap:12px;min-width:0}
-.mv-nh>em{flex:0 0 auto;font-style:normal;font-family:var(--wmono);font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink)}
-.mv-nu{flex:1 1 auto;min-width:0;display:flex;align-items:baseline;justify-content:flex-end;gap:8px;font-size:11px;color:var(--wf);white-space:nowrap}
+/* the same columns as an unstaking row, so the summary stands over the rows' dates (operator, 2026-11-03) */
+.mv-nh{display:grid;grid-template-columns:44px minmax(0,calc(50% - 104px)) 1fr auto 56px;column-gap:8px;align-items:baseline;min-width:0}
+@media(max-width:700px){.mv-nh{grid-template-columns:44px minmax(0,calc(50% - 76px)) 1fr auto 56px}}
+.mv-nh>em{grid-column:1/3;font-style:normal;font-family:var(--wmono);font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
+.mv-nu{grid-column:3/6;justify-self:start;min-width:0;max-width:100%;display:flex;align-items:baseline;gap:8px;font-size:11px;color:var(--wf);white-space:nowrap;overflow:hidden}
 .mv-nu .mv-nut{min-width:0;overflow:hidden;text-overflow:ellipsis}.mv-nu b{color:var(--ink2,var(--ink));font-weight:600}
 .mv-nu .mv-nc{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:none;font:inherit;font-weight:600;color:var(--sv-teal,#2bc8bd);cursor:pointer}
 .mv-nu .mv-nc:hover{text-decoration:underline;text-underline-offset:3px}.mv-nu .mv-nc:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offset:2px}
