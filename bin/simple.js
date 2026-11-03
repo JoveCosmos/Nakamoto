@@ -2319,7 +2319,7 @@
        holds Stake more instead, in every state, whenever the wallet holds ATONE to stake: Autopilot makes the moves,
        staking more is the reader's one action. Wide screens then drop the sentence's own Stake more link (it would say
        it twice); phones keep that link and their boxes' Stake, and do not show the corner button */
-    var ACTIVE = window.__BAL && window.__BAL.uatone > 0 ? '<button class="sv-btn go mv-go mv-tgo mv-more" type=button data-act=stake>Stake more</button>' : '';
+    var ACTIVE = window.__BAL && window.__BAL.uatone > 0 ? '<button class="sv-btn go mv-smore" type=button data-act=stake>Stake more<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>' : '';
     /* the set chart in every state (operator, 2026-09-30): where this wallet's stake sits, lit on the set */
     var mineIds = function(){ var o = {}; (pos && pos.rows || []).forEach(function(r){ if(r.x >= 1e5 && !r.inactive) o[r.id] = 1; }); return o; };
     var nowOn = function(){

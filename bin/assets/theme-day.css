@@ -1230,6 +1230,7 @@
   @media(min-width:1100px){
     html[data-theme=light]:not([data-mono]) #one #p-dele #wk-mv>.wk-ans .p.rate:not(#z):not(#y)::before{background:none}
   }
+  html[data-theme=light]:not([data-mono]) #mv-stage .mv-top>.mv-smore svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) #mv-stage .mv-tdis:hover::after{box-shadow:none}
   html[data-theme=light]:not([data-mono]) #dmy thead th.ck input{background:var(--surface-2);box-shadow:none}
   html[data-theme=light]:not([data-mono]) #dmy thead th.ck input:checked{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}

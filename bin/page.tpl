@@ -6999,7 +6999,12 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 #mv-stage .sv-btn.go.mv-go.mv-tgo:not(#z):not(#y){height:38px;min-width:0;padding:0 18px;font-size:14px;flex:0 0 auto}
 #mv-stage .mv-top .mv-ton:not(#z){font-size:14px;margin-left:10px}
 /* Autopilot on, wide screens: Stake more is in the corner, so the sentence's link would say it twice */
-@media(min-width:701px){#mv-stage:has(.mv-top>.mv-more) .mv-stk{display:none}}
+@media(min-width:701px){#mv-stage:has(.mv-top>.mv-smore) .mv-stk{display:none}}
+/* Stake more in Your move's title row (operator, 2026-11-03): a small button, its arrow after the word, centred on the title */
+#mv-stage .mv-top>.sv-btn.mv-smore:not(#z):not(#y){margin-left:auto;align-self:center;display:inline-flex;align-items:center;gap:6px;width:auto;min-width:0;height:30px;padding:0 12px;font-size:13px;flex:0 0 auto}
+#mv-stage .mv-top:has(>.mv-smore):not(#z){flex-wrap:nowrap}
+#mv-stage .mv-top:has(>.mv-smore)>em:not(#z){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#mv-stage .mv-top>.mv-smore svg{width:13px;height:13px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 #mv-stage .mv-cd{font-family:var(--wmono);font-variant-numeric:tabular-nums;letter-spacing:.02em}
 #mv-stage .mv-set:not(#z):not(#y):not(#x){margin-top:auto}
 #mv-stage .mv-bars i{cursor:pointer}
