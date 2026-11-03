@@ -5728,7 +5728,7 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .tlcard #tlttl{white-space:nowrap}
 .tltag .tlt-s{display:none}
 @media(max-width:375px){#tlpop .tltag:not(#z){font-size:9.5px;padding:2px 6px}#tlpop #tlttl:not(#z){font-size:13px}}
-@media(max-width:700px){.tltag .tlt-l{display:none}.tltag .tlt-s{display:inline}#tlpop .tlcard .wk-txh:not(#z){padding-left:14px;padding-right:14px}.tlcard .wk-txh>div:not(#z){gap:6px}#tlpop #tlttl:not(#z){font-size:14px}.tltag{padding:3px 7px}}
+@media(max-width:700px){.tltag .tlt-l{display:none}.tltag .tlt-s{display:inline}#tlpop .tlcard .wk-txh:not(#z){padding-left:14px;padding-right:14px}.tlcard .wk-txh>div:not(#z){gap:6px}#tlpop #tlttl:not(#z){font-size:13px}.tltag{padding:3px 7px}}
 .tlx{width:32px;height:32px;display:grid;place-items:center;border:1px solid var(--wbd2);border-radius:9px;background:transparent;color:var(--ink);cursor:pointer}
 .tlx svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 #tlpop .card.tlcard:not(#z):not(#y){display:flex;flex-direction:column}
