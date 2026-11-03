@@ -5694,8 +5694,12 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 #mv-stage .mv-hl>span.mv-unb .mv-stk{flex:0 0 auto}
 /* tools: the header button beside day/night, its menu, and the full-screen card */
 .tlw{position:relative;display:inline-flex}
-.thbtn.tlbtn:not(#z){margin-left:6px}
-.thbtn.tlbtn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tlw{margin-left:auto}
+.tlbtn{height:36px;display:inline-flex;align-items:center;gap:7px;padding:0 13px;border-radius:10px;border:1px solid var(--edge2);background:transparent;color:var(--ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.tlbtn:hover{border-color:var(--wcyan)}.tlbtn:focus-visible{outline:2px solid var(--wcyan);outline-offset:2px}
+.tlbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.hdr-r .thbtn:not(#z){margin-left:0}
+@media(max-width:620px){.tlbtn{height:32px;width:32px;padding:0;justify-content:center}.tlbtn span{display:none}}
 .tlmenu{position:absolute;top:calc(100% + 6px);right:0;z-index:60;min-width:240px;display:flex;flex-direction:column;padding:6px;border-radius:12px;border:1px solid var(--edge2);background:var(--bg,#0b0b16);box-shadow:0 12px 32px rgba(0,0,0,.35)}
 .tlmenu[hidden]{display:none}
 .tlmenu:not(#z){left:0;right:auto}
@@ -5718,9 +5722,13 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .pop .card.spcard.tlcard:not(#z){width:min(1180px,96vw);max-width:1180px}
 @media(max-width:700px){.pop .card.spcard.tlcard:not(#z){width:100vw;max-width:100vw;height:100svh;max-height:100svh;border-radius:0}}.tlws{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 /* Now on's unstaking tag, and the 21-day line beside Cooling down (2026-11-03) */
-.mv-r span i.mv-un{font-style:normal;font-weight:400;margin-left:8px;color:var(--wamber)}
-.mv-r span i.mv-un b.mv-unw{font-weight:inherit}
-@media(max-width:700px){.mv-r span i.mv-un{font-size:11px;margin-left:6px}.mv-r span i.mv-un b.mv-unw{display:none}}
+.mv-r.mv-ur{position:relative;grid-template-columns:44px minmax(0,calc(50% - 104px)) 1fr auto 56px}
+.mv-r.mv-ur>span{justify-self:start;max-width:100%;cursor:pointer}
+.mv-r.mv-ur>b{grid-column:4}.mv-r.mv-ur>i{grid-column:5}
+.mv-r.mv-ur>span:hover{text-decoration:underline;text-underline-offset:3px}
+.mv-r.mv-ur>em.mv-un{grid-column:3;justify-self:start;min-width:0;overflow:hidden;text-overflow:ellipsis;font-style:normal;font-size:10.5px;white-space:nowrap;color:var(--wamber)}
+.mv-r.mv-ur>em.mv-un b.mv-unw{font:inherit;color:inherit;letter-spacing:inherit}
+@media(max-width:700px){.mv-r.mv-ur{grid-template-columns:44px minmax(0,calc(50% - 76px)) 1fr auto 56px}.mv-r.mv-ur>em.mv-un{font-size:10px}.mv-r.mv-ur>em.mv-un b.mv-unw{display:none}}
 .mv-r button.mv-uc{font:inherit;font-size:11px;font-weight:600;line-height:1;padding:3px 7px;border:1px solid rgba(255,107,107,.55);border-radius:6px;background:rgba(255,107,107,.08);color:#ff6b6b;cursor:pointer;white-space:nowrap}
 .mv-r button.mv-uc:hover{background:rgba(255,107,107,.18)}.mv-r button.mv-uc:focus-visible{outline:2px solid #ff6b6b;outline-offset:1px}
 .mv-dh{display:flex;gap:10px}.mv-dh>span:first-child{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mv-dh>span:last-child{flex:0 0 auto;white-space:nowrap}
@@ -6007,7 +6015,7 @@ color:#7c7aa3;text-decoration:none;white-space:nowrap;transition:color .15s,back
 .hdr-tick:not([hidden]){display:flex;align-items:center;gap:12px;min-width:0;height:32px}
 /* between the brand and the controls (operator, 2026-10-17: "move the ticker to left, increase its length"): from 48 px
    after the brand's counter line to 40 px before the theme button, at most 1000 px */
-@media(min-width:1180px){.folder>.hdr-tick:not([hidden]){grid-column:1/-1;grid-row:1;justify-self:start;margin-left:222px;width:min(1000px,calc(100% - 631px))}}
+@media(min-width:1180px){.folder>.hdr-tick:not([hidden]){grid-column:1/-1;grid-row:1;justify-self:start;margin-left:222px;width:min(1000px,calc(100% - 730px))}}
 @media(min-width:800px) and (max-width:1179px){.folder:has(>.hdr-tick:not([hidden])){height:auto;padding-bottom:6px}
   .folder>.hdr-tick:not([hidden]){grid-column:1/-1;grid-row:2}}
 @media(max-width:799px){.folder>.hdr-tick:not([hidden]){grid-column:1/-1;grid-row:3;height:28px;margin:2px 0}}
@@ -6046,7 +6054,9 @@ color:#7c7aa3;text-decoration:none;white-space:nowrap;transition:color .15s,back
 .hdr-r .sv-btn.sml{height:32px}
 /* phones under 390px (360, 375): the right group was a fixed 314px and ran into the AtomOne mark; the pill and the
    Connect button narrow to 150px and the gaps to 6px, so the mark keeps its room (2026-10-02) */
-@media(max-width:389px){.folder>.hdr-r{gap:6px}.hdr-r #svconn:not(#z),.hdr-r .wpill:not(#z){width:150px}.hdr-r .wpill .wpcopy svg.cp{display:none}.hdr-r .wpill .wpa{letter-spacing:-.01em}}   /* the address keeps its ends: the copy icon goes (the address itself still copies) */
+/* (2026-11-03) the Tools button joined the row: the same narrowing now applies up to 430px */
+@media(max-width:375px){.folder>.hdr-r:not(#z){gap:4px}.hdr-r .thbtn:not(#z),.tlbtn:not(#z){width:28px;height:28px}}
+@media(max-width:430px){.folder>.hdr-r{gap:6px}.hdr-r #svconn:not(#z),.hdr-r .wpill:not(#z){width:150px}.hdr-r .wpill .wpcopy svg.cp{display:none}.hdr-r .wpill .wpa{letter-spacing:-.01em}}   /* the address keeps its ends: the copy icon goes (the address itself still copies) */
 .l1{display:flex;align-items:center;gap:4px;min-width:0}
 .l1tab{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 13px;border:0;border-radius:6px;
 background:transparent;color:var(--ink2);font:inherit;font-family:var(--sans);font-size:13px;font-weight:400;line-height:1;white-space:nowrap;cursor:pointer;
@@ -7185,15 +7195,15 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
     <a class=brand href="./" data-route="intro" title="AtomOne"><img class=mark src="assets/atomone.svg" alt=""><span class=bw><span class=wordmark>AtomOne</span><span class=bheight id=dlive title="the chain's height, live"><i></i><b>{{HEIGHT}}</b><span class=btag>Nakamoto</span></span></span></a>
     </div>
     <div class=hdr-r>
-    <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
-    <!-- tools (operator, 2026-11-03): next to day/night, a menu, each tool full screen in the app -->
-    <div class=tlw><button class="thbtn tlbtn" id=tlbtn type=button aria-haspopup=menu aria-expanded=false aria-label="Tools" title="Tools"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></button>
+    <!-- tools (operator, 2026-11-03): first in the controls, a text button (operator), a menu, each tool full screen in the app -->
+    <div class=tlw><button class=tlbtn id=tlbtn type=button aria-haspopup=menu aria-expanded=false title="Tools"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg><span>Tools</span></button>
       <div class=tlmenu id=tlmenu role=menu hidden>
         <button type=button role=menuitem data-tool=revoke><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6z"/><circle cx="11.5" cy="11" r="2.6"/><path d="M13.4 12.9l2.1 2.1"/></svg><span><b>Auth Scanner</b><small>who can act for your wallet</small></span></button>
         <button type=button role=menuitem data-tool=send><svg viewBox="0 0 24 24" aria-hidden=true><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/></svg><span><b>Fee Saver</b><small>multi send at chain's price</small></span></button>
         <button type=button role=menuitem data-tool=gather><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="5" cy="6" r="1.8"/><circle cx="5" cy="18" r="1.8"/><circle cx="19" cy="12" r="2.4"/><path d="M6.6 6.9l9.8 4.2M6.6 17.1l9.8-4.2M7 12h9.6"/></svg><span><b>Gather spread stake</b><small>all your stake in one place</small></span></button>
       </div></div>
     <div class=netsw id=netsw role=group aria-label=Network><a id=netmain href="./" aria-label=Mainnet><span class=nl>Mainnet</span><span class=ns aria-hidden=true>Main</span></a><a id=nettest href="testnet/" aria-label=Testnet><span class=nl>Testnet</span><span class=ns aria-hidden=true>Test</span></a></div>
+    <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>
     <div class=sv-who>
       <button class="sv-btn sml pri" id=svconn type=button aria-haspopup=true aria-expanded=false>Connect wallet</button>
       <div class=wpill id=svacct hidden>

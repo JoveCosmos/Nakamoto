@@ -65,7 +65,7 @@ html[data-theme=light] .ibtn .moon{display:none} html:not([data-theme=light]) .i
 .hero em{display:block;margin-top:8px;font-style:normal;font-family:var(--wmono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--wf);white-space:nowrap;overflow:hidden}
 .hero.idle b{color:var(--wf);opacity:.55}
 /* the stage: a canvas with the live picture */
-.stage{position:relative;height:190px;border:1px solid var(--wbd);border-radius:14px;overflow:hidden;background:linear-gradient(180deg,var(--wi),var(--wc))}
+.stage{position:relative;height:250px;border:1px solid var(--wbd);border-radius:14px;overflow:hidden;background:linear-gradient(180deg,var(--wi),var(--wc))}
 .stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .stage .tag{position:absolute;left:12px;top:10px;font-family:var(--wmono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
 /* rows (grants, recipients) */
@@ -128,7 +128,7 @@ textarea.paste{width:100%;min-height:92px;padding:10px 12px;border:1px solid var
   .card{padding:14px 14px 16px;border-radius:12px}
   .card h1{font-size:19px}
   .hero{gap:8px} .hero>div{padding:10px 10px 9px} .hero b{font-size:26px;min-height:26px} .hero em{font-size:8px;letter-spacing:.12em;margin-top:6px}
-  .stage{height:150px}
+  .stage{height:220px}
   .row{grid-template-columns:22px minmax(0,1fr) auto;gap:8px;padding:8px 10px} .row .what{font-size:10px}
   .srow{grid-template-columns:minmax(0,1fr) 92px 34px;gap:6px} .srow input{height:40px;padding:0 9px;font-size:12px}
   .tiles{grid-template-columns:minmax(0,1fr)} .tile{min-height:0}
@@ -148,3 +148,8 @@ textarea.paste{width:100%;min-height:92px;padding:10px 12px;border:1px solid var
 html.embed .bar{display:none}
 html.embed body{background:transparent}
 html.embed .wrap{padding-top:8px}
+
+/* the scanner's legend (2026-11-03) */
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px;font-family:var(--wmono);font-size:10px;letter-spacing:.06em;color:var(--wf)}
+.legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.legend i{width:9px;height:9px;border-radius:3px;border:1.5px solid}
+.legend .lt{border-color:var(--teal)}.legend .lv{border-color:var(--violet)}.legend .la{border-color:var(--amber)}.legend .lr{border-color:var(--red);background:var(--red)}

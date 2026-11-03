@@ -85,24 +85,62 @@ E("go").addEventListener("click", function(){
 E("again").addEventListener("click", function(){ E("done").hidden = true; E("tool").hidden = false; stg.start(); scan(T.wallet()); });
 /* the picture: the wallet in the centre, each grantee a node on a ring, ticked ones in red, revoked ones fading out */
 function draw(){}
+/* (operator, 2026-11-03: clearer) a radar sweep while the grants are read; then each grant is a labelled pill on a ring
+   around "You", coloured by who holds it, its line carrying a pulse outward (the permission leaving the wallet); a
+   ticked one turns red with a cut mark on its line; a revoked one snaps and falls away; none at all is a calm shield */
 stg = T.stage(E("cv"), function(c, w, h, t){
-  var teal = T.tok("--teal"), red = T.tok("--red"), vio = T.tok("--violet"), bar = T.tok("--bar"), dot = T.tok("--dot"), cx = w / 2, cy = h / 2, now = performance.now();
-  c.strokeStyle = bar; c.lineWidth = 1; c.beginPath(); c.arc(cx, cy, Math.min(w, h) * .36, 0, 7); c.stroke();
-  if(!LIVE.length){ for(var k = 0; k < 3; k++){ var rr = (t * 40 + k * 30) % 90; c.globalAlpha = 1 - rr / 90; c.beginPath(); c.arc(cx, cy, 8 + rr, 0, 7); c.strokeStyle = teal; c.stroke(); } c.globalAlpha = 1; }
-  var n = LIVE.length, R0 = Math.min(w, h) * (w > 460 ? .36 : .3);
-  LIVE.forEach(function(x, i){ var age = (now - x.born) / 600; if(age < 0) return; var ease = Math.min(1, age), e2 = 1 - Math.pow(1 - ease, 3);
-    var ang = -Math.PI / 2 + i * Math.PI * 2 / Math.max(1, n) + Math.sin(t * .6 + i) * .03, r = R0 * e2, gone = x.gone ? Math.min(1, (now - x.gone) / 500) : 0;
-    var px = cx + Math.cos(ang) * (r + gone * 60), py = cy + Math.sin(ang) * (r + gone * 60), on = SEL[x.g.i];
-    c.globalAlpha = (1 - gone) * e2; c.strokeStyle = on ? red : x.g.who === "ours" || x.g.who === "governor" ? teal : vio; c.lineWidth = on ? 1.6 : 1; c.beginPath(); c.moveTo(cx, cy); c.lineTo(px, py); c.stroke();
-    c.fillStyle = on ? red : x.g.who === "unknown" ? T.tok("--amber") : x.g.who === "ours" || x.g.who === "governor" ? teal : vio; c.beginPath(); c.arc(px, py, on ? 6 : 4.5, 0, 7); c.fill();
-    if(on){ c.globalAlpha *= .35 + .3 * Math.sin(t * 4 + i); c.beginPath(); c.arc(px, py, 11, 0, 7); c.strokeStyle = red; c.stroke(); }
-    /* the label, kept inside the picture: the name and kind where there is room, the kind alone on a phone */
-    if(n <= 12){ var lab = w > 460 ? (x.g.name.length > 18 ? x.g.name.slice(0, 17) + "\u2026" : x.g.name) + " " + x.g.kind : x.g.kind;
-      c.globalAlpha = (1 - gone) * e2; c.fillStyle = T.tok("--wf"); c.font = "10px " + T.tok("--wmono"); c.textAlign = "center"; c.textBaseline = "middle";
-      var tw = c.measureText(lab).width, lx = px + Math.cos(ang) * (14 + tw / 2), ly = py + Math.sin(ang) * 16;
-      lx = Math.max(tw / 2 + 4, Math.min(w - tw / 2 - 4, lx)); ly = Math.max(28, Math.min(h - 8, ly)); c.fillText(lab, lx, ly); }
-    c.globalAlpha = 1; });
-  c.fillStyle = dot; c.beginPath(); c.arc(cx, cy, 7, 0, 7); c.fill(); c.strokeStyle = teal; c.lineWidth = 2; c.beginPath(); c.arc(cx, cy, 11, 0, 7); c.stroke();
+  var teal = T.tok("--teal"), red = T.tok("--red"), vio = T.tok("--violet"), amb = T.tok("--amber"), bar = T.tok("--bar"), dot = T.tok("--dot"), ink = T.tok("--wt") || dot;
+  var mono = T.tok("--wmono") || "monospace", cx = w / 2, cy = h / 2, now = performance.now(), phone = w < 460;
+  var RX = w * .36, RY = h * .34, R0 = Math.min(RX, RY), scanning = E("stgtag").textContent === "scanning";
+  var col = function(x){ return SEL[x.g.i] ? red : x.g.who === "unknown" ? amb : x.g.who === "ours" || x.g.who === "governor" ? teal : vio; };
+  /* the ring */
+  c.strokeStyle = bar; c.lineWidth = 1; c.setLineDash([2, 5]); c.beginPath(); c.ellipse(cx, cy, RX, RY, 0, 0, 7); c.stroke(); c.setLineDash([]);
+  if(scanning){
+    var a = (t * 1.8) % (Math.PI * 2);
+    for(var k = 0; k < 24; k++){ var a0 = a - k * .045; c.globalAlpha = (1 - k / 24) * .5; c.strokeStyle = teal; c.lineWidth = 2;
+      c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + Math.cos(a0) * RX, cy + Math.sin(a0) * RY); c.stroke(); }
+    c.globalAlpha = 1;
+  } else if(!LIVE.length){
+    /* nothing granted: a shield with a tick */
+    var S = Math.min(w, h) * .16; c.strokeStyle = teal; c.lineWidth = 2.4; c.lineJoin = "round";
+    c.beginPath(); c.moveTo(cx, cy - S); c.lineTo(cx + S * .8, cy - S * .62); c.lineTo(cx + S * .8, cy + S * .05);
+    c.quadraticCurveTo(cx + S * .7, cy + S * .75, cx, cy + S); c.quadraticCurveTo(cx - S * .7, cy + S * .75, cx - S * .8, cy + S * .05);
+    c.lineTo(cx - S * .8, cy - S * .62); c.closePath(); c.stroke();
+    c.beginPath(); c.moveTo(cx - S * .32, cy); c.lineTo(cx - S * .06, cy + S * .28); c.lineTo(cx + S * .38, cy - S * .22); c.stroke();
+    c.fillStyle = T.tok("--wf"); c.font = "11px " + mono; c.textAlign = "center"; c.textBaseline = "top";
+    c.fillText("nobody can act for your wallet", cx, Math.min(h - 16, cy + S + 14)); return;
+  }
+  var n = LIVE.length;
+  LIVE.forEach(function(x, i){
+    var age = (now - x.born) / 600; if(age < 0) return; var e2 = 1 - Math.pow(1 - Math.min(1, age), 3);
+    /* spread from the top, a little off the vertical so no pill sits straight over You at the sides */
+    var gone = x.gone ? Math.min(1, (now - x.gone) / 700) : 0, ang = -Math.PI / 2 + (i + .5) * Math.PI * 2 / Math.max(1, n);
+    var px = cx + Math.cos(ang) * (RX * e2 + gone * 40), py = cy + Math.sin(ang) * (RY * e2 + gone * 40) + gone * gone * 30, on = SEL[x.g.i], cc = col(x);
+    c.globalAlpha = (1 - gone) * e2;
+    /* the line: whole, or snapped in two once revoked */
+    c.strokeStyle = cc; c.lineWidth = on ? 2 : 1.3; if(on) c.setLineDash([6, 4]);
+    var mx = cx + (px - cx) * .5, my = cy + (py - cy) * .5, gap = gone * 14;
+    c.beginPath(); c.moveTo(cx + Math.cos(ang) * 14, cy + Math.sin(ang) * 14); c.lineTo(mx - Math.cos(ang) * gap, my - Math.sin(ang) * gap); c.stroke();
+    c.beginPath(); c.moveTo(mx + Math.cos(ang) * gap, my + Math.sin(ang) * gap); c.lineTo(px, py); c.stroke(); c.setLineDash([]);
+    /* the pulse travelling out */
+    if(!gone){ var f = ((t * .55 + i * .37) % 1), qx = cx + (px - cx) * f, qy = cy + (py - cy) * f; c.fillStyle = cc; c.globalAlpha = e2 * (1 - f) * .9;
+      c.beginPath(); c.arc(qx, qy, on ? 3 : 2.4, 0, 7); c.fill(); c.globalAlpha = (1 - gone) * e2; }
+    /* the cut mark on a ticked line */
+    if(on && !gone){ var s2 = 6; c.strokeStyle = red; c.lineWidth = 2.2; c.lineCap = "round";
+      c.beginPath(); c.moveTo(mx - s2, my - s2); c.lineTo(mx + s2, my + s2); c.moveTo(mx + s2, my - s2); c.lineTo(mx - s2, my + s2); c.stroke(); c.lineCap = "butt"; }
+    /* the pill: name (phones: the kind alone), kept inside the picture */
+    var lab = phone ? x.g.kind : (x.g.name.length > 20 ? x.g.name.slice(0, 19) + "…" : x.g.name), sub = phone ? "" : x.g.kind;
+    c.font = "600 11px " + mono; var tw = Math.max(c.measureText(lab).width, sub ? (c.font = "10px " + mono, c.measureText(sub).width) : 0);
+    var pw = tw + 18, ph = sub ? 34 : 22, bx = Math.max(4, Math.min(w - pw - 4, px - pw / 2)), by = Math.max(4, Math.min(h - ph - 4, py - ph / 2));
+    c.fillStyle = T.tok("--wc") || "#fff"; c.strokeStyle = cc; c.lineWidth = on ? 2 : 1.2;
+    c.beginPath(); if(c.roundRect) c.roundRect(bx, by, pw, ph, 8); else c.rect(bx, by, pw, ph); c.fill(); c.stroke();
+    c.fillStyle = on ? red : ink; c.font = "600 11px " + mono; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(lab, bx + pw / 2, by + (sub ? 12 : ph / 2));
+    if(sub){ c.fillStyle = cc; c.font = "10px " + mono; c.fillText(sub, bx + pw / 2, by + 24); }
+    c.globalAlpha = 1;
+  });
+  /* You, in the middle */
+  c.fillStyle = teal; c.beginPath(); c.arc(cx, cy, 13, 0, 7); c.fill();
+  c.fillStyle = T.tok("--teal-ink"); c.font = "700 9px " + mono; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("YOU", cx, cy + .5);
 });
 window.addEventListener("tools:theme", function(){ stg.redraw(); });
 T.drawGate(E("gatebox"));

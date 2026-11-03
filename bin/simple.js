@@ -2212,7 +2212,10 @@
     var CH = '<svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 9l6 6 6-6"/></svg>';
     return '<div class="mv-rows' + (open ? ' open' : '') + '" data-k="' + key + '">' + list.map(function(r, i){
       /* a row opens its validator's card, whichever list it is in (operator, 2026-10-16) */
-      return '<div class="mv-r' + (i >= lim ? ' mv-x' : '') + '"' + (r.id ? ' data-v="' + esc(r.id) + '" role=button tabindex=0' : '') + '><u class=' + (r.c || cls) + '>' + r.rank + '</u><span title="' + esc(r.name) + '">' + esc(r.name) + (r.sub ? '<i class=mv-un>' + r.sub + '</i>' : '') + '</span><b>' + r.amt + '</b><i class=' + (r.c || cls) + '>' + r.apr + '</i></div>';
+      /* an unstaking row (operator, 2026-11-03): only its name opens the validator; its date sits small, at one place in
+         every row, the name giving way before it */
+      if(r.sub) return '<div class="mv-r mv-ur' + (i >= lim ? ' mv-x' : '') + '"><u class=' + (r.c || cls) + '>' + r.rank + '</u><span title="' + esc(r.name) + '"' + (r.id ? ' data-v="' + esc(r.id) + '" role=button tabindex=0' : '') + '>' + esc(r.name) + '</span><em class=mv-un>' + r.sub + '</em><b>' + r.amt + '</b><i class=' + (r.c || cls) + '>' + r.apr + '</i></div>';
+      return '<div class="mv-r' + (i >= lim ? ' mv-x' : '') + '"' + (r.id ? ' data-v="' + esc(r.id) + '" role=button tabindex=0' : '') + '><u class=' + (r.c || cls) + '>' + r.rank + '</u><span title="' + esc(r.name) + '">' + esc(r.name) + '</span><b>' + r.amt + '</b><i class=' + (r.c || cls) + '>' + r.apr + '</i></div>';
     }).join("") + '</div>' +
       (rest > 0 ? '<button type=button class=mv-more data-act=mvmore data-k="' + key + '" data-closed="' + esc('and ' + rest + ' more ' + more) + '" aria-expanded=' + open + '><span>' + (open ? 'Show fewer' : 'and ' + rest + ' more ' + more) + '</span>' + CH + '</button>' : '');
   }
@@ -2402,7 +2405,7 @@
     var U = window.__UNB || []; if(!U.length) return '';
     var t = 0, e = 0; U.forEach(function(u){ t += u.amt; e = Math.max(e, u.until); });
     var d = window.__dayFull ? window.__dayFull(e) : '';
-    return '<span class="mv-sline mv-unb"><span class=mv-tx>' + fmt(t) + ' ATONE unstaking ' + d + '.</span> <button type=button class=mv-stk data-act=unbcancel>Cancel<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></span>';
+    return '<span class="mv-sline mv-unb"><span class=mv-tx><b>' + fmt(t) + ' ATONE</b> unstaking <b>' + d + '</b>.</span> <button type=button class=mv-stk data-act=unbcancel>Cancel<svg viewBox="0 0 24 24" aria-hidden=true><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></span>';
   }
   /* the time left to Autopilot's next run, h:mm:ss, in every countdown on the page */
   function apTick(){
