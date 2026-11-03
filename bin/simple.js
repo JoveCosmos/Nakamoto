@@ -35,13 +35,22 @@
   }
   /* beside Your APR while Restake is on: what compounding adds, the Restake card's own figure (rewards staked back
      twice a day at today's rate, against the plain year), small, as Net sits beside a validator's APR (operator, 2026-10-08) */
+  /* what Restake adds in a year (operator, 2026-11-03): the wallet's rewards (its own APR r) staked twice a day where
+     Restake stakes them (rr, the box's choice of validators), compounding there; r == rr gives the old figure */
+  function rsAddOf(r, all){
+    var rr = window.__rsRate ? window.__rsRate(all) : r; if(!(rr > 0)) rr = r;
+    return r > 0 ? r * (Math.pow(1 + rr / 730, 730) - 1 - rr) / rr : 0;
+  }
+  window.__rsAddDraw = function(){ var pos = window.__POS, ad = E("rsadd"); if(!ad) return;
+    var r = pos && pos.rows.length ? pos.rate : 0, add = rsAddOf(r, window.__rsAll && window.__rsAll());
+    ad.textContent = add > 0 ? "+" + fmt(pos.total * add) + " ATONE" : "Your rewards"; };
   function rsx(pos, mine, box){
     var at = window.__atInfo ? window.__atInfo() : null, r = mine && pos ? pos.rate : 0;
     if(!(at && at.restake) || !(r > 0)) return '';
     /* two lines in the block's upper corner (operator, 2026-10-08): the addition, then a live dot and the word */
     /* (operator, 2026-10-13) no dot; the addition reads "+3% APR", upright and larger, "restake" small under it */
     /* a balance box (phones, tablets) says it shorter: the box's own label already reads Your APR (2026-10-15) */
-    var add = '+' + pct(Math.pow(1 + r / 730, 730) - 1 - r);
+    var add = '+' + pct(rsAddOf(r, window.__rsAll && window.__rsAll()));
     /* the wallet's APR block (operator, 2026-10-17): "restake" on the line of "on N validators", the addition over it */
     if(box === "line") return '<span class=you-rsl><span>restake</span><span>' + add + '</span></span>';   /* no "APR" (operator, 2026-10-17) */
     return '<span class=you-rsx><span>' + add + (box ? '' : ' APR') + '</span><span>restake</span></span>';
@@ -237,7 +246,7 @@
     var y = stake * rate;
     /* restake runs every 12 hours (a fixed rule): the rewards claimed and staked again earn too - the year
        compounded twice a day at today's rate, against the plain year */
-    var cy = stake * (Math.pow(1 + rate / 730, 730) - 1);
+    var cy = stake * (rate + rsAddOf(rate, window.__rsAll && window.__rsAll()));
     var at = !ex && window.__atInfo ? window.__atInfo() : null, on = !!(at && at.restake);
     /* restaking already: every figure carries the restake's effect */
     var Y = on ? cy : y, P = function(days){ return Y * days / 365; };
@@ -2170,8 +2179,7 @@
   function rsOpen(){
     var el = E("rspop"); if(!el || typeof POP === "undefined") return;
     var at = window.__atInfo ? window.__atInfo() : null, on = !!(at && at.restake), pos = window.__POS;
-    var r = pos && pos.rows.length ? pos.rate : 0, add = r > 0 ? Math.pow(1 + r / 730, 730) - 1 - r : 0;
-    var ad = E("rsadd"); if(ad) ad.textContent = add > 0 ? "+" + fmt(pos.total * add) + " ATONE" : "Your rewards";
+    window.__rsAddDraw();
     var sm = E("rssum"); if(sm) sm.innerHTML = on ? '<i class="you-tag on">Active</i>' : '<i class=you-tag>Inactive</i>';
     var b = E("rsgo"); if(b){ b.textContent = on ? "Revoke" : "Activate"; b.className = "wk-btn " + (on ? "wk-danger" : "wk-go"); }
     if(window.__rsJail) window.__rsJail(on);

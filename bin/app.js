@@ -3786,11 +3786,12 @@ rememberGridH();
             if(a.authorization_type === "AUTHORIZATION_TYPE_DELEGATE" && !seenR){ seenR = true; RS_ALL_G = all; } }); }); })
       .catch(function(){});
   }
+  window.__rsAll = function(){ var at = window.__atInfo ? window.__atInfo() : null; return at && at.restake ? RS_ALL_G : RS_ALL; };
   window.__rsJail = function(on){ var b = E("rsjail"), w = E("rsjailw"), t = E("rsjaili"); if(!b) return;
     if(on) RS_ALL = RS_ALL_G;
     b.checked = !RS_ALL; b.disabled = !!on; w.classList.toggle("all", RS_ALL); w.classList.toggle("ro", !!on);
     t.textContent = RS_ALL ? "All validators, none excluded" : "Recommended"; };
-  (function(){ var b = E("rsjail"); if(b) b.addEventListener("change", function(){ RS_ALL = !b.checked; window.__rsJail(false); }); })();
+  (function(){ var b = E("rsjail"); if(b) b.addEventListener("change", function(){ RS_ALL = !b.checked; window.__rsJail(false); if(window.__rsAddDraw) window.__rsAddDraw(); }); })();
   function grantedAt(who){
     var q = encodeURIComponent("message.action='/cosmos.authz.v1beta1.MsgGrant' AND message.sender='" + who + "'");
     return fetch((window.__API || "https://atomone-api.gatadao.com") + "/cosmos/tx/v1beta1/txs?query=" + q + "&order_by=ORDER_BY_DESC&pagination.limit=20", { cache: "no-store" })
@@ -3866,11 +3867,11 @@ rememberGridH();
   var AT_ALL = false, AT_ALL_G = false;
   function atMemo(){ return "GATA AtomOne Autopilot" + (AT_ALL ? ", all validators" : ""); }
   window.__atMemo = atMemo;
-  window.__atAll = function(){ return AT_ALL; };
+  window.__atAll = function(){ return AT.grant ? AT_ALL_G : AT_ALL; };
   function atJail(ro){ var b = E("atjail"), w = E("atjailw"), t = E("atjaili"); if(!b) return;
     b.checked = !AT_ALL; b.disabled = !!ro; w.classList.toggle("all", AT_ALL); w.classList.toggle("ro", !!ro);
     t.textContent = AT_ALL ? "All validators, none excluded" : "Recommended"; }
-  (function(){ var b = E("atjail"); if(b) b.addEventListener("change", function(){ AT_ALL = !b.checked; atJail(false); }); })();
+  (function(){ var b = E("atjail"); if(b) b.addEventListener("change", function(){ AT_ALL = !b.checked; atJail(false); if(window.__redraw) window.__redraw(); }); })();
   function atMonths(){ return AT.days >= 365 ? "12 months" : AT.days >= 180 ? "6 months" : "3 months"; }
   function atCap(){ var a = E("atcap"), n = window.__amountIn(a.value); return isFinite(n) && n > 0 ? Math.round(n * 1e6) : 0; }
   function atMsgs(){
@@ -4244,6 +4245,14 @@ rememberGridH();
     for(k = 0; k < b.length; k++) if(e < s.length && b[k] > s[s.length - 1 - e]) e++;
     return e; }
   window.__apEdge = apEdge;
+  /* the APR new rewards earn under Restake (keeper plan_restake): the lowest-ranked validator it may stake on, the last
+     3 and the largest fifth left out, the build's no-stake list always, the jailed-often unless the box is unticked */
+  window.__rsRate = function(all){
+    var V = window.__VALS().slice().sort(function(a, b){ return b[1] - a[1]; }), n = V.length, jsk = (window.__D && window.__D.jailskip) || [];
+    for(var i = n - 1 - EDGE; i >= topN(n); i--){ var id = V[i][3];
+      if(noStake(id) || (!all && jsk.indexOf(id) >= 0)) continue;
+      return window.__rateAfter(V[i][1], V[i][2], 0); }
+    return 0; };
   /* validators the build's own list keeps out of a strategy's destinations: stake already there is left alone and may
      still be moved off, they simply take nothing new */
   function noStake(id){ var L = (window.__D && window.__D.nostake) || []; return L.indexOf(id) >= 0; }
