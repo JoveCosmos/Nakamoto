@@ -5702,7 +5702,8 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 @media(max-width:620px){.tlbtn{height:32px;width:32px;padding:0;justify-content:center}.tlbtn span{display:none}}
 .tlmenu{position:absolute;top:calc(100% + 6px);right:0;z-index:60;min-width:240px;display:flex;flex-direction:column;padding:6px;border-radius:12px;border:1px solid var(--edge2);background:var(--bg,#0b0b16);box-shadow:0 12px 32px rgba(0,0,0,.35)}
 .tlmenu[hidden]{display:none}
-.tlmenu:not(#z){left:0;right:auto}
+.tlmenu:not(#z){left:auto;right:0;background:#15152b;border-color:#3a3a66;box-shadow:0 14px 36px rgba(0,0,0,.5)}
+.tlmenu button:hover,.tlmenu button:focus-visible{background:rgba(43,200,189,.12)}
 @media(max-width:700px){.tlmenu:not(#z){position:fixed;left:12px;right:12px;top:58px;min-width:0}}
 .tlmenu button{display:flex;flex-direction:row;align-items:center;gap:11px;padding:9px 11px;border:0;border-radius:8px;background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
 .tlmenu button:hover,.tlmenu button:focus-visible{background:rgba(127,127,127,.12);outline:none}
