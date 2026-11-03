@@ -1904,16 +1904,16 @@
       /* gross, before commission (operator 2026-10-13): the same basis as the map's own legend */
       var V = VALS(), lo = Infinity, hi = 0;
       V.forEach(function(v){ var x = window.__rateAfter ? window.__rateAfter(v[1], 0, 0) : 0; if(x > 0){ if(x < lo) lo = x; if(x > hi) hi = x; } });
-      return hi ? [pct(lo) + " to " + pct(hi), "smaller validators pay more, before commission"] : ["Reading the set…", ""];
+      return hi ? [pct(lo) + " to " + pct(hi), "smaller validators pay more"]   /* fits the card, no cut (operator, 2026-11-03) */ : ["Reading the set…", ""];
     }
     if(id === "gov"){
       loadProps();
       var P = GP.list; if(!P) return ["Reading proposals…", ""];
       var live = P.filter(function(p){ return p.st === "PROPOSAL_STATUS_VOTING_PERIOD"; }), top = P[0];
       var word = function(st){ return st === "PROPOSAL_STATUS_PASSED" ? "passed" : st === "PROPOSAL_STATUS_REJECTED" ? "rejected" : st === "PROPOSAL_STATUS_VOTING_PERIOD" ? "voting now" : "open"; };
-      return [live.length ? live.length + (live.length === 1 ? " vote open" : " votes open") : "No vote open", top ? "#" + top.id + " " + top.title + " " + word(top.st) : ""];
+      return [live.length ? live.length + (live.length === 1 ? " vote open" : " votes open") : "No vote open", top ? "#" + top.id + " " + word(top.st) : ""];
     }
-    return ["Every control, by hand", "stake, unstake, claim, pick validators"];
+    return ["Every control, by hand", "stake, unstake, claim"];
   }
   function drawPaths(){
     put("paths", PATHS.map(function(p){
@@ -2370,7 +2370,7 @@
         var fL = Object.keys(fr).sort(function(x, y){ return fr[y] - fr[x]; }).map(function(id){ src[id] = 1; return { id: id, rank: rk(id), name: nm(id), amt: fmt(fr[id]), apr: pct(rate(id)) }; });
         var tL = Object.keys(to).sort(function(x, y){ return to[y] - to[x]; }).map(function(id){ dst[id] = 1; return { id: id, rank: rk(id), name: nm(id), amt: '+' + fmt(to[id]), apr: pct(rate(id, to[id])) }; });
         var lock = pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is under redelegate lock until ' + day(pos.until) + '</div>' : '';
-        h = top('Best today', auto ? '' : 'Ready, 1 approval', 'ok', auto ? ACTIVE : btn('opt', direct ? 'Activate Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE')) +
+        h = top('Best today', auto ? '' : 'Ready, 1 approval', 'ok', !(at && at.known) ? '' : auto ? ACTIVE : btn('opt', direct ? 'Activate Autopilot' : 'Redelegate ' + fmt(moved) + ' ATONE')) +
           '<div class=mv-hl><b class=g>+' + one(plan.gain) + ' ATONE a year</b><span>The same ' + fmt(moved) + ' ATONE, from <i class=a>' + pct(plan.mnow != null ? plan.mnow : plan.now) + '</i> to <i class=g>' + pct(plan.mafter != null ? plan.mafter : plan.after) + '</i> APR</span>' + lock + '</div>' +   /* the moved stake's own APR (operator, 2026-10-01) */
           '<div class=mv-flow><div class=mv-box><em>From, ' + fL.length + ' validator' + (fL.length === 1 ? '' : 's') + '</em>' + mvRows(fL, 'a', 'validators', 'from') + '</div>' +
           '<div class=mv-arr aria-hidden=true><svg viewBox="0 0 44 20"><path d="M2 10h38M32 3l8 7-8 7"/></svg></div>' +
@@ -2381,14 +2381,14 @@
         var cells = ''; for(var i = 1; i <= 21; i++) cells += '<i' + (i <= k ? ' class=on' : '') + '></i>';
         var hist = at && at.report && at.report.history && at.report.history.length ? at.report.history[0] : null;
         /* no Day k of 21 chip (operator, 2026-10-15: "too redundant"): the 21-day strip below already counts it */
-        h = top(auto ? 'Moved. Autopilot is active' : 'Moved. Cooling down', '', '', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
+        h = top(auto ? 'Moved. Autopilot is active' : 'Moved. Cooling down', '', '', !(at && at.known) ? '' : auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
           /* the one move open while the stake cools down: staking what sits in the wallet (operator, 2026-10-04) */
           '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b>' + line('Free to move again on <b>' + day(t1) + '</b>.') + '</div>' +
           /* the 21-day line sits beside the title, and the cycle boxes are gone (operator, 2026-11-03): the room goes to Now on */
           '<div class=mv-days><div class=mv-dh><span>Cooling down<small class=mv-dn>The chain holds redelegated stake for 21 days.</small></span><span>' + day(t0) + ' to ' + day(t1) + '</span></div><div class=mv-dc>' + cells + '</div></div>' + nowOn() +
           mvSet({}, mineIds());
       } else {
-        h = top('Your stake today', 'At its best', 'ok', auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
+        h = top('Your stake today', 'At its best', 'ok', !(at && at.known) ? '' : auto ? ACTIVE : btn('youauto', 'Activate Autopilot')) +
           '<div class=mv-hl><b class=g>Earning ' + pct(pos.rate) + '</b>' + line('No move earns 3 APR points more today.' + (auto ? '<span class=mv-wide> Autopilot checks again every 12 hours.</span>' : '')) +
           /* the same lock note as the offer's, in the same place (operator, 2026-10-01) */
           (pos.locked >= 1e6 ? '<div class=mv-lock>' + fmt(pos.locked) + ' ATONE is under redelegate lock until ' + day(pos.until) + '</div>' : '') + '</div>' +

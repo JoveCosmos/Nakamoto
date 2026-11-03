@@ -7637,8 +7637,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
 </div></div>
 
 <div class=pop id=tlpop><div class="card txcard uncard spcard tlcard" role=dialog aria-modal=true aria-labelledby=tlttl>
-  <header class=wk-txh><div><b id=tlttl>Tools</b><span class=sd-wch><i class=net id=tlnet></i></span></div>
-    <button class=tlx id=tlx type=button aria-label="Close" title="Close"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
+  <header class=wk-txh><div><b id=tlttl>Tools</b><span class=sd-wch><i class=net id=tlnet></i></span></div></header>
   <div class=tlgate id=tlgate hidden><h2>Connect a wallet</h2><div class=tlws id=tlws></div></div>
   <iframe class=tlfr id=tlfr title="Tool" hidden></iframe>
 </div></div>

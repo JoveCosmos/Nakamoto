@@ -2957,7 +2957,6 @@ rememberGridH();
     }
     window.__tool = open;
     pop.__onclose = function(){ clearInterval(TIMER); fr.removeAttribute("src"); TOOL = null; };
-    E("tlx").addEventListener("click", function(){ POP.close(pop); });
   })();
 
   /* ── cancel unstaking (operator, 2026-11-03): any unstaking entry can be cancelled before it ends; the stake goes back
@@ -3896,7 +3895,7 @@ rememberGridH();
         return null; })
       .catch(function(){ return null; });
   }
-  function atKeep(r){ if(!r || r.who !== window.__ADDR) return false; AT.grant = r.grant; AT.grants = r.grants; AT.since = r.since || null; return true; }
+  function atKeep(r){ if(!r || r.who !== window.__ADDR) return false; AT.known = r.who; AT.grant = r.grant; AT.grants = r.grants; AT.since = r.since || null; return true; }
   /* only grants to our own address (atGrant asks for exactly those) are Autopilot's or Restake's; every other
      authz grant the wallet made - restake bots, any validator's service, GATA's validator included - is foreign
      and ignored: GATA's validator is one validator like any other in this app */
@@ -4465,7 +4464,8 @@ rememberGridH();
   /* what stands between this reader and the keeper, for the simple view to state */
   window.__atInfo = function(){ return { addr: AT.addr, dry: AT.dry, grant: AT.grant, grants: AT.grants || [],
     days: AT.days, report: AT.report, since: AT.since || null,
-    restake: (AT.grants || []).some(function(x){ return grantType(x) === DELEG; }) }; };
+    restake: (AT.grants || []).some(function(x){ return grantType(x) === DELEG; }),
+    known: !!window.__ADDR && AT.known === window.__ADDR }; };   /* the grant has been read for this wallet (a first paint must not guess) */
   window.__planDraw = draw;
   draw();
 
