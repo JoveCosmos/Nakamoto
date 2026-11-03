@@ -5723,6 +5723,12 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .tlcard .wk-txh{display:flex;align-items:center;justify-content:space-between}
 .tlcard .wk-txh>div{display:flex;align-items:center;gap:10px}
 #tlpop .sd-wch i.net{color:var(--wcyan);border-color:currentColor}#tlpop .sd-wch i.net.tn{color:var(--wamber)}
+.tltag{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10.5px;line-height:1.2;padding:3px 8px;border-radius:999px;border:1px solid var(--wamber);color:var(--wamber);background:rgba(255,176,46,.08)}
+.tlcard .wk-txh>div{min-width:0}
+.tlcard #tlttl{white-space:nowrap}
+.tltag .tlt-s{display:none}
+@media(max-width:375px){#tlpop .tltag:not(#z){font-size:9.5px;padding:2px 6px}#tlpop #tlttl:not(#z){font-size:13px}}
+@media(max-width:700px){.tltag .tlt-l{display:none}.tltag .tlt-s{display:inline}#tlpop .tlcard .wk-txh:not(#z){padding-left:14px;padding-right:14px}.tlcard .wk-txh>div:not(#z){gap:6px}#tlpop #tlttl:not(#z){font-size:14px}.tltag{padding:3px 7px}}
 .tlx{width:32px;height:32px;display:grid;place-items:center;border:1px solid var(--wbd2);border-radius:9px;background:transparent;color:var(--ink);cursor:pointer}
 .tlx svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 #tlpop .card.tlcard:not(#z):not(#y){display:flex;flex-direction:column}
@@ -7637,7 +7643,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
 </div></div>
 
 <div class=pop id=tlpop><div class="card txcard uncard spcard tlcard" role=dialog aria-modal=true aria-labelledby=tlttl>
-  <header class=wk-txh><div><b id=tlttl>Tools</b><span class=sd-wch><i class=net id=tlnet></i></span></div></header>
+  <header class=wk-txh><div><b id=tlttl>Tools</b><span class=sd-wch><i class=net id=tlnet></i></span><span class=tltag id=tltag hidden></span></div></header>
   <div class=tlgate id=tlgate hidden><h2>Connect a wallet</h2><div class=tlws id=tlws></div></div>
   <iframe class=tlfr id=tlfr title="Tool" hidden></iframe>
 </div></div>

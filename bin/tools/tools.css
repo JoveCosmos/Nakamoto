@@ -167,3 +167,4 @@ html.embed .foot{margin-top:auto}
 html.embed .gate,html.embed .done{margin:auto}
 @media(max-width:600px){html.embed .wrap{gap:8px;padding:4px 10px 8px}html.embed .wrap>.card:not([hidden]){padding:12px}html.embed .stage{min-height:110px;flex-basis:170px!important}html.embed .rows{min-height:56px}html.embed #rrows{max-height:56px}html.embed .foot{padding-top:8px;gap:8px}}
 @media(max-width:600px) and (max-height:760px){html.embed .stage{min-height:96px}html.embed .rows{min-height:48px}}
+.fee .bad{white-space:normal;overflow-wrap:anywhere}

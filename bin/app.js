@@ -2956,7 +2956,10 @@ rememberGridH();
       clearInterval(TIMER); TIMER = setInterval(function(){ if(pop.classList.contains("on")) show(); }, 600);
     }
     window.__tool = open;
-    pop.__onclose = function(){ clearInterval(TIMER); fr.removeAttribute("src"); TOOL = null; };
+    /* a tool may put one short note in the card's header, beside the network (Gather's Autopilot note) */
+    window.__tlTag = function(t, short){ var x = E("tltag"); if(!x) return; x.hidden = !t; x.title = t || "";
+      x.innerHTML = t ? '<span class=tlt-l>' + att(t) + '</span><span class=tlt-s>' + att(short || t) + '</span>' : ""; };
+    pop.__onclose = function(){ clearInterval(TIMER); fr.removeAttribute("src"); TOOL = null; window.__tlTag(""); };
   })();
 
   /* ── cancel unstaking (operator, 2026-11-03): any unstaking entry can be cancelled before it ends; the stake goes back

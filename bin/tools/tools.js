@@ -101,6 +101,9 @@ document.addEventListener("click", function(ev){ var b = ev.target.closest && ev
   var g = b.closest(".gate"); connect(b.dataset.w).catch(function(e){ var x = E("gerr"); if(x) x.textContent = e && e.message || String(e); }); });
 window.__wconnect = function(name){ return connect(name); };   /* the app's hook, so the same drivers work */
 /* ── signing: amino, through tx.js; step(text) tells the page where it is ── */
+/* a chain refusal, readable: without the RPC wrapping and the message index (operator, 2026-11-03: it was cut and unclear) */
+function why(e){ return String(e && e.message || e).replace(/^The chain refused this transaction: /, "").replace(/^rpc error: code = \w+ desc = /, "")
+  .replace(/^failed to execute message; message index: \d+: /, "").replace(/ \[[^\]]*\]/g, "").replace(/ with gas used: .*$/, "").replace(/: unknown request$/, ""); }
 function sign(msgs, memo, step){
   if(!W) return Promise.reject(new Error("Connect a wallet first"));
   return window.__TX.send(W, msgs, memo || "", function(s, x){
@@ -142,7 +145,7 @@ if(EMB){
   /* after every tool script has registered for the wallet: a sync before then would set it with no one told */
   window.addEventListener("load", function(){ sync(); setInterval(sync, 700); });
 }
-window.T = { NET: NET, BASE: BASE, CHAIN: CHAIN, E: E, esc: esc, get: get, bechOk: bechOk, conv: conv, names: namesReady, nameOf: nameOf, short: short,
+window.T = { why: why, NET: NET, BASE: BASE, CHAIN: CHAIN, E: E, esc: esc, get: get, bechOk: bechOk, conv: conv, names: namesReady, nameOf: nameOf, short: short,
   govOf: govOf, govName: govName, wallet: function(){ return W; }, onWallet: function(f){ onWallet.push(f); }, connect: connect, drawGate: drawGate, sign: sign, feePreview: feePreview,
   fmtP: fmtP, fmtA: fmtA, stage: stage, tok: tok, ours: function(){ return OURS; } };
 })();

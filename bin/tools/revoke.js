@@ -25,19 +25,26 @@ function all(path){ var out = [];
   return page(null); }
 function scan(w){
   G = []; R = []; SEL = {}; E("rows").innerHTML = ""; E("rrows").innerHTML = ""; E("stgtag").textContent = "scanning"; E("hero").classList.add("idle"); draw();
-  Promise.all([T.names, all("/cosmos/authz/v1beta1/grants/granter/" + w.address), all("/cosmos/authz/v1beta1/grants/grantee/" + w.address).catch(function(){ return []; }), T.govOf(w.address)])
+  /* a governor's own wallet follows itself (the chain's rule, it cannot be undone): not a grant to list; its followers are
+     what is given to it (operator, 2026-11-03) */
+  var myGov = T.conv(w.address, "atonegov");
+  var followers = T.get("/atomone/gov/v1/governors/" + myGov + "/delegations?pagination.limit=1&pagination.count_total=true")
+    .then(function(d){ return d && d.pagination ? +d.pagination.total || 0 : 0; }).catch(function(){ return 0; });
+  Promise.all([T.names, all("/cosmos/authz/v1beta1/grants/granter/" + w.address), all("/cosmos/authz/v1beta1/grants/grantee/" + w.address).catch(function(){ return []; }), T.govOf(w.address), followers])
     .then(function(x){ if(!T.wallet() || T.wallet().address !== w.address) return;
       G = x[1].map(function(g, i){ var n = T.nameOf(g.grantee), k = kind(g); return { i: i, grantee: g.grantee, who: n.kind, kind: k, url: url(g), exp: expiry(g), expired: expiry(g) === "expired",
           name: n.kind === "ours" ? (k === "redelegate" ? "Nakamoto Autopilot" : "Nakamoto Restake") : n.n }; })
         .filter(function(g){ return g.url; });
       /* the governor the wallet follows votes with its stake: listed as its own kind, never pre-ticked */
-      if(x[3]) G.push({ i: G.length, grantee: x[3], who: "governor", kind: "governor", gov: true, exp: "until unfollowed", expired: false, name: "Governor: " + T.govName(x[3]) });
+      if(x[3] && x[3] !== myGov) G.push({ i: G.length, grantee: x[3], who: "governor", kind: "governor", gov: true, exp: "until unfollowed", expired: false, name: "Governor: " + T.govName(x[3]) });
       R = x[2].map(function(g){ var n = T.nameOf(g.granter); return { granter: g.granter, name: n.n, who: n.kind, kind: kind(g), exp: expiry(g) }; });
+      var nf = Math.max(0, x[4] - (x[3] === myGov ? 1 : 0));
+      if(x[3] === myGov || nf) R.unshift({ granter: myGov, name: nf + (nf === 1 ? " follower" : " followers") + " vote with you", who: "governor", kind: "governor", exp: "you are a governor" });
       G.forEach(function(g){ SEL[g.i] = g.who === "unknown" || g.expired || g.kind === "SEND"; });   /* the ones to look at first come ticked */
       LIVE = G.map(function(g, k){ return { g: g, born: performance.now() + k * 90 }; });
       E("stgtag").textContent = G.length ? G.length + " grants" : "no grants";
       E("hero").classList.remove("idle"); rows(); hero(); })
-    .catch(function(e){ E("stgtag").textContent = "could not read grants"; E("fee").textContent = String(e && e.message || e).slice(0, 80); });
+    .catch(function(e){ E("stgtag").textContent = "could not read grants"; E("fee").textContent = T.why(e); });
 }
 function rows(){
   E("rows").innerHTML = G.length ? G.map(function(g, k){ return '<label class="row' + (SEL[g.i] ? ' on' : '') + '" style="animation-delay:' + (k * 60) + 'ms"><input type=checkbox data-i=' + g.i + (SEL[g.i] ? ' checked' : '') + ' aria-label="' + esc(g.name) + ' ' + esc(g.kind) + '">' +
@@ -61,7 +68,7 @@ function fee(){
   E("fee").textContent = "fee: pricing…";
   FEE.t = setTimeout(function(){ T.feePreview(msgs(s.slice(0, PAGE))).then(function(f){ if(n !== FEE.n) return;
       E("fee").innerHTML = 'fee ≈ <span class=ok>' + T.fmtP(parseInt(f.fee.amount[0].amount, 10)) + ' PHOTON</span>' + (s.length > PAGE ? ' per signature' : '') + ', gas ' + f.fee.gas.toLocaleString("en-US"); })
-    .catch(function(e){ if(n !== FEE.n) return; E("fee").innerHTML = '<span class=bad>' + esc(String(e && e.message || e).replace(/^The chain refused this transaction: /, "").slice(0, 90)) + '</span>'; }); }, 350);
+    .catch(function(e){ if(n !== FEE.n) return; E("fee").innerHTML = '<span class=bad>' + esc(T.why(e)) + '</span>'; }); }, 350);
 }
 function msgs(list){ var a = T.wallet().address; return list.map(function(g){ return g.gov ? { type: "atomone/v1/MsgUndelegateGovernor", value: { delegator_address: a } }
   : { type: "cosmos-sdk/MsgRevoke", value: { granter: a, grantee: g.grantee, msg_type_url: g.url } }; }); }
@@ -79,7 +86,7 @@ E("go").addEventListener("click", function(){
   })().then(function(){
     E("tool").hidden = true; E("done").hidden = false; E("donen").textContent = done.length + " revoked"; E("donetx").textContent = hashes.length > 1 ? hashes.length + " transactions" : "";
     E("donelink").href = "https://explorer.gatahub.zone/" + T.CHAIN + "/txs/" + hashes[hashes.length - 1]; stg.stop();
-  }).catch(function(e){ E("step").textContent = " "; E("fee").innerHTML = '<span class=bad>' + esc(String(e && e.message || e).slice(0, 120)) + '</span>'; })
+  }).catch(function(e){ E("step").textContent = " "; E("fee").innerHTML = '<span class=bad>' + esc(T.why(e)) + '</span>'; })
   .then(function(){ BUSY = false; hero(); });
 });
 E("again").addEventListener("click", function(){ E("done").hidden = true; E("tool").hidden = false; stg.start(); scan(T.wallet()); });

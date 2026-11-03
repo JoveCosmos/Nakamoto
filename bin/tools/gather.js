@@ -50,7 +50,7 @@ function load(){
     ROWS.sort(function(p, q){ return q.free - p.free; });
     ROWS.forEach(function(r){ if(r.free >= MIN) ON[r.v] = 1; });
     draw(); state();
-  }).catch(function(e){ E("stgtag").textContent = "could not read your stake"; E("fee").innerHTML = '<span class=bad>' + esc(String(e && e.message || e).slice(0, 120)) + '</span>'; });
+  }).catch(function(e){ E("stgtag").textContent = "could not read your stake"; E("fee").innerHTML = '<span class=bad>' + esc(T.why(e)) + '</span>'; });
 }
 function day(t){ return new Date(t).toLocaleDateString("en-GB", { day: "numeric", month: "short" }); }
 function draw(){
@@ -93,7 +93,10 @@ function notes(p){
     }
     h += '<p>Moved stake is held on GATA HUB for <b>21 days</b>, until <b>' + day(Date.now() + 21 * 864e5) + '</b>: it keeps earning, but cannot be moved to another validator before then. You can still unstake it.</p>';
   }
-  if(PILOT) h += '<p class=w><b>Autopilot is active for this wallet.</b> It will redelegate again after 21 day cooldown.</p>';
+  /* inside the app the note is a small tag in the card's header (operator, 2026-11-03); on its own page, here */
+  var PT = "Autopilot is active for this wallet. It will redelegate again after 21 day cooldown.";
+  if(window.parent !== window && window.parent.__tlTag) window.parent.__tlTag(PILOT ? PT : "", "Autopilot on");
+  else if(PILOT) h += '<p class=w><b>Autopilot is active for this wallet.</b> It will redelegate again after 21 day cooldown.</p>';
   E("notes").innerHTML = h;
 }
 /* the fee: each transaction simulated at the chain's price, summed */
@@ -107,7 +110,7 @@ function fee(p){
       .then(function(){ if(k !== FEE.n) return; FEE.u = u;
         E("fee").innerHTML = 'fee ≈ <span class=ok>' + T.fmtP(u) + ' PHOTON</span>, gas ' + gas.toLocaleString("en-US") ;
         window.__TX.balances(T.wallet().address).then(function(b){ if(k === FEE.n && b.uphoton < u){ E("fee").innerHTML += ' <span class=bad>not enough PHOTON for the fee</span>'; E("go").disabled = true; } }).catch(function(){}); })
-      .catch(function(e){ if(k !== FEE.n) return; E("fee").innerHTML = '<span class=bad>' + esc(String(e && e.message || e).replace(/^The chain refused this transaction: /, "").slice(0, 110)) + '</span>'; });
+      .catch(function(e){ if(k !== FEE.n) return; E("fee").innerHTML = '<span class=bad>' + esc(T.why(e)) + '</span>'; });
   }, 350);
 }
 E("rows").addEventListener("change", function(ev){ var v = ev.target.dataset.v; if(!v) return; if(ev.target.checked) ON[v] = 1; else delete ON[v];
@@ -130,7 +133,7 @@ E("go").addEventListener("click", function(){
     E("donelink").href = "https://explorer.gatahub.zone/" + T.CHAIN + "/txs/" + hashes[hashes.length - 1]; stg.stop();
   }).catch(function(e){
     E("step").textContent = " ";
-    E("fee").innerHTML = '<span class=bad>' + (hashes.length ? hashes.length + " of " + parts.length + " transactions went through. " : "") + esc(String(e && e.message || e).slice(0, 120)) + '</span>';
+    E("fee").innerHTML = '<span class=bad>' + (hashes.length ? hashes.length + " of " + parts.length + " transactions went through. " : "") + esc(T.why(e)) + '</span>';
     if(hashes.length) load();
   }).then(function(){ BUSY = false; if(!E("tool").hidden) state(); });
 });

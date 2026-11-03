@@ -1060,6 +1060,7 @@
   html[data-theme=light]:not([data-mono]) .tlmenu button:hover,html[data-theme=light]:not([data-mono]) .tlmenu button:focus-visible{background:var(--surface-2)}
   html[data-theme=light]:not([data-mono]) .tlmenu button>svg{fill:none}
   html[data-theme=light]:not([data-mono]) #tlpop .sd-wch i.net{border-color:currentColor}
+  html[data-theme=light]:not([data-mono]) .tltag{background:var(--warn-bg)}
   html[data-theme=light]:not([data-mono]) .tlx{background:transparent}
   html[data-theme=light]:not([data-mono]) .tlx svg{fill:none;stroke:currentColor}
   html[data-theme=light]:not([data-mono]) .tlfr{background:transparent}

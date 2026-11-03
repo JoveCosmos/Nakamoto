@@ -35,7 +35,7 @@ function fee(m, n){
       FEE.u = u; FEE.gas = f.fee.gas; E("hf").textContent = T.fmtP(u); E("hw").textContent = T.fmtP(typ); E("hp").textContent = Math.max(0, Math.round(100 - 100 * u / typ)) + "%";
       E("fee").innerHTML = 'fee ≈ <span class=ok>' + T.fmtP(u) + ' PHOTON</span>, gas ' + f.fee.gas.toLocaleString("en-US") + (BAL.uphoton < u ? ' <span class=bad>no PHOTON for the fee</span>' : '');
       E("go").disabled = E("go").disabled || BAL.uphoton < u; })
-    .catch(function(e){ if(k !== FEE.n) return; E("fee").innerHTML = '<span class=bad>' + esc(String(e && e.message || e).replace(/^The chain refused this transaction: /, "").slice(0, 90)) + '</span>'; E("go").disabled = true; }); }, 400);
+    .catch(function(e){ if(k !== FEE.n) return; E("fee").innerHTML = '<span class=bad>' + esc(T.why(e)) + '</span>'; E("go").disabled = true; }); }, 400);
 }
 function fromPaste(){ var lines = E("paste").value.split(/\n+/).map(function(l){ return l.trim(); }).filter(Boolean);
   ROWS = lines.slice(0, MAXN + 1).map(function(l){ var p = l.split(/[\s,;]+/); return { a: p[0] || "", x: p[1] || "" }; }); if(!ROWS.length) ROWS = [{ a: "", x: "" }]; }
@@ -56,7 +56,7 @@ E("go").addEventListener("click", function(){
   T.sign(m, E("memo").value.trim(), function(t){ E("step").textContent = t; }).then(function(r){
     E("tool").hidden = true; E("done").hidden = false; E("donen").textContent = "Sent to " + m.length; E("donetx").textContent = "fee " + T.fmtP(FEE.u) + " PHOTON";
     E("donelink").href = "https://explorer.gatahub.zone/" + T.CHAIN + "/txs/" + r.hash; stg.stop();
-  }).catch(function(e){ E("step").textContent = " "; E("fee").innerHTML = '<span class=bad>' + esc(String(e && e.message || e).slice(0, 120)) + '</span>'; })
+  }).catch(function(e){ E("step").textContent = " "; E("fee").innerHTML = '<span class=bad>' + esc(T.why(e)) + '</span>'; })
   .then(function(){ BUSY = false; balances(); });
 });
 E("again").addEventListener("click", function(){ E("done").hidden = true; E("tool").hidden = false; ROWS = [{ a: "", x: "" }]; E("paste").value = ""; drawRows(); stg.start(); state(); });
