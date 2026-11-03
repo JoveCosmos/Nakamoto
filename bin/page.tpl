@@ -5698,8 +5698,12 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .thbtn.tlbtn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tlmenu{position:absolute;top:calc(100% + 6px);right:0;z-index:60;min-width:240px;display:flex;flex-direction:column;padding:6px;border-radius:12px;border:1px solid var(--edge2);background:var(--bg,#0b0b16);box-shadow:0 12px 32px rgba(0,0,0,.35)}
 .tlmenu[hidden]{display:none}
-.tlmenu button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:9px 11px;border:0;border-radius:8px;background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.tlmenu:not(#z){left:0;right:auto}
+@media(max-width:700px){.tlmenu:not(#z){position:fixed;left:12px;right:12px;top:58px;min-width:0}}
+.tlmenu button{display:flex;flex-direction:row;align-items:center;gap:11px;padding:9px 11px;border:0;border-radius:8px;background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
 .tlmenu button:hover,.tlmenu button:focus-visible{background:rgba(127,127,127,.12);outline:none}
+.tlmenu button>span{display:flex;flex-direction:column;gap:2px}
+.tlmenu button>svg{width:20px;height:20px;flex:0 0 auto;fill:none;stroke:var(--wcyan);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .tlmenu b{font-size:13px;font-weight:600}.tlmenu small{font-size:11px;color:var(--ink3)}
 .tlcard .wk-txh{display:flex;align-items:center;justify-content:space-between}
 .tlcard .wk-txh>div{display:flex;align-items:center;gap:10px}
@@ -7185,9 +7189,9 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
     <!-- tools (operator, 2026-11-03): next to day/night, a menu, each tool full screen in the app -->
     <div class=tlw><button class="thbtn tlbtn" id=tlbtn type=button aria-haspopup=menu aria-expanded=false aria-label="Tools" title="Tools"><svg viewBox="0 0 24 24" aria-hidden=true><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></button>
       <div class=tlmenu id=tlmenu role=menu hidden>
-        <button type=button role=menuitem data-tool=revoke><b>Revoke Scanner</b><small>who can act for your wallet</small></button>
-        <button type=button role=menuitem data-tool=send><b>Fee Saver</b><small>send at the chain's price</small></button>
-        <button type=button role=menuitem data-tool=gather><b>Gather to GATA HUB</b><small>all your stake in one place</small></button>
+        <button type=button role=menuitem data-tool=revoke><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6z"/><circle cx="11.5" cy="11" r="2.6"/><path d="M13.4 12.9l2.1 2.1"/></svg><span><b>Auth Scanner</b><small>who can act for your wallet</small></span></button>
+        <button type=button role=menuitem data-tool=send><svg viewBox="0 0 24 24" aria-hidden=true><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/></svg><span><b>Fee Saver</b><small>multi send at chain's price</small></span></button>
+        <button type=button role=menuitem data-tool=gather><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="5" cy="6" r="1.8"/><circle cx="5" cy="18" r="1.8"/><circle cx="19" cy="12" r="2.4"/><path d="M6.6 6.9l9.8 4.2M6.6 17.1l9.8-4.2M7 12h9.6"/></svg><span><b>Gather to GATA HUB</b><small>gather spread stake</small></span></button>
       </div></div>
     <div class=netsw id=netsw role=group aria-label=Network><a id=netmain href="./" aria-label=Mainnet><span class=nl>Mainnet</span><span class=ns aria-hidden=true>Main</span></a><a id=nettest href="testnet/" aria-label=Testnet><span class=nl>Testnet</span><span class=ns aria-hidden=true>Test</span></a></div>
     <div class=sv-who>

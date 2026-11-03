@@ -2919,7 +2919,7 @@ rememberGridH();
      the network, with the app's wallet, or the connect choice when none is connected ── */
   (function(){
     var b = E("tlbtn"), m = E("tlmenu"), pop = E("tlpop"), fr = E("tlfr"), g = E("tlgate"); if(!b || !m || !pop) return;
-    var TOOL = null, TIMER = 0, NAMES = { revoke: "Revoke Scanner", send: "Fee Saver", gather: "Gather to GATA HUB" };
+    var TOOL = null, TIMER = 0, NAMES = { revoke: "Auth Scanner", send: "Fee Saver", gather: "Gather to GATA HUB" };
     var BASEH = (document.querySelector("base") || { getAttribute: function(){ return "/"; } }).getAttribute("href") || "/";
     var test = /testnet/.test(BASEH);
     function menu(on){ m.hidden = !on; b.setAttribute("aria-expanded", on ? "true" : "false"); if(on){ var f = m.querySelector("button"); if(f) f.focus(); } }
