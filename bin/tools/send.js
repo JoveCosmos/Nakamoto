@@ -5,9 +5,23 @@
 var T = window.T, E = T.E, esc = T.esc, TYPICAL = 0.225, MAXN = 60;
 var DEN = "uatone", MODE = "rows", ROWS = [{ a: "", x: "" }], BAL = { uatone: 0, uphoton: 0 }, FEE = { n: 0, t: 0, u: 0, gas: 0 }, BUSY = false, stg, PK = [];
 function sym(d){ return d === "uatone" ? "ATONE" : "PHOTON"; }
-function parseAmt(s){ var v = parseFloat(String(s).replace(/,/g, "")); return v > 0 && isFinite(v) ? Math.round(v * 1e6) : 0; }
-function valid(){ var me = T.wallet() && T.wallet().address; return ROWS.map(function(r){ var a = r.a.trim(), x = parseAmt(r.x);
-  return { a: a, x: x, aok: T.bechOk(a, "atone") && a !== me, xok: x > 0 }; }); }
+/* strict (operator, 2026-11-03: no mistake may pass): digits, an optional point and up to 6 decimals; thousands commas
+   only in their right places. Anything else is 0, which the row reports */
+function parseAmt(s){ s = String(s).trim(); if(/^\d{1,3}(,\d{3})+(\.\d+)?$/.test(s)) s = s.replace(/,/g, "");
+  if(!/^\d+(\.\d{1,6})?$/.test(s)) return 0; var p = s.split("."), u = BigInt(p[0]) * 1000000n + BigInt(((p[1] || "") + "000000").slice(0, 6));
+  return u > 0n && u <= 9007199254740991n ? Number(u) : 0; }
+function valid(){ var me = T.wallet() && T.wallet().address, seen = {};
+  return ROWS.map(function(r, i){ var a = (r.a || "").trim(), x = parseAmt(r.x || ""), err = "";
+    var aok = T.bechOk(a, "atone") && a !== me, xok = x > 0;
+    if(r.bad) err = r.bad;
+    else if(!a) err = "no address";
+    else if(!T.bechOk(a, "atone")) err = "not a valid atone1 address";
+    else if(a === me) err = "your own address";
+    else if(seen[a]) err = "listed twice (line " + seen[a] + ")";
+    else if(!r.x) err = "no amount";
+    else if(!xok) err = /\.\d{7,}/.test(r.x) ? "more than 6 decimals" : "amount is not a number";
+    if(a && !seen[a]) seen[a] = i + 1;
+    return { a: a, x: x, aok: aok && !err, xok: xok && !err, err: err }; }); }
 function msgs(){ var me = T.wallet().address; return valid().filter(function(r){ return r.aok && r.xok; }).map(function(r){
   return { type: "cosmos-sdk/MsgSend", value: { from_address: me, to_address: r.a, amount: [{ denom: DEN, amount: String(r.x) }] } }; }); }
 function drawRows(){
@@ -20,7 +34,11 @@ function drawRows(){
 function state(){
   var v = valid(), good = v.filter(function(r){ return r.aok && r.xok; }), tot = good.reduce(function(s, r){ return s + r.x; }, 0), n = good.length;
   E("stgtag").textContent = n + (n === 1 ? " recipient" : " recipients") + (tot ? ", " + T.fmtA(tot) + " " + sym(DEN) : "");
-  var over = tot > (BAL[DEN] || 0), bad = v.some(function(r){ return (r.a && !r.aok) || (r.x && !r.xok); });
+  var over = tot > (BAL[DEN] || 0), bad = v.some(function(r){ return r.err && (r.a || r.x || r.bad); }) || v.length > MAXN;
+  /* every refused line said, with its number (paste); the rows mark their own fields */
+  var pe = E("perr"); if(pe){ var errs = v.map(function(r, i){ return r.err && (r.a || r.x || r.bad) ? '<li><b>Line ' + (i + 1) + '</b> ' + esc(r.err) + '</li>' : ''; }).join("");
+    if(v.length > MAXN) errs += '<li><b>' + v.length + ' lines</b> at most ' + MAXN + ' recipients in one send</li>';
+    pe.innerHTML = MODE === "paste" && errs ? '<ul>' + errs + '</ul>' : ''; pe.hidden = !(MODE === "paste" && errs); }
   /* the balance as two figures, the one being sent first and marked (operator, 2026-11-03: presented better) */
   var bA = '<span class="bf' + (DEN === "uatone" ? ' on' : '') + '"><em>ATONE</em><b>' + T.fmtA(BAL.uatone) + '</b></span>', bP = '<span class="bf' + (DEN === "uphoton" ? ' on' : '') + '"><em>PHOTON</em><b>' + T.fmtA(BAL.uphoton) + '</b></span>';
   E("bal").innerHTML = '<span class=bl>Balance</span>' + (DEN === "uatone" ? bA + bP : bP + bA) + (over ? '<span class=bo>not enough ' + sym(DEN) + '</span>' : '');
@@ -39,8 +57,13 @@ function fee(m, n){
       E("go").disabled = E("go").disabled || BAL.uphoton < u; })
     .catch(function(e){ if(k !== FEE.n) return; E("fee").innerHTML = '<span class=bad>' + esc(T.why(e)) + '</span>'; E("go").disabled = true; }); }, 400);
 }
-function fromPaste(){ var lines = E("paste").value.split(/\n+/).map(function(l){ return l.trim(); }).filter(Boolean);
-  ROWS = lines.slice(0, MAXN + 1).map(function(l){ var p = l.split(/[\s,;]+/); return { a: p[0] || "", x: p[1] || "" }; }); if(!ROWS.length) ROWS = [{ a: "", x: "" }]; }
+/* one recipient a line: an address and an amount, apart by spaces, a tab, a semicolon or one comma (a CSV line); a line with
+   anything else is refused as it is, never guessed at */
+function fromPaste(){ var lines = E("paste").value.split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean);
+  ROWS = lines.map(function(l){ var p = /\s/.test(l) || /;/.test(l) ? l.split(/\s*[;\t]\s*|\s+/) : l.split(",");
+    p = p.filter(function(x){ return x !== ""; });
+    return p.length === 2 ? { a: p[0], x: p[1] } : { a: p[0] || "", x: p[1] || "", bad: p.length < 2 ? "needs an address and an amount" : "more than an address and an amount" }; });
+  if(!ROWS.length) ROWS = [{ a: "", x: "" }]; }
 E("rows").addEventListener("input", function(ev){ var i = ev.target.dataset.i, k = ev.target.dataset.k; if(i == null) return; ROWS[+i][k] = ev.target.value;
   var v = valid()[+i]; ev.target.className = ev.target.value ? (k === "a" ? (v.aok ? "ok" : "bad") : (v.xok ? "ok" : "bad")) : ""; state(); });
 E("rows").addEventListener("click", function(ev){ var b = ev.target.closest("[data-rm]"); if(!b || ROWS.length < 2) return; ROWS.splice(+b.dataset.rm, 1); drawRows(); state(); });
@@ -54,6 +77,7 @@ E("mode").addEventListener("click", function(ev){ var b = ev.target.closest("[da
   if(MODE === "paste"){ E("paste").value = ROWS.filter(function(r){ return r.a || r.x; }).map(function(r){ return (r.a + " " + r.x).trim(); }).join("\n"); E("rows").hidden = true; E("paste").hidden = false; }
   else { fromPaste(); E("paste").hidden = true; E("rows").hidden = false; drawRows(); } state(); });
 E("go").addEventListener("click", function(){
+  if(valid().some(function(r){ return r.err && (r.a || r.x || r.bad); }) || valid().length > MAXN) return;   /* never with a bad line */
   var m = msgs(); if(!m.length || BUSY) return; BUSY = true; E("go").disabled = true;
   T.sign(m, E("memo").value.trim(), function(t){ E("step").textContent = t; }).then(function(r){
     E("tool").hidden = true; E("done").hidden = false; E("donen").textContent = "Sent to " + m.length; E("donetx").textContent = "fee " + T.fmtP(FEE.u) + " PHOTON";

@@ -226,3 +226,6 @@ html.embed .hero:not(.plain)>div:not(#z){flex:1 1 0;justify-content:center;text-
 .flr b{font-size:13px}.flr small{font-family:var(--wmono);font-size:10.5px;color:var(--wf);overflow-wrap:anywhere}
 /* inside the app on a wide card the header carries the balance (2026-11-03) */
 @media(min-width:701px){html.embed #bal{display:none}}
+.perr{border:1px solid var(--red);border-radius:9px;background:rgba(255,90,60,.06);padding:6px 10px;max-height:96px;overflow-y:auto;font-size:12px;color:var(--wt)}
+.perr ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:3px}.perr b{color:var(--red);margin-right:6px}
+.empty.gem{display:flex;flex-direction:column;align-items:center;gap:4px;padding:18px 12px;text-align:center}.empty.gem b{font-size:14px;color:var(--wt);text-transform:none;letter-spacing:0}.empty.gem span{font-size:12px;color:var(--wf);text-transform:none;letter-spacing:0}

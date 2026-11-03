@@ -61,8 +61,8 @@ function draw(){
       '<input type=checkbox data-v="' + esc(r.v) + '"' + (ON[r.v] ? ' checked' : '') + (can ? '' : ' disabled') + ' aria-label="' + esc(r.n) + '">' +
       '<span class=who><b>' + esc(r.n) + '</b><small>' + esc(T.short(r.v)) + '</small></span>' +
       '<span class=what><b>' + T.fmtA(r.free) + ' ATONE</b>' + (note ? '<span class="pill w">' + esc(note) + '</span>' : '') + '</span></label>';
-  }).join("") || '<div class=row ro><span class=who><b>' + (HELD ? "Everything is already on GATA HUB" : "No stake to gather") + '</b><small>' +
-    (HELD ? T.fmtA(HELD) + " ATONE" : "this wallet has no delegations") + '</small></span><span></span></div>';
+  }).join("") || '<div class="empty gem"><b>' + (HELD ? "Everything is already on GATA HUB" : "No stake to gather") + '</b><span>' +
+    (HELD ? T.fmtA(HELD) + " ATONE on GATA HUB" : "this wallet has no delegations on " + (T.CHAIN === "atomone-1" ? "mainnet" : "testnet")) + '</span></div>';   /* a message, not a cramped row (2026-11-03) */
 }
 function picked(){ return ROWS.filter(function(r){ return ON[r.v] && r.free >= MIN; }); }
 function msgs(list){ var me = T.wallet().address; return list.map(function(r){
