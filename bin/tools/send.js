@@ -21,7 +21,9 @@ function state(){
   var v = valid(), good = v.filter(function(r){ return r.aok && r.xok; }), tot = good.reduce(function(s, r){ return s + r.x; }, 0), n = good.length;
   E("stgtag").textContent = n + (n === 1 ? " recipient" : " recipients") + (tot ? ", " + T.fmtA(tot) + " " + sym(DEN) : "");
   var over = tot > (BAL[DEN] || 0), bad = v.some(function(r){ return (r.a && !r.aok) || (r.x && !r.xok); });
-  E("bal").innerHTML = 'balance <b>' + T.fmtA(BAL.uatone) + ' ATONE</b> <b>' + T.fmtA(BAL.uphoton) + ' PHOTON</b>' + (over ? ' <span style="color:var(--amber)">not enough ' + sym(DEN) + '</span>' : '');
+  /* the balance as two figures, the one being sent first and marked (operator, 2026-11-03: presented better) */
+  var bA = '<span class="bf' + (DEN === "uatone" ? ' on' : '') + '"><em>ATONE</em><b>' + T.fmtA(BAL.uatone) + '</b></span>', bP = '<span class="bf' + (DEN === "uphoton" ? ' on' : '') + '"><em>PHOTON</em><b>' + T.fmtA(BAL.uphoton) + '</b></span>';
+  E("bal").innerHTML = '<span class=bl>Balance</span>' + (DEN === "uatone" ? bA + bP : bP + bA) + (over ? '<span class=bo>not enough ' + sym(DEN) + '</span>' : '');
   E("go").disabled = !n || over || bad || BUSY || n > MAXN; E("go").textContent = n > 1 ? "Send to " + n : "Send";
   E("hero").classList.toggle("idle", !n);
   PK = good.map(function(r){ return r.x; });

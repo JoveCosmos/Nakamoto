@@ -202,3 +202,12 @@ html.embed .hero.plain>div b:not(#z){font-size:16px}
 .sel .lh::before{content:"";width:3px;height:14px;border-radius:2px;background:var(--teal)}
 .sel #selnote{margin-left:12px;font-size:12px;color:var(--wf)}.sel #selnote b{color:var(--red);font-size:14px;margin-right:3px}
 .foot{align-items:center}.foot .fee{display:flex;flex-direction:column;justify-content:center;align-self:center}
+/* Fee Saver (operator, 2026-11-03): the three figures centred, sharing the width; the balance as two figures */
+html.embed .hero:not(.plain)>div:not(#z){flex:1 1 0;justify-content:center;text-align:center;flex-direction:column;align-items:center;gap:4px;padding:9px 8px}
+.bal{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.bal .bl{font-family:var(--wmono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--wf)}
+.bal .bf{display:inline-flex;align-items:baseline;gap:5px;padding:4px 9px;border-radius:8px;border:1px solid var(--wbd);background:var(--wi)}
+.bal .bf em{font-style:normal;font-family:var(--wmono);font-size:9.5px;letter-spacing:.08em;color:var(--wf)}
+.bal .bf b{font-size:13px;color:var(--wt)}.bal .bf.on{border-color:var(--teal)}.bal .bf.on b{color:var(--teal)}
+.bal .bo{font-size:11px;color:var(--amber)}
+@media(max-width:600px){html.embed .hero:not(.plain)>div em:not(#z){white-space:normal;font-size:8.5px;line-height:1.25;letter-spacing:.06em}html.embed .hero:not(.plain)>div:not(#z){padding:7px 4px}}
