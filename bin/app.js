@@ -2950,7 +2950,8 @@ rememberGridH();
       var u = BASEH + "tools/" + TOOL + "?embed=1"; if(fr.getAttribute("src") !== u) fr.setAttribute("src", u);
     }
     function open(t){
-      TOOL = t; E("tlttl").textContent = NAMES[t] || "Tools";
+      TOOL = t; var ic = m.querySelector('[data-tool="' + t + '"] svg');   /* the menu's icon beside the title (operator, 2026-11-03) */
+      E("tlttl").innerHTML = (ic ? ic.outerHTML : "") + '<span>' + (NAMES[t] || "Tools") + '</span>';
       var n = E("tlnet"); n.textContent = test ? "Testnet" : "Mainnet"; n.classList.toggle("tn", test);
       fr.removeAttribute("src"); show(); POP.open(pop);
       clearInterval(TIMER); TIMER = setInterval(function(){ if(pop.classList.contains("on")) show(); }, 600);

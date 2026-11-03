@@ -39,7 +39,7 @@ function scan(w){
       if(x[3] && x[3] !== myGov) G.push({ i: G.length, grantee: x[3], who: "governor", kind: "governor", gov: true, exp: "until unfollowed", expired: false, name: "Governor: " + T.govName(x[3]) });
       R = x[2].map(function(g){ var n = T.nameOf(g.granter); return { granter: g.granter, name: n.n, who: n.kind, kind: kind(g), exp: expiry(g) }; });
       var nf = Math.max(0, x[4] - (x[3] === myGov ? 1 : 0));
-      if(x[3] === myGov || nf) R.unshift({ granter: myGov, name: nf + (nf === 1 ? " follower" : " followers") + " vote with you", who: "governor", kind: "governor", exp: "you are a governor" });
+      if(x[3] === myGov || nf) R.unshift({ granter: myGov, name: nf + (nf === 1 ? " follower" : " followers") + " vote with you", who: "governor", kind: "governor", exp: "you are a governor", fl: nf });
       G.forEach(function(g){ SEL[g.i] = g.who === "unknown" || g.expired || g.kind === "SEND"; });   /* the ones to look at first come ticked */
       LIVE = G.map(function(g, k){ return { g: g, born: performance.now() + k * 90 }; });
       E("stgtag").textContent = G.length ? G.length + " grants" : "no grants";
@@ -51,7 +51,7 @@ function rows(){
     '<span class=who><b>' + esc(g.name) + (g.who === "ours" || g.who === "governor" ? '' : g.who === "unknown" ? ' <span class="pill w">unknown</span>' : ' <span class=pill>validator</span>') + '</b><small>' + esc(g.grantee) + '</small></span>' +
     '<span class=what><span class="pill ' + (g.kind === "SEND" ? 'r' : g.kind === "redelegate" || g.kind === "delegate" ? 't' : 'v') + '">' + esc(g.kind) + '</span><span>' + esc(g.exp) + '</span></span></label>'; }).join("")
     : '<div class=empty>no permissions given</div>';
-  E("rrows").innerHTML = R.length ? R.map(function(g, k){ return '<div class="row ro" style="animation-delay:' + (k * 60) + 'ms"><span class=who><b>' + esc(g.name) + '</b><small>' + esc(g.granter) + '</small></span><span class=what><span class="pill v">' + esc(g.kind) + '</span><span>' + esc(g.exp) + '</span></span></div>'; }).join("")
+  E("rrows").innerHTML = R.length ? R.map(function(g, k){ return '<div class="row ro' + (g.fl ? ' fl" role=button tabindex=0 data-fl="' + esc(g.granter) + '" title="See who follows you"' : '"') + ' style="animation-delay:' + (k * 60) + 'ms"><span class=who><b>' + esc(g.name) + '</b><small>' + esc(g.granter) + '</small></span><span class=what><span class="pill v">' + esc(g.kind) + '</span><span>' + esc(g.exp) + '</span></span></div>'; }).join("")
     : '<div class=empty>none</div>';
 }
 function hero(){
@@ -91,6 +91,23 @@ E("go").addEventListener("click", function(){
   .then(function(){ BUSY = false; hero(); });
 });
 E("again").addEventListener("click", function(){ E("done").hidden = true; E("tool").hidden = false; stg.start(); scan(T.wallet()); });
+/* (operator, 2026-11-03) a governor's followers, as a list: tap the row */
+function followers(gov){
+  var me = T.wallet() && T.wallet().address, out = [];
+  var box = document.createElement("div"); box.className = "flpop"; box.innerHTML = '<div class=flcard role=dialog aria-modal=true aria-label="Followers"><header><b>Followers</b><span id=fln>reading…</span><button type=button class=flx aria-label=Close>Close</button></header><div class=fllist id=fll></div></div>';
+  document.body.appendChild(box);
+  var close = function(){ box.remove(); document.removeEventListener("keydown", esck); }, esck = function(ev){ if(ev.key === "Escape") close(); };
+  box.addEventListener("click", function(ev){ if(ev.target === box || ev.target.closest(".flx")) close(); }); document.addEventListener("keydown", esck);
+  function page(key){ return T.get("/atomone/gov/v1/governors/" + gov + "/delegations?pagination.limit=200" + (key ? "&pagination.key=" + encodeURIComponent(key) : ""))
+    .then(function(d){ out = out.concat((d.delegations || []).map(function(x){ return x.delegator_address; }).filter(function(a){ return a !== me; }));
+      var nk = d.pagination && d.pagination.next_key; return nk && out.length < 5000 ? page(nk) : out; }); }
+  page(null).then(function(list){
+    E("fln").textContent = list.length + (list.length === 1 ? " wallet" : " wallets");
+    E("fll").innerHTML = list.length ? list.map(function(a){ var n = T.nameOf(a); return '<div class=flr><b>' + esc(n.kind === "unknown" ? T.short(a) : n.n) + '</b><small>' + esc(a) + '</small></div>'; }).join("") : '<div class=empty>none</div>';
+  }).catch(function(e){ E("fln").textContent = T.why(e); });
+}
+E("rrows").addEventListener("click", function(ev){ var r = ev.target.closest && ev.target.closest("[data-fl]"); if(r) followers(r.dataset.fl); });
+E("rrows").addEventListener("keydown", function(ev){ if(ev.key !== "Enter" && ev.key !== " ") return; var r = ev.target.closest && ev.target.closest("[data-fl]"); if(r){ ev.preventDefault(); followers(r.dataset.fl); } });
 /* the picture: the wallet in the centre, each grantee a node on a ring, ticked ones in red, revoked ones fading out */
 function draw(){}
 /* (operator, 2026-11-03: clearer) a radar sweep while the grants are read; then each grant is a labelled pill on a ring
