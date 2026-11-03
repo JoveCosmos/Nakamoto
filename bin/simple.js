@@ -1528,7 +1528,8 @@
       return (gvAddr ? '<button type=button class="gp-sv ' + cls + ' ' + st + '" data-gv="' + esc(gvAddr) + '" title="Open this governor">' : '<span class="gp-sv ' + cls + ' ' + st + '">') +
         '<em>' + who + '</em><b>' + (v ? cap(v) : sure ? "Not voted" : "N/A") + '</b>' + (gvAddr ? '</button>' : '</span>'); };
     var h = chip("me", "You", mv, !mv && meNoVoteSure(p));
-    if(mine) h += chip("gov", esc(g ? g.m : mine.slice(0, 12) + "\u2026"), gv, !gv && acctNoVoteSure(ga, p), mine);
+    /* a governor follows itself: its own vote is the one chip (operator, 2026-11-03) */
+    if(mine && mine !== govAddrOf(window.__ADDR)) h += chip("gov", esc(g ? g.m : mine.slice(0, 12) + "\u2026"), gv, !gv && acctNoVoteSure(ga, p), mine);
     return '<div class=gp-you>' + h + '</div>';
   }
   function voteBox(p){
@@ -1540,7 +1541,8 @@
     if(v === null) return '<div class=gp-vote><span class=gp-vn>Reading your vote…</span></div>';
     var btn = function(o, t){ return '<button class="sv-gbtn vote' + (v === o ? ' on' : '') + '" type=button data-act=vote data-pid="' + p.id + '" data-opt="' + VNUM[o] + '"' +
       (v === o ? ' aria-pressed=true' : '') + '>' + t + '</button>'; };
-    var note = v ? 'You voted ' + v + '. You can change it until voting ends.' : g ? 'Your governor votes for your stake unless you vote yourself.' : '';
+    var selfGov = g && (g.addr || g) === govAddrOf(window.__ADDR);
+    var note = v ? 'You voted ' + v + '. You can change it until voting ends.' : g && !selfGov ? 'Your governor votes for your stake unless you vote yourself.' : '';
     return '<div class=gp-vote><span class=gp-vb>' + btn("yes", "Yes") + btn("abstain", "Abstain") + btn("no", "No") + '</span>' + (note ? '<span class=gp-vn>' + note + '</span>' : '') + '</div>';
   }
   function voteSend(t, pid, opt){
