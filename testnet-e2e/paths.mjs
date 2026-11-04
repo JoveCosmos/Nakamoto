@@ -180,7 +180,7 @@ const bal = async (a, dn) => +(((await chain("/cosmos/bank/v1beta1/balances/" + 
 
   await run("restake-off", `E.click('[data-act=restakesw]'); await E.sleep(2500);
     var b = E.vis('#rsgo'); if(b){ await E.wait(function(){ return !b.disabled; }, 30000, 'Restake off enabled'); E.click(b); }`,
-    async (d, s) => { const g = await grants(); return { grants: g, check: s.msgs.every(m => m === "MsgRevoke") && !g.length ? "ok" : "FAILED" }; });
+    async (d, s) => { const g = await grants(); return { grants: g, check: s.msgs.every(m => m === "MsgRevoke") && !g.some(x => /DELEGATE$|WithdrawDelegatorReward/.test(x) && !/REDELEGATE$/.test(x)) ? "ok" : "FAILED" }; });   // Restake's two gone; Autopilot's may stay
 
   // 9b Restake on with the jailed-validators box unticked (2026-11-03)
   await run("restake-all-on", `E.click('[data-act=restakesw]'); await E.wait(function(){ return E.vis('#rsgo'); }, 15000, 'Restake card');
