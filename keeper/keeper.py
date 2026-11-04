@@ -868,6 +868,67 @@ def ranks_kept(ranked, moves, forced=()):
     shelf = max(v["t"] + d.get(v["op"], 0) for v in ranked if v["op"] in dsts)
     return all(v["t"] + d[v["op"]] >= shelf + GAP for v in ranked if v["op"] in srcs and v["op"] not in forced)
 
+MIN_POS = 100_000_000   # no Autopilot delegation between 0 and 100 ATONE (operator, 2026-11-04)
+
+def tidy(moves, rows, ranked, forced, cands=(), used=None):
+    """(operator, 2026-11-04: "so user will not have delegations like 2, 4, 12 atone") every delegation a plan touches ends
+    at 0 or at 100 ATONE and more. The pieces a destination would hold under 100 are taken back and placed again as ONE
+    piece: on the same source's largest move that stays whole, or else as one move to the best-paying validator in the
+    zone (cands, smallest first) with room for all of it, in both cases only where no rank breaks; failing both they stay
+    at their source (an excluded source's pieces still go as they were: zero wins there). A source left with 1 to 99 free
+    ATONE sends that rest along on its largest move where no rank breaks, or else moves 100 less so 100 stays. Locked
+    stake stays wherever the chain holds it."""
+    have = {r["op"]: int(r["x"]) for r in rows}
+    free = {r["op"]: int(r["x"]) - int(r["locked"]) for r in rows}
+    locked = {r["op"]: int(r["locked"]) for r in rows}
+    used = used or {}
+    moves = [dict(x) for x in moves]
+    def inn():
+        d = {}
+        for x in moves: d[x["dst"]] = d.get(x["dst"], 0) + x["amount"]
+        return d
+    # destinations: the small pieces come back, per source
+    back = {}
+    for d, a in list(inn().items()):
+        if have.get(d, 0) + a >= MIN_POS: continue
+        for leg in [x for x in moves if x["dst"] == d]:
+            moves.remove(leg); back.setdefault(leg["src"], []).append(leg)
+    for s_, legs in back.items():
+        R = sum(x["amount"] for x in legs); placed = False
+        for o in sorted((x for x in moves if x["src"] == s_), key=lambda x: -x["amount"]):
+            o["amount"] += R
+            if ranks_kept(ranked, moves, forced): placed = True; break
+            o["amount"] -= R
+        if not placed:
+            for c in cands:
+                if c == s_ or used.get((s_, c), 0) >= 7: continue
+                moves.append({"src": s_, "dst": c, "amount": R})
+                if ranks_kept(ranked, moves, forced): placed = True; break
+                moves.pop()
+        if not placed and s_ in forced: moves.extend(legs)
+    # sources
+    sent = {}
+    for x in moves: sent[x["src"]] = sent.get(x["src"], 0) + x["amount"]
+    for op, amt in sent.items():
+        rest = free.get(op, 0) - amt
+        if not (0 < rest < MIN_POS) or locked.get(op, 0): continue
+        legs = sorted((x for x in moves if x["src"] == op), key=lambda x: -x["amount"])
+        done = False
+        for big in legs:
+            big["amount"] += rest
+            if ranks_kept(ranked, moves, forced): done = True; break
+            big["amount"] -= rest
+        if done or op in forced: continue
+        need = MIN_POS - rest
+        for leg in sorted(legs, key=lambda x: x["amount"]):
+            if need <= 0: break
+            cut = min(need, leg["amount"])
+            if leg["amount"] - cut < MIN_POS and have.get(leg["dst"], 0) + inn()[leg["dst"]] - cut < MIN_POS:
+                cut = leg["amount"]                          # a piece that would be left too small goes back whole
+            leg["amount"] -= cut; need -= cut
+        moves = [x for x in moves if x["amount"] >= MIN_MOVE]
+    return [x for x in moves if x["amount"] >= MIN_MOVE]
+
 def absorb_dust(moves, rows):
     """(operator, 2026-10-31: Autopilot left dust delegations of a few micro-ATONE showing as 0 in every list) a source never
     keeps free stake under 1 ATONE: that last remainder rides on the source's largest move, so no dust delegation is left
@@ -979,7 +1040,10 @@ def plan(g, rows, reds, vals, m, room=None):
     # a source's last piece under 1 ATONE is no move: the shelf it leaves short by less than the 1 ATONE gap keeps its order
     moves = [x for x in moves if x["amount"] >= MIN_MOVE]
     if not moves: return None
-    moves = absorb_dust(moves, rows)   # before the rank check: a remainder that would change a rank still refuses the plan
+    zone = ranked[globals()["top"](n): n - ap_edge([int(v["t"]) for v in ranked])]   # (top is a local name in the rounds above)
+    cands = [v["op"] for v in reversed(zone) if listed(v) and v["op"] not in rate_src]
+    moves = tidy(absorb_dust(moves, rows), rows, ranked, forced, cands, used)   # before the rank check: a remainder that would change a rank still refuses the plan
+    if not moves: return None
     if not ranks_kept(ranked, moves, forced):
         log("plan refused: it would change a rank (%s)" % g.get("granter", "?")); return None
     rate_dst = dst_rates(moves)
