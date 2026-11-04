@@ -7089,6 +7089,8 @@ ul.bn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .mv-nh>em{flex:0 0 auto;font-style:normal;font-family:var(--wmono);font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--wf)}
 .mv-nu{flex:0 1 auto;min-width:0;max-width:100%;display:flex;align-items:baseline;gap:8px;font-size:11px;color:var(--wf);white-space:nowrap;overflow:hidden}
 .mv-nu .mv-nut{min-width:0;overflow:hidden;text-overflow:ellipsis}.mv-nu b{color:var(--ink2,var(--ink));font-weight:600}
+/* the unstaking summary in the lock line's amber, apart from Now on's own colour (operator, 2026-11-04) */
+.mv-nu:not(#z){color:var(--sv-amber)}.mv-nu b:not(#z){color:var(--sv-amber)}
 .mv-nu .mv-nc{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:none;font:inherit;font-weight:600;color:var(--sv-teal,#2bc8bd);cursor:pointer}
 .mv-nu .mv-nc:hover{text-decoration:underline;text-underline-offset:3px}.mv-nu .mv-nc:focus-visible{outline:2px solid var(--sv-teal,#2bc8bd);outline-offset:2px}
 .mv-nu .mv-nc svg{width:12px;height:12px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
