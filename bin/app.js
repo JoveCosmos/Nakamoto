@@ -4379,6 +4379,8 @@ rememberGridH();
   /* the APR new rewards earn under Restake (keeper plan_restake): the lowest-ranked validator it may stake on, the last
      3 and the largest fifth left out, the jailed-often unless the box is unticked */
   window.__rsRate = function(all){
+    /* Autopilot on and leaving the jailed out: Restake leaves them out too, whatever its box (keeper.py, 2026-11-04) */
+    var ai = window.__atInfo ? window.__atInfo() : null; if(ai && ai.grant && window.__atAll && !window.__atAll()) all = false;
     var V = window.__VALS().slice().sort(function(a, b){ return b[1] - a[1]; }), n = V.length, jsk = (window.__D && window.__D.jailskip) || [];
     /* (2026-11-04) Restake tops up the wallet's own delegations first: the best-paying one it may use sets the rate */
     var mine = {}; ((window.__POS && window.__POS.rows) || []).forEach(function(r){ if(r.x >= 1e6) mine[r.id] = 1; });

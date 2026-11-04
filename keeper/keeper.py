@@ -86,6 +86,7 @@ RESTAKE = os.environ.get("KEEPER_RESTAKE", "0") == "1"
 MIN_RESTAKE = float(os.environ.get("KEEPER_MIN_RESTAKE_ATONE", "1"))       # skip while rewards are below this
 RS_LEGS = 10                  # a restake stakes on at most 10 validators (the shelf it pours into)
 RS_TOPUP = 2                  # (2026-11-04) Restake tops up at most 2 of the wallet's own delegations a run
+AP_GRANTERS = set()           # the wallets with an Autopilot grant, refreshed every tick (Restake reads it)
 MAX_CLAIM = int(os.environ.get("KEEPER_MAX_CLAIM", "18"))                  # validators claimed in one transaction (the signer takes 20 messages)
 RESTAKE_URL = os.environ.get("KEEPER_RESTAKE_URL", "") or (SIGNER.rsplit("/", 1)[0] + "/authz-restake" if SIGNER else "")
 WDRAW_URL = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward"
@@ -642,6 +643,9 @@ def plan_restake(c, granter, rg, vals, m):  # noqa: C901
     allow, deny = set(rg["stake"]["allow"] or []), set(rg["stake"].get("deny") or [])
     ranked = sorted(vals.values(), key=lambda v: -v["t"])
     skip = strategy_skip() if all_vals(granter, None, "AUTHORIZATION_TYPE_DELEGATE") else restake_skip()   # the Restake box (2026-11-03)
+    # (operator, 2026-11-04) a wallet whose Autopilot leaves the jailed out has Restake leave them out too, whatever
+    # Restake's own box says: rewards staked there would be forced off by Autopilot in its next run, fees for nothing
+    if granter in AP_GRANTERS and not all_vals(granter, None): skip = skip | restake_skip()
     def ok(v): return (not allow or v["op"] in allow) and v["op"] not in deny and v["op"] not in skip
     # (operator, 2026-11-04: "restake should be smarter, not increasing the delegation count") the rewards go onto the
     # wallet's OWN delegations: the best-paying ones it may use (in the set, not the largest fifth, above Autopilot's bottom guard,
@@ -1551,6 +1555,8 @@ def once(c, only=None, live=None, force=False):
             if mv["dst"] in work: work[mv["dst"]]["t"] += amt
     tick0 = int(time.time()); run_reset()
     gs = [g for g in grants() if not only or g["granter"] == only]; acted = 0
+    global AP_GRANTERS
+    AP_GRANTERS = {g["granter"] for g in gs} if not only else AP_GRANTERS | {g["granter"] for g in gs}
     # a validator that left the active set since the last tick: every Autopilot wallet is checked for stake on it now,
     # not at its next 12-hour run
     global PREV_ACTIVE
