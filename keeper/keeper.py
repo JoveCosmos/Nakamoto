@@ -862,8 +862,12 @@ def ranks_kept(ranked, moves, forced=()):
         d[x["src"]] = d.get(x["src"], 0) - x["amount"]; d[x["dst"]] = d.get(x["dst"], 0) + x["amount"]; srcs.add(x["src"])
     rest = [v for v in ranked if v["op"] not in srcs]
     new = [v["t"] + d.get(v["op"], 0) for v in rest]
+    # levels (operator, 2026-11-04): validators within STEP (300 ATONE) of each other are one level and may change places;
+    # nobody is lifted past, or level with, a validator that stood more than STEP above it
     for j in range(1, len(rest)):
-        if new[j - 1] < new[j] or (rest[j - 1]["t"] > rest[j]["t"] and new[j - 1] <= new[j]): return False
+        for i in range(j - 1, -1, -1):
+            if rest[i]["t"] - rest[j]["t"] <= STEP: continue
+            if new[i] <= new[j]: return False
     dsts = {x["dst"] for x in moves}
     shelf = max(v["t"] + d.get(v["op"], 0) for v in ranked if v["op"] in dsts)
     return all(v["t"] + d[v["op"]] >= shelf + GAP for v in ranked if v["op"] in srcs and v["op"] not in forced)

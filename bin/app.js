@@ -4367,6 +4367,53 @@ rememberGridH();
     for(var i = n - 1 - apEdge(s); i >= topN(n); i--) o.push(i); return o; };
   /* the best case, for a reader with no wallet or no stake: every validator, every slot */
   window.__planMax = function(f){ window.__PLAN_MAX = true; try{ return f(); } finally { window.__PLAN_MAX = false; } };
+  /* keeper.py ranks_kept: validators within STEP (300 ATONE) of each other are one level and may change places; nobody is
+     lifted past, or level with, one that stood more than STEP above; a source not excluded stays 1 ATONE over the shelf */
+  function ranksKept(out, V, forced){
+    var d = {}, srcs = {}, dsts = {};
+    out.forEach(function(m){ d[m.from] = (d[m.from] || 0) - m.amt; d[m.to] = (d[m.to] || 0) + m.amt; srcs[m.from] = 1; dsts[m.to] = 1; });
+    var rest = V.filter(function(v){ return !srcs[v[3]]; }), nw = rest.map(function(v){ return v[1] + (d[v[3]] || 0); }), i, j;
+    for(j = 1; j < rest.length; j++) for(i = j - 1; i >= 0; i--){
+      if(rest[i][1] - rest[j][1] <= STEP) continue;
+      if(nw[i] <= nw[j]) return false; }
+    var shelf = 0; V.forEach(function(v){ if(dsts[v[3]]) shelf = Math.max(shelf, v[1] + d[v[3]]); });
+    return V.every(function(v){ return !srcs[v[3]] || forced[v[3]] || v[1] + d[v[3]] >= shelf + GAP; });
+  }
+  /* keeper.py tidy() (operator, 2026-11-04): every delegation a plan touches ends at 0 or at 100 ATONE and more */
+  var MIN_POS = 100e6;
+  function tidyOut(out, pos, V, at, forced, used){
+    var have = {}, free = {}, locked = {};
+    pos.rows.forEach(function(r){ have[r.id] = r.x; free[r.id] = r.x - r.locked; locked[r.id] = r.locked; });
+    out = out.map(function(m){ return { from: m.from, to: m.to, amt: m.amt }; });
+    function inn(){ var o = {}; out.forEach(function(m){ o[m.to] = (o[m.to] || 0) + m.amt; }); return o; }
+    var jsk = (window.__D && window.__D.jailskip) || [], all = window.__PLAN_MAX || (window.__atAll && window.__atAll());
+    var cands = window.__shelfZone(V.length).map(function(q){ return V[q][3]; }).filter(function(id){ return all || jsk.indexOf(id) < 0; });
+    var back = {}, I = inn();
+    Object.keys(I).forEach(function(dd){ if((have[dd] || 0) + I[dd] >= MIN_POS) return;
+      out.filter(function(m){ return m.to === dd; }).forEach(function(m){ out.splice(out.indexOf(m), 1); (back[m.from] = back[m.from] || []).push(m); }); });
+    Object.keys(back).forEach(function(sId){
+      var legs = back[sId], R = legs.reduce(function(t, m){ return t + m.amt; }, 0), placed = false;
+      out.filter(function(m){ return m.from === sId; }).sort(function(a, b){ return b.amt - a.amt; }).some(function(o){
+        o.amt += R; if(ranksKept(out, V, forced)) return (placed = true); o.amt -= R; return false; });
+      if(!placed) cands.some(function(c){
+        if(c === sId || (used[sId + ">" + c] || 0) >= 7) return false;
+        out.push({ from: sId, to: c, amt: R }); if(ranksKept(out, V, forced)) return (placed = true); out.pop(); return false; });
+      if(!placed && forced[sId]) out = out.concat(legs);
+    });
+    var sent = {}; out.forEach(function(m){ sent[m.from] = (sent[m.from] || 0) + m.amt; });
+    Object.keys(sent).forEach(function(op){
+      var rest = (free[op] || 0) - sent[op]; if(!(rest > 0 && rest < MIN_POS) || locked[op]) return;
+      var legs = out.filter(function(m){ return m.from === op; }).sort(function(a, b){ return b.amt - a.amt; }), done = false;
+      legs.some(function(b){ b.amt += rest; if(ranksKept(out, V, forced)) return (done = true); b.amt -= rest; return false; });
+      if(done || forced[op]) return;
+      var need = MIN_POS - rest, I2 = inn();
+      legs.slice().sort(function(a, b){ return a.amt - b.amt; }).forEach(function(m){ if(need <= 0) return;
+        var cut = Math.min(need, m.amt);
+        if(m.amt - cut < MIN_POS && (have[m.to] || 0) + I2[m.to] - cut < MIN_POS) cut = m.amt;
+        m.amt -= cut; need -= cut; });
+    });
+    return out.filter(function(m){ return m.amt >= 1e6; });
+  }
   window.__planRank = function(pos){
     if(!pos || !pos.rows.length || !(pos.total > 0)) return null;
     /* stake in its 21-day cooldown stays where it is; the free stake is hunted, all of it at once */
@@ -4427,7 +4474,8 @@ rememberGridH();
       var recv = {}, sent = {}, shelf = 0;
       out.forEach(function(m){ recv[m.to] = (recv[m.to] || 0) + m.amt; sent[m.from] = (sent[m.from] || 0) + m.amt; });
       Object.keys(recv).forEach(function(d){ shelf = Math.max(shelf, V[at[d]][1] + recv[d]); });
-      var low = src.filter(function(x){ return at[x.id] != null && V[at[x.id]][1] - (sent[x.id] || 0) < shelf + GAP; });
+      /* an excluded validator has no floor (keeper.py, operator 2026-11-04): its free stake all leaves */
+      var low = src.filter(function(x){ return at[x.id] != null && !forced[x.id] && V[at[x.id]][1] - (sent[x.id] || 0) < shelf + GAP; });
       if(low.length){ low.forEach(function(x){ x.give = Math.max(0, Math.floor(V[at[x.id]][1] - shelf - GAP)); });
         src = src.filter(function(x){ return x.give >= 1e6; }); continue; }
       var fr = out.filter(function(m){ return !forced[m.from]; }).map(function(m){ return rs[m.from]; });
@@ -4443,7 +4491,8 @@ rememberGridH();
     if(!done) return null;
     /* a source's last piece under 1 ATONE is no move: the shelf it leaves short by less than the 1 ATONE gap keeps its order */
     out = out.filter(function(m){ return m.amt >= 1e6; });
-    if(!out.length) return null;
+    out = tidyOut(out, pos, V, at, forced, used);       /* 0 or 100 ATONE, as keeper.py tidy() */
+    if(!out.length || !ranksKept(out, V, forced)) return null;
     var D1 = dstRates(out), moved = D1.moved, rd = D1.rd;
     var gainU = 0; out.forEach(function(m){ gainU += m.amt * (rd[m.to] - rs[m.from]); });
     /* the rest of the wallet (operator, 2026-10-08), as keeper.py plan(): stake already on a destination earns its new,
