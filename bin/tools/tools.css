@@ -353,3 +353,21 @@ html.embed .rows>.row:not(#z),html.embed .rows>.srow:not(#z){flex-shrink:0}
   html.embed .wrap>#tool:not([hidden]):not(#z):not(#y){overflow-y:auto;padding-bottom:0}
   html.embed #tool .foot:not(#z):not(#y){position:sticky;bottom:0;z-index:2;background:var(--wc);margin-top:auto;padding-bottom:10px;box-shadow:0 -10px 14px -10px rgba(0,0,0,.35)}
 }
+/* Gather on phones, third pass (operator, 2026-11-04): "to gather" on one line like the other two boxes, lower boxes, the
+   selection line sized to fit whole on one row, the list takes the room left */
+.nph{display:inline}
+@media(max-width:600px){
+  .nph:not(#z){display:none}
+  html.embed #tool:has(#notes) .hero>div:not(#z):not(#y){padding:5px 6px;min-height:0;gap:1px}
+  html.embed #tool:has(#notes) .hero>div b:not(#z):not(#y){font-size:17px;line-height:1.1}
+  html.embed #tool:has(#notes) .hero>div em:not(#z):not(#y){font-size:8.5px;white-space:nowrap;line-height:1.2}
+  html.embed #tool:has(#notes) .sel:not(#z):not(#y){container-type:inline-size}
+  html.embed #tool:has(#notes) .sel #selnote:not(#z):not(#y){text-overflow:clip;font-size:min(10px,calc(100cqi / 31));letter-spacing:.03em}
+  html.embed #tool:has(#notes)>.left>.stage:not(#z):not(#y):not(#x){flex:0 0 80px!important;height:80px!important}
+  html.embed #tool:has(#notes)>.side>.rows:not(#z):not(#y){flex:1 1 0!important;min-height:96px}
+}
+@media(max-width:600px){
+  html.embed #tool:has(#notes) .sel>.sp:not(#z){display:none}
+  html.embed #tool:has(#notes) .sel #selnote:not(#z):not(#y):not(#x){font-size:min(10px,calc(100cqi / 32));flex:1 1 100%}
+  html.embed #tool:has(#den) .hero>div em:not(#z):not(#y){white-space:nowrap}
+}

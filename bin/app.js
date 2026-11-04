@@ -2977,7 +2977,8 @@ rememberGridH();
       g.hidden = true; fr.hidden = false;
       /* the build's own mark on the frame's address: a published change is never served from a cached tool page */
       var bv = ((document.querySelector('script[src*="app.js"]') || {}).src || "").split("v=")[1] || "";
-      var u = BASEH + "tools/" + TOOL + "?embed=1" + (bv ? "&b=" + bv : ""); if(fr.getAttribute("src") !== u) fr.setAttribute("src", u);
+      var u = BASEH + "tools/" + TOOL + "?embed=1" + (bv ? "&b=" + bv : "");
+      if(fr.getAttribute("src") !== u){ window.__tlTag(""); fr.setAttribute("src", u); }   /* another tool: the last one's note goes with it */
     }
     function open(t){
       TOOL = t; var ic = m.querySelector('[data-tool="' + t + '"] svg');   /* the menu's icon beside the title (operator, 2026-11-03) */

@@ -5756,7 +5756,7 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
   #tlpop .wk-txh .tlwho .tlw-l:not(#z){display:none}
   #tlpop .wk-txh .tlwho .tlw-s:not(#z):not(#y){display:inline;font-size:10px;letter-spacing:.02em}
 }
-@media(max-width:380px){#tlpop .wk-txh .tltag:not(#z){font-size:9.5px;padding:2px 6px}#tlpop .wk-txh>div:not(#z){gap:6px}}
+@media(max-width:380px){#tlpop .wk-txh .tltag:not(#z):not(#y):not(#x){font-size:9.5px;padding:2px 6px;flex:0 0 auto;overflow:visible}#tlpop .wk-txh>div:not(#z):not(#y):not(#x){gap:6px}#tlpop .wk-txh #tlttl:not(#z):not(#y){font-size:15px}}
 .tlcard #tlttl{white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
 .tlcard #tlttl svg{width:18px;height:18px;flex:0 0 auto;fill:none;stroke:var(--wcyan);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .tltag .tlt-s{display:none}
