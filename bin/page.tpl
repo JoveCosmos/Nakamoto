@@ -5798,8 +5798,10 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .pop .atjail:not(#z)>span>i{flex:0 0 auto;display:inline;margin:0;height:auto;font-style:normal;font-size:11px;color:var(--wf)}
 .pop .atjail.all:not(#z)>span>i{color:var(--wamber)}
 .pop .atjail:hover{background:rgba(91,179,232,.1)}
+.pop .atjail.spjail:not(#z){margin:0;flex:0 0 auto}
 .pop .atjail.ro{cursor:default}.pop .atjail.ro:hover{background:rgba(91,179,232,.06)}
 .pop .atjail b{font-weight:400;min-width:0;overflow:hidden;text-overflow:ellipsis}.pop .atjail b.js{display:none}
+@media(max-width:400px){.pop .atjail:not(#z)>span:not(#y){flex-wrap:wrap;row-gap:1px;white-space:normal}.pop .atjail:not(#z)>span>b{flex:1 1 100%}}   /* narrow phones: the hint on its own line, the label never cut (2026-11-04) */
 @media(max-width:520px){.pop .atjail b.jl{display:none}.pop .atjail b.js{display:inline}.pop .atjail:not(#z)>span{font-size:11.5px;gap:6px}.pop .atjail:not(#z)>span>i{font-size:10.5px}}
 #atpop .atnote:not(#z){margin-top:14px;padding:10px 12px;font-size:12px;border-radius:9px}
 /* the list: taller rows, the name and the APR larger */
@@ -7743,6 +7745,8 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
     <div class=sp-stage id=spstage><canvas id=spcv aria-hidden=true></canvas></div>
     <div class=sp-chips id=splegs></div>
     <div class=sp-pho id=sppho></div>
+    <!-- the same box as Autopilot and Restake (operator, 2026-11-04): ticked by default, the plan redraws as it changes -->
+    <label class="aopt atjail spjail" id=spjailw><input type=checkbox id=spjail checked><span><b class=jl>Exclude validators jailed 3x, or 2x in 90 days</b><b class=js>Exclude jailed 3x, or 2x in 90d</b><i id=spjaili>Recommended</i></span></label>
   </div>
   <div class=txfee id=spfee></div>
   <div class=txstep id=spstep></div>

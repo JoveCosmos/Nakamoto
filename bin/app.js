@@ -2129,7 +2129,8 @@ rememberGridH();
     var at = {}; V.forEach(function(v, q){ at[v[3]] = q; });
     /* the build's exclusion list lives with the shelf rule, in its own scope: reach it the way the rule itself is
        reached (a bare name here threw on every keystroke and StakePilot drew nothing, 2026-10-25) */
-    var skip = window.__noStake || function(){ return false; };
+    /* the box in StakePilot (operator, 2026-11-04): the same exclusion list as Autopilot, ticked by default */
+    var skip = window.__SP_ALL ? function(){ return false; } : (window.__noStake || function(){ return false; });
     var add = window.__shelfFill(V, V.map(function(v){ return v[1]; }), u, function(q){ return !skip(V[q][3]); }), legs = [], placed = 0, op;
     for(op in add){ var q = at[op], v = V[q]; legs.push({ id: v[3], m: v[0], rank: q + 1, t: v[1], c: v[2], x: add[op] }); placed += add[op]; }
     /* no room on the shelf at all (operator, 2026-10-17: "stakepilot not working in testnet"): a set levelled flat, as
@@ -2142,6 +2143,22 @@ rememberGridH();
       placed = legs.length ? u : 0;
     }
     if(!legs.length) return null;
+    /* 0 or 100 ATONE, as Autopilot (keeper.py tidy): a validator the reader would hold under 100 ATONE on gives its
+       pieces back, and they go as ONE piece on the largest leg, or else on the best-paying validator with room, wherever
+       no rank breaks (levels of 300 ATONE); an amount under 100 ATONE in all lands whole on one validator */
+    if(window.__ranksKept){
+      var have = {}; ((window.__POS && window.__POS.rows) || []).forEach(function(r){ have[r.id] = r.x; });
+      var asOut = function(L){ return L.map(function(l){ return { from: "", to: l.id, amt: l.x }; }); };
+      var keepL = legs.filter(function(l){ return (have[l.id] || 0) + l.x >= 1e8; }), backL = legs.filter(function(l){ return (have[l.id] || 0) + l.x < 1e8; });
+      if(backL.length && keepL.length + backL.length > 1){
+        var R = backL.reduce(function(t, l){ return t + l.x; }, 0), done = false, Vs = V.slice().sort(function(a, b){ return b[1] - a[1]; });
+        keepL.slice().sort(function(a, b){ return b.x - a.x; }).some(function(l){ l.x += R; if(window.__ranksKept(asOut(keepL), Vs, {})) return (done = true); l.x -= R; return false; });
+        if(!done && window.__shelfZone) window.__shelfZone(n).some(function(q){ var v = V[q]; if(skip(v[3])) return false;
+          var ex = keepL.filter(function(l){ return l.id === v[3]; })[0], L2 = ex ? keepL : keepL.concat([{ id: v[3], m: v[0], rank: q + 1, t: v[1], c: v[2], x: 0 }]), tgt = ex || L2[L2.length - 1];
+          tgt.x += R; if(window.__ranksKept(asOut(L2), Vs, {})){ keepL = L2; return (done = true); } tgt.x -= R; return false; });
+        if(done) legs = keepL;
+      }
+    }
     /* what the shelf leaves (dust under 1 ATONE, the last part of a step) goes on its top leg: that one sits 300 ATONE
        under the validator above it, so a little more passes nobody */
     legs.sort(function(p, q){ return p.rank - q.rank; });
@@ -3483,6 +3500,7 @@ rememberGridH();
     STG.raf = requestAnimationFrame(stgTick);
   }
   if(window.ResizeObserver && E("spstage")) new ResizeObserver(function(){ if(STG.on) stgSize(); else if(stgShown()) stgStart(); }).observe(E("spstage"));
+  window.__spState = function(){ spState(); };
   function spState(){
     var u = spAmount(), bal = spBal(), mx = spMax(), over = u > mx, P = u > 0 && !over ? window.__pilotPlan(u) : null;
     SP.plan = P;
@@ -3976,6 +3994,10 @@ rememberGridH();
     b.checked = !AT_ALL; b.disabled = !!ro; w.classList.toggle("all", AT_ALL); w.classList.toggle("ro", !!ro);
     t.textContent = AT_ALL ? "All validators, none excluded" : "Recommended"; }
   (function(){ var b = E("atjail"); if(b) b.addEventListener("change", function(){ AT_ALL = !b.checked; atJail(false); if(window.__redraw) window.__redraw(); }); })();
+  /* StakePilot's box (operator, 2026-11-04): the same rule and words; ticking or unticking redraws the plan at once */
+  (function(){ var b = E("spjail"), w = E("spjailw"), t = E("spjaili"); if(!b) return;
+    b.addEventListener("change", function(){ window.__SP_ALL = !b.checked; w.classList.toggle("all", !b.checked);
+      t.textContent = b.checked ? "Recommended" : "All validators, none excluded"; if(window.__spState) window.__spState(); }); })();
   function atMonths(){ return AT.days >= 365 ? "12 months" : AT.days >= 180 ? "6 months" : "3 months"; }
   function atCap(){ var a = E("atcap"), n = window.__amountIn(a.value); return isFinite(n) && n > 0 ? Math.round(n * 1e6) : 0; }
   function atMsgs(){
@@ -4414,6 +4436,7 @@ rememberGridH();
     });
     return out.filter(function(m){ return m.amt >= 1e6; });
   }
+  window.__ranksKept = ranksKept;
   window.__planRank = function(pos){
     if(!pos || !pos.rows.length || !(pos.total > 0)) return null;
     /* stake in its 21-day cooldown stays where it is; the free stake is hunted, all of it at once */
