@@ -540,18 +540,18 @@ def gas_price():
 JAIL_EVER, JAIL_90 = 3, 2
 _SKIP = {"mtime": 0, "restake": set(), "all": set()}
 def _skips():
-    """from the build: the validators the operator's list excludes from every strategy ("nostake"), and the ones
-    Restake alone leaves alone (the jailings above). A build that cannot be read excludes nobody"""
+    """from the build: the validators jailed often (above). The operator's separate no-stake list is gone (operator,
+    2026-11-04: one exclusion list, one rule); "all" stays empty for the callers. A build that cannot be read excludes nobody"""
     path = os.path.join(os.path.dirname(REPORTS.rstrip("/")), "data.json")
     try:
         st = os.stat(path)
         if st.st_mtime == _SKIP["mtime"]: return _SKIP
         d = json.load(open(path))
-        _SKIP["all"] = set(d.get("nostake") or [])
+        _SKIP["all"] = set()
         _SKIP["restake"] = _SKIP["all"] | {v["op"] for v in d.get("validators", [])
                                            if (v.get("jail") or 0) >= JAIL_EVER or (v.get("jail90") or 0) >= JAIL_90}
         _SKIP["mtime"] = st.st_mtime
-        log("skips: %d everywhere, %d more for Restake" % (len(_SKIP["all"]), len(_SKIP["restake"]) - len(_SKIP["all"])))
+        log("excluded (jailed often): %d" % len(_SKIP["restake"]))
     except Exception as e:
         log("skip list unreadable, nobody skipped: %s" % e)
     return _SKIP
@@ -899,9 +899,9 @@ def plan(g, rows, reds, vals, m, room=None):
     # stake on a validator the wallet excludes (jailed 3x ever or 2x in 90 days, box ticked) moves first, from any rank,
     # and needs no APR gain: the reader asked for it off them (operator, 2026-11-03). Stake already there was put there
     # by the reader; the exclusion is its own, so nothing else is forced
-    # one exclusion list, one rule (operator, 2026-11-04): the operator's no-stake list is forced off for everyone, the
-    # jailed ones unless the wallet chose "all validators"; an excluded validator keeps no Autopilot stake that can move
-    forced = strategy_skip() | (set() if all_vals(g["granter"], g["exp"]) else restake_skip())
+    # one exclusion list, one rule (operator, 2026-11-04): unless the wallet chose "all validators", an excluded
+    # validator keeps no Autopilot stake that can move
+    forced = set() if all_vals(g["granter"], g["exp"]) else restake_skip()
     src = []
     # all the free stake may go: the floor (never below the shelf) is set in the rounds below, once the shelf is known
     for r in sorted((r for r in rows if r["free"] > 0 and (r["op"] not in bset or r["op"] in forced)), key=lambda r: (r["op"] not in forced, -r["free"])):

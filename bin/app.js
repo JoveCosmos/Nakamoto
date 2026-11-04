@@ -4351,16 +4351,16 @@ rememberGridH();
     return e; }
   window.__apEdge = apEdge;
   /* the APR new rewards earn under Restake (keeper plan_restake): the lowest-ranked validator it may stake on, the last
-     3 and the largest fifth left out, the build's no-stake list always, the jailed-often unless the box is unticked */
+     3 and the largest fifth left out, the jailed-often unless the box is unticked */
   window.__rsRate = function(all){
     var V = window.__VALS().slice().sort(function(a, b){ return b[1] - a[1]; }), n = V.length, jsk = (window.__D && window.__D.jailskip) || [];
     for(var i = n - 1 - EDGE; i >= topN(n); i--){ var id = V[i][3];
-      if(noStake(id) || (!all && jsk.indexOf(id) >= 0)) continue;
+      if(!all && jsk.indexOf(id) >= 0) continue;
       return window.__rateAfter(V[i][1], V[i][2], 0); }
     return 0; };
-  /* validators the build's own list keeps out of a strategy's destinations: stake already there is left alone and may
-     still be moved off, they simply take nothing new */
-  function noStake(id){ var L = (window.__D && window.__D.nostake) || []; return L.indexOf(id) >= 0; }
+  /* the one exclusion list (operator, 2026-11-04): validators jailed 3x ever or 2x in 90 days take nothing new from
+     StakePilot; Autopilot and Restake read the same list, with the box's choice */
+  function noStake(id){ var L = (window.__D && window.__D.jailskip) || []; return L.indexOf(id) >= 0; }
   window.__noStake = noStake;
   /* the ranks the shelf may pour into (0-based, smallest first): the last EDGE left out, never the largest fifth */
   window.__shelfZone = function(n){ var o = [], s = window.__VALS().map(function(v){ return v[1]; }).sort(function(a, b){ return b - a; });
