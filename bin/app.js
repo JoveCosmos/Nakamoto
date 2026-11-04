@@ -4450,6 +4450,7 @@ rememberGridH();
     /* keeper.py: stake on a validator the wallet excludes (box ticked) moves first, from any rank, with no gain test */
     var jskL = (window.__D && window.__D.jailskip) || [], allV = window.__PLAN_MAX || (window.__atAll && window.__atAll()), forced = {};
     if(!allV) jskL.forEach(function(id){ forced[id] = 1; });
+    pos.rows.forEach(function(r){ if(r.inactive || at[r.id] == null) forced[r.id] = 1; });   /* outside the set: always leaves whole (keeper.py) */
     var src = pos.rows.filter(function(r){ return r.x - r.locked > 0 && (!bset[r.id] || forced[r.id]); }).sort(function(a, b){ return ((forced[a.id] ? 0 : 1) - (forced[b.id] ? 0 : 1)) || ((b.x - b.locked) - (a.x - a.locked)); }).map(function(r){
       return { id: r.id, give: Math.floor(r.x - r.locked), rate: r.inactive ? 0 : r.rate };
     }).filter(function(x){ return x.give >= 1e6; });

@@ -34,6 +34,9 @@ NET = os.environ.get("NET", "mainnet")
 # (red team 2026-10-01) mainnet reads the box's own node: the public API shares one nginx rate-limit bucket with the
 # world, and a flood there must not starve the keeper. An ATOMONE_API in the env still wins (testnet sets its own)
 API = (os.environ.get("ATOMONE_API") or ("http://127.0.0.1:3999" if NET == "mainnet" else "https://atomone-api.gatadao.com")).rstrip("/")
+# the node's own RPC: its tx index answers for transactions whose blocks the node has pruned, which the REST tx search
+# cannot (it fetches each block and fails the whole search on one pruned height, 2026-11-04)
+RPC = (os.environ.get("ATOMONE_RPC") or ("http://127.0.0.1:23957" if NET == "mainnet" else "http://127.0.0.1:27957")).rstrip("/")
 SIGNER = os.environ.get("KEEPER_SIGNER_URL", "")
 def _secret():
     """the signer's shared secret: the unit's systemd credential when it loads one, else KEEPER_SECRET from the env
@@ -236,17 +239,60 @@ def grants():
 # (Change, Update) leaves nothing else to tell it apart - the cache is cleared at the start of every tick ──────────────
 ALL_VALS = "all validators"
 _MEMO = {}
+def _pb(b):
+    """protobuf fields of one message: [(field, wire type, value)]; enough to read a transaction's body"""
+    out, i = [], 0
+    def var(i):
+        n = sh = 0
+        while True:
+            c = b[i]; i += 1; n |= (c & 0x7f) << sh; sh += 7
+            if c < 0x80: return n, i
+    while i < len(b):
+        k, i = var(i); f, w = k >> 3, k & 7
+        if w == 0: v, i = var(i)
+        elif w == 2: ln, i = var(i); v = b[i:i + ln]; i += ln
+        elif w == 1: v = b[i:i + 8]; i += 8
+        elif w == 5: v = b[i:i + 4]; i += 4
+        else: raise ValueError("wire type %d" % w)
+        out.append((f, w, v))
+    return out
+
+def _grant_txs(granter):
+    """this wallet's MsgGrant transactions, newest first, as (memo, [(grantee, authorization type)]), from the RPC tx
+    index: TxRaw.body -> TxBody.messages (Any) + memo -> MsgGrant.grantee + grant.authorization (StakeAuthorization.type)"""
+    q = urllib.parse.quote('"message.sender=\'%s\' AND message.action=\'/cosmos.authz.v1beta1.MsgGrant\'"' % granter)
+    with urllib.request.urlopen(RPC + "/tx_search?query=%s&order_by=%%22desc%%22&per_page=10" % q, timeout=20) as r:
+        res = json.load(r)["result"]
+    TYPES = {1: "AUTHORIZATION_TYPE_DELEGATE", 2: "AUTHORIZATION_TYPE_UNDELEGATE", 3: "AUTHORIZATION_TYPE_REDELEGATE"}
+    out = []
+    for t in res.get("txs") or []:
+        body = next(v for f, w, v in _pb(base64.b64decode(t["tx"])) if f == 1)
+        memo, grants = "", []
+        for f, w, v in _pb(body):
+            if f == 2: memo = v.decode("utf-8", "replace")
+            if f != 1: continue
+            any_ = dict((f2, v2) for f2, w2, v2 in _pb(v))
+            if any_.get(1) != b"/cosmos.authz.v1beta1.MsgGrant": continue
+            mg = dict((f2, v2) for f2, w2, v2 in _pb(any_.get(2, b"")))
+            gr = dict((f2, v2) for f2, w2, v2 in _pb(mg.get(3, b"")))
+            au = dict((f2, v2) for f2, w2, v2 in _pb(gr.get(1, b"")))
+            typ = None
+            if au.get(1) == b"/cosmos.staking.v1beta1.StakeAuthorization":
+                typ = TYPES.get(dict((f2, v2) for f2, w2, v2 in _pb(au.get(2, b""))).get(4))
+            grants.append((mg.get(2, b"").decode(), typ))
+        out.append((memo, grants))
+    return out
+
 def all_vals(granter, exp, kind="AUTHORIZATION_TYPE_REDELEGATE"):
-    """True when the reader unticked the box: the latest grant of this kind (REDELEGATE Autopilot, DELEGATE Restake)"""
+    """True when the reader unticked the box: the memo of the latest grant of this kind (REDELEGATE Autopilot,
+    DELEGATE Restake) to our grantee. Read from the RPC tx index, which keeps grants made before the node's pruning
+    horizon (a REST search failed whole on them: atone1axehvc..., grant at 10,083,455, 2026-11-04)"""
     k = (granter, exp, kind)
     if k in _MEMO: return _MEMO[k]
-    q = ("/cosmos/tx/v1beta1/txs?query=" + urllib.parse.quote("message.sender='%s' AND message.action='/cosmos.authz.v1beta1.MsgGrant'" % granter)
-         + "&order_by=ORDER_BY_DESC&limit=5")
     try:
-        for t in get(q).get("tx_responses") or []:
-            ms = t.get("tx", {}).get("body", {}).get("messages", [])
-            if any((x.get("grant") or {}).get("authorization", {}).get("authorization_type") == kind and x.get("grantee") == GRANTEE for x in ms):
-                _MEMO[k] = ALL_VALS in (t["tx"]["body"].get("memo") or "").lower(); return _MEMO[k]
+        for memo, grants in _grant_txs(granter):
+            if any(g == GRANTEE and t == kind for g, t in grants):
+                _MEMO[k] = ALL_VALS in memo.lower(); return _MEMO[k]
         _MEMO[k] = False
     except Exception as e:
         log("grant memo unreadable for %s, jailed validators left out: %s" % (short(granter), e)); return False
@@ -967,6 +1013,9 @@ def plan(g, rows, reds, vals, m, room=None):
     # one exclusion list, one rule (operator, 2026-11-04): unless the wallet chose "all validators", an excluded
     # validator keeps no Autopilot stake that can move
     forced = set() if all_vals(g["granter"], g["exp"]) else restake_skip()
+    # a validator outside the set (jailed, dropped) pays nothing: its free stake always leaves whole, like an excluded
+    # one's, so the 0-or-100 rule never keeps a small piece there (Trace, 2026-11-04: 31 ATONE would have stayed)
+    forced = forced | {r["op"] for r in rows if r["op"] not in vals}
     src = []
     # all the free stake may go: the floor (never below the shelf) is set in the rounds below, once the shelf is known
     for r in sorted((r for r in rows if r["free"] > 0 and (r["op"] not in bset or r["op"] in forced)), key=lambda r: (r["op"] not in forced, -r["free"])):
