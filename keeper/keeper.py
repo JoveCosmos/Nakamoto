@@ -85,6 +85,7 @@ MAX_LIST = 64                 # (red team 2026-10-01) a grant whose allow or den
 RESTAKE = os.environ.get("KEEPER_RESTAKE", "0") == "1"
 MIN_RESTAKE = float(os.environ.get("KEEPER_MIN_RESTAKE_ATONE", "1"))       # skip while rewards are below this
 RS_LEGS = 10                  # a restake stakes on at most 10 validators (the shelf it pours into)
+RS_TOPUP = 2                  # (2026-11-04) Restake tops up at most 2 of the wallet's own delegations a run
 MAX_CLAIM = int(os.environ.get("KEEPER_MAX_CLAIM", "18"))                  # validators claimed in one transaction (the signer takes 20 messages)
 RESTAKE_URL = os.environ.get("KEEPER_RESTAKE_URL", "") or (SIGNER.rsplit("/", 1)[0] + "/authz-restake" if SIGNER else "")
 WDRAW_URL = "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward"
@@ -642,24 +643,40 @@ def plan_restake(c, granter, rg, vals, m):  # noqa: C901
     ranked = sorted(vals.values(), key=lambda v: -v["t"])
     skip = strategy_skip() if all_vals(granter, None, "AUTHORIZATION_TYPE_DELEGATE") else restake_skip()   # the Restake box (2026-11-03)
     def ok(v): return (not allow or v["op"] in allow) and v["op"] not in deny and v["op"] not in skip
-    def room(amount):
-        """(2026-10-09) Autopilot's pours leave the shelf a staircase 1 ATONE a step (20 validators wide that day): rising
-        from its bottom lifts every step, more legs than RS_LEGS, and every restake was skipped. Then the rewards go where
-        there is room without lifting anyone: the lowest-ranked first, each up to 1 ATONE under the one above it (the
-        staircase's top step had 837 ATONE of room). No validator passes another, so no rank changes"""
-        s = [int(v["t"]) for v in ranked]; add, left = {}, int(amount)
-        for i in range(len(ranked) - 1 - EDGE, top(len(ranked)) - 1, -1):
-            if left <= 0 or len(add) >= RS_LEGS: break
-            x = min(left, s[i - 1] - GAP - s[i]) if ok(ranked[i]) else 0
-            if x >= 1: add[ranked[i]["op"]] = x; left -= x
-        return add
+    # (operator, 2026-11-04: "restake should be smarter, not increasing the delegation count") the rewards go onto the
+    # wallet's OWN delegations: the best-paying ones it may use (in the set, not the largest fifth, not the last RS_EDGE,
+    # not excluded by its box, allowed by its grant), at most RS_TOPUP of them, each only as far as no rank breaks (the
+    # 300-ATONE levels). A wallet with no such delegation gets ONE new one, on the best-paying validator with room, which
+    # later runs top up. No waiting: it still restakes every 12 hours from 1 ATONE. Fewer messages, less gas
+    n_ = len(ranked)
+    zone = [v for v in ranked[top(n_): n_ - RS_EDGE] if ok(v)][::-1]          # smallest (best-paying) first
+    held = {r["op"] for r in position(granter, vals)[0] if r["x"] >= MIN_MOVE}
+    def fits_at(op, x, base): return ranks_kept(ranked, base + [{"src": None, "dst": op, "amount": int(x)}], ())
+    def most(op, amount, base):
+        """the most of `amount` op can take on top of base without breaking a rank"""
+        if fits_at(op, amount, base): return int(amount)
+        lo, hi = 0, int(amount)
+        while hi - lo > GAP // 2:
+            mid = (lo + hi) // 2
+            if fits_at(op, mid, base): lo = mid
+            else: hi = mid
+        return lo
+    def place(amount):
+        mine = [v["op"] for v in zone if v["op"] in held]
+        legs_, left = [], int(amount)
+        for op in mine:
+            if left <= 0 or len(legs_) >= RS_TOPUP: break
+            base = [{"src": None, "dst": l[0], "amount": l[1]} for l in legs_]
+            x = most(op, left, base)
+            if x >= GAP: legs_.append((op, x)); left -= x
+        if left > GAP // 2 and not legs_:
+            for v in zone:                                                   # no delegation of its own to top up: one new one
+                if fits_at(v["op"], left, []): legs_.append((v["op"], left)); left = 0; break
+        return dict(legs_), left
     while True:
         stake = rewards - send
-        add = fill(ranked, lambda op: vals[op]["t"], stake, ok, min_leg=1, step=GAP) if stake > 0 else {}
-        # what the shelf cannot take (a grant's list leaves too little room) would pass a validator: claim less
-        fits = len(add) <= RS_LEGS and stake - sum(add.values()) < GAP // 2
-        if not fits and stake > 0:
-            add = room(stake); fits = bool(add) and stake - sum(add.values()) < 1
+        add, left = place(stake) if stake > 0 else ({}, 0)
+        fits = bool(add) and left < GAP // 2
         if fits or len(claim) <= 1: break
         claim.pop(); rewards = sum(a for a, v in pend if v in claim)
     if not add or not fits: out["skip"] = "no validator to stake on"; return out
