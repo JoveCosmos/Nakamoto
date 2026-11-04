@@ -154,3 +154,28 @@ window.T = { why: why, NET: NET, BASE: BASE, CHAIN: CHAIN, E: E, esc: esc, get: 
   govOf: govOf, govName: govName, wallet: function(){ return W; }, onWallet: function(f){ onWallet.push(f); }, connect: connect, drawGate: drawGate, sign: sign, feePreview: feePreview,
   fmtP: fmtP, fmtA: fmtA, stage: stage, tok: tok, ours: function(){ return OURS; } };
 })();
+
+/* the keyboard over a tool (operator, 2026-11-04: "the keyboard takes over the last input field"): the card does not move
+   or shrink for it (the app's rule), so the tool makes room under its content as tall as the part of this frame the
+   keyboard covers, and brings the field being typed in to the middle of what is still visible */
+(function(){
+  if(!(window.matchMedia && matchMedia("(pointer:coarse)").matches)) return;
+  var P = window.parent && window.parent !== window ? window.parent : window, F = window.frameElement;
+  function covered(){
+    var vv = P.visualViewport; if(!vv) return 0;
+    var bottom = F ? F.getBoundingClientRect().bottom : P.innerHeight;
+    return Math.max(0, Math.round(bottom - (vv.offsetTop + vv.height)));
+  }
+  function editing(){ var a = document.activeElement; return a && (a.tagName === "TEXTAREA" || (a.tagName === "INPUT" && !/^(button|checkbox|radio|range|submit|reset|file|color|image|hidden)$/i.test(a.type || "text"))) ? a : null; }
+  var T = 0;
+  function fit(){
+    clearTimeout(T); T = setTimeout(function(){
+      var t = document.getElementById("tool"); if(!t || t.hidden) return;
+      var a = editing(), k = a ? covered() : 0;
+      t.style.paddingBottom = k ? (k + 16) + "px" : "";
+      if(a && k) a.scrollIntoView({ block: "center", behavior: "smooth" });
+    }, 120);
+  }
+  if(P.visualViewport){ P.visualViewport.addEventListener("resize", fit); P.visualViewport.addEventListener("scroll", fit); }
+  document.addEventListener("focusin", fit); document.addEventListener("focusout", function(){ setTimeout(fit, 150); });
+})();
