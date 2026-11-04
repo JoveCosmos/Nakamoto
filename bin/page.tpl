@@ -2877,6 +2877,8 @@ html:not([data-wallet]) #wk-mine{align-self:auto}
   .mv-bal .mv-yk>em:not(#z){text-indent:.14em}   /* the letter-spacing after the last letter, balanced */
   .mv-bal .mv-yk>:is(.yk-act,.you-rsx):not(#z){position:static;order:3;align-self:center;margin-top:auto;padding-top:4px}
   .mv-bal .mv-yk>:is(.yk-act,.you-rsx)~b:not(#z){padding-right:0}
+  /* the restake line takes the action buttons' height, centred, so it reads level with Claim beside it (operator, 2026-11-04) */
+  .mv-bal .mv-yk>.you-rsx:not(#z):not(#y){display:flex;align-items:center;justify-content:center;gap:4px;min-height:22px;box-sizing:content-box}
   .mv-bal .mv-yk>.you-rsx:not(#z){flex-direction:row;align-items:baseline;gap:5px}
 }
 /* the lock tag: on phones it sits in Delegations' title row, where the stake is listed, and leaves Redelegate's
@@ -5746,8 +5748,11 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
    row, in every tool; a note (Gather's Autopilot) never swaps it out, so nothing flashes */
 .tlwho .tlw-s{display:none}
 @media(max-width:700px){
-  #tlpop .wk-txh:not(#z){position:relative;padding-top:22px}
-  #tlpop .wk-txh .tlwho:not(#z):not(#y){position:absolute;top:7px;right:20px;margin:0}
+  /* no note: the address ends the title row, right-aligned; with Gather's note it moves to the corner above */
+  #tlpop .wk-txh>div:not(#z):not(#y):not(#x){display:flex;align-items:center;flex-wrap:nowrap}
+  #tlpop .wk-txh .tlwho:not(#z):not(#y):not(#x){margin:0 0 0 auto;flex:0 0 auto;align-self:center}
+  #tlpop .wk-txh:has(.tltag:not([hidden])):not(#z){position:relative;padding-top:22px}
+  #tlpop .wk-txh:has(.tltag:not([hidden])) .tlwho:not(#z):not(#y):not(#x):not(#w){position:absolute;top:7px;right:20px;margin:0}
   #tlpop .wk-txh .tlwho .tlw-l:not(#z){display:none}
   #tlpop .wk-txh .tlwho .tlw-s:not(#z):not(#y){display:inline;font-size:10px;letter-spacing:.02em}
 }

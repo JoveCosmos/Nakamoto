@@ -338,3 +338,18 @@ html.embed .rows>.row:not(#z),html.embed .rows>.srow:not(#z){flex-shrink:0}
   html.embed #tool:has(#notes) .row input[type=checkbox]:not(#z){width:15px;height:15px}
   html.embed #tool:has(#notes) .rows:not(#z){gap:4px}
 }
+/* Gather on phones, tighter (operator, 2026-11-04): the selection line on one row, less air around the two notes, so
+   the list above gets the room */
+@media(max-width:600px){
+  html.embed #tool:has(#notes)>.side:not(#z):not(#y){gap:6px}
+  html.embed #tool:has(#notes) .sel:not(#z):not(#y){min-height:0;height:auto;margin:0;padding:0 2px;font-size:9.5px;letter-spacing:.04em;line-height:1.3}
+  html.embed #tool:has(#notes) .sel #selnote:not(#z){white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto}
+  html.embed #tool:has(#notes) .notes:not(#z):not(#y){gap:3px;margin:0}
+  html.embed #tool:has(#notes) .foot:not(#z):not(#y){padding-top:6px}
+}
+/* phones (operator, 2026-11-04): the button never scrolls away - the fee line and the button are pinned to the bottom
+   of the tool, everything between the header and them scrolls, and the button keeps room under its edge */
+@media(max-width:600px){
+  html.embed .wrap>#tool:not([hidden]):not(#z):not(#y){overflow-y:auto;padding-bottom:0}
+  html.embed #tool .foot:not(#z):not(#y){position:sticky;bottom:0;z-index:2;background:var(--wc);margin-top:auto;padding-bottom:10px;box-shadow:0 -10px 14px -10px rgba(0,0,0,.35)}
+}
