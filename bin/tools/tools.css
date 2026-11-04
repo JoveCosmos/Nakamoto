@@ -396,3 +396,19 @@ html.embed .rows>.row:not(#z),html.embed .rows>.srow:not(#z){flex-shrink:0}
   html.embed #tool:has(#den)>.left>.stage:not(#z):not(#y):not(#x){flex:0 0 56px!important;height:56px!important}
   html.embed #tool:has(#den) #rows:not(#z):not(#y):not(#x){min-height:110px}
 }
+/* Fee Saver on phones, fifth pass (operator, 2026-11-04): the three boxes first, the picture under them; the recipients
+   are part of the page, not a box of their own - everything between the header and the pinned button scrolls as one */
+@media(max-width:600px){
+  html.embed #tool:has(#den):not(#z):not(#y){display:flex;flex-direction:column;gap:6px;overflow-y:auto}
+  html.embed #tool:has(#den)>.left:not(#z),html.embed #tool:has(#den)>.side:not(#z){display:contents}
+  html.embed #tool:has(#den) .hero{order:1}
+  html.embed #tool:has(#den) .stage{order:2}
+  html.embed #tool:has(#den) .tools:has(#den){order:3}
+  html.embed #tool:has(#den) .tools:has(#memo){order:4}
+  html.embed #tool:has(#den) #rows,html.embed #tool:has(#den) #paste{order:5}
+  html.embed #tool:has(#den) #perr{order:6}
+  html.embed #tool:has(#den) .foot{order:7}
+  html.embed #tool:has(#den) .stage:not(#z):not(#y):not(#x):not(#w){flex:0 0 70px!important;height:70px!important;min-height:0;margin:0!important}
+  html.embed #tool:has(#den) #rows:not(#z):not(#y):not(#x):not(#w){flex:0 0 auto!important;min-height:0;max-height:none;overflow:visible;padding:0;border:0;background:none;box-shadow:none}
+  html.embed #tool:has(#den) .foot:not(#z):not(#y):not(#x){margin-top:auto}
+}
