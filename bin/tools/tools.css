@@ -412,3 +412,9 @@ html.embed .rows>.row:not(#z),html.embed .rows>.srow:not(#z){flex-shrink:0}
   html.embed #tool:has(#den) #rows:not(#z):not(#y):not(#x):not(#w){flex:0 0 auto!important;min-height:0;max-height:none;overflow:visible;padding:0;border:0;background:none;box-shadow:none}
   html.embed #tool:has(#den) .foot:not(#z):not(#y):not(#x){margin-top:auto}
 }
+/* phones (2026-11-04): the pinned foot without a shadow (it drew a strip over the card), and Fee Saver's picture
+   without its label (it overlapped the recipients' dots; the count is in the list itself) */
+@media(max-width:600px){
+  html.embed #tool .foot:not(#z):not(#y):not(#x){box-shadow:none}
+  html.embed #tool:has(#den) .stage>.tag:not(#z){display:none}
+}
