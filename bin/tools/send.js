@@ -21,7 +21,9 @@ function valid(){ var me = T.wallet() && T.wallet().address, seen = {};
     else if(!r.x) err = "no amount";
     else if(!xok) err = /\.\d{7,}/.test(r.x) ? "more than 6 decimals" : "amount is not a number";
     if(a && !seen[a]) seen[a] = i + 1;
-    return { a: a, x: x, aok: aok && !err, xok: xok && !err, err: err }; }); }
+    /* each field shows its own state: an address is red only for an address fault, an amount only for an amount fault */
+    var aerr = !!r.bad || !a || !T.bechOk(a, "atone") || a === me || /listed twice/.test(err);
+    return { a: a, x: x, aok: aok && !aerr, xok: xok && !r.bad, err: err }; }); }
 function msgs(){ var me = T.wallet().address; return valid().filter(function(r){ return r.aok && r.xok; }).map(function(r){
   return { type: "cosmos-sdk/MsgSend", value: { from_address: me, to_address: r.a, amount: [{ denom: DEN, amount: String(r.x) }] } }; }); }
 function drawRows(){
@@ -40,7 +42,9 @@ function state(){
     if(v.length > MAXN) errs += '<li><b>' + v.length + ' lines</b> at most ' + MAXN + ' recipients in one send</li>';
     pe.innerHTML = MODE === "paste" && errs ? '<ul>' + errs + '</ul>' : ''; pe.hidden = !(MODE === "paste" && errs); }
   /* the balance as two figures, the one being sent first and marked (operator, 2026-11-03: presented better) */
-  var bA = '<span class="bf' + (DEN === "uatone" ? ' on' : '') + '"><em>ATONE</em><b>' + T.fmtA(BAL.uatone) + '</b></span>', bP = '<span class="bf' + (DEN === "uphoton" ? ' on' : '') + '"><em>PHOTON</em><b>' + T.fmtA(BAL.uphoton) + '</b></span>';
+  /* a long figure (millions) takes a smaller size class, so any balance fits its box on a phone (operator, 2026-11-04) */
+  var fig = function(u){ var t = T.fmtA(u), n = t.length; return '<b' + (n > 12 ? ' class=l2' : n > 9 ? ' class=l1' : '') + '>' + t + '</b>'; };
+  var bA = '<span class="bf' + (DEN === "uatone" ? ' on' : '') + '"><em>ATONE</em>' + fig(BAL.uatone) + '</span>', bP = '<span class="bf' + (DEN === "uphoton" ? ' on' : '') + '"><em>PHOTON</em>' + fig(BAL.uphoton) + '</span>';
   E("bal").innerHTML = '<span class=bl>Balance</span>' + (DEN === "uatone" ? bA + bP : bP + bA) + (over ? '<span class=bo>not enough ' + sym(DEN) + '</span>' : '');
   E("go").disabled = !n || over || bad || BUSY || n > MAXN; E("go").textContent = n > 1 ? "Send to " + n : "Send";
   E("hero").classList.toggle("idle", !n);

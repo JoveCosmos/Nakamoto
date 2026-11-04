@@ -253,3 +253,72 @@ html.embed #tool>.side>.rows:not(#z){padding:3px}
 /* the fee line is one text line centred on the button (operator, 2026-11-03): a flex column split "fee ≈", the PHOTON span and ", gas" into stacked rows */
 .foot>.fee:not(#z){display:block;align-self:center;min-height:0;line-height:18px}
 .foot>.fee:not(#z) span{white-space:normal}
+/* phones (operator, 2026-11-04): Fee Saver's controls in two rows - ATONE|PHOTON beside Rows|Paste, then the two balances
+   and + recipient as three equal boxes; a short picture and compact recipient rows so the list shows several at once;
+   Gather's column scrolls when a short phone cannot hold it, so its button is always reachable */
+@media(max-width:600px){
+  html.embed .tools:has(#den):not(#z):not(#y){display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;align-items:stretch}
+  html.embed .tools:has(#den)>#den:not(#z){grid-column:1/4;grid-row:1;display:flex}
+  html.embed .tools:has(#den)>#mode:not(#z){grid-column:4/7;grid-row:1;display:flex}
+  html.embed .tools:has(#den)>.seg>button:not(#z){flex:1 1 0;padding:0 6px}
+  html.embed .tools:has(#den)>.sp:not(#z){display:none}
+  html.embed .tools:has(#den)>.bal:not(#z){display:contents}
+  html.embed .tools:has(#den)>.bal>.bl:not(#z){display:none}
+  html.embed .tools:has(#den)>.bal>.bf:not(#z){grid-row:2;display:flex;align-items:center;justify-content:center;gap:5px;height:32px;margin:0;min-width:0;white-space:nowrap;overflow:hidden}
+  html.embed .tools:has(#den)>.bal>.bf:nth-of-type(2):not(#z){grid-column:1/3}
+  html.embed .tools:has(#den)>.bal>.bf:nth-of-type(3):not(#z){grid-column:3/5}
+  html.embed .tools:has(#den)>.bal>.bo:not(#z){grid-column:1/7;grid-row:3}
+  html.embed .tools:has(#den)>#add:not(#z){grid-column:5/7;grid-row:2;height:32px;margin:0;padding:0 6px;justify-content:center;width:auto}
+  html.embed #tool:has(#den)>.left>.stage:not(#z):not(#y){flex:0 0 76px!important;height:76px!important;min-height:0}
+  html.embed #rows:not(#z){gap:6px}
+  html.embed .srow:not(#z):not(#y){row-gap:4px}
+  html.embed .srow input:not(#z):not(#y){height:32px}
+  html.embed .srow .rm:not(#z){width:32px;height:32px}
+  html.embed .wrap>#tool:not([hidden]):not(#z){overflow-y:auto;overscroll-behavior:contain}
+  html.embed #tool:has(#notes)>.left>.stage:not(#z):not(#y){flex:0 0 96px!important;height:96px!important;min-height:0}
+  html.embed #tool:has(#notes)>.side>.rows:not(#z){min-height:96px}
+}
+/* phones, second pass (operator, 2026-11-04): balance boxes hold any figure (label above, the figure under it, smaller
+   for millions, never cut); every tool's column scrolls when a short screen cannot hold it; Auth Scanner's picture
+   gives its room to the two lists, whose rows are compact */
+@media(max-width:600px){
+  html.embed .tools:has(#den)>.bal>.bf:not(#z):not(#y){flex-direction:column;align-items:center;justify-content:center;gap:1px;height:38px;padding:2px 4px;line-height:1.1}
+  html.embed .tools:has(#den)>.bal>.bf em:not(#z){font-size:8.5px}
+  html.embed .tools:has(#den)>.bal>.bf b:not(#z){font-size:12.5px;white-space:nowrap}
+  html.embed .tools:has(#den)>.bal>.bf b.l1:not(#z){font-size:11px}
+  html.embed .tools:has(#den)>.bal>.bf b.l2:not(#z){font-size:9.5px;letter-spacing:-.02em}
+  html.embed .tools:has(#den)>#add:not(#z):not(#y){height:38px}
+  html.embed .wrap:not(#z){min-height:0}
+  html.embed #tool:has(#rrows)>.left>.stage:not(#z):not(#y){flex:0 0 72px!important;height:72px!important;min-height:0}
+  html.embed #tool:has(#rrows) .row:not(#z):not(#y){min-height:0;padding:5px 8px;gap:6px;grid-template-columns:18px minmax(0,1fr) auto}
+  html.embed #tool:has(#rrows) .row .who b:not(#z){font-size:12.5px}
+  html.embed #tool:has(#rrows) .row .who small:not(#z){font-size:9.5px}
+  html.embed #tool:has(#rrows) .row .what:not(#z){font-size:9.5px;gap:2px}
+  html.embed #tool:has(#rrows) .row .what .pill:not(#z){font-size:8.5px;padding:1px 5px}
+  html.embed #tool:has(#rrows) .row input[type=checkbox]:not(#z){width:15px;height:15px}
+}
+/* the balance figure sizes itself to its box (any phone width): monospace digits are 0.6em wide, so the size is the box
+   over the figure's length class - up to 9, 12 or 15 characters (operator, 2026-11-04: large balances never overflow) */
+@media(max-width:600px){
+  html.embed .tools:has(#den)>.bal>.bf:not(#z):not(#y){container-type:inline-size}
+  html.embed .tools:has(#den)>.bal>.bf b:not(#z):not(#y){font-size:min(12.5px,calc((100cqi - 8px) / 5.4))}
+  html.embed .tools:has(#den)>.bal>.bf b.l1:not(#z):not(#y){font-size:min(11px,calc((100cqi - 8px) / 7.2))}
+  html.embed .tools:has(#den)>.bal>.bf b.l2:not(#z):not(#y){font-size:min(9.5px,calc((100cqi - 8px) / 9));letter-spacing:0}
+  html.embed #tool:has(#den) #rows:not(#z):not(#y){min-height:150px}
+}
+/* a list's rows keep their height and the list scrolls; nothing is squeezed into overlapping lines (operator,
+   2026-11-04: Auth Scanner on a short phone) */
+html.embed .rows>.row:not(#z),html.embed .rows>.srow:not(#z){flex-shrink:0}
+@media(max-width:600px){html.embed #rrows:not(#z) .none,html.embed #rrows:not(#z)>.empty{padding:8px;min-height:0}}
+@media(max-width:600px){
+  html.embed #tool:has(#rrows) .row:not(#z):not(#y){padding:4px 8px;line-height:1.2}
+  html.embed #tool:has(#rrows) .row .who:not(#z){gap:0}
+  html.embed #tool:has(#rrows) .row .what:not(#z):not(#y){gap:1px;line-height:1.15}
+  html.embed #tool:has(#rrows) .row .what .pill:not(#z):not(#y){font-size:8px;padding:0 5px;line-height:13px}
+  html.embed #tool:has(#rrows) .rows:not(#z){gap:4px}
+}
+@media(max-width:600px){
+  html.embed #rrows:has(>.empty):not(#z):not(#y){flex:0 0 auto!important;min-height:0;max-height:none}
+  html.embed #tool:has(#rrows) #rows:not(#z):not(#y){flex:1 1 auto!important}
+  html.embed #tool:has(#rrows) .stage>.tag:not(#z){display:none}
+}

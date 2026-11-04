@@ -2948,7 +2948,7 @@ rememberGridH();
      the network, with the app's wallet, or the connect choice when none is connected ── */
   (function(){
     var b = E("tlbtn"), m = E("tlmenu"), pop = E("tlpop"), fr = E("tlfr"), g = E("tlgate"); if(!b || !m || !pop) return;
-    var TOOL = null, TIMER = 0, NAMES = { revoke: "Auth Scanner", send: "Fee Saver", gather: "Gather spread stake" };
+    var TOOL = null, TIMER = 0, NAMES = { revoke: "Auth Scanner", send: "Fee Saver", gather: "Gather stake" };
     var BASEH = (document.querySelector("base") || { getAttribute: function(){ return "/"; } }).getAttribute("href") || "/";
     var test = /testnet/.test(BASEH);
     function menu(on){ m.hidden = !on; b.setAttribute("aria-expanded", on ? "true" : "false"); if(on){ var f = m.querySelector("button"); if(f) f.focus(); } }
@@ -2974,7 +2974,9 @@ rememberGridH();
       who();
       if(!window.__ADDR){ fr.hidden = true; g.hidden = false; gate(); return; }
       g.hidden = true; fr.hidden = false;
-      var u = BASEH + "tools/" + TOOL + "?embed=1"; if(fr.getAttribute("src") !== u) fr.setAttribute("src", u);
+      /* the build's own mark on the frame's address: a published change is never served from a cached tool page */
+      var bv = ((document.querySelector('script[src*="app.js"]') || {}).src || "").split("v=")[1] || "";
+      var u = BASEH + "tools/" + TOOL + "?embed=1" + (bv ? "&b=" + bv : ""); if(fr.getAttribute("src") !== u) fr.setAttribute("src", u);
     }
     function open(t){
       TOOL = t; var ic = m.querySelector('[data-tool="' + t + '"] svg');   /* the menu's icon beside the title (operator, 2026-11-03) */

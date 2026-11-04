@@ -5757,7 +5757,7 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .tlgate{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px}
 .tlgate h2{margin:0;font-size:20px;color:var(--ink);font-weight:600}
 .pop .card.spcard.tlcard:not(#z){width:min(1180px,96vw);max-width:1180px}
-@media(max-width:700px){.pop .card.spcard.tlcard:not(#z){width:100vw;max-width:100vw;height:100svh;max-height:100svh;border-radius:0}}.tlws{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+@media(max-width:700px){.pop .card.spcard.tlcard:not(#z){width:100vw;max-width:100vw;height:var(--fvh,100svh);max-height:var(--fvh,100svh);border-radius:0}}   /* --fvh: a keyboard covers the card, it does not move or squeeze it (2026-11-04) */.tlws{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 /* Now on's unstaking tag, and the 21-day line beside Cooling down (2026-11-03) */
 .mv-r.mv-ur{position:relative;grid-template-columns:44px minmax(0,calc(50% - 104px)) 1fr auto 56px}
 .mv-r.mv-ur>span{justify-self:start;max-width:100%;cursor:pointer}
@@ -7282,7 +7282,7 @@ html[data-pro] #dmy tbody tr.on td:not(#z){background:none}
       <div class=tlmenu id=tlmenu role=menu hidden>
         <button type=button role=menuitem data-tool=revoke><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 3l7 3v5c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6z"/><circle cx="11.5" cy="11" r="2.6"/><path d="M13.4 12.9l2.1 2.1"/></svg><span><b>Auth Scanner</b><small>who can act for your wallet</small></span></button>
         <button type=button role=menuitem data-tool=send><svg viewBox="0 0 24 24" aria-hidden=true><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/></svg><span><b>Fee Saver</b><small>multi send at chain's price</small></span></button>
-        <button type=button role=menuitem data-tool=gather><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="5" cy="6" r="1.8"/><circle cx="5" cy="18" r="1.8"/><circle cx="19" cy="12" r="2.4"/><path d="M6.6 6.9l9.8 4.2M6.6 17.1l9.8-4.2M7 12h9.6"/></svg><span><b>Gather spread stake</b><small>all your stake in one place</small></span></button>
+        <button type=button role=menuitem data-tool=gather><svg viewBox="0 0 24 24" aria-hidden=true><circle cx="5" cy="6" r="1.8"/><circle cx="5" cy="18" r="1.8"/><circle cx="19" cy="12" r="2.4"/><path d="M6.6 6.9l9.8 4.2M6.6 17.1l9.8-4.2M7 12h9.6"/></svg><span><b>Gather stake</b><small>all your stake in one place</small></span></button>
       </div></div>
     <div class=netsw id=netsw role=group aria-label=Network><a id=netmain href="./" aria-label=Mainnet><span class=nl>Mainnet</span><span class=ns aria-hidden=true>Main</span></a><a id=nettest href="testnet/" aria-label=Testnet><span class=nl>Testnet</span><span class=ns aria-hidden=true>Test</span></a></div>
     <button class=thbtn id=thbtn type=button role=switch aria-checked=false aria-label="Day or night" title="Day"><svg class=sun viewBox="0 0 24 24" aria-hidden=true><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg><svg class=moon viewBox="0 0 24 24" aria-hidden=true><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></button>

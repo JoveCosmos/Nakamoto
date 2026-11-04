@@ -69,7 +69,10 @@ try{(function(){
   if(!(window.matchMedia && matchMedia("(pointer:coarse)").matches)) return;
   var W = innerWidth, KB = false, add = window.addEventListener;
   function editing(){
-    var a = document.activeElement; if(!a) return false; if(a.isContentEditable || a.tagName === "TEXTAREA") return true;
+    var a = document.activeElement; if(!a) return false;
+    /* a field inside a tool's frame (the tools card, 2026-11-04): the parent sees only the IFRAME as focused */
+    if(a.tagName === "IFRAME"){ try{ a = a.contentDocument && a.contentDocument.activeElement; }catch(e){ a = null; } if(!a) return false; }
+    if(a.isContentEditable || a.tagName === "TEXTAREA") return true;
     return a.tagName === "INPUT" && !/^(button|checkbox|radio|range|submit|reset|file|color|image|hidden)$/i.test(a.type || "text");
   }
   /* --fvh: the screen's height without a keyboard. Popups take their height from it, so a keyboard covers a card instead of
