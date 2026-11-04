@@ -89,10 +89,10 @@ function notes(p){
     if(all > 0 && APR[GATA] != null){
       var a0 = yNow / all * 100, a1 = yAfter / all * 100, d = (yAfter - yNow) / 1e6;
       E("hg").textContent = (d < -0.05 ? "\u2212" : "+") + T.fmtA(Math.abs(d) * 1e6, 1);   /* a real minus, spaced (2026-11-03) */
-      h += '<p' + (d < 0 ? ' class=w' : '') + '>Your staking APR goes from <b>' + a0.toFixed(1) + '%</b> to <b>' + a1.toFixed(1) + '%</b>, ' +
-        (d < 0 ? '<b>' + T.fmtA(-d * 1e6, 1) + ' ATONE a year less</b>' : '<b>' + T.fmtA(d * 1e6, 1) + ' ATONE a year more</b>') + '.</p>';
+      /* one line (operator, 2026-11-04): the APR change alone, the yearly figure is in the box above */
+      h += '<p' + (d < 0 ? ' class=w' : '') + '>Your staking APR goes from <b>' + a0.toFixed(1) + '%</b> to <b>' + a1.toFixed(1) + '%</b></p>';
     }
-    h += '<p>Moved stake is held on GATA HUB for <b>21 days</b>, until <b>' + day(Date.now() + 21 * 864e5) + '</b>: it keeps earning, but cannot be moved to another validator before then. You can still unstake it.</p>';
+    h += '<p>Gathered stake on GATA HUB cannot be redelegated for <b>21 days</b>, until <b>' + day(Date.now() + 21 * 864e5) + '</b></p>';
   }
   /* inside the app the note is a small tag in the card's header (operator, 2026-11-03); on its own page, here */
   var PT = "Autopilot is active for this wallet. It will redelegate again after 21 day cooldown.";

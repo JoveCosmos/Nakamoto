@@ -2965,7 +2965,8 @@ rememberGridH();
     /* the header names the wallet, after the network; Fee Saver also shows the balance there (operator, 2026-11-03) */
     function who(){
       var W = window.__WALLET, a = window.__ADDR, wh = E("tlwho"), bl = E("tlbal");
-      wh.innerHTML = a ? '<span>' + a.slice(0, 10) + '\u2026' + a.slice(-6) + '</span>' : '';   /* the address only (operator, 2026-11-03) */
+      /* the address only (operator, 2026-11-03); a shorter form for the phone's corner (2026-11-04) */
+      wh.innerHTML = a ? '<span class=tlw-l>' + a.slice(0, 10) + '\u2026' + a.slice(-6) + '</span><span class=tlw-s>' + a.slice(0, 8) + '\u2026' + a.slice(-4) + '</span>' : '';
       var B = window.__BAL, f = function(u){ return (u / 1e6).toLocaleString("en-US", { maximumFractionDigits: 2 }); };
       bl.hidden = !(TOOL === "send" && a && B);
       if(!bl.hidden) bl.innerHTML = '<span><b>' + f(B.uatone || 0) + '</b><em>ATONE</em></span><span><b>' + f(B.uphoton || 0) + '</b><em>PHOTON</em></span>';

@@ -5742,7 +5742,16 @@ font-family:var(--wmono);font-size:7.5px;letter-spacing:.14em;text-transform:upp
 .tlbal{display:inline-flex;align-items:baseline;gap:10px;font-size:12.5px;white-space:nowrap}
 .tlbal b{font-weight:600;color:var(--ink)}.tlbal em{font-style:normal;font-family:var(--wmono);font-size:10px;letter-spacing:.06em;color:var(--ink3);margin-left:4px}
 @media(max-width:700px){.tlwho b,.tlbal{display:none!important}}
-@media(max-width:700px){#tlpop .wk-txh>div:has(.tltag:not([hidden])) .tlwho{display:none!important}}   /* a phone header with a note drops the address */
+/* phones (operator, 2026-11-04): the address has its own fixed place, small in the header's top corner above the title
+   row, in every tool; a note (Gather's Autopilot) never swaps it out, so nothing flashes */
+.tlwho .tlw-s{display:none}
+@media(max-width:700px){
+  #tlpop .wk-txh:not(#z){position:relative;padding-top:22px}
+  #tlpop .wk-txh .tlwho:not(#z):not(#y){position:absolute;top:7px;right:20px;margin:0}
+  #tlpop .wk-txh .tlwho .tlw-l:not(#z){display:none}
+  #tlpop .wk-txh .tlwho .tlw-s:not(#z):not(#y){display:inline;font-size:10px;letter-spacing:.02em}
+}
+@media(max-width:380px){#tlpop .wk-txh .tltag:not(#z){font-size:9.5px;padding:2px 6px}#tlpop .wk-txh>div:not(#z){gap:6px}}
 .tlcard #tlttl{white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
 .tlcard #tlttl svg{width:18px;height:18px;flex:0 0 auto;fill:none;stroke:var(--wcyan);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .tltag .tlt-s{display:none}

@@ -322,3 +322,19 @@ html.embed .rows>.row:not(#z),html.embed .rows>.srow:not(#z){flex-shrink:0}
   html.embed #tool:has(#rrows) #rows:not(#z):not(#y){flex:1 1 auto!important}
   html.embed #tool:has(#rrows) .stage>.tag:not(#z){display:none}
 }
+/* Gather on phones (operator, 2026-11-04): the APR note on one line, the lock note on at most two; compact rows so the
+   list shows several validators */
+@media(max-width:600px){
+  html.embed .notes p:not(#z):not(#y){font-size:10.5px;line-height:1.35;padding:4px 8px 4px 20px}
+  html.embed .notes p:not(#z):not(#y)::before{left:8px;top:8px;width:5px;height:5px}
+  html.embed .notes p:first-child:not(#z):not(#y){white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  html.embed .notes p:not(:first-child):not(#z){display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  html.embed #tool:has(#notes) .row:not(#z):not(#y){min-height:0;padding:4px 8px;gap:6px;grid-template-columns:18px minmax(0,1fr) auto;line-height:1.2}
+  html.embed #tool:has(#notes) .row .who:not(#z){gap:0}
+  html.embed #tool:has(#notes) .row .who b:not(#z){font-size:12.5px}
+  html.embed #tool:has(#notes) .row .who small:not(#z){font-size:9.5px}
+  html.embed #tool:has(#notes) .row .what:not(#z):not(#y){font-size:9.5px;gap:1px;line-height:1.15}
+  html.embed #tool:has(#notes) .row .what .pill:not(#z):not(#y){font-size:8px;padding:0 5px;line-height:13px}
+  html.embed #tool:has(#notes) .row input[type=checkbox]:not(#z){width:15px;height:15px}
+  html.embed #tool:has(#notes) .rows:not(#z){gap:4px}
+}
