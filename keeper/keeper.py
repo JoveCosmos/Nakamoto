@@ -899,7 +899,9 @@ def plan(g, rows, reds, vals, m, room=None):
     # stake on a validator the wallet excludes (jailed 3x ever or 2x in 90 days, box ticked) moves first, from any rank,
     # and needs no APR gain: the reader asked for it off them (operator, 2026-11-03). Stake already there was put there
     # by the reader; the exclusion is its own, so nothing else is forced
-    forced = set() if all_vals(g["granter"], g["exp"]) else (restake_skip() - strategy_skip())
+    # one exclusion list, one rule (operator, 2026-11-04): the operator's no-stake list is forced off for everyone, the
+    # jailed ones unless the wallet chose "all validators"; an excluded validator keeps no Autopilot stake that can move
+    forced = strategy_skip() | (set() if all_vals(g["granter"], g["exp"]) else restake_skip())
     src = []
     # all the free stake may go: the floor (never below the shelf) is set in the rounds below, once the shelf is known
     for r in sorted((r for r in rows if r["free"] > 0 and (r["op"] not in bset or r["op"] in forced)), key=lambda r: (r["op"] not in forced, -r["free"])):

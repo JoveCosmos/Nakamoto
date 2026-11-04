@@ -172,7 +172,7 @@ http.createServer(async (req, res) => {
     if (u.pathname === "/eval") { const r = await cdp("Runtime.evaluate", { expression: await body(req), awaitPromise: true, returnByValue: true });
       return send(200, r.exceptionDetails ? { error: r.exceptionDetails.exception?.description || r.exceptionDetails.text } : { value: r.result.value }); }
     if (u.pathname === "/shot") { const w = +(q("w") || 1440), h = +(q("h") || 900);
-      await cdp("Emulation.setDeviceMetricsOverride", { width: w, height: h, deviceScaleFactor: 1, mobile: w < 600 });
+      await cdp("Emulation.setDeviceMetricsOverride", { width: w, height: h, deviceScaleFactor: +(q("s") || 1), mobile: w < 600 });
       const r = await cdp("Page.captureScreenshot", { format: "png" }); fs.writeFileSync(q("path"), Buffer.from(r.data, "base64")); return send(200, { ok: true }); }
     if (u.pathname === "/dialog") { DIALOG = q("accept") !== "0"; return send(200, { accept: DIALOG }); }
     if (u.pathname === "/log") return send(200, LOG.slice(-60));
