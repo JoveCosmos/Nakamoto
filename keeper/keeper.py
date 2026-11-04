@@ -446,7 +446,7 @@ def run_summaries(c, n_ap, n_rs, dry, ap_gr=(), rs_gr=()):
             # (operator, 2026-10-09) an admin watch in sentences: what moved, from which validator to which, how many moves
             N, im, held = _names(), impact(c), (" %d held." % RUN["ap_held"]) if RUN["ap_held"] else ""
             if RUN["ap_moves"]:
-                text = ("Moved {:,.1f} ATONE for %d wallet%s in %d moves (%d transaction%s), +{:,.1f} ATONE a year. Fees {:,.4f} PHOTON.%s\n\n"
+                text = ("Moved {:,.1f} ATONE for %d wallet%s in %d moves (%d transaction%s), {:+,.1f} ATONE a year. Fees {:,.4f} PHOTON.%s\n\n"
                         .format(RUN["ap_uatone"] / 1e6, RUN["ap_gain"], fee / 1e6)
                         % (len(RUN["ap_wallets"]), "" if len(RUN["ap_wallets"]) == 1 else "s", RUN["ap_moves"],
                            len(RUN["ap_txs"]), "" if len(RUN["ap_txs"]) == 1 else "s", held))
@@ -461,7 +461,7 @@ def run_summaries(c, n_ap, n_rs, dry, ap_gr=(), rs_gr=()):
                     w["src"].append(src); w["dst"].append(dst); w["u"] += u; w["gain"] += gain or 0; w["n"] += 1
                     if h not in w["tx"]: w["tx"].append(h)
                 for g, w in sorted(by.items(), key=lambda kv: -kv[1]["u"]):
-                    lines.append("`%s` {:,.1f} ATONE from %s to %s, %d move%s, +{:,.1f} ATONE a year, %s".format(w["u"] / 1e6, w["gain"])
+                    lines.append("`%s` {:,.1f} ATONE from %s to %s, %d move%s, {:+,.1f} ATONE a year, %s".format(w["u"] / 1e6, w["gain"])
                                  % (short(g), _vals(N, w["src"]), _vals(N, w["dst"]), w["n"], "" if w["n"] == 1 else "s", " ".join(_tx(h) for h in w["tx"])))
             lines = ["Failed: `%s`, %s." % (short(g), _why(w)) for g, w in RUN["ap_fail"]] + lines      # failures first
             tail = "\nSo far Autopilot has moved {:,.1f} ATONE for %d wallets onto %d smaller validators, +{:,.1f} ATONE a year.".format(
@@ -851,11 +851,12 @@ def fill(ranked, stake, amount, ok, min_leg=MIN_MOVE, step=STEP, edge=EDGE):
     # dust (a delegation spends no pair entry): it passes min_leg=1
     return {op: x for op, x in add.items() if x >= min_leg}
 
-def ranks_kept(ranked, moves):
+def ranks_kept(ranked, moves, forced=()):
     """the plan's own proof, with every move applied: every validator but the plan's sources still stands where it
     stood among the others (above the one under it, never level unless they were level before), and every source in
     the set stays at least 1 ATONE above the highest stake any destination reaches - a source may fall in rank, never
-    below the shelf (operator, 2026-10-01)"""
+    below the shelf (operator, 2026-10-01). A validator the wallet excludes may fall below it: its stake leaves as the
+    reader asked, wherever it stands (operator, 2026-11-04)"""
     d, srcs = {}, set()
     for x in moves:
         d[x["src"]] = d.get(x["src"], 0) - x["amount"]; d[x["dst"]] = d.get(x["dst"], 0) + x["amount"]; srcs.add(x["src"])
@@ -865,7 +866,7 @@ def ranks_kept(ranked, moves):
         if new[j - 1] < new[j] or (rest[j - 1]["t"] > rest[j]["t"] and new[j - 1] <= new[j]): return False
     dsts = {x["dst"] for x in moves}
     shelf = max(v["t"] + d.get(v["op"], 0) for v in ranked if v["op"] in dsts)
-    return all(v["t"] + d[v["op"]] >= shelf + GAP for v in ranked if v["op"] in srcs)
+    return all(v["t"] + d[v["op"]] >= shelf + GAP for v in ranked if v["op"] in srcs and v["op"] not in forced)
 
 def absorb_dust(moves, rows):
     """(operator, 2026-10-31: Autopilot left dust delegations of a few micro-ATONE showing as 0 in every list) a source never
@@ -956,7 +957,8 @@ def plan(g, rows, reds, vals, m, room=None):
         for x in moves:
             recv[x["dst"]] = recv.get(x["dst"], 0) + x["amount"]; sent[x["src"]] = sent.get(x["src"], 0) + x["amount"]
         shelf = max(vals[op]["t"] + a for op, a in recv.items())
-        low = [x for x in src if x["op"] in vals and vals[x["op"]]["t"] - sent.get(x["op"], 0) < shelf + GAP]
+        # an excluded validator has no floor (operator, 2026-11-04): its free stake all leaves, even below the shelf
+        low = [x for x in src if x["op"] in vals and x["op"] not in forced and vals[x["op"]]["t"] - sent.get(x["op"], 0) < shelf + GAP]
         if low:
             for x in low: x["give"] = max(0, int(vals[x["op"]]["t"] - shelf - GAP))
             src = [x for x in src if x["give"] >= MIN_MOVE]; continue
@@ -976,7 +978,7 @@ def plan(g, rows, reds, vals, m, room=None):
     moves = [x for x in moves if x["amount"] >= MIN_MOVE]
     if not moves: return None
     moves = absorb_dust(moves, rows)   # before the rank check: a remainder that would change a rank still refuses the plan
-    if not ranks_kept(ranked, moves):
+    if not ranks_kept(ranked, moves, forced):
         log("plan refused: it would change a rank (%s)" % g.get("granter", "?")); return None
     rate_dst = dst_rates(moves)
     for mv in moves: mv["gain"] = mv["amount"] * (rate_dst[mv["dst"]] - rate_src[mv["src"]]) / 1e6
@@ -1489,7 +1491,7 @@ def once(c, only=None, live=None, force=False):
                 rep["until"] = int(max([t for t in ends if t > time.time()] or [0])) or None
                 if prev and prev.get("restake"): rep["restake"] = prev["restake"]
                 pid = plan_id(p)
-                if p["moves"]: log("granter=%s plan %s: %d moves, +%.1f ATONE a year" % (gr, pid, len(p["moves"]), p["gain"]))
+                if p["moves"]: log("granter=%s plan %s: %d moves, %+.1f ATONE a year" % (gr, pid, len(p["moves"]), p["gain"]))
             else:
                 rep = prev or {"granter": gr, "strategy": name, "moves": []}
                 pid = (rep.get("admin") or {}).get("plan_id")

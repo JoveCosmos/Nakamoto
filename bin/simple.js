@@ -1903,7 +1903,7 @@
       var pl = planNow(pos);
       /* with Autopilot on, the move waits for its next run, no approval (operator, 2026-10-01) */
       var apOn = !!(window.__atInfo && window.__atInfo() && window.__atInfo().grant);
-      if(pl && pl.after != null) return ["+" + one(pl.gain) + " ATONE a year", apOn ? "Autopilot is active" : "ready to move, 1 approval"];
+      if(pl && pl.after != null) return [(pl.gain < 0 ? "\u2212" : "+") + one(Math.abs(pl.gain)) + " ATONE a year", apOn ? "Autopilot is active" : "ready to move, 1 approval"];
       if(pos.free < 1e6 && pos.locked >= 1e6) return ["Cooling down", "free to move on " + (window.__dayFull ? window.__dayFull(pos.until) : "")];
       return ["Earning " + pct(pos.rate), "at its best today"];
     }
