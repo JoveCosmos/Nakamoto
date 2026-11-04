@@ -140,8 +140,8 @@ const bal = async (a, dn) => +(((await chain("/cosmos/bank/v1beta1/balances/" + 
   // 7b Cancel unstaking (2026-11-03): the first unstaking row's cancel in Pro, then the card's button
   const unb = async () => ((await chain("/cosmos/staking/v1beta1/delegators/" + A + "/unbonding_delegations")).unbonding_responses || []).reduce((n, u) => n + (u.entries || []).length, 0);
   const unb0 = await unb();
-  await run("cancel-unstake", `await E.wait(function(){ return document.querySelector('#dunb .unbx'); }, 20000, 'unstaking rows');
-    document.querySelector('#dunb .unbx').click(); await E.wait(function(){ var b = document.getElementById('cusign'); return b && !b.disabled && E.vis('#cusign'); }, 30000, 'Cancel enabled');
+  await run("cancel-unstake", `var vx = function(){ return Array.prototype.find.call(document.querySelectorAll('#dmy .unbx, #dunb .unbx'), function(b){ return b.offsetWidth; }); };
+    await E.wait(vx, 20000, 'unstaking rows'); vx().click(); await E.wait(function(){ var b = document.getElementById('cusign'); return b && !b.disabled && E.vis('#cusign'); }, 30000, 'Cancel enabled');
     E.click('#cusign')`,
     async (d, s) => { const n = await unb(); return { entries: unb0 + " -> " + n, check: s.msgs.every(m => m === "MsgCancelUnbondingDelegation") && n === unb0 - 1 ? "ok" : "FAILED" }; }, "dashboard/self");
   // 7c the same from Your move's summary line: every entry at once
