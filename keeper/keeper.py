@@ -58,7 +58,7 @@ MIN_GAIN_APR = 0.03          # 3 APR points on the stake that moves (operator, 2
 MIN_GAIN_ATONE = 1.0          # and pay at least this per year
 MAX_MOVES_DAY = 60            # per wallet in any 24 hours (operator, 2026-10-01: a large wallet finishes in one run); the signer's MAX_MOVES_DAY
 MAX_MOVES_TX = 60             # per transaction (operator, 2026-10-01: one transaction, ~20M gas of the block's 100M); the signer's MAX_MOVES
-RS_EDGE = 3                   # restake: the last 3 of the set are left out of the highest-APR pick (the signer's RS_EDGE)
+RS_EDGE = 3                   # (unused since 2026-11-04: Restake takes Autopilot's bottom guard, ap_edge)
 MIN_MOVE = 1_000_000          # no move under 1 ATONE: dust uses a pair entry and a move slot for nothing
 # A move off a validator that has been slashed makes the chain replay the delegation's reward history: CoreStake
 # (2,219 delegators, one slash) prices at 5.2M a move against the usual 300k, measured 2026-10-22, and a 21-move plan
@@ -644,12 +644,12 @@ def plan_restake(c, granter, rg, vals, m):  # noqa: C901
     skip = strategy_skip() if all_vals(granter, None, "AUTHORIZATION_TYPE_DELEGATE") else restake_skip()   # the Restake box (2026-11-03)
     def ok(v): return (not allow or v["op"] in allow) and v["op"] not in deny and v["op"] not in skip
     # (operator, 2026-11-04: "restake should be smarter, not increasing the delegation count") the rewards go onto the
-    # wallet's OWN delegations: the best-paying ones it may use (in the set, not the largest fifth, not the last RS_EDGE,
+    # wallet's OWN delegations: the best-paying ones it may use (in the set, not the largest fifth, above Autopilot's bottom guard,
     # not excluded by its box, allowed by its grant), at most RS_TOPUP of them, each only as far as no rank breaks (the
     # 300-ATONE levels). A wallet with no such delegation gets ONE new one, on the best-paying validator with room, which
     # later runs top up. No waiting: it still restakes every 12 hours from 1 ATONE. Fewer messages, less gas
     n_ = len(ranked)
-    zone = [v for v in ranked[top(n_): n_ - RS_EDGE] if ok(v)][::-1]          # smallest (best-paying) first
+    zone = [v for v in ranked[top(n_): n_ - ap_edge([int(v["t"]) for v in ranked])] if ok(v)][::-1]   # Autopilot's bottom guard (2026-11-04); smallest first
     held = {r["op"] for r in position(granter, vals)[0] if r["x"] >= MIN_MOVE}
     def fits_at(op, x, base): return ranks_kept(ranked, base + [{"src": None, "dst": op, "amount": int(x)}], ())
     def most(op, amount, base):

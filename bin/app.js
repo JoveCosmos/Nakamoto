@@ -4382,8 +4382,9 @@ rememberGridH();
     var V = window.__VALS().slice().sort(function(a, b){ return b[1] - a[1]; }), n = V.length, jsk = (window.__D && window.__D.jailskip) || [];
     /* (2026-11-04) Restake tops up the wallet's own delegations first: the best-paying one it may use sets the rate */
     var mine = {}; ((window.__POS && window.__POS.rows) || []).forEach(function(r){ if(r.x >= 1e6) mine[r.id] = 1; });
-    for(var j = n - 1 - EDGE; j >= topN(n); j--){ var jd = V[j][3]; if(mine[jd] && (all || jsk.indexOf(jd) < 0)) return window.__rateAfter(V[j][1], V[j][2], 0); }
-    for(var i = n - 1 - EDGE; i >= topN(n); i--){ var id = V[i][3];
+    var lo = n - 1 - apEdge(V.map(function(v){ return v[1]; }));          /* Autopilot's bottom guard (2026-11-04) */
+    for(var j = lo; j >= topN(n); j--){ var jd = V[j][3]; if(mine[jd] && (all || jsk.indexOf(jd) < 0)) return window.__rateAfter(V[j][1], V[j][2], 0); }
+    for(var i = lo; i >= topN(n); i--){ var id = V[i][3];
       if(!all && jsk.indexOf(id) >= 0) continue;
       return window.__rateAfter(V[i][1], V[i][2], 0); }
     return 0; };

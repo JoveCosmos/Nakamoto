@@ -119,9 +119,9 @@ const isVal = s => typeof s === "string" && /^atonevaloper1[02-9ac-hj-np-z]{38}$
 const isAmt = s => /^[1-9]\d{0,17}$/.test(String(s));
 
 // ---- policy: pure functions, no I/O (audit 2026-09-30) ----
-// top(), EDGE and RS_EDGE MUST match keeper.py's top(), EDGE and RS_EDGE: the keeper plans inside this
+// top() and EDGE MUST match keeper.py's top() and EDGE: the keeper plans inside this
 // window and the signer refuses anything outside it
-const EDGE = 3, RS_EDGE = 3;
+const EDGE = 3;   // the bottom guard when the returning list cannot be read (moves and restakes alike)
 // the shelf rise (operator, 2026-10-01): the largest fifth never take stake - ranks 21 to n-3 of 100 (it was a fixed 20,
 // which on testnet's 44 left nothing to do)
 const top = n => Math.floor(n / 5);
@@ -153,14 +153,15 @@ function checkMoves(ranked, moves, back) {
   }
   return null;
 }
-// a restake's validator: bonded, not jailed, rank n-RS_EDGE or higher
-function checkStake(ranked, stake) {
-  const n = ranked.length, idx = new Map(ranked.map((v, i) => [v.op, i]));
+// a restake's validator: bonded, not jailed, above the same bottom guard as a move (operator, 2026-11-04: Restake follows
+// the wallet's stake down to the last slot, less one slot for each returning validator; unreadable = the last 3)
+function checkStake(ranked, stake, back) {
+  const n = ranked.length, idx = new Map(ranked.map((v, i) => [v.op, i])), hi = n - 1 - apEdge(ranked, back);
   for (const s of stake) {
     const i = idx.get(s.validator);
     if (i === undefined) return "validator " + s.validator + " is not bonded";
     if (ranked[i].jailed) return "validator " + s.validator + " is jailed";
-    if (i > n - 1 - RS_EDGE) return `validator ${s.validator} is rank ${i + 1} of ${n}, below rank ${n - RS_EDGE}`;
+    if (i > hi) return `validator ${s.validator} is rank ${i + 1} of ${n}, below rank ${hi + 1}`;
   }
   return null;
 }
@@ -462,7 +463,7 @@ async function restake(body, send) {
     const need = stake.length ? [WDRAW_URL, DELEG_URL] : [WDRAW_URL];
     const gp = grantProblem(await grantsFor(query, granter, sender, need), need, Date.now());
     if (gp) return { code: 409, err: gp };
-    const bad = checkStake(await bondedSet(query), stake);
+    const rk = await bondedSet(query), bad = checkStake(rk, stake, rk.back);
     if (bad) return { code: 400, err: bad };
     // rewards must come back to the delegator: otherwise the claim lands elsewhere and a
     // stake of 'the same amount' would be the delegator's own liquid ATONE
