@@ -1,6 +1,6 @@
 /* clipaudit.js - the probe snippet for clipaudit.sh (ROUTE is replaced per run): every piece of visible text
    that sits below a clipping box or the bottom of the screen with no scroll to reach it. */
-window.keplr={enable:function(){return Promise.resolve()},getKey:function(){return Promise.resolve({name:"demo",bech32Address:"atone14y3usgepvcxxs6jkjqwhuyjy6eyhu7rkvpg2a7",pubKey:new Uint8Array(33)})},signDirect:function(){return Promise.reject(new Error("no"))}};
+window.keplr={enable:function(){return Promise.resolve()},getKey:function(){return Promise.resolve({name:"demo",bech32Address:"atone10unx6s0cdqntvrumd5hs07rgd5ytcztqun3e53",pubKey:new Uint8Array(33)})},signDirect:function(){return Promise.reject(new Error("no"))}};
 setTimeout(function(){window.__wconnect("Keplr");},50);
 setTimeout(function(){ __shellGo("ROUTE"); },900);
 setTimeout(function(){

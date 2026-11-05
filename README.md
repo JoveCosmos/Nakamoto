@@ -12,14 +12,20 @@ ATONE earns more on a smaller validator. Nakamoto makes that incentive visible a
 - **Your move**: connect a wallet (Keplr, Adena, or Ledger through Keplr) and see the same stake's best
   placement as one line: the APR now, the APR after, the gain in ATONE a year, and the exact validators.
 - **Autopilot**: one approval, then twice a day stake moves to the best-paying smaller validators, filling
-  from the bottom up without changing any validator's rank. The grant is redelegate-only.
-- **Restake**: every 12 hours, pending rewards are claimed and staked back onto smaller validators.
+  from the bottom up while keeping the order of the set: no validator is lifted past one more than 300 ATONE above
+  it, so a smaller validator never ends up paying less than a larger one. Validators jailed 3 times, or twice in
+  90 days, are left out by default. The grant is redelegate-only. The full rules: [RULES.md](RULES.md).
+- **Restake**: every 12 hours, pending rewards are claimed and staked back onto your own best-paying delegations.
+- **StakePilot**: new stake placed by Autopilot's own rules, signed by you.
+- **Cancel unstaking**: return an unstaking to its validator before the 21 days end.
 - **Governance**: every proposal with its tally and text, voting (Yes / Abstain / No) signed in the wallet,
   your own and your governor's voting record marked per proposal, governors, the core DAOs, and AtomOne's
   constitution pinned to the genesis text.
 - **Network**: uptime, live signing, proposers, chain pace and economics, no wallet needed.
 - **Wallet tools**: stake, unstake, claim, PHOTON mint at the chain rate, and an Activity view of the
   account's moves, restakes and transactions.
+- **Tools**: Auth Scanner (who can act for your wallet, revoke in one signature), Fee Saver (many sends in one
+  transaction at the chain's own price) and Gather stake (all your stake in one place).
 - **Alerts**: a Telegram bot that reports validator misses, rank and APR changes, and each Autopilot move.
 
 ## How it holds your stake: it does not
@@ -28,6 +34,8 @@ There are no accounts and no custody. The app reads the chain; everything you do
 wallet. Autopilot and Restake run on an [x/authz](https://docs.cosmos.network/main/build/modules/authz)
 `StakeAuthorization` that permits **redelegation and staking only**: the grant cannot send, cannot unstake,
 and is revocable in one click. Transaction fees for the automation are paid by us in PHOTON.
+Every Autopilot and Restake transaction comes from one public address,
+`atone1j7u4528vu28cl6950kqtl60wdl5djed6x47yms`, so anyone can audit them on chain against [RULES.md](RULES.md).
 
 ## Layout
 

@@ -14,7 +14,7 @@ const flag = k => { const i = A.indexOf(k); if(i < 0) return false; A.splice(i, 
 const URL0 = opt("--url") || "http://127.0.0.1:8089", PAGE = opt("--page") || "/", PHONE = flag("--phone");
 const SIZE = (opt("--size") || (PHONE ? "390x844" : "1440x900")).split("x").map(Number);
 const WAIT = +(opt("--wait") || 2500), SETTLE = +(opt("--settle") || 8000), VERBOSE = flag("--verbose"), CLICKS = flag("--clicks");
-const ADDR0 = opt("--addr"), ADDR = ADDR0 || "atone14y3usgepvcxxs6jkjqwhuyjy6eyhu7rkvpg2a7", WALLET = flag("--wallet") || !!ADDR0;
+const ADDR0 = opt("--addr"), ADDR = ADDR0 || "atone10unx6s0cdqntvrumd5hs07rgd5ytcztqun3e53", WALLET = flag("--wallet") || !!ADDR0;
 const shell = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "shell.json"), "utf8"));
 const ROUTES = A.length ? A : shell.sections.flatMap(s => (s.sub || []).filter(v => !v.off).map(v => s.route + "/" + v.route));
 const PORT = 9300 + Math.floor(Math.random() * 500), dir = fs.mkdtempSync(path.join(os.tmpdir(), "console-"));

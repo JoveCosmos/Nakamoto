@@ -7,8 +7,8 @@ const { spawn } = require("child_process"), fs = require("fs"), path = require("
 const A = process.argv.slice(2), opt = k => { const i = A.indexOf(k); if(i < 0) return null; const v = A[i + 1]; A.splice(i, 2); return v; };
 const URL0 = opt("--url") || "http://127.0.0.1:8089", SIZE = (opt("--size") || "390x844").split("x").map(Number), OUT = opt("--out");
 const EVAL = opt("--eval"), WAIT = +(opt("--wait") || 0);
-const ADDR = opt("--addr") || "atone14y3usgepvcxxs6jkjqwhuyjy6eyhu7rkvpg2a7";
-const WALLET = A.includes("--wallet") || ADDR !== "atone14y3usgepvcxxs6jkjqwhuyjy6eyhu7rkvpg2a7"; if(A.includes("--wallet")) A.splice(A.indexOf("--wallet"), 1);
+const ADDR = opt("--addr") || "atone10unx6s0cdqntvrumd5hs07rgd5ytcztqun3e53";
+const WALLET = A.includes("--wallet") || ADDR !== "atone10unx6s0cdqntvrumd5hs07rgd5ytcztqun3e53"; if(A.includes("--wallet")) A.splice(A.indexOf("--wallet"), 1);
 const VP = A.includes("--vp"); if(VP) A.splice(A.indexOf("--vp"), 1);
 const DARK = A.includes("--dark"); if(DARK) A.splice(A.indexOf("--dark"), 1);
 const shell = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "shell.json"), "utf8"));
