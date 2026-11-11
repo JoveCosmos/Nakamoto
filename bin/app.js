@@ -2131,7 +2131,9 @@ rememberGridH();
        reached (a bare name here threw on every keystroke and StakePilot drew nothing, 2026-10-25) */
     /* the box in StakePilot (operator, 2026-11-04): the same exclusion list as Autopilot, ticked by default */
     var skip = window.__SP_ALL ? function(){ return false; } : (window.__noStake || function(){ return false; });
-    var add = window.__shelfFill(V, V.map(function(v){ return v[1]; }), u, function(q){ return !skip(V[q][3]); }), legs = [], placed = 0, op;
+    /* ghosts (operator, 2026-11-11): the excluded are no rung - the shelf rises past them to the next kept validator */
+    var add = window.__shelfFill(V, V.map(function(v){ return v[1]; }), u, function(q){ return !skip(V[q][3]); },
+                                 function(q){ return skip(V[q][3]); }), legs = [], placed = 0, op;
     for(op in add){ var q = at[op], v = V[q]; legs.push({ id: v[3], m: v[0], rank: q + 1, t: v[1], c: v[2], x: add[op] }); placed += add[op]; }
     /* no room on the shelf at all (operator, 2026-10-17: "stakepilot not working in testnet"): a set levelled flat, as
        testnet's is (ranks 7-43 within 4 ATONE, the one above the zone among them), leaves no validator 300 ATONE under the
@@ -4350,20 +4352,26 @@ rememberGridH();
   /* keeper.py fill(): {op: added}; s[j] the stake as it stands, ok(j) whether rank j+1 may take any. One that may not is
      a fixed step: the shelf below it rises to STEP (300 ATONE, the room Restake stakes into) under it, then the pour
      carries on above it */
-  function shelfFill(V, s, amount, ok){
+  function shelfFill(V, s, amount, ok, ghost){
+    /* ghost(q) (operator, 2026-11-11): a jailed-list validator is no rung at all - it takes nothing and caps nothing;
+       the shelf below it rises to STEP under the next kept validator above, as if it were not there */
+    var g = ghost || function(){ return false; };
     var n = V.length, add = {}, left = Math.floor(amount), i = n - 1 - apEdge(s), j, TOP = topN(n);
     while(i >= TOP && left >= GAP){
-      if(!ok(i)){ i--; continue; }
-      var b0 = i;
-      while(i - 1 >= TOP && ok(i - 1)) i--;
-      var k0 = i; i--;
-      var cost = function(k, L){ var c = 0; for(var q = k; q <= b0; q++) c += Math.max(0, L - (q - k) * STEP - s[q]); return c; };
+      if(g(i) || !ok(i)){ i--; continue; }
+      var M = [i];
+      while(i - 1 >= TOP && (ok(i - 1) || g(i - 1))){ i--; if(!g(i)) M.push(i); }
+      var ci = i - 1; while(ci >= 0 && g(ci)) ci--;
+      i--;
+      M.reverse(); var b0 = M.length - 1;
+      var cost = function(k, L){ var c = 0; for(var q = k; q <= b0; q++) c += Math.max(0, L - (q - k) * STEP - s[M[q]]); return c; };
+      var over = function(k){ return k > 0 ? s[M[k - 1]] : (ci >= 0 ? s[ci] : s[M[0]] + left + STEP); };
       var k = b0, lmax;
-      for(;;){ lmax = s[k - 1] - STEP; if(cost(k, lmax) >= left || k === k0) break; k--; }
-      var hi = lmax, lo = Math.min(s[k], hi);
+      for(;;){ lmax = over(k) - STEP; if(cost(k, lmax) >= left || k === 0) break; k--; }
+      var hi = lmax, lo = Math.min(s[M[k]], hi);
       if(cost(k, hi) <= left) lo = hi;
       else while(lo < hi){ var mid = Math.floor((lo + hi + 1) / 2); if(cost(k, mid) <= left) lo = mid; else hi = mid - 1; }
-      for(j = k; j <= b0; j++){ var x = lo - (j - k) * STEP - s[j]; if(x > 0){ add[V[j][3]] = x; left -= x; } }
+      for(j = k; j <= b0; j++){ var x = lo - (j - k) * STEP - s[M[j]]; if(x > 0){ add[V[M[j]][3]] = x; left -= x; } }
     }
     Object.keys(add).forEach(function(op){ if(add[op] < 1e6) delete add[op]; });
     return add;
@@ -4401,11 +4409,13 @@ rememberGridH();
   window.__planMax = function(f){ window.__PLAN_MAX = true; try{ return f(); } finally { window.__PLAN_MAX = false; } };
   /* keeper.py ranks_kept: validators within STEP (300 ATONE) of each other are one level and may change places; nobody is
      lifted past, or level with, one that stood more than STEP above; a source not excluded stays 1 ATONE over the shelf */
-  function ranksKept(out, V, forced){
+  function ranksKept(out, V, forced, ghosts){
+    var gh = ghosts || {};
     var d = {}, srcs = {}, dsts = {};
     out.forEach(function(m){ d[m.from] = (d[m.from] || 0) - m.amt; d[m.to] = (d[m.to] || 0) + m.amt; srcs[m.from] = 1; dsts[m.to] = 1; });
     var rest = V.filter(function(v){ return !srcs[v[3]]; }), nw = rest.map(function(v){ return v[1] + (d[v[3]] || 0); }), i, j;
     for(j = 1; j < rest.length; j++) for(i = j - 1; i >= 0; i--){
+      if(gh[rest[i][3]]) continue;                     /* a jailed-list validator may be passed (2026-11-11) */
       if(rest[i][1] - rest[j][1] <= STEP) continue;
       if(nw[i] <= nw[j]) return false; }
     var shelf = 0; V.forEach(function(v){ if(dsts[v[3]]) shelf = Math.max(shelf, v[1] + d[v[3]]); });
@@ -4413,7 +4423,7 @@ rememberGridH();
   }
   /* keeper.py tidy() (operator, 2026-11-04): every delegation a plan touches ends at 0 or at 100 ATONE and more */
   var MIN_POS = 100e6;
-  function tidyOut(out, pos, V, at, forced, used){
+  function tidyOut(out, pos, V, at, forced, used, ghosts){
     var have = {}, free = {}, locked = {};
     pos.rows.forEach(function(r){ have[r.id] = r.x; free[r.id] = r.x - r.locked; locked[r.id] = r.locked; });
     out = out.map(function(m){ return { from: m.from, to: m.to, amt: m.amt }; });
@@ -4426,17 +4436,17 @@ rememberGridH();
     Object.keys(back).forEach(function(sId){
       var legs = back[sId], R = legs.reduce(function(t, m){ return t + m.amt; }, 0), placed = false;
       out.filter(function(m){ return m.from === sId; }).sort(function(a, b){ return b.amt - a.amt; }).some(function(o){
-        o.amt += R; if(ranksKept(out, V, forced)) return (placed = true); o.amt -= R; return false; });
+        o.amt += R; if(ranksKept(out, V, forced, ghosts)) return (placed = true); o.amt -= R; return false; });
       if(!placed) cands.some(function(c){
         if(c === sId || (used[sId + ">" + c] || 0) >= 7) return false;
-        out.push({ from: sId, to: c, amt: R }); if(ranksKept(out, V, forced)) return (placed = true); out.pop(); return false; });
+        out.push({ from: sId, to: c, amt: R }); if(ranksKept(out, V, forced, ghosts)) return (placed = true); out.pop(); return false; });
       if(!placed && forced[sId]) out = out.concat(legs);
     });
     var sent = {}; out.forEach(function(m){ sent[m.from] = (sent[m.from] || 0) + m.amt; });
     Object.keys(sent).forEach(function(op){
       var rest = (free[op] || 0) - sent[op]; if(!(rest > 0 && rest < MIN_POS) || locked[op]) return;
       var legs = out.filter(function(m){ return m.from === op; }).sort(function(a, b){ return b.amt - a.amt; }), done = false;
-      legs.some(function(b){ b.amt += rest; if(ranksKept(out, V, forced)) return (done = true); b.amt -= rest; return false; });
+      legs.some(function(b){ b.amt += rest; if(ranksKept(out, V, forced, ghosts)) return (done = true); b.amt -= rest; return false; });
       if(done || forced[op]) return;
       var need = MIN_POS - rest, I2 = inn();
       legs.slice().sort(function(a, b){ return a.amt - b.amt; }).forEach(function(m){ if(need <= 0) return;
@@ -4458,8 +4468,8 @@ rememberGridH();
     /* sources in the keeper's order: the most free stake first */
     /* all the free stake may go: the floor (never below the shelf) is set in the rounds, once the shelf is known */
     /* keeper.py: stake on a validator the wallet excludes (box ticked) moves first, from any rank, with no gain test */
-    var jskL = (window.__D && window.__D.jailskip) || [], allV = window.__PLAN_MAX || (window.__atAll && window.__atAll()), forced = {};
-    if(!allV) jskL.forEach(function(id){ forced[id] = 1; });
+    var jskL = (window.__D && window.__D.jailskip) || [], allV = window.__PLAN_MAX || (window.__atAll && window.__atAll()), forced = {}, ghosts = {};
+    if(!allV) jskL.forEach(function(id){ forced[id] = 1; ghosts[id] = 1; });   /* ghosts (2026-11-11): no rung, caps nobody */
     pos.rows.forEach(function(r){ if(r.inactive || at[r.id] == null) forced[r.id] = 1; });   /* outside the set: always leaves whole (keeper.py) */
     var src = pos.rows.filter(function(r){ return r.x - r.locked > 0 && (!bset[r.id] || forced[r.id]); }).sort(function(a, b){ return ((forced[a.id] ? 0 : 1) - (forced[b.id] ? 0 : 1)) || ((b.x - b.locked) - (a.x - a.locked)); }).map(function(r){
       return { id: r.id, give: Math.floor(r.x - r.locked), rate: r.inactive ? 0 : r.rate };
@@ -4472,7 +4482,7 @@ rememberGridH();
     var dstRates = function(ms){ var mv = {}, r = {}; ms.forEach(function(m){ mv[m.to] = (mv[m.to] || 0) + m.amt; });
       Object.keys(mv).forEach(function(k){ var v = V[at[k]]; r[k] = window.__rateAfter(v[1], v[2], mv[k]); }); return { moved: mv, rd: r }; };
     function movesFor(srcs, amount, Vn, s, ok){
-      var add = shelfFill(Vn, s, amount, ok), out = [], short = {}, si = 0, lf = srcs.map(function(x){ return { id: x.id, give: x.give }; });
+      var add = shelfFill(Vn, s, amount, ok, function(q){ return !!ghosts[Vn[q][3]]; }), out = [], short = {}, si = 0, lf = srcs.map(function(x){ return { id: x.id, give: x.give }; });
       var an = {}; Vn.forEach(function(v, q){ an[v[3]] = q; });
       Object.keys(add).sort(function(a, b){ return an[b] - an[a]; }).forEach(function(d){
         var need = add[d];
@@ -4525,8 +4535,8 @@ rememberGridH();
     if(!done) return null;
     /* a source's last piece under 1 ATONE is no move: the shelf it leaves short by less than the 1 ATONE gap keeps its order */
     out = out.filter(function(m){ return m.amt >= 1e6; });
-    out = tidyOut(out, pos, V, at, forced, used);       /* 0 or 100 ATONE, as keeper.py tidy() */
-    if(!out.length || !ranksKept(out, V, forced)) return null;
+    out = tidyOut(out, pos, V, at, forced, used, ghosts);       /* 0 or 100 ATONE, as keeper.py tidy() */
+    if(!out.length || !ranksKept(out, V, forced, ghosts)) return null;
     var D1 = dstRates(out), moved = D1.moved, rd = D1.rd;
     var gainU = 0; out.forEach(function(m){ gainU += m.amt * (rd[m.to] - rs[m.from]); });
     /* the rest of the wallet (operator, 2026-10-08), as keeper.py plan(): stake already on a destination earns its new,

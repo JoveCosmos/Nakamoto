@@ -646,6 +646,8 @@ def plan_restake(c, granter, rg, vals, m):  # noqa: C901
     # (operator, 2026-11-04) a wallet whose Autopilot leaves the jailed out has Restake leave them out too, whatever
     # Restake's own box says: rewards staked there would be forced off by Autopilot in its next run, fees for nothing
     if granter in AP_GRANTERS and not all_vals(granter, None): skip = skip | restake_skip()
+    # ghosts (operator, 2026-11-11): the jailed validators this wallet leaves out are no rung - they cap no top-up
+    ghosts = skip & restake_skip()
     def ok(v): return (not allow or v["op"] in allow) and v["op"] not in deny and v["op"] not in skip
     # (operator, 2026-11-04: "restake should be smarter, not increasing the delegation count") the rewards go onto the
     # wallet's OWN delegations: the best-paying ones it may use (in the set, not the largest fifth, above Autopilot's bottom guard,
@@ -655,7 +657,7 @@ def plan_restake(c, granter, rg, vals, m):  # noqa: C901
     n_ = len(ranked)
     zone = [v for v in ranked[top(n_): n_ - ap_edge([int(v["t"]) for v in ranked])] if ok(v)][::-1]   # Autopilot's bottom guard (2026-11-04); smallest first
     held = {r["op"] for r in position(granter, vals)[0] if r["x"] >= MIN_MOVE}
-    def fits_at(op, x, base): return ranks_kept(ranked, base + [{"src": None, "dst": op, "amount": int(x)}], ())
+    def fits_at(op, x, base): return ranks_kept(ranked, base + [{"src": None, "dst": op, "amount": int(x)}], (), ghosts)
     def most(op, amount, base):
         """the most of `amount` op can take on top of base without breaking a rank"""
         if fits_at(op, amount, base): return int(amount)
@@ -886,25 +888,35 @@ GAP = 1_000_000     # 1 ATONE between neighbours: a tie would let the chain's ti
 STEP = 300_000_000  # Autopilot fills each validator to 300 ATONE under the one above (operator, 2026-10-09; was 1 ATONE):
                     # the room left is where Restake stakes, as a 1-ATONE staircase had none (no restake ran 10-09 12:00)
 
-def fill(ranked, stake, amount, ok, min_leg=MIN_MOVE, step=STEP, edge=EDGE):
+def fill(ranked, stake, amount, ok, min_leg=MIN_MOVE, step=STEP, edge=EDGE, ghost=None):
     """the shelf rise: answers {op: added}. ranked is largest first; stake(op) the stake as it stands; ok(v) whether v
     may take any. A validator that may not (a source, a refused pair, a grant's list) is a fixed step: the shelf below
-    it rises to `step` under it, then the pour carries on above it. Autopilot pours with STEP, Restake with GAP"""
+    it rises to `step` under it, then the pour carries on above it. Autopilot pours with STEP, Restake with GAP.
+    ghost(v) (operator, 2026-11-11: "stakelab is acting like a ceiling"): a validator on the wallet's jailed list is no
+    rung at all - it takes nothing AND caps nothing. The shelf below it rises to `step` under the next kept validator
+    above, as if it were not there; only real steps (sources, refused pairs, a grant's list) still hold the shelf down"""
+    g = ghost or (lambda v: False)
     n = len(ranked); add = {}; left = int(amount); TOP = top(n)
     s = [int(stake(v["op"])) for v in ranked]
     i = n - 1 - edge
     while i >= TOP and left >= GAP:
-        if not ok(ranked[i]): i -= 1; continue
-        b0 = i                                         # the segment: b0 up to the first fixed step (or TOP)
-        while i - 1 >= TOP and ok(ranked[i - 1]): i -= 1
-        k0 = i; i -= 1                                 # ranked[k0 - 1] is a fixed step, or rank TOP
-        def cost(k, L): return sum(max(0, L - (j - k) * step - s[j]) for j in range(k, b0 + 1))
+        if g(ranked[i]) or not ok(ranked[i]): i -= 1; continue
+        M = [i]                                        # the segment's rungs, up to the first fixed step (or TOP);
+        while i - 1 >= TOP and (ok(ranked[i - 1]) or g(ranked[i - 1])):
+            i -= 1                                     # a ghost between rungs is walked through, never a rung itself
+            if not g(ranked[i]): M.append(i)
+        ci = i - 1                                     # the ceiling above the segment: the nearest real validator
+        while ci >= 0 and g(ranked[ci]): ci -= 1
+        i -= 1
+        M = M[::-1]; b0 = len(M) - 1                   # rungs top first, as the plain indexes were
+        def cost(k, L): return sum(max(0, L - (j - k) * step - s[M[j]]) for j in range(k, b0 + 1))
+        def over(k): return s[M[k - 1]] if k > 0 else (s[ci] if ci >= 0 else s[M[0]] + left + step)
         k = b0
         while True:
-            lmax = s[k - 1] - step                     # the shelf's top stays `step` under the one above it
-            if cost(k, lmax) >= left or k == k0: break
-            k -= 1                                     # it reached ranked[k - 1]: that one joins the shelf
-        hi = lmax; lo = min(s[k], hi)                  # the highest level the amount pays for, never past lmax
+            lmax = over(k) - step                      # the shelf's top stays `step` under the one above it
+            if cost(k, lmax) >= left or k == 0: break
+            k -= 1                                     # it reached the rung above: that one joins the shelf
+        hi = lmax; lo = min(s[M[k]], hi)               # the highest level the amount pays for, never past lmax
         if cost(k, hi) <= left: lo = hi
         else:
             while lo < hi:
@@ -912,27 +924,30 @@ def fill(ranked, stake, amount, ok, min_leg=MIN_MOVE, step=STEP, edge=EDGE):
                 if cost(k, mid) <= left: lo = mid
                 else: hi = mid - 1
         for j in range(k, b0 + 1):
-            x = lo - (j - k) * step - s[j]
-            if x > 0: add[ranked[j]["op"]] = x; left -= x
+            x = lo - (j - k) * step - s[M[j]]
+            if x > 0: add[ranked[M[j]]["op"]] = x; left -= x
     # dust is not a move; leaving it out keeps the order, as the gap (1 ATONE) is wider than any dust. A restake has no
     # dust (a delegation spends no pair entry): it passes min_leg=1
     return {op: x for op, x in add.items() if x >= min_leg}
 
-def ranks_kept(ranked, moves, forced=()):
+def ranks_kept(ranked, moves, forced=(), ghosts=()):
     """the plan's own proof, with every move applied: every validator but the plan's sources still stands where it
     stood among the others (above the one under it, never level unless they were level before), and every source in
     the set stays at least 1 ATONE above the highest stake any destination reaches - a source may fall in rank, never
     below the shelf (operator, 2026-10-01). A validator the wallet excludes may fall below it: its stake leaves as the
-    reader asked, wherever it stands (operator, 2026-11-04)"""
+    reader asked, wherever it stands (operator, 2026-11-04). ghosts (operator, 2026-11-11): a validator on the wallet's
+    jailed list holds no place in the order - the shelf may rise past it, so it is no one's ceiling"""
     d, srcs = {}, set()
     for x in moves:
         d[x["src"]] = d.get(x["src"], 0) - x["amount"]; d[x["dst"]] = d.get(x["dst"], 0) + x["amount"]; srcs.add(x["src"])
     rest = [v for v in ranked if v["op"] not in srcs]
     new = [v["t"] + d.get(v["op"], 0) for v in rest]
     # levels (operator, 2026-11-04): validators within STEP (300 ATONE) of each other are one level and may change places;
-    # nobody is lifted past, or level with, a validator that stood more than STEP above it
+    # nobody is lifted past, or level with, a validator that stood more than STEP above it - except one the wallet
+    # excludes (ghosts), which may be passed
     for j in range(1, len(rest)):
         for i in range(j - 1, -1, -1):
+            if rest[i]["op"] in ghosts: continue
             if rest[i]["t"] - rest[j]["t"] <= STEP: continue
             if new[i] <= new[j]: return False
     dsts = {x["dst"] for x in moves}
@@ -941,7 +956,7 @@ def ranks_kept(ranked, moves, forced=()):
 
 MIN_POS = 100_000_000   # no Autopilot delegation between 0 and 100 ATONE (operator, 2026-11-04)
 
-def tidy(moves, rows, ranked, forced, cands=(), used=None):
+def tidy(moves, rows, ranked, forced, cands=(), used=None, ghosts=()):
     """(operator, 2026-11-04: "so user will not have delegations like 2, 4, 12 atone") every delegation a plan touches ends
     at 0 or at 100 ATONE and more. The pieces a destination would hold under 100 are taken back and placed again as ONE
     piece: on the same source's largest move that stays whole, or else as one move to the best-paying validator in the
@@ -968,13 +983,13 @@ def tidy(moves, rows, ranked, forced, cands=(), used=None):
         R = sum(x["amount"] for x in legs); placed = False
         for o in sorted((x for x in moves if x["src"] == s_), key=lambda x: -x["amount"]):
             o["amount"] += R
-            if ranks_kept(ranked, moves, forced): placed = True; break
+            if ranks_kept(ranked, moves, forced, ghosts): placed = True; break
             o["amount"] -= R
         if not placed:
             for c in cands:
                 if c == s_ or used.get((s_, c), 0) >= 7: continue
                 moves.append({"src": s_, "dst": c, "amount": R})
-                if ranks_kept(ranked, moves, forced): placed = True; break
+                if ranks_kept(ranked, moves, forced, ghosts): placed = True; break
                 moves.pop()
         if not placed and s_ in forced: moves.extend(legs)
     # sources
@@ -987,7 +1002,7 @@ def tidy(moves, rows, ranked, forced, cands=(), used=None):
         done = False
         for big in legs:
             big["amount"] += rest
-            if ranks_kept(ranked, moves, forced): done = True; break
+            if ranks_kept(ranked, moves, forced, ghosts): done = True; break
             big["amount"] -= rest
         if done or op in forced: continue
         need = MIN_POS - rest
@@ -1034,6 +1049,8 @@ def plan(g, rows, reds, vals, m, room=None):
     # one exclusion list, one rule (operator, 2026-11-04): unless the wallet chose "all validators", an excluded
     # validator keeps no Autopilot stake that can move
     forced = set() if all_vals(g["granter"], g["exp"]) else restake_skip()
+    # ghosts (operator, 2026-11-11): the same jailed list, as NO rung in the ladder - it caps nobody below it
+    jghost = set(forced)
     # a validator outside the set (jailed, dropped) pays nothing: its free stake always leaves whole, like an excluded
     # one's, so the 0-or-100 rule never keeps a small piece there (Trace, 2026-11-04: 31 ATONE would have stayed)
     forced = forced | {r["op"] for r in rows if r["op"] not in vals}
@@ -1054,7 +1071,8 @@ def plan(g, rows, reds, vals, m, room=None):
         for x in ms: mv_[x["dst"]] = mv_.get(x["dst"], 0) + x["amount"]
         return {op: rate_after(m, vals[op]["t"], vals[op]["c"], a) for op, a in mv_.items()}
     def moves_for(srcs, amount, ok, rk):
-        add = fill(rk, stake, amount, ok, edge=ap_edge([int(stake(v["op"])) for v in rk]))
+        add = fill(rk, stake, amount, ok, edge=ap_edge([int(stake(v["op"])) for v in rk]),
+                   ghost=lambda v: v["op"] in jghost)
         at = {v["op"]: i for i, v in enumerate(rk)}
         # sources fill destinations in turn, smallest validator first: at most S + D - 1 moves
         out, short, si, left = [], set(), 0, [dict(x) for x in srcs]
@@ -1116,9 +1134,9 @@ def plan(g, rows, reds, vals, m, room=None):
     if not moves: return None
     zone = ranked[globals()["top"](n): n - ap_edge([int(v["t"]) for v in ranked])]   # (top is a local name in the rounds above)
     cands = [v["op"] for v in reversed(zone) if listed(v) and v["op"] not in rate_src]
-    moves = tidy(absorb_dust(moves, rows), rows, ranked, forced, cands, used)   # before the rank check: a remainder that would change a rank still refuses the plan
+    moves = tidy(absorb_dust(moves, rows), rows, ranked, forced, cands, used, jghost)   # before the rank check: a remainder that would change a rank still refuses the plan
     if not moves: return None
-    if not ranks_kept(ranked, moves, forced):
+    if not ranks_kept(ranked, moves, forced, jghost):
         log("plan refused: it would change a rank (%s)" % g.get("granter", "?")); return None
     rate_dst = dst_rates(moves)
     for mv in moves: mv["gain"] = mv["amount"] * (rate_dst[mv["dst"]] - rate_src[mv["src"]]) / 1e6

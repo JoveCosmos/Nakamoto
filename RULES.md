@@ -18,6 +18,11 @@ validator past one that stood more than 300 ATONE above it. The order of the set
 was: a smaller validator never ends up paying less than a larger one because of Autopilot. Only near-ties can swap
 places: validators within 300 ATONE of each other, about 0.1% of their stake, whose APRs are practically the same.
 
+**One exception: a validator on the jailed list holds no place in that order.** For a wallet that leaves the jailed
+out, such a validator is not a rung at all: it takes no stake, and it caps nobody - the validators below it fill up to
+300 ATONE under the next validator above it that is not on the list, and may rise past it. A validator that earned its
+way onto the list keeps its stake and its delegators; it just no longer sets a ceiling for everyone beneath it.
+
 ## What you grant
 
 | Service | Grant | What it can do |
@@ -61,7 +66,8 @@ All of these must hold:
 
 - **Water fill from the bottom:** the smallest allowed validator rises first, to 300 ATONE under the one above it; then
   the two rise together, each 300 ATONE under the one above, and so on up.
-- **The order is kept** as described above (300-ATONE levels). A plan that would break it is refused whole.
+- **The order is kept** as described above (300-ATONE levels), jailed-list validators excepted: they are no rung
+  and may be passed. A plan that would break the order otherwise is refused whole.
 - **0 or 100 ATONE:** every delegation a move touches ends at zero or at 100 ATONE or more. Small pieces are gathered
   into one; a source is never left holding 1 to 99 ATONE; a wallet moving under 100 ATONE in all uses one validator.
   No move is under 1 ATONE, and no dust is left behind.
