@@ -2805,6 +2805,7 @@ rememberGridH();
     (ap ? window.__TX.sendDirect(window.__WALLET, msgs, window.__atMemo ? window.__atMemo() : "GATA AtomOne Autopilot", function(){}) : window.__TX.send(window.__WALLET, msgs, "", function(){}))
     .then(function(){
       n.ok(); POP.close(txpop); TXAP = false;
+      if(window.__hit) window.__hit("sign", ap ? "move+autopilot" : "move");   /* counted like views: no address (2026-11-14) */
       if(ap && window.__atReload) window.__atReload();
       if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); });
     })
@@ -3558,6 +3559,7 @@ rememberGridH();
     window.__TX.send(window.__WALLET, msgs, "", function(){})
     .then(function(){
       n.ok(); window.__closeCard(sppop);   /* docked in Pro too: the view goes, nothing of the move stays */
+      if(window.__hit) window.__hit("sign", "stakepilot");   /* counted like views: no address (2026-11-14) */
       if(window.__refreshPos) window.__refreshPos().then(function(){ draw(); });
     })
     .catch(function(e){ n.fail(e && e.message || String(e)); })
