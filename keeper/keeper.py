@@ -635,7 +635,7 @@ def plan_restake(c, granter, rg, vals, m):  # noqa: C901
     stake = rewards - send
     if cap is not None and stake > cap: out["skip"] = "delegate cap used up"; return out
     # where the rewards go (operator, 2026-10-01): poured onto the shelf, as Autopilot's moves are - from the smallest
-    # validator up (the last EDGE left out, never the largest fifth), each 1 ATONE under the one above, so a restake never
+    # validator up (above Autopilot's bottom guard, never the largest fifth), each 1 ATONE under the one above, so a restake never
     # passes a validator and many restakes in one run spread instead of piling onto one (until 2026-10-01: all onto
     # the single highest-APR validator). An older DELEGATE grant that names validators keeps to them, and a validator
     # its grant denies is never picked (the chain would refuse it; audit 2026-09-30). At most RS_LEGS validators:
@@ -824,7 +824,7 @@ def pairs_used(reds):
     return u
 
 # ── the plan: the operator's rule (2026-09-29), with the shelf rise (2026-10-01) ─────────────
-# Water poured from the lowest step: the smallest validator (leaving out the last EDGE, the edge of the set) rises
+# Water poured from the lowest step: the smallest validator (above the bottom guard, ap_edge below) rises
 # first, to STEP (300 ATONE since 2026-10-09) under the validator ranked just above it; then the two rise together, each STEP under the
 # one above, and so on: a shelf that rises one step at a time and takes the next validator up as it reaches it
 # (operator, 2026-10-01: "apply shelf rise"). Nobody passes the validator above, so no rank changes; the largest
@@ -834,11 +834,11 @@ def pairs_used(reds):
 # any of the delegator's stake cools down, so the offer comes back every 21 days, when the last move's cooldown clears.
 # fixed in code, as the rest of the operator's rule: no env value can change them at launch
 # both scale with the set (2026-10-01: sized for 100, they left nothing to do on testnet's 44): the largest fifth never
-# take stake (mainnet: 20, destinations ranks 21 to 97 of 100; the signer's top()), and stake on the smallest 34% never
+# take stake (mainnet: 20, destinations ranks 21 to 100 less the bottom guard; the signer's top()), and stake on the smallest 34% never
 # moves out (mainnet: 34). Integer arithmetic, so the page and the signer round the same way
 def top(n): return n // 5
 def bottom(n): return (n * 34 + 50) // 100
-EDGE = 3            # the last 3 are left out (operator, 2026-09-30)
+EDGE = 3            # the last 3 are left out only when the returning validators cannot be read (fill's default)
 # Autopilot pours down to the last slot of the set (operator, 2026-11-03: "all 100 qualify except jailed ones"), less one
 # slot for every validator that left the set within the unbonding period (jailed or dropped, status UNBONDING) and holds
 # more than that slot: when it unjails it takes a place in the set and pushes the last one out, and stake Autopilot had
