@@ -4459,7 +4459,7 @@ rememberGridH();
     return out.filter(function(m){ return m.amt >= 1e6; });
   }
   window.__ranksKept = ranksKept;
-  window.__planRank = function(pos){
+  window.__planRank = function(pos, onlyForced){
     if(!pos || !pos.rows.length || !(pos.total > 0)) return null;
     /* stake in its 21-day cooldown stays where it is; the free stake is hunted, all of it at once */
     var V = window.__VALS().slice().sort(function(a, b){ return b[1] - a[1]; }), n = V.length;
@@ -4473,7 +4473,7 @@ rememberGridH();
     var jskL = (window.__D && window.__D.jailskip) || [], allV = window.__PLAN_MAX || (window.__atAll && window.__atAll()), forced = {}, ghosts = {};
     if(!allV) jskL.forEach(function(id){ forced[id] = 1; ghosts[id] = 1; });   /* ghosts (2026-11-11): no rung, caps nobody */
     pos.rows.forEach(function(r){ if(r.inactive || at[r.id] == null) forced[r.id] = 1; });   /* outside the set: always leaves whole (keeper.py) */
-    var src = pos.rows.filter(function(r){ return r.x - r.locked > 0 && (!bset[r.id] || forced[r.id]); }).sort(function(a, b){ return ((forced[a.id] ? 0 : 1) - (forced[b.id] ? 0 : 1)) || ((b.x - b.locked) - (a.x - a.locked)); }).map(function(r){
+    var src = pos.rows.filter(function(r){ return r.x - r.locked > 0 && (!bset[r.id] || forced[r.id]) && (!onlyForced || forced[r.id]); }).sort(function(a, b){ return ((forced[a.id] ? 0 : 1) - (forced[b.id] ? 0 : 1)) || ((b.x - b.locked) - (a.x - a.locked)); }).map(function(r){
       return { id: r.id, give: Math.floor(r.x - r.locked), rate: r.inactive ? 0 : r.rate };
     }).filter(function(x){ return x.give >= 1e6; });
     if(!src.length) return null;
@@ -4549,7 +4549,13 @@ rememberGridH();
       else if(sentU[r.id]) gainU += (r.x - sentU[r.id]) * (window.__rateAfter(v[1], v[2], -sentU[r.id]) - r.rate); });
     var after = now + gainU / pos.total, gain = gainU / 1e6, movedU = out.reduce(function(s, m){ return s + m.amt; }, 0), lift = gainU / movedU;
     /* only a move whose true gain is worth more than 3 APR points on the stake that moves (operator, 2026-09-30 / 10-08) */
-    if(!out.some(function(m){ return forced[m.from]; }) && (gain < 1 || !(lift > MIN_LIFT))) return null;
+    /* keeper.py BIG_WALLET (operator, 2026-11-19): a wallet of 10,000 ATONE or more needs its gain moves to pay 100 a year;
+       moves off a jailed-often or inactive validator still go with no minimum */
+    var floor = (!window.__PLAN_MAX && pos.total >= 1e10) ? 100 : 1, anyF = out.some(function(m){ return forced[m.from]; });
+    if(!anyF && (gain < floor || !(lift > MIN_LIFT))) return null;
+    if(anyF && floor > 1 && !onlyForced && out.some(function(m){ return !forced[m.from]; })){
+      var fo = window.__planRank(pos, true);
+      if(gain - (fo ? fo.gain : 0) < floor) return fo; }
     /* the moved stake alone (operator, 2026-10-01): what it earns where it sits and where it lands - the numbers
        "The same N ATONE, from a to b" and the sign card speak of */
     var mnow = out.reduce(function(s, m){ return s + m.amt * rs[m.from]; }, 0) / movedU;

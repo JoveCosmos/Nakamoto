@@ -1168,9 +1168,9 @@ def plan(g, rows, reds, vals, m, room=None, only_forced=False):
     if not any(mv["src"] in forced for mv in moves) and (gain < floor or lift <= MIN_GAIN_APR): return None
     # a big wallet leaving a jailed-often or inactive validator: those moves go, but the gain moves riding with them only
     # if they pay the 100 a year themselves (2026-11-19: 410 ATONE off a jailed validator plus one +11 move went as one run)
-    if not only_forced and floor > MIN_GAIN_ATONE and any(mv["src"] not in forced for mv in moves) \
-            and sum(mv["gain"] for mv in moves if mv["src"] not in forced) < floor:
-        return plan(g, rows, reds, vals, m, room, only_forced=True)
+    if not only_forced and floor > MIN_GAIN_ATONE and any(mv["src"] not in forced for mv in moves):
+        fo = plan(g, rows, reds, vals, m, room, only_forced=True)
+        if gain - (fo["gain"] if fo else 0) < floor: return fo
     return {"moves": moves, "now": now, "after": after, "total": total, "gain": gain, "lift": lift}
 
 # ── execution ──────────────────────────────────────────────────────────────
