@@ -56,6 +56,9 @@ EVERY = 12 * 3600
 def slot0(t=None): return int((time.time() if t is None else t) // EVERY) * EVERY
 MIN_GAIN_APR = 0.03          # 3 APR points on the stake that moves (operator, 2026-11-03; was 5)
 MIN_GAIN_ATONE = 1.0          # and pay at least this per year
+BIG_WALLET = 10_000_000_000    # a wallet of 10,000 ATONE staked or more (the whole wallet, however little of it moves)
+BIG_GAIN_ATONE = 100.0        # needs its gain moves to pay at least 100 ATONE a year (operator, 2026-11-19); a move off a
+                              # jailed-often or inactive validator still goes with no minimum: getting off it is priority
 MAX_MOVES_DAY = 60            # per wallet in any 24 hours (operator, 2026-10-01: a large wallet finishes in one run); the signer's MAX_MOVES_DAY
 MAX_MOVES_TX = 60             # per transaction (operator, 2026-10-01: one transaction, ~20M gas of the block's 100M); the signer's MAX_MOVES
 RS_EDGE = 3                   # (unused since 2026-11-04: Restake takes Autopilot's bottom guard, ap_edge)
@@ -1030,7 +1033,7 @@ def absorb_dust(moves, rows):
             big = max((x for x in moves if x["src"] == op), key=lambda x: x["amount"]); big["amount"] += rest
     return moves
 
-def plan(g, rows, reds, vals, m, room=None):
+def plan(g, rows, reds, vals, m, room=None, only_forced=False):
     room = MAX_MOVES_DAY if room is None else room
     for r in rows:
         v = vals.get(r["op"])
@@ -1057,6 +1060,7 @@ def plan(g, rows, reds, vals, m, room=None):
     src = []
     # all the free stake may go: the floor (never below the shelf) is set in the rounds below, once the shelf is known
     for r in sorted((r for r in rows if r["free"] > 0 and (r["op"] not in bset or r["op"] in forced)), key=lambda r: (r["op"] not in forced, -r["free"])):
+        if only_forced and r["op"] not in forced: continue
         if r["free"] >= MIN_MOVE: src.append({"op": r["op"], "give": int(r["free"]), "rate": r["rate"]})
     if not src: return None
     rate_src = {x["op"]: x["rate"] for x in src}
@@ -1160,7 +1164,13 @@ def plan(g, rows, reds, vals, m, room=None):
     moved_u = sum(mv["amount"] for mv in moves)
     lift = gain * 1e6 / moved_u
     # only a move whose true gain is worth more than MIN_GAIN_APR (3 APR points) on the stake that moves: otherwise the wallet is at its best
-    if not any(mv["src"] in forced for mv in moves) and (gain < MIN_GAIN_ATONE or lift <= MIN_GAIN_APR): return None
+    floor = BIG_GAIN_ATONE if total >= BIG_WALLET else MIN_GAIN_ATONE
+    if not any(mv["src"] in forced for mv in moves) and (gain < floor or lift <= MIN_GAIN_APR): return None
+    # a big wallet leaving a jailed-often or inactive validator: those moves go, but the gain moves riding with them only
+    # if they pay the 100 a year themselves (2026-11-19: 410 ATONE off a jailed validator plus one +11 move went as one run)
+    if not only_forced and floor > MIN_GAIN_ATONE and any(mv["src"] not in forced for mv in moves) \
+            and sum(mv["gain"] for mv in moves if mv["src"] not in forced) < floor:
+        return plan(g, rows, reds, vals, m, room, only_forced=True)
     return {"moves": moves, "now": now, "after": after, "total": total, "gain": gain, "lift": lift}
 
 # ── execution ──────────────────────────────────────────────────────────────
