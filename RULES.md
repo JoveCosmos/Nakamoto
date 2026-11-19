@@ -77,7 +77,9 @@ All of these must hold:
 1. **Always, from any rank:** stake on a validator on the jailed list (box ticked), or on a validator outside the active
    set (it earns nothing). All of its free stake leaves.
 2. **For gain:** when the move earns at least **3 APR points** more on the stake that moves, and at least 1 ATONE a year.
-   The gain counts the whole wallet, including the stake already on the destination.
+   A wallet of **10,000 ATONE staked or more** needs at least **100 ATONE a year** from its gain moves, however little
+   of it moves; moves off the jailed list or out of the active set still go as in 1. The gain counts the whole wallet,
+   including the stake already on the destination.
 3. **Never:** stake under AtomOne's 21-day redelegation lock. The chain also refuses any redelegation out of a validator
    that received a redelegation from you in the last 21 days, so that whole delegation waits for the date.
 
